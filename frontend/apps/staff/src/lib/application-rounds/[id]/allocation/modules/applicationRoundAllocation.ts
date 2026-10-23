@@ -1,17 +1,11 @@
-import { set } from "date-fns";
-import { padStart } from "lodash-es";
 import type { TFunction } from "next-i18next/pages";
-import type { DayT } from "ui/src/modules/const";
-import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
-import { formatDuration, formatTimeRange, timeToMinutes } from "ui/src/modules/date-utils";
-import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
+import type { VisibleHours } from "@ui/components/WeeklyPatternCalendar/types";
+import { convertWeekday } from "ui/src/modules/conversion";
+import { formatDuration, formatTimeRange, minutesToHoursString, timeToMinutes } from "ui/src/modules/date-utils";
+import { filterNonNullable, sort } from "ui/src/modules/helpers";
 import { Priority } from "@gql/gql-types";
-import type {
-  SuitableTimeRangeNode,
-  ApplicationSectionNode,
-  ApplicationSectionAllocationsQuery,
-  Weekday,
-} from "@gql/gql-types";
+import type { SuitableTimeRangeNode, ApplicationSectionNode, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
+import { ALLOCATION_STEP_MINUTES } from "./allocationPattern";
 
 type QueryT = NonNullable<ApplicationSectionAllocationsQuery["applicationSections"]>;
 type EdgeT = NonNullable<QueryT["edges"][0]>;
@@ -19,127 +13,32 @@ export type SectionNodeT = NonNullable<EdgeT["node"]>;
 export type SuitableTimeRangeNodeT = SectionNodeT["suitableTimeRanges"][0];
 export type ReservationUnitOptionNodeT = NonNullable<SectionNodeT["reservationUnitOptions"]>[0];
 
-export type RelatedSlot = {
-  day: number;
-  beginTime: number;
-  endTime: number;
-};
+/** One time the form offers. The value is minutes from midnight, the shape the Selection speaks in. */
+export type TimeOption = { label: string; value: number };
 
-export type Cell = {
-  hour: number;
-  minute: number;
-  key: string;
-};
-
-export function applicationEventSchedulesToCells(
-  firstSlotStart: number | undefined,
-  lastSlotStart: number | undefined
-): Cell[][] {
-  const cells: Cell[][] = [];
-  if (firstSlotStart == null || lastSlotStart == null) {
-    return cells;
+/** Every step from the first time to the last one, both included. 1440 reads as `24:00`, not `00:00`. */
+function timeOptions(beginMinutes: number, endMinutes: number): TimeOption[] {
+  const options: TimeOption[] = [];
+  for (let minutes = beginMinutes; minutes <= endMinutes; minutes += ALLOCATION_STEP_MINUTES) {
+    options.push({ label: minutesToHoursString(minutes, true), value: minutes });
   }
-
-  for (let j = 0; j < 7; j += 1) {
-    const day = [];
-    for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
-      day.push({
-        key: `${j}-${i}-00`,
-        hour: i,
-        minute: 0,
-      });
-      day.push({
-        key: `${j}-${i}-30`,
-        hour: i,
-        minute: 30,
-      });
-    }
-    cells.push(day);
-  }
-
-  return cells;
+  return options;
 }
 
-export function timeSlotKeyToTime(slot: string): number {
-  const [, hours, minutes] = slot.split("-").map((part) => toNumber(part));
-  if (hours == null || minutes == null) {
-    return 0;
-  }
-  return set(new Date(), { hours, minutes }).getTime();
+/**
+ * The begin times of the form, taken from the hours the grid draws. The last step of the extent is left out,
+ * because a Selection that begins there has no room for an end time.
+ */
+export function getBeginTimeOptions(extent: VisibleHours): TimeOption[] {
+  return timeOptions(extent.beginMinutes, extent.endMinutes - ALLOCATION_STEP_MINUTES);
 }
 
-export function getTimeSlotOptions(
-  day: DayT,
-  startHours: number,
-  startMinutes: number,
-  endHours: number,
-  endOptions?: boolean
-): Array<{ label: string; value: string }> {
-  const timeSlots = [];
-  for (let i = startHours; i <= endHours; i += 1) {
-    if (endOptions) {
-      timeSlots.push({
-        label: `${i}:30`,
-        value: `${day}-${i}-00`,
-      });
-      timeSlots.push({
-        label: `${i === 23 ? 0 : i + 1}:00`,
-        value: `${day}-${i}-30`,
-      });
-    } else {
-      timeSlots.push({
-        label: `${i}:00`,
-        value: `${day}-${i}-00`,
-      });
-      timeSlots.push({
-        label: `${i}:30`,
-        value: `${day}-${i}-30`,
-      });
-    }
-  }
-
-  if (startMinutes === 30) timeSlots.shift();
-
-  return timeSlots;
-}
-
-type TimeSlot = { day: number; hour: number };
-
-export function decodeTimeSlot(slot: string): TimeSlot {
-  const [day, hour, min] = slot.split("-").map((part) => toNumber(part));
-  return { day: day ?? 0, hour: (hour ?? 0) + (min ?? 0) / 60 };
-}
-
-export function encodeTimeSlot(day: number, hour: number): string {
-  const h = Math.floor(hour);
-  const m = Math.round((hour - h) * 60);
-  return `${day}-${h < 10 ? `0${h}` : h}-${m < 10 ? `0${m}` : m}`;
-}
-
-function constructTimeSlot(day: number, begin: string): TimeSlot | null {
-  const time = timeToMinutes(begin) / 60;
-  if (time == null) {
-    return null;
-  }
-  return { day, hour: time };
-}
-
-export function getTimeSeries(day: string, begin: string, end: string): string[] {
-  const [, startHours, startMinutes] = begin.split("-").map((part) => toNumber(part));
-  const [, endHours, endMinutes] = end.split("-").map((part) => toNumber(part));
-  const timeSlots: string[] = [];
-  if (startHours == null || startMinutes == null || endHours == null) {
-    return timeSlots;
-  }
-  for (let i = startHours; i <= endHours; i += 1) {
-    timeSlots.push(`${day}-${i}-00`);
-    timeSlots.push(`${day}-${i}-30`);
-  }
-
-  if (startMinutes === 30) timeSlots.shift();
-  if (endMinutes === 0) timeSlots.pop();
-
-  return timeSlots;
+/**
+ * The end times of the form. An end time is exclusive, so the first option is one step after the extent begins and
+ * the last one is the end of the extent.
+ */
+export function getEndTimeOptions(extent: VisibleHours): TimeOption[] {
+  return timeOptions(extent.beginMinutes + ALLOCATION_STEP_MINUTES, extent.endMinutes);
 }
 
 export function formatSuitableTimeRange(
@@ -180,23 +79,6 @@ export function formatTimeRangeList(
     .join(", ");
 }
 
-export function timeSlotKeyToScheduleTime(slot: string | undefined, padEnd = false): string {
-  let [, hours, minutes] = slot?.split("-").map((part) => toNumber(part)) ?? [];
-  if (hours == null || minutes == null) {
-    return "";
-  }
-  if (padEnd) {
-    if (minutes === 0) {
-      minutes = 30;
-    } else {
-      hours = hours < 23 ? hours + 1 : 0;
-      minutes = 0;
-    }
-  }
-
-  return `${padStart(`${hours}`, 2, "0")}:${padStart(`${minutes}`, 2, "0")}:00`;
-}
-
 export function createDurationString(
   section: Pick<ApplicationSectionNode, "reservationMinDuration" | "reservationMaxDuration">,
   t: TFunction
@@ -211,91 +93,6 @@ export function createDurationString(
 }
 
 export type AllocatedTimeSlotNodeT = SectionNodeT["reservationUnitOptions"][0]["allocatedTimeSlots"][0];
-
-export function getRelatedTimeSlots(
-  allocations: Array<Pick<AllocatedTimeSlotNodeT, "endTime" | "beginTime" | "dayOfTheWeek">>
-): RelatedSlot[][] {
-  const relatedSpacesTimeSlots = allocations;
-
-  // split the data to days
-  // sort every array by start time
-  // run reduce to get contiguous time slots (and remove extras)
-  // we should end up with 7 arrays (one for each day), each having a list of time slots (beginTime, endTime)
-  // then we can use that data to draw the calendar
-  const dayArray = Array.from({ length: 7 }).map(() => []);
-  const relatedSpacesTimeSlotsByDay = relatedSpacesTimeSlots.reduce<RelatedSlot[][]>((acc, ts) => {
-    const day = convertWeekday(ts.dayOfTheWeek);
-    const arr = acc[day];
-    if (arr == null) {
-      return acc;
-    }
-    const beginTime = timeToMinutes(ts.beginTime);
-    const endTime = timeToMinutes(ts.endTime);
-    arr.push({
-      day,
-      beginTime,
-      endTime,
-    });
-    return acc;
-  }, dayArray);
-
-  return relatedSpacesTimeSlotsByDay;
-}
-
-export function isInsideSelection(
-  selection: { day: DayT; start: number; end: number },
-  tr: {
-    dayOfTheWeek: Weekday;
-    beginTime: string;
-    endTime: string;
-  }
-): boolean {
-  const start = constructTimeSlot(selection.day, tr.beginTime);
-  const end = constructTimeSlot(selection.day, tr.endTime);
-  if (!start || !end) {
-    return false;
-  }
-  // NOTE 00:00 could be either 24:00 or 00:00
-  // but we use number comparison so for end we need 24 and start 0
-  if (end?.hour === 0) {
-    end.hour = 24;
-  }
-  if (selection.day !== convertWeekday(tr.dayOfTheWeek)) {
-    return false;
-  }
-  if (start.hour > selection.end) {
-    return false;
-  }
-  if (end.hour <= selection.start) {
-    return false;
-  }
-  return true;
-}
-
-export function isInsideCell(
-  day: DayT,
-  cell: Cell,
-  ts: {
-    dayOfTheWeek: Weekday;
-    beginTime: string;
-    endTime: string;
-  }
-) {
-  const { beginTime, endTime, dayOfTheWeek } = ts;
-  if (dayOfTheWeek !== transformWeekday(day)) {
-    return false;
-  }
-  // NOTE if the end time is 00:00 swap it to 24:00 (24h)
-  const begin = timeToMinutes(beginTime) / 60;
-  const end = timeToMinutes(endTime) / 60;
-  if (begin == null || end == null) {
-    return false;
-  }
-  const cellTime = cell.hour * 60 + cell.minute;
-  const beginMinutes = begin * 60;
-  const endMinutes = (end === 0 ? 24 : end) * 60;
-  return cellTime >= beginMinutes && cellTime < endMinutes;
-}
 
 export function convertPriorityFilter(values: number[]): Priority[] {
   const result: Priority[] = [];
