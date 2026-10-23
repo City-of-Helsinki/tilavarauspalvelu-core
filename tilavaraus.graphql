@@ -910,6 +910,11 @@ type ReservationUnitNode implements Node {
   firstReservableDatetime: DateTime
   effectiveAccessType: AccessType
   haukiUrl: String
+
+  """
+  Summary of the base prices of the pricing group that the reservation unit uses today.
+  """
+  priceSummary: PriceSummaryType
   reservableTimeSpans(startDate: Date!, endDate: Date!): [ReservableTimeSpanType!]
   numActiveUserReservations: Int!
   calculatedSurfaceArea: Int!
@@ -2483,6 +2488,13 @@ type PriceOptionNode implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
+}
+
+type PriceSummaryType {
+  isFree: Boolean!
+  lowestAmount: Decimal!
+  priceUnit: PriceUnit!
+  varies: Boolean!
 }
 
 type ReservableTimeSpanType {
