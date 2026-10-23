@@ -96,7 +96,7 @@ type ApplicationEventsProps = {
 
 export function AllocationPageContent(props: ApplicationEventsProps): React.ReactElement {
   return (
-    <SelectedSlotsContextProvider>
+    <SelectedSlotsContextProvider reservationUnitPk={props.reservationUnit.pk}>
       <AllocationContent {...props} />
     </SelectedSlotsContextProvider>
   );
