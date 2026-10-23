@@ -3985,6 +3985,7 @@ input ReservationUnitCreateMutationInput {
   pricings: [ReservationUnitPricingSerializerInput]
   accessTypes: [ReservationUnitAccessTypeSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
+  ownPricings: [OwnPricingInputSerializerInput]
 }
 
 input ReservationUnitImageFieldSerializerInput {
@@ -4029,6 +4030,18 @@ input ApplicationRoundTimeSlotSerializerInput {
 input TimeSlotSerializerInput {
   begin: Time!
   end: Time!
+}
+
+input OwnPricingInputSerializerInput {
+  pk: Int
+  begins: Date!
+  amount: Decimal!
+  priceUnit: PriceUnit!
+  paymentType: PaymentType
+  canApplyForDiscount: Boolean
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionSv: String
 }
 
 type ReservationUnitUpdateMutationPayload {
@@ -4167,6 +4180,7 @@ input ReservationUnitUpdateMutationInput {
   pricings: [UpdateReservationUnitPricingSerializerInput]
   accessTypes: [UpdateReservationUnitAccessTypeSerializerInput]
   applicationRoundTimeSlots: [UpdateApplicationRoundTimeSlotSerializerInput]
+  ownPricings: [OwnPricingInputSerializerInput]
 }
 
 input UpdateReservationUnitImageFieldSerializerInput {
