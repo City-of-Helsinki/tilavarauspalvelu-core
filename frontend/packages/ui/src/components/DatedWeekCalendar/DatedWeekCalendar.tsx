@@ -24,6 +24,8 @@ import {
   dayKeyOf,
   isCellOpen,
   minutesOfDay,
+  nowHourOffsetPercent,
+  nowOffsetPercent,
   openRangesByDay,
   resizeRange,
   resolveVisibleHours,
@@ -143,7 +145,6 @@ function DatedWeekTable<TData extends CalendarData>(
   const nowMinutes = minutesOfDay(wallNow);
   const nowRowIndex = Math.floor(nowMinutes / step);
   const showNowLine = dayKeys.includes(todayKey) && nowRowIndex >= firstIndex && nowRowIndex < endIndex;
-  const nowOffsetPercent = ((nowMinutes - nowRowIndex * step) / step) * 100;
 
   const [listOpen, setListOpen] = useState(false);
   const listRef = useRef<HTMLDetailsElement>(null);
@@ -517,6 +518,13 @@ function DatedWeekTable<TData extends CalendarData>(
                 {row.rowSpan != null && (
                   <th role="rowheader" scope="row" rowSpan={row.rowSpan} aria-label={formatClock(row.beginMinutes)}>
                     {Math.floor(row.beginMinutes / 60)}
+                    {showNowLine && nowRowIndex >= row.index * 2 && nowRowIndex < (row.index + 1) * 2 && (
+                      <NowDot
+                        aria-hidden
+                        data-testid="resource-day-calendar__now-line"
+                        style={{ top: `${nowHourOffsetPercent(nowMinutes)}%` }}
+                      />
+                    )}
                   </th>
                 )}
                 {dayKeys.map((dayKey) => {
@@ -588,7 +596,7 @@ function DatedWeekTable<TData extends CalendarData>(
                         <NowLine
                           aria-hidden
                           data-testid="dated-week-calendar__now-line"
-                          style={{ top: `${nowOffsetPercent}%` }}
+                          style={{ top: `${nowOffsetPercent(nowMinutes, nowRowIndex, step)}%` }}
                         >
                           {dayKey === dayKeys[0] && <NowDot data-testid="dated-week-calendar__now-dot" />}
                         </NowLine>

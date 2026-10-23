@@ -23,6 +23,8 @@ import {
   segmentsInCell,
   dayKeyOf,
   minutesOfDay,
+  nowHourOffsetPercent,
+  nowOffsetPercent,
   openRangesByDay,
   resolveVisibleHours,
   segmentEvents,
@@ -102,8 +104,8 @@ function ResourceDayTable<TData extends CalendarData>(
   const nowMinutes = minutesOfDay(wallNow);
   const nowIndex = Math.floor(nowMinutes / step);
   const showNowLine = isToday && nowIndex >= firstIndex && nowIndex < endIndex;
-  const nowOffsetPercent = ((nowMinutes - nowIndex * step) / step) * 100;
-  const nowHourOffsetPercent = ((nowMinutes - Math.floor(nowMinutes / 60) * 60) / 60) * 100;
+  const nowOffset = nowOffsetPercent(nowMinutes, nowIndex, step);
+  const nowHourOffset = nowHourOffsetPercent(nowMinutes);
 
   // The tooltip owns its state, so hovering never renders the grid.
   const tooltipRef = useRef<TooltipController<TData> | null>(null);
@@ -254,7 +256,7 @@ function ResourceDayTable<TData extends CalendarData>(
                     <NowDot
                       aria-hidden
                       data-testid="resource-day-calendar__now-line"
-                      style={{ left: `${nowHourOffsetPercent}%` }}
+                      style={{ left: `${nowHourOffset}%` }}
                     />
                   )}
                 </th>
@@ -275,7 +277,7 @@ function ResourceDayTable<TData extends CalendarData>(
                 shownEnd={hours.endMinutes}
                 activeIndex={grid.activeAddress?.column === resource.id ? grid.activeAddress.index : null}
                 nowIndex={showNowLine ? nowIndex : null}
-                nowOffsetPercent={showNowLine ? nowOffsetPercent : 0}
+                nowOffsetPercent={showNowLine ? nowOffset : 0}
                 labels={labels}
                 getEventLabel={getEventLabel}
                 getEventProps={getEventProps}
