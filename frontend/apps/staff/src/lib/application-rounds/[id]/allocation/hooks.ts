@@ -3,10 +3,11 @@ import { ApolloError, gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import type { ApolloQueryResult } from "@apollo/client";
+import type { WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
 import { logError } from "@ui/modules/errors";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
-import { numberToDayT } from "ui/src/modules/conversion";
+import { convertWeekday, numberToDayT, transformWeekday } from "ui/src/modules/conversion";
 import { toNumber } from "ui/src/modules/helpers";
 import { useCreateAllocatedTimeSlotMutation, useDeleteAllocatedTimeSlotMutation } from "@gql/gql-types";
 import type { AllocatedTimeSlotCreateMutationInput, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
@@ -18,7 +19,6 @@ import type {
   SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
 import { useSelectedSlots } from "./SelectedSlotsContext";
-import type { TimeSlotRange } from "./SelectedSlotsContext";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();
@@ -64,71 +64,67 @@ export function useFocusAllocatedSlot(): [
   return [allocatedPk, setAllocated];
 }
 
-// generate a list of strings for each slot based on the interval
-const generateSelection = (selectionRange: TimeSlotRange): string[] => {
-  const { day, ends, begins } = selectionRange;
-  const beginHour = Math.floor(begins);
-  const beginMinute = Math.round((begins - beginHour) * 60);
-  const endHour = Math.floor(ends);
-  const endMinute = Math.round((ends - endHour) * 60);
+/** The old grid draws one cell per half hour, so one string key stands for 30 minutes. */
+const SLOT_MINUTES = 30;
 
-  const slots = [];
-  if (day == null || beginHour == null || beginMinute == null || endHour == null || endMinute == null) {
-    return [];
+// TEMPORARY BRIDGE. The context holds the Selection as a WeekdayInterval, while the old grid, the column and the
+// cards still speak in "day-hour-min" string keys, one key per half hour slot. These two functions translate
+// between the two shapes so each consumer can move on its own. Step 12 of the allocation calendar migration
+// deletes them, together with the keys and the helpers they use.
+
+/** One key per half hour slot that starts inside the interval. */
+function selectionToSlotKeys(selection: WeekdayInterval): string[] {
+  const day = convertWeekday(selection.weekday);
+  const keys: string[] = [];
+  for (let minutes = selection.beginMinutes; minutes < selection.endMinutes; minutes += SLOT_MINUTES) {
+    const hour = Math.floor(minutes / 60);
+    const minute = minutes % 60;
+    // hours have no leading zero, minutes have to have it
+    keys.push(`${day}-${hour}-${minute < 10 ? `0${minute}` : minute}`);
   }
-  // NOTE: parseInt returns NaN for invalid => the loop checks will fail and return []
-  for (let hour = beginHour; hour <= endHour; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      if (hour === beginHour && minute < beginMinute) {
-        continue;
-      }
-      if (hour === endHour && minute > endMinute) {
-        break;
-      }
-      // hours have no leading zero, minutes have to have it
-      const minuteString = minute < 10 ? `0${minute}` : `${minute}`;
-      slots.push(`${day}-${hour}-${minuteString}`);
-    }
+  return keys;
+}
+
+/** The first and the last key decide the span. The last key is a slot start, and the interval's end is exclusive. */
+function slotKeysToSelection(slots: string[]): WeekdayInterval | null {
+  const first = slots[0];
+  const last = slots[slots.length - 1];
+  if (first == null || last == null) {
+    return null;
   }
-  return slots;
-};
+  const begins = decodeTimeSlot(first);
+  const ends = decodeTimeSlot(last);
+  const day = numberToDayT(begins.day);
+  if (day == null) {
+    return null;
+  }
+  return {
+    weekday: transformWeekday(day),
+    beginMinutes: Math.round(begins.hour * 60),
+    endMinutes: Math.round(ends.hour * 60) + SLOT_MINUTES,
+  };
+}
 
 /// Allow selecting a continuous block on a single day
-/// state is saved in the URL as selectionBegin and selectionEnd parameters
 export function useSlotSelection(): [string[], (slots: string[]) => void] {
   const { selection, setSelection } = useSelectedSlots();
 
   const setSelectedSlots = (slots: string[]) => {
     if (slots.length === 0) {
       setSelection(null);
-    } else {
-      const selectionBegin = slots[0];
-      const selectionEnd = slots[slots.length - 1];
-      if (selectionBegin == null || selectionEnd == null) {
-        return;
-      }
-      const begins = decodeTimeSlot(selectionBegin);
-      const ends = decodeTimeSlot(selectionEnd);
-      const day = numberToDayT(begins.day);
-      if (day == null) {
-        return;
-      }
-      setSelection({
-        begins: begins.hour,
-        ends: ends.hour,
-        day,
-      });
+      return;
     }
+    const next = slotKeysToSelection(slots);
+    // a key that does not parse leaves the Selection as it is, the same way it did before
+    if (next == null) {
+      return;
+    }
+    setSelection(next);
   };
 
-  const getSelection = (): string[] => {
-    if (selection == null) {
-      return [];
-    }
-    return generateSelection(selection);
-  };
+  const selectedSlots = selection != null ? selectionToSlotKeys(selection) : [];
 
-  return [getSelection(), setSelectedSlots];
+  return [selectedSlots, setSelectedSlots];
 }
 
 // side effects that should happen when a modification is made
