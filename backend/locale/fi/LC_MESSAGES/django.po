@@ -1319,6 +1319,12 @@ msgstr ""
 msgid "processed at"
 msgstr "käsitelty alkaen"
 
+#: tilavarauspalvelu/admin/price_option/admin.py
+#: tilavarauspalvelu/admin/pricing_group/admin.py
+#: tilavarauspalvelu/admin/unit_group/admin.py
+msgid "Search by name"
+msgstr "Etsi nimellä"
+
 #: tilavarauspalvelu/admin/rejected_occurrence/admin.py
 msgid "Search by rejection reason or reservation series' name"
 msgstr "Hae hylkäyksen syyn tai toistuvan varauksen nimen perusteella"
@@ -2412,10 +2418,6 @@ msgid ""
 msgstr ""
 "Sallitaanko käyttäjien tekevän toimintoja toimipisteessä AD-ryhmistä "
 "automaattisesti annettujen käyttöoikeuksien perusteella?"
-
-#: tilavarauspalvelu/admin/unit_group/admin.py
-msgid "Search by name"
-msgstr "Etsi nimellä"
 
 #: tilavarauspalvelu/admin/unit_group/admin.py
 msgid "Number of units"
