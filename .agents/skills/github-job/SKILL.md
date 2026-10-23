@@ -30,7 +30,7 @@ If the user gives a run id or a run URL, list the failed jobs in the run:
 
 ```bash
 .agents/skills/github-job/github-job run 123
-.agents/skills/github-job/github-job run 'https://github.com/City-of-Helsinki/tilavarauspalvelu-core/actions/runs/123'
+.agents/skills/github-job/github-job run 'https://github.com/City-of-Helsinki/tilavarauspalvelu/actions/runs/123'
 ```
 
 Take the id of the job that needs attention (`conclusion: "failure"`).
@@ -39,7 +39,7 @@ Take the id of the job that needs attention (`conclusion: "failure"`).
 
 ```bash
 .agents/skills/github-job/github-job log 456
-.agents/skills/github-job/github-job log 'https://github.com/City-of-Helsinki/tilavarauspalvelu-core/actions/runs/123/job/456'
+.agents/skills/github-job/github-job log 'https://github.com/City-of-Helsinki/tilavarauspalvelu/actions/runs/123/job/456'
 ```
 
 ## 4. Fetch job metadata (only if needed)
