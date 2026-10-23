@@ -5,6 +5,7 @@ import { act, render, renderHook, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
 import { CreateAllocatedTimeSlotDocument, DeleteAllocatedTimeSlotDocument, Weekday } from "@gql/gql-types";
 import {
   useAcceptSlotMutation,
@@ -14,11 +15,7 @@ import {
   useRemoveAllocation,
   useSlotSelection,
 } from "./hooks";
-import type {
-  AllocatedTimeSlotNodeT,
-  SectionNodeT,
-  SuitableTimeRangeNodeT,
-} from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { SelectedSlotsContextProvider, useSelectedSlots } from "./SelectedSlotsContext";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
@@ -259,18 +256,17 @@ describe("useRefreshApplications", () => {
 
 function AcceptSlotTestComponent({
   reservationUnitOptionPk,
-  timeRange,
+  selection,
   refresh,
 }: {
   reservationUnitOptionPk: number;
-  timeRange: SuitableTimeRangeNodeT | null;
+  selection: WeekdayInterval | null;
   refresh: () => void;
 }): ReactElement {
   const [handleAcceptSlot] = useAcceptSlotMutation({
     applicationSection: createSection({ pk: 1 }),
     reservationUnitOptionPk,
-    selection: ["1-10-00", "1-10-30"],
-    timeRange,
+    selection,
     refresh,
   });
 
@@ -282,9 +278,8 @@ function AcceptSlotTestComponent({
 }
 
 describe("useAcceptSlotMutation", () => {
-  const timeRange: SuitableTimeRangeNodeT = {
-    dayOfTheWeek: Weekday.Tuesday,
-  } as SuitableTimeRangeNodeT;
+  // The Selection carries the weekday and both times, so the mutation reads them straight off it.
+  const selection: WeekdayInterval = { weekday: Weekday.Tuesday, beginMinutes: 10 * 60, endMinutes: 11 * 60 };
 
   it("creates an allocated time slot and refreshes on success", async () => {
     const refresh = vi.fn();
@@ -318,7 +313,7 @@ describe("useAcceptSlotMutation", () => {
 
     const view = render(
       <MockedProvider mocks={mocks}>
-        <AcceptSlotTestComponent reservationUnitOptionPk={1} timeRange={timeRange} refresh={refresh} />
+        <AcceptSlotTestComponent reservationUnitOptionPk={1} selection={selection} refresh={refresh} />
       </MockedProvider>
     );
     const user = userEvent.setup();
@@ -327,11 +322,11 @@ describe("useAcceptSlotMutation", () => {
     await waitFor(() => expect(refresh).toHaveBeenCalled());
   });
 
-  it("does not call the mutation nor refresh when the time range is invalid", async () => {
+  it("does not call the mutation nor refresh when there is no Selection", async () => {
     const refresh = vi.fn();
     const view = render(
       <MockedProvider mocks={[]}>
-        <AcceptSlotTestComponent reservationUnitOptionPk={1} timeRange={null} refresh={refresh} />
+        <AcceptSlotTestComponent reservationUnitOptionPk={1} selection={null} refresh={refresh} />
       </MockedProvider>
     );
     const user = userEvent.setup();
@@ -364,7 +359,7 @@ describe("useAcceptSlotMutation", () => {
 
     const view = render(
       <MockedProvider mocks={mocks}>
-        <AcceptSlotTestComponent reservationUnitOptionPk={1} timeRange={timeRange} refresh={refresh} />
+        <AcceptSlotTestComponent reservationUnitOptionPk={1} selection={selection} refresh={refresh} />
       </MockedProvider>
     );
     const user = userEvent.setup();

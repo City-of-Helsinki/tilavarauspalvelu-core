@@ -8,16 +8,13 @@ import { logError } from "@ui/modules/errors";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { convertWeekday, numberToDayT, transformWeekday } from "ui/src/modules/conversion";
+import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";
 import { toNumber } from "ui/src/modules/helpers";
 import { useCreateAllocatedTimeSlotMutation, useDeleteAllocatedTimeSlotMutation } from "@gql/gql-types";
 import type { AllocatedTimeSlotCreateMutationInput, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { decodeTimeSlot, timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
-import type {
-  AllocatedTimeSlotNodeT,
-  SectionNodeT,
-  SuitableTimeRangeNodeT,
-} from "./modules/applicationRoundAllocation";
+import { decodeTimeSlot } from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { useSelectedSlots } from "./SelectedSlotsContext";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
@@ -150,8 +147,8 @@ export function useRefreshApplications(
 type AcceptSlotMutationProps = {
   applicationSection: SectionNodeT;
   reservationUnitOptionPk: number;
-  selection: string[];
-  timeRange: SuitableTimeRangeNodeT | null;
+  /** The Selection to allocate. It carries the weekday and both times. */
+  selection: WeekdayInterval | null;
   refresh: (clearSelection?: boolean) => void;
 };
 
@@ -162,9 +159,14 @@ type HookReturnValue = [
   },
 ];
 
+/** The API writes a time as `HH:MM:SS`, and the end of the day as `00:00:00`. */
+function toApiTime(minutes: number): string {
+  const hours = Math.floor(minutes / 60) % 24;
+  return `${formatApiTimeUnsafe(hours, minutes % 60)}:00`;
+}
+
 export function useAcceptSlotMutation({
   selection,
-  timeRange,
   applicationSection,
   reservationUnitOptionPk,
   refresh,
@@ -175,28 +177,24 @@ export function useAcceptSlotMutation({
   const displayError = useDisplayError();
 
   const handleAcceptSlot = async () => {
-    if (selection.length === 0) {
-      logError("Invalid selection", "warning");
-    }
-    if (timeRange == null) {
-      logError(`Invalid timeRange for section ${JSON.stringify(applicationSection)}`, "warning");
+    if (selection == null) {
+      logError(`Invalid selection for section ${JSON.stringify(applicationSection)}`, "warning");
     }
     if (reservationUnitOptionPk < 1) {
       logError(`Invalid reservation unit pk ${reservationUnitOptionPk}`, "warning");
     }
-    if (selection.length === 0 || timeRange == null || reservationUnitOptionPk < 1) {
+    if (selection == null || reservationUnitOptionPk < 1) {
       errorToast({ text: t("allocation:errors.accepting.generic") });
       return;
     }
-    const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
-    const allocatedEnd = timeSlotKeyToScheduleTime(selection[selection.length - 1], true);
 
     // NOTE the pk is an update pk that matches AllocatedTimeSlot (not the applicationSection)
     const input: AllocatedTimeSlotCreateMutationInput = {
       reservationUnitOption: reservationUnitOptionPk,
-      dayOfTheWeek: timeRange.dayOfTheWeek,
-      beginTime: allocatedBegin,
-      endTime: allocatedEnd,
+      // The Selection says which weekday it is on, so no Suitable Time Range is searched for it.
+      dayOfTheWeek: selection.weekday,
+      beginTime: toApiTime(selection.beginMinutes),
+      endTime: toApiTime(selection.endMinutes),
       // Disable backend checks
       force: true,
     };

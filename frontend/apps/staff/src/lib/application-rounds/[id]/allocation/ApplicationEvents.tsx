@@ -12,6 +12,7 @@ import type {
   ReservationUnitNode,
 } from "@gql/gql-types";
 import { Accordion } from "@/components/Accordion";
+import { useGetFilterSearchParams } from "@/hooks";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import { ApplicationSectionCard } from "./ApplicationEventCard";
@@ -99,6 +100,7 @@ export function AllocationPageContent({
   applicationRoundStatus,
   relatedAllocations,
 }: ApplicationEventsProps): React.ReactElement {
+  const { priorityFilter } = useGetFilterSearchParams();
   const relatedSpacesTimeSlotsByDayReduced = getRelatedTimeSlots(relatedAllocations);
 
   // NOTE left hand cards include other reservation units as well (if they are allocated)
@@ -132,7 +134,8 @@ export function AllocationPageContent({
           reservationUnit={reservationUnit}
           refetchApplicationEvents={refetchApplicationEvents}
           applicationRoundStatus={applicationRoundStatus}
-          relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
+          affecting={relatedAllocations}
+          priorityFilter={priorityFilter}
         />
       </Content>
     </SelectedSlotsContextProvider>
