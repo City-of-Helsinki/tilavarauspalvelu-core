@@ -9,6 +9,7 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 from tilavarauspalvelu.models import PriceComponent, PricingGroup
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
+from utils.utils import to_drf_validation_error
 
 from .coverage import check_pricing_group_coverage
 
@@ -63,7 +64,11 @@ def save_price_component_changes(
             _validate_change(saved_component=saved_component, changed_component=component, today=today)
 
             component.pricing_group = pricing_group
-            _validate_constraints(component)
+            try:
+                component.validate_constraints()
+            except DjangoValidationError as error:
+                raise to_drf_validation_error(error) from error
+
             component.validators.validate_option_belongs_to_pricing_group_unit_group()
             if component.price_option_id != saved_component.price_option_id:
                 component.validators.validate_option_is_active()
@@ -74,7 +79,11 @@ def save_price_component_changes(
                 raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_FROM_NOT_IN_FUTURE)
 
             component.pricing_group = pricing_group
-            _validate_constraints(component)
+            try:
+                component.validate_constraints()
+            except DjangoValidationError as error:
+                raise to_drf_validation_error(error) from error
+
             component.validators.validate_option_belongs_to_pricing_group_unit_group()
             component.validators.validate_option_is_active()
 
@@ -108,18 +117,6 @@ def save_price_component_changes(
 
 
 # Internals
-
-
-def _validate_constraints(component: PriceComponent) -> None:
-    try:
-        component.validate_constraints()
-    except DjangoValidationError as error:
-        details = [
-            ErrorDetail(constraint_error.messages[0], code=constraint_error.code)
-            for constraint_errors in error.error_dict.values()
-            for constraint_error in constraint_errors
-        ]
-        raise ValidationError(details) from error
 
 
 def _validate_change(

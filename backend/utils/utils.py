@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import get_language_from_path, get_language_from_request
 from html2text import HTML2Text  # noqa: TID251
@@ -287,7 +288,13 @@ def to_django_validation_error(error: ValidationError) -> DjangoValidationError:
 
 def to_drf_validation_error(error: DjangoValidationError) -> ValidationError:
     """Given a Django ValidationError, return a django-rest-framework ValidationError."""
-    return ValidationError(get_error_detail(exc_info=error))
+    error_detail = get_error_detail(exc_info=error)
+
+    # Non-field errors, e.g. from model constraints, should not show up as errors for a field named "__all__".
+    if isinstance(error_detail, dict) and error_detail.keys() == {NON_FIELD_ERRORS}:
+        error_detail = error_detail[NON_FIELD_ERRORS]
+
+    return ValidationError(error_detail)
 
 
 @contextmanager
