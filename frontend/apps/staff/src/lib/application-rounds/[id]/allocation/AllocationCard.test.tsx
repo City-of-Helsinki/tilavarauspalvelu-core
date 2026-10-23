@@ -2,7 +2,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Priority, ReserveeType, Weekday } from "@gql/gql-types";
+import type { WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
+import { Priority, ReservationStartInterval, ReserveeType, Weekday } from "@gql/gql-types";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import type {
   AllocatedTimeSlotNodeT,
@@ -159,127 +160,164 @@ describe("AllocatedCard", () => {
 });
 
 describe("SuitableTimeCard", () => {
-  const baseSelection = ["1-10-00", "1-10-00"];
+  // Monday 10:00 to 11:00, which is the hour the default section asks for.
+  const baseSelection: WeekdayInterval = { weekday: Weekday.Monday, beginMinutes: 10 * 60, endMinutes: 11 * 60 };
 
-  it("disables the accept button when there is no reservation unit option", () => {
-    render(
+  /** A section that wants Monday 10:00 to 11:00, so the Selection fits it unless a test says otherwise. */
+  function createRequestingSection(overrides: Partial<SectionNodeT> = {}): SectionNodeT {
+    return createSection({ suitableTimeRanges: [createTimeSlot()], ...overrides });
+  }
+
+  function renderCard({
+    applicationSection = createRequestingSection(),
+    selection = baseSelection,
+    startInterval = ReservationStartInterval.Interval_15Minutes,
+    reservationUnitOptionPk = 1,
+    isAllocationEnabled = true,
+  }: {
+    applicationSection?: SectionNodeT;
+    selection?: WeekdayInterval;
+    startInterval?: ReservationStartInterval;
+    reservationUnitOptionPk?: number;
+    isAllocationEnabled?: boolean;
+  } = {}) {
+    return render(
       <SuitableTimeCard
-        applicationSection={createSection()}
-        reservationUnitOptionPk={0}
-        selection={baseSelection}
-        isAllocationEnabled
+        applicationSection={applicationSection}
+        reservationUnitOptionPk={reservationUnitOptionPk}
+        selection={selection}
+        startInterval={startInterval}
+        isAllocationEnabled={isAllocationEnabled}
         refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot()}
       />
     );
+  }
+
+  it("disables the accept button when there is no reservation unit option", () => {
+    renderCard({ reservationUnitOptionPk: 0 });
 
     expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeDisabled();
   });
 
   it("disables the accept button when allocation is not enabled", () => {
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection()}
-        reservationUnitOptionPk={1}
-        selection={baseSelection}
-        isAllocationEnabled={false}
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot()}
-      />
-    );
+    renderCard({ isAllocationEnabled: false });
 
     expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeDisabled();
   });
 
   it("enables the accept button for a valid selection inside the requested time range", () => {
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection()}
-        reservationUnitOptionPk={1}
-        selection={baseSelection}
-        isAllocationEnabled
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot()}
-      />
-    );
+    renderCard();
 
     expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeEnabled();
     expect(screen.queryByText("allocation:errors.selectionOutsideOfRequestedTimes")).not.toBeInTheDocument();
     expect(screen.queryByText("allocation:errors.requestedDurationIsIncorrect")).not.toBeInTheDocument();
+    expect(screen.queryByText("allocation:errors.selectionBeginTimeNotAllowed")).not.toBeInTheDocument();
+  });
+
+  it("gives the mutation the Selection itself", () => {
+    renderCard();
+
+    expect(mockUseAcceptSlotMutation).toHaveBeenCalledWith(expect.objectContaining({ selection: baseSelection }));
   });
 
   it("shows an error when the selection is shorter than the minimum duration", () => {
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection({ reservationMinDuration: 7200, reservationMaxDuration: 7200 })}
-        reservationUnitOptionPk={1}
-        selection={baseSelection}
-        isAllocationEnabled
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot()}
-      />
-    );
+    renderCard({
+      applicationSection: createRequestingSection({ reservationMinDuration: 7200, reservationMaxDuration: 7200 }),
+    });
 
     expect(screen.getByText("allocation:errors.requestedDurationIsIncorrect")).toBeInTheDocument();
   });
 
   it("shows an error when the selection is longer than the maximum duration", () => {
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection({ reservationMinDuration: 900, reservationMaxDuration: 900 })}
-        reservationUnitOptionPk={1}
-        selection={baseSelection}
-        isAllocationEnabled
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot()}
-      />
-    );
+    renderCard({
+      applicationSection: createRequestingSection({ reservationMinDuration: 900, reservationMaxDuration: 900 }),
+    });
 
     expect(screen.getByText("allocation:errors.requestedDurationIsIncorrect")).toBeInTheDocument();
   });
 
+  it("reads the duration from the interval, so 45 minutes is too short for an hour", () => {
+    renderCard({ selection: { ...baseSelection, endMinutes: 10 * 60 + 45 } });
+
+    expect(screen.getByText("allocation:errors.requestedDurationIsIncorrect")).toBeInTheDocument();
+  });
+
+  it("shows no duration error when the section asks for the 45 minutes that are selected", () => {
+    renderCard({
+      applicationSection: createRequestingSection({ reservationMinDuration: 2700, reservationMaxDuration: 2700 }),
+      selection: { ...baseSelection, endMinutes: 10 * 60 + 45 },
+    });
+
+    expect(screen.queryByText("allocation:errors.requestedDurationIsIncorrect")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeEnabled();
+  });
+
   it("shows an error when the selection falls outside the requested time range", () => {
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection()}
-        reservationUnitOptionPk={1}
-        selection={["1-8-00", "1-8-00"]}
-        isAllocationEnabled
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot({ beginTime: "10:00:00", endTime: "11:00:00" })}
-      />
-    );
+    renderCard({ selection: { ...baseSelection, beginMinutes: 8 * 60, endMinutes: 9 * 60 } });
 
     expect(screen.getByText("allocation:errors.selectionOutsideOfRequestedTimes")).toBeInTheDocument();
   });
 
-  it("treats a missing requested time range as always outside", () => {
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection()}
-        reservationUnitOptionPk={1}
-        selection={baseSelection}
-        isAllocationEnabled
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot({ beginTime: undefined, endTime: undefined })}
-      />
-    );
+  it("treats a section with no requested time on the weekday as always outside", () => {
+    renderCard({ applicationSection: createSection({ suitableTimeRanges: [] }) });
 
     expect(screen.getByText("allocation:errors.selectionOutsideOfRequestedTimes")).toBeInTheDocument();
   });
+
+  it("accepts a selection that crosses two touching requested time ranges", () => {
+    renderCard({
+      applicationSection: createSection({
+        suitableTimeRanges: [
+          createTimeSlot({ beginTime: "10:00:00", endTime: "11:00:00", priority: Priority.Primary }),
+          createTimeSlot({ beginTime: "11:00:00", endTime: "12:00:00", priority: Priority.Secondary }),
+        ],
+      }),
+      selection: { ...baseSelection, beginMinutes: 10 * 60 + 30, endMinutes: 11 * 60 + 30 },
+    });
+
+    expect(screen.queryByText("allocation:errors.selectionOutsideOfRequestedTimes")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeEnabled();
+  });
+
+  it("warns about a begin time on the quarter hour and disables the button on a 30 minute unit", () => {
+    renderCard({
+      applicationSection: createRequestingSection({ suitableTimeRanges: [createTimeSlot({ endTime: "11:30:00" })] }),
+      selection: { ...baseSelection, beginMinutes: 10 * 60 + 15, endMinutes: 11 * 60 + 15 },
+      startInterval: ReservationStartInterval.Interval_30Minutes,
+    });
+
+    expect(screen.getByText("allocation:errors.selectionBeginTimeNotAllowed")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeDisabled();
+  });
+
+  it("allows a begin time on the quarter hour on a 15 minute unit", () => {
+    renderCard({
+      applicationSection: createRequestingSection({ suitableTimeRanges: [createTimeSlot({ endTime: "11:30:00" })] }),
+      selection: { ...baseSelection, beginMinutes: 10 * 60 + 15, endMinutes: 11 * 60 + 15 },
+      startInterval: ReservationStartInterval.Interval_15Minutes,
+    });
+
+    expect(screen.queryByText("allocation:errors.selectionBeginTimeNotAllowed")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeEnabled();
+  });
+
+  it.each([ReservationStartInterval.Interval_15Minutes, ReservationStartInterval.Interval_30Minutes])(
+    "allows an end time on the quarter hour on a %s unit",
+    (startInterval) => {
+      renderCard({
+        applicationSection: createRequestingSection({ reservationMinDuration: 2700, reservationMaxDuration: 2700 }),
+        selection: { ...baseSelection, endMinutes: 10 * 60 + 45 },
+        startInterval,
+      });
+
+      expect(screen.queryByText("allocation:errors.selectionBeginTimeNotAllowed")).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeEnabled();
+    }
+  );
 
   it("calls handleAcceptSlot when the accept button is clicked", async () => {
     const user = userEvent.setup();
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection()}
-        reservationUnitOptionPk={1}
-        selection={baseSelection}
-        isAllocationEnabled
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot()}
-      />
-    );
+    renderCard();
 
     await user.click(screen.getByRole("button", { name: "allocation:acceptSlot" }));
     expect(handleAcceptSlot).toHaveBeenCalledTimes(1);
@@ -288,31 +326,13 @@ describe("SuitableTimeCard", () => {
   it("disables the accept button and shows a spinner while loading", () => {
     mockUseAcceptSlotMutation.mockReturnValue([handleAcceptSlot, { isLoading: true }]);
 
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection()}
-        reservationUnitOptionPk={1}
-        selection={baseSelection}
-        isAllocationEnabled
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot()}
-      />
-    );
+    renderCard();
 
     expect(screen.getByRole("button", { name: "allocation:acceptSlot" })).toBeDisabled();
   });
 
   it("renders '-' for primary/secondary requested times when none are set", () => {
-    render(
-      <SuitableTimeCard
-        applicationSection={createSection({ suitableTimeRanges: [] })}
-        reservationUnitOptionPk={1}
-        selection={baseSelection}
-        isAllocationEnabled
-        refetchApplicationEvents={vi.fn()}
-        timeSlot={createTimeSlot()}
-      />
-    );
+    renderCard({ applicationSection: createSection({ suitableTimeRanges: [] }) });
 
     expect(screen.getByText("allocation:primaryTimes:", { exact: false })).toBeInTheDocument();
     expect(screen.getByText("allocation:secondaryTimes:", { exact: false })).toBeInTheDocument();
