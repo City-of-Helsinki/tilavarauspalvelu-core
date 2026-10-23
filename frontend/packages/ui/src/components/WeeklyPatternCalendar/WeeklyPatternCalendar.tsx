@@ -67,6 +67,9 @@ function WeeklyPatternTable<TData extends CalendarData>(
     disabled,
     readOnly,
     announcements = NO_ANNOUNCEMENTS,
+    selection,
+    onSelectionChange,
+    selectionAnnouncements,
     step,
     availability,
     paintable,
@@ -93,6 +96,13 @@ function WeeklyPatternTable<TData extends CalendarData>(
     [t, weekdayNameStyle, longNames]
   );
 
+  // The three select mode props travel together, so the grid is given one object or nothing and can never be
+  // left in a half-built mode.
+  const select =
+    onSelectionChange && selectionAnnouncements
+      ? { selection: selection ?? null, onSelectionChange, announcements: selectionAnnouncements }
+      : undefined;
+
   const grid = useWeeklyPatternCalendar({
     value,
     onChange,
@@ -107,6 +117,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     readOnly,
     disabled,
     announcements,
+    select,
     describeSpan: (weekday, beginMinutes, endMinutes) =>
       `${longNames[weekday]}, ${formatClockRange(beginMinutes, endMinutes)}`,
   });
@@ -292,6 +303,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
             data-name={name}
             data-readonly={readOnly ? "" : undefined}
             data-disabled={disabled ? "" : undefined}
+            data-select={select ? "" : undefined}
           >
             {columns}
             <thead>
@@ -346,6 +358,8 @@ function WeeklyPatternTable<TData extends CalendarData>(
                         data-block-start={cell.isBlockStart ? "" : undefined}
                         data-block-end={cell.isBlockEnd ? "" : undefined}
                         data-invalid={runErrorOf(cell) ? "" : undefined}
+                        data-selection-start={cell.isSelectionStart ? "" : undefined}
+                        data-selection-end={cell.isSelectionEnd ? "" : undefined}
                       >
                         {(renderCellContent ?? getDefaultCellContent)(cell)}
                       </td>
