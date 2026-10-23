@@ -9,8 +9,10 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import Unit, UnitRole
-    from tilavarauspalvelu.models._base import ManyToManyRelatedManager
+    from tilavarauspalvelu.models import PriceOption, PricingGroup, Unit, UnitRole
+    from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
+    from tilavarauspalvelu.models.price_option.queryset import PriceOptionQuerySet
+    from tilavarauspalvelu.models.pricing_group.queryset import PricingGroupQuerySet
     from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
     from tilavarauspalvelu.models.unit_role.queryset import UnitRoleQuerySet
 
@@ -42,6 +44,8 @@ class UnitGroup(models.Model):
     validators: LazyAttribute[UnitGroupValidator] = LazyModelAttribute.new()
 
     unit_roles: ManyToManyRelatedManager[UnitRole, UnitRoleQuerySet]
+    pricing_groups: OneToManyRelatedManager[PricingGroup, PricingGroupQuerySet]
+    price_options: OneToManyRelatedManager[PriceOption, PriceOptionQuerySet]
 
     class Meta:
         db_table = "unit_group"

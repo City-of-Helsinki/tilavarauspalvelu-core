@@ -50,6 +50,7 @@ if TYPE_CHECKING:
         ReservationUnitImage,
         ReservationUnitOption,
         ReservationUnitPricing,
+        ReservationUnitPricingGroup,
         ReservationUnitType,
         Resource,
         Space,
@@ -67,6 +68,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation_unit_image.queryset import ReservationUnitImageQuerySet
     from tilavarauspalvelu.models.reservation_unit_option.queryset import ReservationUnitOptionQuerySet
     from tilavarauspalvelu.models.reservation_unit_pricing.queryset import ReservationUnitPricingQuerySet
+    from tilavarauspalvelu.models.reservation_unit_pricing_group.queryset import ReservationUnitPricingGroupQuerySet
     from tilavarauspalvelu.models.resource.queryset import ResourceQuerySet
     from tilavarauspalvelu.models.space.queryset import SpaceQuerySet
 
@@ -327,6 +329,9 @@ class ReservationUnit(models.Model):
 
     reservation_unit_hierarchy: ReservationUnitHierarchy | None  # Can be missing
     pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
+    reservation_unit_pricing_groups: OneToManyRelatedManager[
+        ReservationUnitPricingGroup, ReservationUnitPricingGroupQuerySet
+    ]
     reservation_unit_options: OneToManyRelatedManager[ReservationUnitOption, ReservationUnitOptionQuerySet]
     images: OneToManyRelatedManager[ReservationUnitImage, ReservationUnitImageQuerySet]
     access_types: OneToManyRelatedManager[ReservationUnitAccessType, ReservationUnitAccessTypeQuerySet]
