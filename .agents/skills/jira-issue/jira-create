@@ -18,7 +18,7 @@ Options marked with * can be repeated.
   --blocks <key>              * Add a link: the new issue blocks <key>.
   --blocked-by <key>          * Add a link: the new issue is blocked by <key>.
   --relates <key>             * Add a link: the new issue relates to <key>.
-  --dry-run                     Print the requests and send nothing.
+  --dry-run                     Print the write requests and change nothing in Jira.
 EOF
   exit 2
 }
@@ -124,7 +124,7 @@ build_links() {
 }
 
 if [[ "$dry_run" == true ]]; then
-  echo "Dry run. Nothing is sent. NEW-ISSUE stands for the key of the new issue."
+  echo "Dry run. Nothing is changed in Jira. NEW-ISSUE stands for the key of the new issue."
   echo
   echo "POST $base_url/rest/api/2/issue"
   jq . <<<"$body"

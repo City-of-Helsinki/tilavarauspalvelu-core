@@ -78,7 +78,7 @@ Give the issue first, then one or more options. Each run changes only the parts 
 | `--blocked-by <key>`        | yes    | Add a link: this issue is blocked by `<key>`.          |
 | `--relates <key>`           | yes    | Add a link: this issue relates to `<key>`.             |
 | `--remove-link <key>`       | yes    | Remove every link between this issue and `<key>`.      |
-| `--dry-run`                 | no     | Print the requests. Send nothing.                      |
+| `--dry-run`                 | no     | Print the write requests. Change nothing in Jira.      |
 
 The script skips a label or link that is already as requested and prints a "Skipped" line for it.
 To keep parts of the old description, fetch the issue with `jira-issue` first and edit its text.
@@ -100,7 +100,7 @@ To keep parts of the old description, fetch the issue with `jira-issue` first an
 | `--blocks <key>`            | yes    | Add a link: the new issue blocks `<key>`.                   |
 | `--blocked-by <key>`        | yes    | Add a link: the new issue is blocked by `<key>`.            |
 | `--relates <key>`           | yes    | Add a link: the new issue relates to `<key>`.               |
-| `--dry-run`                 | no     | Print the requests. Send nothing.                           |
+| `--dry-run`                 | no     | Print the write requests. Change nothing in Jira.           |
 
 The script checks the type against the types of the project. An error lists the allowed types.
 It creates the issue first, then the links. In a dry run, `NEW-ISSUE` stands for the new key.

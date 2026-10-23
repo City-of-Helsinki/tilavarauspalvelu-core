@@ -17,7 +17,7 @@ Give at least one change. Options marked with * can be repeated.
   --blocked-by <key>        * Add a link: this issue is blocked by <key>.
   --relates <key>           * Add a link: this issue relates to <key>.
   --remove-link <key>       * Remove every link between this issue and <key>.
-  --dry-run                   Print the requests and send nothing.
+  --dry-run                   Print the write requests and change nothing in Jira.
 EOF
   exit 2
 }
@@ -194,7 +194,7 @@ for other in ${relates[@]+"${relates[@]}"}; do
 done
 
 if [[ "$dry_run" == true ]]; then
-  echo "Dry run for $key. Nothing is sent."
+  echo "Dry run for $key. Nothing is changed in Jira."
   for request in ${requests[@]+"${requests[@]}"}; do
     IFS="$sep" read -r method path body summary <<<"$request"
     echo
