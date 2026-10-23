@@ -4204,6 +4204,14 @@ msgstr "varauksen hylkäyksen syy"
 msgid "reservation deny reasons"
 msgstr "varauksen hylkäyksen syyt"
 
+#: tilavarauspalvelu/models/reservation_price_line/model.py
+msgid "reservation price line"
+msgstr "varauksen hintarivi"
+
+#: tilavarauspalvelu/models/reservation_price_line/model.py
+msgid "reservation price lines"
+msgstr "varauksen hintarivit"
+
 #: tilavarauspalvelu/models/reservation_purpose/model.py
 msgid "reservation purpose"
 msgstr "varaustarkoitus"
