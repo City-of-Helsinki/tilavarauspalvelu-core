@@ -19,7 +19,6 @@ import { ApplicationSectionCard } from "./ApplicationEventCard";
 import type { AllocationApplicationSectionCardType } from "./ApplicationEventCard";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { toAllocationPattern, toHighlightRanges } from "./modules/allocationPattern";
-import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
 import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { SelectedSlotsContextProvider, useSelectedSlots } from "./SelectedSlotsContext";
 
@@ -161,7 +160,8 @@ function AllocationContent({
         reservationUnit={reservationUnit}
         refetchApplicationEvents={refetchApplicationEvents}
         applicationRoundStatus={applicationRoundStatus}
-        relatedAllocations={getRelatedTimeSlots(relatedAllocations)}
+        affecting={relatedAllocations}
+        priorityFilter={priorityFilter}
         extent={extent}
       />
     </Content>

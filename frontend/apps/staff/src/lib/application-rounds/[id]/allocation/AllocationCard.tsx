@@ -3,35 +3,41 @@ import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { ApolloQueryResult } from "@apollo/client";
+import type { WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
+import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatDuration, timeToMinutes } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { Flex, fontMedium, H5, SemiBold, Strong } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
-import type { ApplicationSectionAllocationsQuery } from "@gql/gql-types";
+import type { ApplicationSectionAllocationsQuery, Maybe, ReservationStartInterval } from "@gql/gql-types";
 import { Accordion } from "@/components/Accordion";
 import { NotificationInline } from "@/components/NotificationInline";
-import { getApplicantName } from "@/modules/helpers";
+import { getApplicantName, getNormalizedInterval } from "@/modules/helpers";
 import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
+import { fitsSection } from "./modules/allocationPattern";
 import {
   createDurationString,
-  decodeTimeSlot,
   formatSuitableTimeRange,
   formatTimeRangeList,
 } from "./modules/applicationRoundAllocation";
-import type {
-  AllocatedTimeSlotNodeT,
-  SectionNodeT,
-  SuitableTimeRangeNodeT,
-} from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 
-type Props = {
+type CommonProps = {
   applicationSection: SectionNodeT;
-  reservationUnitOptionPk: number;
-  selection: string[];
-  isAllocationEnabled: boolean;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
-  timeSlot: SuitableTimeRangeNodeT;
+};
+
+type AllocatedCardProps = CommonProps & {
   allocatedTimeSlot: AllocatedTimeSlotNodeT;
+};
+
+type SuitableTimeCardProps = CommonProps & {
+  reservationUnitOptionPk: number;
+  /** The Selection, which is one span on one weekday. Both the duration and the mutation read it. */
+  selection: WeekdayInterval;
+  /** The shown reservation unit's own start interval. The begin time has to match it, capped at 30 minutes. */
+  startInterval: Maybe<ReservationStartInterval> | undefined;
+  isAllocationEnabled: boolean;
 };
 
 const Wrapper = styled(Flex).attrs({
@@ -96,7 +102,7 @@ export function AllocatedCard({
   applicationSection,
   refetchApplicationEvents,
   allocatedTimeSlot,
-}: Omit<Props, "timeSlot" | "selection" | "isAllocationEnabled" | "reservationUnitOptionPk">): React.ReactElement {
+}: AllocatedCardProps): React.ReactElement {
   const { t } = useTranslation();
 
   const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
@@ -150,64 +156,47 @@ export function AllocatedCard({
   );
 }
 
-function isOutsideOfRequestedTimes(
-  time: SuitableTimeRangeNodeT | AllocatedTimeSlotNodeT | null,
-  beginHours: number,
-  endHours: number
-) {
-  if (time?.beginTime == null || time.endTime == null) {
-    return true;
-  }
-  const beginTime = timeToMinutes(time.beginTime) / 60;
-  const endTime = timeToMinutes(time.endTime) / 60;
-  if (beginTime == null || endTime == null) {
-    return true;
-  }
-  if (beginHours < beginTime || endHours > (endTime === 0 ? 24 : endTime)) {
-    return true;
-  }
-}
-
 /// Right hand side single card
 /// Contains the single applicationScheduleEvent and its actions (accept / decline etc.)
 export function SuitableTimeCard({
   applicationSection,
   reservationUnitOptionPk,
   selection,
+  startInterval,
   isAllocationEnabled,
   refetchApplicationEvents,
-  timeSlot,
-}: Omit<Props, "allocatedTimeSlot">): React.ReactElement {
+}: SuitableTimeCardProps): React.ReactElement {
   const { t } = useTranslation();
 
   const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
 
   const [handleAcceptSlot, { isLoading: isAcceptLoading }] = useAcceptSlotMutation({
     selection,
-    timeRange: timeSlot,
     applicationSection,
     reservationUnitOptionPk,
     refresh,
   });
   const applicantName = getApplicantName(applicationSection.application);
 
-  const isDisabled = !reservationUnitOptionPk || !isAllocationEnabled;
-
-  // Time interval checks
-  const selectionMins = selection.length * 30;
+  // The duration is the Selection's own length, so a 45 minute Selection reads as 45 minutes.
+  const selectionMins = selection.endMinutes - selection.beginMinutes;
   const minDurationSeconds = applicationSection.reservationMinDuration ?? 0;
   const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
   const selectionDurationString = formatDuration(t, { minutes: selectionMins });
-  const firstSelected = selection[0] ?? "";
-  const lastSelected = selection[selection.length - 1] ?? "";
-  const selectionBegin = decodeTimeSlot(firstSelected);
-  const selectionEnd = decodeTimeSlot(lastSelected);
   // Duration checks
   const isTooShort = selectionMins < minDurationSeconds / 60;
   const isTooLong = selectionMins > maxDurationSeconds / 60;
   const durationIsInvalid = isTooShort || isTooLong;
 
-  const isTimeMismatch = isOutsideOfRequestedTimes(timeSlot, selectionBegin.hour, selectionEnd.hour + 0.5);
+  // The section's own ranges on this weekday are merged first, so a Selection across two touching ranges fits.
+  const isTimeMismatch = !fitsSection(selection, applicationSection);
+
+  // The backend caps the staff start interval at 30 minutes. An end time only has to be a multiple of 15, which
+  // every Selection is, so only the begin time is checked here.
+  const beginStepMinutes = getIntervalMinutes(getNormalizedInterval(startInterval));
+  const isBeginTimeRefused = selection.beginMinutes % beginStepMinutes !== 0;
+
+  const isDisabled = !reservationUnitOptionPk || !isAllocationEnabled || isBeginTimeRefused;
 
   const isMutationLoading = isAcceptLoading;
   const isLoading = isMutationLoading || isRefreshLoading;
@@ -224,6 +213,9 @@ export function SuitableTimeCard({
       ) : null}
       {durationIsInvalid ? (
         <NotificationInline type="alert">{t("allocation:errors.requestedDurationIsIncorrect")}</NotificationInline>
+      ) : null}
+      {isBeginTimeRefused ? (
+        <NotificationInline type="alert">{t("allocation:errors.selectionBeginTimeNotAllowed")}</NotificationInline>
       ) : null}
       <Flex $gap="s" $justifyContent="space-between">
         <Button
