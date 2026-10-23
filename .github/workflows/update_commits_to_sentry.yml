@@ -24,11 +24,14 @@ jobs:
   upload-customer-sentry-sourcemaps:
     name: "Upload customer ui sentry sourcemaps"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: "Create release name"
         id: release
         run: >-
@@ -38,7 +41,7 @@ jobs:
       - name: Print release
         run: echo ${{ steps.release.outputs.release }}
       - name: Create Sentry release
-        uses: getsentry/action-release@v3
+        uses: getsentry/action-release@e6703d0b00208e0b3687ba660d18ab5af7892821 # v3.7.2
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_PROJECT: "tilavarauspalvelu-customer-ui"
@@ -50,11 +53,14 @@ jobs:
   upload-staff-sentry-sourcemaps:
     name: "Upload staff ui sentry sourcemaps"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
         # release name can't contain slashes e.g. merge/PR_number
       - name: "Create release name"
         id: release
@@ -65,7 +71,7 @@ jobs:
       - name: Print release
         run: echo ${{ steps.release.outputs.release }}
       - name: Create Sentry release
-        uses: getsentry/action-release@v3
+        uses: getsentry/action-release@e6703d0b00208e0b3687ba660d18ab5af7892821 # v3.7.2
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_PROJECT: "tilavarauspalvelu-staff-ui"
