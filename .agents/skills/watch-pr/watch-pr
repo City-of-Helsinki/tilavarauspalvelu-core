@@ -106,10 +106,10 @@ read_fingerprint() {
       }' <<< "$raw"
 }
 
-# State, mergeability, head commit, every check on the head commit, and how far the branch is
-# behind its base, for 1 GraphQL point and 1 REST call.
+# State, mergeability, head commit, every check on the head commit, how far the branch is
+# behind its base, and the names of the required checks, for 1 GraphQL point and 2 REST calls.
 read_detail() {
-  local raw detail base head behind
+  local raw detail base base_ref head behind required
   # shellcheck disable=SC2016  # The $ names are GraphQL variables.
   raw="$(graphql -F owner="$owner" -F name="$name" -F number="$number" -f query='
     query($owner: String!, $name: String!, $number: Int!) {
@@ -160,7 +160,17 @@ read_detail() {
   if [[ -n "$base" && -n "$head" ]]; then
     behind="$(gh api "repos/$repo/compare/$base...$head?per_page=1" --jq .behind_by 2>/dev/null)" || behind="null"
   fi
-  jq -c --argjson behind "${behind:-null}" '.behindBy = $behind' <<< "$detail"
+  # A required job that needs other jobs is not on the commit until they finish, so read the
+  # required names from the rulesets of the base branch. A failed read gives null.
+  base_ref="$(jq -r '.baseRef // empty' <<< "$detail")"
+  required="null"
+  if [[ -n "$base_ref" ]]; then
+    required="$(gh api "repos/$repo/rules/branches/$base_ref?per_page=100" --jq '[.[]
+      | select(.type == "required_status_checks") | .parameters.required_status_checks[].context] | unique' \
+      2>/dev/null)" || required="null"
+  fi
+  jq -c --argjson behind "${behind:-null}" --argjson required "${required:-null}" \
+    '.behindBy = $behind | .requiredNames = $required' <<< "$detail"
 }
 
 # Every comment, review comment, and review, through REST. REST has its own quota,
@@ -183,8 +193,8 @@ read_remarks() {
 }
 
 # Compares the pull request with what the agent was last told. Each check is reported as soon
-# as it fails. "Passed" is reported once the required checks all passed, or all checks when
-# none is required. A remark counts unless it has the agent marker. Remarks is null when they
+# as it fails. "Passed" is reported once every required check is on the commit and passed,
+# or all checks when none is required. A remark counts unless it has the agent marker. Remarks is null when they
 # were not read, and the remark watermark then stays where it is.
 evaluate() {
   jq -cn --argjson watch "$1" --argjson detail "$2" --argjson remarks "$3" \
@@ -202,7 +212,10 @@ evaluate() {
         | ($failed | map(select(has($failedBefore; .name) | not))) as $newlyFailed
         | ($detail.checks | map(select(.required))) as $required
         | (if ($required | length) > 0 then $required else $detail.checks end) as $gate
-        | ($gate | all(.status == "passed")) as $passedNow
+        # A required check that is not on the commit yet is still to come.
+        | ($detail.checks | map(.name)) as $names
+        | (($detail.requiredNames // []) | map(select(has($names; .) | not))) as $missing
+        | (($missing | length) == 0 and ($gate | all(.status == "passed"))) as $passedNow
         | ($gate | map(.name)) as $gateNames
         # A required check created and finished between two passes is never seen pending.
         | (($required | length) > 0 and ($gateNames | any(has($passedChecksBefore; .) | not))) as $gateGrew
