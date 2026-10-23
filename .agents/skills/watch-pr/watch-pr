@@ -153,7 +153,7 @@ read_detail() {
             } end]
       }' <<< "$raw")"
   # GraphQL can compare only with a ref that is known before the query, so ask REST.
-  # A failed compare gives null, and the watch then keeps what it knew.
+  # A failed compare gives null. The watch then keeps what it knew and reads again on the next pass.
   base="$(jq -r '.baseSha // empty' <<< "$detail")"
   head="$(jq -r '.headSha // empty' <<< "$detail")"
   behind="null"
@@ -161,7 +161,8 @@ read_detail() {
     behind="$(gh api "repos/$repo/compare/$base...$head?per_page=1" --jq .behind_by 2>/dev/null)" || behind="null"
   fi
   # A required job that needs other jobs is not on the commit until they finish, so read the
-  # required names from the rulesets of the base branch. A failed read gives null.
+  # required names from the rulesets of the base branch. A failed read gives null, and "passed" then waits
+  # for the next pass to read them again.
   base_ref="$(jq -r '.baseRef // empty' <<< "$detail")"
   required="null"
   if [[ -n "$base_ref" ]]; then
@@ -215,7 +216,7 @@ evaluate() {
         # A required check that is not on the commit yet is still to come.
         | ($detail.checks | map(.name)) as $names
         | (($detail.requiredNames // []) | map(select(has($names; .) | not))) as $missing
-        | (($missing | length) == 0 and ($gate | all(.status == "passed"))) as $passedNow
+        | ($detail.requiredNames != null and ($missing | length) == 0 and ($gate | all(.status == "passed"))) as $passedNow
         | ($gate | map(.name)) as $gateNames
         # A required check created and finished between two passes is never seen pending.
         | (($required | length) > 0 and ($gateNames | any(has($passedChecksBefore; .) | not))) as $gateGrew
@@ -394,7 +395,8 @@ pass() {
       at: (if $read or $last == null then $now else $last.at end),
       status: $fp.status,
       remarks: $fp.remarks,
-      inFlight: ($detail.mergeable == "UNKNOWN" or ($detail.checks | any(.status == "pending"))),
+      inFlight: ($detail.mergeable == "UNKNOWN" or ($detail.checks | any(.status == "pending"))
+        or $detail.behindBy == null or $detail.requiredNames == null),
       remarksComplete: (if $read then $remarks != null else ($last.remarksComplete // false) end)
     }')"
 
