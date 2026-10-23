@@ -1,6 +1,6 @@
 ---
 name: watch-pr
-description: Watch a pull request until it merges. Fix failed CI checks, answer review comments, and resolve merge conflicts as they come in.
+description: Watch a pull request until it merges. Fix failed CI checks, answer review comments, and rebase onto the base branch as they come in.
 disable-model-invocation: true
 argument-hint: <PR number or URL>
 ---
@@ -13,7 +13,7 @@ The user ran this skill on purpose. For this pull request only, it gives you the
 Merging is the user's call. Leave the pull request unmerged. A comment that is exactly `/ff` or `/fast-forward` merges it.
 
 A script does all the polling. It wakes you only with news: a check failed, the required checks passed,
-someone commented or reviewed, or the branch started to conflict. Between wakes, end your turn.
+someone commented or reviewed, or the branch fell behind its base or started to conflict. Between wakes, end your turn.
 
 ## Identify as the agent
 
@@ -96,7 +96,9 @@ Comment snippets are cut at 200 characters. Read the full text with the `github-
   - It is unclear: reply with a question.
   - It is wrong or out of scope: reply with the reason, and leave the code as is.
   - It needs a decision from the user: ask the user in the session.
-- **Merge conflict.** Fetch, rebase onto `origin/<base branch>`, and resolve the conflicts. Run the tests for the files you touched, then push.
+- **Behind or conflict.** The repository requires linear history, so the branch must be on top of its base to merge.
+  Rebase at once: fetch, rebase onto `origin/<base branch>`, and resolve any conflicts.
+  If you resolved conflicts, run the tests for the files you changed. Then push with `--force-with-lease`.
   If both sides changed the same logic and the right merge is not clear, stop and ask the user.
 
 ## Commit and push
