@@ -97,7 +97,8 @@ Comment snippets are cut at 200 characters. Read the full text with the `github-
   - It is wrong or out of scope: reply with the reason, and leave the code as is.
   - It needs a decision from the user: ask the user in the session.
 - **Behind or conflict.** The repository requires linear history, so the branch must be on top of its base to merge.
-  Rebase at once: fetch, rebase onto `origin/<base branch>`, and resolve any conflicts.
+  If tracked files have uncommitted changes, stop and ask the user. They can be the user's other work.
+  Else rebase at once: fetch, rebase onto `origin/<base branch>`, and resolve any conflicts.
   If you resolved conflicts, run the tests for the files you changed. Then push with `--force-with-lease`.
   If both sides changed the same logic and the right merge is not clear, stop and ask the user.
 
