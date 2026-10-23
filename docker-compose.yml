@@ -1,7 +1,88 @@
+# Development setup. Runs the backend and the frontends from the local source code.
+# Django runserver and "next dev" reload the code when a file changes.
+# Without a profile, only the database and Redis start.
+# The "backend" profile starts the backend, the worker and the scheduler.
+# The "frontend" profile starts the customer UI and the staff UI. It needs the "backend" profile.
+# Start with "docker compose up --watch" to also rebuild or restart the backend when its dependencies or settings change.
+# The backend and the frontends run as the host user, so the files that they create in the source code belong to that user.
+# The "just stack" commands set HOST_UID and HOST_GID.
+# See the Docker section in README.md.
+
+x-backend: &backend
+  build:
+    context: backend
+    dockerfile: docker/Dockerfile
+    args:
+      DEPS: main,admin,celery,test,lint
+      # Keep the virtualenv out of /tvp, because the source code mount hides /tvp.
+      VENV_ROOT: /venv
+  image: varaamo-dev-backend
+  profiles: [backend]
+  user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+  # The image gives the root group access to the virtualenv and the static files, as OpenShift needs.
+  group_add: ["0"]
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  environment:
+    DJANGO_SETTINGS_ENVIRONMENT: Docker
+    # The host user has no home directory in the image.
+    HOME: /tmp
+  volumes:
+    - ./backend:/tvp
+    - type: bind
+      source: ./backend/.env.docker
+      target: /tvp/.env
+      read_only: true
+      bind:
+        create_host_path: false
+    - tvp-media:/media
+  develop:
+    watch:
+      # Settings load only when the process starts. Restart to read a changed .env.docker.
+      - action: restart
+        path: ./backend/.env.docker
+      - action: rebuild
+        path: ./backend/pyproject.toml
+      - action: rebuild
+        path: ./backend/poetry.lock
+      # Compose watch skips the files in backend/.dockerignore, which lists the Dockerfile.
+      # After a change to the Dockerfile, run "just stack build".
+
+# The frontends read their settings from apps/<app>/.env.local in the source code mount.
+x-frontend: &frontend
+  build:
+    context: frontend
+    dockerfile_inline: |
+      FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core-base:node-24-slim
+      RUN apt-get update \
+        && apt-get install -y --no-install-recommends socat \
+        && rm -rf /var/lib/apt/lists/*
+      RUN npm install -g corepack@latest && corepack enable
+      ENV COREPACK_HOME=/corepack COREPACK_ENABLE_DOWNLOAD_PROMPT=0 HOME=/tmp
+  image: varaamo-dev-frontend
+  profiles: [frontend]
+  user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+  working_dir: /app
+  volumes:
+    - ./frontend:/app
+    - ./tilavaraus.graphql:/tilavaraus.graphql:ro
+    # Keep the dependencies and build output of the container apart from the host.
+    # The host can have packages for another platform, for example macOS.
+    - node-modules:/app/node_modules
+    - node-modules-customer:/app/apps/customer/node_modules
+    - node-modules-staff:/app/apps/staff/node_modules
+    - node-modules-ui:/app/packages/ui/node_modules
+    - node-modules-tsconfig:/app/packages/tsconfig/node_modules
+    - next-customer:/app/apps/customer/.next
+    - next-staff:/app/apps/staff/.next
+    - corepack:/corepack
+
 services:
 
   db:
-    container_name: tvp-db
     image: "postgis/postgis:17-3.5-alpine"
     platform: linux/amd64
     environment:
@@ -19,7 +100,6 @@ services:
       - tvp-postgres:/var/lib/postgresql/data
 
   redis:
-    container_name: tvp-redis
     image: "redis:7-alpine"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -29,67 +109,120 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
 
+  # Docker creates the named volumes owned by root. Give the media volume to the host user, then stop.
+  backend-volumes:
+    <<: *backend
+    user: root
+    entrypoint:
+      - sh
+      - -c
+      - >-
+        [ "$$(stat -c %u:%g /media)" = "${HOST_UID:-1000}:${HOST_GID:-1000}" ]
+        || chown -R "${HOST_UID:-1000}:${HOST_GID:-1000}" /media
+
   backend:
-    container_name: tvp-core
-    build:
-      context: backend/
-      dockerfile: docker/Dockerfile
-      args:
-        DEPS: main,admin,celery,test,lint
+    <<: *backend
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    env_file:
-      - backend/.env
-    environment:
-      DJANGO_SETTINGS_ENVIRONMENT: Docker
+      backend-volumes:
+        condition: service_completed_successfully
     ports:
       - "127.0.0.1:8000:8000"
-    volumes:
-      - tvp-media:/media
-    entrypoint: /tvp/docker/entrypoint_dev.sh
+    # The scripts in the source code mount are not executable. Run them with bash.
+    entrypoint: ["bash", "/tvp/docker/entrypoint_dev.sh"]
+    # Healthy after the migrations are done and the server runs.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/monitoring/liveness/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
 
+  # Celery does not reload code. Restart the worker and the scheduler after a change to task code.
   worker:
-    container_name: tvp-worker
+    <<: *backend
     depends_on:
       backend:
-        condition: service_started
-      redis:
         condition: service_healthy
-    build:
-      context: backend/
-      dockerfile: docker/Dockerfile
-      args:
-        DEPS: main,admin,celery,test,lint
-    env_file:
-      - backend/.env
-    environment:
-      DJANGO_SETTINGS_ENVIRONMENT: Docker
-    entrypoint: /tvp/docker/worker.sh
+    entrypoint: ["bash", "/tvp/docker/worker.sh"]
 
   scheduler:
-    container_name: tvp-scheduler
+    <<: *backend
     depends_on:
       backend:
-        condition: service_started
-      redis:
         condition: service_healthy
-    build:
-      context: backend/
-      dockerfile: docker/Dockerfile
-      args:
-        DEPS: main,admin,celery,test,lint
-    env_file:
-      - backend/.env
+    entrypoint: ["bash", "/tvp/docker/scheduler.sh"]
+
+  # The frontends share the network namespace of this container. It publishes the frontend ports
+  # and forwards "localhost:8000" to the backend container. The frontends use one backend URL
+  # for the server side rendering and for the browser, so "localhost:8000" must work in both places.
+  frontend-net:
+    <<: *frontend
+    init: true
+    ports:
+      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3001:3001"
+    command: ["socat", "TCP-LISTEN:8000,fork,reuseaddr", "TCP:backend:8000"]
+
+  # Docker creates the named volumes owned by root. Give them to the host user, then stop.
+  frontend-volumes:
+    <<: *frontend
+    user: root
+    command:
+      - sh
+      - -c
+      - >-
+        for directory in /app/node_modules /app/*/*/node_modules /app/apps/*/.next /corepack; do
+        [ "$$(stat -c %u:%g "$$directory")" = "${HOST_UID:-1000}:${HOST_GID:-1000}" ]
+        || chown -R "${HOST_UID:-1000}:${HOST_GID:-1000}" "$$directory";
+        done
+
+  # Installs the frontend dependencies and generates the GraphQL types, then stops.
+  # Run it again after a change to pnpm-lock.yaml or tilavaraus.graphql.
+  frontend-install:
+    <<: *frontend
+    depends_on:
+      frontend-volumes:
+        condition: service_completed_successfully
     environment:
-      DJANGO_SETTINGS_ENVIRONMENT: Docker
-    entrypoint: /tvp/docker/scheduler.sh
+      # Prevents prompts from pnpm.
+      CI: "true"
+    command:
+      - sh
+      - -c
+      - >-
+        pnpm install --frozen-lockfile --ignore-scripts
+        && pnpm codegen
+
+  customer:
+    <<: *frontend
+    network_mode: service:frontend-net
+    depends_on:
+      frontend-install:
+        condition: service_completed_successfully
+    command: ["pnpm", "--filter", "customer", "run", "dev", "--hostname", "0.0.0.0"]
+
+  staff:
+    <<: *frontend
+    network_mode: service:frontend-net
+    depends_on:
+      frontend-install:
+        condition: service_completed_successfully
+    command: ["pnpm", "--filter", "staff", "run", "dev", "--hostname", "0.0.0.0"]
 
 volumes:
   tvp-postgres:
   tvp-media:
+  node-modules:
+  node-modules-customer:
+  node-modules-staff:
+  node-modules-ui:
+  node-modules-tsconfig:
+  next-customer:
+  next-staff:
+  corepack:
 
 networks:
   default:

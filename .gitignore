@@ -44,6 +44,7 @@ gql-pluck-output/
 **/.vscode
 backend/local_settings.py
 backend/.env
+backend/.env.docker
 backend/pytest.ini
 .claude/
 CLAUDE.md

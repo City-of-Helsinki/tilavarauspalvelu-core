@@ -1,6 +1,7 @@
 mod be 'backend/justfile'
 mod fe 'frontend/justfile'
 mod infra 'infra.just'
+mod stack 'stack.just'
 
 import? 'local.just'
 
@@ -13,6 +14,8 @@ help:
     @just --list fe
     @echo -e "\n[Infra] \033[0;31m(just infra <recipe>)\033[0m"
     @just --list infra
+    @echo -e "\n[Docker setups with backend and frontend] \033[0;31m(just stack <recipe>)\033[0m"
+    @just --list stack
 
 # Setup environment variables
 setup:
@@ -33,21 +36,17 @@ claude-hooks:
     @jq --slurpfile hooks .agents/hooks/claude-hooks.json '.hooks = $hooks[0]' .claude/settings.json > .claude/settings.json.tmp
     @mv .claude/settings.json.tmp .claude/settings.json
 
-# Open bash in backend container
-bash:
-    @docker exec -it tvp-core bash
+# Open bash in the backend container
+bash: stack::bash
 
-# Start docker containers for frontend development
-run:
-    @docker compose up --detach --build
+# Start the backend in Docker for frontend development. See the Docker section in README.md.
+run: stack::up-backend
 
-# Run required services in docker
-services:
-    @docker compose up --detach --build db redis
+# Run the database and Redis in Docker
+services: stack::services
 
-# Stop running containers
-stop:
-    @docker compose stop
+# Stop the Docker containers
+stop: stack::stop
 
 # Generate GraphQL types for the frontend
 codegen: fe::codegen

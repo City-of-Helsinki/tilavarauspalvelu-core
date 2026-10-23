@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getSignInUrl } from "./urlBuilder";
+import { getClientOrigin, getSignInUrl } from "./urlBuilder";
 
 describe("getSignInUrl", () => {
   it("keeps the query string of the callback url in next", () => {
@@ -35,5 +35,48 @@ describe("getSignInUrl", () => {
       })
     );
     expect(url.searchParams.get("next")).toBe("https://example.com/reservations?x=1");
+  });
+});
+
+describe("getClientOrigin", () => {
+  it("uses the forwarded host and proto", () => {
+    const headers = new Headers({
+      host: "0.0.0.0:3000",
+      "x-forwarded-host": "varaamo.hel.fi",
+      "x-forwarded-proto": "https",
+    });
+    expect(getClientOrigin(headers)).toBe("https://varaamo.hel.fi");
+  });
+
+  it("uses the first value of a forwarded list", () => {
+    const headers = new Headers({
+      "x-forwarded-host": "varaamo.hel.fi, gateway.internal",
+      "x-forwarded-proto": "https, http",
+    });
+    expect(getClientOrigin(headers)).toBe("https://varaamo.hel.fi");
+  });
+
+  it("uses the host header with http without a gateway", () => {
+    const headers = new Headers({ host: "localhost:3000" });
+    expect(getClientOrigin(headers)).toBe("http://localhost:3000");
+  });
+
+  it("uses the request protocol without a forwarded proto", () => {
+    const headers = new Headers({ host: "localhost:3000" });
+    expect(getClientOrigin(headers, "https")).toBe("https://localhost:3000");
+  });
+
+  it("prefers the forwarded proto over the request protocol", () => {
+    const headers = new Headers({ "x-forwarded-host": "varaamo.hel.fi", "x-forwarded-proto": "https" });
+    expect(getClientOrigin(headers, "http")).toBe("https://varaamo.hel.fi");
+  });
+
+  it("reads node request headers", () => {
+    expect(getClientOrigin({ host: "localhost:3000", "x-forwarded-proto": ["https"] })).toBe("https://localhost:3000");
+  });
+
+  it("returns null without a host", () => {
+    expect(getClientOrigin(new Headers())).toBeNull();
+    expect(getClientOrigin({})).toBeNull();
   });
 });
