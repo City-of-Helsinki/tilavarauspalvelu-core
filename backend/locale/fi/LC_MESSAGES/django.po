@@ -3009,6 +3009,11 @@ msgid "fixed"
 msgstr "per kerta"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "PriceComponentKind"
+msgid "Base"
+msgstr "Perushinta"
+
+#: tilavarauspalvelu/enums.py
 msgctxt "PricingStatus"
 msgid "past"
 msgstr "mennyt"
@@ -4097,6 +4102,30 @@ msgstr "henkilötietojen näyttöloki"
 msgid "personal info view logs"
 msgstr "henkilötietojen näyttölokit"
 
+#: tilavarauspalvelu/models/price_component/model.py
+msgid "price component"
+msgstr "hintakomponentti"
+
+#: tilavarauspalvelu/models/price_component/model.py
+msgid "price components"
+msgstr "hintakomponentit"
+
+#: tilavarauspalvelu/models/price_option/model.py
+msgid "price option"
+msgstr "hintavaihtoehto"
+
+#: tilavarauspalvelu/models/price_option/model.py
+msgid "price options"
+msgstr "hintavaihtoehdot"
+
+#: tilavarauspalvelu/models/pricing_group/model.py
+msgid "pricing group"
+msgstr "hinnoitteluryhmä"
+
+#: tilavarauspalvelu/models/pricing_group/model.py
+msgid "pricing groups"
+msgstr "hinnoitteluryhmät"
+
 #: tilavarauspalvelu/models/rejected_occurrence/model.py
 msgid "rejected occurrence"
 msgstr "hylätty ajankohta"
@@ -4257,6 +4286,14 @@ msgstr "varausyksikön hinnoittelu"
 #: tilavarauspalvelu/models/reservation_unit_pricing/model.py
 msgid "reservation unit pricings"
 msgstr "varausyksiköiden hinnoittelut"
+
+#: tilavarauspalvelu/models/reservation_unit_pricing_group/model.py
+msgid "reservation unit pricing group"
+msgstr "varausyksikön hinnoitteluryhmä"
+
+#: tilavarauspalvelu/models/reservation_unit_pricing_group/model.py
+msgid "reservation unit pricing groups"
+msgstr "varausyksiköiden hinnoitteluryhmät"
 
 #: tilavarauspalvelu/models/reservation_unit_type/model.py
 msgid "reservation unit type"
