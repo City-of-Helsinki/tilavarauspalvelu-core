@@ -472,6 +472,11 @@ type Query {
     """Ordering"""
     orderBy: [ReservationOrderingChoices]
   ): [ReservationNode!]
+
+  """
+  Calculate the price lines that a reservation with the given input would get.
+  """
+  reservationPrice(reservationUnit: Int!, priceOption: Int, beginsAt: DateTime!, endsAt: DateTime!): ReservationPriceType
   reservationSeries(
     """The ID of the object"""
     id: ID!
@@ -2892,6 +2897,27 @@ type ReservationNodeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+type ReservationPriceType {
+  lines: [ReservationPriceCalculationLineType!]!
+  total: Decimal!
+  canApplyForDiscount: Boolean!
+  paymentType: PaymentType
+}
+
+type ReservationPriceCalculationLineType {
+  descriptionFi: String!
+  descriptionEn: String!
+  descriptionSv: String!
+  quantity: Decimal!
+  priceUnit: PriceUnit!
+  unitAmount: Decimal!
+  amount: Decimal!
+  taxPercentage: Decimal!
+  materialPriceDescriptionFi: String!
+  materialPriceDescriptionEn: String!
+  materialPriceDescriptionSv: String!
 }
 
 type ReservationSeriesNodeConnection {
