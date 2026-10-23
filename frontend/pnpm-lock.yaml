@@ -393,6 +393,9 @@ importers:
       vitest:
         specifier: ^5.0.5
         version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/coverage-istanbul@5.0.5)(happy-dom@20.10.1)(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
+      vitest-axe:
+        specifier: ^0.1.0
+        version: 0.1.0(vitest@5.0.5)
 
   packages/tsconfig:
     devDependencies:
