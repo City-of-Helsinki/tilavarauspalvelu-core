@@ -17,6 +17,17 @@ import { decodeTimeSlot } from "./modules/applicationRoundAllocation";
 import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { useSelectedSlots } from "./SelectedSlotsContext";
 
+/**
+ * Forget the Highlight, which lives in the `aes` and `allocated` search params.
+ *
+ * A Highlight means "this section on this reservation unit", the same way the Selection does. So the write that
+ * changes the unit clears it in the same navigation.
+ */
+export function clearHighlightParams(params: URLSearchParams): void {
+  params.delete("aes");
+  params.delete("allocated");
+}
+
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();
   const setParams = useSetSearchParams();
@@ -25,11 +36,9 @@ export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT)
 
   const setFocused: (aes?: SectionNodeT) => Promise<void> = async (aes) => {
     const p = new URLSearchParams(params);
+    clearHighlightParams(p);
     if (aes?.pk != null) {
       p.set("aes", aes.pk.toString());
-      p.delete("allocated");
-    } else {
-      p.delete("aes");
     }
     await setParams(p);
   };
@@ -49,11 +58,9 @@ export function useFocusAllocatedSlot(): [
 
   const setAllocated: (allocated?: Pick<AllocatedTimeSlotNodeT, "pk">) => Promise<void> = async (allocated) => {
     const p = new URLSearchParams(params);
+    clearHighlightParams(p);
     if (allocated?.pk != null) {
       p.set("allocated", allocated.pk.toString());
-      p.delete("aes");
-    } else {
-      p.delete("allocated");
     }
     await setParams(p);
   };

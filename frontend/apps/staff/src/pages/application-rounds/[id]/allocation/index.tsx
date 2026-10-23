@@ -29,6 +29,7 @@ import { LinkPrev } from "@/components/LinkPrev";
 import { useGetFilterSearchParams, useSession } from "@/hooks";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { Filters } from "@/lib/application-rounds/[id]/allocation/Filters";
+import { clearHighlightParams } from "@/lib/application-rounds/[id]/allocation/hooks";
 import { createClient } from "@/modules/apolloClient";
 import {
   ALLOCATION_POLL_INTERVAL_MS,
@@ -144,18 +145,22 @@ function ApplicationRoundAllocation({
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const setSingleValueSearchParam = (param: string, value: string | null) => {
+  /**
+   * Show another reservation unit.
+   *
+   * The Highlight goes with the unit, because it names a section or an allocation on the unit that was shown.
+   * Clearing it here keeps it to one navigation, so the view never draws a Highlight of the old unit. The
+   * Selection goes with the unit too, and `SelectedSlotsContextProvider` keys its state on the unit for that.
+   */
+  const setSelectedReservationUnit = (value: number | null) => {
     const vals = new URLSearchParams(searchParams);
     if (value == null) {
-      vals.delete(param);
+      vals.delete("reservationUnit");
     } else {
-      vals.set(param, value);
+      vals.set("reservationUnit", value.toString());
     }
+    clearHighlightParams(vals);
     void setParams(vals);
-  };
-
-  const setSelectedReservationUnit = (value: number | null) => {
-    setSingleValueSearchParam("reservationUnit", value?.toString() ?? null);
   };
 
   const unitFilter = toNumber(searchParams.get("unit"));
