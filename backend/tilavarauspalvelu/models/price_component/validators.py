@@ -46,17 +46,19 @@ class PriceComponentValidator:
         is_past = saved_component.valid_until is not None and saved_component.valid_until <= today
         is_active = not is_past and saved_component.valid_from <= today
 
+        changed_field_names = _get_changed_field_names(
+            saved_component=saved_component,
+            changed_component=changed_component,
+        )
+
         if is_past:
-            if _has_changes(saved_component=saved_component, changed_component=changed_component):
+            if changed_field_names:
                 msg = f"Price component {saved_component.pk} is in the past and cannot be changed."
                 raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_PAST_CHANGED)
             return
 
         if is_active:
-            if _has_changes_other_than_valid_until(
-                saved_component=saved_component,
-                changed_component=changed_component,
-            ):
+            if changed_field_names - {"valid_until"}:
                 msg = f"Price component {saved_component.pk} is active. Only its end date can be changed."
                 raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_ACTIVE_CHANGED)
 
@@ -88,23 +90,9 @@ class PriceComponentValidator:
 # Internals
 
 
-def _has_changes(*, saved_component: PriceComponent, changed_component: PriceComponent) -> bool:
-    return saved_component.valid_until != changed_component.valid_until or _has_changes_other_than_valid_until(
-        saved_component=saved_component, changed_component=changed_component
-    )
-
-
-def _has_changes_other_than_valid_until(*, saved_component: PriceComponent, changed_component: PriceComponent) -> bool:
-    return (
-        saved_component.kind != changed_component.kind
-        or saved_component.valid_from != changed_component.valid_from
-        or saved_component.price_option_id != changed_component.price_option_id
-        or saved_component.amount != changed_component.amount
-        or saved_component.price_unit != changed_component.price_unit
-        or saved_component.accounting_id != changed_component.accounting_id
-        or saved_component.can_apply_for_discount != changed_component.can_apply_for_discount
-        or saved_component.material_price_description_fi != changed_component.material_price_description_fi
-        or saved_component.material_price_description_en != changed_component.material_price_description_en
-        or saved_component.material_price_description_sv != changed_component.material_price_description_sv
-        or saved_component.payment_type != changed_component.payment_type
-    )
+def _get_changed_field_names(*, saved_component: PriceComponent, changed_component: PriceComponent) -> set[str]:
+    return {
+        field.name
+        for field in saved_component._meta.concrete_fields
+        if field.value_from_object(saved_component) != field.value_from_object(changed_component)
+    }

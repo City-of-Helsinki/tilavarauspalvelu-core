@@ -60,9 +60,9 @@ def save_price_component_changes(
                 msg = f"Price component {component.pk} does not belong to this pricing group."
                 raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_NOT_IN_PRICING_GROUP)
 
+            component.pricing_group = pricing_group
             saved_component.validators.validate_change(component)
 
-            component.pricing_group = pricing_group
             try:
                 component.validate_constraints()
             except DjangoValidationError as error:
