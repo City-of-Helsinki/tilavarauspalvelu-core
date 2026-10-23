@@ -88,8 +88,7 @@ export function TimeSelectorForm({
   const getStateLabel = (cell: WeeklyPatternCellInfo<SuitableTimeData>) =>
     t(`application:TimeSelector.legend.${cell.data ? priorityKey(cell.data.priority) : cell.availability}`);
   return (
-    // NOTE flex inside a grid container breaks overflow-x
-    <Flex style={{ display: "grid" }} $marginTop="m">
+    <Flex $marginTop="m">
       <Notification label={t("application:Page2.info")} size={NotificationSize.Small} type="info">
         {t("application:Page2.info")}
       </Notification>
@@ -123,6 +122,7 @@ export function TimeSelectorForm({
             }}
             alternative={{ id: formId, label: t("application:TimeSelector.skipToForm") }}
             aria-label={t("application:TimeSelector.calendarLabel")}
+            style={{ "--weekly-pattern-day-min-width": "110px" } as React.CSSProperties}
           />
         )}
       />

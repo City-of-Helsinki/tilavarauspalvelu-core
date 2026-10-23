@@ -119,7 +119,7 @@ export const WeeklyPatternRoot = styled.div`
     The container's overflow-x: auto scrolls instead of squeezing columns too thin.
   */
   table {
-    min-width: calc(var(--time-column-width) + 7 * var(--weekly-pattern-day-min-width, 110px));
+    width: calc(var(--time-column-width) + 7 * var(--weekly-pattern-day-min-width, 110px));
     user-select: none;
     touch-action: manipulation;
 
