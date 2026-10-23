@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import TYPE_CHECKING, NamedTuple
 
 import graphene
+from django.contrib.postgres.expressions import ArraySubquery
 from django.db import models
 from django.db.models import Sum
+from django.db.models.functions import Cast, JSONObject
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.errors import GQLCodeError
 from lookup_property import L
@@ -12,11 +15,25 @@ from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedFi
 from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
-from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
+from tilavarauspalvelu.enums import (
+    AccessType,
+    PriceComponentKind,
+    PriceUnit,
+    ReservationUnitPublishingState,
+    ReservationUnitReservationState,
+)
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
-from tilavarauspalvelu.models import OriginHaukiResource, PaymentMerchant, Reservation, ReservationUnit, Unit
+from tilavarauspalvelu.models import (
+    OriginHaukiResource,
+    PaymentMerchant,
+    PriceComponent,
+    Reservation,
+    ReservationUnit,
+    ReservationUnitPricingGroup,
+    Unit,
+)
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_date
 from utils.db import SubqueryCount
 
 from .filtersets import ReservationUnitAllFilterSet, ReservationUnitFilterSet
@@ -43,6 +60,20 @@ class ReservableTimeSpanType(graphene.ObjectType):
     end_datetime = graphene.DateTime(required=True)
 
 
+class PriceSummary(NamedTuple):
+    is_free: bool
+    lowest_amount: Decimal
+    price_unit: str
+    varies: bool
+
+
+class PriceSummaryType(graphene.ObjectType):
+    is_free = graphene.Boolean(required=True)
+    lowest_amount = graphene.Decimal(required=True)
+    price_unit = graphene.Field(graphene.Enum.from_enum(PriceUnit), required=True)
+    varies = graphene.Boolean(required=True)
+
+
 class ReservationUnitNode(DjangoNode):
     publishing_state = AnnotatedField(
         graphene.Enum.from_enum(ReservationUnitPublishingState),
@@ -60,6 +91,11 @@ class ReservationUnitNode(DjangoNode):
     effective_access_type = graphene.Field(graphene.Enum.from_enum(AccessType))
 
     hauki_url = ManuallyOptimizedField(graphene.String)
+
+    price_summary = ManuallyOptimizedField(
+        PriceSummaryType,
+        description="Summary of the base prices of the pricing group that the reservation unit uses today.",
+    )
 
     reservable_time_spans = graphene.List(
         graphene.NonNull(ReservableTimeSpanType),
@@ -167,6 +203,7 @@ class ReservationUnitNode(DjangoNode):
             "first_reservable_datetime",
             "effective_access_type",
             "num_active_user_reservations",
+            "price_summary",
         ]
         restricted_fields = {
             "cancellation_rule": lambda user: user.is_authenticated,
@@ -321,6 +358,48 @@ class ReservationUnitNode(DjangoNode):
                 start_date, end_date
             )
         ]
+
+    @staticmethod
+    def optimize_price_summary(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:  # noqa: ARG004
+        today = local_date()
+
+        active_pricing_group = (
+            ReservationUnitPricingGroup.objects
+            .filter(reservation_unit=models.OuterRef(models.OuterRef("pk")), begins__lte=today)
+            .order_by("-begins")
+            .values("pricing_group")[:1]
+        )
+        active_base_components = (
+            PriceComponent.objects
+            .filter(
+                models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+                pricing_group=models.Subquery(active_pricing_group),
+                kind=PriceComponentKind.BASE,
+                valid_from__lte=today,
+            )
+            .order_by("amount", "pk")
+            .annotate(
+                # Amount as text, so that it does not go through a float in JSON.
+                data=JSONObject(amount=Cast("amount", models.CharField()), price_unit="price_unit"),
+            )
+            .values("data")
+        )
+        return queryset.annotate(price_summary_components=ArraySubquery(active_base_components))
+
+    def resolve_price_summary(root: ReservationUnit, info: GQLInfo) -> PriceSummary | None:
+        components: list[dict[str, str]] = root.price_summary_components
+        if not components:
+            return None
+
+        prices = {(Decimal(component["amount"]), component["price_unit"]) for component in components}
+        cheapest = components[0]
+
+        return PriceSummary(
+            is_free=all(amount == 0 for amount, _ in prices),
+            lowest_amount=Decimal(cheapest["amount"]),
+            price_unit=cheapest["price_unit"],
+            varies=len(prices) > 1,
+        )
 
     @staticmethod
     def optimize_num_active_user_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
