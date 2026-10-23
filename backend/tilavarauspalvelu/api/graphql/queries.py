@@ -24,6 +24,9 @@ from .types.payment_merchant.types import PaymentMerchantNode
 from .types.payment_order.types import PaymentOrderNode
 from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
+from .types.price_component.types import PriceComponentNode
+from .types.price_option.types import PriceOptionNode
+from .types.pricing_group.types import PricingGroupNode
 from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
 from .types.reservation_cancel_reason.types import ReservationCancelReasonType
@@ -36,6 +39,7 @@ from .types.reservation_unit_cancellation_rule.types import ReservationUnitCance
 from .types.reservation_unit_image.types import ReservationUnitImageNode
 from .types.reservation_unit_option.types import ReservationUnitOptionNode
 from .types.reservation_unit_pricing.types import ReservationUnitPricingNode
+from .types.reservation_unit_pricing_group.types import ReservationUnitPricingGroupNode
 from .types.reservation_unit_type.types import ReservationUnitTypeNode
 from .types.resource.types import ResourceNode
 from .types.space.types import SpaceNode
@@ -65,6 +69,9 @@ __all__ = [
     "PaymentOrderNode",
     "PaymentProductNode",
     "PermissionCheckerType",
+    "PriceComponentNode",
+    "PriceOptionNode",
+    "PricingGroupNode",
     "RejectedOccurrenceNode",
     "ReservationCancelReasonType",
     "ReservationDenyReasonNode",
@@ -77,6 +84,7 @@ __all__ = [
     "ReservationUnitImageNode",
     "ReservationUnitNode",
     "ReservationUnitOptionNode",
+    "ReservationUnitPricingGroupNode",
     "ReservationUnitPricingNode",
     "ReservationUnitTypeNode",
     "ResourceNode",
