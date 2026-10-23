@@ -22,6 +22,9 @@ jobs:
   build-ui-docker:
     name: "Build customer ui docker"
     uses: ./.github/workflows/build-ui-docker.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       app-name: "customer"
       sentry-project: "tilavarauspalvelu-customer-ui"
@@ -31,6 +34,9 @@ jobs:
   build-admin-ui-docker:
     name: "Build staff ui docker"
     uses: ./.github/workflows/build-ui-docker.yml
+    permissions:
+      contents: read
+      packages: write
     with:
       app-name: "staff"
       sentry-project: "tilavarauspalvelu-staff-ui"

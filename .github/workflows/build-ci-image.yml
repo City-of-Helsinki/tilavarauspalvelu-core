@@ -33,6 +33,7 @@ jobs:
         with:
           sparse-checkout: ${{ env.DOCKERFILE }}
           sparse-checkout-cone-mode: false
+          persist-credentials: false
 
       - name: "Create image name"
         id: image
