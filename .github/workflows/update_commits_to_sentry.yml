@@ -24,11 +24,14 @@ jobs:
   upload-customer-sentry-sourcemaps:
     name: "Upload customer ui sentry sourcemaps"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: "Create release name"
         id: release
         run: >-
@@ -50,11 +53,14 @@ jobs:
   upload-staff-sentry-sourcemaps:
     name: "Upload staff ui sentry sourcemaps"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
         # release name can't contain slashes e.g. merge/PR_number
       - name: "Create release name"
         id: release
