@@ -89,6 +89,7 @@ def calculate_price(
         ).order_by("valid_from")
     )
 
+    # Same rounding as in the old pricing model (`ReservationUnitPricingActions.calculate_reservation_price`).
     duration_minutes = math.ceil((end - begin).total_seconds() / 60 / 15) * 15
     end = begin + datetime.timedelta(minutes=duration_minutes)
 
