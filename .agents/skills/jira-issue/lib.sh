@@ -1,5 +1,7 @@
 # Shared code for the Jira scripts. Source it, do not run it.
 # Each script defines `usage` before it sources this file.
+# macOS ships Bash 3.2. With `set -u`, it fails on "${arr[@]}" when the array is empty.
+# Expand an array that can be empty as ${arr[@]+"${arr[@]}"}.
 
 base_url="https://helsinkisolutionoffice.atlassian.net"
 host='https://helsinkisolutionoffice\.atlassian\.net'

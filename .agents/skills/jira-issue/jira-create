@@ -66,7 +66,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --label)
       check_label "$value"
-      contains "$value" "${labels[@]}" || labels+=("$value")
+      contains "$value" ${labels[@]+"${labels[@]}"} || labels+=("$value")
       ;;
     --blocks | --blocked-by | --relates)
       link_options+=("$option")
@@ -90,8 +90,8 @@ load_credentials
 types="$(api "rest/api/2/issue/createmeta/$project/issuetypes?maxResults=200")"
 type_names=()
 while IFS= read -r name; do type_names+=("$name"); done < <(jq --raw-output '(.issueTypes // .values)[].name' <<<"$types")
-contains "$issue_type" "${type_names[@]}" \
-  || { echo "Not an issue type in $project: $issue_type. Use one of: $(printf '%s, ' "${type_names[@]}" | sed 's/, $//')" >&2; exit 2; }
+contains "$issue_type" ${type_names[@]+"${type_names[@]}"} \
+  || { echo "Not an issue type in $project: $issue_type. Use one of: $(printf '%s, ' ${type_names[@]+"${type_names[@]}"} | sed 's/, $//')" >&2; exit 2; }
 
 # The REST API v2 stores the description as wiki markup.
 body="$(
@@ -99,7 +99,7 @@ body="$(
     --arg project "$project" --arg type "$issue_type" --arg summary "$summary" --arg parent "$parent" \
     --arg has_description "$([[ -n "$description_file" ]] && echo true || echo false)" \
     --rawfile description "${description_file:-/dev/null}" \
-    --argjson labels "$(jq --null-input --compact-output '$ARGS.positional' --args "${labels[@]}")" \
+    --argjson labels "$(jq --null-input --compact-output '$ARGS.positional' --args ${labels[@]+"${labels[@]}"})" \
     '{fields: {project: {key: $project}, issuetype: {name: $type}, summary: $summary}}
     | if $parent != "" then .fields.parent = {key: $parent} else . end
     | if $has_description == "true" then .fields.description = $description else . end
@@ -111,10 +111,10 @@ build_links() {
   local key="$1" i request duplicate
   link_requests=()
   link_texts=()
-  for i in "${!link_options[@]}"; do
+  for i in ${link_options[@]+"${!link_options[@]}"}; do
     make_link "${link_options[$i]}" "$key" "${link_keys[$i]}"
     duplicate=false
-    for request in "${link_requests[@]}"; do
+    for request in ${link_requests[@]+"${link_requests[@]}"}; do
       [[ "$request" != "$link_body" ]] || duplicate=true
     done
     [[ "$duplicate" == false ]] || continue
@@ -129,7 +129,7 @@ if [[ "$dry_run" == true ]]; then
   echo "POST $base_url/rest/api/2/issue"
   jq . <<<"$body"
   build_links NEW-ISSUE
-  for i in "${!link_requests[@]}"; do
+  for i in ${link_requests[@]+"${!link_requests[@]}"}; do
     echo
     echo "POST $base_url/rest/api/2/issueLink"
     jq . <<<"${link_requests[$i]}"
@@ -144,7 +144,7 @@ echo "Created $key ($base_url/browse/$key)."
 
 # Print each link after its request succeeds, so a failure shows what is already done.
 build_links "$key"
-for i in "${!link_requests[@]}"; do
+for i in ${link_requests[@]+"${!link_requests[@]}"}; do
   send POST rest/api/2/issueLink "${link_requests[$i]}" >/dev/null
   echo "- Added link: ${link_texts[$i]}."
 done
