@@ -24,7 +24,7 @@
     "date-fns-tz": "^3.2.0",
     "focus-trap-react": "^11.0.6",
     "graphql": "^16.14.1",
-    "hds-react": "^6.0.5",
+    "hds-react": "^6.0.6",
     "i18next": "^26.4.6",
     "lodash-es": "^4.18.1",
     "react": "^19.3.0",
