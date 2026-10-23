@@ -31,7 +31,7 @@ from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
 from .types.reservation_cancel_reason.types import ReservationCancelReasonType
 from .types.reservation_deny_reason.types import ReservationDenyReasonNode
-from .types.reservation_price_line.types import ReservationPriceLineNode
+from .types.reservation_price_line.types import ReservationPriceLineNode, ReservationPriceType
 from .types.reservation_purpose.types import ReservationPurposeNode
 from .types.reservation_series.types import ReservationSeriesNode
 from .types.reservation_unit.types import ReservationUnitAllNode, ReservationUnitNode
@@ -79,6 +79,7 @@ __all__ = [
     "ReservationDenyReasonNode",
     "ReservationNode",
     "ReservationPriceLineNode",
+    "ReservationPriceType",
     "ReservationPurposeNode",
     "ReservationSeriesNode",
     "ReservationUnitAccessTypeNode",
