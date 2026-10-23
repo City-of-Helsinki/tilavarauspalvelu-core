@@ -12,13 +12,16 @@ import type {
   ReservationUnitNode,
 } from "@gql/gql-types";
 import { Accordion } from "@/components/Accordion";
+import { useGetFilterSearchParams } from "@/hooks";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import { ApplicationSectionCard } from "./ApplicationEventCard";
 import type { AllocationApplicationSectionCardType } from "./ApplicationEventCard";
+import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
+import { toAllocationPattern, toHighlightRanges } from "./modules/allocationPattern";
 import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
 import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
-import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
+import { SelectedSlotsContextProvider, useSelectedSlots } from "./SelectedSlotsContext";
 
 // fit-content is rubbish (content change -> layout jumps),
 // fixed size is impossible unless we use calc
@@ -92,14 +95,29 @@ type ApplicationEventsProps = {
   relatedAllocations: Array<Pick<AllocatedTimeSlotNodeT, "dayOfTheWeek" | "beginTime" | "endTime">>;
 };
 
-export function AllocationPageContent({
+export function AllocationPageContent(props: ApplicationEventsProps): React.ReactElement {
+  return (
+    <SelectedSlotsContextProvider>
+      <AllocationContent {...props} />
+    </SelectedSlotsContextProvider>
+  );
+}
+
+/**
+ * The three columns of the allocation view. It sits inside the Selection's own provider, because the hours the
+ * grid draws cover the Selection, so that a poll cannot push it out of view.
+ */
+function AllocationContent({
   applicationSections,
   reservationUnit,
   refetchApplicationEvents,
   applicationRoundStatus,
   relatedAllocations,
 }: ApplicationEventsProps): React.ReactElement {
-  const relatedSpacesTimeSlotsByDayReduced = getRelatedTimeSlots(relatedAllocations);
+  const { priorityFilter } = useGetFilterSearchParams();
+  const { selection } = useSelectedSlots();
+  const [focusedSection] = useFocusApplicationEvent();
+  const [focusedAllocation] = useFocusAllocatedSlot();
 
   // NOTE left hand cards include other reservation units as well (if they are allocated)
   // remove those from the calendar and the right hand side
@@ -115,27 +133,38 @@ export function AllocationPageContent({
       reservationUnitOptions: ae.reservationUnitOptions?.filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk),
     }));
 
+  // One pass over the data for the whole view. Demand is counted once, and the grid and the column read the same
+  // hours, so the cells and the time selects cannot disagree about what the week holds.
+  const { pattern, extent } = toAllocationPattern({
+    sections: aesForThisUnit,
+    affecting: relatedAllocations,
+    priorityFilter,
+    selection,
+  });
+  const highlights = toHighlightRanges({
+    sections: aesForThisUnit,
+    sectionPk: focusedSection,
+    allocationPk: focusedAllocation,
+    priorityFilter,
+  });
+
   return (
-    <SelectedSlotsContextProvider>
-      <Content>
-        <ApplicationSectionColumn
-          applicationSections={applicationSections}
-          reservationUnit={reservationUnit}
-          refetchApplicationEvents={refetchApplicationEvents}
-        />
-        <AllocationCalendar
-          applicationSections={aesForThisUnit}
-          relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
-        />
-        <AllocationColumn
-          applicationSections={aesForThisUnit}
-          reservationUnit={reservationUnit}
-          refetchApplicationEvents={refetchApplicationEvents}
-          applicationRoundStatus={applicationRoundStatus}
-          relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
-        />
-      </Content>
-    </SelectedSlotsContextProvider>
+    <Content>
+      <ApplicationSectionColumn
+        applicationSections={applicationSections}
+        reservationUnit={reservationUnit}
+        refetchApplicationEvents={refetchApplicationEvents}
+      />
+      <AllocationCalendar pattern={pattern} extent={extent} highlights={highlights} />
+      <AllocationColumn
+        applicationSections={aesForThisUnit}
+        reservationUnit={reservationUnit}
+        refetchApplicationEvents={refetchApplicationEvents}
+        applicationRoundStatus={applicationRoundStatus}
+        relatedAllocations={getRelatedTimeSlots(relatedAllocations)}
+        extent={extent}
+      />
+    </Content>
   );
 }
 

@@ -37,6 +37,33 @@
   "lockOptions": "Hylkää kaikki",
   "lockPartialOptions": "Hylkää loput",
   "unlockOptions": "Palauta käsittelyyn",
+  "calendar": {
+    "label": "Vuorojen jaon kalenteri",
+    "skipToForm": "Siirry ajan valintaan",
+    "announcements": {
+      "chosen": "Valittu",
+      "cleared": "Valinta poistettu"
+    },
+    "state": {
+      "free": "Ei vuorotoiveita",
+      "demand_one": "1 vuorotoive",
+      "demand_other": "{{count}} vuorotoivetta",
+      "allocated": "Jaettu vuoro",
+      "affecting": "Estynyt, aika on jo jaettu",
+      "highlighted": "korostettu"
+    },
+    "legend": {
+      "demandOne": "1 vuorotoive",
+      "demandFew": "2-4 vuorotoivetta",
+      "demandMany": "5-10 vuorotoivetta",
+      "demandFull": "Yli 10 vuorotoivetta",
+      "allocated": "Jaettu vuoro",
+      "affecting": "Estynyt",
+      "selection": "Valittu aika",
+      "highlightRange": "Hakijan vuorotoiveet",
+      "highlightAllocation": "Hakijan jaettu vuoro"
+    }
+  },
   "errors": {
     "accepting": {
       "generic": "Varmista, että hakukierros on käsittelyssä ja että valittu ajankohta on vapaana."

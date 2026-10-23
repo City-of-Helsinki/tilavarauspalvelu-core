@@ -1,6 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterAll, beforeAll, vi, afterEach } from "vitest";
+import { afterAll, beforeAll, vi, afterEach, expect } from "vitest";
+// vitest-axe only exports the matchers as a namespace
+// oxlint-disable-next-line import/no-namespace
+import * as axeMatchers from "vitest-axe/matchers";
+
+expect.extend(axeMatchers);
 
 beforeAll(() => {
   // Workaround react-testing-library hard coding to jest.useFakeTimers
