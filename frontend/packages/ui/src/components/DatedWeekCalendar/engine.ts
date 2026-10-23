@@ -212,3 +212,10 @@ export function resizeRange(range: DatedRange, minutes: number, minimum: number)
   const shortest = shiftRange({ start: range.start, end: range.start }, { minutes: minimum }).start;
   return { start: range.start, end: end < shortest ? shortest : end };
 }
+
+export function nowOffsetPercent(nowMinutes: number, nowIndex: number, step: number) {
+  return ((nowMinutes - nowIndex * step) / step) * 100;
+}
+export function nowHourOffsetPercent(nowMinutes: number) {
+  return ((nowMinutes - Math.floor(nowMinutes / 60) * 60) / 60) * 100;
+}
