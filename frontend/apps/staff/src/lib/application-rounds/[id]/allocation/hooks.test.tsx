@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
 import { CreateAllocatedTimeSlotDocument, DeleteAllocatedTimeSlotDocument, Weekday } from "@gql/gql-types";
 import {
+  clearHighlightParams,
   useAcceptSlotMutation,
   useFocusAllocatedSlot,
   useFocusApplicationEvent,
@@ -132,7 +133,7 @@ describe("useFocusAllocatedSlot", () => {
 });
 
 function Wrapper({ children }: { children: React.ReactNode }) {
-  return <SelectedSlotsContextProvider>{children}</SelectedSlotsContextProvider>;
+  return <SelectedSlotsContextProvider reservationUnitPk={1}>{children}</SelectedSlotsContextProvider>;
 }
 
 // The hook is a string key adapter over the interval the context holds, so a test needs to see both shapes.
@@ -235,6 +236,84 @@ describe("useSlotSelection", () => {
       result.current.setSlots(["9-10-00"]);
     });
     expect(result.current.slots).toEqual(["1-10-00", "1-10-30", "1-11-00"]);
+  });
+});
+
+describe("clearHighlightParams", () => {
+  it("removes both Highlight params and leaves the rest alone", () => {
+    const params = new URLSearchParams("unit=2&aes=5&allocated=3&priority=PRIMARY");
+    clearHighlightParams(params);
+    expect(params.toString()).toBe("unit=2&priority=PRIMARY");
+  });
+
+  it("does nothing when there is no Highlight", () => {
+    const params = new URLSearchParams("unit=2");
+    clearHighlightParams(params);
+    expect(params.toString()).toBe("unit=2");
+  });
+});
+
+/** Shows the Selection the context holds, and sets one on request. */
+function SelectionProbe(): ReactElement {
+  const { selection, setSelection } = useSelectedSlots();
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() =>
+          setSelection({
+            weekday: Weekday.Tuesday,
+            beginMinutes: 10 * 60,
+            endMinutes: 10 * 60 + 30,
+          })
+        }
+      >
+        select
+      </button>
+      <span data-testid="selection">
+        {selection == null ? "none" : `${selection.weekday} ${selection.beginMinutes}`}
+      </span>
+    </>
+  );
+}
+
+describe("SelectedSlotsContextProvider", () => {
+  function renderWithUnit(reservationUnitPk: number) {
+    const view = render(
+      <SelectedSlotsContextProvider reservationUnitPk={reservationUnitPk}>
+        <SelectionProbe />
+      </SelectedSlotsContextProvider>
+    );
+    const showUnit = (pk: number) =>
+      view.rerender(
+        <SelectedSlotsContextProvider reservationUnitPk={pk}>
+          <SelectionProbe />
+        </SelectedSlotsContextProvider>
+      );
+    return { ...view, showUnit };
+  }
+
+  it("clears the Selection when the reservation unit changes", async () => {
+    const view = renderWithUnit(1);
+    const user = userEvent.setup();
+    await user.click(view.getByRole("button", { name: /select/i }));
+    expect(view.getByTestId("selection")).toHaveTextContent(`${Weekday.Tuesday} 600`);
+
+    view.showUnit(2);
+
+    expect(view.getByTestId("selection")).toHaveTextContent("none");
+  });
+
+  it("keeps the Selection when the reservation unit stays the same", async () => {
+    const view = renderWithUnit(1);
+    const user = userEvent.setup();
+    await user.click(view.getByRole("button", { name: /select/i }));
+
+    // a filter change renders the view again with the same unit
+    view.showUnit(1);
+
+    expect(view.getByTestId("selection")).toHaveTextContent(`${Weekday.Tuesday} 600`);
   });
 });
 
