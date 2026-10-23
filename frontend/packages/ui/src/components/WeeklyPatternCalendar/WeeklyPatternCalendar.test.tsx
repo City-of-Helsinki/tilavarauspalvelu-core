@@ -73,7 +73,6 @@ function SelectHarness({ value = [], initialSelection = null, onSelectionChange,
         selectionAnnouncements={{ chosen: "Selected", cleared: "Selection cleared" }}
         step={30}
         availability={availability}
-        locale="en"
         getStateLabel={(cell) => (cell.data ? cell.data.priority : cell.availability === "open" ? "free" : "closed")}
         getCellAppearance={(data) => (data.priority === "primary" ? "primary" : "secondary")}
         alternative={{ id: "form", label: "Skip to the time form" }}

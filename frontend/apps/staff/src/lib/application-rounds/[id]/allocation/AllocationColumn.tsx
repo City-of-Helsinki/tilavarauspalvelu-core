@@ -6,6 +6,7 @@ import styled from "styled-components";
 import type { ApolloQueryResult } from "@apollo/client";
 import type { Option } from "hds-react";
 import type { TFunction } from "next-i18next/pages";
+import type { VisibleHours } from "@ui/components/WeeklyPatternCalendar/types";
 import { ShowAllContainer } from "ui/src/components";
 import type { DayT } from "ui/src/modules/const";
 import { numberToDayT, transformWeekday } from "ui/src/modules/conversion";
@@ -14,7 +15,7 @@ import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/
 import { fontMedium } from "ui/src/styled";
 import { ApplicationRoundStatusChoice, ApplicationSectionStatusChoice } from "@gql/gql-types";
 import type { ApplicationSectionAllocationsQuery, ReservationUnitNode, Weekday } from "@gql/gql-types";
-import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
+import { ALLOCATION_TIME_FORM_ID } from "@/modules/const";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
 import { decodeTimeSlot, getTimeSlotOptions, isInsideSelection } from "./modules/applicationRoundAllocation";
@@ -31,6 +32,8 @@ type Props = {
   refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
   relatedAllocations: RelatedSlot[][];
+  /** The hours the grid draws. The time options come from them, so both sides offer the same times. */
+  extent: VisibleHours;
 };
 
 const Wrapper = styled.div`
@@ -125,9 +128,13 @@ function deserializeSlot(slot: string): { day: DayT; hour: number; mins: number 
   return { day: day, hour, mins };
 }
 
-function TimeSelection(): React.ReactElement {
+function TimeSelection({ extent }: { extent: VisibleHours }): React.ReactElement {
   const { t } = useTranslation();
   const [selection, setSelection] = useSlotSelection();
+
+  // The last option starts in the hour before the end of the extent, because an option is a slot start.
+  const start = Math.floor(extent.beginMinutes / 60);
+  const end = Math.ceil(extent.endMinutes / 60) - 1;
 
   const getOptions = useCallback(
     (type: "start" | "end") => {
@@ -136,15 +143,13 @@ function TimeSelection(): React.ReactElement {
         return [];
       }
       const d = sel.split("-")[0];
-      const start = ALLOCATION_CALENDAR_TIMES[0];
-      const end = ALLOCATION_CALENDAR_TIMES[1];
       const day = numberToDayT(Number(d));
       if (day == null) {
         return [];
       }
       return getTimeSlotOptions(day, start, 0, end, type === "end");
     },
-    [selection]
+    [selection, start, end]
   );
 
   const timeSlotStartOptions = getOptions("start");
@@ -304,6 +309,7 @@ export function AllocationColumn({
   refetchApplicationEvents,
   applicationRoundStatus,
   relatedAllocations,
+  extent,
 }: Props): React.ReactElement | null {
   const { t } = useTranslation();
   const [selection, setSelection] = useSlotSelection();
@@ -386,13 +392,14 @@ export function AllocationColumn({
   );
 
   return (
-    <Wrapper>
+    // The grid's skip link lands here, because this column is the equal form for the same task.
+    <Wrapper id={ALLOCATION_TIME_FORM_ID}>
       <CloseBtn type="button" onClick={() => setSelection([])}>
         <IconCross />
       </CloseBtn>
       <TimeLabel>{getTimeLabel(selection, t)}</TimeLabel>
       <StyledShowAllContainer showAllLabel={t("allocation:changeTime")}>
-        <TimeSelection />
+        <TimeSelection extent={extent} />
       </StyledShowAllContainer>
       {allocatedData.map((props) => (
         <AllocatedCard

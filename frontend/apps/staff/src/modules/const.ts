@@ -9,7 +9,9 @@ export const PUBLIC_URL = env.NEXT_PUBLIC_BASE_URL ?? "";
 export const LIST_PAGE_SIZE = 50;
 export const LARGE_LIST_PAGE_SIZE = 100;
 
-export const ALLOCATION_CALENDAR_TIMES = [7, 23] as const;
+/// The allocation column, which is the equal form for the task the allocation grid does.
+/// The grid's skip link leads here, so both sides have to agree on the id.
+export const ALLOCATION_TIME_FORM_ID = "allocation-time-form";
 
 export const NUMBER_OF_DECIMALS = 6;
 
