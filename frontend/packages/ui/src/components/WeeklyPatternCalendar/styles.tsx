@@ -95,18 +95,20 @@ const eventBackground = (appearance: CellAppearance) => css`
 `;
 
 /**
- * The grid's own box. A view that needs another size sets one of these custom properties on an ancestor, or
- * through the calendar's `style` prop:
+ * The grid's own box. A view that needs another size, or another colour, sets one of these custom properties on
+ * an ancestor, or through the calendar's `style` prop:
  *
  * - `--weekly-pattern-height`, the height of the box. `auto` drops the inner vertical scroll and lets the page
  *   carry the whole grid.
  * - `--weekly-pattern-day-min-width`, how narrow a weekday column may get before the box scrolls sideways.
  * - `--weekly-pattern-step-height`, the height of one row.
+ * - `--weekly-pattern-selection-color`, the colour of the frame around the Selection in select mode.
  *
  * The defaults suit the application funnel and the staff application view, which pass nothing.
  */
 export const WeeklyPatternRoot = styled.div`
   --border-color: var(--color-black-50);
+  --selection-color: var(--weekly-pattern-selection-color, var(--color-black-80));
   ${gridTableStyles};
 
   position: relative;
@@ -233,6 +235,31 @@ export const WeeklyPatternRoot = styled.div`
 
     &[data-appearance="secondary"][data-run-start] {
       ${secondaryIndicator};
+    }
+  }
+
+  /*
+    Select mode. The Selection is one run of cells on one weekday, so it is drawn as one frame around the run:
+    both sides on every cell, the top on the first and the bottom on the last. A view that wants a tint as well
+    styles these same attributes. The frame is a box shadow, so it takes no space and leaves the focus outline,
+    which is an outline, to show on top of it.
+  */
+  table[data-select] tbody td[data-selected] {
+    --selection-top: 0;
+    --selection-bottom: 0;
+
+    box-shadow:
+      inset 3px 0 0 0 var(--selection-color),
+      inset -3px 0 0 0 var(--selection-color),
+      inset 0 var(--selection-top) 0 0 var(--selection-color),
+      inset 0 calc(-1 * var(--selection-bottom)) 0 0 var(--selection-color);
+
+    &[data-selection-start] {
+      --selection-top: 3px;
+    }
+
+    &[data-selection-end] {
+      --selection-bottom: 3px;
     }
   }
 
