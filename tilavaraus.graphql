@@ -895,7 +895,7 @@ type ReservationUnitNode implements Node {
   ): [ReservationUnitAccessTypeNode!]!
   images: [ReservationUnitImageNode!]!
   pricings: [ReservationUnitPricingNode!]!
-  pricingGroups: [ReservationUnitPricingGroupNode!]!
+  reservationUnitPricingGroups: [ReservationUnitPricingGroupNode!]!
 
   """The ID of the object"""
   id: ID!
@@ -2401,7 +2401,7 @@ type PricingGroupNode implements Node {
   nameSv: String
   unitGroup: UnitGroupNode
   components: [PriceComponentNode!]!
-  reservationUnits: [ReservationUnitPricingGroupNode!]!
+  reservationUnitPricingGroups: [ReservationUnitPricingGroupNode!]!
 
   """The ID of the object"""
   id: ID!

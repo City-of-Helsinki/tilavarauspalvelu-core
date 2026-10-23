@@ -88,8 +88,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('begins', models.DateField()),
-                ('pricing_group', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='reservation_units', to='tilavarauspalvelu.pricinggroup')),
-                ('reservation_unit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='pricing_groups', to='tilavarauspalvelu.reservationunit')),
+                ('pricing_group', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='reservation_unit_pricing_groups', to='tilavarauspalvelu.pricinggroup')),
+                ('reservation_unit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reservation_unit_pricing_groups', to='tilavarauspalvelu.reservationunit')),
             ],
             options={
                 'verbose_name': 'reservation unit pricing group',

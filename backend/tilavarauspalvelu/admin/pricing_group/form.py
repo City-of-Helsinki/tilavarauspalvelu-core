@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-RESERVATION_UNITS_PREFIX = "reservation_units"
+RESERVATION_UNITS_PREFIX = "reservation_unit_pricing_groups"
 
 
 class PriceComponentForm(forms.ModelForm):
@@ -75,7 +75,7 @@ class PriceComponentFormSet(BaseInlineFormSet):
             prefix=RESERVATION_UNITS_PREFIX,
         )
         if not reservation_unit_formset.is_valid():
-            return list(self.instance.reservation_units.values_list("begins", flat=True))
+            return list(self.instance.reservation_unit_pricing_groups.values_list("begins", flat=True))
 
         return [
             form.cleaned_data["begins"]

@@ -30,12 +30,12 @@ class ReservationUnitPricingGroup(models.Model):
 
     reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
-        related_name="pricing_groups",
+        related_name="reservation_unit_pricing_groups",
         on_delete=models.CASCADE,
     )
     pricing_group: PricingGroup = models.ForeignKey(
         "tilavarauspalvelu.PricingGroup",
-        related_name="reservation_units",
+        related_name="reservation_unit_pricing_groups",
         on_delete=models.PROTECT,
     )
     begins: datetime.date = models.DateField()

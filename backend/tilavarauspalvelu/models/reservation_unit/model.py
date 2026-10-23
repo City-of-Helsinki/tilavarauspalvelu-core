@@ -329,7 +329,9 @@ class ReservationUnit(models.Model):
 
     reservation_unit_hierarchy: ReservationUnitHierarchy | None  # Can be missing
     pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
-    pricing_groups: OneToManyRelatedManager[ReservationUnitPricingGroup, ReservationUnitPricingGroupQuerySet]
+    reservation_unit_pricing_groups: OneToManyRelatedManager[
+        ReservationUnitPricingGroup, ReservationUnitPricingGroupQuerySet
+    ]
     reservation_unit_options: OneToManyRelatedManager[ReservationUnitOption, ReservationUnitOptionQuerySet]
     images: OneToManyRelatedManager[ReservationUnitImage, ReservationUnitImageQuerySet]
     access_types: OneToManyRelatedManager[ReservationUnitAccessType, ReservationUnitAccessTypeQuerySet]

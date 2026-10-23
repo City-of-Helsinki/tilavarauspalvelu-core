@@ -23,4 +23,4 @@ class PricingGroupFactory(GenericDjangoModelFactory[PricingGroup]):
     unit_group = ForeignKeyFactory("tests.factories.UnitGroupFactory")
 
     components = ReverseForeignKeyFactory("tests.factories.PriceComponentFactory")
-    reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingGroupFactory")
+    reservation_unit_pricing_groups = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingGroupFactory")

@@ -156,7 +156,7 @@ class ReservationUnitNode(DjangoNode):
             # Reverse one-to-many related
             "images",
             "pricings",
-            "pricing_groups",
+            "reservation_unit_pricing_groups",
             "access_types",
             "application_round_time_slots",
             #

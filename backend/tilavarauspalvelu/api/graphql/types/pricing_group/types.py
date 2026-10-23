@@ -19,6 +19,6 @@ class PricingGroupNode(DjangoNode):
             "name",
             "unit_group",
             "components",
-            "reservation_units",
+            "reservation_unit_pricing_groups",
         ]
         permission_classes = [PricingGroupPermission]

@@ -37,13 +37,13 @@ def test_reservation_unit__query__pricing_groups_exclude_past_rows(graphql):
         begins=today + datetime.timedelta(days=10),
     )
 
-    fields = "pricingGroups { begins pricingGroup { pk } }"
+    fields = "reservationUnitPricingGroups { begins pricingGroup { pk } }"
     query = reservation_unit_query(fields=fields, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
     response = graphql(query)
 
     assert response.has_errors is False, response
     assert response.first_query_object == {
-        "pricingGroups": [
+        "reservationUnitPricingGroups": [
             {"begins": active.begins.isoformat(), "pricingGroup": {"pk": active.pricing_group.pk}},
             {"begins": future.begins.isoformat(), "pricingGroup": {"pk": future.pricing_group.pk}},
         ],
@@ -58,9 +58,9 @@ def test_reservation_unit__query__only_future_pricing_group(graphql):
         begins=today + datetime.timedelta(days=10),
     )
 
-    fields = "pricingGroups { begins }"
+    fields = "reservationUnitPricingGroups { begins }"
     query = reservation_unit_query(fields=fields, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert response.first_query_object == {"pricingGroups": [{"begins": future.begins.isoformat()}]}
+    assert response.first_query_object == {"reservationUnitPricingGroups": [{"begins": future.begins.isoformat()}]}

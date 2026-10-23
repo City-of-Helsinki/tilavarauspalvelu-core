@@ -343,7 +343,7 @@ class PermissionResolver:
 
         units = (
             Unit.objects
-            .filter(reservation_units__pricing_groups__pricing_group=pricing_group)
+            .filter(reservation_units__reservation_unit_pricing_groups__pricing_group=pricing_group)
             .prefetch_related("unit_groups")
             .distinct()
         )

@@ -132,7 +132,7 @@ def remove_existing_data() -> None:
 
     own_pricing_groups = PricingGroup.objects.filter(
         unit_group__isnull=True,
-        reservation_units__reservation_unit__in=sq,
+        reservation_unit_pricing_groups__reservation_unit__in=sq,
     )
     own_pricing_group_ids = list(own_pricing_groups.values_list("id", flat=True))
 

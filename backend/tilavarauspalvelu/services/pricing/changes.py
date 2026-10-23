@@ -99,7 +99,9 @@ def save_price_component_changes(
         for component in changed_components:
             merged_components[component.pk] = component
 
-        reservation_unit_begin_dates = list(pricing_group.reservation_units.values_list("begins", flat=True))
+        reservation_unit_begin_dates = list(
+            pricing_group.reservation_unit_pricing_groups.values_list("begins", flat=True)
+        )
         all_components = [*merged_components.values(), *new_components]
         coverage_errors = check_pricing_group_coverage(
             components=all_components,

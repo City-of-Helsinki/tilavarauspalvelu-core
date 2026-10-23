@@ -93,7 +93,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     effectiveAccessType: null,
     maxPersons: null,
     pricings: [],
-    pricingGroups: [],
+    reservationUnitPricingGroups: [],
     unit: createMockUnit({ pk }),
     reservationUnitType: createMockReservationUnitType({
       name: "ReservationUnitType",

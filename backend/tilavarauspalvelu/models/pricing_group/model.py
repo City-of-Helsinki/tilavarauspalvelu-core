@@ -49,7 +49,9 @@ class PricingGroup(models.Model):
     validators: LazyAttribute[PricingGroupValidator] = LazyModelAttribute.new()
 
     components: OneToManyRelatedManager[PriceComponent, PriceComponentQuerySet]
-    reservation_units: OneToManyRelatedManager[ReservationUnitPricingGroup, ReservationUnitPricingGroupQuerySet]
+    reservation_unit_pricing_groups: OneToManyRelatedManager[
+        ReservationUnitPricingGroup, ReservationUnitPricingGroupQuerySet
+    ]
 
     class Meta:
         db_table = "pricing_group"
