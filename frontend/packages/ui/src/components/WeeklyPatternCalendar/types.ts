@@ -36,6 +36,10 @@ export type WeeklyPatternCellInfo<TData extends CalendarData> = WeekdayInterval 
   isRunEnd: boolean;
   runBeginMinutes: number;
   runEndMinutes: number;
+  /** First cell of the Selection, so a view can draw a frame around the whole run. False outside select mode. */
+  isSelectionStart: boolean;
+  /** Last cell of the Selection. False outside select mode. */
+  isSelectionEnd: boolean;
   availability: "open" | "closed";
 };
 
@@ -53,19 +57,58 @@ export type WeeklyPatternAnnouncements = {
   erased: string;
 };
 
+export type WeeklyPatternSelectionAnnouncements = {
+  /** Spoken (with weekday and time range appended) after a Selection is chosen, e.g. "Selected". */
+  chosen: string;
+  /** Spoken (with weekday and time range appended) after the Selection is cleared, e.g. "Selection cleared". */
+  cleared: string;
+};
+
+/** Painting writes the value. Each gesture paints or erases, and a paint can be refused. */
 type EditableProps<TData extends CalendarData> = {
   readOnly?: false;
   onChange: (value: WeeklyPatternValue<TData>) => void;
   announcements: WeeklyPatternAnnouncements;
+  selection?: never;
+  onSelectionChange?: never;
+  selectionAnnouncements?: never;
 };
 
+/** Nothing can be changed. The value is only drawn. */
 type ReadOnlyProps<TData extends CalendarData> = {
   readOnly: true;
   onChange?: (value: WeeklyPatternValue<TData>) => void;
   announcements?: WeeklyPatternAnnouncements;
+  selection?: never;
+  onSelectionChange?: never;
+  selectionAnnouncements?: never;
 };
 
-export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditableProps<TData> | ReadOnlyProps<TData>) & {
+/**
+ * The gestures choose a Selection, which is one span on one weekday that the consumer owns. The value is still
+ * drawn, so a layer such as Demand and the Selection live in the same cell. `aria-selected` marks only the
+ * Selection here.
+ */
+type SelectProps<TData extends CalendarData> = {
+  readOnly?: false;
+  /** Never called in this mode. It is taken so the props of a form field can still be spread in. */
+  onChange?: (value: WeeklyPatternValue<TData>) => void;
+  announcements?: never;
+  /** The chosen span, or `null` when nothing is chosen. */
+  selection: WeekdayInterval | null;
+  /**
+   * Called with the span every committed gesture chose, or with `null` when the Selection is cleared. There is no
+   * return value, so a Selection is never refused.
+   */
+  onSelectionChange: (next: WeekdayInterval | null) => void;
+  selectionAnnouncements: WeeklyPatternSelectionAnnouncements;
+};
+
+export type WeeklyPatternCalendarProps<TData extends CalendarData> = (
+  | EditableProps<TData>
+  | ReadOnlyProps<TData>
+  | SelectProps<TData>
+) & {
   // Controlled value/onChange pair, shaped like a react-hook-form Controller field.
   value: WeeklyPatternValue<TData>;
   onBlur?: () => void;
