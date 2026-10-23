@@ -14,6 +14,7 @@ from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
+from tilavarauspalvelu.api.graphql.types.reservation_price_line.types import ReservationPriceLineNode
 from tilavarauspalvelu.api.graphql.types.user.types import UserNode
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -33,6 +34,7 @@ from .filtersets import ReservationFilterSet
 from .permissions import ReservationPermission
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationPriceLine
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import AnyUser, GQLInfo, PindoraReservationInfoData
 
@@ -186,6 +188,7 @@ class ReservationNode(DjangoNode):
     reservee_type = graphene.Field(graphene.Enum.from_enum(ReserveeType))
     #
     user = graphene.Field(UserNode)
+    price_lines = graphene.List(graphene.NonNull(ReservationPriceLineNode))
 
     class Meta:
         model = Reservation
@@ -214,6 +217,7 @@ class ReservationNode(DjangoNode):
             "price_net",
             "unit_price",
             "tax_percentage_value",
+            "price_lines",
             #
             "access_type",
             "access_code_generated_at",
@@ -296,6 +300,9 @@ class ReservationNode(DjangoNode):
         )
         user_optimizer.only_fields.append("id")
         return queryset
+
+    def resolve_price_lines(root: Reservation, info: GQLInfo) -> models.QuerySet[ReservationPriceLine]:
+        return root.price_lines.all()
 
     def resolve_calendar_url(root: Reservation, info: GQLInfo) -> str:
         scheme = info.context.scheme
