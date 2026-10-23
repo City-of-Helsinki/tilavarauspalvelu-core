@@ -30,7 +30,7 @@ from graphene_django_extensions.errors import (
 )
 from rest_framework.exceptions import ValidationError
 from sentry_sdk.integrations.django import _got_request_exception  # noqa: PLC2701
-from social_core.exceptions import AuthCanceled, AuthFailed, AuthStateForbidden, AuthStateMissing, AuthTokenError
+from social_core.exceptions import AuthCanceled, AuthCredentialError, AuthResponseError, AuthSessionError
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
@@ -276,24 +276,30 @@ if sentry_disconnected:
 
         # Social auth errors
 
-        if isinstance(exception, AuthFailed):
+        # The message of a social auth error is generic. The provider's message is in `detail`.
+
+        if isinstance(exception, AuthCredentialError):
             msg = "Authentication failed"
-            SentryLogger.log_message(msg, details=str(exception), level="info")
+            details = {"code": exception.code, "stage": exception.stage, "detail": exception.detail}
+            SentryLogger.log_message(msg, details=details, level="info")
             return
 
         if isinstance(exception, AuthCanceled):
             msg = "Authentication cancelled"
-            SentryLogger.log_message(msg, details=str(exception), level="info")
+            details = {"code": exception.code, "stage": exception.stage, "detail": exception.detail}
+            SentryLogger.log_message(msg, details=details, level="info")
             return
 
-        if isinstance(exception, AuthTokenError):
+        if isinstance(exception, AuthResponseError):
             msg = "Authentication token is invalid"
-            SentryLogger.log_message(msg, details=str(exception), level="info")
+            details = {"code": exception.code, "stage": exception.stage, "detail": exception.detail}
+            SentryLogger.log_message(msg, details=details, level="info")
             return
 
-        if isinstance(exception, AuthStateMissing | AuthStateForbidden):
+        if isinstance(exception, AuthSessionError):
             msg = "Authentication state is invalid"
-            SentryLogger.log_message(msg, details=str(exception), level="info")
+            details = {"code": exception.code, "stage": exception.stage, "detail": exception.detail}
+            SentryLogger.log_message(msg, details=details, level="info")
             return
 
         # Validation errors

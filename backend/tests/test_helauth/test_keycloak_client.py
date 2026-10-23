@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from unittest.mock import MagicMock
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
@@ -12,9 +11,9 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import UserFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import patch_method
 
-from .helpers import TokenRequest
+from .helpers import ErrorResponse, TokenRequest
 
 pytestmark = [
     pytest.mark.django_db,
@@ -66,9 +65,9 @@ def test_keycloak_client__get_token__expired_token_is_refreshed(keycloak):
     }
 
     social_auth = user.social_auth.get()
-    assert social_auth.extra_data["id_token"] == keycloak.id_token
+    assert social_auth.extra_data["id_token"] == keycloak.issued_id_tokens[-1]
     assert social_auth.extra_data["auth_time"] == int(local_datetime().timestamp())
-    assert social_auth.extra_data["token_type"] == "bearer"
+    assert social_auth.extra_data["token_type"] == "Bearer"
     assert social_auth.extra_data["refresh_token"] == "refreshed-refresh-token"
     assert social_auth.extra_data["access_token"] == "refreshed-access-token"
 
@@ -108,10 +107,7 @@ def test_keycloak_client__refresh_token__user_without_social_auth(keycloak):
 def test_keycloak_client__refresh_token__expired_refresh_token(keycloak):
     user = UserFactory.create_profile_user()
     refresh_token = user.current_social_auth.extra_data["refresh_token"]
-    keycloak.refresh_error_responses[refresh_token] = ResponseMock(
-        json_data={"error": "invalid_grant"},
-        status_code=400,
-    )
+    keycloak.refresh_error_responses[refresh_token] = ErrorResponse(status_code=400, error="invalid_grant")
     session = {}
 
     token = KeyCloakClient.refresh_token(user=user, session=session)
@@ -128,28 +124,32 @@ def test_keycloak_client__refresh_token__expired_refresh_token(keycloak):
 def test_keycloak_client__refresh_token__other_error(keycloak):
     user = UserFactory.create_profile_user()
     refresh_token = user.current_social_auth.extra_data["refresh_token"]
-    keycloak.refresh_error_responses[refresh_token] = ResponseMock(
-        json_data={"error": "invalid_client"},
-        status_code=401,
-    )
+    keycloak.refresh_error_responses[refresh_token] = ErrorResponse(status_code=401, error="invalid_client")
     session = {}
 
     token = KeyCloakClient.refresh_token(user=user, session=session)
 
     assert token is None
     assert session == {}
-    assert SentryLogger.log_message.call_count == 0
+
+    SentryLogger.log_message.assert_called_once_with(
+        "Unable to refresh keycloak token",
+        details={
+            "user": user.pk,
+            "code": "invalid_setting",
+            "provider_code": "invalid_client",
+            "status_code": 401,
+            "detail": "",
+        },
+        level="error",
+    )
 
 
 @patch_method(SentryLogger.log_message)
 def test_keycloak_client__refresh_token__error_response_is_not_json(keycloak):
     user = UserFactory.create_profile_user()
     refresh_token = user.current_social_auth.extra_data["refresh_token"]
-
-    error_response = MagicMock()
-    error_response.text = "Bad Gateway"
-    error_response.json.side_effect = ValueError("Not JSON")
-    keycloak.refresh_error_responses[refresh_token] = error_response
+    keycloak.refresh_error_responses[refresh_token] = ErrorResponse(status_code=502, text="Bad Gateway")
 
     session = {}
 
@@ -160,6 +160,6 @@ def test_keycloak_client__refresh_token__error_response_is_not_json(keycloak):
 
     SentryLogger.log_message.assert_called_once_with(
         "Unable to refresh keycloak token",
-        details={"user": user.pk, "error": "Bad Gateway"},
+        details={"user": user.pk, "code": "unavailable", "provider_code": None, "status_code": 502, "detail": ""},
         level="error",
     )
