@@ -15,6 +15,9 @@ from .models import (
     Equipment,
     EquipmentCategory,
     IntendedUse,
+    PriceComponent,
+    PriceOption,
+    PricingGroup,
     ReservationDenyReason,
     ReservationPurpose,
     ReservationUnit,
@@ -109,6 +112,21 @@ class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
 
 @register_lazy(ReservationUnitType)
 class ReservationUnitTypeTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register_lazy(PriceComponent)
+class PriceComponentTranslationOptions(TranslationOptions):
+    fields = ["material_price_description"]
+
+
+@register_lazy(PriceOption)
+class PriceOptionTranslationOptions(TranslationOptions):
+    fields = ["name", "description"]
+
+
+@register_lazy(PricingGroup)
+class PricingGroupTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
