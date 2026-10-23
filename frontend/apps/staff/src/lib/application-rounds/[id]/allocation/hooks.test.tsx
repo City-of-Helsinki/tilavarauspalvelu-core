@@ -136,106 +136,37 @@ function Wrapper({ children }: { children: React.ReactNode }) {
   return <SelectedSlotsContextProvider reservationUnitPk={1}>{children}</SelectedSlotsContextProvider>;
 }
 
-// The hook is a string key adapter over the interval the context holds, so a test needs to see both shapes.
-function useSlotSelectionBridge() {
-  const [slots, setSlots] = useSlotSelection();
-  const { selection } = useSelectedSlots();
-  return { slots, setSlots, selection };
-}
-
-function renderSlotSelection() {
-  return renderHook(() => useSlotSelectionBridge(), { wrapper: Wrapper });
-}
-
 describe("useSlotSelection", () => {
-  it("starts with no selected slots", () => {
+  function renderSlotSelection() {
+    return renderHook(() => useSlotSelection(), { wrapper: Wrapper });
+  }
+
+  it("starts with no Selection", () => {
     const { result } = renderSlotSelection();
-    expect(result.current.slots).toEqual([]);
-    expect(result.current.selection).toBeNull();
+    expect(result.current[0]).toBeNull();
   });
 
-  it("generates every half hour slot between the first and last selected slot", () => {
+  it("holds the Selection it is given, times included", () => {
     const { result } = renderSlotSelection();
     act(() => {
-      result.current.setSlots(["1-10-00", "1-11-00"]);
+      result.current[1]({ weekday: Weekday.Tuesday, beginMinutes: 10 * 60, endMinutes: 10 * 60 + 45 });
     });
-    expect(result.current.slots).toEqual(["1-10-00", "1-10-30", "1-11-00"]);
-  });
-
-  it("clears the selection when given an empty list", () => {
-    const { result } = renderSlotSelection();
-    act(() => {
-      result.current.setSlots(["1-10-00", "1-11-00"]);
-    });
-    act(() => {
-      result.current.setSlots([]);
-    });
-    expect(result.current.slots).toEqual([]);
-    expect(result.current.selection).toBeNull();
-  });
-
-  it("stores the keys as an interval whose end is exclusive", () => {
-    const { result } = renderSlotSelection();
-    act(() => {
-      result.current.setSlots(["1-10-00", "1-11-00"]);
-    });
-    // the last key starts the 11:00 slot, so the Selection ends at 11:30
-    expect(result.current.selection).toEqual({
+    expect(result.current[0]).toEqual({
       weekday: Weekday.Tuesday,
       beginMinutes: 10 * 60,
-      endMinutes: 11 * 60 + 30,
+      endMinutes: 10 * 60 + 45,
     });
   });
 
-  it("stores one key as an interval of one slot", () => {
+  it("clears the Selection", () => {
     const { result } = renderSlotSelection();
     act(() => {
-      result.current.setSlots(["3-7-00"]);
-    });
-    expect(result.current.selection).toEqual({
-      weekday: Weekday.Thursday,
-      beginMinutes: 7 * 60,
-      endMinutes: 7 * 60 + 30,
-    });
-    expect(result.current.slots).toEqual(["3-7-00"]);
-  });
-
-  it("ends the last slot of the day at midnight and round trips it", () => {
-    const { result } = renderSlotSelection();
-    act(() => {
-      result.current.setSlots(["0-23-00", "0-23-30"]);
-    });
-    expect(result.current.selection).toEqual({
-      weekday: Weekday.Monday,
-      beginMinutes: 23 * 60,
-      endMinutes: 24 * 60,
-    });
-    expect(result.current.slots).toEqual(["0-23-00", "0-23-30"]);
-  });
-
-  it("round trips a selection that covers the whole day", () => {
-    const wholeDay = Array.from({ length: 48 }, (_, i) => `2-${Math.floor(i / 2)}-${i % 2 === 0 ? "00" : "30"}`);
-    const { result } = renderSlotSelection();
-    act(() => {
-      result.current.setSlots(["2-0-00", "2-23-30"]);
-    });
-    expect(result.current.selection).toEqual({
-      weekday: Weekday.Wednesday,
-      beginMinutes: 0,
-      endMinutes: 24 * 60,
-    });
-    expect(result.current.slots).toEqual(wholeDay);
-  });
-
-  it("keeps the selection when a key cannot be read", () => {
-    const { result } = renderSlotSelection();
-    act(() => {
-      result.current.setSlots(["1-10-00", "1-11-00"]);
+      result.current[1]({ weekday: Weekday.Monday, beginMinutes: 23 * 60, endMinutes: 24 * 60 });
     });
     act(() => {
-      result.current.setSlots(["9-10-00"]);
+      result.current[1](null);
     });
-    expect(result.current.slots).toEqual(["1-10-00", "1-10-30", "1-11-00"]);
+    expect(result.current[0]).toBeNull();
   });
 });
 

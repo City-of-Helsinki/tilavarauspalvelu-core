@@ -1,5 +1,4 @@
-import React, { useCallback } from "react";
-import { addMinutes, startOfDay } from "date-fns";
+import React from "react";
 import { IconCross, Select } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
@@ -8,9 +7,8 @@ import type { Option } from "hds-react";
 import type { TFunction } from "next-i18next/pages";
 import type { VisibleHours, WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
 import { ShowAllContainer } from "ui/src/components";
-import type { DayT } from "ui/src/modules/const";
-import { convertWeekday, numberToDayT } from "ui/src/modules/conversion";
-import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
+import { convertWeekday } from "ui/src/modules/conversion";
+import { formatTimeRange } from "ui/src/modules/date-utils";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { fontMedium } from "ui/src/styled";
 import { ApplicationRoundStatusChoice, ApplicationSectionStatusChoice } from "@gql/gql-types";
@@ -18,9 +16,9 @@ import type { ApplicationSectionAllocationsQuery, ReservationUnitNode } from "@g
 import { ALLOCATION_TIME_FORM_ID } from "@/modules/const";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
-import { findBlockingAffecting, wantsInterval } from "./modules/allocationPattern";
+import { ALLOCATION_STEP_MINUTES, findBlockingAffecting, wantsInterval } from "./modules/allocationPattern";
 import type { AllocationSlot, PriorityFilter } from "./modules/allocationPattern";
-import { getTimeSlotOptions } from "./modules/applicationRoundAllocation";
+import { getBeginTimeOptions, getEndTimeOptions } from "./modules/applicationRoundAllocation";
 import type { SectionNodeT } from "./modules/applicationRoundAllocation";
 import { useSelectedSlots } from "./SelectedSlotsContext";
 
@@ -97,147 +95,46 @@ function getTimeLabel(selection: WeekdayInterval, t: TFunction): string {
   return `${dayString} ${timeString}`;
 }
 
-function deserializeSlot(slot: string): { day: DayT; hour: number; mins: number } | null {
-  const res = slot.split("-").map((part) => toNumber(part));
-  if (res.length !== 3) {
-    return null;
-  }
-  const [d, hour, mins] = res;
-  if (d == null || hour == null || mins == null) {
-    return null;
-  }
-  const day = numberToDayT(d);
-  if (day == null) {
-    return null;
-  }
-
-  return { day: day, hour, mins };
+/** The chosen time, in minutes from midnight. A select writes its value as a string. */
+function toMinutes(selected: Option[]): number | null {
+  return toNumber(selected.find(() => true)?.value);
 }
 
+/**
+ * The begin and the end time of the Selection, which is the same task the grid does with a drag.
+ *
+ * Both times come from the hours the grid draws, at the grid's own 15 minute step, so the two ways of saying a time
+ * offer exactly the same times. The weekday still comes from the grid, which step 14 of the migration changes.
+ */
 function TimeSelection({ extent }: { extent: VisibleHours }): React.ReactElement {
   const { t } = useTranslation();
   const [selection, setSelection] = useSlotSelection();
 
-  // The last option starts in the hour before the end of the extent, because an option is a slot start.
-  const start = Math.floor(extent.beginMinutes / 60);
-  const end = Math.ceil(extent.endMinutes / 60) - 1;
+  // There is no weekday to put a time on before the grid makes a Selection, so the form offers nothing yet.
+  const beginOptions = selection == null ? [] : getBeginTimeOptions(extent);
+  const endOptions = selection == null ? [] : getEndTimeOptions(extent);
 
-  const getOptions = useCallback(
-    (type: "start" | "end") => {
-      const sel = selection[0];
-      if (sel == null) {
-        return [];
-      }
-      const d = sel.split("-")[0];
-      const day = numberToDayT(Number(d));
-      if (day == null) {
-        return [];
-      }
-      return getTimeSlotOptions(day, start, 0, end, type === "end");
-    },
-    [selection, start, end]
-  );
-
-  const timeSlotStartOptions = getOptions("start");
-  const timeSlotEndOptions = getOptions("end");
-
-  const setSelectedTime = (startValue?: string, endValue?: string): void => {
-    if (!selection) {
-      return undefined;
-    }
-    const startSelection = startValue || selection[0];
-    const endSelection = endValue || selection[selection.length - 1];
-    if (startSelection == null || endSelection == null) {
+  const onBeginTimeChange = (selected: Option[]): void => {
+    const beginMinutes = toMinutes(selected);
+    if (selection == null || beginMinutes == null) {
       return;
     }
-    const start = deserializeSlot(startSelection);
-    const end = deserializeSlot(endSelection);
-    if (start == null || end == null) {
-      return;
-    }
-
-    const { day, hour: startHours, mins: startMinutes } = start;
-    const { day: dayEnd, hour: endHours, mins: endMinutes } = end;
-    if (day !== dayEnd) {
-      return;
-    }
-    const timeSlots = getTimeSlotOptions(day, startHours, startMinutes, endHours).map((n) => n.value);
-
-    if (endValue && endMinutes === 0) timeSlots.pop();
-    setSelection(timeSlots);
+    // A begin time at or after the end time pushes the end one step on, so the Selection is never empty.
+    const endMinutes = Math.max(selection.endMinutes, beginMinutes + ALLOCATION_STEP_MINUTES);
+    setSelection({ ...selection, beginMinutes, endMinutes });
   };
 
-  const onStartTimeChange = (sel: Option[]): void => {
-    const val = sel.find(() => true);
-    if (!val) {
+  const onEndTimeChange = (selected: Option[]): void => {
+    const endMinutes = toMinutes(selected);
+    if (selection == null || endMinutes == null) {
       return;
     }
-    const minsStart = timeToMinutes(val.label);
-    const startTime = addMinutes(startOfDay(new Date()), minsStart);
-    const endOption = timeSlotEndOptions.find((n) => n.value === selection?.[selection.length - 1]);
-    if (!endOption) {
+    // A disabled option still reports a change, so the end time is checked here as well.
+    if (endMinutes <= selection.beginMinutes) {
       return;
     }
-
-    const minsEnd = timeToMinutes(endOption.label);
-    const endTime = addMinutes(startOfDay(new Date()), minsEnd);
-    const startIndex = timeSlotStartOptions.indexOf(val);
-    // The select component completely breaks if the end time is before the start time
-    if (minsEnd <= minsStart && minsEnd !== 0) {
-      return;
-    }
-
-    const endValue =
-      startTime >= endTime
-        ? timeSlotEndOptions[startIndex + 1]?.value
-        : timeSlotEndOptions.find((n) => n.value === selection?.[selection.length - 1])?.value;
-    if (endValue != null && val.value != null) {
-      setSelectedTime(val.value, endValue);
-    }
+    setSelection({ ...selection, endMinutes });
   };
-
-  const onEndTimeChange = (sel: Option[]): void => {
-    const val = sel.find(() => true);
-    if (!val) {
-      return;
-    }
-    const minsEnd = timeToMinutes(val.label);
-    // Disabling options shows them disabled but does NOT prevent them from being selected
-    // the select component breaks if the end time is before the start time
-    const startOption = timeSlotStartOptions.find((n) => n.value === selection?.[0]);
-    if (!startOption) {
-      return;
-    }
-    const minsStart = timeToMinutes(startOption?.label ?? "");
-    if (minsEnd <= minsStart && minsEnd !== 0) {
-      return;
-    }
-    setSelectedTime(undefined, val.value);
-  };
-
-  const isOptionDisabled = (option: Partial<Option>) => {
-    const firstOption = timeSlotStartOptions.find((n) => n.value === selection?.[0]);
-    if (!firstOption) {
-      return false;
-    }
-    if (!option.label) {
-      return false;
-    }
-    const minsStart = timeToMinutes(firstOption.label);
-    const startTime = addMinutes(startOfDay(new Date()), minsStart);
-    const minsEnd = timeToMinutes(option.label);
-    const endTime = addMinutes(startOfDay(new Date()), minsEnd);
-
-    return endTime <= startTime && minsEnd !== 0;
-  };
-
-  const startTimeOptions = timeSlotStartOptions.map((option) => convertOptionToHDS(option));
-  const endTimeOptions = timeSlotEndOptions
-    .map((option) => convertOptionToHDS(option))
-    .map((n) => ({
-      ...n,
-      disabled: isOptionDisabled(n),
-    }));
 
   return (
     <TimeSelectWrapper>
@@ -246,17 +143,20 @@ function TimeSelection({ extent }: { extent: VisibleHours }): React.ReactElement
           label: t("allocation:startingTime"),
         }}
         clearable={false}
-        options={startTimeOptions}
-        value={timeSlotStartOptions.find((n) => n.value === selection?.[0])?.value}
-        onChange={onStartTimeChange}
+        options={beginOptions.map((option) => convertOptionToHDS(option))}
+        value={selection != null ? String(selection.beginMinutes) : undefined}
+        onChange={onBeginTimeChange}
       />
       <Select
         texts={{
           label: t("allocation:endingTime"),
         }}
         clearable={false}
-        options={endTimeOptions}
-        value={timeSlotEndOptions.find((n) => n.value === selection?.[selection.length - 1])?.value}
+        options={endOptions.map((option) => ({
+          ...convertOptionToHDS(option),
+          disabled: selection != null && option.value <= selection.beginMinutes,
+        }))}
+        value={selection != null ? String(selection.endMinutes) : undefined}
         onChange={onEndTimeChange}
       />
     </TimeSelectWrapper>
