@@ -14,6 +14,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   PYTHON_VERSION: 3.13
 
@@ -29,6 +32,9 @@ jobs:
     name: "Check migrations, translations and outdated graphql schema"
     runs-on: ubuntu-latest
     needs: ci-image
+    permissions:
+      contents: read
+      packages: read
     container:
       image: ${{ needs.ci-image.outputs.image }}
       credentials:
@@ -63,6 +69,8 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: "Install project dependencies"
         uses: ./.github/actions/poetry
@@ -93,6 +101,10 @@ jobs:
     name: "Run tests (${{ matrix.group }}/8)"
     runs-on: ubuntu-latest
     needs: ci-image
+    permissions:
+      actions: read
+      contents: read
+      packages: read
     container:
       image: ${{ needs.ci-image.outputs.image }}
       credentials:
@@ -132,6 +144,8 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: "Install project dependencies"
         uses: ./.github/actions/poetry
@@ -188,6 +202,7 @@ jobs:
         with:
           # Disable shallow cloning to improve relevancy of reporting in SonarCloud
           fetch-depth: 0
+          persist-credentials: false
 
       # Invalid characters in artifact name: " :  < > | * ? \r \n \ /
       - name: "Create artifact name"
