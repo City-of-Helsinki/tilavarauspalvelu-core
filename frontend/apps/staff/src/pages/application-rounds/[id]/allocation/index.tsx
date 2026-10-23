@@ -508,6 +508,10 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
             pk
             isRejected
             isLocked
+            reservationUnit {
+              id
+              reservationStartInterval
+            }
             allocatedTimeSlots {
               pk
               ...AllocatedTimeSlot
