@@ -58,7 +58,7 @@
     "@types/react-dom": "^19.3.0",
     "@types/react-transition-group": "^4.4.12",
     "@vitejs/plugin-react": "^5.2.0",
-    "@vitest/coverage-istanbul": "^4.1.11",
+    "@vitest/coverage-istanbul": "^5.0.5",
     "happy-dom": "^20.10.1",
     "postcss-styled-syntax": "^0.7.3",
     "stylelint": "^17.16.0",
