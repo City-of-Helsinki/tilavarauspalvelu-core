@@ -64,6 +64,7 @@ export const GridScroller = styled.div`
   position: relative;
   overflow: auto;
   max-height: 70vh;
+  border-right: 1px solid var(--border-color);
 
   /* Keeps a focused cell out from under the sticky header (WCAG 2.4.11). */
   scroll-padding-top: 3rem;
@@ -73,8 +74,13 @@ export const GridScroller = styled.div`
     min-width: calc(56px + var(--days) * 110px);
   }
 
-  thead td {
-    border: none;
+  thead {
+    td {
+      border: none;
+    }
+    th {
+      border-bottom: 1px solid var(--border-color);
+    }
   }
 
   thead th[aria-current="date"] {
@@ -83,6 +89,7 @@ export const GridScroller = styled.div`
   }
 
   tbody th {
+    border-right: 1px solid var(--border-color);
     padding: 0 var(--spacing-xs);
     ${fontBold};
     text-align: center;
@@ -166,18 +173,18 @@ export const NowIndicator = styled.span`
 `;
 
 export const NowLine = styled(NowIndicator)`
+  z-index: 0;
   left: 0;
   right: 0;
   height: 2px;
 `;
 
 export const NowDot = styled(NowIndicator)`
-  top: 50%;
-  left: 0;
+  right: 0;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(50%, -30%);
 `;
 
 export const ListAlternative = styled.details`

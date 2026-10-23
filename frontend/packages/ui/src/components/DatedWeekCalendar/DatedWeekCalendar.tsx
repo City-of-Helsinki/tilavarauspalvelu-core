@@ -516,12 +516,18 @@ function DatedWeekTable<TData extends CalendarData>(
             {rows.map((row) => (
               <tr key={row.index} role="row">
                 {row.rowSpan != null && (
-                  <th role="rowheader" scope="row" rowSpan={row.rowSpan} aria-label={formatClock(row.beginMinutes)}>
+                  <th
+                    role="rowheader"
+                    scope="row"
+                    data-row={row.index}
+                    rowSpan={row.rowSpan}
+                    aria-label={formatClock(row.beginMinutes)}
+                  >
                     {Math.floor(row.beginMinutes / 60)}
-                    {showNowLine && nowRowIndex >= row.index * 2 && nowRowIndex < (row.index + 1) * 2 && (
+                    {showNowLine && nowRowIndex >= row.index && nowRowIndex < row.index + 2 && (
                       <NowDot
                         aria-hidden
-                        data-testid="resource-day-calendar__now-line"
+                        data-testid="dated-week-calendar__now-dot"
                         style={{ top: `${nowHourOffsetPercent(nowMinutes)}%` }}
                       />
                     )}
@@ -597,9 +603,7 @@ function DatedWeekTable<TData extends CalendarData>(
                           aria-hidden
                           data-testid="dated-week-calendar__now-line"
                           style={{ top: `${nowOffsetPercent(nowMinutes, nowRowIndex, step)}%` }}
-                        >
-                          {dayKey === dayKeys[0] && <NowDot data-testid="dated-week-calendar__now-dot" />}
-                        </NowLine>
+                        />
                       )}
                     </td>
                   );
