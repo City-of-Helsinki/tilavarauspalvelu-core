@@ -88,6 +88,8 @@ updates:
       linter:
         patterns:
           - "oxlint"
+          - "oxlint*"
+          - "oxfmt"
           - "husky"
           - "prettier*"
           - "stylelint*"
