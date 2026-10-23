@@ -7,8 +7,8 @@ export async function register() {
     // This is not a leak. The count is fixed per response.
     // With the default limit of 10, Node.js logs a MaxListenersExceededWarning for each tunnel request.
     // Remove this if the tunnel moves out of Next.js or the listener count goes down.
-    const { setMaxListeners } = await import("node:events");
-    setMaxListeners(12);
+    const { default: events } = await import("node:events");
+    events.defaultMaxListeners = 12;
     await import("../sentry.server.config");
   }
 }
