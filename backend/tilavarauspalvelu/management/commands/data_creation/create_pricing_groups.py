@@ -5,14 +5,17 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
+from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.models import (
     PriceComponent,
     PriceOption,
     PricingGroup,
+    Reservation,
     ReservationUnit,
     ReservationUnitPricingGroup,
     UnitGroup,
 )
+from tilavarauspalvelu.services.pricing.price_lines import set_reservation_price_lines
 from utils.date_utils import local_date
 
 from .utils import with_logs
@@ -76,6 +79,31 @@ def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit]) -> N
             for pricing, valid_until in zip(pricings, valid_until_dates, strict=True)
         ]
         PriceComponent.objects.bulk_create(components)
+
+
+@with_logs
+def _create_reservation_price_lines() -> None:
+    reservations = (
+        Reservation.objects
+        .filter(reservation_unit__reservation_unit_pricing_groups__isnull=False)
+        .select_related("reservation_unit__unit")
+        .distinct()
+        .order_by("reservation_unit", "begins_at")
+    )
+
+    price_options: dict[int, PriceOption | None] = {}
+    for reservation in reservations:
+        reservation_unit = reservation.reservation_unit
+        if reservation_unit.pk not in price_options:
+            options = PriceOption.objects.filter(
+                price_components__pricing_group__reservation_unit_pricing_groups__reservation_unit=reservation_unit,
+            )
+            price_options[reservation_unit.pk] = options.order_by("name").first()
+
+        try:
+            set_reservation_price_lines(reservation=reservation, price_option=price_options[reservation_unit.pk])
+        except PriceCalculationError:
+            continue
 
 
 # Internals
