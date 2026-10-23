@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Watch a pull request and exit when it has news for the agent: a check failed, the required
-# checks passed, someone commented or reviewed, or the branch started to conflict.
+# checks passed, someone commented or reviewed, or the branch fell behind its base or started to conflict.
 #
 # Usage: watch-pr start|wait|stop <number or URL>
 #   start  Start a watch from now. Only news after this wakes the agent.
@@ -67,7 +67,7 @@ graphql() {
 }
 
 # What a watch needs to notice, for 1 GraphQL point. "status" moves when the state,
-# mergeability, head commit, or check counts by state move. "remarks" moves on a new comment,
+# mergeability, head commit, base branch tip, or check counts by state move. "remarks" moves on a new comment,
 # review, or review thread, and when a comment or review is edited.
 read_fingerprint() {
   local edits="totalCount nodes { lastEditedAt }"
@@ -80,6 +80,7 @@ read_fingerprint() {
       repository(owner: \$owner, name: \$name) {
         pullRequest(number: \$number) {
           state mergeable headRefOid
+          baseRef { target { oid } }
           comments(first: 100, orderBy: { field: UPDATED_AT, direction: DESC }) { $edits }
           reviews(last: 100) { $edits }
           reviewThreads { totalCount }
@@ -98,22 +99,24 @@ read_fingerprint() {
         remaining: $data.rateLimit.remaining,
         resetAt: $data.rateLimit.resetAt,
         state: $pr.state,
-        status: [$pr.state, ($pr.mergeable // ""), $pr.headRefOid,
+        status: [$pr.state, ($pr.mergeable // ""), $pr.headRefOid, ($pr.baseRef.target.oid // ""),
           ($contexts.checkRunCountsByState | counts), ($contexts.statusContextCountsByState | counts)] | join(" "),
         remarks: [$pr.comments.totalCount, ($pr.comments | newest), $pr.reviews.totalCount,
           ($pr.reviews | newest), $pr.reviewThreads.totalCount] | map(tostring) | join(" ")
       }' <<< "$raw"
 }
 
-# State, mergeability, head commit, and every check on the head commit, for 1 GraphQL point.
+# State, mergeability, head commit, every check on the head commit, and how far the branch is
+# behind its base, for 1 GraphQL point and 1 REST call.
 read_detail() {
-  local raw
+  local raw detail base head behind
   # shellcheck disable=SC2016  # The $ names are GraphQL variables.
   raw="$(graphql -F owner="$owner" -F name="$name" -F number="$number" -f query='
     query($owner: String!, $name: String!, $number: Int!) {
       repository(owner: $owner, name: $name) {
         pullRequest(number: $number) {
           state mergeable headRefOid baseRefName
+          baseRef { target { oid } }
           commits(last: 1) { nodes { commit { statusCheckRollup { contexts(first: 100) { nodes {
             __typename
             ... on CheckRun { name status conclusion detailsUrl isRequired(pullRequestNumber: $number) }
@@ -122,13 +125,14 @@ read_detail() {
         }
       }
     }')" || return
-  jq -c '
+  detail="$(jq -c '
     .data.repository.pullRequest as $pr
     | {
         state: $pr.state,
         mergeable: $pr.mergeable,
         headSha: $pr.headRefOid,
         baseRef: $pr.baseRefName,
+        baseSha: $pr.baseRef.target.oid,
         checks: [($pr.commits.nodes[0].commit.statusCheckRollup.contexts.nodes // [])[]
           | if .__typename == "CheckRun" then {
               name,
@@ -147,7 +151,16 @@ read_detail() {
                 elif .state | IN("FAILURE", "ERROR") then "failed"
                 else "passed" end)
             } end]
-      }' <<< "$raw"
+      }' <<< "$raw")"
+  # GraphQL can compare only with a ref that is known before the query, so ask REST.
+  # A failed compare gives null, and the watch then keeps what it knew.
+  base="$(jq -r '.baseSha // empty' <<< "$detail")"
+  head="$(jq -r '.headSha // empty' <<< "$detail")"
+  behind="null"
+  if [[ -n "$base" && -n "$head" ]]; then
+    behind="$(gh api "repos/$repo/compare/$base...$head?per_page=1" --jq .behind_by 2>/dev/null)" || behind="null"
+  fi
+  jq -c --argjson behind "${behind:-null}" '.behindBy = $behind' <<< "$detail"
 }
 
 # Every comment, review comment, and review, through REST. REST has its own quota,
@@ -218,7 +231,15 @@ evaluate() {
     | (if $detail.mergeable == "CONFLICTING" and ($watch.conflicting | not) then [{kind: "conflicting"}] else [] end) as $conflict
     # UNKNOWN means GitHub is still computing after a push. Only a clean answer clears a conflict.
     | (if $detail.mergeable == "UNKNOWN" then $watch.conflicting else $detail.mergeable == "CONFLICTING" end) as $conflicting
-    | ($checks.changes + (if ($fresh | length) > 0 then [{kind: "remarks", remarks: $fresh}] else [] end) + $conflict) as $changes
+    # Linear history is required, so a branch behind its base cannot merge. Report it once
+    # for each new base tip. A failed compare keeps the last state.
+    | ($detail.behindBy != null) as $compared
+    | (if $compared then $detail.behindBy else ($watch.behindBy // 0) end) as $behindBy
+    | (if $compared then $detail.baseSha else $watch.baseSha end) as $baseSha
+    | (if $compared and $behindBy > 0 and ($baseSha != $watch.baseSha or ($watch.behindBy // 0) == 0)
+        then [{kind: "behind", count: $behindBy}] else [] end) as $behind
+    | ($checks.changes + (if ($fresh | length) > 0 then [{kind: "remarks", remarks: $fresh}] else [] end)
+        + $conflict + $behind) as $changes
     | (($changes | length) > 0 and ($changes | all(.kind == "remarks"))) as $commentsOnly
     | ($moved or (($changes | length) > 0 and ($commentsOnly | not))) as $progress
     | ((if $progress then 0 else $watch.wakes end) + (if $commentsOnly then 1 else 0 end)) as $wakes
@@ -233,6 +254,8 @@ evaluate() {
           remarksThrough: $latest,
           remarkIds: $remarkIds,
           conflicting: $conflicting,
+          baseSha: $baseSha,
+          behindBy: $behindBy,
           wakes: $wakes
         })
       }'
@@ -259,6 +282,8 @@ message() {
               (.body | snippet) as $body
               | "  - \(.author)\(if .you then " (you)" else "" end)\(if .path then " on \(.path)" else "" end): \(if $body == "" then (.state // "reviewed") else "\"\($body)\"" end) \(.url)"
             ))[]
+          elif .kind == "behind" then
+            "- The branch is \(.count) commit\(if .count == 1 then "" else "s" end) behind \($detail.baseRef)."
           else
             "- The branch now conflicts with \($detail.baseRef)."
           end),
@@ -393,7 +418,7 @@ case "$command" in
     # Remarks count from now.
     save_state "$(jq -cn --arg viewer "$viewer" --arg now "$(now_iso)" '{
       viewer: $viewer, startedAt: $now, headSha: null, failedChecks: [], passed: false,
-      passedChecks: [], remarksThrough: $now, remarkIds: [], conflicting: false, wakes: 0,
+      passedChecks: [], remarksThrough: $now, remarkIds: [], conflicting: false, baseSha: null, behindBy: 0, wakes: 0,
       failures: 0, lastRead: null
     }')"
     echo "Watching pull request #$number as $viewer."
