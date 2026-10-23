@@ -110,6 +110,6 @@ def save_price_component_changes(
             raise ValidationError(details)
 
         PriceComponent.objects.filter(pk__in=deleted_component_pks).delete()
-        for component in changed_components:
+        # Save one by one, so that the audit log gets an entry for every component.
+        for component in components:
             component.save()
-        PriceComponent.objects.bulk_create(new_components)
