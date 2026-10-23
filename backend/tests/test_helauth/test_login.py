@@ -146,10 +146,11 @@ def test_social_login__redirect_to_keycloak(client, keycloak):
     params = dict(urllib.parse.parse_qsl(redirect_url.query))
     nonce = params.pop("nonce")
     assert re.fullmatch(r"[a-zA-Z0-9]{64}", nonce), nonce
+    state = params.pop("state")
+    assert state in client.session["tunnistamo_oauth2_transaction_index"]
     assert params == {
         "client_id": "SOCIAL_AUTH_TUNNISTAMO_KEY",
         "redirect_uri": "http://testserver/pysocial/complete/tunnistamo/",
-        "state": client.session["tunnistamo_state"],
         "response_type": "code",
         "scope": "openid profile email",
         "ui_locales": "sv",
