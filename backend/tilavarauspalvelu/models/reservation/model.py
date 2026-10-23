@@ -36,6 +36,7 @@ if TYPE_CHECKING:
         AgeGroup,
         PaymentOrder,
         ReservationDenyReason,
+        ReservationPriceLine,
         ReservationPurpose,
         ReservationSeries,
         ReservationStatistic,
@@ -43,6 +44,8 @@ if TYPE_CHECKING:
         Unit,
         User,
     )
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.reservation_price_line.queryset import ReservationPriceLineQuerySet
 
     from .actions import ReservationActions
     from .queryset import ReservationManager
@@ -170,6 +173,7 @@ class Reservation(SerializableModelMixin, models.Model):
     payment_order: PaymentOrder | None  # Can be missing
     reservation_statistic: ReservationStatistic | None  # Can be missing
     affecting_time_span: AffectingTimeSpan | None  # Can be missing
+    price_lines: OneToManyRelatedManager[ReservationPriceLine, ReservationPriceLineQuerySet]
 
     class Meta:
         db_table = "reservation"
