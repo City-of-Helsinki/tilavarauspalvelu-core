@@ -62,6 +62,15 @@ export const gridTableStyles = css`
     background: var(--color-white);
     ${fontBold};
     text-align: center;
+    user-select: none;
+  }
+
+  tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--color-white);
+    user-select: none;
   }
 
   tbody td {
