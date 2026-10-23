@@ -79,12 +79,12 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-for label in "${add_labels[@]}"; do
-  ! contains "$label" "${remove_labels[@]}" \
+for label in ${add_labels[@]+"${add_labels[@]}"}; do
+  ! contains "$label" ${remove_labels[@]+"${remove_labels[@]}"} \
     || { echo "Label $label is both added and removed." >&2; exit 2; }
 done
-for other in "${remove_links[@]}"; do
-  ! contains "$other" "${blocks[@]}" "${blocked_by[@]}" "${relates[@]}" \
+for other in ${remove_links[@]+"${remove_links[@]}"}; do
+  ! contains "$other" ${blocks[@]+"${blocks[@]}"} ${blocked_by[@]+"${blocked_by[@]}"} ${relates[@]+"${relates[@]}"} \
     || { echo "Link to $other is both added and removed." >&2; exit 2; }
 done
 
@@ -113,24 +113,24 @@ if [[ -n "$new_summary" ]] && [[ "$(jq --raw-output '.fields.summary' <<<"$issue
 fi
 labels_to_add=()
 labels_to_remove=()
-for label in "${add_labels[@]}"; do
+for label in ${add_labels[@]+"${add_labels[@]}"}; do
   if jq --exit-status --arg l "$label" '.fields.labels | index($l)' <<<"$issue" >/dev/null; then
     skipped+=("Label $label is already on $key.")
-  elif ! contains "$label" "${labels_to_add[@]}"; then
+  elif ! contains "$label" ${labels_to_add[@]+"${labels_to_add[@]}"}; then
     labels_to_add+=("$label")
     edit_summary+=("Added label $label.")
   fi
 done
-for label in "${remove_labels[@]}"; do
+for label in ${remove_labels[@]+"${remove_labels[@]}"}; do
   if ! jq --exit-status --arg l "$label" '.fields.labels | index($l)' <<<"$issue" >/dev/null; then
     skipped+=("Label $label is not on $key.")
-  elif ! contains "$label" "${labels_to_remove[@]}"; then
+  elif ! contains "$label" ${labels_to_remove[@]+"${labels_to_remove[@]}"}; then
     labels_to_remove+=("$label")
     edit_summary+=("Removed label $label.")
   fi
 done
-[[ -z "$description_file" ]] || edit_summary=("Replaced the description." "${edit_summary[@]}")
-[[ -z "$new_summary" ]] || edit_summary=("Changed the summary to \"$new_summary\"." "${edit_summary[@]}")
+[[ -z "$description_file" ]] || edit_summary=("Replaced the description." ${edit_summary[@]+"${edit_summary[@]}"})
+[[ -z "$new_summary" ]] || edit_summary=("Changed the summary to \"$new_summary\"." ${edit_summary[@]+"${edit_summary[@]}"})
 
 if (( ${#edit_summary[@]} > 0 )); then
   body="$(
@@ -138,20 +138,20 @@ if (( ${#edit_summary[@]} > 0 )); then
       --arg summary "$new_summary" \
       --arg has_description "$([[ -n "$description_file" ]] && echo true || echo false)" \
       --rawfile description "${description_file:-/dev/null}" \
-      --argjson add "$(jq --null-input --compact-output '$ARGS.positional' --args "${labels_to_add[@]}")" \
-      --argjson remove "$(jq --null-input --compact-output '$ARGS.positional' --args "${labels_to_remove[@]}")" \
+      --argjson add "$(jq --null-input --compact-output '$ARGS.positional' --args ${labels_to_add[@]+"${labels_to_add[@]}"})" \
+      --argjson remove "$(jq --null-input --compact-output '$ARGS.positional' --args ${labels_to_remove[@]+"${labels_to_remove[@]}"})" \
       '{}
       | if $summary != "" then .fields.summary = $summary else . end
       | if $has_description == "true" then .fields.description = $description else . end
       | ([$add[] | {add: .}] + [$remove[] | {remove: .}]) as $ops
       | if ($ops | length) > 0 then .update.labels = $ops else . end'
   )"
-  summary="$(printf '%s ' "${edit_summary[@]}")"
+  summary="$(printf '%s ' ${edit_summary[@]+"${edit_summary[@]}"})"
   requests+=("PUT${sep}rest/api/2/issue/$key$sep$body$sep${summary% }")
 fi
 
 # Remove links before adding new ones.
-for other in "${remove_links[@]}"; do
+for other in ${remove_links[@]+"${remove_links[@]}"}; do
   found="$(
     jq --raw-output --arg k "$key" --arg o "$other" '
       .fields.issuelinks[]
@@ -178,43 +178,43 @@ add_link() {
     return
   fi
   # Skip duplicates in the arguments.
-  for request in "${requests[@]}"; do
+  for request in ${requests[@]+"${requests[@]}"}; do
     [[ "$request" == *"$sep$link_body$sep"* ]] && return
   done
   requests+=("POST${sep}rest/api/2/issueLink$sep$link_body${sep}Added link: $link_text.")
 }
-for other in "${blocks[@]}"; do
+for other in ${blocks[@]+"${blocks[@]}"}; do
   add_link --blocks "$other" '.outwardIssue.key == $o'
 done
-for other in "${blocked_by[@]}"; do
+for other in ${blocked_by[@]+"${blocked_by[@]}"}; do
   add_link --blocked-by "$other" '.inwardIssue.key == $o'
 done
-for other in "${relates[@]}"; do
+for other in ${relates[@]+"${relates[@]}"}; do
   add_link --relates "$other" '.outwardIssue.key == $o or .inwardIssue.key == $o'
 done
 
 if [[ "$dry_run" == true ]]; then
   echo "Dry run for $key. Nothing is sent."
-  for request in "${requests[@]}"; do
+  for request in ${requests[@]+"${requests[@]}"}; do
     IFS="$sep" read -r method path body summary <<<"$request"
     echo
     echo "$method $base_url/$path"
     [[ -z "$body" ]] || jq . <<<"$body"
     echo "Change: $summary"
   done
-  for line in "${skipped[@]}"; do echo "Skipped: $line"; done
+  for line in ${skipped[@]+"${skipped[@]}"}; do echo "Skipped: $line"; done
   (( ${#requests[@]} > 0 )) || echo "Nothing to change."
   exit 0
 fi
 
-for line in "${skipped[@]}"; do echo "Skipped: $line"; done
+for line in ${skipped[@]+"${skipped[@]}"}; do echo "Skipped: $line"; done
 if (( ${#requests[@]} == 0 )); then
   echo "Nothing to change on $key."
   exit 0
 fi
 # Print each change after its request succeeds, so a failure shows what is already done.
 echo "Changes to $key ($base_url/browse/$key):"
-for request in "${requests[@]}"; do
+for request in ${requests[@]+"${requests[@]}"}; do
   IFS="$sep" read -r method path body summary <<<"$request"
   send "$method" "$path" "$body" >/dev/null
   echo "- $summary"
