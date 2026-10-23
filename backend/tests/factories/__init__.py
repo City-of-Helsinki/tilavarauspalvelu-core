@@ -18,6 +18,9 @@ from .payment_accounting import PaymentAccountingFactory
 from .payment_merchant import PaymentMerchantFactory
 from .payment_order import PaymentOrderFactory
 from .payment_product import PaymentProductFactory
+from .price_component import PriceComponentFactory
+from .price_option import PriceOptionFactory
+from .pricing_group import PricingGroupFactory
 from .rejected_occurrence import RejectedOccurrenceFactory
 from .reservable_time_span import ReservableTimeSpanFactory
 from .reservation import ReservationFactory
@@ -30,6 +33,7 @@ from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleF
 from .reservation_unit_image import ReservationUnitImageFactory
 from .reservation_unit_option import ReservationUnitOptionFactory
 from .reservation_unit_pricing import ReservationUnitPricingFactory
+from .reservation_unit_pricing_group import ReservationUnitPricingGroupFactory
 from .reservation_unit_type import ReservationUnitTypeFactory
 from .resource import ResourceFactory
 from .space import SpaceFactory
@@ -68,6 +72,9 @@ __all__ = [
     "PaymentMerchantFactory",
     "PaymentOrderFactory",
     "PaymentProductFactory",
+    "PriceComponentFactory",
+    "PriceOptionFactory",
+    "PricingGroupFactory",
     "RefundFactory",
     "RefundStatusResultFactory",
     "RejectedOccurrenceFactory",
@@ -82,6 +89,7 @@ __all__ = [
     "ReservationUnitImageFactory",
     "ReservationUnitOptionFactory",
     "ReservationUnitPricingFactory",
+    "ReservationUnitPricingGroupFactory",
     "ReservationUnitTypeFactory",
     "ResourceFactory",
     "SpaceFactory",
