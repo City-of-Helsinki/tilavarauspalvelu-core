@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import PaymentOrder, Reservation
+from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationPriceLine
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -167,6 +167,28 @@ class PaymentOrderInline(admin.TabularInline):
         "payment_type",
         "status",
         "price_total",
+    ]
+    readonly_fields = fields
+
+    def has_add_permission(self, request: WSGIRequest, obj: Reservation | None = None) -> bool:
+        return False
+
+
+class ReservationPriceLineInline(admin.TabularInline):
+    model = ReservationPriceLine
+    extra = 0
+    can_delete = False
+    fields = [
+        "description",
+        "quantity",
+        "price_unit",
+        "unit_amount",
+        "amount",
+        "override_amount",
+        "tax_percentage",
+        "vat_code",
+        "accounting",
+        "price_component",
     ]
     readonly_fields = fields
 

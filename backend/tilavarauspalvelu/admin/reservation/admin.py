@@ -31,7 +31,7 @@ from .filters import (
     ReservationUnitFilter,
     UnitFilter,
 )
-from .form import PaymentOrderInline, ReservationAdminForm
+from .form import PaymentOrderInline, ReservationAdminForm, ReservationPriceLineInline
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -200,7 +200,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "reservation_series",
         "reservation_unit",
     ]
-    inlines = [PaymentOrderInline]
+    inlines = [PaymentOrderInline, ReservationPriceLineInline]
 
     @button(label=_("Open in staff UI"), change_form=True)
     def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
