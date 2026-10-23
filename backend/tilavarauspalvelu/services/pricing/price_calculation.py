@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import math
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -12,6 +12,7 @@ from tilavarauspalvelu.enums import PriceUnit
 from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup
 from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
+from utils.decimal_utils import round_decimal
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import PaymentType
@@ -121,7 +122,7 @@ def calculate_price(
     lines: list[PriceCalculationLine] = []
     for pk, quantity in quantities.items():
         component = components_by_pk[pk]
-        amount = (component.amount * quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        amount = round_decimal(component.amount * quantity, 2)
         line = PriceCalculationLine(
             component=component,
             quantity=quantity,
