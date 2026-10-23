@@ -9,13 +9,17 @@ command="$(jq -r '.tool_input.command // empty')"
 root="$(git rev-parse --show-toplevel)"
 
 safe_arg="('[^']*'|[A-Za-z0-9_.:/=-]+)"
+# A call has the script as the first word of a command, maybe after a wrapper such as bash.
+# A file argument to another command, such as shellcheck or git add, is not a call.
+command_start="(^|[;&|(\`{]|\\\$\\(|"$'\n'")[[:space:]]*((bash|sh|env|exec|time|nohup|xargs|command)[[:space:]]+)*"
 
 for script in "$root"/.agents/skills/*/*; do
   [[ -f "$script" && -x "$script" ]] || continue
   name="$(basename "$script")"
   skill="$(basename "$(dirname "$script")")"
 
-  [[ "$command" == *"$skill/"*"$name"* || "$command" == *"./$name"* ]] || continue
+  call="${command_start}(\"[^\"]*\"|'[^']*'|[^[:space:];&|\"'])*($skill/$name|\./$name)[\"']?([[:space:];&|)]|\$)"
+  [[ "$command" =~ $call ]] || continue
 
   allowed="^(\.agents|\.claude)/skills/$skill/$name( +$safe_arg)* *\$"
   if [[ ! "$command" =~ $allowed ]]; then
