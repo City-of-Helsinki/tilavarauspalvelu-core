@@ -229,14 +229,23 @@ describe("DatedWeekCalendar current time line", () => {
     expect(lines[0]).toHaveStyle({ top: "50%" });
   });
 
-  test("only the leftmost line carries the dot", () => {
+  // The dot sits in the row header, not in a line, so it stays in view while the header is sticky and the grid
+  // scrolls sideways. There is one header per hour, so the dot's offset is read against the hour and not the row.
+  test("the hour's row header carries the one dot, at the time inside that hour", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-10-21T09:15:00+03:00"));
     renderCalendar();
-    expect(screen.getAllByTestId("dated-week-calendar__now-dot")).toHaveLength(1);
-    expect(
-      within(required(nowLines()[0], "No now-line found")).getByTestId("dated-week-calendar__now-dot")
-    ).toBeInTheDocument();
+
+    const dots = screen.getAllByTestId("dated-week-calendar__now-dot");
+    expect(dots).toHaveLength(1);
+    expect(dots[0]).toHaveStyle({ top: "25%" });
+
+    const header = required(dots[0]?.closest("th"), "The dot is not in a row header");
+    expect(header).toHaveAttribute("role", "rowheader");
+    expect(header).toHaveAccessibleName("09:00");
+    for (const line of nowLines()) {
+      expect(within(line).queryByTestId("dated-week-calendar__now-dot")).not.toBeInTheDocument();
+    }
   });
 
   test("is hidden when today is outside the shown range", () => {
