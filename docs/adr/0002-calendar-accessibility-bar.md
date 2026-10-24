@@ -4,7 +4,7 @@ The Calendar must meet WCAG 2.2 AA. It must also meet these AAA criteria: 2.4.13
 
 Every action the old calendar had stays in the grid. These are select a slot, select a span, move a Draft Reservation and resize it. Each action has a way to do it without dragging, to meet 2.5.7 Dragging Movements.
 
-Every use of the Calendar needs an equal form for the same task. The Calendar requires a skip link target for it (the `alternative` prop). For Suitable Time Ranges the form is `SuitableTimeRangeForm` in the customer funnel. In the read only staff view the text list of the same times is the alternative.
+Every use of the Calendar needs an equal form for the same task. The Calendar requires a skip link target for it (the `alternative` prop). For Suitable Time Ranges the form is `SuitableTimeRangeForm` in the customer funnel. In the read only staff view the text list of the same times is the alternative. In the allocation view the form is the weekday, start and end selects in the allocation column. The cards beside them list who asked for the chosen time, so the grid is not the only way to read it.
 
 ## Done means
 

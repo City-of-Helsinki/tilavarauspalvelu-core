@@ -12,7 +12,6 @@
   "openApplication": "Avaa hakemus",
   "ageGroup": "Ikäryhmä",
   "desiredReservationUnit": "Tilatoive",
-  "changeTime": "Muuta aikaa",
   "startingTime": "Aloitusaika",
   "endingTime": "Päättymisaika",
   "primaryItems": "Ensisijaiset",
@@ -36,6 +35,15 @@
   "lockOptions": "Hylkää kaikki",
   "lockPartialOptions": "Hylkää loput",
   "unlockOptions": "Palauta käsittelyyn",
+  "form": {
+    "weekday": "Viikonpäivä",
+    "status": {
+      "demand_one": "1 vuorotoive",
+      "demand_other": "{{count}} vuorotoivetta",
+      "allocation_one": "1 jaettu vuoro",
+      "allocation_other": "{{count}} jaettua vuoroa"
+    }
+  },
   "calendar": {
     "label": "Vuorojen jaon kalenteri",
     "skipToForm": "Siirry ajan valintaan",
