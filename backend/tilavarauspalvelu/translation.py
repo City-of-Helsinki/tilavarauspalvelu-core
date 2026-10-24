@@ -19,6 +19,7 @@ from .models import (
     PriceOption,
     PricingGroup,
     ReservationDenyReason,
+    ReservationPriceLine,
     ReservationPurpose,
     ReservationUnit,
     ReservationUnitCancellationRule,
@@ -128,6 +129,11 @@ class PriceOptionTranslationOptions(TranslationOptions):
 @register_lazy(PricingGroup)
 class PricingGroupTranslationOptions(TranslationOptions):
     fields = ["name"]
+
+
+@register_lazy(ReservationPriceLine)
+class ReservationPriceLineTranslationOptions(TranslationOptions):
+    fields = ["description"]
 
 
 @register_lazy(ReservationUnitPricing)
