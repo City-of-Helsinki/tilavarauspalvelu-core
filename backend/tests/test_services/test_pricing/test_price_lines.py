@@ -31,6 +31,9 @@ pytestmark = [
 ]
 
 
+# ── Helpers ──
+
+
 JAN_1 = datetime.date(2026, 1, 1)
 MAR_1 = datetime.date(2026, 3, 1)
 
