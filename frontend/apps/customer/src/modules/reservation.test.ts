@@ -1,4 +1,4 @@
-import { addDays, addHours, addMinutes, format, startOfDay, startOfToday } from "date-fns";
+import { addDays, addHours, addMinutes, format, setHours, startOfDay, startOfToday } from "date-fns";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import type { TFunction } from "i18next";
 import { formatApiDate } from "ui/src/modules/date-utils";
@@ -513,8 +513,8 @@ describe("reservation form transformations", () => {
     ).toMatchObject({
       isReservable: true,
       durationMinutes: 60,
-      start: addHours(startOfDay(start), 10),
-      end: addHours(startOfDay(start), 11),
+      start: setHours(startOfDay(start), 10),
+      end: setHours(startOfDay(start), 11),
     });
   });
 
