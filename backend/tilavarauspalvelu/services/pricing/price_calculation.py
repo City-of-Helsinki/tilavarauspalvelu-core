@@ -58,16 +58,18 @@ def calculate_price(
     - A fixed price counts once and covers the rest of the reservation.
 
     The duration of the reservation is rounded up to the next 15 minutes.
+    Durations are real time, so a night with a daylight saving change is one hour shorter or longer.
 
     :raises PriceCalculationError: If the reservation unit has no pricing group or no price on a date.
     """
-    begin = begin.astimezone(DEFAULT_TIMEZONE)
-    end = end.astimezone(DEFAULT_TIMEZONE)
+    # Python counts the difference of two datetimes with the same timezone in wall time, so count in UTC.
+    begin = begin.astimezone(datetime.UTC)
+    end = end.astimezone(datetime.UTC)
     if begin >= end:
         msg = "Reservation must end after it begins."
         raise PriceCalculationError(msg)
 
-    begin_date = begin.date()
+    begin_date = begin.astimezone(DEFAULT_TIMEZONE).date()
     reservation_unit_pricing_group = (
         ReservationUnitPricingGroup.objects
         .filter(reservation_unit=reservation_unit, begins__lte=begin_date)
@@ -100,7 +102,8 @@ def calculate_price(
     moment = begin
 
     while moment < end:
-        component = _component_for_date(components=components, date=moment.date())
+        moment_date = moment.astimezone(DEFAULT_TIMEZONE).date()
+        component = _component_for_date(components=components, date=moment_date)
         components_by_pk[component.pk] = component
         quantity = quantities.get(component.pk, Decimal(0))
         price_unit = PriceUnit(component.price_unit)
@@ -114,7 +117,7 @@ def calculate_price(
             moment += datetime.timedelta(minutes=price_unit.in_minutes)
             continue
 
-        next_midnight = local_start_of_day(moment.date() + datetime.timedelta(days=1))
+        next_midnight = local_start_of_day(moment_date + datetime.timedelta(days=1)).astimezone(datetime.UTC)
         step_end = min(next_midnight, end)
         step_minutes = Decimal(int((step_end - moment).total_seconds()) // 60)
         quantities[component.pk] = quantity + step_minutes / price_unit.in_minutes
