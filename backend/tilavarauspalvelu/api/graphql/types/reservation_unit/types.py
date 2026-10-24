@@ -32,6 +32,7 @@ from tilavarauspalvelu.models import (
     ReservationUnitPricingGroup,
     Unit,
 )
+from tilavarauspalvelu.services.pricing.price_summary import BasePrice, summarize_base_prices
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 from utils.db import SubqueryCount
@@ -42,6 +43,7 @@ from .permissions import ReservationUnitAllPermission, ReservationUnitPermission
 if TYPE_CHECKING:
     import datetime
 
+    from tilavarauspalvelu.services.pricing.price_summary import PriceSummary
     from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
@@ -60,18 +62,14 @@ class ReservableTimeSpanType(graphene.ObjectType):
     end_datetime = graphene.DateTime(required=True)
 
 
-class PriceSummary(NamedTuple):
-    is_free: bool
-    lowest_amount: Decimal
-    price_unit: str
-    varies: bool
-
-
 class PriceSummaryType(graphene.ObjectType):
     is_free = graphene.Boolean(required=True)
     lowest_amount = graphene.Decimal(required=True)
     price_unit = graphene.Field(graphene.Enum.from_enum(PriceUnit), required=True)
     varies = graphene.Boolean(required=True)
+
+    def resolve_price_unit(root: PriceSummary, info: GQLInfo) -> str:
+        return root.price_unit.value
 
 
 class ReservationUnitNode(DjangoNode):
@@ -389,18 +387,11 @@ class ReservationUnitNode(DjangoNode):
 
     def resolve_price_summary(root: ReservationUnit, info: GQLInfo) -> PriceSummary | None:
         components: list[dict[str, str]] = root.price_summary_components
-        if not components:
-            return None
-
-        prices = {(Decimal(component["amount"]), component["price_unit"]) for component in components}
-        cheapest = components[0]
-
-        return PriceSummary(
-            is_free=all(amount == 0 for amount, _ in prices),
-            lowest_amount=Decimal(cheapest["amount"]),
-            price_unit=cheapest["price_unit"],
-            varies=len(prices) > 1,
-        )
+        base_prices = [
+            BasePrice(amount=Decimal(component["amount"]), price_unit=PriceUnit(component["price_unit"]))
+            for component in components
+        ]
+        return summarize_base_prices(base_prices)
 
     @staticmethod
     def optimize_num_active_user_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
