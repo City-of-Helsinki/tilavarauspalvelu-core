@@ -103,6 +103,35 @@ def test_calculate_price__duration_is_rounded_up_to_15_minutes():
     assert result.total == Decimal("12.50")
 
 
+@pytest.mark.parametrize(
+    ("date", "expected_hours"),
+    [
+        (datetime.date(2026, 3, 29), Decimal(5)),
+        (datetime.date(2026, 10, 25), Decimal(7)),
+    ],
+)
+def test_calculate_price__daylight_saving_change_counts_real_hours(date, expected_hours):
+    row = create_pricing_group_row()
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(10),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+
+    result = calculate_price(
+        reservation_unit=reservation_unit,
+        price_option=None,
+        begin=local_datetime(date.year, date.month, date.day, 0),
+        end=local_datetime(date.year, date.month, date.day, 6),
+    )
+
+    assert result.lines[0].quantity == expected_hours
+    assert result.total == expected_hours * 10
+
+
 def test_calculate_price__fixed_price():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
