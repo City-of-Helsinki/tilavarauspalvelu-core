@@ -409,6 +409,7 @@ class ReservationUnitNode(DjangoNode):
             PriceComponent.objects
             .filter(
                 models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+                models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
                 pricing_group=models.Subquery(active_pricing_group),
                 kind=PriceComponentKind.BASE,
                 valid_from__lte=today,
