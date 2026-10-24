@@ -1288,6 +1288,12 @@ msgstr ""
 msgid "processed at"
 msgstr ""
 
+#: tilavarauspalvelu/admin/price_option/admin.py
+#: tilavarauspalvelu/admin/pricing_group/admin.py
+#: tilavarauspalvelu/admin/unit_group/admin.py
+msgid "Search by name"
+msgstr ""
+
 #: tilavarauspalvelu/admin/rejected_occurrence/admin.py
 msgid "Search by rejection reason or reservation series' name"
 msgstr ""
@@ -2340,10 +2346,6 @@ msgstr ""
 msgid ""
 "Should users be allowed to perform actions for this unit based on roles they "
 "have received automatically from AD groups?"
-msgstr ""
-
-#: tilavarauspalvelu/admin/unit_group/admin.py
-msgid "Search by name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/unit_group/admin.py
