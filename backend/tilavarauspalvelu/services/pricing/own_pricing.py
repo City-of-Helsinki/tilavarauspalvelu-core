@@ -7,7 +7,7 @@ from django.db import transaction
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import PriceComponentKind
-from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
+from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnit, ReservationUnitPricingGroup
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 
@@ -18,7 +18,6 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from tilavarauspalvelu.enums import PaymentType, PriceUnit
-    from tilavarauspalvelu.models import ReservationUnit
 
 __all__ = [
     "OwnPricing",
@@ -56,6 +55,9 @@ def save_own_pricings(*, reservation_unit: ReservationUnit, pricings: list[OwnPr
     today = local_date()
 
     with transaction.atomic():
+        # Lock the reservation unit, so that two saves at the same time cannot both make a new own pricing group.
+        ReservationUnit.objects.select_for_update().get(pk=reservation_unit.pk)
+
         pricing_group = _own_pricing_group(reservation_unit=reservation_unit, today=today)
         if pricing_group is None:
             pricing_group = PricingGroup.objects.create(
