@@ -13,6 +13,9 @@ pytestmark = [
 ]
 
 
+# ── Begin date ──
+
+
 def test_reservation_unit_pricing_group__one_group_per_reservation_unit_and_date():
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitPricingGroupFactory.create(reservation_unit=reservation_unit, begins=datetime.date(2026, 1, 1))
