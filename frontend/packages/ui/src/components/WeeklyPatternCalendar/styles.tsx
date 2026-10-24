@@ -243,23 +243,28 @@ export const WeeklyPatternRoot = styled.div`
     both sides on every cell, the top on the first and the bottom on the last. A view that wants a tint as well
     styles these same attributes. The frame is a box shadow, so it takes no space and leaves the focus outline,
     which is an outline, to show on top of it.
+
+    All four shadows are always there, and the two that only the ends of the run need are turned on by their
+    colour. Hiding an edge by its offset instead would need a zero length, and a zero length in a custom property
+    is easy to write without a unit. That makes the offset a number, which is not a length, and one invalid
+    shadow drops the whole declaration, so the frame would disappear from every cell but one.
   */
   table[data-select] tbody td[data-selected] {
-    --selection-top: 0;
-    --selection-bottom: 0;
+    --selection-top-color: transparent;
+    --selection-bottom-color: transparent;
 
     box-shadow:
       inset 3px 0 0 0 var(--selection-color),
       inset -3px 0 0 0 var(--selection-color),
-      inset 0 var(--selection-top) 0 0 var(--selection-color),
-      inset 0 calc(-1 * var(--selection-bottom)) 0 0 var(--selection-color);
+      inset 0 3px 0 0 var(--selection-top-color),
+      inset 0 -3px 0 0 var(--selection-bottom-color);
 
     &[data-selection-start] {
-      --selection-top: 3px;
+      --selection-top-color: var(--selection-color);
     }
 
     &[data-selection-end] {
-      --selection-bottom: 3px;
+      --selection-bottom-color: var(--selection-color);
     }
   }
 

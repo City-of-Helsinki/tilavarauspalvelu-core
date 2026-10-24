@@ -462,6 +462,24 @@ describe("WeeklyPatternCalendar in select mode", () => {
     expect(last).not.toHaveAttribute("data-selection-start");
   });
 
+  // Every offset of the frame has to be a length. A browser drops the whole box shadow when one of them is not,
+  // and then only the cell that sets its own value keeps a frame. jsdom does not check a length, so this test
+  // reads the offsets instead and fails if any of them loses its unit.
+  test("every cell of the Selection keeps all four shadows of the frame", () => {
+    render(<SelectHarness initialSelection={monday(480, 570)} />);
+
+    const cells = [cell(/^Monday, 08:00–08:30/), cell(/^Monday, 08:30–09:00/), cell(/^Monday, 09:00–09:30/)];
+
+    for (const td of cells) {
+      const shadows = [...getComputedStyle(td).boxShadow.matchAll(/inset (\S+) (\S+)/g)];
+      expect(shadows).toHaveLength(4);
+      for (const [, offsetX, offsetY] of shadows) {
+        expect(offsetX).toMatch(/^-?(0|\d+px)$/);
+        expect(offsetY).toMatch(/^-?(0|\d+px)$/);
+      }
+    }
+  });
+
   test("no gesture changes the value", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
