@@ -524,7 +524,7 @@ function DatedWeekTable<TData extends CalendarData>(
                     aria-label={formatClock(row.beginMinutes)}
                   >
                     {Math.floor(row.beginMinutes / 60)}
-                    {showNowLine && nowRowIndex >= row.index && nowRowIndex < row.index + 2 && (
+                    {showNowLine && nowRowIndex >= row.index && nowRowIndex < row.index + (row.rowSpan ?? 1) && (
                       <NowDot
                         aria-hidden
                         data-testid="dated-week-calendar__now-dot"
