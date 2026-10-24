@@ -403,6 +403,25 @@ def test_calculate_price__option_is_required_when_the_group_has_options():
         )
 
 
+@pytest.mark.parametrize("group_has_unit_group", [True, False])
+def test_calculate_price__option_of_another_unit_group(group_has_unit_group):
+    unit_group = UnitGroupFactory.create() if group_has_unit_group else None
+    row = create_pricing_group_row(unit_group=unit_group)
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
+    other_option = PriceOptionFactory.create()
+
+    msg = "Price option does not belong to the unit group of the pricing group."
+    with pytest.raises(PriceCalculationError, match=exact(msg)):
+        calculate_price(
+            reservation_unit=reservation_unit,
+            price_option=other_option,
+            begin=local_datetime(2026, 2, 1, 10),
+            end=local_datetime(2026, 2, 1, 11),
+        )
+
+
 # ── Errors ──
 
 

@@ -60,7 +60,8 @@ def calculate_price(
     The duration of the reservation is rounded up to the next 15 minutes.
     Durations are real time, so a night with a daylight saving change is one hour shorter or longer.
 
-    :raises PriceCalculationError: If the reservation unit has no pricing group or no price on a date.
+    :raises PriceCalculationError: If the reservation unit has no pricing group, the price option belongs to
+                                   another unit group, or there is no price on a date.
     """
     # Python counts the difference of two datetimes with the same timezone in wall time, so count in UTC.
     begin = begin.astimezone(datetime.UTC)
@@ -81,15 +82,16 @@ def calculate_price(
         msg = f"Reservation unit has no pricing group on {begin_date.isoformat()}."
         raise PriceCalculationError(msg)
 
+    pricing_group = reservation_unit_pricing_group.pricing_group
+    if price_option is not None and price_option.unit_group_id != pricing_group.unit_group_id:
+        msg = "Price option does not belong to the unit group of the pricing group."
+        raise PriceCalculationError(msg)
+
     option_filter = models.Q(price_option__isnull=True)
     if price_option is not None:
         option_filter |= models.Q(price_option=price_option)
 
-    components = list(
-        PriceComponent.objects.filter(
-            option_filter, pricing_group=reservation_unit_pricing_group.pricing_group
-        ).order_by("valid_from")
-    )
+    components = list(PriceComponent.objects.filter(option_filter, pricing_group=pricing_group).order_by("valid_from"))
 
     # Same rounding as in the old pricing model (`ReservationUnitPricingActions.calculate_reservation_price`).
     duration_minutes = math.ceil((end - begin).total_seconds() / 60 / 15) * 15
