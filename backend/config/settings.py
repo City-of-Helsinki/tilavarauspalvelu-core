@@ -126,8 +126,8 @@ class Common(Environment):
 
     # --- Versioning settings ----------------------------------------------------------------------------------------
 
-    SOURCE_BRANCH_NAME: str = values.StringValue(default="")  # type: ignore[assignment]
-    SOURCE_VERSION: str = values.StringValue(default="")  # type: ignore[assignment]
+    SOURCE_BRANCH_NAME = values.StringValue(default="")
+    SOURCE_VERSION = values.StringValue(default="")
 
     @classproperty
     def APP_VERSION(cls) -> str:
@@ -196,8 +196,8 @@ class Common(Environment):
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 
-    STATIC_ROOT: Path = values.PathValue(default="staticroot")  # type: ignore[assignment]
-    MEDIA_ROOT: Path = values.PathValue(default="media")  # type: ignore[assignment]
+    STATIC_ROOT = values.PathValue(default="staticroot")
+    MEDIA_ROOT = values.PathValue(default="media")
 
     STATIC_URL = values.StringValue(default="/static/")
     MEDIA_URL = values.StringValue(default="/media/")
@@ -557,13 +557,13 @@ class Common(Environment):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
-    SENTRY_ENABLED: bool = values.BooleanValue(default=False)  # type: ignore[assignment]
-    SENTRY_DSN: str = values.StringValue(default="")  # type: ignore[assignment]
-    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")  # type: ignore[assignment]
-    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)  # type: ignore[assignment]
-    SENTRY_RELEASE: str | None = values.StringValue(default=None)  # type: ignore[assignment]
-    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)  # type: ignore[assignment]
-    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(  # type: ignore[assignment]
+    SENTRY_ENABLED = values.BooleanValue(default=False)
+    SENTRY_DSN = values.StringValue(default="")
+    SENTRY_ENVIRONMENT = values.StringValue(default="local")
+    SENTRY_PROFILE_SESSION_SAMPLE_RATE = values.FloatValue(default=None)
+    SENTRY_RELEASE = values.StringValue(default=None)
+    SENTRY_TRACES_SAMPLE_RATE = values.FloatValue(default=None)
+    SENTRY_TRACES_IGNORE_PATHS = values.ListValue(
         default=[
             "/healthz",
             "/readiness",
@@ -702,8 +702,8 @@ class EmptyDefaults:
     DATABASES: dict[str, Any] = {}
     REDIS_URL = ""
 
-    STATIC_ROOT = Common.BASE_DIR / "staticroot"
-    MEDIA_ROOT = Common.BASE_DIR / "media"
+    STATIC_ROOT = str(Common.BASE_DIR / "staticroot")
+    MEDIA_ROOT = str(Common.BASE_DIR / "media")
 
     HAUKI_API_URL = ""
     HAUKI_ADMIN_UI_URL = ""
@@ -767,8 +767,8 @@ class Local(Common, overrides_from=LocalMixin):
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 
-    STATIC_ROOT: Path = values.PathValue(default="staticroot", create_if_missing=True)  # type: ignore[assignment]
-    MEDIA_ROOT: Path = values.PathValue(default="media", create_if_missing=True)  # type: ignore[assignment]
+    STATIC_ROOT = values.PathValue(default="staticroot", create_if_missing=True)
+    MEDIA_ROOT = values.PathValue(default="media", create_if_missing=True)
 
     # --- Logging settings -------------------------------------------------------------------------------------------
 
@@ -862,8 +862,8 @@ class Docker(Common, overrides_from=DockerMixin):
     CORS_ALLOWED_ORIGINS = values.ListValue(default=[])
     CSRF_TRUSTED_ORIGINS = values.ListValue(default=[])
 
-    STATIC_ROOT = Path("/srv/static")
-    MEDIA_ROOT = Path("/media")
+    STATIC_ROOT = "/srv/static"
+    MEDIA_ROOT = "/media"
 
     DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@db/tvp")
 
@@ -1050,8 +1050,8 @@ class Build(EmptyDefaults, Common, use_environ=True):
 
     DEBUG = True
 
-    STATIC_ROOT = Path("/srv/static")
-    MEDIA_ROOT = Path("/media")
+    STATIC_ROOT = "/srv/static"
+    MEDIA_ROOT = "/media"
 
 
 class CI(EmptyDefaults, Common, use_environ=True):
@@ -1082,14 +1082,14 @@ class Platta(Common, use_environ=True):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
-    SENTRY_ENABLED: bool = values.BooleanValue(default=True)  # type: ignore[assignment]
+    SENTRY_ENABLED = values.BooleanValue(default=True)
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
     REDIS_URL = ""  # Not used in Platta environments
-    REDIS_SENTINEL_SERVICE: str = values.StringValue()  # type: ignore[assignment]
-    REDIS_MASTER: str = values.StringValue()  # type: ignore[assignment]
-    REDIS_PASSWORD: str = values.StringValue()  # type: ignore[assignment]
+    REDIS_SENTINEL_SERVICE = values.StringValue()
+    REDIS_MASTER = values.StringValue()
+    REDIS_PASSWORD = values.StringValue()
 
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
 
