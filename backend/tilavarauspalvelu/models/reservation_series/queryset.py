@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from django.db import models
 from lookup_property import L
@@ -20,7 +20,11 @@ __all__ = [
 ]
 
 
-class ReservationSeriesQuerySet(ModelQuerySet[ReservationSeries]):
+_TModel_co = TypeVar("_TModel_co", bound=ReservationSeries, covariant=True, default=ReservationSeries)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationSeries)
+
+
+class ReservationSeriesQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def requiring_access_code(self) -> Self:
         """Return all reservation series that should have an access code but don't."""
         return self.alias(

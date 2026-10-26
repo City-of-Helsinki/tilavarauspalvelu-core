@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Self
+from typing import Literal, Self, TypeVar
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -22,7 +22,11 @@ __all__ = [
 ]
 
 
-class ApplicationQuerySet(ModelQuerySet[Application]):
+_TModel_co = TypeVar("_TModel_co", bound=Application, covariant=True, default=Application)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=Application)
+
+
+class ApplicationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def has_status_in(self, statuses: list[str]) -> Self:
         return self.filter(L(status__in=statuses))
 

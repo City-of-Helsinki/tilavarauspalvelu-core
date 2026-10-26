@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import Self, TypeVar
 
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
@@ -15,7 +15,11 @@ __all__ = [
 ]
 
 
-class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
+_TModel_co = TypeVar("_TModel_co", bound=ApplicationRound, covariant=True, default=ApplicationRound)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ApplicationRound)
+
+
+class ApplicationRoundQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def active(self) -> Self:
         return self.filter(sent_at=None)
 

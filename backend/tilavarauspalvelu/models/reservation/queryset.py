@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import itertools
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -41,7 +41,11 @@ __all__ = [
 ]
 
 
-class ReservationQuerySet(ModelQuerySet[Reservation]):
+_TModel_co = TypeVar("_TModel_co", bound=Reservation, covariant=True, default=Reservation)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=Reservation)
+
+
+class ReservationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def _fetch_all(self) -> None:
         super()._fetch_all()
         if "FETCH_UNITS_FOR_PERMISSIONS_FLAG" in self._hints:
@@ -267,7 +271,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
             ),
         )
 
-    def upsert_statistics(self) -> None:
+    def upsert_statistics(self: ReservationQuerySet) -> None:
         reservations = self.select_related(
             "user",
             "reservation_series",

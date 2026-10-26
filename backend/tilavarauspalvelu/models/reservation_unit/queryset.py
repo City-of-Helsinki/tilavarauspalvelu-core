@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from itertools import islice
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, Self, TypeVar
 
 from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
@@ -37,9 +37,13 @@ def _get_vector_translation_fallback(obj: models.Model | None, lang: str) -> str
     return getattr(obj, f"name_{lang}", "") or getattr(obj, "name_fi", "")
 
 
-class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
+_TModel_co = TypeVar("_TModel_co", bound=ReservationUnit, covariant=True, default=ReservationUnit)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationUnit)
+
+
+class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
     def with_first_reservable_time(
-        self,
+        self: ReservationUnitQuerySet,
         *,
         filter_date_start: datetime.date | None,
         filter_date_end: datetime.date | None,
@@ -95,7 +99,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         return ReservationUnit.objects.alias(ids=ids).filter(pk__in=models.F("ids"))
 
     def hooked_iterator(
-        self,
+        self: ReservationUnitQuerySet,
         hook: Callable[[list[ReservationUnit]], None],
         *,
         chunk_size: int,
@@ -171,7 +175,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
     def hidden(self) -> Self:
         return self.published().exclude(self._is_visible)
 
-    def update_search_vectors(self, pks: list[int] | None = None) -> None:
+    def update_search_vectors(self: ReservationUnitQuerySet, pks: list[int] | None = None) -> None:
         qs = self.select_related(
             "unit",
             "reservation_unit_type",

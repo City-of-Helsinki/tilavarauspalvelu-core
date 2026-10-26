@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from django.db import models
 from lookup_property import L
@@ -24,7 +24,11 @@ __all__ = [
 ]
 
 
-class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
+_TModel_co = TypeVar("_TModel_co", bound=AllocatedTimeSlot, covariant=True, default=AllocatedTimeSlot)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=AllocatedTimeSlot)
+
+
+class AllocatedTimeSlotQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def has_section_status_in(self, statuses: list[str]) -> Self:
         order = L("reservation_unit_option__application_section__status")
         return self.alias(application_section_status=order).filter(application_section_status__in=statuses)
@@ -61,7 +65,7 @@ class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
         )
 
     def has_overlapping_allocations(
-        self,
+        self: AllocatedTimeSlotQuerySet,
         *,
         reservation_unit_option: ReservationUnitOption,
         begin_date: datetime.date,

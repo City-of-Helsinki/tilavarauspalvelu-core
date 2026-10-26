@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from contextlib import suppress
-from typing import Self
+from typing import Self, TypeVar
 
 from django.conf import settings
 from django.db import models, transaction
@@ -20,7 +20,11 @@ __all__ = [
 ]
 
 
-class PaymentOrderQuerySet(ModelQuerySet[PaymentOrder]):
+_TModel_co = TypeVar("_TModel_co", bound=PaymentOrder, covariant=True, default=PaymentOrder)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=PaymentOrder)
+
+
+class PaymentOrderQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def expired_direct_payments(self) -> Self:
         now = utc_datetime()
         expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)

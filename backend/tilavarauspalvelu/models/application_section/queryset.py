@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Self
+from typing import Literal, Self, TypeVar
 
 from django.db import models
 from django.db.models import Subquery
@@ -19,7 +19,11 @@ __all__ = [
 ]
 
 
-class ApplicationSectionQuerySet(ModelQuerySet[ApplicationSection]):
+_TModel_co = TypeVar("_TModel_co", bound=ApplicationSection, covariant=True, default=ApplicationSection)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ApplicationSection)
+
+
+class ApplicationSectionQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def has_status_in(self, statuses: list[str]) -> Self:
         return self.filter(L(status__in=statuses))
 

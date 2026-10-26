@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from lookup_property import L
 
@@ -17,7 +17,11 @@ __all__ = [
 ]
 
 
-class BannerNotificationQuerySet(ModelQuerySet[BannerNotification]):
+_TModel_co = TypeVar("_TModel_co", bound=BannerNotification, covariant=True, default=BannerNotification)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=BannerNotification)
+
+
+class BannerNotificationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def active(self) -> Self:
         return self.filter(L(is_active=True))
 
