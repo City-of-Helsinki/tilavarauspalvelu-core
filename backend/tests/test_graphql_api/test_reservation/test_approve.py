@@ -12,10 +12,17 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import PaymentOrder, Reservation
+from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationPriceLine
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory
+from tests.factories import (
+    PaymentOrderFactory,
+    ReservationFactory,
+    ReservationPriceLineFactory,
+    ReservationSeriesFactory,
+    ReservationUnitFactory,
+)
 from tests.helpers import ResponseMock, patch_method
 
 from .helpers import APPROVE_MUTATION, get_approve_data
@@ -571,7 +578,8 @@ def test_reservation__approve__price_missing(graphql):
     input_data.pop("price")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
-    assert response.has_schema_errors is True, response
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_codes() == [error_codes.RESERVATION_PRICE_REQUIRED]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
@@ -613,3 +621,330 @@ def test_reservation__approve__empty_handling_details(graphql):
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
+
+
+# ── Price lines ──────────────────────────────────────────────────────────────
+
+
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+def test_reservation__approve__price_lines__one_line_free_and_one_paid(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        price=Decimal(30),
+        non_subsidised_price=Decimal(30),
+    )
+    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20))
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = [
+        {"pk": first_line.pk, "overrideAmount": "0"},
+        {"pk": second_line.pk, "overrideAmount": None},
+    ]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.price == Decimal(20)
+    assert reservation.non_subsidised_price == Decimal(30)
+
+    first_line.refresh_from_db()
+    assert first_line.override_amount == Decimal(0)
+
+    second_line.refresh_from_db()
+    assert second_line.override_amount is None
+
+
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+def test_reservation__approve__price_lines__amounts_corrected_up_and_down(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        price=Decimal(30),
+        non_subsidised_price=Decimal(30),
+    )
+    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20))
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = [
+        {"pk": first_line.pk, "overrideAmount": "12.50"},
+        {"pk": second_line.pk, "overrideAmount": "15.25"},
+    ]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.price == Decimal("27.75")
+    assert reservation.non_subsidised_price == Decimal(30)
+
+    first_line.refresh_from_db()
+    assert first_line.override_amount == Decimal("12.50")
+
+    second_line.refresh_from_db()
+    assert second_line.override_amount == Decimal("15.25")
+
+
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+def test_reservation__approve__price_lines__null_override_clears_existing_override(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        price=Decimal(5),
+        non_subsidised_price=Decimal(10),
+    )
+    line = ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal(10),
+        override_amount=Decimal(5),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = [{"pk": line.pk, "overrideAmount": None}]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.price == Decimal(10)
+
+    line.refresh_from_db()
+    assert line.override_amount is None
+
+
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__price_lines__all_lines_free(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
+        price=Decimal(30),
+        non_subsidised_price=Decimal(30),
+    )
+    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20))
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = [
+        {"pk": first_line.pk, "overrideAmount": "0"},
+        {"pk": second_line.pk, "overrideAmount": "0"},
+    ]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert EmailService.send_reservation_confirmed_email.called is True
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.price == Decimal(0)
+    assert reservation.non_subsidised_price == Decimal(30)
+    assert hasattr(reservation, "payment_order") is False
+
+
+@patch_method(EmailService.send_reservation_requires_payment_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__price_lines__paid__in_webshop(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
+        price=Decimal(30),
+        non_subsidised_price=Decimal(30),
+    )
+    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20))
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = [
+        {"pk": first_line.pk, "overrideAmount": "0"},
+        {"pk": second_line.pk, "overrideAmount": None},
+    ]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert EmailService.send_reservation_requires_payment_email.called is True
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.price == Decimal(20)
+    assert reservation.tax_percentage_value == Decimal("25.5")
+
+    payment_order = reservation.payment_order
+    assert payment_order.status == OrderStatus.PENDING
+    assert payment_order.price_net == Decimal("15.94")
+    assert payment_order.price_vat == Decimal("4.06")
+    assert payment_order.price_total == Decimal(20)
+
+
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+def test_reservation__approve__price_lines__price_given_for_reservation_with_lines(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        price=Decimal(10),
+        non_subsidised_price=Decimal(10),
+    )
+    line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="0")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.price == Decimal(0)
+
+    line.refresh_from_db()
+    assert line.amount == Decimal(10)
+    assert line.override_amount is None
+
+
+def test_reservation__approve__price_lines__price_also_given(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        price=Decimal(10),
+    )
+    line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="0")
+    data["priceLines"] = [{"pk": line.pk, "overrideAmount": "0"}]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_codes() == [error_codes.RESERVATION_PRICE_AND_PRICE_LINES_GIVEN]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+    assert reservation.price == Decimal(10)
+
+    line.refresh_from_db()
+    assert line.override_amount is None
+
+
+@pytest.mark.parametrize("case", ["other_reservation", "missing_line", "duplicate_line"])
+def test_reservation__approve__price_lines__lines_do_not_match(graphql, case):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        price=Decimal(20),
+    )
+    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+    other_line = ReservationPriceLineFactory.create(amount=Decimal(10))
+
+    match case:
+        case "other_reservation":
+            line_pks = [first_line.pk, other_line.pk]
+        case "missing_line":
+            line_pks = [first_line.pk]
+        case "duplicate_line":
+            line_pks = [first_line.pk, first_line.pk, second_line.pk]
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = [{"pk": line_pk, "overrideAmount": "0"} for line_pk in line_pks]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_codes() == [error_codes.RESERVATION_PRICE_LINES_MISMATCH]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+    assert reservation.price == Decimal(20)
+
+    overrides = list(ReservationPriceLine.objects.values_list("override_amount", flat=True))
+    assert overrides == [None, None, None]
+
+
+def test_reservation__approve__price_lines__reservation_has_no_lines(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = []
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_codes() == [error_codes.RESERVATION_PRICE_LINES_MISMATCH]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+
+def test_reservation__approve__price_lines__negative_override_amount(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        price=Decimal(10),
+    )
+    line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = [{"pk": line.pk, "overrideAmount": "-1"}]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("priceLines.0.overrideAmount") == [
+        "Ensure this value is greater than or equal to 0."
+    ]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+    line.refresh_from_db()
+    assert line.override_amount is None
