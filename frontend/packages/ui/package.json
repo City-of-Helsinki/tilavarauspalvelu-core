@@ -55,7 +55,7 @@
     "@types/sanitize-html": "^2.16.1",
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/coverage-istanbul": "^5.0.5",
-    "happy-dom": "^20.10.1",
+    "happy-dom": "^21.0.3",
     "next": "^16.4.2",
     "next-i18next": "^16.3.2",
     "postcss-styled-syntax": "^0.7.3",

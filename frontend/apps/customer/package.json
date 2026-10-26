@@ -59,7 +59,7 @@
     "@types/react-transition-group": "^4.4.12",
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/coverage-istanbul": "^5.0.5",
-    "happy-dom": "^20.10.1",
+    "happy-dom": "^21.0.3",
     "postcss-styled-syntax": "^0.7.3",
     "stylelint": "^17.16.0",
     "stylelint-config-standard": "^40.0.0",
