@@ -126,7 +126,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
         iterator = iter(iterable)  # type: ignore[call-overload]
 
         while results := list(islice(iterator, chunk_size)):
-            prefetch_related_objects(results, *self._prefetch_related_lookups)  # type: ignore[attr-defined]
+            prefetch_related_objects(results, *self._prefetch_related_lookups)
             hook(results)
             yield from results
 

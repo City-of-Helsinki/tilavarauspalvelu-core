@@ -39,7 +39,8 @@ class ApplicationRoundQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
 
-        items = list(self._result_cache or [])
+        # Only `with_permissions` sets the flag that runs this, and it is used on model querysets.
+        items: list[ApplicationRound] = list(self._result_cache or [])  # type: ignore[arg-type]
         if not items:
             return
 
