@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from tilavarauspalvelu.models import ReservationUnitOption
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
@@ -16,7 +16,11 @@ __all__ = [
 ]
 
 
-class ReservationUnitOptionQuerySet(ModelQuerySet[ReservationUnitOption]):
+_TModel_co = TypeVar("_TModel_co", bound=ReservationUnitOption, covariant=True, default=ReservationUnitOption)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationUnitOption)
+
+
+class ReservationUnitOptionQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def for_application_round(self, ref: ApplicationRound | models.OuterRef) -> Self:
         """Return all reservation unit options for the given application round."""
         return self.filter(application_section__application__application_round=ref)
