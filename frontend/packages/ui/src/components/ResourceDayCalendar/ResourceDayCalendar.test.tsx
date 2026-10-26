@@ -233,6 +233,19 @@ describe("ResourceDayCalendar", () => {
     expect(labelledEvents()).toEqual(new Set(["Event 1", "Event 2"]));
   });
 
+  // There is one column header per hour, whatever the step, so the dot is placed by the hour and not by the column.
+  test.each([30, 15])("only the hour of the current time carries the now dot, with a %i minute step", (step) => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-21T09:15:00+03:00"));
+    renderCalendar({ step });
+
+    const dots = screen.getAllByTestId("resource-day-calendar__now-dot");
+    expect(dots).toHaveLength(1);
+    expect(dots[0]).toHaveStyle({ left: "25%" });
+    expect(dots[0]?.closest("th")).toHaveAccessibleName("09:00");
+    vi.useRealTimers();
+  });
+
   test("marks the grid busy while loading", () => {
     renderCalendar({ isLoading: true });
     expect(screen.getByRole("grid")).toHaveAttribute("aria-busy", "true");
