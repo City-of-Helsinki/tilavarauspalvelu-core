@@ -1,0 +1,7 @@
+  /** Marks that the paid booking test has started execution */
+  "Mark Paid Booking Test Started": async () => {
+    await parallel_test_data["Store Test Data Variable"]("PAID_BOOKING_STARTED", "True");
+    // Port: a Playwright retry starts the test again, so the failure of the previous attempt no longer counts
+    await parallel_test_data["Store Test Data Variable"]("PAID_BOOKING_FAILED", "");
+    await BuiltIn["Log"]("Marked paid booking test as started");
+  },

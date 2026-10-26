@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": false,
+  "trailingComma": "es5",
+  "printWidth": 120,
+  "sortImports": {
+    "newlinesBetween": false,
+    "customGroups": [{ "groupName": "node-libs", "elementNamePattern": ["node:*"] }],
+    "groups": [
+      "node-libs",
+      ["value-builtin", "value-external"],
+      "type-import",
+      "internal",
+      ["parent", "sibling", "index"]
+    ]
+  }
+}

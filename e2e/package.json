@@ -1,0 +1,33 @@
+{
+  "name": "e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright end-to-end tests for Varaamo, ported from the tilavarauspalvelu-robot Robot Framework suite",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test --grep-invert @serialonly --project 'Tests_*' --project create_data",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:notifications": "playwright test --project Tests_admin_notifications_serial --workers 1",
+    "test:all": "playwright test --grep-invert @serialonly --project 'Tests_*' --project create_data; parallel=$?; PLAYWRIGHT_HTML_OUTPUT_DIR=playwright-report/notifications PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/notifications/junit.xml playwright test --project Tests_admin_notifications_serial --workers 1 --output test-results/notifications; notifications=$?; exit $((parallel || notifications))",
+    "test:sequential": "FORCE_SINGLE_USER=True playwright test --grep-invert @serialonly --project 'Tests_*' --project create_data --workers 1",
+    "selftest": "playwright test --project selftest",
+    "list": "playwright test --list",
+    "parity": "playwright test --list --reporter ./tools/naming-parity-reporter.ts",
+    "report": "playwright show-report",
+    "lint": "oxlint --type-aware --type-check",
+    "lint:fix": "oxlint --type-aware --type-check --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@types/node": "^24.19.2",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "oxlint-tsgolint": "^7.0.2004"
+  },
+  "engines": {
+    "npm": "pnpm"
+  },
+  "packageManager": "pnpm@11.3.0"
+}
