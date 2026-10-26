@@ -78,5 +78,6 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/.next/static ./apps/$
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/public ./apps/$APP/public
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/next-i18next.config.cjs ./apps/$APP/
 
+ENV TZ=Europe/Helsinki
 ENV BIN="apps/$APP/server.js"
 CMD ["sh", "-c", "dumb-init node $BIN"]

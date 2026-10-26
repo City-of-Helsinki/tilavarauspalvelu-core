@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "ROARR_LOG=true next dev -p 3000 --turbopack",
-    "build": "SKIP_ENV_VALIDATION=true next build",
+    "build": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki next build",
     "start": "next start -p 3000",
     "clean:cache": "rm -rf .next",
     "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest run",
