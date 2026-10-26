@@ -30,17 +30,24 @@ export type TimeSelectorProps = {
   index: number;
   reservationUnitOptions: Array<{ label: string; value: number }>;
   reservationUnitOpeningHours: Readonly<TimeSelectorFragment[]>;
+  /**
+   * The opening hours of every reservation unit in the section. A time that one of them opens can be applied for,
+   * whichever unit is shown, so the calendar and the form both paint inside these.
+   */
+  sectionOpeningHours: Readonly<TimeSelectorFragment[]>;
 };
 
 export function TimeSelectorForm({
   index,
   reservationUnitOptions,
   reservationUnitOpeningHours,
+  sectionOpeningHours,
 }: TimeSelectorProps): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const { control, getValues, setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
   const availability = useMemo(() => toAvailability(reservationUnitOpeningHours), [reservationUnitOpeningHours]);
+  const paintable = useMemo(() => toAvailability(sectionOpeningHours), [sectionOpeningHours]);
 
   const copyCells = () => {
     // Normalising through the pattern drops the source section's primary keys, which must not leak to other sections.
@@ -70,11 +77,7 @@ export function TimeSelectorForm({
     });
   };
   const getStateLabel = (cell: WeeklyPatternCellInfo<SuitableTimeData>) =>
-    t(
-      `application:TimeSelector.legend.${
-        cell.data ? priorityKey(cell.data.priority) : cell.availability === "open" ? "open" : "unavailable"
-      }`
-    );
+    t(`application:TimeSelector.legend.${cell.data ? priorityKey(cell.data.priority) : cell.availability}`);
   return (
     // NOTE flex inside a grid container breaks overflow-x
     <Flex style={{ display: "grid" }} $marginTop="m">
@@ -94,6 +97,7 @@ export function TimeSelectorForm({
             onBlur={field.onBlur}
             step={SUITABLE_TIME_STEP_MINUTES}
             availability={availability}
+            paintable={paintable}
             visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
             brush={{ priority }}
             locale={i18n.language}
@@ -123,10 +127,11 @@ export function TimeSelectorForm({
             current: priority === Priority.Secondary,
           },
           { state: "open", label: t("application:TimeSelector.legend.open") },
-          { state: "closed", label: t("application:TimeSelector.legend.unavailable") },
+          { state: "closed", label: t("application:TimeSelector.legend.closed") },
+          { state: "unavailable", label: t("application:TimeSelector.legend.unavailable") },
         ]}
       />
-      <SuitableTimeRangeForm id={formId} index={index} openingHours={reservationUnitOpeningHours} />
+      <SuitableTimeRangeForm id={formId} index={index} openingHours={sectionOpeningHours} />
       <div data-testid={`time-selector__preview-${index}`}>
         <TimePreview index={index} />
       </div>

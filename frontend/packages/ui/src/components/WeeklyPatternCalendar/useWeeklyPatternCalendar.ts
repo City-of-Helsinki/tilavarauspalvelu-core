@@ -21,6 +21,7 @@ import {
 import type { CellGrid, PaintMode } from "./engine";
 import type {
   CalendarData,
+  CellAvailability,
   WeeklyPatternAnnouncements,
   WeeklyPatternCalendarProps,
   WeeklyPatternCellInfo,
@@ -33,6 +34,7 @@ export type WeeklyPatternOptions<TData extends CalendarData> = Pick<
   | "onBlur"
   | "step"
   | "availability"
+  | "paintable"
   | "visibleHours"
   | "brush"
   | "isDataEqual"
@@ -65,6 +67,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   onBlur,
   step,
   availability,
+  paintable,
   visibleHours,
   brush,
   isDataEqual = shallowEqual,
@@ -77,15 +80,27 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   assertValidStep(step);
 
   const days = WEEKDAYS_SORTED;
-  const rangesByDay = groupAvailability(availability);
-  const hours = resolveVisibleHours(visibleHours, rangesByDay, value, step);
+  const openByDay = groupAvailability(availability);
+  // Gestures reach the open cells, and the closed cells that `paintable` adds.
+  const paintableByDay = paintable ? groupAvailability([...availability, ...paintable]) : openByDay;
+  const hours = resolveVisibleHours(visibleHours, paintableByDay, value, step);
   const firstIndex = hours ? hours.beginMinutes / step : 0;
   const endIndex = hours ? hours.endMinutes / step : 0;
   const rowsPerHour = Math.max(1, 60 / step);
   const baseGrid = patternToGrid(value, step);
 
-  const isOpen = (weekday: Weekday, index: number) =>
-    isRangeOpen(rangesByDay[weekday], index * step, (index + 1) * step);
+  const isOpen = (weekday: Weekday, index: number) => isRangeOpen(openByDay[weekday], index * step, (index + 1) * step);
+
+  const isPaintable = (weekday: Weekday, index: number) =>
+    isRangeOpen(paintableByDay[weekday], index * step, (index + 1) * step);
+
+  // Without `paintable`, every cell outside `availability` is closed.
+  const cellAvailability = (weekday: Weekday, index: number): CellAvailability => {
+    if (isOpen(weekday, index)) {
+      return "open";
+    }
+    return !paintable || isPaintable(weekday, index) ? "closed" : "unavailable";
+  };
 
   const [gesture, setGesture] = useState<Gesture<TData> | null>(null);
   const [message, setMessage] = useState({ text: "", count: 0 });
@@ -106,16 +121,16 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
         gesture.anchor,
         gesture.current,
         gesture.mode,
-        isEditableFor(gesture.mode, (index) => isOpen(gesture.weekday, index)),
+        isEditableFor(gesture.mode, (index) => isPaintable(gesture.weekday, index)),
         isDataEqual
       )
     : baseGrid;
 
-  // The tab stop starts on the first open cell, so the grid isn't entered through a closed one.
+  // The tab stop starts on the first paintable cell, so the grid isn't entered through one that can't be painted.
   const defaultActive = (): GridAddress<Weekday> | null => {
     for (let index = firstIndex; index < endIndex; index++) {
       for (const weekday of days) {
-        if (isOpen(weekday, index)) {
+        if (isPaintable(weekday, index)) {
           return { column: weekday, index };
         }
       }
@@ -131,7 +146,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     onChange,
     step,
     isDataEqual,
-    isOpen,
+    isPaintable,
     isValidSelection,
     announcements,
     describeSpan,
@@ -142,7 +157,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       onChange,
       step,
       isDataEqual,
-      isOpen,
+      isPaintable,
       isValidSelection,
       announcements,
       describeSpan,
@@ -152,7 +167,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   const interactive = !readOnly && !disabled;
 
   const modeAt = (weekday: Weekday, index: number): PaintMode<TData> | null =>
-    interactive ? paintModeFor(baseGrid[weekday]?.[index], brush, isOpen(weekday, index), isDataEqual) : null;
+    interactive ? paintModeFor(baseGrid[weekday]?.[index], brush, isPaintable(weekday, index), isDataEqual) : null;
 
   // The single path through which every gesture changes `value`. `spanFrom` is where the whole
   // gesture began, so validation and the announcement describe the entire span, not just the last step.
@@ -165,7 +180,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
         from,
         to,
         mode,
-        isEditableFor(mode, (index) => current.isOpen(weekday, index)),
+        isEditableFor(mode, (index) => current.isPaintable(weekday, index)),
         current.isDataEqual
       );
       if (next === current.baseGrid) {
@@ -352,7 +367,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       isRunEnd,
       runBeginMinutes,
       runEndMinutes,
-      availability: isOpen(weekday, index) ? "open" : "closed",
+      availability: cellAvailability(weekday, index),
     };
   };
 
