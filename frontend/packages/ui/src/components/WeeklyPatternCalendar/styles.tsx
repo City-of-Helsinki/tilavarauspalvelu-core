@@ -35,14 +35,14 @@ const secondaryFill = css`
 const primaryIndicator = css`
   &::after {
     ${arrow};
-    border-bottom: 8px solid var(--color-white);
+    border-bottom: 10px solid var(--color-white);
   }
 `;
 
 const secondaryIndicator = css`
   &::after {
     ${arrow};
-    border-top: 8px solid var(--color-black);
+    border-top: 10px solid var(--color-black);
   }
 `;
 
@@ -75,8 +75,7 @@ const eventBackground = (appearance: CellAppearance) => css`
   }
 
   &[data-run-start] {
-    ${primaryIndicator};
-
+    z-index: 1;
     &::before {
       top: 1px;
       padding-top: 2px;
@@ -101,7 +100,7 @@ export const WeeklyPatternRoot = styled.div`
 
   position: relative;
   overflow-x: auto;
-  height: 500px;
+  height: 600px;
 
   /* 
     The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
@@ -124,6 +123,7 @@ export const WeeklyPatternRoot = styled.div`
   thead td {
     font-size: var(--fontsize-body-m);
     border-bottom: 1px solid var(--border-color);
+    z-index: 3;
   }
 
   thead td {
@@ -137,6 +137,7 @@ export const WeeklyPatternRoot = styled.div`
     text-align: center;
     vertical-align: middle;
     white-space: nowrap;
+    z-index: 2;
   }
 
   tbody td {
@@ -144,7 +145,7 @@ export const WeeklyPatternRoot = styled.div`
     width: calc((100% - 30px) / 7);
     cursor: pointer;
     text-align: right;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 0.9;
     color: transparent;
     transition:
@@ -168,12 +169,15 @@ export const WeeklyPatternRoot = styled.div`
     &[data-appearance="secondary"] {
       ${eventBackground("secondary")};
       border-inline: 1px solid var(--border-color);
+
       &[data-run-start]::before {
         box-shadow: inset 0 1px 0 var(--color-black-50);
       }
+
       &[data-run-end]::before {
         box-shadow: inset 0 -1px 0 var(--color-black-50);
       }
+
       &[data-run-start][data-run-end]::before {
         box-shadow:
           inset 0 1px 0 var(--color-black-50),
@@ -196,13 +200,11 @@ export const WeeklyPatternRoot = styled.div`
       /* Due to the opacity being lower, a darker background can be used. It also makes a clearer distinction between
          the parts of the run which are on closed cells. */
       &[data-appearance="primary"]::before {
-        background-color: var(--color-bus-dark);
-        opacity: 0.5;
+        background-color: rgba(from var(--color-bus-dark) r g b / 0.75);
       }
 
       &[data-appearance="secondary"]::before {
-        background-color: var(--color-engel-dark);
-        opacity: 0.8;
+        background-color: rgba(from var(--color-engel-dark) r g b / 0.75);
       }
     }
 
@@ -238,8 +240,8 @@ export const WeeklyPatternRoot = styled.div`
 `;
 
 const LegendList = styled.ul`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-xs);
   margin: 0;
   padding: 0;

@@ -3,6 +3,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
+import styled from "styled-components";
 import { WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar/styles";
 import type { WeeklyPatternCellInfo, WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/types";
 import { WeeklyPatternCalendar } from "@ui/components/WeeklyPatternCalendar/WeeklyPatternCalendar";
@@ -19,12 +20,16 @@ import {
   toPattern,
 } from "ui/src/modules/suitableTimes";
 import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
-import { AutoGrid, Flex } from "ui/src/styled";
+import { AutoGrid, Flex, H4 } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
 import { TimePreview } from "@/components/application/funnel/TimePreview";
 import type { ApplicationPage2FormValues } from "./form";
 import { SuitableTimeRangeForm } from "./SuitableTimeRangeForm";
+
+const CenterHeader = styled(H4)`
+  text-align: center;
+`;
 
 export type TimeSelectorProps = {
   index: number;
@@ -67,6 +72,9 @@ export function TimeSelectorForm({
 
   const priority = watch(`applicationSections.${index}.priority`);
   const formId = `time-selector__form-${index}`;
+  const reservationUnitName = reservationUnitOptions.find(
+    (option) => option.value === watch(`applicationSections.${index}.reservationUnitPk`)
+  )?.label;
 
   const enableCopyCells = filterNonNullable(watch("applicationSections")).length > 1;
   const onChange = (pattern: WeeklyPatternValue<SuitableTimeData>) => {
@@ -76,6 +84,7 @@ export function TimeSelectorForm({
       shouldTouch: true,
     });
   };
+
   const getStateLabel = (cell: WeeklyPatternCellInfo<SuitableTimeData>) =>
     t(`application:TimeSelector.legend.${cell.data ? priorityKey(cell.data.priority) : cell.availability}`);
   return (
@@ -85,6 +94,9 @@ export function TimeSelectorForm({
         {t("application:Page2.info")}
       </Notification>
       <OptionSelector reservationUnitOptions={reservationUnitOptions} index={index} />
+      <CenterHeader $noMargin data-testid={`time-selector__heading-${index}`}>
+        {reservationUnitName}:
+      </CenterHeader>
       <Controller
         control={control}
         name={`applicationSections.${index}.suitableTimeRanges`}
@@ -167,16 +179,16 @@ function OptionSelector({
   return (
     <AutoGrid $minWidth="20rem" data-testid={`time-selector__options-${index}`}>
       <ControlledSelect
-        name={`applicationSections.${index}.priority`}
-        label={t("application:Page2.prioritySelectLabel")}
-        control={control}
-        options={priorityOptions}
-      />
-      <ControlledSelect
         name={`applicationSections.${index}.reservationUnitPk`}
         label={t("application:Page2.reservationUnitSelectLabel")}
         control={control}
         options={reservationUnitOptions}
+      />
+      <ControlledSelect
+        name={`applicationSections.${index}.priority`}
+        label={t("application:Page2.prioritySelectLabel")}
+        control={control}
+        options={priorityOptions}
       />
     </AutoGrid>
   );
