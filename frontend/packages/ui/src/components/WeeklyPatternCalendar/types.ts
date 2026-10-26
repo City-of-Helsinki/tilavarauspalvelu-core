@@ -23,6 +23,8 @@ export type VisibleHours = { beginMinutes: number; endMinutes: number };
 
 export type CellAppearance = "primary" | "secondary";
 
+export type CellAvailability = "open" | "closed" | "unavailable";
+
 export type WeeklyPatternCellInfo<TData extends CalendarData> = WeekdayInterval & {
   data: TData | undefined;
   selected: boolean;
@@ -30,7 +32,11 @@ export type WeeklyPatternCellInfo<TData extends CalendarData> = WeekdayInterval 
   isRunEnd: boolean;
   runBeginMinutes: number;
   runEndMinutes: number;
-  availability: "open" | "closed";
+  /**
+   * Open is inside `availability`. Closed is outside it, and can still be painted when `paintable` reaches it.
+   * Unavailable is outside `paintable` too, so nothing can be painted there.
+   */
+  availability: CellAvailability;
 };
 
 export type WeeklyPatternCellProps = { className?: string; style?: CSSProperties } & Record<
@@ -69,6 +75,11 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
   /** Grid granularity in minutes. Must divide an hour, or be a whole number of hours dividing a day. */
   step: number;
   availability: WeeklyPatternAvailability;
+  /**
+   * Where a gesture can paint or select, when that reaches past `availability`. The cells it adds stay closed but
+   * can be painted, and the cells outside both are unavailable. Without it, painting stops at `availability`.
+   */
+  paintable?: WeeklyPatternAvailability;
   /** Replaces the extent derived from `availability`. Painted spans outside it still extend the grid. */
   visibleHours?: VisibleHours;
 

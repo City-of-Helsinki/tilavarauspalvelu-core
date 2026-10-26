@@ -83,6 +83,7 @@ function ApplicationSectionTimePicker({
   const selectedReservationUnitPk = watch(`applicationSections.${sectionIndex}.reservationUnitPk`);
   const reservationUnitOpeningHours =
     allOpeningHours?.find((n) => n.pk === selectedReservationUnitPk)?.openingHours ?? [];
+  const sectionOpeningHours = allOpeningHours?.flatMap((n) => n.openingHours) ?? [];
 
   const reservationUnitOptions = filterNonNullable(section?.reservationUnitOptions)
     .map((n) => n.reservationUnit)
@@ -105,6 +106,7 @@ function ApplicationSectionTimePicker({
         index={sectionIndex}
         reservationUnitOptions={reservationUnitOptions}
         reservationUnitOpeningHours={reservationUnitOpeningHours}
+        sectionOpeningHours={sectionOpeningHours}
       />
     </Accordion>
   );
