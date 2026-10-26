@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db import transaction
@@ -34,7 +34,7 @@ class GDPRScopesAndLOAPermission(BasePermission):
             return False
 
         # The view authenticates with 'ApiTokenAuthentication' from helusers, which sets this object.
-        auth = cast("UserAuthorization", request.auth)
+        auth: UserAuthorization = request.auth  # type: ignore[assignment]
 
         # Ensure request is made with by a strongly authenticated user,
         # following best practices set by the City of Helsinki.
