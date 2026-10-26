@@ -16,7 +16,7 @@ from utils.date_utils import local_date
 from utils.db import ArrayUnnest, CoalesceEmpty, Now, SubqueryArray
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable, Generator, Mapping
     from decimal import Decimal
 
     from query_optimizer.validators import PaginationArgs
@@ -86,7 +86,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
         return helper.get_annotated_queryset()
 
     @property
-    def affected_reservation_unit_ids(self) -> models.QuerySet[ReservationUnit, dict[str, Any]]:
+    def affected_reservation_unit_ids(self) -> models.QuerySet[ReservationUnit, Mapping[str, Any]]:
         """
         Get a "values" queryset of reservation unit ids that affect a given reservation unit in the queryset.
         This can be used in two ways:
@@ -100,7 +100,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
         >>> qs.annotate(affected=SubqueryArray(sq.affected_reservation_unit_ids, agg_field="ids", distinct=True))
         """
         return (
-            self  # type: ignore[return-value]
+            self
             .annotate(ids=ArrayUnnest("reservation_unit_hierarchy__related_reservation_unit_ids"))
             .values("ids")
             .distinct()
