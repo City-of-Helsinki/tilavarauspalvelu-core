@@ -252,10 +252,10 @@ function ResourceDayTable<TData extends CalendarData>(
                   aria-label={formatClock(hour * 60)}
                 >
                   {hour}
-                  {showNowLine && nowIndex >= hour * 2 && nowIndex < (hour + 1) * 2 && (
+                  {showNowLine && Math.floor(nowMinutes / 60) === hour && (
                     <NowDot
                       aria-hidden
-                      data-testid="resource-day-calendar__now-line"
+                      data-testid="resource-day-calendar__now-dot"
                       style={{ left: `${nowHourOffset}%` }}
                     />
                   )}
