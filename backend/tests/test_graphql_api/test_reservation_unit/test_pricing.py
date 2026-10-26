@@ -132,6 +132,25 @@ def test_reservation_unit__create__pricing__is_required_for_non_drafts(graphql):
     assert ReservationUnit.objects.count() == 0
 
 
+def test_reservation_unit__create__pricing__empty_list_is_allowed_for_drafts(graphql):
+    graphql.login_with_superuser()
+    response = graphql(CREATE_MUTATION, input_data=get_create_draft_input_data(pricings=[]))
+
+    assert response.has_errors is False, response
+
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 0
+
+
+def test_reservation_unit__create__pricing__empty_list_is_blocked_for_non_drafts(graphql):
+    graphql.login_with_superuser()
+    response = graphql(CREATE_MUTATION, input_data=get_create_non_draft_input_data(pricings=[]))
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_MISSING
+    assert ReservationUnit.objects.count() == 0
+
+
 def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_information(graphql):
     tax_percentage = TaxPercentageFactory.create(value=Decimal("0.0"))
 
@@ -314,7 +333,7 @@ def test_reservation_unit__create__pricing__material_pricing_blocked_tags(graphq
 
 def test_reservation_unit__update__pricing__active_pricing_can_be_created_on_update(graphql):
     graphql.login_with_superuser()
-    data = get_create_non_draft_input_data(pricings=[])
+    data = get_create_non_draft_input_data(isDraft=True, pricings=[])
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
@@ -510,6 +529,28 @@ def test_reservation_unit__update__pricing__pricings_not_sent_for_non_draft_rese
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
+
+
+def test_reservation_unit__update__pricing__empty_list_is_blocked_for_non_drafts(graphql):
+    graphql.login_with_superuser()
+
+    data = get_create_non_draft_input_data(pricings=[get_pricing_data()])
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+
+    data["pk"] = reservation_unit.pk
+    data["pricings"] = []
+    data["accessTypes"] = []
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_MISSING
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.pricings.count() == 1
 
 
 def test_reservation_unit__update__pricing__cannot_use_disabled_tax_percentage(graphql):
