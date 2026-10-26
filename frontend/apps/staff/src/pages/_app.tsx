@@ -54,12 +54,14 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   // -> render the component without currentUser
   // -> run useEffect
   // -> redraw component with currentUser
-  apolloClient.writeQuery({
-    query: CurrentUserDocument,
-    data: {
-      currentUser,
-    },
-  });
+  if (currentUser !== undefined) {
+    apolloClient.writeQuery({
+      query: CurrentUserDocument,
+      data: {
+        currentUser,
+      },
+    });
+  }
   if (handlingData) {
     apolloClient.writeQuery({
       query: HandlingDataDocument,
@@ -98,7 +100,8 @@ function formatUrlPath(router: Router): string {
 }
 
 type AppOwnProps = {
-  currentUser: CurrentUserQuery["currentUser"];
+  // undefined when getInitialProps runs in the browser, so the cached user is kept
+  currentUser: CurrentUserQuery["currentUser"] | undefined;
   handlingData: HandlingDataQuery | null;
   handlingVariables: HandlingDataQueryVariables | null;
   notificationsData: ShowNotificationsListQuery | null;
@@ -111,6 +114,20 @@ type AppOwnProps = {
 // it disables automatic static page generation (we don't care) but might disable other optimizations
 MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppInitialProps> => {
   const ctx = await App.getInitialProps(context);
+
+  // Next.js runs this in the browser on client navigation to a page without getServerSideProps.
+  // Server env is empty in the browser, so reuse the env of the first server render.
+  // The Apollo cache already has the user and navigation data, so do not query them again.
+  if (typeof window !== "undefined") {
+    return {
+      ...ctx,
+      envConfig: window.__NEXT_DATA__.props.envConfig,
+      currentUser: undefined,
+      handlingData: null,
+      handlingVariables: null,
+      notificationsData: null,
+    };
+  }
 
   const commonProps = await getCommonServerSideProps();
   triggerServerError(commonProps.isErrorTriggerEnabled, context.ctx);
