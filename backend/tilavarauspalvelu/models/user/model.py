@@ -54,11 +54,11 @@ __all__ = [
 
 class User(AbstractUser):
     tvp_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    preferred_language: Language = TextChoicesField(enum=Language, default=Language.FI, blank=True)  # type: ignore[assignment]
+    preferred_language = TextChoicesField(enum=Language, default=Language.FI, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     profile_id = models.CharField(max_length=255, blank=True, default="")
 
-    reservation_notification: ReservationNotification = TextChoicesField(  # type: ignore[assignment]
+    reservation_notification = TextChoicesField(
         enum=ReservationNotification,
         default=ReservationNotification.ONLY_HANDLING_REQUIRED,
     )

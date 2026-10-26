@@ -38,7 +38,7 @@ class TermsOfUse(models.Model):
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
-    terms_type: TermsOfUseTypeChoices = TextChoicesField(  # type: ignore[assignment]
+    terms_type = TextChoicesField(
         enum=TermsOfUseTypeChoices,
         default=TermsOfUseTypeChoices.GENERIC,
         blank=False,

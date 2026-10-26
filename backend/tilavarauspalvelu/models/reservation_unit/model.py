@@ -159,20 +159,20 @@ class ReservationUnit(models.Model):
 
     # Enums
 
-    authentication: AuthenticationType = TextChoicesField(  # type: ignore[assignment]
+    authentication = TextChoicesField(
         enum=AuthenticationType,
         default=AuthenticationType.WEAK,
     )
-    reservation_start_interval: ReservationStartInterval = TextChoicesField(  # type: ignore[assignment]
+    reservation_start_interval = TextChoicesField(
         enum=ReservationStartInterval,
         default=ReservationStartInterval.INTERVAL_15_MINUTES,
     )
-    reservation_kind: ReservationKind = TextChoicesField(  # type: ignore[assignment]
+    reservation_kind = TextChoicesField(
         enum=ReservationKind,
         default=ReservationKind.DIRECT_AND_SEASON,
         db_index=True,
     )
-    reservation_form: ReservationFormType = TextChoicesField(  # type: ignore[assignment]
+    reservation_form = TextChoicesField(
         enum=ReservationFormType,
         default=ReservationFormType.CONTACT_INFO_FORM,
         db_index=True,

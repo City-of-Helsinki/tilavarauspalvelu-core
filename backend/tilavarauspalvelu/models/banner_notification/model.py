@@ -36,8 +36,8 @@ class BannerNotification(models.Model):
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
     draft = models.BooleanField(default=True)
-    level: BannerNotificationLevel = TextChoicesField(enum=BannerNotificationLevel)  # type: ignore[assignment]
-    target: BannerNotificationTarget = TextChoicesField(enum=BannerNotificationTarget)  # type: ignore[assignment]
+    level = TextChoicesField(enum=BannerNotificationLevel)
+    target = TextChoicesField(enum=BannerNotificationTarget)
     active_from = models.DateTimeField(null=True, blank=True, default=None)
     active_until = models.DateTimeField(null=True, blank=True, default=None)
 

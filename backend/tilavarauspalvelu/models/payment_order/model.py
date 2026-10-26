@@ -41,8 +41,8 @@ class PaymentOrder(models.Model):
     remote_id = models.UUIDField(blank=True, null=True)
     payment_id = models.CharField(blank=True, default="", max_length=128)
     refund_id = models.UUIDField(blank=True, null=True)
-    payment_type: PaymentType = TextChoicesField(enum=PaymentType)  # type: ignore[assignment]
-    status: OrderStatus = TextChoicesField(enum=OrderStatus, db_index=True)  # type: ignore[assignment]
+    payment_type = TextChoicesField(enum=PaymentType)
+    status = TextChoicesField(enum=OrderStatus, db_index=True)
 
     price_net = models.DecimalField(max_digits=10, decimal_places=2)
     price_vat = models.DecimalField(max_digits=10, decimal_places=2)
@@ -53,7 +53,7 @@ class PaymentOrder(models.Model):
     # Only set when reservation also requires handling, meaning user cannot pay directly during checkout.
     handled_payment_due_by = models.DateTimeField(null=True, blank=True)
 
-    language: Language = TextChoicesField(enum=Language)  # type: ignore[assignment]
+    language = TextChoicesField(enum=Language)
     reservation_user_uuid = models.UUIDField(blank=True, null=True)
     checkout_url = models.CharField(blank=True, default="", max_length=512)
     receipt_url = models.CharField(blank=True, default="", max_length=512)
