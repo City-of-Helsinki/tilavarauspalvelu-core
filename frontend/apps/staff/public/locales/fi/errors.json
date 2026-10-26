@@ -93,7 +93,7 @@
       "RESERVATION_UNIT_PRICINGS_DUPLICATE_DATE": "Päivämäärä on jo käytössä",
       "RESERVATION_UNIT_PRICINGS_INVALID_PRICES": "Hinnoittelussa on virheellisiä hintoja",
       "RESERVATION_UNIT_PRICINGS_MISSING": "Varausyksiköllä ei ole hinnoittelua",
-      "RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICINGS": "Varausyksiköllä ei ole aktiivisia hinnoitteluita",
+      "RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING": "Varausyksiköllä ei ole aktiivisia hinnoitteluita",
       "RESERVATION_WRONG_ACCESS_TYPE": "Toimintoa ei voida suorittaa, koska varaus ei käytä ovikoodia",
       "unique": "Nimi on jo käytössä.",
       "invalid": "Virheellinen arvo.",
