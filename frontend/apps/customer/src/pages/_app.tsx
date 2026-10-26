@@ -113,6 +113,11 @@ type AppOwnProps = {
 };
 MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppInitialProps> => {
   const ctx = await App.getInitialProps(context);
+  // Next.js runs this in the browser on client navigation to a page without getServerSideProps.
+  // Server env is empty in the browser, so reuse the env of the first server render.
+  if (isBrowser) {
+    return { ...ctx, envConfig: window.__NEXT_DATA__.props.envConfig };
+  }
   const commonProps = getCommonServerSideProps();
   triggerServerError(commonProps.isErrorTriggerEnabled, context.ctx);
   return { ...ctx, envConfig: commonProps };
