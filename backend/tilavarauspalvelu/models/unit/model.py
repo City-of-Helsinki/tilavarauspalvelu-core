@@ -14,9 +14,6 @@ from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
 from utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
-    import datetime
-
-    from django.contrib.gis.geos import Point
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import ReservationUnit, Space, UnitGroup, UnitRole
@@ -39,34 +36,34 @@ __all__ = [
 class Unit(models.Model):
     """Model representation of Unit as in "office" or "premises" that could contain spaces."""
 
-    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # type: ignore[assignment]  # Used for ordering
+    rank = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 
-    tprek_id: str | None = models.CharField(max_length=255, unique=True, blank=True, null=True)  # type: ignore[assignment]
-    tprek_department_id: str | None = models.CharField(max_length=255, blank=True, null=True)  # type: ignore[assignment]  # noqa: DJ001
-    tprek_last_modified: datetime.datetime | None = models.DateTimeField(blank=True, null=True)  # type: ignore[assignment]
+    tprek_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    tprek_department_id = models.CharField(max_length=255, blank=True, null=True)  # noqa: DJ001
+    tprek_last_modified = models.DateTimeField(blank=True, null=True)
 
-    name: str = models.CharField(max_length=255)  # type: ignore[assignment]
-    description: str = Nh3CharField(  # type: ignore[assignment]
+    name = models.CharField(max_length=255)
+    description = Nh3CharField(
         max_length=8000,  # Double of the limit of 4000 chars in order to accommodate HTML tags
         blank=True,
         default="",
         allowed_tags=settings.NH3_ALLOWED_TAGS,
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    short_description: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    web_page: str = models.URLField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    email: str = models.EmailField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    phone: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    short_description = models.CharField(max_length=255, blank=True, default="")
+    web_page = models.URLField(max_length=255, blank=True, default="")
+    email = models.EmailField(max_length=255, blank=True, default="")
+    phone = models.CharField(max_length=255, blank=True, default="")
 
-    address_street: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    address_zip: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    address_city: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    address_street = models.CharField(max_length=255, blank=True, default="")
+    address_zip = models.CharField(max_length=255, blank=True, default="")
+    address_city = models.CharField(max_length=255, blank=True, default="")
 
-    coordinates: Point | None = PointField(null=True, blank=True, srid=COORDINATE_SYSTEM_ID)  # type: ignore[assignment]
+    coordinates = PointField(null=True, blank=True, srid=COORDINATE_SYSTEM_ID)
 
-    search_terms: list[str] = ArrayField(models.CharField(max_length=255), blank=True, default=list)  # type: ignore[assignment]
+    search_terms = ArrayField(models.CharField(max_length=255), blank=True, default=list)
 
-    allow_permissions_from_ad_groups: bool = models.BooleanField(default=False)  # type: ignore[assignment]
+    allow_permissions_from_ad_groups = models.BooleanField(default=False)
 
     origin_hauki_resource = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",

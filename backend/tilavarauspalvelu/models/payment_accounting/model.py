@@ -31,22 +31,22 @@ __all__ = [
 class PaymentAccounting(models.Model):
     # Custom validation comes from requirements in SAP
 
-    name: str = models.CharField(max_length=128)  # type: ignore[assignment]
-    company_code: str = models.CharField(max_length=4, validators=[is_numeric])  # type: ignore[assignment]
-    main_ledger_account: str = models.CharField(max_length=6, validators=[is_numeric])  # type: ignore[assignment]
-    vat_code: str = models.CharField(max_length=2, validators=[MinLengthValidator(2)])  # type: ignore[assignment]
+    name = models.CharField(max_length=128)
+    company_code = models.CharField(max_length=4, validators=[is_numeric])
+    main_ledger_account = models.CharField(max_length=6, validators=[is_numeric])
+    vat_code = models.CharField(max_length=2, validators=[MinLengthValidator(2)])
 
-    internal_order: str = models.CharField(blank=True, default="", max_length=10, validators=[is_numeric])  # type: ignore[assignment]
-    profit_center: str = models.CharField(blank=True, default="", max_length=7, validators=[is_numeric])  # type: ignore[assignment]
-    project: str = models.CharField(  # type: ignore[assignment]
+    internal_order = models.CharField(blank=True, default="", max_length=10, validators=[is_numeric])
+    profit_center = models.CharField(blank=True, default="", max_length=7, validators=[is_numeric])
+    project = models.CharField(
         blank=True,
         default="",
         max_length=16,
         validators=[validate_accounting_project, is_numeric],
     )
 
-    operation_area: str = models.CharField(blank=True, default="", max_length=6, validators=[is_numeric])  # type: ignore[assignment]
-    balance_profit_center: str = models.CharField(max_length=10, validators=[is_numeric])  # type: ignore[assignment]
+    operation_area = models.CharField(blank=True, default="", max_length=6, validators=[is_numeric])
+    balance_profit_center = models.CharField(max_length=10, validators=[is_numeric])
 
     # Must be provided together or not at all
     product_invoicing_sales_org = models.CharField(

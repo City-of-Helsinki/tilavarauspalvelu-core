@@ -9,8 +9,6 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
-    import uuid
-
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import PaymentProduct, ReservationUnit, Unit
@@ -35,8 +33,8 @@ class PaymentMerchant(models.Model):
     https://checkout-test-api.test.hel.ninja/v1/merchant/docs/swagger-ui/
     """
 
-    id: uuid.UUID = models.UUIDField(primary_key=True)  # type: ignore[assignment]
-    name: str = models.CharField(max_length=128)  # type: ignore[assignment]
+    id = models.UUIDField(primary_key=True)
+    name = models.CharField(max_length=128)
 
     objects: ClassVar[PaymentMerchantManager] = LazyModelManager.new()
     actions: LazyAttribute[PaymentMerchantActions] = LazyModelAttribute.new()

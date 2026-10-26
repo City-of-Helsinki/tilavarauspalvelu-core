@@ -22,11 +22,9 @@ from utils.fields.model import TextChoicesField
 from utils.mixins import SerializableModelMixin
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, Unit, User
+    from tilavarauspalvelu.models import ApplicationSection, Unit
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
 
@@ -48,50 +46,50 @@ class Application(SerializableModelMixin, models.Model):
 
     # Basic information
     applicant_type: ReserveeType | None = TextChoicesField(enum=ReserveeType, null=True, blank=True)  # type: ignore[assignment]
-    additional_information: str = Nh3TextField(blank=True, default="")  # type: ignore[assignment]
+    additional_information = Nh3TextField(blank=True, default="")
 
     # Handling data
-    cancelled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
-    sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
-    working_memo: str = Nh3TextField(blank=True, default="")  # type: ignore[assignment]
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    working_memo = Nh3TextField(blank=True, default="")
 
     # Email notification flags
-    in_allocation_notification_sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
-    results_ready_notification_sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
+    in_allocation_notification_sent_at = models.DateTimeField(null=True, blank=True)
+    results_ready_notification_sent_at = models.DateTimeField(null=True, blank=True)
 
     # Contact person data
-    contact_person_first_name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    contact_person_last_name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    contact_person_email: str | None = models.EmailField(null=True, blank=True)  # type: ignore[assignment]  # noqa: DJ001
-    contact_person_phone_number: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    contact_person_first_name = models.CharField(max_length=255, blank=True, default="")
+    contact_person_last_name = models.CharField(max_length=255, blank=True, default="")
+    contact_person_email = models.EmailField(null=True, blank=True)  # noqa: DJ001
+    contact_person_phone_number = models.CharField(max_length=255, blank=True, default="")
 
     # Billing address
-    billing_street_address: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    billing_post_code: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    billing_city: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    billing_street_address = models.CharField(max_length=255, blank=True, default="")
+    billing_post_code = models.CharField(max_length=255, blank=True, default="")
+    billing_city = models.CharField(max_length=255, blank=True, default="")
 
     # Organisation data
-    organisation_name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    organisation_email: str | None = models.EmailField(null=True, blank=True)  # type: ignore[assignment]  # noqa: DJ001
-    organisation_identifier: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    organisation_year_established: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
-    organisation_active_members: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
-    organisation_core_business: str = Nh3TextField(blank=True, default="")  # type: ignore[assignment]
-    organisation_street_address: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    organisation_post_code: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    organisation_city: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    organisation_name = models.CharField(max_length=255, blank=True, default="")
+    organisation_email = models.EmailField(null=True, blank=True)  # noqa: DJ001
+    organisation_identifier = models.CharField(max_length=255, blank=True, default="")
+    organisation_year_established = models.PositiveIntegerField(null=True, blank=True)
+    organisation_active_members = models.PositiveIntegerField(null=True, blank=True)
+    organisation_core_business = Nh3TextField(blank=True, default="")
+    organisation_street_address = models.CharField(max_length=255, blank=True, default="")
+    organisation_post_code = models.CharField(max_length=255, blank=True, default="")
+    organisation_city = models.CharField(max_length=255, blank=True, default="")
     municipality: MunicipalityChoice | None = TextChoicesField(enum=MunicipalityChoice, null=True, blank=True)  # type: ignore[assignment]
 
     # Auto-filled fields
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)  # type: ignore[assignment]
-    updated_at: datetime.datetime = models.DateTimeField(auto_now=True)  # type: ignore[assignment]
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    application_round: ApplicationRound = models.ForeignKey(  # type: ignore[assignment]
+    application_round = models.ForeignKey(
         "tilavarauspalvelu.ApplicationRound",
         related_name="applications",
         on_delete=models.PROTECT,
     )
-    user: User = models.ForeignKey(  # type: ignore[assignment]
+    user = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="applications",
         on_delete=models.PROTECT,

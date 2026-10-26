@@ -24,8 +24,8 @@ __all__ = [
 
 
 class TaxPercentage(models.Model):
-    value: Decimal = models.DecimalField(max_digits=5, decimal_places=2)  # type: ignore[assignment]
-    is_enabled: bool = models.BooleanField(blank=True, default=True)  # type: ignore[assignment]
+    value = models.DecimalField(max_digits=5, decimal_places=2)
+    is_enabled = models.BooleanField(blank=True, default=True)
 
     objects: ClassVar[TaxPercentageManager] = LazyModelManager.new()
     actions: LazyAttribute[TaxPercentageActions] = LazyModelAttribute.new()

@@ -13,12 +13,9 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, timedelta_to_json
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
-    from tilavarauspalvelu.models import Reservation
 
     from .actions import AffectingTimeSpanActions
     from .queryset import AffectingTimeSpanManager
@@ -40,7 +37,7 @@ class AffectingTimeSpan(models.Model):
     to query things like "Give me all time spans that affect reservation units X, Y, and Z".
     """
 
-    reservation: Reservation = models.OneToOneField(  # type: ignore[assignment]
+    reservation = models.OneToOneField(
         "tilavarauspalvelu.Reservation",
         related_name="affecting_time_span",
         on_delete=models.DO_NOTHING,
@@ -48,12 +45,12 @@ class AffectingTimeSpan(models.Model):
         db_column="reservation_id",
     )
 
-    affected_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())  # type: ignore[assignment]
-    buffered_start_datetime: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
-    buffered_end_datetime: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
-    is_blocking: bool = models.BooleanField()  # type: ignore[assignment]
-    buffer_time_before: datetime.timedelta = models.DurationField()  # type: ignore[assignment]
-    buffer_time_after: datetime.timedelta = models.DurationField()  # type: ignore[assignment]
+    affected_reservation_unit_ids = ArrayField(base_field=models.IntegerField())
+    buffered_start_datetime = models.DateTimeField()
+    buffered_end_datetime = models.DateTimeField()
+    is_blocking = models.BooleanField()
+    buffer_time_before = models.DurationField()
+    buffer_time_after = models.DurationField()
 
     objects: ClassVar[AffectingTimeSpanManager] = LazyModelManager.new()
     actions: LazyAttribute[AffectingTimeSpanActions] = LazyModelAttribute.new()

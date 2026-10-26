@@ -9,7 +9,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection, ReservationUnit
+    from tilavarauspalvelu.models import AllocatedTimeSlot
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.allocated_timeslot.queryset import AllocatedTimeSlotQuerySet
 
@@ -24,16 +24,16 @@ __all__ = [
 
 
 class ReservationUnitOption(models.Model):
-    preferred_order: int = models.PositiveIntegerField()  # type: ignore[assignment]
-    is_rejected: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
-    is_locked: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
+    preferred_order = models.PositiveIntegerField()
+    is_rejected = models.BooleanField(default=False, blank=True)
+    is_locked = models.BooleanField(default=False, blank=True)
 
-    application_section: ApplicationSection = models.ForeignKey(  # type: ignore[assignment]
+    application_section = models.ForeignKey(
         "tilavarauspalvelu.ApplicationSection",
         related_name="reservation_unit_options",
         on_delete=models.CASCADE,
     )
-    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
+    reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservation_unit_options",
         on_delete=models.PROTECT,

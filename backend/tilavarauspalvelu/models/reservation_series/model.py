@@ -18,18 +18,9 @@ from utils.db import SubqueryArray
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import (
-        AgeGroup,
-        AllocatedTimeSlot,
-        RejectedOccurrence,
-        Reservation,
-        ReservationUnit,
-        User,
-    )
+    from tilavarauspalvelu.models import RejectedOccurrence, Reservation
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.rejected_occurrence.queryset import RejectedOccurrenceQuerySet
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
@@ -47,42 +38,42 @@ __all__ = [
 class ReservationSeries(models.Model):
     """Defines a series of reservations that are created using given recurrence rules."""
 
-    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # type: ignore[assignment]  # ID for external systems
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)  # type: ignore[assignment]
+    ext_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
-    description: str = models.CharField(max_length=500, blank=True, default="")  # type: ignore[assignment]
+    name = models.CharField(max_length=255, blank=True, default="")
+    description = models.CharField(max_length=500, blank=True, default="")
 
-    begin_date: datetime.date = models.DateField()  # type: ignore[assignment]
-    begin_time: datetime.time = models.TimeField()  # type: ignore[assignment]
-    end_date: datetime.date = models.DateField()  # type: ignore[assignment]
-    end_time: datetime.time = models.TimeField()  # type: ignore[assignment]
+    begin_date = models.DateField()
+    begin_time = models.TimeField()
+    end_date = models.DateField()
+    end_time = models.TimeField()
 
-    recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    recurrence_in_days = models.PositiveIntegerField(null=True, blank=True)
 
-    weekdays: list[Weekday] = ArrayField(TextChoicesField(enum=Weekday), size=7, default=list)  # type: ignore[assignment]
+    weekdays = ArrayField(TextChoicesField(enum=Weekday), size=7, default=list)
 
     # Relations
 
-    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
+    reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservation_series",
         on_delete=models.PROTECT,
     )
-    user: User = models.ForeignKey(  # type: ignore[assignment]
+    user = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="reservation_series",
         on_delete=models.PROTECT,
     )
 
-    allocated_time_slot: AllocatedTimeSlot | None = models.OneToOneField(  # type: ignore[assignment]
+    allocated_time_slot = models.OneToOneField(
         "tilavarauspalvelu.AllocatedTimeSlot",
         related_name="reservation_series",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
-    age_group: AgeGroup | None = models.ForeignKey(  # type: ignore[assignment]
+    age_group = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
         related_name="reservation_series",
         on_delete=models.SET_NULL,

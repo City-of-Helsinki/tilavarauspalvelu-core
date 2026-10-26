@@ -31,11 +31,11 @@ __all__ = [
 
 class OriginHaukiResource(models.Model):
     # Resource id in Hauki API
-    id: int = models.IntegerField(unique=True, primary_key=True)  # type: ignore[assignment]
+    id = models.IntegerField(unique=True, primary_key=True)
     # Hauki API hash for opening hours, which is used to determine if the opening hours have changed
-    opening_hours_hash: str = models.CharField(max_length=64, blank=True)  # type: ignore[assignment]
+    opening_hours_hash = models.CharField(max_length=64, blank=True)
     # Latest date fetched from Hauki opening hours API (NOT when the data was last updated)
-    latest_fetched_date: datetime.date | None = models.DateField(null=True, blank=True)  # type: ignore[assignment]
+    latest_fetched_date = models.DateField(null=True, blank=True)
 
     objects: ClassVar[OriginHaukiResourceManager] = LazyModelManager.new()
     actions: LazyAttribute[OriginHaukiResourceActions] = LazyModelAttribute.new()

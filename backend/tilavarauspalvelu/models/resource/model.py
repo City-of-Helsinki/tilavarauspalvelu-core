@@ -12,7 +12,7 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ReservationUnit, Space
+    from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 
@@ -27,14 +27,14 @@ __all__ = [
 
 
 class Resource(models.Model):
-    name: str = models.CharField(max_length=255)  # type: ignore[assignment]
+    name = models.CharField(max_length=255)
 
     location_type: ResourceLocationType = TextChoicesField(  # type: ignore[assignment]
         enum=ResourceLocationType,
         default=ResourceLocationType.FIXED,
     )
 
-    space: Space | None = models.ForeignKey(  # type: ignore[assignment]
+    space = models.ForeignKey(
         "tilavarauspalvelu.Space",
         related_name="resources",
         on_delete=models.SET_NULL,

@@ -11,11 +11,9 @@ from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import Unit, UnitGroup, User
+    from tilavarauspalvelu.models import Unit, UnitGroup
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
     from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
     from tilavarauspalvelu.models.unit_group.queryset import UnitGroupQuerySet
@@ -30,7 +28,7 @@ __all__ = [
 
 
 class UnitRole(models.Model):
-    user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="unit_roles", on_delete=models.CASCADE)  # type: ignore[assignment]
+    user = models.ForeignKey("tilavarauspalvelu.User", related_name="unit_roles", on_delete=models.CASCADE)
     role: UserRoleChoice = TextChoicesField(enum=UserRoleChoice)  # type: ignore[assignment]
 
     units: ManyToManyRelatedManager[Unit, UnitQuerySet] = models.ManyToManyField(  # type: ignore[assignment]
@@ -44,18 +42,18 @@ class UnitRole(models.Model):
         blank=True,
     )
 
-    assigner: User | None = models.ForeignKey(  # type: ignore[assignment]
+    assigner = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="assigned_unit_roles",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)  # type: ignore[assignment]
-    updated_at: datetime.datetime = models.DateTimeField(auto_now=True)  # type: ignore[assignment]
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    is_role_active: bool = models.BooleanField(default=True)  # type: ignore[assignment]
-    is_from_ad_group: bool = models.BooleanField(default=False)  # type: ignore[assignment]
+    is_role_active = models.BooleanField(default=True)
+    is_from_ad_group = models.BooleanField(default=False)
 
     objects: ClassVar[UnitRoleManager] = LazyModelManager.new()
     actions: LazyAttribute[UnitRoleActions] = LazyModelAttribute.new()

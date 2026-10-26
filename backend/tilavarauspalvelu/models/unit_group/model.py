@@ -25,7 +25,7 @@ __all__ = [
 
 
 class UnitGroup(models.Model):
-    name: str = models.CharField(max_length=255)  # type: ignore[assignment]
+    name = models.CharField(max_length=255)
 
     units: ManyToManyRelatedManager[Unit, UnitQuerySet] = models.ManyToManyField(  # type: ignore[assignment]
         "tilavarauspalvelu.Unit",

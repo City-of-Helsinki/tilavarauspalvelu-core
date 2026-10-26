@@ -25,7 +25,7 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import Application, ReservationPurpose, ReservationUnit, TermsOfUse, Unit
+    from tilavarauspalvelu.models import Application, ReservationPurpose, ReservationUnit, Unit
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
     from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
     from tilavarauspalvelu.models.reservation_purpose.queryset import ReservationPurposeQuerySet
@@ -48,14 +48,14 @@ class ApplicationRound(models.Model):
     as well as the reservation units that can be applied for, and for what purposes.
     """
 
-    name: str = models.CharField(max_length=255)  # type: ignore[assignment]
-    criteria: str = Nh3TextField(  # type: ignore[assignment]
+    name = models.CharField(max_length=255)
+    criteria = Nh3TextField(
         blank=True,
         default="",
         allowed_tags=settings.NH3_ALLOWED_TAGS,
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    notes_when_applying: str = Nh3TextField(  # type: ignore[assignment]
+    notes_when_applying = Nh3TextField(
         blank=True,
         default="",
         allowed_tags=settings.NH3_ALLOWED_TAGS,
@@ -63,19 +63,19 @@ class ApplicationRound(models.Model):
     )
 
     # Period when the application round accepts applications
-    application_period_begins_at: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
-    application_period_ends_at: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    application_period_begins_at = models.DateTimeField()
+    application_period_ends_at = models.DateTimeField()
 
     # Period where the reservations from the application round's applications will be allocated to
-    reservation_period_begin_date: datetime.date = models.DateField()  # type: ignore[assignment]
-    reservation_period_end_date: datetime.date = models.DateField()  # type: ignore[assignment]
+    reservation_period_begin_date = models.DateField()
+    reservation_period_end_date = models.DateField()
 
     # When the application round is visible to the public
-    public_display_begins_at: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
-    public_display_ends_at: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    public_display_begins_at = models.DateTimeField()
+    public_display_ends_at = models.DateTimeField()
 
-    handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
-    sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
+    handled_at = models.DateTimeField(null=True, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
 
     reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet] = models.ManyToManyField(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
@@ -86,7 +86,7 @@ class ApplicationRound(models.Model):
         "tilavarauspalvelu.ReservationPurpose",
         related_name="application_rounds",
     )
-    terms_of_use: TermsOfUse | None = models.ForeignKey(  # type: ignore[assignment]
+    terms_of_use = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="application_rounds",
         on_delete=models.SET_NULL,

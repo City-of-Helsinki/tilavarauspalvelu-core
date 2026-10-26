@@ -38,23 +38,15 @@ if TYPE_CHECKING:
         ApplicationRoundTimeSlot,
         Equipment,
         IntendedUse,
-        OriginHaukiResource,
-        PaymentAccounting,
-        PaymentMerchant,
-        PaymentProduct,
         Reservation,
         ReservationSeries,
         ReservationUnitAccessType,
-        ReservationUnitCancellationRule,
         ReservationUnitHierarchy,
         ReservationUnitImage,
         ReservationUnitOption,
         ReservationUnitPricing,
-        ReservationUnitType,
         Resource,
         Space,
-        TermsOfUse,
-        Unit,
     )
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
     from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
@@ -83,46 +75,46 @@ __all__ = [
 class ReservationUnit(models.Model):
     # IDs
 
-    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # type: ignore[assignment]  # ID for external systems
-    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # type: ignore[assignment]  # Used for ordering
+    ext_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
+    rank = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 
     # Strings
 
-    name: str = models.CharField(max_length=255)  # type: ignore[assignment]
-    description: str = Nh3CharField(  # type: ignore[assignment]
+    name = models.CharField(max_length=255)
+    description = Nh3CharField(
         blank=True,
         default="",
         max_length=8000,  # Double of the limit of 4000 chars in order to accommodate HTML tags
         allowed_tags=settings.NH3_ALLOWED_TAGS,
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    contact_information: str = Nh3CharField(  # type: ignore[assignment]
+    contact_information = Nh3CharField(
         blank=True,
         default="",
         max_length=1000,  # Double of the limit of 500 chars in order to accommodate HTML tags
     )
-    notes_when_applying: str | None = Nh3CharField(  # type: ignore[assignment]
+    notes_when_applying = Nh3CharField(
         null=True,
         blank=True,
         max_length=4000,  # Double of the limit of 2000 chars in order to accommodate HTML tags
         allowed_tags=settings.NH3_ALLOWED_TAGS,
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    reservation_pending_instructions: str = Nh3CharField(  # type: ignore[assignment]
+    reservation_pending_instructions = Nh3CharField(
         blank=True,
         default="",
         max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
         allowed_tags=settings.NH3_ALLOWED_TAGS,
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    reservation_confirmed_instructions: str = Nh3CharField(  # type: ignore[assignment]
+    reservation_confirmed_instructions = Nh3CharField(
         blank=True,
         default="",
         max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
         allowed_tags=settings.NH3_ALLOWED_TAGS,
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    reservation_cancelled_instructions: str = Nh3CharField(  # type: ignore[assignment]
+    reservation_cancelled_instructions = Nh3CharField(
         blank=True,
         default="",
         max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
@@ -132,38 +124,38 @@ class ReservationUnit(models.Model):
 
     # Integers
 
-    surface_area: int | None = models.IntegerField(null=True, blank=True)  # type: ignore[assignment]
-    min_persons: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
-    max_persons: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
-    max_reservations_per_user: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    surface_area = models.IntegerField(null=True, blank=True)
+    min_persons = models.PositiveIntegerField(null=True, blank=True)
+    max_persons = models.PositiveIntegerField(null=True, blank=True)
+    max_reservations_per_user = models.PositiveIntegerField(null=True, blank=True)
     # In calculations this is interpreted as the beginning of the calculated day.
     # e.g. Today is 2023-10-10
     # min_days_before = 1, earliest reservation that can be made is 2023-10-11 00:00
     # min_days_before = 2, earliest reservation that can be made is 2023-10-12 00:00
-    reservations_min_days_before: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    reservations_min_days_before = models.PositiveIntegerField(null=True, blank=True)
     # The latest reservation that can be made is calculated as now + max_days_before. No time interpretation made.
-    reservations_max_days_before: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    reservations_max_days_before = models.PositiveIntegerField(null=True, blank=True)
 
     # Datetime
 
-    reservation_begins_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)  # type: ignore[assignment]
-    reservation_ends_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)  # type: ignore[assignment]
-    publish_begins_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)  # type: ignore[assignment]
-    publish_ends_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)  # type: ignore[assignment]
-    min_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)  # type: ignore[assignment]
-    max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)  # type: ignore[assignment]
-    buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)  # type: ignore[assignment]
-    buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)  # type: ignore[assignment]
-    updated_at: datetime.datetime = models.DateTimeField(auto_now=True, db_index=True)  # type: ignore[assignment]
+    reservation_begins_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    reservation_ends_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    publish_begins_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    publish_ends_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    min_reservation_duration = models.DurationField(null=True, blank=True)
+    max_reservation_duration = models.DurationField(null=True, blank=True)
+    buffer_time_before = models.DurationField(default=datetime.timedelta(), blank=True)
+    buffer_time_after = models.DurationField(default=datetime.timedelta(), blank=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
     # Booleans
 
-    is_draft: bool = models.BooleanField(default=False, blank=True, db_index=True)  # type: ignore[assignment]
-    is_archived: bool = models.BooleanField(default=False, db_index=True)  # type: ignore[assignment]
-    require_adult_reservee: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
-    require_reservation_handling: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
-    reservation_block_whole_day: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
-    can_apply_free_of_charge: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
+    is_draft = models.BooleanField(default=False, blank=True, db_index=True)
+    is_archived = models.BooleanField(default=False, db_index=True)
+    require_adult_reservee = models.BooleanField(default=False, blank=True)
+    require_reservation_handling = models.BooleanField(default=False, blank=True)
+    reservation_block_whole_day = models.BooleanField(default=False, blank=True)
+    can_apply_free_of_charge = models.BooleanField(default=False, blank=True)
 
     # Enums
 
@@ -192,33 +184,33 @@ class ReservationUnit(models.Model):
 
     # Many-to-One related
 
-    unit: Unit = models.ForeignKey(  # type: ignore[assignment]
+    unit = models.ForeignKey(
         "tilavarauspalvelu.Unit",
         related_name="reservation_units",
         on_delete=models.PROTECT,
     )
-    origin_hauki_resource: OriginHaukiResource | None = models.ForeignKey(  # type: ignore[assignment]
+    origin_hauki_resource = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",
         related_name="reservation_units",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    reservation_unit_type: ReservationUnitType | None = models.ForeignKey(  # type: ignore[assignment]
+    reservation_unit_type = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnitType",
         related_name="reservation_units",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    cancellation_rule: ReservationUnitCancellationRule | None = models.ForeignKey(  # type: ignore[assignment]
+    cancellation_rule = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnitCancellationRule",
         related_name="reservation_units",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
     )
-    cancellation_terms: TermsOfUse | None = models.ForeignKey(  # type: ignore[assignment]
+    cancellation_terms = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="cancellation_terms_reservation_units",
         on_delete=models.SET_NULL,
@@ -226,7 +218,7 @@ class ReservationUnit(models.Model):
         null=True,
         limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.CANCELLATION),
     )
-    service_specific_terms: TermsOfUse | None = models.ForeignKey(  # type: ignore[assignment]
+    service_specific_terms = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="service_specific_terms_reservation_units",
         on_delete=models.SET_NULL,
@@ -234,7 +226,7 @@ class ReservationUnit(models.Model):
         null=True,
         limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.SERVICE),
     )
-    pricing_terms: TermsOfUse | None = models.ForeignKey(  # type: ignore[assignment]
+    pricing_terms = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="pricing_terms_reservation_units",
         on_delete=models.SET_NULL,
@@ -242,7 +234,7 @@ class ReservationUnit(models.Model):
         null=True,
         limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.PRICING),
     )
-    payment_terms: TermsOfUse | None = models.ForeignKey(  # type: ignore[assignment]
+    payment_terms = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
         related_name="payment_terms_reservation_units",
         on_delete=models.SET_NULL,
@@ -250,21 +242,21 @@ class ReservationUnit(models.Model):
         null=True,
         limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.PAYMENT),
     )
-    payment_product: PaymentProduct | None = models.ForeignKey(  # type: ignore[assignment]
+    payment_product = models.ForeignKey(
         "tilavarauspalvelu.PaymentProduct",
         related_name="reservation_units",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
     )
-    payment_merchant: PaymentMerchant | None = models.ForeignKey(  # type: ignore[assignment]
+    payment_merchant = models.ForeignKey(
         "tilavarauspalvelu.PaymentMerchant",
         related_name="reservation_units",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
     )
-    payment_accounting: PaymentAccounting | None = models.ForeignKey(  # type: ignore[assignment]
+    payment_accounting = models.ForeignKey(
         "tilavarauspalvelu.PaymentAccounting",
         related_name="reservation_units",
         on_delete=models.PROTECT,
