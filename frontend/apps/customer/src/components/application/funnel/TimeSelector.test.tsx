@@ -34,6 +34,8 @@ const OPEN_ALL_WEEK: TimeSelectorFragment[] = WEEKDAYS_SORTED.map((weekday, inde
 interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   onSubmit?: (appToSave: ApplicationPage2FormValues) => Promise<void>;
   reservationUnitOpeningHours?: TimeSelectorProps["reservationUnitOpeningHours"];
+  /** Defaults to the shown unit's opening hours, as if the section listed only that unit. */
+  sectionOpeningHours?: TimeSelectorProps["sectionOpeningHours"];
 }
 
 function customRender(props: TimeSelectorMockProps = {}): ReturnType<typeof render> {
@@ -47,6 +49,7 @@ function customRender(props: TimeSelectorMockProps = {}): ReturnType<typeof rend
 function WrapTimeSelector({
   onSubmit = vi.fn(),
   reservationUnitOpeningHours = OPEN_ALL_WEEK,
+  sectionOpeningHours = reservationUnitOpeningHours,
   ...props
 }: TimeSelectorMockProps) {
   const application: ApplicationPage2 = createMockApplicationFragment(props);
@@ -75,6 +78,7 @@ function WrapTimeSelector({
           index={0}
           reservationUnitOptions={reservationUnitOptions}
           reservationUnitOpeningHours={reservationUnitOpeningHours}
+          sectionOpeningHours={sectionOpeningHours}
         />
         <button type="submit">submit</button>
       </FormProvider>
@@ -119,7 +123,7 @@ function weekdayLabel(day: Weekday): string {
 
 // The first cell of a painted run is named after the whole run, so pass its end.
 function cellName(
-  state: "open" | "unavailable" | "primary" | "secondary",
+  state: "open" | "closed" | "unavailable" | "primary" | "secondary",
   day: Weekday,
   start: number,
   end: number = start + STEP
@@ -587,5 +591,85 @@ describe("TimeSelector form alternative", () => {
     await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
 
     expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.outsideReservable");
+  });
+});
+
+describe("TimeSelector with several reservation units", () => {
+  // The shown unit opens Tuesday 10:00-12:00, and another unit in the section opens Tuesday 12:00-14:00.
+  const tuesday = (index: number, begin: string, end: string): TimeSelectorFragment => ({
+    id: createNodeId("TimeSelector", index),
+    weekday: Weekday.Tuesday,
+    isClosed: false,
+    reservableTimes: [{ begin, end }],
+  });
+  const shownUnit = [tuesday(0, "10:00:00", "12:00:00")];
+  const sectionUnits = [...shownUnit, tuesday(1, "12:00:00", "14:00:00")];
+
+  test("a time only another unit opens is closed, and a time no unit opens is unavailable", () => {
+    const view = customRender({ reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
+    const calendar = getGrid(view);
+
+    expect(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 11 * 60))).not.toHaveAttribute(
+      "aria-disabled"
+    );
+    expect(within(calendar).getByLabelText(cellName("closed", Weekday.Tuesday, 12 * 60))).not.toHaveAttribute(
+      "aria-disabled"
+    );
+    expect(within(calendar).getByLabelText(cellName("unavailable", Weekday.Tuesday, 14 * 60))).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
+  });
+
+  test("a time only another unit opens can be painted", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const view = customRender({ onSubmit, reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
+
+    await user.click(within(getGrid(view)).getByLabelText(cellName("closed", Weekday.Tuesday, 12 * 60)));
+    await user.click(view.getByRole("button", { name: "submit" }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      createMockSubmitValues([{ day: Weekday.Tuesday, start: 12 * 60, end: 12 * 60 + STEP }])
+    );
+  });
+
+  test("a time no unit opens cannot be painted", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const view = customRender({ onSubmit, reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
+
+    await user.click(within(getGrid(view)).getByLabelText(cellName("unavailable", Weekday.Tuesday, 14 * 60)));
+    await user.click(view.getByRole("button", { name: "submit" }));
+
+    expect(onSubmit).toHaveBeenCalledWith(createMockSubmitValues([]));
+  });
+
+  test("the form adds a time only another unit opens, and refuses one no unit opens", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
+    const form = view.getByTestId("time-selector__form-0");
+    const add = async (from: number, to: number) => {
+      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.day"), Weekday.Tuesday);
+      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(from));
+      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(to));
+      await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
+    };
+
+    await add(12 * 60, 13 * 60);
+    expect(
+      within(getGrid(view)).getByLabelText(cellName("primary", Weekday.Tuesday, 12 * 60, 13 * 60))
+    ).toBeInTheDocument();
+
+    await add(13 * 60, 15 * 60);
+    expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.outsideReservable");
+  });
+
+  test("the legend explains closed and unavailable times apart", () => {
+    const view = customRender({ reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
+    const legend = view.getByTestId("weekly-pattern__legend");
+
+    expect(within(legend).getByText("application:TimeSelector.legend.closed")).toBeInTheDocument();
+    expect(within(legend).getByText("application:TimeSelector.legend.unavailable")).toBeInTheDocument();
   });
 });

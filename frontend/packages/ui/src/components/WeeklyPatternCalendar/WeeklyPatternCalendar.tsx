@@ -12,7 +12,13 @@ import { formatTimeRange, minutesToHoursString } from "@ui/modules/date-utils";
 import type { Weekday } from "../../../gql/gql-types";
 import { LiveRegion, SkipLink } from "../CalendarGrid/styles";
 import { WeeklyPatternRoot } from "./styles";
-import type { CalendarData, WeeklyPatternCalendarProps, WeeklyPatternCellInfo, WeeklyPatternHandle } from "./types";
+import type {
+  CalendarData,
+  CellAvailability,
+  WeeklyPatternCalendarProps,
+  WeeklyPatternCellInfo,
+  WeeklyPatternHandle,
+} from "./types";
 import { useWeeklyPatternCalendar } from "./useWeeklyPatternCalendar";
 
 const NOOP = () => {};
@@ -51,6 +57,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     announcements = NO_ANNOUNCEMENTS,
     step,
     availability,
+    paintable,
     visibleHours,
     brush,
     isDataEqual,
@@ -73,6 +80,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     onBlur,
     step,
     availability,
+    paintable,
     visibleHours,
     brush,
     isDataEqual,
@@ -85,6 +93,10 @@ function WeeklyPatternTable<TData extends CalendarData>(
   });
 
   useImperativeHandle(ref, () => ({ focus: grid.focus }), [grid.focus]);
+
+  // A closed cell can still be painted when `paintable` reaches it. An unavailable cell never can.
+  const isDisabledCell = (availability: CellAvailability) =>
+    availability === "unavailable" || (availability === "closed" && !paintable);
 
   // The first cell of a run names the whole run. The cells after it name only themselves.
   const getCellLabel = (cell: WeeklyPatternCellInfo<TData>) => {
@@ -165,7 +177,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
                       {...grid.cellBehaviour(weekday, row.index)}
                       aria-label={getCellLabel(cell)}
                       aria-selected={cell.selected}
-                      aria-disabled={cell.availability === "closed" ? true : undefined}
+                      aria-disabled={isDisabledCell(cell.availability) ? true : undefined}
                       data-weekday={weekday}
                       data-begin-minutes={cell.beginMinutes}
                       data-availability={cell.availability}
