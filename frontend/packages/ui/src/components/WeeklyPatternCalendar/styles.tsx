@@ -61,7 +61,6 @@ const secondaryFragment = css`
 // The cell stays in the table's flow (the shared styles make it `position: relative`, the box `::before` fills).
 // An absolute cell would leave its row, and the cells after it would slide one column to the left.
 const eventBackground = (appearance: CellAppearance) => css`
-  background: transparent;
   padding-right: 4px;
   &::before {
     display: block;
@@ -76,7 +75,6 @@ const eventBackground = (appearance: CellAppearance) => css`
   }
 
   &[data-run-start] {
-    background: var(--color-white);
     ${primaryIndicator};
 
     &::before {
@@ -89,7 +87,6 @@ const eventBackground = (appearance: CellAppearance) => css`
   }
 
   &[data-run-end] {
-    background: var(--color-white);
     &::before {
       bottom: 0;
       border-bottom-left-radius: var(--spacing-2-xs);
@@ -186,6 +183,27 @@ export const WeeklyPatternRoot = styled.div`
 
     &[aria-disabled="true"] {
       cursor: default;
+    }
+
+    &[data-availability="closed"] {
+      /* A run can be painted on closed cells, as long as at least one space has the time reservable. Then the
+         hatch-pattern shows through it. So a run can be placed on closed cells, but not on unavailable ones. */
+      &[data-appearance="primary"],
+      &[data-appearance="secondary"] {
+        cursor: pointer;
+      }
+
+      /* Due to the opacity being lower, a darker background can be used. It also makes a clearer distinction between
+         the parts of the run which are on closed cells. */
+      &[data-appearance="primary"]::before {
+        background-color: var(--color-bus-dark);
+        opacity: 0.5;
+      }
+
+      &[data-appearance="secondary"]::before {
+        background-color: var(--color-engel-dark);
+        opacity: 0.8;
+      }
     }
 
     /* None of the reservation units can be booked here, so nothing can be painted either. */
