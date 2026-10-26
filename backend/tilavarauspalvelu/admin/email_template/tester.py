@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from admin_data_views.settings import admin_data_settings
 from django import forms
@@ -46,7 +46,7 @@ class ReservationUnitSelectForm(forms.Form):
             (runit.pk, f"{runit.name} - {safe_getattr(runit, 'unit.name')}")
             for runit in ReservationUnit.objects.select_related("unit").order_by("name_fi")
         ]
-        reservation_unit_field = cast("forms.ChoiceField", self.fields["reservation_unit"])
+        reservation_unit_field: forms.ChoiceField = self.fields["reservation_unit"]  # type: ignore[assignment]
         reservation_unit_field.choices = runit_choices
 
 

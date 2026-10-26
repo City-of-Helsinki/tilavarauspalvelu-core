@@ -471,6 +471,8 @@ exempt-modules = [
 "utils.db.NowTT".msg = "Use `utils.db.Now` instead."
 "django.db.models.functions.Now".msg = "Use `utils.db.Now` instead."
 
+"typing.cast".msg = "Annotate the variable and add `# type: ignore[...]` with the error code that mypy reports instead."
+
 [tool.ruff.lint.flake8-import-conventions]
 banned-from = [
     # Python standard libraries

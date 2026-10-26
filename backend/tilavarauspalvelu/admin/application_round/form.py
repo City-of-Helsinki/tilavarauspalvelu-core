@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -38,7 +38,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationRoundStatusChoice(instance.status).label
-        reservation_units_field = cast("forms.ModelMultipleChoiceField", self.base_fields["reservation_units"])
+        reservation_units_field: forms.ModelMultipleChoiceField = self.base_fields["reservation_units"]  # type: ignore[assignment]
         reservation_units_field.queryset = ReservationUnit.objects.select_related("unit").all()
         self.base_fields["terms_of_use"].required = True
         super().__init__(*args, **kwargs)

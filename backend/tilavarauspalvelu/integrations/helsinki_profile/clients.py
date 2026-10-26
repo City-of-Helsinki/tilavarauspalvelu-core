@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import json
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.utils.functional import classproperty
@@ -142,7 +142,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 # Use the profile refresh token to fetch a 'special' access token from Keycloak that
                 # can only be used to fetch new access and refresh tokens for Helsinki profile for the same audience.
                 # The OAuth backend types the response as a plain dict.
-                refresh_response = cast("RefreshResponse", cls.oidc_backend.refresh_token(token=profile_refresh_token))
+                refresh_response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)  # type: ignore[assignment]
                 access_token = refresh_response["access_token"]
             except HTTPError as error:
                 #

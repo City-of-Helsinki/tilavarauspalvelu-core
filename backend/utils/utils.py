@@ -10,7 +10,7 @@ import re
 import unicodedata
 import urllib.parse
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.cache import cache
@@ -282,7 +282,7 @@ def get_jwt_payload(json_web_token: str) -> dict[str, Any]:
 
 def to_django_validation_error(error: ValidationError) -> DjangoValidationError:
     """Given a django-rest-framework ValidationError, return a Django ValidationError."""
-    details = cast("list[ErrorDetail]", error.detail)
+    details: list[ErrorDetail] = error.detail  # type: ignore[assignment]
     return DjangoValidationError(message=str(details[0]), code=details[0].code)
 
 
