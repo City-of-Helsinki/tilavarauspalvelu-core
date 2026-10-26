@@ -45,7 +45,7 @@ class Application(SerializableModelMixin, models.Model):
     """
 
     # Basic information
-    applicant_type: ReserveeType | None = TextChoicesField(enum=ReserveeType, null=True, blank=True)  # type: ignore[assignment]
+    applicant_type = TextChoicesField(enum=ReserveeType, null=True, blank=True)
     additional_information = Nh3TextField(blank=True, default="")
 
     # Handling data
@@ -78,7 +78,7 @@ class Application(SerializableModelMixin, models.Model):
     organisation_street_address = models.CharField(max_length=255, blank=True, default="")
     organisation_post_code = models.CharField(max_length=255, blank=True, default="")
     organisation_city = models.CharField(max_length=255, blank=True, default="")
-    municipality: MunicipalityChoice | None = TextChoicesField(enum=MunicipalityChoice, null=True, blank=True)  # type: ignore[assignment]
+    municipality = TextChoicesField(enum=MunicipalityChoice, null=True, blank=True)
 
     # Auto-filled fields
     created_at = models.DateTimeField(auto_now_add=True)

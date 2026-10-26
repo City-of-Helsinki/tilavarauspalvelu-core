@@ -29,7 +29,7 @@ __all__ = [
 class Resource(models.Model):
     name = models.CharField(max_length=255)
 
-    location_type: ResourceLocationType = TextChoicesField(  # type: ignore[assignment]
+    location_type = TextChoicesField(
         enum=ResourceLocationType,
         default=ResourceLocationType.FIXED,
     )

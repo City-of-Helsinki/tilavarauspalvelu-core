@@ -26,7 +26,7 @@ __all__ = [
 class RejectedOccurrence(models.Model):
     begin_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
-    rejection_reason: RejectionReadinessChoice = TextChoicesField(enum=RejectionReadinessChoice)  # type: ignore[assignment]
+    rejection_reason = TextChoicesField(enum=RejectionReadinessChoice)
     created_at = models.DateTimeField(auto_now_add=True)
 
     reservation_series = models.ForeignKey(
