@@ -1,0 +1,5 @@
+# The e2e tests are their own pnpm project, separate from the frontend workspace.
+# The supply-chain settings follow frontend/pnpm-workspace.yaml.
+
+# Don't allow dependencies to be used before they have been released for at least 1 week
+minimumReleaseAge: 10080

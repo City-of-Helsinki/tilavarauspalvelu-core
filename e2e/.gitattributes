@@ -1,0 +1,14 @@
+# Generated files (see tools/README.md), collapsed in GitHub diffs
+# ============
+TestSuites/**                                   linguist-generated
+tools/naming-manifest.json                      linguist-generated
+tools/translation-report.json                   linguist-generated
+
+# Hand-written files in TestSuites/
+# ============
+TestSuites/create_data.setup.ts                 -linguist-generated
+TestSuites/Resources/env_loader.ts              -linguist-generated
+TestSuites/Resources/python_keywords.ts         -linguist-generated
+TestSuites/Resources/robot_email_test_tool.ts   -linguist-generated
+TestSuites/Resources/pabot_users.dat            -linguist-generated
+TestSuites/Resources/.env.example               -linguist-generated

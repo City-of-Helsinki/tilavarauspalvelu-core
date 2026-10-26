@@ -1,0 +1,13 @@
+# Playwright output
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Shared state of parallel workers (PabotLib replacement)
+.pabot-shared/
+
+# Robot suite paths kept as they were
+TestSuites/Resources/downloads/
+TestSuites/Resources/.env
+output/

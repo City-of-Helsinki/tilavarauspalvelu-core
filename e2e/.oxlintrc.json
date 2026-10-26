@@ -1,0 +1,5 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["../frontend/.oxlintrc.json"],
+  "ignorePatterns": ["node_modules/", "test-results/", "playwright-report/", "blob-report/"]
+}
