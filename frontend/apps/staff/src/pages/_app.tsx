@@ -23,15 +23,15 @@ import type {
   ShowNotificationsListQuery,
   ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
+import { Layout } from "@/components/Layout";
 import { PageWrapper } from "@/components/PageWrapper";
 import { EnvContextProvider } from "@/context/EnvContext";
 import { ModalContextProvider } from "@/context/ModalContext";
 import { getHandlingDataVariables } from "@/hooks/useHandling";
 import { createClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import type { StaffEnvConfig } from "@/modules/serverUtils";
 import "../styles/global.scss";
-import Layout from "./layout";
+import type { StaffEnvConfig } from "@/modules/serverUtils";
 
 // suppress useLayoutEffect warnings on SSR till it's fixed upstream in HDS
 if (typeof window === "undefined") React.useLayoutEffect = () => {};
