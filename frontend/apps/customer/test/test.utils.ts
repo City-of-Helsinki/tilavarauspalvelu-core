@@ -13,6 +13,18 @@ export const TIMERS_TO_FAKE = [
   "Date",
 ] as const;
 
+// HDS Select ignores an open / close toggle that comes less than 200 ms after the previous one.
+// Without a wait the option is selected but the list stays open, and on the next render
+// HDS moves focus back to the select button. Then the next user.type goes to the wrong element.
+const HDS_SELECT_TOGGLE_DEBOUNCE_MS = 200;
+
+async function waitForSelectToggleDebounce(openedAt: number) {
+  const remaining = HDS_SELECT_TOGGLE_DEBOUNCE_MS - (Date.now() - openedAt);
+  if (remaining > 0) {
+    await new Promise((resolve) => setTimeout(resolve, remaining + 1));
+  }
+}
+
 export async function selectOption(
   view: ReturnType<typeof render> | ReturnType<typeof within>,
   listLabel: RegExp | string,
@@ -28,6 +40,7 @@ export async function selectOption(
 
   expect(btn).not.toHaveAttribute("aria-disabled", "true");
   await user.click(btn);
+  const openedAt = Date.now();
   // NOTE using "listbox" forces the users to narrow down the view
   // if this finds multiple elements, the test will fail
   // not an issue with multiple HDS selects since "listbox" is only visible after click
@@ -39,6 +52,7 @@ export async function selectOption(
     throw new Error("Option not found");
   }
   expect(opt).toBeInTheDocument();
+  await waitForSelectToggleDebounce(openedAt);
   await user.click(opt);
 }
 
@@ -56,6 +70,7 @@ export async function selectFirstOption(
 
   expect(btn).not.toHaveAttribute("aria-disabled", "true");
   await user.click(btn);
+  const openedAt = Date.now();
   // NOTE using "listbox" forces the users to narrow down the view
   // if this finds multiple elements, the test will fail
   // not an issue with multiple HDS selects since "listbox" is only visible after click
@@ -65,6 +80,7 @@ export async function selectFirstOption(
     throw new Error("Option not found");
   }
   expect(opt).toBeInTheDocument();
+  await waitForSelectToggleDebounce(openedAt);
   await user.click(opt);
 }
 
