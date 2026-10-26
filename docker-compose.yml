@@ -203,6 +203,8 @@ services:
       frontend-install:
         condition: service_completed_successfully
     command: ["pnpm", "--filter", "customer", "run", "dev", "--hostname", "0.0.0.0"]
+    environment:
+      TZ: Europe/Helsinki
 
   staff:
     <<: *frontend
@@ -211,6 +213,8 @@ services:
       frontend-install:
         condition: service_completed_successfully
     command: ["pnpm", "--filter", "staff", "run", "dev", "--hostname", "0.0.0.0"]
+    environment:
+      TZ: Europe/Helsinki
 
 volumes:
   tvp-postgres:
