@@ -570,6 +570,82 @@ describe("DatedWeekCalendar choosing and moving", () => {
     expect(onMoveDraft).not.toHaveBeenCalled();
   });
 
+  // Wednesday is closed before 09:00 and over a lunch break from 11:30 to 12:00. Every other cell is open.
+  const at = (time: string) => new Date(`2026-10-21T${time}:00+03:00`).getTime();
+  const lunchBreak = ({ start }: { start: Date }) => {
+    const time = start.getTime();
+    return !((time >= at("00:00") && time < at("09:00")) || (time >= at("11:30") && time < at("12:00")));
+  };
+
+  test("a drag doesn't take the draft onto closed cells, it stays at the last place it fitted", () => {
+    const { onMoveDraft } = renderInteractive({ isOpen: lunchBreak });
+    fireEvent.pointerDown(draftHandle());
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 09:00–09:30/));
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 08:30–09:00/));
+    expect(cell(/^Wednesday 21 October, 09:00–10:00, Draft: Your reservation$/)).toBeInTheDocument();
+    // 11:00–12:00 would cover the closed 11:30.
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 11:00–11:30/));
+    fireEvent.pointerUp(window);
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-21T09:00:00+03:00", "2026-10-21T10:00:00+03:00"));
+  });
+
+  test("a drag doesn't take the draft where the consumer refuses it", () => {
+    const { onMoveDraft } = renderInteractive({
+      isDraftAllowed: ({ start }) => start.getTime() !== new Date("2026-10-22T10:00:00+03:00").getTime(),
+    });
+    fireEvent.pointerDown(draftHandle());
+    fireEvent.pointerEnter(cell(/^Thursday 22 October, 10:00–10:30/));
+    fireEvent.pointerUp(window);
+    expect(onMoveDraft).not.toHaveBeenCalled();
+  });
+
+  test("the resize handle stops at a closed cell", () => {
+    const { onMoveDraft } = renderInteractive({ isOpen: lunchBreak });
+    fireEvent.pointerDown(screen.getByTestId("dated-week-calendar__resize-handle"));
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 11:00–11:30/));
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 11:30–12:00/));
+    fireEvent.pointerUp(window);
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-21T10:00:00+03:00", "2026-10-21T11:30:00+03:00"));
+  });
+
+  test("the arrows jump the draft over closed cells and say where it is when it can't go further", async () => {
+    const user = userEvent.setup();
+    const { onMoveDraft } = renderInteractive({
+      isOpen: lunchBreak,
+      visibleHours: { beginMinutes: 480, endMinutes: 840 },
+    });
+    cell(/^Wednesday 21 October, 10:00–11:00/).focus();
+    await user.keyboard("{Enter}{ArrowDown}{ArrowDown}");
+    expect(log()).toHaveTextContent("Wednesday 21 October, 12:00–13:00");
+
+    await user.keyboard("{Enter}");
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-21T12:00:00+03:00", "2026-10-21T13:00:00+03:00"));
+
+    cell(/^Wednesday 21 October, 10:00–11:00/).focus();
+    await user.keyboard("{Enter}{ArrowUp}{ArrowUp}");
+    expect(log()).toHaveTextContent("Wednesday 21 October, 09:00–10:00");
+  });
+
+  test("hovering a free cell shows a ghost of the draft where a click would move it", () => {
+    renderInteractive();
+    fireEvent.pointerEnter(cell(/^Thursday 22 October, 08:30–09:00, free$/));
+    // The ghost keeps the draft's hour, so it covers two cells.
+    expect(screen.getAllByTestId("dated-week-calendar__ghost")).toHaveLength(2);
+    expect(screen.getAllByTestId("dated-week-calendar__ghost")[0]).toHaveTextContent("Your reservation");
+    fireEvent.pointerLeave(screen.getByRole("grid"));
+    expect(screen.queryByTestId("dated-week-calendar__ghost")).not.toBeInTheDocument();
+  });
+
+  test("there is no ghost where the draft doesn't fit, on the draft itself, or for a touch", () => {
+    renderInteractive({ isOpen: lunchBreak });
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 11:00–11:30, free$/));
+    expect(screen.queryByTestId("dated-week-calendar__ghost")).not.toBeInTheDocument();
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 10:00–11:00/));
+    expect(screen.queryByTestId("dated-week-calendar__ghost")).not.toBeInTheDocument();
+    fireEvent.pointerEnter(cell(/^Thursday 22 October, 08:30–09:00, free$/), { pointerType: "touch" });
+    expect(screen.queryByTestId("dated-week-calendar__ghost")).not.toBeInTheDocument();
+  });
+
   test("an interactive grid has no axe violations", { timeout: 20_000 }, async () => {
     // The day view has the same draft, hint, buttons and cell markup with a seventh of the cells.
     const { container } = renderInteractive({ view: "day" });

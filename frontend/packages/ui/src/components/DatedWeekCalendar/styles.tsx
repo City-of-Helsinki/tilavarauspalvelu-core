@@ -149,6 +149,11 @@ export const EventStripe = styled.span`
   &[data-moving] {
     cursor: grabbing;
   }
+
+  /* Where a click would move the draft. Clicks fall through to the cell underneath, which does the move. */
+  &[data-ghost] {
+    opacity: 0.5;
+  }
 `;
 
 // Resizes the draft from its foot, the way the Shorter and Longer buttons do. Its own pointerdown stops the

@@ -223,38 +223,38 @@ export function ReservationTimePicker({
 
   const durationOptions = getDurationOptions(reservationUnit, t);
 
-  const handleCalendarEventChange = ({ start, end }: DatedRange): boolean => {
-    if (isReservationQuotaReached) {
-      return false;
+  // The draft's new place snapped to the unit's rules, or null when it can't be reserved there.
+  const toReservableRange = ({ start, end }: DatedRange): DatedRange | null => {
+    const bounded = getBoundCheckedReservation({
+      start,
+      end,
+      reservationUnit,
+      durationOptions,
+    });
+    if (bounded == null) {
+      return null;
     }
-
-    const { start: newStart, end: newEnd } =
-      getBoundCheckedReservation({
-        start,
-        end,
-        reservationUnit,
-        durationOptions,
-      }) ?? {};
-
-    if (newEnd == null || newStart == null) {
-      return false;
-    }
-    const duration = differenceInMinutes(newEnd, newStart);
-
     const isReservable = isRangeReservable({
-      range: {
-        start: newStart,
-        end: newEnd,
-      },
+      range: bounded,
       reservationUnit,
       reservableTimes,
       activeApplicationRounds,
       blockingReservations,
     });
+    return isReservable ? bounded : null;
+  };
 
-    if (!isReservable) {
+  const handleCalendarEventChange = (range: DatedRange): boolean => {
+    if (isReservationQuotaReached) {
       return false;
     }
+
+    const reservable = toReservableRange(range);
+    if (reservable == null) {
+      return false;
+    }
+    const { start: newStart, end: newEnd } = reservable;
+    const duration = differenceInMinutes(newEnd, newStart);
 
     // Limit the duration to the max reservation duration
     const { begin } = getNewReservation({
@@ -416,6 +416,7 @@ export function ReservationTimePicker({
         draftId={focusSlot.isReservable ? DRAFT_ID : undefined}
         onSelectSlot={isReservationQuotaReached ? undefined : (range) => refuseUnless(handleSlotClick(range))}
         onMoveDraft={isReservationQuotaReached ? undefined : (range) => refuseUnless(handleCalendarEventChange(range))}
+        isDraftAllowed={(range) => toReservableRange(range) != null}
         alternative={{ id: CONTROLS_ID, label: t("reservationCalendar:skipToForm") }}
         getEventLabel={getEventLabel}
         getEventProps={({ data: { source } }) => ({
