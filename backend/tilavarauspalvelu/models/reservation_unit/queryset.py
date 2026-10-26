@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from itertools import islice
-from typing import TYPE_CHECKING, Protocol, Self
+from typing import TYPE_CHECKING, Any, Protocol, Self, TypeVar
 
 from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
@@ -16,7 +16,7 @@ from utils.date_utils import local_date
 from utils.db import ArrayUnnest, CoalesceEmpty, Now, SubqueryArray
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import Callable, Generator, Mapping
     from decimal import Decimal
 
     from query_optimizer.validators import PaginationArgs
@@ -53,9 +53,13 @@ def _get_vector_translation_fallback(obj: _TranslatedName | None, lang: str) -> 
     return name or obj.name_fi or ""
 
 
-class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
+_TModel_co = TypeVar("_TModel_co", bound=ReservationUnit, covariant=True, default=ReservationUnit)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationUnit)
+
+
+class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
     def with_first_reservable_time(
-        self,
+        self: ReservationUnitQuerySet,
         *,
         filter_date_start: datetime.date | None,
         filter_date_end: datetime.date | None,
@@ -82,7 +86,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         return helper.get_annotated_queryset()
 
     @property
-    def affected_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
+    def affected_reservation_unit_ids(self) -> models.QuerySet[ReservationUnit, Mapping[str, Any]]:
         """
         Get a "values" queryset of reservation unit ids that affect a given reservation unit in the queryset.
         This can be used in two ways:
@@ -111,7 +115,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         return ReservationUnit.objects.alias(ids=ids).filter(pk__in=models.F("ids"))
 
     def hooked_iterator(
-        self,
+        self: ReservationUnitQuerySet,
         hook: Callable[[list[ReservationUnit]], None],
         *,
         chunk_size: int,
@@ -187,7 +191,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
     def hidden(self) -> Self:
         return self.published().exclude(self._is_visible)
 
-    def update_search_vectors(self, pks: list[int] | None = None) -> None:
+    def update_search_vectors(self: ReservationUnitQuerySet, pks: list[int] | None = None) -> None:
         qs = self.select_related(
             "unit",
             "reservation_unit_type",

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from django.db import models
 from lookup_property import L
@@ -19,7 +19,11 @@ __all__ = [
 ]
 
 
-class ReservationUnitAccessTypeQuerySet(ModelQuerySet[ReservationUnitAccessType]):
+_TModel_co = TypeVar("_TModel_co", bound=ReservationUnitAccessType, covariant=True, default=ReservationUnitAccessType)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationUnitAccessType)
+
+
+class ReservationUnitAccessTypeQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def active(self, *, on_date: datetime.date | None = None) -> Self:
         """Get only the active access types for each reservation unit."""
         on_date = on_date or local_date()

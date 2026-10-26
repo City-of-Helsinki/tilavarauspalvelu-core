@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from tilavarauspalvelu.models import ReservableTimeSpan
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
@@ -16,7 +16,11 @@ __all__ = [
 ]
 
 
-class ReservableTimeSpanQuerySet(ModelQuerySet[ReservableTimeSpan]):
+_TModel_co = TypeVar("_TModel_co", bound=ReservableTimeSpan, covariant=True, default=ReservableTimeSpan)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservableTimeSpan)
+
+
+class ReservableTimeSpanQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def overlapping_with_period(
         self,
         start: datetime.datetime | datetime.date,

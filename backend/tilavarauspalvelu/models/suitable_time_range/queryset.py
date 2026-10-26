@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from django.db import models
 from lookup_property import L
@@ -23,14 +23,18 @@ __all__ = [
 ]
 
 
-class SuitableTimeRangeQuerySet(ModelQuerySet[SuitableTimeRange]):
+_TModel_co = TypeVar("_TModel_co", bound=SuitableTimeRange, covariant=True, default=SuitableTimeRange)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=SuitableTimeRange)
+
+
+class SuitableTimeRangeQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def order_by_day_of_the_week(self, *, desc: bool = False) -> Self:
         return self.alias(day_of_the_week_number=L("day_of_the_week_number")).order_by(
             models.OrderBy(models.F("day_of_the_week_number"), descending=desc)
         )
 
     def fits_in_time_range(
-        self,
+        self: SuitableTimeRangeQuerySet,
         application_section: ApplicationSection,
         day_of_the_week: Weekday,
         begin_time: datetime.time,
