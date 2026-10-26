@@ -180,6 +180,45 @@ describe("WeeklyPatternCalendar", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  describe("with paintable times beyond the availability", () => {
+    // Wednesday is closed but paintable from 08:00 to 09:00. Everything else outside the availability is not.
+    const paintable = [{ weekday: Weekday.Wednesday, beginMinutes: 480, endMinutes: 540 }];
+    const label = (cell: { data?: Data; availability: string }) => cell.data?.priority ?? cell.availability;
+
+    test("cells are open, closed or unavailable, and only unavailable cells are disabled", () => {
+      render(<Harness paintable={paintable} getStateLabel={label} />);
+      expect(cell(/^Monday, 08:00–08:30, open$/)).not.toHaveAttribute("aria-disabled");
+      expect(cell(/^Wednesday, 08:00–08:30, closed$/)).not.toHaveAttribute("aria-disabled");
+      expect(cell(/^Wednesday, 09:00–09:30, unavailable$/)).toHaveAttribute("aria-disabled", "true");
+    });
+
+    test("closed cells inside them can be painted", async () => {
+      const onChange = vi.fn();
+      const user = userEvent.setup();
+      render(<Harness paintable={paintable} getStateLabel={label} onChange={onChange} />);
+      cell(/^Wednesday, 08:00–08:30/).focus();
+      await user.keyboard("{Enter}");
+      expect(onChange).toHaveBeenLastCalledWith([
+        { weekday: Weekday.Wednesday, beginMinutes: 480, endMinutes: 510, data: primary },
+      ]);
+    });
+
+    test("unavailable cells cannot be painted, and a sweep stops short of them", async () => {
+      const onChange = vi.fn();
+      const user = userEvent.setup();
+      render(<Harness paintable={paintable} getStateLabel={label} onChange={onChange} />);
+      cell(/^Wednesday, 09:00–09:30/).focus();
+      await user.keyboard("{Enter}");
+      expect(onChange).not.toHaveBeenCalled();
+
+      cell(/^Wednesday, 08:30–09:00/).focus();
+      await user.keyboard("{Shift>}{ArrowDown}{/Shift}");
+      expect(onChange).toHaveBeenLastCalledWith([
+        { weekday: Weekday.Wednesday, beginMinutes: 510, endMinutes: 540, data: primary },
+      ]);
+    });
+  });
+
   test("a skip link leads to the equivalent form", () => {
     render(<Harness />);
     expect(screen.getByRole("link", { name: "Skip to the time form" })).toHaveAttribute("href", "#form");

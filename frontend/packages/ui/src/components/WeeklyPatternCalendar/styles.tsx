@@ -5,7 +5,7 @@ import { fontBold } from "@ui/styled";
 import { gridTableStyles } from "../CalendarGrid/styles";
 import type { CellAppearance } from "./types";
 
-export type LegendState = CellAppearance | "open" | "closed";
+export type LegendState = CellAppearance | "open" | "closed" | "unavailable";
 export type LegendItem = { state: LegendState; label: string; current?: boolean };
 
 const arrow = css`
@@ -162,11 +162,6 @@ export const WeeklyPatternRoot = styled.div`
       }
     }
 
-    &[data-availability="closed"] {
-      background-repeat: repeat;
-      cursor: default;
-    }
-
     &[data-appearance="primary"] {
       ${eventBackground("primary")};
       text-align: right;
@@ -189,6 +184,16 @@ export const WeeklyPatternRoot = styled.div`
       }
     }
 
+    &[aria-disabled="true"] {
+      cursor: default;
+    }
+
+    /* None of the reservation units can be booked here, so nothing can be painted either. */
+    &[data-availability="unavailable"] {
+      border-top-color: var(--color-black-30);
+      background: var(--color-black-30);
+    }
+
     /* The arrow only marks where a run begins, not every cell in it. */
     &[data-appearance="primary"][data-run-start] {
       ${primaryIndicator};
@@ -208,7 +213,7 @@ export const WeeklyPatternRoot = styled.div`
     border-bottom: 1px solid var(--border-color);
   }
 
-  table:not([aria-readonly]) tbody td:not([data-availability="closed"], [data-appearance]):hover {
+  table:not([aria-readonly]) tbody td[data-availability="open"]:not([data-appearance]):hover {
     color: var(--color-black-30);
     background: var(--color-black-5);
   }
@@ -240,7 +245,12 @@ const LegendBox = styled.div<{ $state: LegendState }>`
   width: 30px;
   height: 30px;
   border: 1px solid var(--color-black-50);
-  background-color: ${({ $state }) => ($state === "closed" ? "var(--color-black-5)" : "var(--color-white)")};
+  background-color: ${({ $state }) =>
+    $state === "unavailable"
+      ? "var(--color-black-30)"
+      : $state === "closed"
+        ? "var(--color-black-5)"
+        : "var(--color-white)"};
   ${({ $state }) => ($state === "primary" ? primaryFragment : $state === "secondary" ? secondaryFragment : "")}
   ${({ $state }) => $state === "closed" && `background-image: ${unavailableBackgroundSVG}; background-size: auto 10px; background-repeat: repeat;`}
   [aria-current="true"] > & {

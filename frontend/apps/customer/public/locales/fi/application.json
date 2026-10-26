@@ -64,6 +64,7 @@
     "calendarLabel": "Valitse aikatoiveet kalenterista",
     "legend": {
       "unavailable": "Ei varattavissa",
+      "closed": "Ei varattavissa tässä tilassa",
       "primary": "Ensisijainen toive",
       "secondary": "Muu toive",
       "open": "Varattavissa"

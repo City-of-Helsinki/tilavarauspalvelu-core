@@ -64,6 +64,7 @@
     "calendarLabel": "Select time slots from the calendar",
     "legend": {
       "unavailable": "Not available",
+      "closed": "Not available in this space",
       "primary": "Preferred time slots",
       "secondary": "Other request",
       "open": "Reservable"

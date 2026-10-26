@@ -64,6 +64,7 @@
     "calendarLabel": "Välj önskade tider",
     "legend": {
       "unavailable": "Kan inte bokas",
+      "closed": "Kan inte bokas i denna lokal",
       "primary": "Prioriterat önskemål",
       "secondary": "Alternativt önskemål",
       "open": "Kan reserveras"
