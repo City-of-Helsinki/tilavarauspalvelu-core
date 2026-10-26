@@ -1,0 +1,12 @@
+  "Navigate To Past Bookings": async () => {
+    // Port: focus before the click and check the selection, see Navigate To Cancelled Bookings
+    await BuiltIn["Wait Until Keyword Succeeds"]("3x", "500ms", async () => {
+      await Browser["Focus"]("id=tab-1-button");
+      await Browser["Click"]("id=tab-1-button");
+      await Browser["Wait For Elements State"](
+        'css=#tab-1-button[aria-selected="true"]',
+        "visible",
+        named({ timeout: "2s", message: "The past bookings tab is not selected after the click" })
+      );
+    });
+  },

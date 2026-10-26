@@ -1,0 +1,14 @@
+  "Navigate To Cancelled Bookings": async () => {
+    // Port: the HDS tab list slides when a tab gets focus. On mobile WebKit the slide can move the tab away between
+    // mousedown and mouseup, so the click is lost and the tab is only focused, not selected. Focus first so that
+    // the slide happens before the click, check that the tab got selected, and repeat a lost click.
+    await BuiltIn["Wait Until Keyword Succeeds"]("3x", "500ms", async () => {
+      await Browser["Focus"]("id=tab-2-button");
+      await Browser["Click"]("id=tab-2-button");
+      await Browser["Wait For Elements State"](
+        'css=#tab-2-button[aria-selected="true"]',
+        "visible",
+        named({ timeout: "2s", message: "The cancelled bookings tab is not selected after the click" })
+      );
+    });
+  },
