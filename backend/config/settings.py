@@ -1030,6 +1030,14 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"
 
 
+class CITests(AutomatedTests, use_environ=True):
+    """
+    Settings when running automated tests in GitHub Actions.
+
+    The tests run in a container there, so the database and Redis are not on localhost.
+    """
+
+
 class Build(EmptyDefaults, Common, use_environ=True):
     """Settings when building the docker image."""
 
