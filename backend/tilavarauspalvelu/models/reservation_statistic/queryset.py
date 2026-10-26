@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -25,7 +25,11 @@ def statistics_retention_cutoff() -> datetime.datetime:
     return local_datetime() - relativedelta(years=older_than_years)
 
 
-class ReservationStatisticQuerySet(ModelQuerySet[ReservationStatistic]):
+_TModel_co = TypeVar("_TModel_co", bound=ReservationStatistic, covariant=True, default=ReservationStatistic)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationStatistic)
+
+
+class ReservationStatisticQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def expired_statistics(self) -> Self:
         retention_cutoff = statistics_retention_cutoff()
         return self.filter(reservation_created_at__lte=retention_cutoff)

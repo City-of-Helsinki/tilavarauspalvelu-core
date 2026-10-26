@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Self
+from typing import Literal, Self, TypeVar
 
 from django.db import models
 
@@ -14,7 +14,11 @@ __all__ = [
 ]
 
 
-class UnitQuerySet(TranslatedModelQuerySet[Unit]):
+_TModel_co = TypeVar("_TModel_co", bound=Unit, covariant=True, default=Unit)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=Unit)
+
+
+class UnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
     def order_by_unit_group_name(self, *, language: Literal["fi", "en", "sv"], desc: bool = False) -> Self:
         return self.alias(**{
             f"unit_group_name_{language}": models.Subquery(
