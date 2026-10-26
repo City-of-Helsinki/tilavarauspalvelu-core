@@ -29,4 +29,6 @@ ENV PATH=$POETRY_HOME/bin:$PATH
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
 # Install poetry.
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.5.1 python -
+RUN curl -fsSLo /tmp/install-poetry.py https://install.python-poetry.org \
+    && POETRY_VERSION=2.5.1 python /tmp/install-poetry.py \
+    && rm /tmp/install-poetry.py
