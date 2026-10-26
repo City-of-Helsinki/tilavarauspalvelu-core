@@ -92,7 +92,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer[ReservationSe
 
         # We know there is at least one future reservation, so we can safely assume
         # that we will have at least one reservation in the series
-        first_reservation: Reservation = self.instance.reservations.order_by("begins_at").first()  # type: ignore[attr-defined]
+        first_reservation: Reservation = self.instance.reservations.order_by("begins_at").first()
         if begin_date != self.instance.begin_date and first_reservation.begins_at < now:
             msg = (
                 "Reservation series' begin date cannot be changed after its "

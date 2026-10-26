@@ -101,6 +101,7 @@ plugins = [
 exclude = [
     "/migrations/",
 ]
+warn_unused_ignores = true
 
 [[tool.mypy.overrides]]
 # These packages have no type hints or stubs.
