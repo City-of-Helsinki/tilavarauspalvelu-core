@@ -10,6 +10,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+      time: "04:00"
+      timezone: "Europe/Helsinki"
     pull-request-branch-name:
       separator: "-"
     groups:
@@ -24,6 +26,8 @@ updates:
     directory: "/frontend/"
     schedule:
       interval: "daily"
+      time: "03:00"
+      timezone: "Europe/Helsinki"
     rebase-strategy: "disabled"
     pull-request-branch-name:
       separator: "-"
@@ -110,6 +114,8 @@ updates:
     directory: "/backend/"
     schedule:
       interval: "daily"
+      time: "02:00"
+      timezone: "Europe/Helsinki"
     pull-request-branch-name:
       separator: "-"
     groups:
