@@ -58,8 +58,9 @@ const secondaryFragment = css`
   ${secondaryIndicator};
 `;
 
+// The cell stays in the table's flow (the shared styles make it `position: relative`, the box `::before` fills).
+// An absolute cell would leave its row, and the cells after it would slide one column to the left.
 const eventBackground = (appearance: CellAppearance) => css`
-  position: absolute;
   background: transparent;
   padding-right: 4px;
   &::before {
