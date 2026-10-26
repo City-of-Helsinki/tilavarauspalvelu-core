@@ -15,15 +15,26 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: 3.13
   NODE_VERSION: 24
   PNPM_VERSION: 11.3.0
 
 jobs:
 
+  ci-image:
+    uses: ./.github/workflows/build-ci-image.yml
+    permissions:
+      contents: read
+      packages: write
+
   frontend-query-tests:
     name: "Run frontend query tests"
     runs-on: ubuntu-latest
+    needs: ci-image
+    container:
+      image: ${{ needs.ci-image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     services:
       postgres:
@@ -40,8 +51,6 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
-        ports:
-          - 5432:5432
 
       redis:
         image: redis:7-alpine
@@ -51,23 +60,13 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
-        ports:
-          - 6379:6379
 
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v7
 
-      - name: "Set up python"
-        id: setup-python
-        uses: actions/setup-python@v7
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: "Install Poetry and project dependencies"
+      - name: "Install project dependencies"
         uses: ./.github/actions/poetry
-        with:
-          python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Install pnpm"
         uses: pnpm/action-setup@v6
@@ -93,7 +92,9 @@ jobs:
         working-directory: backend
         run: poetry run python manage.py defragment_frontend_queries
         env:
-          DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
+          DJANGO_SETTINGS_ENVIRONMENT: CITests
+          DATABASE_URL: postgis://tvp:tvp@postgres:5432/tvp
+          REDIS_URL: redis://redis:6379/0
 
       - name: "Run frontend query tests"
         working-directory: backend
@@ -104,4 +105,6 @@ jobs:
               --disable-warnings \
               --only-frontend-query-tests
         env:
-          DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
+          DJANGO_SETTINGS_ENVIRONMENT: CITests
+          DATABASE_URL: postgis://tvp:tvp@postgres:5432/tvp
+          REDIS_URL: redis://redis:6379/0
