@@ -15,7 +15,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { CSSProperties, ForwardedRef, KeyboardEvent, PointerEvent, ReactElement, Ref } from "react";
+import type { ForwardedRef, KeyboardEvent, PointerEvent, ReactElement, Ref } from "react";
 import { HiddenText, LiveRegion, SkipLink } from "../CalendarGrid/styles";
 import { MINUTES_PER_DAY, assertValidStep } from "../WeeklyPatternCalendar/engine";
 import type { CalendarData } from "../WeeklyPatternCalendar/types";
@@ -101,6 +101,7 @@ function DatedWeekTable<TData extends CalendarData>(
     onSelectSlot,
     draftId,
     onMoveDraft,
+    isDraftAllowed,
     isLoading,
     alternative,
     toolbarExtra,
@@ -206,6 +207,30 @@ function DatedWeekTable<TData extends CalendarData>(
   const segmentsAt = (dayKey: string, index: number) =>
     segmentsInCell(segmentsByDay.get(dayKey) ?? [], index * step, (index + 1) * step);
 
+  // Where the draft may go: inside one shown day and the visible hours, on open cells only, and where the consumer
+  // agrees. The consumer is asked last, as its rules may be costly. A range may end at the midnight closing its day.
+  const draftFits = (range: DatedRange): boolean => {
+    const start = toWallClock(range.start);
+    const dayKey = dayKeyOf(start);
+    const dayEnd = cellRange(dayKey, MINUTES_PER_DAY / step - 1, step).end;
+    if (!dayKeys.includes(dayKey) || range.end <= range.start || range.end > dayEnd) {
+      return false;
+    }
+    const endMinutes =
+      range.end.getTime() === dayEnd.getTime() ? MINUTES_PER_DAY : minutesOfDay(toWallClock(range.end));
+    const beginIndex = Math.floor(minutesOfDay(start) / step);
+    const stopIndex = Math.ceil(endMinutes / step);
+    if (beginIndex < firstIndex || stopIndex > endIndex) {
+      return false;
+    }
+    for (let index = beginIndex; index < stopIndex; index++) {
+      if (!cellIsOpen(dayKey, index)) {
+        return false;
+      }
+    }
+    return isDraftAllowed?.(range) ?? true;
+  };
+
   // An event with a link opens it when it is the only one in the cell. With several, they are reached as links in the list.
   const openLinked = (dayKey: string, index: number): boolean => {
     const linked = segmentsAt(dayKey, index).filter((segment) => getEventHref?.(segment.event) != null);
@@ -239,13 +264,17 @@ function DatedWeekTable<TData extends CalendarData>(
     return reason == null;
   };
 
-  const previewDraft = (next: DatedRange) => {
-    const start = toWallClock(next.start);
-    const dayKey = dayKeyOf(start);
-    // A move stays inside the shown days. Use the toolbar to change the week first.
-    if (!dayKeys.includes(dayKey)) {
+  // A move stays where the draft fits, inside the shown days. Use the toolbar to change the week first.
+  const previewDraft = (next: DatedRange | null) => {
+    if (next == null || !draftFits(next)) {
+      // Saying where the draft still is tells that the key did nothing.
+      if (movingRef.current) {
+        announce(describeRange(movingRef.current));
+      }
       return;
     }
+    const start = toWallClock(next.start);
+    const dayKey = dayKeyOf(start);
     updateMoving(next);
     announce(describeRange(next));
     pendingCellFocus.current = { dayKey, index: Math.floor(minutesOfDay(start) / step) };
@@ -329,12 +358,29 @@ function DatedWeekTable<TData extends CalendarData>(
       return;
     }
     const cell = cellRange(dayKey, index, step);
+    let next: DatedRange;
     if (info.mode === "move") {
-      updateMoving({ start: cell.start, end: new Date(cell.start.getTime() + info.durationMs) });
+      next = { start: cell.start, end: new Date(cell.start.getTime() + info.durationMs) };
     } else {
       const shortest = shiftRange({ start: base.start, end: base.start }, { minutes: step }).start;
-      updateMoving({ start: base.start, end: cell.end < shortest ? shortest : cell.end });
+      next = { start: base.start, end: cell.end < shortest ? shortest : cell.end };
     }
+    // Where the draft can't go, it stays at the last place it could, until the pointer reaches one again.
+    if (draftFits(next)) {
+      updateMoving(next);
+    }
+  };
+
+  // The nearest place `shift` steps the draft to where it fits, so a keyboard move jumps over closed or refused
+  // times as a drag can. Null when there is none within `limit` steps.
+  const nearestFit = (shift: (times: number) => DatedRange, limit: number): DatedRange | null => {
+    for (let times = 1; times <= limit; times++) {
+      const candidate = shift(times);
+      if (draftFits(candidate)) {
+        return candidate;
+      }
+    }
+    return null;
   };
 
   // Keyboard move mode, as in ADR 0003. The arrows move, Shift and the arrows resize, Enter confirms, Escape cancels.
@@ -361,14 +407,19 @@ function DatedWeekTable<TData extends CalendarData>(
       case "ArrowDown":
         event.preventDefault();
         previewDraft(
-          event.shiftKey ? resizeRange(moving, sign * step, step) : shiftRange(moving, { minutes: sign * step })
+          event.shiftKey
+            ? resizeRange(moving, sign * step, step)
+            : nearestFit(
+                (times) => shiftRange(moving, { minutes: sign * times * step }),
+                (dayKeys.length * MINUTES_PER_DAY) / step
+              )
         );
         return true;
       case "ArrowLeft":
       case "ArrowRight":
         event.preventDefault();
         if (!event.shiftKey) {
-          previewDraft(shiftRange(moving, { days: sign }));
+          previewDraft(nearestFit((times) => shiftRange(moving, { days: sign * times }), dayKeys.length));
         }
         return true;
       default:
@@ -392,6 +443,38 @@ function DatedWeekTable<TData extends CalendarData>(
       selectSlot(dayKey, index);
     }
   };
+
+  // The free cell under a mouse or pen. Choosing it moves the draft there, which a faded copy, the ghost, previews.
+  const [hovered, setHovered] = useState<{ dayKey: string; index: number } | null>(null);
+  const canPreviewChoice = onSelectSlot != null && draftEvent != null;
+
+  const hoverCell = (event: PointerEvent<HTMLTableCellElement>, dayKey: string, index: number) => {
+    if (dragInfoRef.current) {
+      dragOverCell(dayKey, index);
+      return;
+    }
+    // A touch has no hover, and a ghost left behind by a tap would only confuse.
+    if (canPreviewChoice && event.pointerType !== "touch") {
+      setHovered({ dayKey, index });
+    }
+  };
+
+  const ghostRange = ((): DatedRange | null => {
+    if (!hovered || !canPreviewChoice || moving) {
+      return null;
+    }
+    const { dayKey, index } = hovered;
+    if (!cellIsOpen(dayKey, index) || segmentsAt(dayKey, index).length > 0) {
+      return null;
+    }
+    const { start } = cellRange(dayKey, index, step);
+    const range = { start, end: new Date(start.getTime() + draftEvent.end.getTime() - draftEvent.start.getTime()) };
+    return draftFits(range) ? range : null;
+  })();
+  const ghostSegments =
+    ghostRange && draftEvent
+      ? segmentEvents([{ ...draftEvent, ...ghostRange, id: `${draftEvent.id}:ghost` }], days)
+      : null;
 
   // The list is not focusable while closed, so focus moves once it has opened.
   useEffect(() => {
@@ -492,12 +575,13 @@ function DatedWeekTable<TData extends CalendarData>(
           </ToolbarButton>
         </ToolbarGroup>
       )}
-      <GridScroller style={{ "--days": days.length } as CSSProperties}>
+      <GridScroller style={{ "--days": days.length }}>
         <table
           role="grid"
           aria-readonly={interactive ? undefined : true}
           aria-busy={isLoading || undefined}
           aria-label={ariaLabel}
+          onPointerLeave={() => setHovered(null)}
           onBlur={(event) => {
             // Moving between cells also blurs the old one. Only leaving the grid cancels a move.
             if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -575,7 +659,7 @@ function DatedWeekTable<TData extends CalendarData>(
                       key={dayKey}
                       role="gridcell"
                       {...grid.cellBehaviour(dayKey, row.index)}
-                      onPointerEnter={() => dragOverCell(dayKey, row.index)}
+                      onPointerEnter={(event) => hoverCell(event, dayKey, row.index)}
                       aria-label={`${longDay.format(keyToDate(dayKey))}, ${formatRange(begin, end)}, ${state}`}
                       aria-disabled={isOpen ? undefined : true}
                       aria-describedby={isDraft ? hintId : undefined}
@@ -594,9 +678,7 @@ function DatedWeekTable<TData extends CalendarData>(
                             key={segment.event.id}
                             aria-hidden
                             {...extra}
-                            style={
-                              { ...extra?.style, "--lane": segment.lane, "--lanes": segment.lanes } as CSSProperties
-                            }
+                            style={{ ...extra?.style, "--lane": segment.lane, "--lanes": segment.lanes }}
                             data-draft={segment.event.id === draftId ? "" : undefined}
                             data-moving={moving && segment.event.id === draftId ? "" : undefined}
                             data-segment-start={startsHere ? "" : undefined}
@@ -619,6 +701,27 @@ function DatedWeekTable<TData extends CalendarData>(
                           </EventStripe>
                         );
                       })}
+                      {draftEvent &&
+                        segmentsInCell(ghostSegments?.get(dayKey) ?? [], row.beginMinutes, row.endMinutes).map(
+                          (segment) => {
+                            const extra = getEventProps?.(draftEvent);
+                            const startsHere = segment.beginMinutes >= row.beginMinutes;
+                            return (
+                              <EventStripe
+                                key={segment.event.id}
+                                aria-hidden
+                                {...extra}
+                                style={{ ...extra?.style, "--lane": 0, "--lanes": 1 }}
+                                data-ghost=""
+                                data-segment-start={startsHere ? "" : undefined}
+                                data-segment-end={segment.endMinutes <= row.endMinutes ? "" : undefined}
+                                data-testid="dated-week-calendar__ghost"
+                              >
+                                {startsHere ? draftEvent.title : null}
+                              </EventStripe>
+                            );
+                          }
+                        )}
                       {showNowLine && row.index === nowRowIndex && (
                         <NowLine
                           aria-hidden

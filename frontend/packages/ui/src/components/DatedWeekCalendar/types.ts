@@ -113,7 +113,8 @@ export type DatedWeekCalendarProps<TData extends CalendarData> = {
   isOpen?: (range: DatedRange) => boolean;
   /**
    * Called when a free open cell is chosen by click, tap, Enter or Space. Return a reason to refuse, which is
-   * announced, or null to accept. Without it cells can't be chosen and the grid is read only.
+   * announced, or null to accept. Without it cells can't be chosen and the grid is read only. With a draft, choosing
+   * a cell is taken to move the draft there, keeping its length, and a faded copy previews that on hover.
    */
   onSelectSlot?: (range: DatedRange) => string | null;
   /** The event the user can move. Needs `onMoveDraft`. */
@@ -123,6 +124,11 @@ export type DatedWeekCalendarProps<TData extends CalendarData> = {
    * refuse, which is announced, or null to accept. Without it the draft can't be moved.
    */
   onMoveDraft?: (range: DatedRange) => string | null;
+  /**
+   * Whether the draft may be placed at a range, for rules the cells don't show, e.g. buffers or start intervals.
+   * A drag, a keyboard move and the hover preview of a click only go where every cell is open and this agrees.
+   */
+  isDraftAllowed?: (range: DatedRange) => boolean;
   /** Marks the grid busy while its events are being fetched. */
   isLoading?: boolean;
   /** The equal form for the same task. A skip link to it is shown before the grid. */
