@@ -26,9 +26,9 @@ __all__ = [
 
 class ReservationUnitPricing(models.Model):
     begins = models.DateField()
-    price_unit: PriceUnit = TextChoicesField(enum=PriceUnit, default=PriceUnit.PER_HOUR)  # type: ignore[assignment]
+    price_unit = TextChoicesField(enum=PriceUnit, default=PriceUnit.PER_HOUR)
 
-    payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)  # type: ignore[assignment]
+    payment_type = TextChoicesField(enum=PaymentType, null=True, blank=True)
 
     # Not used. Kept so that migrations can be reversed. Removed in TILA-4558.
     is_activated_on_begins = models.BooleanField(default=False)

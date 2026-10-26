@@ -31,7 +31,7 @@ class ReservationUnitImage(models.Model):
     )
 
     image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True, blank=True)
-    image_type: ReservationUnitImageType = TextChoicesField(enum=ReservationUnitImageType)  # type: ignore[assignment]
+    image_type = TextChoicesField(enum=ReservationUnitImageType)
 
     large_url = models.URLField(max_length=255, default="", blank=True)
     medium_url = models.URLField(max_length=255, default="", blank=True)

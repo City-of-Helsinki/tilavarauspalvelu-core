@@ -32,7 +32,7 @@ class ReservationUnitAccessType(models.Model):
         related_name="access_types",
         on_delete=models.CASCADE,
     )
-    access_type: AccessType = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)  # type: ignore[assignment]
+    access_type = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)
     begin_date = models.DateField()
 
     objects: ClassVar[ReservationUnitAccessTypeManager] = LazyModelManager.new()
