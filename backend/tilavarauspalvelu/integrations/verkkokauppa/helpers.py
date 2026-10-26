@@ -82,6 +82,8 @@ def get_verkkokauppa_order_params(
     order_expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
     last_valid_purchase_datetime = (utc_datetime() + order_expiration).astimezone(DEFAULT_TIMEZONE)
 
+    # One row with the reservation's VAT, also for a reservation with price lines.
+    # TILA-4594 makes one row per price line with the tax of the line.
     items = [
         OrderItemParams(
             product_id=reservation_unit.payment_product.id,
