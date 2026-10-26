@@ -1,0 +1,32 @@
+# Image for running backend checks and tests in GitHub Actions.
+# See ".github/workflows/build-ci-image.yml" for how it is built and tagged.
+FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core-base:python-3.13-slim-trixie
+
+# Install system dependencies
+# - build-essential: for building uWSGI and psycopg2
+# - curl: for installing poetry
+# - gdal-bin: for GeoDjango
+# - gettext: for making translations
+# - git: for actions/checkout
+# - libcurl4-openssl-dev: for building uWSGI
+# - libpcre2-dev: for uWSGI internal routing support
+# - libpq-dev: for building psycopg2
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential \
+      curl \
+      gdal-bin \
+      gettext \
+      git \
+      libcurl4-openssl-dev \
+      libpcre2-dev \
+      libpq-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Setup environment variables for poetry.
+ENV POETRY_HOME=/opt/poetry
+ENV PATH=$POETRY_HOME/bin:$PATH
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+
+# Install poetry.
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.5.1 python -

@@ -1,0 +1,61 @@
+# Build the image for running backend checks and tests, and push it to the GitHub Container Registry.
+# The tag is the hash of the Dockerfile. A run skips the build if an image with that tag exists.
+# So a pull request that changes the Dockerfile builds its own image, without changing the image used on main.
+name: "Build CI image"
+
+on:
+  workflow_call:
+    outputs:
+      image:
+        description: "The CI image to use as the job container."
+        value: ${{ jobs.build.outputs.image }}
+
+env:
+  REGISTRY: "ghcr.io"
+  REPOSITORY: "ghcr.io/city-of-helsinki/tilavarauspalvelu-core-ci"
+  DOCKERFILE: "backend/docker/Dockerfile.ci"
+
+jobs:
+  build:
+    name: "Build CI image"
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: ${{ env.DOCKERFILE }}
+          sparse-checkout-cone-mode: false
+
+      - name: "Create image name"
+        id: image
+        run: echo "image=${{ env.REPOSITORY }}:$(sha256sum "${{ env.DOCKERFILE }}" | cut -c 1-16)" >> "$GITHUB_OUTPUT"
+
+      - name: "Log in to the Container registry"
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Check if the image exists"
+        id: exists
+        run: |
+          if docker manifest inspect "${{ steps.image.outputs.image }}" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: "Build and push the image"
+        if: steps.exists.outputs.exists != 'true'
+        run: |
+          docker build --file "${{ env.DOCKERFILE }}" --tag "${{ steps.image.outputs.image }}" backend/docker
+          docker push "${{ steps.image.outputs.image }}"
