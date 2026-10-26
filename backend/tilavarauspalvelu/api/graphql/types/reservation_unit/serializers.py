@@ -248,21 +248,21 @@ class ReservationUnitSerializer(NestingModelSerializer):
         pricings = data.get("pricings")
 
         # Pricings are optional when reservation unit is draft
-        if is_draft and pricings is None:
+        if is_draft and not pricings:
             return
 
         # If the pricings were not given, but the reservation unit has some, skip validation and assume they are valid
         if pricings is None and self.instance and self.instance.pricings.exists():
             return
 
-        if pricings is None:
+        if not pricings:
             msg = "Pricings are required for non-draft reservation units."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_MISSING)
 
         # At least one given pricing must be currently active (begin date is today or earlier)
         today = local_date()
         has_active_pricing = any(p["begins"] <= today for p in pricings)
-        if pricings and not has_active_pricing:
+        if not has_active_pricing:
             msg = "At least one active pricing is required."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING)
 
