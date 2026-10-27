@@ -9,6 +9,8 @@ from modeltranslation.admin import TabbedTranslationAdmin
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import PriceOption
 
+from .form import PriceOptionAdminForm
+
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -35,6 +37,7 @@ class PriceOptionAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslationAdmin):
     ordering = ["name"]
 
     # Form
+    form = PriceOptionAdminForm
     fields = [
         "name",
         "description",
