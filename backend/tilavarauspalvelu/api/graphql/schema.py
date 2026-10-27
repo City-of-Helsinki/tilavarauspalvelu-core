@@ -12,8 +12,17 @@ from query_optimizer.compiler import optimize
 from tilavarauspalvelu.enums import ReservationCancelReasonChoice, UserPermissionChoice
 from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
-from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, PriceOption, Reservation, ReservationUnit, User
+from tilavarauspalvelu.models import (
+    AllocatedTimeSlot,
+    ApplicationRound,
+    PaymentOrder,
+    PriceOption,
+    Reservation,
+    ReservationUnit,
+    User,
+)
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from tilavarauspalvelu.services.pricing.application_round_options import application_round_price_options
 from tilavarauspalvelu.services.pricing.price_lines import build_price_lines
 from tilavarauspalvelu.translation import translated
 from tilavarauspalvelu.typing import error_codes
@@ -143,6 +152,12 @@ class Query(graphene.ObjectType):
     # Seasonal booking
     application_round = ApplicationRoundNode.Node()
     application_rounds = ApplicationRoundNode.Connection()
+    application_round_price_options = Field(
+        graphene.List(graphene.NonNull(PriceOptionNode)),
+        required=True,
+        application_round=graphene.Int(required=True),
+        description="Price options that the applicant can select for the application sections of the round.",
+    )
     application = ApplicationNode.Node()
     applications = ApplicationNode.Connection()
     application_section = ApplicationSectionNode.Node()
@@ -275,6 +290,19 @@ class Query(graphene.ObjectType):
         if PaymentOrderPermission.has_node_permission(order, info.context.user, {}):
             return order
         return None
+
+    def resolve_application_round_price_options(
+        root: None,
+        info: GQLInfo,
+        *,
+        application_round: int,
+    ) -> list[PriceOption]:
+        application_round_instance = ApplicationRound.objects.filter(pk=application_round).first()
+        if application_round_instance is None:
+            msg = f"Application round with pk {application_round} does not exist."
+            raise GQLNotFoundError(msg)
+
+        return application_round_price_options(application_round_instance)
 
     def resolve_reservation_price(
         root: None,

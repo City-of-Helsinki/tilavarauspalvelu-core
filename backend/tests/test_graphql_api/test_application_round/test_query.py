@@ -11,13 +11,7 @@ from tilavarauspalvelu.enums import (
 )
 from utils.date_utils import local_datetime
 
-from tests.factories import (
-    ApplicationFactory,
-    ApplicationRoundFactory,
-    PriceOptionFactory,
-    ReservationFactory,
-    ReservationUnitFactory,
-)
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory
 from tests.factories.application import ApplicationBuilder
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
@@ -159,29 +153,6 @@ def test_application_round_query__applications_count_does_not_include_cancelled_
     # - The applications count does not include the cancelled application
     assert len(response.edges) == 1, response
     assert response.node(0) == {"applicationsCount": 1}
-
-
-def test_application_round_query__price_options(graphql):
-    application_round = ApplicationRoundFactory.create_in_status_open(
-        reservation_units=[ReservationUnitFactory.create()]
-    )
-    price_option = PriceOptionFactory.create_for_application_round(application_round, name="Adults")
-    graphql.login_with_superuser()
-
-    response = graphql(rounds_query(fields="priceOptions { pk nameFi }"))
-
-    assert len(response.edges) == 1, response
-    assert response.node(0) == {"priceOptions": [{"pk": price_option.pk, "nameFi": "Adults"}]}
-
-
-def test_application_round_query__price_options__none_offered(graphql):
-    ApplicationRoundFactory.create_in_status_open(reservation_units=[ReservationUnitFactory.create()])
-    graphql.login_with_superuser()
-
-    response = graphql(rounds_query(fields="priceOptions { pk }"))
-
-    assert len(response.edges) == 1, response
-    assert response.node(0) == {"priceOptions": []}
 
 
 def test_application_round_query__is_setting_handled_allowed__no_permissions__false(graphql):

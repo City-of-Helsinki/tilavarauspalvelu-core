@@ -18,6 +18,11 @@ type Query {
     """Ordering"""
     orderBy: [ApplicationRoundOrderingChoices]
   ): ApplicationRoundNodeConnection
+
+  """
+  Price options that the applicant can select for the application sections of the round.
+  """
+  applicationRoundPriceOptions(applicationRound: Int!): [PriceOptionNode!]!
   application(
     """The ID of the object"""
     id: ID!
@@ -730,11 +735,6 @@ type ApplicationRoundNode implements Node {
   isSettingHandledAllowed: Boolean!
   applicationsCount: Int!
   reservationUnitCount: Int!
-
-  """
-  Price options that the applicant can select for each application section. Computed for each round, so query this only for a few rounds at a time.
-  """
-  priceOptions: [PriceOptionNode!]!
   pk: Int
 }
 
