@@ -1,9 +1,9 @@
-// @ts-check
 import { availableParallelism } from "node:os";
 import { join } from "node:path";
 import * as url from "node:url";
+import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
-import { CSP_HEADER } from "@ui/modules/baseUtils";
+import { CSP_HEADER } from "ui/src/modules/baseUtils";
 import { SENTRY_APPLICATION_KEY, getCustomerRelease } from "@/modules/baseUtils";
 import i18nconfig from "./next-i18next.config.cjs";
 import { env } from "./src/env.mjs";
@@ -18,8 +18,7 @@ const HDS_COOKIE_CONSENT_TARGET = "hds-core/lib/components/cookie-consent/cookie
 
 const { i18n } = i18nconfig;
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   agentRules: false,
   reactStrictMode: true,
   // NOTE default worker count uses os.cpus() which ignores container CPU limits
