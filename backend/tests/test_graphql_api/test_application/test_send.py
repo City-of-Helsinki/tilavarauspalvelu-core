@@ -11,6 +11,7 @@ from utils.date_utils import local_datetime, local_start_of_day, local_time
 
 from tests.factories import (
     ApplicationFactory,
+    PriceOptionFactory,
     ReservationUnitFactory,
     ReservationUnitOptionFactory,
     SuitableTimeRangeFactory,
@@ -110,6 +111,48 @@ def test_application__send__no_age_group(graphql):
 
     assert response.has_errors is True
     assert response.field_error_messages() == [f"Application section {section.pk} must have age group set."]
+
+
+@patch_method(EmailService.send_seasonal_booking_application_received_email)
+def test_application__send__with_offered_price_option(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending()
+    price_option = PriceOptionFactory.create_for_application_round(application.application_round)
+    application.application_sections.update(price_option=price_option)
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is False, response
+    application.refresh_from_db()
+    assert application.sent_at is not None
+
+
+def test_application__send__no_price_option(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending()
+    PriceOptionFactory.create_for_application_round(application.application_round)
+    section = application.application_sections.first()
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is True
+    assert response.field_error_messages() == [f"Application section {section.pk} must have a price option selected."]
+
+
+def test_application__send__price_option_not_offered(graphql):
+    price_option = PriceOptionFactory.create()
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_sections__price_option=price_option,
+    )
+    section = application.application_sections.first()
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is True
+    assert response.field_error_messages() == [
+        f"Application section {section.pk} has a price option that the application round does not offer."
+    ]
 
 
 def test_application__send__no_suitable_time_ranges(graphql):

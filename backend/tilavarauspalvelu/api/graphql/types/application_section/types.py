@@ -92,6 +92,7 @@ class ApplicationSectionNode(DjangoNode):
             "allocations",
             "age_group",
             "purpose",
+            "price_option",
             "application",
             "reservation_unit_options",
             "suitable_time_ranges",
