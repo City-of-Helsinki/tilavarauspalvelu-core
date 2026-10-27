@@ -3,14 +3,12 @@ import type { Dispatch, SetStateAction } from "react";
 import { gql } from "@apollo/client";
 import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
-import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import {
   ReservationUnitPublishingStatusLabel,
   ReservationUnitReservationStatusLabel,
 } from "ui/src/components/statuses";
-import { breakpoints } from "ui/src/modules/const";
 import { Flex } from "ui/src/styled";
 import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";
@@ -125,17 +123,10 @@ export function ReservationUnitsTable({
       selectAllRowsText={t("common:selectAllRows")}
       clearSelectionsText={t("common:clearAllSelections")}
       setSelectedRows={setSelectedRows}
-      customActionButtons={[<ActionButtons key="1" selectedRows={selectedRows} />]}
+      customActionButtons={[<ActionButtons key="table-custom-action-buttons" selectedRows={selectedRows} />]}
     />
   );
 }
-
-const Spacer = styled.div`
-  flex-grow: 1;
-  @media (min-width: ${breakpoints.m}) {
-    margin-left: var(--spacing-s);
-  }
-`;
 
 type ActionButtonsProps = {
   selectedRows: SelectedRow[];
@@ -149,23 +140,16 @@ function ActionButtons({ selectedRows }: ActionButtonsProps): React.ReactElement
   const openingHoursUrl = getOpeningHoursUrl(env.apiBaseUrl, selectedPks, redirectOnErrorUrl);
   const editLink = openingHoursUrl !== "" ? openingHoursUrl : undefined;
   return (
-    <Spacer>
-      <Flex $gap="xs" $direction="row" $wrap="wrap">
-        <Flex
-          $gap="xs"
-          $direction="row"
-          $alignItems="center"
-          style={{ flexShrink: "1", maxWidth: "490px", marginRight: "auto" }}
-        >
-          <IconInfoCircle size={IconSize.Medium} />
-          <div>{t("reservationUnit:editInfoText")}</div>
-        </Flex>
-        <ButtonLikeLink external disabled={!editLink} href={editLink ?? ""} target="_blank">
-          {t("reservationUnit:goToMassEdit")}
-          <IconLinkExternal />
-        </ButtonLikeLink>
+    <Flex $gap="s" $direction="row" $wrap="wrap" $justifyContent="space-between" $grow>
+      <Flex $gap="2-xs" $direction="row" $alignItems="center">
+        <IconInfoCircle size={IconSize.Medium} />
+        <span>{t("reservationUnit:editInfoText")}</span>
       </Flex>
-    </Spacer>
+      <ButtonLikeLink external disabled={!editLink} href={editLink ?? ""} target="_blank">
+        {t("reservationUnit:goToMassEdit")}
+        <IconLinkExternal />
+      </ButtonLikeLink>
+    </Flex>
   );
 }
 
