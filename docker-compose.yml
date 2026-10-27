@@ -3,6 +3,8 @@
 # Without a profile, only the database and Redis start.
 # The "backend" profile starts the backend, the worker and the scheduler.
 # The "frontend" profile starts the customer UI and the staff UI. It needs the "backend" profile.
+# The "frontend-release" profile builds the customer UI and the staff UI and runs them as in production.
+# Use it in place of the "frontend" profile, because both use the same ports.
 # Start with "docker compose up --watch" to also rebuild or restart the backend when its dependencies or settings change.
 # The backend and the frontends run as the host user, so the files that they create in the source code belong to that user.
 # The "just stack" commands set HOST_UID and HOST_GID.
@@ -160,6 +162,7 @@ services:
   # for the server side rendering and for the browser, so "localhost:8000" must work in both places.
   frontend-net:
     <<: *frontend
+    profiles: [frontend, frontend-release]
     init: true
     ports:
       - "127.0.0.1:3000:3000"
@@ -169,6 +172,7 @@ services:
   # Docker creates the named volumes owned by root. Give them to the host user, then stop.
   frontend-volumes:
     <<: *frontend
+    profiles: [frontend, frontend-release]
     user: root
     command:
       - sh
@@ -183,6 +187,7 @@ services:
   # Run it again after a change to pnpm-lock.yaml or tilavaraus.graphql.
   frontend-install:
     <<: *frontend
+    profiles: [frontend, frontend-release]
     depends_on:
       frontend-volumes:
         condition: service_completed_successfully
@@ -213,6 +218,42 @@ services:
       frontend-install:
         condition: service_completed_successfully
     command: ["pnpm", "--filter", "staff", "run", "dev", "--hostname", "0.0.0.0"]
+    environment:
+      TZ: Europe/Helsinki
+
+  # The release services run "next build" and then "next start", so the pages with getStaticProps,
+  # for example 404 and 500, work as in production. The code does not reload.
+  # Restart the service to build again. "next dev" keeps its output in .next/dev, so the build does not remove it.
+  # "next start" shows a warning about the "standalone" output. The production image runs the standalone server.
+  customer-release:
+    <<: *frontend
+    profiles: [frontend-release]
+    network_mode: service:frontend-net
+    depends_on:
+      frontend-install:
+        condition: service_completed_successfully
+    command:
+      - sh
+      - -c
+      - >-
+        pnpm --filter customer run build
+        && pnpm --filter customer run start --hostname 0.0.0.0
+    environment:
+      TZ: Europe/Helsinki
+
+  staff-release:
+    <<: *frontend
+    profiles: [frontend-release]
+    network_mode: service:frontend-net
+    depends_on:
+      frontend-install:
+        condition: service_completed_successfully
+    command:
+      - sh
+      - -c
+      - >-
+        pnpm --filter staff run build
+        && pnpm --filter staff run start --hostname 0.0.0.0
     environment:
       TZ: Europe/Helsinki
 
