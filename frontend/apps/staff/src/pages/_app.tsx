@@ -131,6 +131,19 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
 
   const commonProps = await getCommonServerSideProps();
   triggerServerError(commonProps.isErrorTriggerEnabled, context.ctx);
+
+  // The proxy shows 503 when the backend is down, so do not query it
+  if (context.router.pathname === "/503") {
+    return {
+      ...ctx,
+      envConfig: commonProps,
+      currentUser: null,
+      handlingData: null,
+      handlingVariables: null,
+      notificationsData: null,
+    };
+  }
+
   const client = createClient(commonProps.apiBaseUrl, context.ctx.req);
 
   try {

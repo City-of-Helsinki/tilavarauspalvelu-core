@@ -5,9 +5,9 @@ import { ErrorContainer } from "ui/src/components";
 import { useEnvContext } from "@/context/EnvContext";
 import { PUBLIC_URL } from "@/modules/const";
 
-/// Unlike 404 and 500 this is not a standard next error page
-/// so using getServerSideProps is possible but 503 means we can't do backend calls
-export async function getStaticProps({ locale }: GetServerSidePropsContext) {
+/// Unlike 404 and 500 this is not a standard next error page, so it can use getServerSideProps.
+/// The env is then loaded at runtime. Do not make backend calls here, 503 means the backend is down.
+export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
       ...(await serverSideTranslations(locale ?? "fi")),
