@@ -1149,14 +1149,14 @@ class MidHook(EmptyDefaults, Platta, use_environ=True):
 class Development(Platta, use_environ=True):
     """Settings for the Development environment on Platta."""
 
-    DEBUG = True
+    DEBUG = False
     ENVIRONMENT_NAME = "development"
 
 
 class Testing(Platta, use_environ=True):
     """Settings for the Testing environment on Platta."""
 
-    DEBUG = True
+    DEBUG = False
     ENVIRONMENT_NAME = "testing"
 
 
