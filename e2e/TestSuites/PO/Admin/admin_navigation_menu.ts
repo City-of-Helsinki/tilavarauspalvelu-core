@@ -1,37 +1,36 @@
 /** Port of PO/Admin/admin_navigation_menu.robot */
-import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
+import { Browser, currentPage } from "../../../lib/Browser";
 import { keywords, named } from "../../../lib/robot";
 
 export const admin_navigation_menu = keywords("admin_navigation_menu", {
   "Admin Navigates To Requested Reservations": async () => {
     await Browser["Click"]('[href="/kasittely/reservations/requested"]');
-    await BuiltIn["Sleep"]("4s");
+    await currentPage().waitForURL((url) => url.pathname === "/kasittely/reservations/requested");
   },
 
   "Admin Navigates To Reservations": async () => {
     await Browser["Click"]('[href="/kasittely/reservations"]');
-    await BuiltIn["Sleep"]("4s");
+    await currentPage().waitForURL((url) => url.pathname === "/kasittely/reservations");
   },
 
   "Admin Navigates To Application Rounds": async () => {
     await Browser["Click"]('[href="/kasittely/application-rounds"]');
-    await BuiltIn["Sleep"]("4s");
+    await currentPage().waitForURL((url) => url.pathname === "/kasittely/application-rounds");
   },
 
   "Admin Navigates To Reservation Units": async () => {
     await Browser["Click"]('[href="/kasittely/reservation-units"]');
-    await BuiltIn["Sleep"]("4s");
+    await currentPage().waitForURL((url) => url.pathname === "/kasittely/reservation-units");
   },
 
   "Admin Navigates To Units": async () => {
     await Browser["Click"]('[href="/kasittely/units"]');
-    await BuiltIn["Sleep"]("4s");
+    await currentPage().waitForURL((url) => url.pathname === "/kasittely/units");
   },
 
   "Admin Navigates To My Units": async () => {
     await Browser["Click"]('[href="/kasittely/my-units"]');
-    await BuiltIn["Sleep"]("4s");
+    await currentPage().waitForURL((url) => url.pathname === "/kasittely/my-units");
   },
 
   "Admin Navigates To Notifications": async () => {

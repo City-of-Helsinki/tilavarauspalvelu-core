@@ -1,7 +1,6 @@
 /** Port of PO/User/reservation_unit_reserver_info.robot */
-import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, chain, keywords, named, str } from "../../../lib/robot";
+import { Browser, loc } from "../../../lib/Browser";
+import { V, chain, expect, keywords, named, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
 import "../../Resources/variables";
@@ -47,11 +46,9 @@ export const reservation_unit_reserver_info = keywords("reservation_unit_reserve
    * fields are missing.
    */
   "Check Application Cannot Be Made Without Info": async () => {
-    await Browser["Wait For Elements State"]('[data-testid="reservation__button--continue"]', "visible");
     await Browser["Click"]('[data-testid="reservation__button--continue"]');
-    await BuiltIn["Sleep"]("1s");
 
     // Check that error notification banner is displayed
-    await Browser["Wait For Elements State"](V.NOTIFICATION_TYPE_ERROR, "visible");
+    await expect(loc(V.NOTIFICATION_TYPE_ERROR)).toBeVisible();
   },
 });

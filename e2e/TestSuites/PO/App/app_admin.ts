@@ -1,7 +1,7 @@
 /** Port of PO/App/app_admin.robot */
-import { Browser } from "../../../lib/Browser";
+import { Browser, loc } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, keywords, named, str } from "../../../lib/robot";
+import { V, expect, keywords, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { admin_my_units } from "../../PO/Admin/admin_my_units";
 import { admin_navigation_menu } from "../../PO/Admin/admin_navigation_menu";
@@ -33,14 +33,13 @@ export const app_admin = keywords("app_admin", {
     await admin_reservations["Admin Clicks Button In Reservation Page"](
       '[data-testid="approval-buttons__approve-button"]'
     );
-    await BuiltIn["Sleep"]("4s");
+    // Waits for the approval dialog
     await admin_reservations["Admin Checks Reason For Subvention In Dialog"]();
     await admin_reservations["Admin Clicks Set Reservation To Free"]();
     await admin_reservations["Admin Clicks Button In Reservation Page"](
       '[data-testid="approval-dialog__accept-button"]'
     );
-    // Waiting payment status to be updated
-    await BuiltIn["Sleep"]("4s");
+    // The checks wait until the payment status is updated
     await admin_reservations["Admin Checks Reservation Info After Handling"](
       V.SINGLEBOOKING_NO_PAYMENT_ADMIN_SIDE,
       V.MYBOOKINGS_STATUS_CONFIRMED,
@@ -82,10 +81,7 @@ export const app_admin = keywords("app_admin", {
     await admin_reservations["Admin Clicks Button In Reservation Page"](
       '[data-testid="approval-buttons__return-to-handling-button"] >> nth=-1'
     );
-    await BuiltIn["Sleep"]("1s");
-    await Browser["Wait For Elements State"]("id=info-dialog", "visible");
     await custom_keywords["Find And Click Element With Text"]("id=info-dialog >> span", V.RESERVATION_STATUS_DIALOG);
-    await BuiltIn["Sleep"]("2s");
     await admin_reservations["Admin Checks Reservation Status"](V.ADMIN_STATUS_PROCESSED);
   },
 
@@ -141,13 +137,8 @@ export const app_admin = keywords("app_admin", {
   "Admin Changes Access Code": async () => {
     await admin_reservations["Admin Changes Access Code"]();
     await admin_reservations["Admin Clicks Confirm Access Code Button"]();
-    // waiting for the access code to be changed
-    await BuiltIn["Sleep"]("3s");
-    await Browser["Wait For Elements State"](
-      '[data-testid="reservation__info--Ovikoodi"]',
-      "visible",
-      named({ timeout: "5s" })
-    );
+    // Admin Checks Access Code Does Not Match waits until the access code has changed
+    await expect(loc('[data-testid="reservation__info--Ovikoodi"]')).toBeVisible({ timeout: 10_000 });
   },
 
   /** Verifies that the access code matches the expected value (extracts numbers only). */
@@ -239,53 +230,58 @@ export const app_admin = keywords("app_admin", {
   },
 
   "Admin Checks Top Navigation For Notification Manager With Unit Permissions": async () => {
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations/requested"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
   },
 
   "Admin Checks Top Navigation For Viewer With Unit Permissions": async () => {
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
   },
 
   "Admin Checks Top Navigation For Reserver With Unit Permissions": async () => {
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
   },
 
   "Admin Checks Top Navigation For Handler With Unit Permissions": async () => {
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
+    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
+    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
+    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
   },
 
   "Admin Checks Top Navigation For Admin With Unit Permissions": async () => {
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
+    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
 
     //
     //
@@ -296,53 +292,58 @@ export const app_admin = keywords("app_admin", {
   },
 
   "Admin Checks Top Navigation For Notification Manager With Group Unit Permissions": async () => {
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations/requested"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
   },
 
   "Admin Checks Top Navigation For Viewer With Group Unit Permissions": async () => {
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
   },
 
   "Admin Checks Top Navigation For Reserver With Group Unit Permissions": async () => {
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
+    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
   },
 
   "Admin Checks Top Navigation For Handler With Group Unit Permissions": async () => {
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
+    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
+    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
+    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
   },
 
   "Admin Checks Top Navigation For Admin With Group Unit Permissions": async () => {
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
+    // The Found checks wait for the navigation, so the Not Found checks see it rendered
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
+    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
 
     //
     //
@@ -361,27 +362,17 @@ export const app_admin = keywords("app_admin", {
 
   "Admin Clicks Make Reservation And Checks Dialog Opens": async () => {
     await admin_my_units["Admin Clicks Make Reservation"]();
-    await BuiltIn["Sleep"]("1s");
-    await Browser["Wait For Elements State"](
-      "id=info-dialog",
-      "visible",
-      named({ timeout: "5s", message: "Info dialog should be visible after clicking make reservation button" })
-    );
+    await expect(
+      loc("id=info-dialog"),
+      "Info dialog should be visible after clicking make reservation button"
+    ).toBeVisible({ timeout: 10_000 });
   },
 
   "Admin Rejects Reservation And Checks The Status": async () => {
-    let elements: RobotValue, element_count: RobotValue;
-    // Get all elements and click the last one to avoid strict mode violation that might happen
-    // when accordion is open
-    elements = await Browser["Get Elements"]('[data-testid="approval-buttons__reject-button"]');
-    element_count = await BuiltIn["Get Length"](elements);
-    await BuiltIn["Log"](`Found ${str(element_count)} reject buttons`);
-    await Browser["Click"](elements.at(-1));
-    await BuiltIn["Sleep"]("4s"); // wait for the page to load
+    // Click the last one to avoid strict mode violation that might happen when accordion is open
+    await Browser["Click"]('[data-testid="approval-buttons__reject-button"] >> nth=-1');
     await admin_reservations["Admin Selects Reason For Rejection"](V.ADMIN_REASON_REJECTED);
-    await BuiltIn["Sleep"]("1s"); // wait for the page to load
     await Browser["Click"]('[data-testid="deny-dialog__deny-button"]');
-    await BuiltIn["Sleep"]("4s"); // wait for the page to load
     await admin_reservations["Admin Checks Reservation Status"](V.MYBOOKINGS_STATUS_REJECTED);
   },
 
@@ -408,7 +399,6 @@ export const app_admin = keywords("app_admin", {
     await admin_reservations["Admin Clicks Button In Reservation Page"](
       '[data-testid="CreateReservationModal__accept-reservation"]'
     );
-    await BuiltIn["Sleep"]("4s"); // wait for the page to load
     await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
   },
 
@@ -430,7 +420,6 @@ export const app_admin = keywords("app_admin", {
     await admin_reservations["Admin Clicks Button In Reservation Page"](
       '[data-testid="CreateReservationModal__accept-reservation"]'
     );
-    await BuiltIn["Sleep"]("4s"); // wait for the page to load
     await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
   },
 
@@ -452,7 +441,6 @@ export const app_admin = keywords("app_admin", {
     await admin_reservations["Admin Clicks Button In Reservation Page"](
       '[data-testid="CreateReservationModal__accept-reservation"]'
     );
-    await BuiltIn["Sleep"]("4s"); // wait for the page to load
     await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
   },
 
@@ -463,14 +451,12 @@ export const app_admin = keywords("app_admin", {
       V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
       V.UNAVAILABLE_RESERVATION_DATE
     );
-    await Browser["Wait For Elements State"]('[data-testid="CreateReservationModal__accept-reservation"]', "visible");
     await Browser["Scroll To Element"]('[data-testid="CreateReservationModal__accept-reservation"]');
     await custom_keywords["Check Elements Text"](
       '[data-testid="CreateReservationModal__collision-warning"] >> [class*="Notification-module_body__"]',
       V.RESERVATION_TIME_NOT_FREE
     );
     await Browser["Click"]("data-testid=CreateReservationModal__cancel-reservation");
-    await BuiltIn["Sleep"]("4s"); // wait for the page to load
     await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
 
     //

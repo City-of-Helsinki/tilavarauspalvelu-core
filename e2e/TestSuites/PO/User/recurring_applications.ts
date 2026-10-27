@@ -1,6 +1,5 @@
 /** A resource file with top navigation keywords. */
 import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
 import { keywords } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
@@ -19,14 +18,17 @@ export const recurring_applications = keywords("recurring_applications", {
 
   "User Fills The Age Group In The Recurring Reservation": async (age_group: RobotValue) => {
     await Browser["Click"]('css=[aria-label*="Ikäryhmä. "]');
-    await BuiltIn["Sleep"]("300ms");
     await custom_keywords["Find And Click Element With Text"]("span", age_group);
+    // An option picked within 200 ms of opening leaves the HDS Select list open
+    await custom_keywords["Close Select List If Open"]('[aria-haspopup="listbox"][aria-label*="Ikäryhmä. "]');
   },
 
   "User Chooses The Purpose Of The Recurring Reservation": async (purpose: RobotValue) => {
     await Browser["Click"]('css=[aria-label*="Varauksen käyttötarkoitus. "]');
-    await BuiltIn["Sleep"]("300ms");
     await custom_keywords["Find And Click Element With Text"]("span", purpose);
+    await custom_keywords["Close Select List If Open"](
+      '[aria-haspopup="listbox"][aria-label*="Varauksen käyttötarkoitus. "]'
+    );
 
     //
   },
@@ -37,14 +39,18 @@ export const recurring_applications = keywords("recurring_applications", {
 
   "User Selects The Minimum Length For The Recurring Reservation": async (minimum_length: RobotValue) => {
     await Browser["Click"]('css=[aria-label*="Varauksen vähimmäiskesto. "]');
-    await BuiltIn["Sleep"]("300ms");
     await custom_keywords["Find And Click Element With Text"]("span", minimum_length);
+    await custom_keywords["Close Select List If Open"](
+      '[aria-haspopup="listbox"][aria-label*="Varauksen vähimmäiskesto. "]'
+    );
   },
 
   "User Selects The Maximum Length For The Recurring Reservation": async (maximum_length: RobotValue) => {
     await Browser["Click"]('css=[aria-label*="Varauksen enimmäiskesto. "]');
-    await BuiltIn["Sleep"]("300ms");
     await custom_keywords["Find And Click Element With Text"]("span", maximum_length);
+    await custom_keywords["Close Select List If Open"](
+      '[aria-haspopup="listbox"][aria-label*="Varauksen enimmäiskesto. "]'
+    );
   },
 
   "User Selects The Amount Of Reservations Per Week": async (amount_of_reservations_per_week: RobotValue) => {

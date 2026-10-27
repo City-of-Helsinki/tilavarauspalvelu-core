@@ -12,9 +12,9 @@ export const reservation_calendar = keywords("reservation_calendar", {
   "Select Duration Calendar": async (duration: RobotValue) => {
     // Click  [data-testid="reservation__input--duration"] >> id=duration-toggle-button
     await Browser["Click"]('[data-testid="calendar-controls__duration"] >> id=calendar-controls__duration-main-button');
-    await BuiltIn["Sleep"]("1s");
     await Browser["Click"](`[role="option"] >> '${str(duration)}'`);
-    await BuiltIn["Sleep"]("1s");
+    // An option picked within 200 ms of opening leaves the HDS Select list open
+    await custom_keywords["Close Select List If Open"]("id=calendar-controls__duration-main-button");
   },
 
   "Click And Store Free Reservation Time": async () => {
@@ -106,7 +106,7 @@ export const reservation_calendar = keywords("reservation_calendar", {
   },
 
   "User Click Reservation Calendar Toggle Button": async () => {
+    // The next click waits until the calendar's animation has ended
     await Browser["Click"]('[data-testid="calendar-controls__toggle-button"]');
-    await BuiltIn["Sleep"]("1.5s"); // Wait for animation
   },
 });

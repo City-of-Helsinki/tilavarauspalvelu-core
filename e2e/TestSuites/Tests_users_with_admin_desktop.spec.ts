@@ -1,6 +1,7 @@
 /** Desktop browser tests */
 import { BuiltIn } from "../lib/BuiltIn";
-import { V, test } from "../lib/robot";
+import { V } from "../lib/robot";
+import { test } from "./fixtures";
 import { admin_navigation_menu } from "./PO/Admin/admin_navigation_menu";
 import { admin_reservations } from "./PO/Admin/admin_reservations";
 import { app_admin } from "./PO/App/app_admin";

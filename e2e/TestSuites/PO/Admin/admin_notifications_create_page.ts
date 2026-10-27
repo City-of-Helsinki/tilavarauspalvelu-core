@@ -1,6 +1,5 @@
 /** Port of PO/Admin/admin_notifications_create_page.robot */
 import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
 import { V, keywords, named, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
@@ -16,7 +15,6 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
 
   "Admin Selects Notification Active Until": async (date: RobotValue) => {
     await Browser["Type Text"]("id=notification-active-until", date);
-    await BuiltIn["Sleep"]("500ms");
 
     // Admin clicks notification active until time label
     // Click  id=notification-active-until-time-label
@@ -37,7 +35,6 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
 
   "Admin Fills Notification Name": async (name: RobotValue) => {
     await Browser["Fill Text"]("id=notification-name", name);
-    await BuiltIn["Sleep"]("500ms");
 
     // Ilmoituksen tyyppi
   },
@@ -115,22 +112,18 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
   "Admin Clicks Notification Text Fi Container": async () => {
     //
     await Browser["Click"]('[data-testid="Notification__Page--message-fi-input"]');
-    await BuiltIn["Sleep"]("1s");
   },
 
   "Admin Fills Notification Text Fi": async (text_fi: RobotValue) => {
     await Browser["Fill Text"]('[data-testid="Notification__Page--message-fi-input"] >> p', text_fi);
-    await BuiltIn["Sleep"]("500ms");
   },
 
   "Admin Fills Notification Text Eng": async (text_eng: RobotValue) => {
     await Browser["Fill Text"]('[data-testid="Notification__Page--message-en-input"]', text_eng);
-    await BuiltIn["Sleep"]("500ms");
   },
 
   "Admin Fills Notification Text Sv": async (text_sv: RobotValue) => {
     await Browser["Fill Text"]('[data-testid="Notification__Page--message-sv-input"]', text_sv);
-    await BuiltIn["Sleep"]("500ms");
   },
 
   "Admin Publishes Notification": async () => {

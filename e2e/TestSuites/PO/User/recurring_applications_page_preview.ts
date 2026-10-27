@@ -1,7 +1,6 @@
 /** A resource file with top navigation keywords. */
-import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { keywords, named } from "../../../lib/robot";
+import { Browser, currentPage } from "../../../lib/Browser";
+import { keywords } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
@@ -17,7 +16,7 @@ export const recurring_applications_page_preview = keywords("recurring_applicati
 
   "User Clicks The Submit Button": async () => {
     await Browser["Click"]("id=button__application--submit");
-    await BuiltIn["Sleep"]("3s"); // wait for the page to load
-    await Browser["Wait For Load State"]("load", named({ timeout: "10s" }));
+    // Sending the application opens its sent page
+    await currentPage().waitForURL((url) => url.pathname.endsWith("/sent"));
   },
 });

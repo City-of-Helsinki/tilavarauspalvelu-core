@@ -1,6 +1,7 @@
 /** Android chrome tests */
 import { BuiltIn } from "../lib/BuiltIn";
-import { V, test } from "../lib/robot";
+import { V } from "../lib/robot";
+import { test } from "./fixtures";
 import { app_common } from "./PO/App/app_common";
 import { app_user } from "./PO/App/app_user";
 import { popups } from "./PO/Common/popups";

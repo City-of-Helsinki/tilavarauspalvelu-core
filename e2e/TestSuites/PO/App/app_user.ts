@@ -53,7 +53,6 @@ export const app_user = keywords("app_user", {
 
   "User Accepts Payment To Checkout": async () => {
     await BuiltIn["Log"]("This clicks approve button from notification banner");
-    await BuiltIn["Sleep"]("1.5s"); // Wait for banner to load
     await user_landingpage["Approve Interrupted Payment"]();
 
     //
@@ -565,7 +564,6 @@ export const app_user = keywords("app_user", {
   },
 
   "User Can See Upcoming Booking In List And Clicks It": async (unitname: RobotValue, reservationtime: RobotValue) => {
-    await BuiltIn["Sleep"]("1s");
     await BuiltIn["Log"](unitname);
     await BuiltIn["Log"](reservationtime);
     // The list is fetched once when the page opens, so reload it if the booking is not in it
@@ -581,7 +579,6 @@ export const app_user = keywords("app_user", {
     unitname: RobotValue,
     reservationtime: RobotValue
   ) => {
-    await BuiltIn["Sleep"]("2s");
     await BuiltIn["Log"](unitname);
     await BuiltIn["Log"](reservationtime);
     await mybookings["Check My Bookings H1"](V.MYBOOKINGS_FI);
@@ -781,11 +778,8 @@ export const app_user = keywords("app_user", {
    */
   "User Saves File And Formats Booking Time To ICS": async (file_path: RobotValue) => {
     let download_promise: RobotValue, file_obj: RobotValue, content: RobotValue, ICS_TEXT: RobotValue;
-    await BuiltIn["Sleep"]("1s");
-
     // Ensure the directory exists
     await OperatingSystem["Create Directory"](file_path);
-    await BuiltIn["Sleep"]("1s");
     await OperatingSystem["Directory Should Exist"](file_path);
 
     await custom_keywords["Convert Booking Time To ICS Format"](V.TIME_OF_QUICK_RESERVATION_MINUS_T);
@@ -954,8 +948,7 @@ export const app_user = keywords("app_user", {
       "Peru"
     );
 
-    // Wait for animation
-    await BuiltIn["Sleep"]("1s");
+    // The click waits until the modal's animation has ended
     await custom_keywords["Find And Click Element With Text"]("id=application-card-modal >> span", "Kyllä");
   },
 

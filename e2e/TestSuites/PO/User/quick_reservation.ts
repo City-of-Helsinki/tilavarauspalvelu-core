@@ -1,8 +1,8 @@
 /** Port of PO/User/quick_reservation.robot */
-import { Browser } from "../../../lib/Browser";
+import { Browser, loc } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
 import { Collections } from "../../../lib/Collections";
-import { V, chain, isTruthy, keywords, named, str } from "../../../lib/robot";
+import { V, chain, expect, isTruthy, keywords, named, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { String_ } from "../../../lib/String";
 import { custom_keywords } from "../../Resources/custom_keywords";
@@ -207,7 +207,6 @@ export const quick_reservation = keywords("quick_reservation", {
 
   "Click More Available Slots": async () => {
     await Browser["Click"]('[data-testid="quick-reservation-next-available-time"]');
-    await BuiltIn["Sleep"]("500ms");
   },
 
   /**
@@ -262,26 +261,18 @@ export const quick_reservation = keywords("quick_reservation", {
   },
 
   "Check Booking Number": async (booking_number: RobotValue) => {
-    let quick_booking_num: RobotValue;
-    await Browser["Wait For Elements State"](
-      '[data-testid="reservation__reservation-info-card__reservationNumber"]',
-      "visible"
+    await BuiltIn["Log"](`booking_number: ${str(booking_number)}`);
+    await expect(loc('[data-testid="reservation__reservation-info-card__reservationNumber"]')).toHaveText(
+      str(booking_number),
+      { useInnerText: true }
     );
-    quick_booking_num = await Browser["Get Text"](
-      '[data-testid="reservation__reservation-info-card__reservationNumber"]'
-    );
-    await BuiltIn["Log"](`quick_booking_num: ${str(quick_booking_num)}, booking_number: ${str(booking_number)}`);
-    await BuiltIn["Should Be Equal"](quick_booking_num, booking_number);
   },
 
   /** Extracts and saves the numeric access code from the element. */
   "Get Access Code": async () => {
     let access_code_numbers: RobotValue, access_code_with_hash: RobotValue;
-    await Browser["Wait For Elements State"](
-      '[data-testid="reservation__reservation-info-card__accessType"]',
-      "visible"
-    );
-    await BuiltIn["Sleep"]("2s");
+    // The access code is filled in after the card renders
+    await expect(loc('[data-testid="reservation__reservation-info-card__accessType"]')).toContainText(/\d/);
     access_code_numbers = await custom_keywords["Get Number From Element Text"](
       '[data-testid="reservation__reservation-info-card__accessType"]'
     );
@@ -331,11 +322,9 @@ export const quick_reservation = keywords("quick_reservation", {
 
   "Select Duration Mobile": async (duration: RobotValue) => {
     // Set to 1h
-    await Browser["Wait For Elements State"]("id=mobile-quick-reservation-duration-toggle-button", "visible");
     await Browser["Click"]("id=mobile-quick-reservation-duration-toggle-button");
-    await BuiltIn["Sleep"]("1s");
+    // The clicks wait until the list's animation has ended
     await Browser["Click"](`[role="option"] >> '${str(duration)}'`);
-    await BuiltIn["Sleep"]("1.5s"); // wait for animation to complete
   },
 
   /** Verifies that the specified time slot is not available in the list of free slots. */
@@ -343,8 +332,9 @@ export const quick_reservation = keywords("quick_reservation", {
     let elements: RobotValue, count: RobotValue, slot_texts: RobotValue, el: RobotValue, ok: RobotValue, t: RobotValue;
     await BuiltIn["Log"](`Verifying time slot not available: ${str(time_to_check)}`);
 
-    await BuiltIn["Sleep"]("2s");
     await Browser["Wait For Elements State"]("id=quick-reservation__duration-main-button", "visible");
+    // The free slots are rendered after the reservation form
+    await expect(loc('[class*="slider-list"] >> [data-testid="quick-reservation__slot"]').first()).toBeVisible();
 
     // 1 Collect all time slots
     elements = await Browser["Get Elements"]('[class*="slider-list"] >> [data-testid="quick-reservation__slot"]');

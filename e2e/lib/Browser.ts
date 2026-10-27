@@ -3,10 +3,24 @@ import { chromium, devices, expect, firefox, webkit } from "@playwright/test";
  * The Robot Framework Browser library keywords the suite uses, with the same names and semantics
  * (robotframework-browser 19.12.0). The Browser library is Playwright underneath, so selectors are unchanged.
  */
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import type { BrowserContext, Download, Locator, Page, Browser as PlaywrightBrowser, Response } from "@playwright/test";
-import { argsOf, isSecret, isTruthy, library, named, onTestEnd, redact, sleepMs, testInfo, timeToMs } from "./robot";
+import {
+  argsOf,
+  harRecordingEnabled,
+  isSecret,
+  isTruthy,
+  library,
+  named,
+  onTestEnd,
+  redact,
+  redactHarFile,
+  sleepMs,
+  testFixtures,
+  testInfo,
+  timeToMs,
+} from "./robot";
 import type { RobotValue } from "./robot";
 
 interface PageEntry {
@@ -19,10 +33,10 @@ interface ContextEntry {
   context: BrowserContext;
   pages: PageEntry[];
   activePage: PageEntry | null;
-  // A Playwright trace is recorded (PW_TRACE=on)
-  tracing: boolean;
   // The HAR file Playwright writes when the context closes (recordHar)
   harPath: string | null;
+  // False for the test's own context, which Playwright closes after the test
+  owned: boolean;
 }
 
 interface BrowserEntry {
@@ -30,6 +44,8 @@ interface BrowserEntry {
   browser: PlaywrightBrowser;
   contexts: ContextEntry[];
   activeContext: ContextEntry | null;
+  // False for the test's own browser, which Playwright shares between the tests of a worker
+  owned: boolean;
 }
 
 const DEFAULT_TIMEOUT = 10_000;
@@ -42,6 +58,8 @@ const state = {
   timeout: DEFAULT_TIMEOUT,
   strict: true,
   counter: 0,
+  // openTestPage has handed out the test's own page
+  testPageOpened: false,
 };
 
 function nextId(prefix: string): string {
@@ -70,9 +88,14 @@ export function browserTimeout(): number {
   return state.timeout;
 }
 
+/** All the elements a Robot selector string or an element reference matches, like Get Element Count counts. */
+export function allElements(selector: RobotValue): Locator {
+  return typeof selector === "string" ? currentPage().locator(selector) : (selector as Locator);
+}
+
 /** A Locator for a Robot selector string or an element reference returned by Get Element(s). */
 export function loc(selector: RobotValue): Locator {
-  const locator: Locator = typeof selector === "string" ? currentPage().locator(selector) : selector;
+  const locator = allElements(selector);
   return state.strict ? locator : locator.first();
 }
 
@@ -232,28 +255,13 @@ function responseDetails(response: Response, body: RobotValue): Record<string, R
   };
 }
 
-/** Hides secrets in a HAR file, like in the logs. */
-async function redactHarFile(path: string): Promise<void> {
-  // A .zip HAR is an archive, not text; the suite writes .har files
-  if (path.endsWith(".zip")) {
-    return;
-  }
-  const text = await readFile(path, "utf8");
-  const hidden = redact(text);
-  if (hidden !== text) {
-    await writeFile(path, hidden);
-  }
-}
-
 /**
- * Closes a context like the Browser library does: the trace is saved first, and closing the context writes the
- * HAR file of a context made with recordHar (Playwright saves neither when only the browser is closed).
- * The trace is saved only in the test's results folder and not attached to the HTML report.
+ * Closes a context like the Browser library does: closing the context writes the HAR file of a context made with
+ * recordHar (Playwright doesn't save it when only the browser is closed). Playwright closes the test's own context.
  */
 async function closeContextEntry(entry: ContextEntry): Promise<void> {
-  if (entry.tracing) {
-    entry.tracing = false;
-    await entry.context.tracing.stop({ path: testInfo().outputPath(`trace-${entry.id}.zip`) });
+  if (!entry.owned) {
+    return;
   }
   await entry.context.close();
   if (entry.harPath != null) {
@@ -273,7 +281,9 @@ async function closeBrowserEntry(entry: BrowserEntry): Promise<void> {
       failure ??= err;
     }
   }
-  await entry.browser.close();
+  if (entry.owned) {
+    await entry.browser.close();
+  }
   state.browser = state.browsers.at(-1) ?? null;
   if (failure != null) {
     throw failure;
@@ -290,9 +300,103 @@ onTestEnd(async () => {
   state.browser = null;
   state.timeout = DEFAULT_TIMEOUT;
   state.strict = true;
+  state.testPageOpened = false;
 });
 
+/** Makes a context the current one of its browser, with the Browser library's timeout. */
+function addContextEntry(
+  browser: BrowserEntry,
+  context: BrowserContext,
+  options: { harPath: string | null; owned: boolean }
+): ContextEntry {
+  context.setDefaultTimeout(state.timeout);
+  context.setDefaultNavigationTimeout(state.timeout);
+  const entry: ContextEntry = { id: nextId("context"), context, pages: [], activePage: null, ...options };
+  const track = (page: Page) => {
+    if (!entry.pages.some((known) => known.page === page)) {
+      entry.pages.push({ id: nextId("page"), page });
+    }
+  };
+  for (const page of context.pages()) {
+    track(page);
+  }
+  context.on("page", track);
+  browser.contexts.push(entry);
+  browser.activeContext = entry;
+  return entry;
+}
+
+/** A new context in a browser. With ENABLE_HAR_RECORDING=True it records a HAR file into the test's results. */
+async function newContextEntry(browser: BrowserEntry, options: Record<string, RobotValue>): Promise<ContextEntry> {
+  const contextOptions = { ...options };
+  if (harRecordingEnabled() && contextOptions.recordHar == null) {
+    contextOptions.recordHar = { path: testInfo().outputPath(`context-${state.counter + 1}.har`), content: "embed" };
+  }
+  const context = await browser.browser.newContext(contextOptions);
+  const harPath = typeof contextOptions.recordHar?.path === "string" ? contextOptions.recordHar.path : null;
+  return addContextEntry(browser, context, { harPath, owned: true });
+}
+
+/** A new page in a context, which becomes the current page. */
+async function newPageEntry(context: ContextEntry): Promise<PageEntry> {
+  const page = await context.context.newPage();
+  const entry = context.pages.find((known) => known.page === page) ?? { id: nextId("page"), page };
+  if (!context.pages.includes(entry)) {
+    context.pages.push(entry);
+  }
+  context.activePage = entry;
+  return entry;
+}
+
 const LAUNCHERS = { chromium, firefox, webkit };
+
+/**
+ * Opens the page of a "Set Up … And Open Url" keyword in devices.robot. The first one in a test is the test's own
+ * page (Playwright's `page` fixture), which the project's `use` options in playwright.config.ts make. Each later
+ * one is a new context, a session of its own like a new browser in the Robot suite: in the test's browser, or in a
+ * browser of type `browserName` (Firefox for Django admin), which is closed when the test ends. New contexts get
+ * the project's `use` options too, and `contextOptions` (e.g. extraHTTPHeaders) on top.
+ */
+export async function openTestPage(
+  options: { browserName?: string; contextOptions?: Record<string, RobotValue> } = {}
+): Promise<void> {
+  const fixtures = testFixtures();
+  const contextOptions = options.contextOptions ?? {};
+  const browserName = options.browserName ?? fixtures.browser.browserType().name();
+  let entry: BrowserEntry;
+  if (browserName === fixtures.browser.browserType().name()) {
+    entry = state.browsers.find((candidate) => candidate.browser === fixtures.browser) ?? {
+      id: nextId("browser"),
+      browser: fixtures.browser,
+      contexts: [],
+      activeContext: null,
+      owned: false,
+    };
+    if (!state.browsers.includes(entry)) {
+      state.browsers.push(entry);
+    }
+    state.browser = entry;
+    if (!state.testPageOpened) {
+      state.testPageOpened = true;
+      const context = addContextEntry(entry, fixtures.context, { harPath: null, owned: false });
+      if (contextOptions.extraHTTPHeaders != null) {
+        await fixtures.context.setExtraHTTPHeaders(contextOptions.extraHTTPHeaders);
+      }
+      context.activePage = context.pages.find((known) => known.page === fixtures.page) ?? null;
+      return;
+    }
+  } else {
+    const launcher = LAUNCHERS[browserName as keyof typeof LAUNCHERS];
+    if (launcher == null) {
+      throw new Error(`Unknown browser "${browserName}"`);
+    }
+    // With the run's launch options, so --headed applies too
+    entry = { id: nextId("browser"), browser: await launcher.launch(), contexts: [], activeContext: null, owned: true };
+    state.browsers.push(entry);
+    state.browser = entry;
+  }
+  await newPageEntry(await newContextEntry(entry, contextOptions));
+}
 
 const BOOLEAN_CONTEXT_OPTIONS = new Set([
   "acceptDownloads",
@@ -377,7 +481,13 @@ export const Browser = library("Browser", {
       throw new Error(`Unknown browser "${String(browser)}"`);
     }
     const launched = await launcher.launch({ headless: isTruthy(headless), args: launchArgs });
-    const entry: BrowserEntry = { id: nextId("browser"), browser: launched, contexts: [], activeContext: null };
+    const entry: BrowserEntry = {
+      id: nextId("browser"),
+      browser: launched,
+      contexts: [],
+      activeContext: null,
+      owned: true,
+    };
     state.browsers.push(entry);
     state.browser = entry;
     return entry.id;
@@ -390,28 +500,7 @@ export const Browser = library("Browser", {
     if (state.browser == null) {
       await Browser["New Browser"]();
     }
-    const browser = state.browser as unknown as BrowserEntry;
-    const context = await browser.browser.newContext(options);
-    context.setDefaultTimeout(state.timeout);
-    context.setDefaultNavigationTimeout(state.timeout);
-    // Traces are for local debugging only, so they aren't recorded in CI
-    let tracing = process.env.PW_TRACE === "on";
-    if (tracing && process.env.CI != null) {
-      tracing = false;
-      testInfo().annotations.push({ type: "warning", description: "PW_TRACE=on is ignored in CI" });
-    }
-    if (tracing) {
-      await context.tracing.start({ screenshots: true, snapshots: true });
-    }
-    const harPath = typeof options.recordHar?.path === "string" ? options.recordHar.path : null;
-    const entry: ContextEntry = { id: nextId("context"), context, pages: [], activePage: null, tracing, harPath };
-    context.on("page", (page) => {
-      if (!entry.pages.some((known) => known.page === page)) {
-        entry.pages.push({ id: nextId("page"), page });
-      }
-    });
-    browser.contexts.push(entry);
-    browser.activeContext = entry;
+    const entry = await newContextEntry(state.browser as unknown as BrowserEntry, options);
     return entry.id;
   },
 
@@ -420,15 +509,9 @@ export const Browser = library("Browser", {
     if (state.browser?.activeContext == null) {
       await Browser["New Context"]();
     }
-    const context = currentContext();
-    const page = await context.context.newPage();
-    const entry = context.pages.find((known) => known.page === page) ?? { id: nextId("page"), page };
-    if (!context.pages.includes(entry)) {
-      context.pages.push(entry);
-    }
-    context.activePage = entry;
+    const entry = await newPageEntry(currentContext());
     if (url != null && url !== "") {
-      await page.goto(String(url), { waitUntil: "load", timeout: state.timeout });
+      await entry.page.goto(String(url), { waitUntil: "load", timeout: state.timeout });
     }
     return { page_id: entry.id, video_path: null };
   },
@@ -737,7 +820,7 @@ export const Browser = library("Browser", {
       "assertion_expected",
       "message",
     ]);
-    const locator = typeof selector === "string" ? currentPage().locator(selector) : (selector as Locator);
+    const locator = allElements(selector);
     return verified(() => locator.count(), assertion_operator, assertion_expected, message);
   },
 
