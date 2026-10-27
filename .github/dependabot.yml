@@ -118,6 +118,10 @@ updates:
       timezone: "Europe/Helsinki"
     pull-request-branch-name:
       separator: "-"
+    ignore:
+      # kombu (required by celery) supports only redis<6.5
+      - dependency-name: "redis"
+        versions: [">=6.5"]
     groups:
       python-dependencies:
         patterns:
