@@ -6,7 +6,7 @@ import * as Sentry from "@sentry/nextjs";
 import { captureRouterTransitionStart } from "@sentry/nextjs";
 import { beforeSend, beforeSendTransaction, parseSampleRate } from "ui/src";
 import { env } from "@/env.mjs";
-import { getCustomerRelease } from "@/modules/baseUtils";
+import { SENTRY_APPLICATION_KEY, getCustomerRelease } from "@/modules/baseUtils";
 
 if (env.SENTRY_DSN) {
   const release = getCustomerRelease();
@@ -19,7 +19,7 @@ if (env.SENTRY_DSN) {
     integrations: [
       Sentry.extraErrorDataIntegration({ depth: 3 }),
       thirdPartyErrorFilterIntegration({
-        filterKeys: env.SENTRY_PROJECT ? [env.SENTRY_PROJECT] : [],
+        filterKeys: [SENTRY_APPLICATION_KEY],
         behaviour: "drop-error-if-contains-third-party-frames",
       }),
     ],

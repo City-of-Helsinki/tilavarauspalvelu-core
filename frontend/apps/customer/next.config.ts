@@ -4,7 +4,7 @@ import { join } from "node:path";
 import * as url from "node:url";
 import { withSentryConfig } from "@sentry/nextjs";
 import { CSP_HEADER } from "@ui/modules/baseUtils";
-import { getCustomerRelease } from "@/modules/baseUtils";
+import { SENTRY_APPLICATION_KEY, getCustomerRelease } from "@/modules/baseUtils";
 import i18nconfig from "./next-i18next.config.cjs";
 import { env } from "./src/env.mjs";
 
@@ -127,6 +127,8 @@ export default withSentryConfig(nextConfig, {
   release: {
     name: getCustomerRelease(),
   },
+  // Tags our own code, so thirdPartyErrorFilterIntegration does not drop every error.
+  applicationKey: SENTRY_APPLICATION_KEY,
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
   // Disable sourcemaps because we use nextjs configuration for it
