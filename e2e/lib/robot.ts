@@ -5,8 +5,10 @@
  * `keywords()` wraps each one in a `test.step` titled `module.Keyword Name`, so the Playwright report shows the
  * same keyword tree as the Robot log. Robot variables keep their names as properties of `V`.
  */
+import { existsSync } from "node:fs";
 import { test as base, errors } from "@playwright/test";
-import type { TestInfo } from "@playwright/test";
+import { readFile, writeFile } from "node:fs/promises";
+import type { BrowserContext, Page, Browser as PlaywrightBrowser, TestInfo } from "@playwright/test";
 
 // Robot Framework values are dynamically typed, and a line-by-line port keeps that.
 // oxlint-disable-next-line typescript/no-explicit-any
@@ -39,6 +41,24 @@ export function redact(text: string): string {
     }
   }
   return result;
+}
+
+/** Hides secrets in a HAR file, like in the logs. */
+export async function redactHarFile(path: string): Promise<void> {
+  // A .zip HAR is an archive, not text; the suite writes .har files
+  if (path.endsWith(".zip") || !existsSync(path)) {
+    return;
+  }
+  const text = await readFile(path, "utf8");
+  const hidden = redact(text);
+  if (hidden !== text) {
+    await writeFile(path, hidden);
+  }
+}
+
+/** ENABLE_HAR_RECORDING=True records a HAR file of every browser context (har_recording.robot). */
+export function harRecordingEnabled(): boolean {
+  return process.env.ENABLE_HAR_RECORDING === "True";
 }
 
 export function isSecret(value: unknown): boolean {
@@ -302,8 +322,25 @@ export function onTestEnd(hook: TestEndHook): void {
   testEndHooks.push(hook);
 }
 
-/** The Playwright `test` used by the ported suites. Sets up Robot's per-test state. */
-export const test = base.extend<{ robotTest: undefined }>({
+/** Playwright's browser, context and page of the running test. */
+export interface TestFixtures {
+  browser: PlaywrightBrowser;
+  context: BrowserContext;
+  page: Page;
+}
+
+let currentFixtures: TestFixtures | null = null;
+
+/** The running test's browser, context and page, which `openTestPage` in Browser.ts starts from. */
+export function testFixtures(): TestFixtures {
+  if (currentFixtures == null) {
+    throw new Error("This test has no page: tests that open pages use `test` from lib/robot");
+  }
+  return currentFixtures;
+}
+
+/** The Playwright `test` of tests that open no pages (create_data, selftest). Sets up Robot's per-test state. */
+export const testWithoutBrowser = base.extend<{ robotTest: undefined }>({
   robotTest: [
     async ({ playwright: _playwright }, use, info) => {
       currentTestInfo = info;
@@ -316,6 +353,34 @@ export const test = base.extend<{ robotTest: undefined }>({
         await redactingErrors(() => hook(info));
       }
       currentTestInfo = null;
+    },
+    { auto: true },
+  ],
+});
+
+/**
+ * The Playwright `test` used by the ported suites. It also gives the Browser library keywords Playwright's browser,
+ * context and page, which the project's `use` options in playwright.config.ts make, so traces, screenshots and video
+ * work like in any Playwright test.
+ */
+export const test = testWithoutBrowser.extend<{ robotPage: undefined }>({
+  // ENABLE_HAR_RECORDING=True: the test's context records a HAR file into the test's results folder
+  contextOptions: [
+    async ({ contextOptions }, use, info) => {
+      const path = harRecordingEnabled() ? info.outputPath("context.har") : null;
+      await use(path == null ? contextOptions : { ...contextOptions, recordHar: { path, content: "embed" } });
+      // The context has closed by now, so the file is complete
+      if (path != null) {
+        await redactHarFile(path);
+      }
+    },
+    { scope: "test" },
+  ],
+  robotPage: [
+    async ({ browser, context, page }, use) => {
+      currentFixtures = { browser, context, page };
+      await use(undefined);
+      currentFixtures = null;
     },
     { auto: true },
   ],

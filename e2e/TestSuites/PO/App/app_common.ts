@@ -84,12 +84,10 @@ export const app_common = keywords("app_common", {
   "User Logs Out": async () => {
     await topnav["Click User Menu"]();
     await topnav["Click Logout"]();
-    await BuiltIn["Sleep"]("1s");
   },
 
   "User Confirms Log Out": async () => {
     await topnav["Click Login"]();
-    await BuiltIn["Sleep"]("1s");
 
     // Confirms the logout was success
     await Browser["Wait For Elements State"]("id=social-suomi_fi", "visible");
@@ -107,7 +105,8 @@ export const app_common = keywords("app_common", {
   /** Fails if a notification banner is shown. Use after the banners have loaded. */
   "Verify Notification Banner Message Is Not Visible": async () => {
     let banner_count: RobotValue;
-    // Give a banner a second to render. A failing wait here would take a screenshot in passing tests.
+    // Port: kept on purpose. The banners' query has returned, and when no banner should show there is nothing to
+    // wait for, so a banner that renders a moment late gets a second before the count.
     await BuiltIn["Sleep"]("1s");
     banner_count = await Browser["Get Element Count"]('[data-testid="BannerNotificationList__Notification"]');
     await BuiltIn["Should Be Equal As Integers"](
@@ -125,7 +124,6 @@ export const app_common = keywords("app_common", {
     await topnav["Click Navigation Menu Mobile"]();
     await topnav["Click User Menu Mobile"]();
     await topnav["Click Logout Mobile"]();
-    await BuiltIn["Sleep"]("2s");
   },
 
   "User Confirms Log Out Mobile": async () => {
@@ -169,9 +167,8 @@ export const app_common = keywords("app_common", {
   },
 
   "Admin Goes To Landing Page": async () => {
+    // Go To waits for the page to load
     await Browser["Go To"](V.URL_ADMIN);
-    await BuiltIn["Sleep"]("2s"); // wait for the page to load
-    await Browser["Wait For Load State"]("load", named({ timeout: "15s" }));
     await admin_landingpage["Checks The Admin Landing Page H1"](V.ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN);
   },
 
@@ -219,9 +216,8 @@ export const app_common = keywords("app_common", {
 
   "Admin Navigates To Django Admin": async () => {
     // Default is chrome
+    // Go To waits for the page to load
     await Browser["Go To"](V.URL_DJANGO_ADMIN);
-    await BuiltIn["Sleep"]("2s"); // wait for the page to load
-    await Browser["Wait For Load State"]("load", named({ timeout: "15s" }));
 
     //
     // END OF ADMIN TEST SET UP
@@ -292,7 +288,6 @@ export const app_common = keywords("app_common", {
 
   "Reload Page": async () => {
     await Browser["Reload"]();
-    await BuiltIn["Sleep"]("3s");
     await Browser["Wait For Load State"]("networkidle", named({ timeout: "30s" }));
   },
 

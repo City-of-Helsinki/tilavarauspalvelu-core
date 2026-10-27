@@ -1,16 +1,8 @@
 /**
- * Shared fallback user data for serial/sequential execution.
- * WHEN THESE USERS ARE USED:
- * 1. SEQUENTIAL/SERIAL EXECUTION (docker-test sequential mode):
- * Command: robot --variable FORCE_SINGLE_USER:True TestSuites/Tests_*.robot
- * Behavior: All tests share these hardcoded users
- * 2. AUTOMATIC FALLBACK:
- * When pabot_users.dat value sets fail or PabotLib is unavailable
- * Behavior: System automatically uses these shared users
- * Use case: Error recovery, safety net
- * NOTE: docker-test script implements TWO execution modes:
- * - PARALLEL (pabot): Uses pabot_users.dat → unique users per test
- * - SEQUENTIAL (robot): Uses THIS file → shared users for all tests
+ * Shared user data. The testData fixture (TestSuites/fixtures.ts) uses these users:
+ * - in sequential mode (FORCE_SINGLE_USER=True or one worker), where all tests share them
+ * - in tests without a data set tag, like the notification tests
+ * In parallel runs, the other tests get their own users from pabot_users.dat.
  */
 import { registerVariables, str } from "../../lib/robot";
 

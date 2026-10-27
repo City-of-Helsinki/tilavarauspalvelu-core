@@ -1,5 +1,5 @@
 /** Port of PO/Common/checkout.robot */
-import { Browser } from "../../../lib/Browser";
+import { Browser, currentPage } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
 import { V, exceptionMatches, isTruthy, keywords, named, rethrowSkip, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
@@ -46,17 +46,14 @@ export const checkout = keywords("checkout", {
   },
 
   "Select Payment Method OP": async () => {
-    await Browser["Wait For Elements State"]("css=#OP", "visible");
     await Browser["Click"]("css=#OP");
   },
 
   "Click Submit": async () => {
-    await Browser["Wait For Elements State"]("css=.submit", "visible");
     await Browser["Click"]("css=.submit");
   },
 
   "Click Accept Terms": async () => {
-    await Browser["Wait For Elements State"]("css=#acceptTerms", "visible");
     await Browser["Click"]("css=#acceptTerms");
   },
 
@@ -112,8 +109,7 @@ export const checkout = keywords("checkout", {
     await checkout["Click Accept Terms"]();
     await checkout["Click Submit"]();
     // Submitting the summary goes through the payment back to Varaamo
-    await BuiltIn["Wait Until Keyword Succeeds"]("50s", "500ms", checkout["Url Should Start With"], V.URL_TEST);
-    await Browser["Wait For Load State"]("load", named({ timeout: "50s" }));
+    await currentPage().waitForURL((url) => url.href.startsWith(str(V.URL_TEST)), { timeout: 50_000 });
   },
 
   "Url Should Start With": async (prefix: RobotValue) => {
@@ -126,7 +122,7 @@ export const checkout = keywords("checkout", {
     // The checkout opens on its payment method step
     await Browser["Wait For Elements State"]("css=#OP", "visible", named({ timeout: "30s" }));
     await checkout["Allow All Cookies If Visible"]();
+    // Go To waits for the page to load
     await Browser["Go To"](input_URL);
-    await Browser["Wait For Load State"]("load", named({ timeout: "15s" }));
   },
 });

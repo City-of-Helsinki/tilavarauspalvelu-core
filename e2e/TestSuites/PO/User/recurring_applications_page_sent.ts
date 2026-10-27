@@ -8,7 +8,6 @@ import "../../Resources/serial_users";
 
 export const recurring_applications_page_sent = keywords("recurring_applications_page_sent", {
   "User Checks H1 Of The Sent Page": async () => {
-    await Browser["Get Text"]("h1", "==", "Kiitos hakemuksesta!");
     await custom_keywords["Check Elements Text"]("h1", "Kiitos hakemuksesta!");
   },
 

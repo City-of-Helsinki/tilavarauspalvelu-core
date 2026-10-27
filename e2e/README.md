@@ -45,12 +45,16 @@ Environment variables:
 
 - `WORKERS` (default 5) and `RETRIES` (default 1).
 - `FORCE_SINGLE_USER=True`: all tests use the same shared users. Use it with one worker, like `pnpm test:sequential`.
-- `ENABLE_HAR_RECORDING=True`: writes HAR files to `output/har_files/`.
-- `PW_TRACE=on`: writes traces to the test's results folder (`test-results/<test>/trace-*.zip`, open with
-  `pnpm exec playwright show-trace <file>`), not to the HTML report. It is ignored when `CI` is set.
+- `ENABLE_HAR_RECORDING=True`: writes a HAR file of each browser context into the test's results folder
+  (`test-results/<test>/context*.har`).
+- `PW_TRACE=on` (or another Playwright trace mode, like `retain-on-failure`): records Playwright traces, which the
+  HTML report shows. It is ignored when `CI` is set.
 
-Both files are written when the browser closes. Use them for local debugging only, and don't upload them as CI
-artifacts. Other environment variables don't change the suite's variables, even with the same name (like `BROWSER`).
+Use HAR files and traces for local debugging only, and don't upload them as CI artifacts. Other environment
+variables don't change the suite's variables, even with the same name (like `BROWSER`).
+
+Playwright's own options work too: `--headed` shows the browsers, `--ui` opens the UI mode and `--debug` the
+inspector, e.g. `pnpm exec playwright test --project Tests_user_desktop_FI --headed`.
 
 ## Suites
 
@@ -68,7 +72,7 @@ the runtime offline.
 
 ## Layout
 
-- `TestSuites/Tests_*.spec.ts`: the suites, one file per project.
+- `TestSuites/Tests_*.spec.ts`: the suites, one file per project. They use the `test` of `TestSuites/fixtures.ts`.
 - `TestSuites/PO/{Admin,App,Common,User}/`: page objects. The tests call the workflow keywords in
   `PO/App/app_user.ts`, `app_admin.ts` and `app_common.ts`.
 - `TestSuites/Resources/`: shared keywords (`custom_keywords`, `devices` for the browsers and devices,
@@ -80,9 +84,6 @@ the runtime offline.
   `DateTime`, `OperatingSystem`, `RequestsLibrary` (HTTP) and `PabotLib` (locks and shared values between workers).
 - `tools/`: the checks and the report reader described below. See `tools/README.md` for the rest.
 
-Most files in `TestSuites/` are generated. Change them through the generator or an override, as described in
-`tools/README.md`, not by editing the files.
-
 ### Keywords, variables and tags
 
 - A keyword is called by its name: `await app_common["User Logs In With Suomi Fi"]()`. Each call is a step named
@@ -90,16 +91,20 @@ Most files in `TestSuites/` are generated. Change them through the generator or 
 - Library keywords work the same way: `await Browser["Click"]("id=login")`. Named arguments go in a trailing
   `named()`: `named({ timeout: "10s" })`.
 - Variables are properties of `V`, e.g. `V.CURRENT_USER_HETU`. They are reset before each test.
-- Tags choose the test data. A data set tag like `@desktop-test-data-set-0` picks a user from the section with the
-  same tag in `pabot_users.dat`. A suite tag (`@desktop-suite`, `@admin-suite`, `@combined-suite`,
-  `@android-suite`, `@iphone-suite`) picks the units. `Complete Test Setup From Tags` reads them. Without a matching
-  data set, the test uses the shared users in `serial_users.ts`.
+- Tags choose the test data, through the `testData` fixture in `TestSuites/fixtures.ts`, before the test starts.
+  A data set tag like `@desktop-test-data-set-0` picks the users from the section with the same tag in
+  `pabot_users.dat`, and only one test at a time uses a data set. A data set tag that `pabot_users.dat` doesn't have
+  fails the test. A suite tag (`@desktop-suite`, `@admin-suite`, `@combined-suite`, `@android-suite`,
+  `@iphone-suite`) picks the units. In sequential mode, and in tests without a data set tag, the tests use the shared
+  users in `serial_users.ts`. The fixture sets the variables the keywords read (`V.CURRENT_USER_HETU`, …), and
+  `Complete Test Setup From Tags` logs the users it chose.
 
 ## How it works
 
-- **Parallel runs:** the workers share locks, values and test users through files in a folder of each run's own
-  under `.pabot-shared/`, so a run (or `pnpm selftest`) never touches another run's state. Folders of runs started
-  over a day ago are removed when a run starts. A worker can take a lock it already holds, and releasing a lock it
+- **Parallel runs:** the workers share locks and values through files in a folder of each run's own under
+  `.pabot-shared/`, so a run (or `pnpm selftest`) never touches another run's state. The locks keep a data set's
+  users and a unit's free times to one test at a time, and the values pass the paid booking to the email test.
+  Folders of runs started over a day ago are removed when a run starts. A worker can take a lock it already holds, and releasing a lock it
   doesn't hold fails. Locks a test still holds are released when it ends, and a lock left by a worker that stopped
   is taken over.
 - **Retries:** a failed test is retried once. A skipped test fails the run (`lib/skips-fail-run-reporter.ts`).
@@ -108,24 +113,31 @@ Most files in `TestSuites/` are generated. Change them through the generator or 
 - **My bookings tabs:** `mybookings.Navigate To Cancelled/Past/Upcoming Bookings` focus the tab before clicking it
   and check that it got selected. The HDS tab list slides when a tab gets focus, and on mobile WebKit the slide could
   make a plain click miss.
-- **Browsers:** each test launches its own browsers, and every browser it leaves open is closed after it.
+- **Browsers:** each project's browser and device are in its `use` options in `playwright.config.ts`: Chromium at
+  1440×900 on desktop, Pixel 5 and iPhone 14 on mobile. Playwright starts one browser per worker and gives each test
+  a new context and page, which the "Set Up … And Open Url" keywords in `devices` open. A second one in a test opens
+  a new context, a session of its own; the permission tests open Django admin in Firefox. Whatever a test opens
+  itself is closed after it.
+- **Waiting:** keywords wait for what they need: actions wait for their element, checks use Playwright's `expect`,
+  and navigations wait for the new URL (`waitForURL`). A logout waits for the app's `/auth/logout/` redirect, which
+  comes after the session is destroyed. After a pick from an HDS Select, `Close Select List If Open` closes a list
+  that stayed open (HDS ignores a close within 200 ms of opening). Fixed sleeps are left only where nothing on the
+  page tells when to go on: the 3-minute wait for the test data, the wait for the paid booking test, the pause
+  between login click retries, and a second for banners before a "no banner" check. The config's `baseURL` is the
+  test environment, so Playwright code can open pages with `page.goto("/…")`.
 - **Reports:** the HTML report shows the keyword steps of each test, and `test-results/junit.xml` is for CI
-  summaries. `Complete Test Teardown` attaches a screenshot when a test fails.
+  summaries. A failed test has a screenshot of each open page and a video of its own page.
 
 ## Checks without the test environment
 
 ```bash
 pnpm lint      # oxlint with type checking, with the frontend's rules
-pnpm parity    # names and keyword flows match tools/naming-manifest.json
-pnpm selftest  # the runtime and the keywords that need no test environment, against local data: pages
+pnpm parity    # the names match tools/naming-manifest.json
+pnpm selftest  # the runtime and the keywords that need no test environment, against local pages
 ```
 
-`pnpm parity` checks the names of the suites, tests, tags, keywords, keyword arguments and variables. It also checks
-the flow of every test and keyword:
-
-- the keyword calls in order
-- the variables each call's arguments use
-- every variable a test or keyword sets for the rest of the test
+`pnpm parity` checks the names of the suites, tests, tags, keywords, keyword arguments and variables, the tests'
+documentation and the values of plain variables.
 
 ## Reading a run's results
 

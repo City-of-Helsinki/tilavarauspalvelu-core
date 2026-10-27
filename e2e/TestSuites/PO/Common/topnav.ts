@@ -1,7 +1,7 @@
 /** A resource file with top navigation keywords. */
-import { Browser } from "../../../lib/Browser";
+import { Browser, currentPage, loc } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, keywords, named, str } from "../../../lib/robot";
+import { V, expect, keywords, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { mybookings } from "../../PO/User/mybookings";
 import { custom_keywords } from "../../Resources/custom_keywords";
@@ -9,51 +9,53 @@ import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
 
+/**
+ * Clicks a logout button and waits until the logout is done: signOut (packages/ui) ends on the app's /auth/logout/,
+ * which redirects back to the app after the session is destroyed.
+ */
+async function clickAndWaitForLogout(logout_button: string): Promise<void> {
+  const page = currentPage();
+  const app_host = new URL(page.url()).host;
+  // Waiting together, so a failed click doesn't leave the response wait unhandled
+  await Promise.all([
+    page.waitForResponse((response) => new URL(response.url()).pathname.endsWith("/auth/logout/"), {
+      timeout: 30_000,
+    }),
+    Browser["Click"](logout_button),
+  ]);
+  await page.waitForURL((url) => url.host === app_host && !url.pathname.endsWith("/auth/logout/"));
+}
+
 export const topnav = keywords("topnav", {
   "Click Login": async () => {
-    await Browser["Wait For Elements State"]("id=login", "stable");
     await Browser["Click"]("id=login");
   },
 
   "Click Login Admin Side": async () => {
     await Browser["Wait For Elements State"]("h1", "visible");
     await Browser["Click"](`button >> span:text-is("${str(V.LOGIN_TEXT_ADMIN)}") >> nth=-1`);
-    await BuiltIn["Sleep"]("1s");
   },
 
   "Click Logout": async () => {
-    await BuiltIn["Sleep"]("1s");
-    await Browser["Wait For Elements State"]('css=[aria-label="Kirjaudu ulos"]', "stable");
-    await Browser["Click"]('css=[aria-label="Kirjaudu ulos"]');
-    await BuiltIn["Sleep"]("3s"); // wait for the page to load
+    await clickAndWaitForLogout('css=[aria-label="Kirjaudu ulos"]');
   },
 
   "Click Logout Admin Side": async () => {
-    await BuiltIn["Sleep"]("1s");
-    await Browser["Wait For Elements State"]('css=[aria-label="signout"]', "visible");
-    await Browser["Click"]('css=[aria-label="signout"]');
-    await BuiltIn["Sleep"]("3s"); // wait for the page to load
+    await clickAndWaitForLogout('css=[aria-label="signout"]');
   },
 
   "Click User Menu": async () => {
-    await Browser["Wait For Elements State"]("id=user-menu", "stable");
     await Browser["Click"]("id=user-menu");
-    await BuiltIn["Sleep"]("1s");
   },
 
   "Click Close Navigation Menu": async () => {
-    await Browser["Wait For Elements State"]("id=Menu", "stable");
     await Browser["Click"]("id=Menu");
-    await BuiltIn["Sleep"]("1s");
   },
 
   "Check Dropdown Menu Has User Info": async (name: RobotValue) => {
-    let Topnav_Login_Button_Text: RobotValue;
     // DEVNOTE Enable this when the profile bug no longer empties the name info
-    Topnav_Login_Button_Text = await Browser["Get Text"](`id=user-menu:text-is("${str(name)}")`);
-    await BuiltIn["Log"](Topnav_Login_Button_Text);
     await BuiltIn["Log"](name);
-    await BuiltIn["Should Be Equal"](Topnav_Login_Button_Text, name);
+    await expect(loc("id=user-menu")).toHaveText(str(name), { useInnerText: true });
   },
 
   "Navigate To Single Booking Page": async () => {
@@ -73,12 +75,12 @@ export const topnav = keywords("topnav", {
 
   "Navigate To Recurring Booking Page": async () => {
     await Browser["Click"](`header >> [href="/recurring"]:text-is("${str(V.RECURRING_BOOKINGS_FI)}")`);
-    await BuiltIn["Sleep"]("4s");
+    await currentPage().waitForURL((url) => url.pathname === "/recurring");
   },
 
   "Navigate To My Applications": async () => {
     await Browser["Click"](`header >> [href="/applications"]:text-is("${str(V.MYAPPLICATIONS_FI)}")`);
-    await BuiltIn["Sleep"]("4s");
+    await currentPage().waitForURL((url) => url.pathname === "/applications");
 
     //
     // MOBILE UI
@@ -86,34 +88,25 @@ export const topnav = keywords("topnav", {
   },
 
   "Click Navigation Menu Mobile": async () => {
-    await Browser["Wait For Elements State"]("id=Menu", "visible");
+    // The clicks in the menu wait until its animation has ended
     await Browser["Click"]("id=Menu");
-    await BuiltIn["Sleep"]("1s"); // wait for animation to complete
   },
 
   "Click User Menu Mobile": async () => {
     await Browser["Click"]("id=user-menu");
-    await BuiltIn["Sleep"]("1s"); // wait for animation to complete
   },
 
   "Click Login Mobile": async () => {
-    await Browser["Wait For Elements State"]("id=login", "visible");
     await Browser["Click"]("id=login");
-    await BuiltIn["Sleep"]("2s"); // wait for the page to load
-    await Browser["Wait For Load State"]("load", named({ timeout: "15s" }));
   },
 
   "Click Logout Mobile": async () => {
-    await Browser["Wait For Elements State"]('css=[aria-label="Kirjaudu ulos"]', "visible");
-    await Browser["Click"]('css=[aria-label="Kirjaudu ulos"]');
-    await BuiltIn["Sleep"]("2s"); // wait for the page to load
-    await Browser["Wait For Load State"]("load", named({ timeout: "15s" }));
+    await clickAndWaitForLogout('css=[aria-label="Kirjaudu ulos"]');
   },
 
   "Click Tablist Scroll Button To Right Mobile": async () => {
-    await Browser["Wait For Elements State"]("[class*=Tabs-module_scrollButton__]", "visible");
+    // The next click waits until the tab list has stopped sliding
     await Browser["Click"]('[class*=Tabs-module_scrollButton__] >> [aria-label="angle-right"]');
-    await BuiltIn["Sleep"]("1.5s"); // wait for the animation to complete
     // Check menu has user info mobile
     // DEVNOTE - Waiting for fixes for the test environment from another team
     // this step will be enabled when the test environment is fixed
@@ -134,10 +127,10 @@ export const topnav = keywords("topnav", {
 
   "Navigate To Single Booking Page Mobile": async () => {
     await Browser["Click"]("id=Menu");
-    await BuiltIn["Sleep"]("1s"); // wait for animation to complete
-    await Browser["Click"](`header >> [href="/search"]:text-is("${str(V.SINGLEBOOKING_FI)}")`);
-    await BuiltIn["Sleep"]("3s");
-    await Browser["Wait For Load State"]("load", named({ timeout: "15s" }));
+    await custom_keywords["Click And Wait For Page"](
+      `header >> [href="/search"]:text-is("${str(V.SINGLEBOOKING_FI)}")`,
+      "/search"
+    );
   },
 
   "Navigate To My Bookings Mobile": async () => {

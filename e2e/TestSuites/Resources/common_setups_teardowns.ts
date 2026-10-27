@@ -4,10 +4,8 @@
  */
 import { Browser } from "../../lib/Browser";
 import { BuiltIn } from "../../lib/BuiltIn";
-import { keywords, robot, str } from "../../lib/robot";
+import { V, keywords, robot, str } from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
-import { parallel_test_data } from "../Resources/parallel_test_data";
-import { suite_unit_selector } from "../Resources/suite_unit_selector";
 import "../Resources/suite_specific_units";
 import "../Resources/variables";
 import "../Resources/serial_users";
@@ -34,15 +32,20 @@ export const common_setups_teardowns = keywords("common_setups_teardowns", {
   "Complete Test Setup From Tags": async () => {
     let test_name: RobotValue;
     test_name = robot.TEST_NAME ?? "unknown_test";
-    await BuiltIn["Log"](`🚀 Starting tag-based setup for: ${str(test_name)}`);
-
-    // Initialize suite-specific units from tags
-    await suite_unit_selector["Initialize Suite Units From Tags"]();
-
-    // Initialize test data (users) from tags
-    await parallel_test_data["Initialize Test Data From Tags"]();
-
-    await BuiltIn["Log"]("✓ Test setup completed successfully");
+    // Port: the testData fixture (TestSuites/fixtures.ts) chose the users and units from the tags before the test
+    // started; this logs them
+    await BuiltIn["Log"](`🚀 Test data for: ${str(test_name)}`);
+    await BuiltIn["Log"](`🏷️ Tags: ${str(robot.TEST_TAGS)}`);
+    for (const name of [
+      "CURRENT_USER_FULLNAME",
+      "ADMIN_CURRENT_USER_FULLNAME",
+      "DJANGO_ADMIN_FULLNAME",
+      "PERMISSION_TARGET_ADMIN_FULLNAME",
+    ]) {
+      if (str(V[name] ?? "") !== "") {
+        await BuiltIn["Log"](`👤 ${name}: ${str(V[name])}`);
+      }
+    }
 
     // =============================================================================
     // TEST TEARDOWN
@@ -51,12 +54,11 @@ export const common_setups_teardowns = keywords("common_setups_teardowns", {
 
   /** Complete teardown with session cleanup */
   "Complete Test Teardown": async () => {
-    // Always take screenshot on failure, after giving the page a moment to settle
-    await BuiltIn["Run Keyword If Test Failed"](BuiltIn["Sleep"], "2s");
-    await BuiltIn["Run Keyword If Test Failed"](Browser["Take Screenshot"], "EMBED");
+    // Port: Playwright takes the failure screenshots of the open pages when the test fails (screenshot:
+    // "only-on-failure" in playwright.config.ts), so there's no Sleep and Take Screenshot here
+    // imports: Browser
 
-    // Cleanup process
-    await parallel_test_data["Release Test Data"]();
+    // Cleanup process (the testData fixture releases the data set)
     await BuiltIn["Run Keyword And Ignore Error"](Browser["Close Browser"]);
   },
 });

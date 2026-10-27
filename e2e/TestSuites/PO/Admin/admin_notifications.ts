@@ -10,11 +10,6 @@ import "../../Resources/parallel_test_data";
 
 export const admin_notifications = keywords("admin_notifications", {
   "Admin Clicks Create Notification Button": async () => {
-    await Browser["Wait For Elements State"](
-      '[href="/kasittely/notifications/new"]',
-      "visible",
-      named({ timeout: "15s" })
-    );
     await Browser["Click"]('[href="/kasittely/notifications/new"]');
     await Browser["Wait For Elements State"](
       '[data-testid="Notification__Page--publish-button"]',

@@ -1,7 +1,7 @@
 /** Port of PO/User/singlebooking.robot */
-import { Browser } from "../../../lib/Browser";
+import { Browser, loc } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
-import { isTruthy, keywords, named, str } from "../../../lib/robot";
+import { expect, isTruthy, keywords, named, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 
 export const singlebooking = keywords("singlebooking", {
@@ -18,11 +18,8 @@ export const singlebooking = keywords("singlebooking", {
   },
 
   "Click Searched Unit": async (searched_text: RobotValue) => {
-    let searched_list_element: RobotValue;
-    await BuiltIn["Sleep"]("2s");
-    searched_list_element = await Browser["Get Text"]('[data-testid="list-with-pagination__list--container"] >> h2');
-    await BuiltIn["Log"](searched_list_element);
-    await BuiltIn["Should Be Equal"](searched_list_element, searched_text);
+    // Port: expect waits until the search results are the searched unit only
+    await expect(loc('[data-testid="list-with-pagination__list--container"] >> h2')).toHaveText([str(searched_text)]);
     await Browser["Click"](`h2 >> '${str(searched_text)}'`);
   },
 
@@ -42,11 +39,8 @@ export const singlebooking = keywords("singlebooking", {
     if (!isTruthy(search_visible)) {
       await BuiltIn["Log"]("Search input is not visible. Clicking advanced search");
       // Tää ei klikkaa oikeasti
-      await Browser["Wait For Elements State"]('[data-testid="show-all__toggle-button"]', "visible");
       await Browser["Click"]('[data-testid="show-all__toggle-button"]');
-      // Wait for animation
-      await BuiltIn["Sleep"]("1s");
-      await Browser["Wait For Elements State"]("id=search", "visible", named({ timeout: "5s" }));
+      await expect(loc("id=search")).toBeVisible({ timeout: 5000 });
     } else {
       await BuiltIn["Log"]("Search input is visible. No further action required.");
     }
