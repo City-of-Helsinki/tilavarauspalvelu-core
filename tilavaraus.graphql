@@ -717,6 +717,11 @@ type ApplicationRoundNode implements Node {
   isSettingHandledAllowed: Boolean!
   applicationsCount: Int!
   reservationUnitCount: Int!
+
+  """
+  Price options that the applicant can select for each application section. Computed for each round, so query this only for a few rounds at a time.
+  """
+  priceOptions: [PriceOptionNode!]!
   pk: Int
 }
 
@@ -1843,6 +1848,7 @@ type ApplicationSectionNode implements Node {
   application: ApplicationNode!
   purpose: ReservationPurposeNode
   ageGroup: AgeGroupNode
+  priceOption: PriceOptionNode
   reservationUnitOptions(
     pk: [Int]
     preferredOrder: [Int]
@@ -2024,6 +2030,21 @@ type ReservationPurposeNode implements Node {
 type AgeGroupNode implements Node {
   minimum: Int!
   maximum: Int
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type PriceOptionNode implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  isActive: Boolean!
+  unitGroup: UnitGroupNode!
 
   """The ID of the object"""
   id: ID!
@@ -2473,21 +2494,6 @@ type PriceComponentNode implements Node {
 enum PriceComponentKind {
   """Base"""
   BASE
-}
-
-type PriceOptionNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  isActive: Boolean!
-  unitGroup: UnitGroupNode!
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
 }
 
 type PriceSummaryType {
@@ -3387,6 +3393,7 @@ input ApplicationSectionForApplicationSerializerInput {
   appliedReservationsPerWeek: Int!
   purpose: Int
   ageGroup: Int
+  priceOption: Int
   reservationUnitOptions: [ReservationUnitOptionApplicantSerializerInput]!
   suitableTimeRanges: [SuitableTimeRangeSerializerInput]!
 }
@@ -3471,6 +3478,7 @@ input UpdateApplicationSectionForApplicationSerializerInput {
   appliedReservationsPerWeek: Int
   purpose: Int
   ageGroup: Int
+  priceOption: Int
   reservationUnitOptions: [UpdateReservationUnitOptionApplicantSerializerInput]
   suitableTimeRanges: [UpdateSuitableTimeRangeSerializerInput]
 }
@@ -3527,6 +3535,7 @@ type ApplicationSectionCreateMutationPayload {
   application: Int
   purpose: Int
   ageGroup: Int
+  priceOption: Int
   reservationUnitOptions: [ReservationUnitOptionNode]
   suitableTimeRanges: [SuitableTimeRangeNode]
 }
@@ -3543,6 +3552,7 @@ input ApplicationSectionCreateMutationInput {
   application: Int!
   purpose: Int
   ageGroup: Int
+  priceOption: Int
   reservationUnitOptions: [ReservationUnitOptionApplicantSerializerInput]!
   suitableTimeRanges: [SuitableTimeRangeSerializerInput]!
 }
@@ -3559,6 +3569,7 @@ type ApplicationSectionUpdateMutationPayload {
   application: Int
   purpose: Int
   ageGroup: Int
+  priceOption: Int
   reservationUnitOptions: [ReservationUnitOptionNode]
   suitableTimeRanges: [SuitableTimeRangeNode]
 }
@@ -3575,6 +3586,7 @@ input ApplicationSectionUpdateMutationInput {
   application: Int
   purpose: Int
   ageGroup: Int
+  priceOption: Int
   reservationUnitOptions: [UpdateReservationUnitOptionApplicantSerializerInput]
   suitableTimeRanges: [UpdateSuitableTimeRangeSerializerInput]
 }

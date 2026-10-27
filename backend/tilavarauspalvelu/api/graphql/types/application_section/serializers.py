@@ -19,6 +19,7 @@ from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationCan
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection, Reservation
+from tilavarauspalvelu.services.pricing.application_round_options import application_round_price_options
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.typing import error_codes
 from utils.utils import comma_sep_str
@@ -26,6 +27,7 @@ from utils.utils import comma_sep_str
 if TYPE_CHECKING:
     import datetime
 
+    from tilavarauspalvelu.models import PriceOption
     from tilavarauspalvelu.typing import AnyUser
 
 
@@ -54,6 +56,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             "application",
             "purpose",
             "age_group",
+            "price_option",
             "reservation_unit_options",
             "suitable_time_ranges",
         ]
@@ -95,6 +98,8 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
         if errors:
             raise ValidationError(errors)
+
+        self.validate_price_option_is_offered(data)
 
         return data
 
@@ -226,6 +231,30 @@ class ApplicationSectionSerializer(NestingModelSerializer):
         if reservation_period["reservation_period_end_date"] < reservations_end_date:
             msg = "Reservations end date cannot be after the application round's reservation period end date."
             errors.append(msg)
+
+    def validate_price_option_is_offered(self, data: dict[str, Any]) -> None:
+        price_option: PriceOption | None = data.get("price_option")
+        if price_option is None:
+            return
+
+        application_round = self.find_application_round(data)
+        offered_options = application_round_price_options(application_round)
+        if price_option not in offered_options:
+            msg = f"Price option {price_option.pk} is not offered by the application round."
+            raise ValidationError(msg, code=error_codes.APPLICATION_SECTION_PRICE_OPTION_NOT_OFFERED)
+
+    def find_application_round(self, data: dict[str, Any]) -> ApplicationRound:
+        application: Application | NotProvided = self.get_or_default("application", data)
+        if application is not NotProvided:
+            return application.application_round
+
+        # Creating/updating application with application section
+        parent_serializer = self.parent.parent
+        application_round = parent_serializer.get_or_default("application_round", parent_serializer.initial_data)
+        if isinstance(application_round, ApplicationRound):
+            return application_round
+
+        return ApplicationRound.objects.get(pk=application_round)
 
 
 class ApplicationSectionForApplicationSerializer(ApplicationSectionSerializer):
