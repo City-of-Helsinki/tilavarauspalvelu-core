@@ -36,7 +36,8 @@ def application_round_price_options(application_round: ApplicationRound) -> list
 
     A round offers an option if the pricing groups of all its reservation units offer it
     on every day of the reservation period. A group offers an option on a date if it has
-    an active base component for that option.
+    an active base component for that option. An active base component without an option
+    offers every active option of the group's unit group.
     """
     reservation_unit_pks = list(application_round.reservation_units.values_list("pk", flat=True))
     round_pricing = _load_round_pricing(
@@ -134,14 +135,16 @@ def check_pricing_change_keeps_round_options(
         other_group_components = [
             component for component in saved_pricing.components if component.pricing_group_id != pricing_group.pk
         ]
-        changed_group_components = [component for component in components if _offers_option(component)]
+        changed_group_components = [component for component in components if component.kind == PriceComponentKind.BASE]
+        new_components = [*other_group_components, *changed_group_components]
 
         new_pricing = _RoundPricing(
             reservation_unit_pks=saved_pricing.reservation_unit_pks,
             period_begin=saved_pricing.period_begin,
             period_end=saved_pricing.period_end,
             rows=[*other_group_rows, *changed_group_rows],
-            components=[*other_group_components, *changed_group_components],
+            components=new_components,
+            implicit_options=_load_implicit_options(new_components),
         )
 
         round_errors = [
@@ -165,7 +168,8 @@ class _RoundPricing:
     period_begin: datetime.date
     period_end: datetime.date  # Inclusive
     rows: list[ReservationUnitPricingGroup]
-    components: list[PriceComponent]  # Base components with a price option
+    components: list[PriceComponent]  # Base components
+    implicit_options: dict[int, list[PriceOption]]  # Active options by unit group, for components without an option
 
 
 def _load_round_pricing(
@@ -183,10 +187,9 @@ def _load_round_pricing(
         .filter(
             pricing_group__in=pricing_group_pks,
             kind=PriceComponentKind.BASE,
-            price_option__isnull=False,
             valid_from__lte=period_end,
         )
-        .select_related("price_option")
+        .select_related("price_option", "pricing_group")
     )
 
     return _RoundPricing(
@@ -195,16 +198,26 @@ def _load_round_pricing(
         period_end=period_end,
         rows=rows,
         components=components,
+        implicit_options=_load_implicit_options(components),
     )
+
+
+def _load_implicit_options(components: Iterable[PriceComponent]) -> dict[int, list[PriceOption]]:
+    unit_group_pks = {
+        component.pricing_group.unit_group_id
+        for component in components
+        if component.price_option_id is None and component.pricing_group.unit_group_id is not None
+    }
+
+    implicit_options: dict[int, list[PriceOption]] = {}
+    for option in PriceOption.objects.filter(unit_group__in=unit_group_pks, is_active=True):
+        implicit_options.setdefault(option.unit_group_id, []).append(option)
+    return implicit_options
 
 
 def _reservations_are_pending(application_round: ApplicationRound) -> bool:
     status = application_round.reservation_creation_status
     return status != ApplicationRoundReservationCreationStatusChoice.COMPLETED
-
-
-def _offers_option(component: PriceComponent) -> bool:
-    return component.kind == PriceComponentKind.BASE and component.price_option_id is not None
 
 
 def _check_consistency(round_pricing: _RoundPricing) -> list[RoundOptionError]:
@@ -285,12 +298,21 @@ def _option_sets_by_reservation_unit(round_pricing: _RoundPricing) -> dict[int, 
         for day in days:
             row = _row_on_day(rows=rows, day=day)
             components = [] if row is None else components_by_pricing_group.get(row.pricing_group_id, [])
-            options = frozenset(
-                component.price_option_id
+            active_components = [
+                component
                 for component in components
                 if component.valid_from <= day and (component.valid_until is None or component.valid_until > day)
-            )
-            daily_options.append(options)
+            ]
+            options: set[int] = set()
+            for component in active_components:
+                if component.price_option_id is not None:
+                    options.add(component.price_option_id)
+                    continue
+
+                unit_group_options = round_pricing.implicit_options.get(component.pricing_group.unit_group_id, [])
+                options.update(option.pk for option in unit_group_options)
+
+            daily_options.append(frozenset(options))
 
         option_sets[reservation_unit_pk] = daily_options
 
@@ -313,7 +335,11 @@ def _days(round_pricing: _RoundPricing) -> list[datetime.date]:
 
 
 def _option_names(round_pricing: _RoundPricing) -> dict[int, str]:
-    return {component.price_option_id: component.price_option.name for component in round_pricing.components}
+    option_names = {option.pk: option.name for options in round_pricing.implicit_options.values() for option in options}
+    for component in round_pricing.components:
+        if component.price_option is not None:
+            option_names[component.price_option_id] = component.price_option.name
+    return option_names
 
 
 def _describe(option_pks: Collection[int], option_names: dict[int, str]) -> str:
