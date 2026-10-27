@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
         AgeGroup,
         Application,
+        PriceOption,
         ReservationPurpose,
         ReservationUnitOption,
         SuitableTimeRange,
@@ -76,6 +77,13 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         "tilavarauspalvelu.AgeGroup",
         related_name="application_sections",
         on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    price_option: PriceOption | None = models.ForeignKey(
+        "tilavarauspalvelu.PriceOption",
+        related_name="application_sections",
+        on_delete=models.PROTECT,
         blank=True,
         null=True,
     )
