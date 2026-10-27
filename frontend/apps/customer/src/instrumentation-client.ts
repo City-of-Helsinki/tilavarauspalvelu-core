@@ -21,6 +21,7 @@ if (env.SENTRY_DSN) {
       thirdPartyErrorFilterIntegration({
         filterKeys: [SENTRY_APPLICATION_KEY],
         behaviour: "drop-error-if-exclusively-contains-third-party-frames",
+        ignoreSentryInternalFrames: true,
       }),
     ],
     dsn: env.SENTRY_DSN,
