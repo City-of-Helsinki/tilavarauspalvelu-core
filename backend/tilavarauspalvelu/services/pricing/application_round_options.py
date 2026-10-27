@@ -20,6 +20,7 @@ __all__ = [
     "RoundOptionError",
     "application_round_price_options",
     "check_application_round_change",
+    "check_price_option_change_keeps_round_options",
     "check_pricing_change_keeps_round_options",
 ]
 
@@ -147,14 +148,63 @@ def check_pricing_change_keeps_round_options(
             implicit_options=_load_implicit_options(new_components),
         )
 
-        round_errors = [
-            *_check_consistency(new_pricing),
-            *_check_no_lost_options(saved_pricing=saved_pricing, new_pricing=new_pricing),
-        ]
-        errors += [
-            RoundOptionError(code=error.code, message=f"Application round '{application_round.name}': {error.message}")
-            for error in round_errors
-        ]
+        errors += _check_round_change(
+            round_name=application_round.name,
+            saved_pricing=saved_pricing,
+            new_pricing=new_pricing,
+        )
+
+    return errors
+
+
+def check_price_option_change_keeps_round_options(price_option: PriceOption) -> list[RoundOptionError]:
+    """
+    Check a new or changed price option against the application rounds whose reservations are not made yet.
+
+    A base component without an option offers every active option of its unit group.
+    So a new, deactivated or moved option can change the options of a round.
+    Each such round must stay consistent and must not lose any of the options it offers.
+
+    :param price_option: The price option with its new values, not saved yet. No pk for a new option.
+    """
+    unit_group_pks = {price_option.unit_group_id}
+    if price_option.pk is not None:
+        saved_option = PriceOption.objects.get(pk=price_option.pk)
+        unit_group_pks.add(saved_option.unit_group_id)
+
+    rounds_using_unit_groups = ApplicationRound.objects.filter(
+        reservation_units__reservation_unit_pricing_groups__pricing_group__unit_group__in=unit_group_pks,
+    )
+    application_rounds = (
+        ApplicationRound.objects
+        .filter(pk__in=rounds_using_unit_groups.values("pk"))
+        .exclude(L(reservation_creation_status=ApplicationRoundReservationCreationStatusChoice.COMPLETED))
+        .order_by("pk")
+    )
+
+    errors: list[RoundOptionError] = []
+    for application_round in application_rounds:
+        round_reservation_unit_pks = list(application_round.reservation_units.values_list("pk", flat=True))
+        saved_pricing = _load_round_pricing(
+            reservation_unit_pks=round_reservation_unit_pks,
+            period_begin=application_round.reservation_period_begin_date,
+            period_end=application_round.reservation_period_end_date,
+        )
+
+        implicit_options = {
+            unit_group_pk: [option for option in options if option.pk != price_option.pk]
+            for unit_group_pk, options in saved_pricing.implicit_options.items()
+        }
+        if price_option.is_active and price_option.unit_group_id in implicit_options:
+            implicit_options[price_option.unit_group_id].append(price_option)
+
+        new_pricing = dataclasses.replace(saved_pricing, implicit_options=implicit_options)
+
+        errors += _check_round_change(
+            round_name=application_round.name,
+            saved_pricing=saved_pricing,
+            new_pricing=new_pricing,
+        )
 
     return errors
 
@@ -218,6 +268,22 @@ def _load_implicit_options(components: Iterable[PriceComponent]) -> dict[int, li
 def _reservations_are_pending(application_round: ApplicationRound) -> bool:
     status = application_round.reservation_creation_status
     return status != ApplicationRoundReservationCreationStatusChoice.COMPLETED
+
+
+def _check_round_change(
+    *,
+    round_name: str,
+    saved_pricing: _RoundPricing,
+    new_pricing: _RoundPricing,
+) -> list[RoundOptionError]:
+    round_errors = [
+        *_check_consistency(new_pricing),
+        *_check_no_lost_options(saved_pricing=saved_pricing, new_pricing=new_pricing),
+    ]
+    return [
+        RoundOptionError(code=error.code, message=f"Application round '{round_name}': {error.message}")
+        for error in round_errors
+    ]
 
 
 def _check_consistency(round_pricing: _RoundPricing) -> list[RoundOptionError]:
