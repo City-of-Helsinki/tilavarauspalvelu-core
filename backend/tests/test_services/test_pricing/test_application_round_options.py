@@ -110,13 +110,43 @@ def test_round_price_options__inactive_option_is_offered():
     assert application_round_price_options(application_round) == [adults]
 
 
-def test_round_price_options__component_for_all_options_offers_no_option():
-    pricing_group = PricingGroupFactory.create()
+def test_round_price_options__component_without_option_offers_active_unit_group_options():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
+    juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
+    PriceOptionFactory.create(unit_group=unit_group, is_active=False)
+    PriceOptionFactory.create()
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=None, valid_from=JAN_1)
+
+    application_round = create_round([create_unit_using(pricing_group)])
+
+    assert application_round_price_options(application_round) == [adults, juniors]
+
+
+def test_round_price_options__own_group_component_without_option_offers_no_option():
+    pricing_group = PricingGroupFactory.create(unit_group=None)
     PriceComponentFactory.create(pricing_group=pricing_group, price_option=None, valid_from=JAN_1)
 
     application_round = create_round([create_unit_using(pricing_group)])
 
     assert application_round_price_options(application_round) == []
+
+
+def test_round_price_options__explicit_and_implicit_options_match():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
+    juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
+
+    explicit_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=explicit_group, price_option=adults, valid_from=JAN_1)
+    PriceComponentFactory.create(pricing_group=explicit_group, price_option=juniors, valid_from=JAN_1)
+    implicit_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=implicit_group, price_option=None, valid_from=JAN_1)
+
+    application_round = create_round([create_unit_using(explicit_group), create_unit_using(implicit_group)])
+
+    assert application_round_price_options(application_round) == [adults, juniors]
 
 
 def test_round_price_options__groups_with_different_options():
@@ -171,7 +201,7 @@ def test_round_price_options__pricing_group_changes_during_period():
 
     first_group = PricingGroupFactory.create(unit_group=unit_group)
     PriceComponentFactory.create(pricing_group=first_group, price_option=adults, valid_from=JAN_1)
-    second_group = PricingGroupFactory.create(unit_group=unit_group)
+    second_group = PricingGroupFactory.create(unit_group=None)
     PriceComponentFactory.create(pricing_group=second_group, price_option=None, valid_from=JAN_1)
 
     reservation_unit = create_unit_using(first_group)
@@ -241,9 +271,10 @@ def test_round_change__new_round_with_different_options():
 def test_round_change__new_round_with_option_for_part_of_period():
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
+    juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     PriceComponentFactory.create(pricing_group=pricing_group, price_option=adults, valid_from=JUN_1)
-    PriceComponentFactory.create(pricing_group=pricing_group, price_option=None, valid_from=JAN_1, valid_until=JUN_1)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=juniors, valid_from=JAN_1)
 
     reservation_unit = create_unit_using(pricing_group)
 
@@ -255,8 +286,8 @@ def test_round_change__new_round_with_option_for_part_of_period():
     )
 
     message = (
-        f"Reservation unit {reservation_unit.pk} has price options 'Adults' on 2027-06-01, "
-        f"but reservation unit {reservation_unit.pk} has (none) on 2027-05-01. "
+        f"Reservation unit {reservation_unit.pk} has price options 'Adults', 'Juniors' on 2027-06-01, "
+        f"but reservation unit {reservation_unit.pk} has 'Juniors' on 2027-05-01. "
         f"All reservation units must have the same price options for the whole reservation period."
     )
     assert errors == [RoundOptionError(code=error_codes.APPLICATION_ROUND_PRICE_OPTIONS_INCONSISTENT, message=message)]
@@ -357,6 +388,26 @@ def test_pricing_change__option_added_to_only_group():
     assert errors == []
 
 
+def test_pricing_change__explicit_options_replaced_by_component_without_option():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group)
+    juniors = PriceOptionFactory.create(unit_group=unit_group)
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=adults, valid_from=JAN_1)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=juniors, valid_from=JAN_1)
+
+    create_round([create_unit_using(pricing_group)])
+
+    component_for_all = PriceComponentFactory.build(pricing_group=pricing_group, price_option=None, valid_from=JAN_1)
+    errors = check_pricing_change_keeps_round_options(
+        pricing_group=pricing_group,
+        components=[component_for_all],
+        reservation_unit_rows=None,
+    )
+
+    assert errors == []
+
+
 def test_pricing_change__option_added_to_one_of_two_groups():
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
@@ -391,7 +442,7 @@ def test_pricing_change__reservation_unit_moves_to_group_without_option():
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     shared_group = PricingGroupFactory.create(unit_group=unit_group)
     PriceComponentFactory.create(pricing_group=shared_group, price_option=adults, valid_from=JAN_1)
-    other_group = PricingGroupFactory.create(unit_group=unit_group)
+    other_group = PricingGroupFactory.create(unit_group=None)
     other_component = PriceComponentFactory.create(pricing_group=other_group, price_option=None, valid_from=JAN_1)
 
     reservation_unit = create_unit_using(shared_group)
