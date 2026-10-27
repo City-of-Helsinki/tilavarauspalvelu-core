@@ -5,7 +5,7 @@ import * as url from "node:url";
 import { withSentryConfig } from "@sentry/nextjs";
 import { CSP_HEADER } from "ui/src/modules/baseUtils";
 import { env } from "./src/env.mjs";
-import { getStaffRelease } from "./src/modules/baseUtils";
+import { SENTRY_APPLICATION_KEY, getStaffRelease } from "./src/modules/baseUtils";
 
 // NOTE required for next-i18next to find the config file (when not .js)
 // required to be cjs because they don't support esm
@@ -131,6 +131,8 @@ export default withSentryConfig(config, {
   release: {
     name: getStaffRelease(),
   },
+  // Tags our own code, so thirdPartyErrorFilterIntegration does not drop every error.
+  applicationKey: SENTRY_APPLICATION_KEY,
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
   // Disable sourcemaps because we use nextjs configuration for it
