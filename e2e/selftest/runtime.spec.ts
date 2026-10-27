@@ -10,10 +10,10 @@ import { basename, dirname, join } from "node:path";
 import { errors } from "@playwright/test";
 import { mkdir, readdir, readFile, rm, stat, utimes, writeFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
-import { Browser, within } from "../lib/Browser";
+import { Browser, currentPage, openTestPage, within } from "../lib/Browser";
 import { BuiltIn } from "../lib/BuiltIn";
 import { DateTime } from "../lib/DateTime";
-import { PabotLib, SHARED_BASE, readValueSets, resetSharedState, sharedDir } from "../lib/PabotLib";
+import { PabotLib, SHARED_BASE, resetSharedState, sharedDir } from "../lib/PabotLib";
 import {
   V,
   errorMessage,
@@ -26,13 +26,14 @@ import {
   resetVariables,
   robot,
   str,
-  test,
+  testWithoutBrowser as test,
+  test as testWithPage,
   timeToMs,
 } from "../lib/robot";
 import type { RobotValue } from "../lib/robot";
+import { resolveTestData } from "../TestSuites/fixtures";
 import { custom_keywords } from "../TestSuites/Resources/custom_keywords";
 import { data_modification } from "../TestSuites/Resources/data_modification";
-import { parallel_test_data } from "../TestSuites/Resources/parallel_test_data";
 import { python_keywords } from "../TestSuites/Resources/python_keywords";
 import "../TestSuites/Resources/variables";
 import "../TestSuites/Resources/serial_users";
@@ -270,30 +271,55 @@ test.describe("Runtime self-test", () => {
     expect(python_keywords.get_finnish_day(new Date(2023, 11, 5))).toBe("Ti");
   });
 
-  test("Tags are parsed like in parallel_test_data.robot", async () => {
-    const parsed = await parallel_test_data["Parse Test Tags"]([
-      "admin-suite",
-      "admin-test-data-set-2",
-      "general-permissions-test",
-    ]);
-    expect(parsed).toEqual(["admin-test-data-set-2", true, false, true, false, "general-permissions-test"]);
+  test("Tags choose the test data like parallel_test_data.robot did", () => {
+    const parallel = { sequential: false, defaults: V };
+
+    // A user test gets its users from its data set, and its units from its suite tag
+    const user = resolveTestData(["desktop-suite", "desktop-test-data-set-0", "smoke"], parallel);
+    expect(user.dataSet).toBe("desktop-test-data-set-0");
+    expect(user.variables.CURRENT_USER_HETU).toMatch(/\S/);
+    expect(user.variables.CURRENT_ALWAYS_FREE_UNIT).toBe(V.DESKTOP_ALWAYS_FREE_UNIT);
+    expect(Object.keys(user.variables).some((key) => key.startsWith("ADMIN_"))).toBe(false);
+
+    // A permission test gets the Django admin and the admin whose permissions change
+    const permissions = resolveTestData(["admin-suite", "admin-test-data-set-2", "general-permissions-test"], parallel);
+    expect(permissions.variables.DJANGO_ADMIN_DJANGO_USERNAME).toMatch(/\S/);
+    expect(permissions.variables.PERMISSION_TARGET_ADMIN_HETU).toMatch(/\S/);
+    expect(Object.keys(permissions.variables).some((key) => key.startsWith("CURRENT_USER_"))).toBe(false);
+    expect(permissions.variables.CURRENT_UNAVAILABLE_UNIT).toBe(V.DESKTOP_UNAVAILABLE_UNIT);
+
+    // A combined test gets both a user and an admin
+    const combined = resolveTestData(["combined-suite", "combined-test-data-set-1"], parallel);
+    expect(combined.variables.CURRENT_USER_FULLNAME).toMatch(/\S/);
+    expect(combined.variables.ADMIN_CURRENT_USER_FULLNAME).toMatch(/\S/);
+    expect(combined.variables.CURRENT_UNIT_WITH_ACCESS_CODE).toBe(V.DESKTOP_UNIT_WITH_ACCESS_CODE);
+
+    // Sequential mode and tests without a data set use the shared users of serial_users
+    const sequential = resolveTestData(["desktop-suite", "desktop-test-data-set-0"], { sequential: true, defaults: V });
+    expect(sequential.dataSet).toBeNull();
+    expect(sequential.variables.CURRENT_USER_FULLNAME).toBe("Ande AutomaatioTesteri");
+    const unitPermissions = resolveTestData(["admin-suite", "admin-test-data-set-3", "unit-permissions-test"], {
+      sequential: true,
+      defaults: V,
+    });
+    expect(unitPermissions.variables.PERMISSION_TARGET_ADMIN_FULLNAME).toBe("Niko Selänne");
+    expect(resolveTestData([], parallel)).toMatchObject({ dataSet: null, suite: "desktop-suite" });
+
+    // A data set that pabot_users.dat doesn't have fails the test instead of falling back to the shared users
+    expect(() => resolveTestData(["desktop-test-data-set-99"], parallel)).toThrow(
+      "No section with tags=desktop-test-data-set-99 in pabot_users.dat"
+    );
   });
 
-  test("PabotLib locks, parallel values and value sets", async () => {
+  test("PabotLib locks and parallel values", async () => {
     await PabotLib["Acquire Lock"]("SELFTEST_LOCK");
     await PabotLib["Release Lock"]("SELFTEST_LOCK");
     expect(await PabotLib["Get Parallel Value For Key"]("SELFTEST_MISSING")).toBe("");
     await PabotLib["Set Parallel Value For Key"]("SELFTEST_KEY", "value");
     expect(await PabotLib["Get Parallel Value For Key"]("SELFTEST_KEY")).toBe("value");
-
-    const set = readValueSets().find((candidate) => candidate.name === "desktop-test-data-set-0");
-    expect(set).toBeDefined();
-    await PabotLib["Acquire Value Set"]("desktop-test-data-set-0");
-    expect(await PabotLib["Get Value From Set"]("CURRENT_USER_HETU")).toBe(set?.values.current_user_hetu);
-    await PabotLib["Release Value Set"]();
   });
 
-  test("PabotLib locks and value sets follow pabot's lock server", async () => {
+  test("PabotLib locks follow pabot's lock server", async () => {
     // Expected behaviour and errors from pabot 5.1.0's pabotlib.py and its remote server
     await PabotLib["Acquire Lock"]("SELFTEST_REENTRANT");
     await PabotLib["Acquire Lock"]("SELFTEST_REENTRANT");
@@ -332,22 +358,6 @@ test.describe("Runtime self-test", () => {
     await rm(lockPath("SELFTEST_LIVE_OWNER"), { recursive: true });
     expect(await waiting).toBe(true);
     await PabotLib["Release Lock"]("SELFTEST_LIVE_OWNER");
-
-    // Releasing without a value set does nothing; one value set at a time; keys are case-insensitive
-    await PabotLib["Release Value Set"]();
-    await PabotLib["Acquire Value Set"]("desktop-test-data-set-1");
-    await expect(PabotLib["Acquire Value Set"]("desktop-test-data-set-2")).rejects.toThrow(
-      /^ValueError: Caller has already reserved a value set\.$/
-    );
-    await expect(PabotLib["Acquire Value Set"]("no-such-tag")).rejects.toThrow(/^ValueError: Caller has/);
-    expect(await PabotLib["Get Value From Set"]("current_user_hetu")).toBe(
-      await PabotLib["Get Value From Set"]("CURRENT_USER_HETU")
-    );
-    await expect(PabotLib["Get Value From Set"]("NO_SUCH_KEY")).rejects.toThrow(/^No value for key "no_such_key"$/);
-    await PabotLib["Release Value Set"]();
-    await expect(PabotLib["Acquire Value Set"]("no-such-tag")).rejects.toThrow(
-      /^ValueError: No value set matching given tags exists\.$/
-    );
   });
 
   test("Each run keeps PabotLib's state in a folder of its own", async () => {
@@ -458,34 +468,105 @@ test.describe("Runtime self-test", () => {
     }
   });
 
-  test("Closing a browser saves its HAR file and trace", async () => {
-    // har_recording.robot passes recordHar to New Context; PW_TRACE=on adds a Playwright trace
+  test("Navigation and text helpers wait for the page", async () => {
+    // The list and the URL change 300 ms late, like a page that is still rendering
+    const server = createServer((request, response) => {
+      if (request.url === "/") {
+        response.writeHead(200, { "content-type": "text/html" });
+        response.end(`
+          <button id="push" onclick="setTimeout(() => history.pushState({}, '', '/pushed'), 300)">Push</button>
+          <a id="next" href="/next">Seuraava</a>
+          <ul id="list"><li> Yksi </li><li class="leaving">Poistuva</li></ul>
+          <script>
+            setTimeout(() => {
+              document.querySelector(".leaving").remove();
+              document.getElementById("list").insertAdjacentHTML("beforeend", "<li> Kaksi </li>");
+            }, 300);
+          </script>
+        `);
+      } else if (request.url === "/next") {
+        response.writeHead(200, { "content-type": "text/html" });
+        response.end(`<p id="target" hidden>Perillä</p><script>setTimeout(() => target.hidden = false, 300)</script>`);
+      } else {
+        response.writeHead(404).end();
+      }
+    });
+    await once(server.listen(0, "127.0.0.1"), "listening");
+    const { port } = server.address() as AddressInfo;
+    try {
+      await Browser["New Browser"]("chromium", true);
+      await Browser["New Page"](`http://127.0.0.1:${port}/`);
+      await custom_keywords["Find Text From Elements Or Fail"]("#list >> li", "Kaksi");
+      await custom_keywords["Verify Element With Text Is Not Found"]("#list >> li", "Poistuva");
+      // A client side navigation (history.pushState) after the click
+      await custom_keywords["Click And Wait For Page"]("id=push");
+      expect(currentPage().url()).toBe(`http://127.0.0.1:${port}/pushed`);
+      await custom_keywords["Wait For Url To Contain"]("/pushed", "5s");
+      // A full navigation, whose target element shows up after the page has loaded
+      await custom_keywords["Click And Wait For Navigation With Retry"]("id=next", "id=target", "2", "5s");
+      expect(currentPage().url()).toBe(`http://127.0.0.1:${port}/next`);
+      await Browser["Close Browser"]();
+    } finally {
+      server.closeAllConnections();
+      server.close();
+    }
+  });
+
+  test("Closing a browser saves its HAR file", async () => {
+    // har_recording.robot passes recordHar to New Context; with ENABLE_HAR_RECORDING=True every context records one
     const har = test.info().outputPath("selftest.har");
-    const previous = { PW_TRACE: process.env.PW_TRACE, CI: process.env.CI };
-    process.env.PW_TRACE = "on";
-    Reflect.deleteProperty(process.env, "CI");
+    const previous = { ENABLE_HAR_RECORDING: process.env.ENABLE_HAR_RECORDING };
     try {
       await Browser["New Browser"]("chromium", true);
       await Browser["New Context"](named({ recordHar: { path: har, omitContent: false } }));
       await Browser["New Page"](page("<h1>HAR</h1>"));
-      await Browser["Close Browser"]();
-      // In CI no trace is recorded
-      process.env.CI = "true";
-      await Browser["New Browser"]("chromium", true);
+      process.env.ENABLE_HAR_RECORDING = "True";
       await Browser["New Context"]();
-      await Browser["New Page"](page("<h1>CI</h1>"));
+      await Browser["New Page"](page("<h1>ENABLE_HAR_RECORDING</h1>"));
       await Browser["Close Browser"]();
     } finally {
       restoreEnv(previous);
     }
     const recorded = JSON.parse(await readFile(har, "utf8")) as { log: { entries: unknown[] } };
     expect(Array.isArray(recorded.log.entries)).toBe(true);
-    // The trace is saved in the test's results folder only, not attached to the report
-    const traces = (await readdir(test.info().outputDir)).filter((name) => /^trace-.+\.zip$/.test(name));
-    expect(traces).toHaveLength(1);
-    expect((await stat(test.info().outputPath(traces[0] ?? ""))).size).toBeGreaterThan(0);
-    expect(test.info().attachments.map((attachment) => attachment.name)).not.toContain("trace");
-    expect(test.info().annotations).toContainEqual({ type: "warning", description: "PW_TRACE=on is ignored in CI" });
+    const recordedByDefault = (await readdir(test.info().outputDir)).filter((name) => /^context-\d+\.har$/.test(name));
+    expect(recordedByDefault).toHaveLength(1);
+    expect((await stat(test.info().outputPath(recordedByDefault[0] ?? ""))).size).toBeGreaterThan(0);
+  });
+
+  testWithPage("Set Up keywords open the test's own page first, then a session of their own", async ({ page }) => {
+    // The server echoes a header, like the WAF bypass header that devices.robot adds to every context
+    const server = createServer((request, response) => {
+      response.writeHead(200, { "content-type": "text/html" });
+      response.end(`<p>${String(request.headers["x-selftest-header"])}</p>`);
+    });
+    await once(server.listen(0, "127.0.0.1"), "listening");
+    const { port } = server.address() as AddressInfo;
+    const headers = { extraHTTPHeaders: { "X-Selftest-Header": "header" } };
+    try {
+      // The first one is Playwright's page, made with the project's `use` options
+      await openTestPage({ contextOptions: headers });
+      expect(currentPage()).toBe(page);
+      await Browser["Go To"](`http://127.0.0.1:${port}/`);
+      expect(await Browser["Get Text"]("p")).toBe("header");
+
+      // A later one is a new context, in the same browser or in another one
+      await openTestPage({ contextOptions: headers });
+      expect(currentPage().context()).not.toBe(page.context());
+      await Browser["Go To"](`http://127.0.0.1:${port}/`);
+      expect(await Browser["Get Text"]("p")).toBe("header");
+      await openTestPage({ browserName: "firefox" });
+      expect(currentPage().context().browser()?.browserType().name()).toBe("firefox");
+      expect(await Browser["Get Browser Ids"]()).toHaveLength(2);
+
+      // Closing the browsers closes what the keywords opened. Playwright closes its own page after the test.
+      await Browser["Close Browser"]("ALL");
+      expect(page.isClosed()).toBe(false);
+      expect(await Browser["Get Browser Ids"]()).toEqual([]);
+    } finally {
+      server.closeAllConnections();
+      server.close();
+    }
   });
 
   test("HAR files hide secrets like the logs", async () => {

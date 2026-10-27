@@ -1,8 +1,9 @@
 /** Desktop browser tests */
 import { BuiltIn } from "../lib/BuiltIn";
 import { PabotLib } from "../lib/PabotLib";
-import { V, errorMessage, isTruthy, rethrowSkip, str, test } from "../lib/robot";
+import { V, errorMessage, isTruthy, rethrowSkip, str } from "../lib/robot";
 import type { RobotValue } from "../lib/robot";
+import { test } from "./fixtures";
 import { app_common } from "./PO/App/app_common";
 import { app_user } from "./PO/App/app_user";
 import { mail } from "./PO/App/mail";

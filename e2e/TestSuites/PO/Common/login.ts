@@ -55,12 +55,10 @@ export const login = keywords("login", {
       );
     }
 
-    await Browser["Wait For Elements State"]("id=id_username", "visible", named({ timeout: "10s" }));
     await Browser["Type Text"]("id=id_username", input_username);
     // Verify that the username was actually typed
     typed_username = await Browser["Get Property"]("id=id_username", "value");
     await BuiltIn["Should Be Equal"](typed_username, input_username);
-    await BuiltIn["Sleep"]("100ms");
 
     // Use password from Robot Framework variable (loaded by env_loader.py)
     // Suppress logging when typing password
@@ -73,12 +71,11 @@ export const login = keywords("login", {
 
     // Submit login form and wait for password field to disappear (indicates successful login)
     await Browser["Click"]('[type="submit"]');
-    await BuiltIn["Sleep"]("5s"); // wait for the page to load
-    await Browser["Wait For Load State"]("load", named({ timeout: "60s" }));
+    // The logged-in page has no password field
     await Browser["Wait For Elements State"](
       "id=id_password",
       "hidden",
-      named({ timeout: "5s", message: "Check that login credentials are correct and match the backend data." })
+      named({ timeout: "60s", message: "Check that login credentials are correct and match the backend data." })
     );
   },
 

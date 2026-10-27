@@ -1,7 +1,8 @@
 /** Admin notification tests that must run serially */
 import { Browser } from "../lib/Browser";
 import { BuiltIn } from "../lib/BuiltIn";
-import { V, test } from "../lib/robot";
+import { V } from "../lib/robot";
+import { test } from "./fixtures";
 import { admin_navigation_menu } from "./PO/Admin/admin_navigation_menu";
 import { admin_notifications } from "./PO/Admin/admin_notifications";
 import { admin_notifications_create_page } from "./PO/Admin/admin_notifications_create_page";

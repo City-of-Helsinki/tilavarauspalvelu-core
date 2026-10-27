@@ -59,7 +59,6 @@ export const popups = keywords("popups", {
 
       // Close notification and refresh
       await Browser["Click"]('[data-testid="BannerNotificationList__Notification"] >> button[title="Sulje"] >> nth=0');
-      await BuiltIn["Sleep"]("1s");
       await BuiltIn["Log"]("Clicked close button on notification");
 
       await popups["Reload Page"]();
@@ -73,7 +72,6 @@ export const popups = keywords("popups", {
 
   "Reload Page": async () => {
     await Browser["Reload"]();
-    await BuiltIn["Sleep"]("2s"); // wait for the page to load
     await Browser["Wait For Load State"]("networkidle", named({ timeout: "30s" }));
   },
 });

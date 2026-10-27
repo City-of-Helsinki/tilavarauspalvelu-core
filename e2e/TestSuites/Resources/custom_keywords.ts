@@ -1,9 +1,22 @@
 /** A resource file with keywords. */
-import { Browser } from "../../lib/Browser";
+import { Browser, allElements, currentPage, loc } from "../../lib/Browser";
 import { BuiltIn } from "../../lib/BuiltIn";
 import { Collections } from "../../lib/Collections";
 import { OperatingSystem } from "../../lib/OperatingSystem";
-import { V, chain, errorMessage, isTruthy, keywords, named, namedOnly, rethrowSkip, robot, str } from "../../lib/robot";
+import {
+  V,
+  chain,
+  errorMessage,
+  expect,
+  isTruthy,
+  keywords,
+  named,
+  namedOnly,
+  rethrowSkip,
+  robot,
+  str,
+  timeToMs,
+} from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
 import { String_ } from "../../lib/String";
 import { python_keywords } from "../Resources/python_keywords";
@@ -20,11 +33,8 @@ export const custom_keywords = keywords("custom_keywords", {
   "Find And Click Element With Text": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
     let target: RobotValue;
     target = chain(element_with_text, `text="${str(wanted_text)}" >> nth=0`);
-    await Browser["Wait For Elements State"](
-      target,
-      "visible",
-      named({ timeout: V.CONTENT_WAIT_TIMEOUT, message: `Element with text "${str(wanted_text)}" not found` })
-    );
+    // Port: Click waits for the element to be visible and enabled (Playwright's auto-waiting), so there's no
+    // separate Wait For Elements State
     await Browser["Click"](target);
     await BuiltIn["Log"](`Element with text "${str(wanted_text)}" clicked.`);
   },
@@ -40,32 +50,26 @@ export const custom_keywords = keywords("custom_keywords", {
     max_attempts: RobotValue = "2",
     nav_timeout: RobotValue = "10s"
   ) => {
-    let url_before: RobotValue,
-      attempt: RobotValue,
-      target_exists: RobotValue,
-      url_after: RobotValue,
-      still_on_same_page: RobotValue;
+    let url_before: RobotValue, attempt: RobotValue, target_exists: RobotValue, url_after: RobotValue;
     // Get URL before click to detect if navigation happened
-    url_before = await Browser["Get Url"]();
+    url_before = currentPage().url();
 
     for (attempt = 1; attempt < Number(max_attempts) + 1; attempt++) {
       await BuiltIn["Log"](`Attempt ${str(attempt)} of ${str(max_attempts)}: Clicking ${str(click_selector)}`);
 
-      // Ensure element is in view and stable before clicking
-      await Browser["Scroll To Element"](click_selector);
-      await Browser["Wait For Elements State"](click_selector, "stable", named({ timeout: "5s" }));
-
-      // Click the element
+      // Port: the click scrolls the element into view and waits until it's stable and enabled (Playwright's
+      // auto-waiting), so there's no Scroll To Element and Wait For Elements State before it
       await Browser["Focus"](click_selector);
       await Browser["Click"](click_selector);
 
       // Wait for target element to appear (indicates successful navigation)
-      target_exists = await BuiltIn["Run Keyword And Return Status"](
-        Browser["Wait For Elements State"],
-        target_element_selector,
-        "visible",
-        named({ timeout: nav_timeout })
-      );
+      // Port: expect waits for it, instead of Run Keyword And Return Status around Wait For Elements State
+      target_exists = await expect(loc(target_element_selector))
+        .toBeVisible({ timeout: timeToMs(nav_timeout) })
+        .then(
+          () => true,
+          () => false
+        );
 
       if (isTruthy(target_exists)) {
         await BuiltIn["Log"](`✅ Successfully navigated on attempt ${str(attempt)}`);
@@ -73,14 +77,8 @@ export const custom_keywords = keywords("custom_keywords", {
       }
 
       // Target element not found - check if we should retry
-      url_after = await Browser["Get Url"]();
-      still_on_same_page = await BuiltIn["Run Keyword And Return Status"](
-        BuiltIn["Should Be Equal"],
-        url_before,
-        url_after
-      );
-
-      if (isTruthy(still_on_same_page)) {
+      url_after = currentPage().url();
+      if (url_after === url_before) {
         await BuiltIn["Log"](`⚠️ Navigation did not occur on attempt ${str(attempt)}, URL unchanged`);
       } else {
         await BuiltIn["Log"](`⚠️ URL changed to ${str(url_after)} but target element not found`);
@@ -108,27 +106,20 @@ export const custom_keywords = keywords("custom_keywords", {
     timeout: RobotValue = V.BROWSER_TIMEOUT_GLOBAL
   ) => {
     let url_before: RobotValue;
-    url_before = await Browser["Get Url"]();
+    url_before = currentPage().url();
     await Browser["Click"](click_selector);
-    await BuiltIn["Wait Until Keyword Succeeds"](
-      timeout,
-      "250ms",
-      custom_keywords["Url Should Have Changed"],
-      url_before,
-      url_part
+    // Port: waitForURL waits for the new URL and then for the page to load, instead of Wait Until Keyword Succeeds
+    // with Url Should Have Changed and Wait For Load State. After a client side navigation the page has loaded already.
+    await currentPage().waitForURL(
+      (url) => (url_part !== "" ? url.href.includes(str(url_part)) : url.href !== url_before),
+      { timeout: timeToMs(timeout), waitUntil: "load" }
     );
-    // Returns at once after client side navigation, waits for the document after a full page navigation
-    await Browser["Wait For Load State"]("load", named({ timeout: "50s" }));
   },
 
   "Wait For Url To Contain": async (url_part: RobotValue, timeout: RobotValue = "20s") => {
-    await BuiltIn["Wait Until Keyword Succeeds"](
-      timeout,
-      "250ms",
-      custom_keywords["Url Should Have Changed"],
-      "",
-      url_part
-    );
+    // Port: expect retries until the URL contains url_part, instead of Wait Until Keyword Succeeds with Url Should
+    // Have Changed
+    await expect(currentPage()).toHaveURL((url) => url.href.includes(str(url_part)), { timeout: timeToMs(timeout) });
   },
 
   "Url Should Have Changed": async (url_before: RobotValue, url_part: RobotValue) => {
@@ -143,12 +134,10 @@ export const custom_keywords = keywords("custom_keywords", {
 
   /** An HDS Select ignores a close within 200 ms of opening, so its list can stay open after the pick. */
   "Close Select List If Open": async (main_button: RobotValue) => {
-    await BuiltIn["Wait Until Keyword Succeeds"](
-      "5s",
-      "300ms",
-      custom_keywords["Select List Should Be Closed"],
-      main_button
-    );
+    // Port: expect(...).toPass retries every 300 ms, instead of Wait Until Keyword Succeeds
+    await expect(async () => {
+      await custom_keywords["Select List Should Be Closed"](main_button);
+    }).toPass({ intervals: [300], timeout: 5000 });
   },
 
   "Select List Should Be Closed": async (main_button: RobotValue) => {
@@ -189,62 +178,40 @@ export const custom_keywords = keywords("custom_keywords", {
 
   /** This keyword verifies that an element containing the specified text is NOT found within a list of elements identified by the given selector. */
   "Verify Element With Text Is Not Found": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
-    let elements_with_text: RobotValue, found: RobotValue, element: RobotValue, el_text: RobotValue;
     await BuiltIn["Log"](`Verifying that ${str(element_with_text)} with text: ${str(wanted_text)} is NOT found`);
-    elements_with_text = await Browser["Get Elements"](element_with_text);
-    found = "False"; // Initialize a flag to track if the element is found
-
-    for (element of elements_with_text) {
-      el_text = await Browser["Get Text"](element);
-      el_text = await String_["Strip String"](el_text); // Remove leading and trailing whitespaces for webkit
-      await BuiltIn["Log"](`element is: ${str(element)}`);
-      await BuiltIn["Log"](`Text found in element: ${str(el_text)}`);
-
-      if (el_text === wanted_text) {
-        await BuiltIn["Log"](`Element with text "${str(wanted_text)}" found when it should not be.`);
-        found = "True"; // Set the flag to True since the element is found
-        break;
-      }
-    }
-
-    // Fail the test if the element WAS found (opposite of the original keyword)
-    if (isTruthy(found)) {
-      await BuiltIn["Fail"](`Element with text "${str(wanted_text)}" was found but should not be present`);
-    }
+    // Port: expect.poll reads the elements' texts (stripped, for webkit) again until none of them is the text,
+    // instead of reading them once in a loop
+    await expect
+      .poll(async () => (await allElements(element_with_text).allInnerTexts()).map((text) => text.trim()), {
+        message: `Element with text "${str(wanted_text)}" was found but should not be present`,
+      })
+      .not.toContain(str(wanted_text));
   },
 
   /** This keyword verifies that an element identified by the given selector is NOT found on the page. */
   "Verify Element Is Not Found": async (element_selector: RobotValue) => {
-    let element_count: RobotValue;
     await BuiltIn["Log"](`Verifying that element ${str(element_selector)} is NOT found`);
-    element_count = await Browser["Get Element Count"](element_selector);
-    await BuiltIn["Log"](`Element count: ${str(element_count)}`);
 
-    // Fail the test if the element WAS found
-    if (Number(element_count) > 0) {
-      await BuiltIn["Fail"](
-        `Element "${str(element_selector)}" was found but should not be present (count: ${str(element_count)})`
-      );
-    }
+    // Port: waits until the element is gone (expect's timeout) instead of counting the elements once
+    await expect(
+      allElements(element_selector),
+      `Element "${str(element_selector)}" was found but should not be present`
+    ).toHaveCount(0);
 
     await BuiltIn["Log"](`Element "${str(element_selector)}" is correctly not present on the page`);
   },
 
   /** This keyword verifies that an element identified by the given selector IS found on the page. */
   "Verify Element Is Found": async (element_selector: RobotValue) => {
-    let element_count: RobotValue;
     await BuiltIn["Log"](`Verifying that element ${str(element_selector)} IS found`);
-    element_count = await Browser["Get Element Count"](element_selector);
-    await BuiltIn["Log"](`Element count: ${str(element_count)}`);
 
-    // Fail the test if the element was NOT found
-    if (Number(element_count) === 0) {
-      await BuiltIn["Fail"](`Element "${str(element_selector)}" was not found but should be present`);
-    }
+    // Port: waits until the element is there (expect's timeout) instead of counting the elements once
+    await expect(
+      allElements(element_selector),
+      `Element "${str(element_selector)}" was not found but should be present`
+    ).not.toHaveCount(0);
 
-    await BuiltIn["Log"](
-      `Element "${str(element_selector)}" is correctly present on the page (count: ${str(element_count)})`
-    );
+    await BuiltIn["Log"](`Element "${str(element_selector)}" is correctly present on the page`);
   },
 
   "Find And Click Element With Exact Text Using JS": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
@@ -573,32 +540,15 @@ export const custom_keywords = keywords("custom_keywords", {
   },
 
   "Find Text From Elements Or Fail": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
-    let elements_with_text: RobotValue,
-      text_found: RobotValue,
-      element: RobotValue,
-      el_text: RobotValue,
-      el_text_clean: RobotValue,
-      wanted_text_clean: RobotValue;
     await BuiltIn["Log"](`Searching for text: ${str(wanted_text)}`);
-    elements_with_text = await Browser["Get Elements"](element_with_text);
-    text_found = "False"; // Initialize the flag to False
-
-    for (element of elements_with_text) {
-      el_text = await Browser["Get Text"](element);
-      el_text_clean = await String_["Strip String"](el_text);
-      wanted_text_clean = await String_["Strip String"](wanted_text);
-      await BuiltIn["Log"](`Found text in element (cleaned): ${str(el_text_clean)}`);
-
-      if (str(el_text_clean) === str(wanted_text_clean)) {
-        await BuiltIn["Log"](`Found element with text: "${str(wanted_text_clean)}."`);
-        text_found = "True"; // Set the flag to True when text is found
-        break;
-      }
-    }
-
-    if (!isTruthy(text_found)) {
-      await BuiltIn["Fail"](`"Text '${str(wanted_text)}' not found in any given elements."`);
-    }
+    // Port: expect.poll reads the elements' texts again until one of them is the wanted text (both stripped),
+    // instead of reading them once in a loop
+    await expect
+      .poll(async () => (await allElements(element_with_text).allInnerTexts()).map((text) => text.trim()), {
+        message: `"Text '${str(wanted_text)}' not found in any given elements."`,
+      })
+      .toContain(str(wanted_text).trim());
+    await BuiltIn["Log"](`Found element with text: "${str(wanted_text).trim()}."`);
   },
 
   "Find Text Element From Elements": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
@@ -679,22 +629,11 @@ export const custom_keywords = keywords("custom_keywords", {
   },
 
   "Check Elements Text With Remove Non-breaking Space": async (Element: RobotValue, Expected_text: RobotValue) => {
-    let Elements_text: RobotValue;
-    await BuiltIn["Sleep"]("2s");
     await BuiltIn["Log"](`Element: ${str(Element)}`);
     await BuiltIn["Log"](`Expected text: ${str(Expected_text)}`);
 
-    // Wait until the element is visible on the page
-    await Browser["Wait For Elements State"](Element, "visible");
-
-    // Retrieve the text content of the element
-    Elements_text = await Browser["Get Text"](Element);
-
-    // Normalize the element's text by removing non-breaking spaces
-    Elements_text = await custom_keywords["Remove Non-breaking Space"](Elements_text);
-
-    // Final text comparison
-    await BuiltIn["Should Be Equal"](Elements_text, Expected_text);
+    // Port: expect waits until the text matches. It normalizes whitespace, non-breaking spaces included.
+    await expect(loc(Element)).toHaveText(str(Expected_text), { useInnerText: true, timeout: 20_000 });
   },
 
   /**
@@ -713,7 +652,6 @@ export const custom_keywords = keywords("custom_keywords", {
       header: RobotValue,
       formatted_differences: RobotValue,
       content: RobotValue;
-    await BuiltIn["Sleep"]("1s");
     await BuiltIn["Log"](`Element: ${str(Element)}`);
     await BuiltIn["Log"](`Expected text: ${str(Expected_text)}`);
 
@@ -816,15 +754,14 @@ Differences:
     await BuiltIn["Log"](`Element: ${str(Element)}`);
     await BuiltIn["Log"](`Expected text: ${str(Expected_text)}`);
 
-    // Wait until the element is visible on the page
-    await Browser["Wait For Elements State"](Element, "visible", named({ timeout: "10s" }));
-
     // Determine the error message to use
     default_msg = `Element text does not match. Element: ${str(Element)}`;
     final_msg = str(message) !== "None" ? message : default_msg;
 
     // Return status boolean for loops vs fail test for assertions
     if (isTruthy(return_status)) {
+      // Wait until the element is visible on the page
+      await Browser["Wait For Elements State"](Element, "visible", named({ timeout: "10s" }));
       status = await BuiltIn["Run Keyword And Return Status"](
         custom_keywords["Element Text Should Be"],
         Element,
@@ -835,16 +772,13 @@ Differences:
       );
       return status;
     }
-    await BuiltIn["Wait Until Keyword Succeeds"](
-      V.CONTENT_WAIT_TIMEOUT,
-      "250ms",
-      custom_keywords["Element Text Should Be"],
-      Element,
-      Expected_text,
-      strip_spaces,
-      ignore_case,
-      final_msg
-    );
+    // Port: expect waits for the element and retries until its text matches, instead of the visible wait (10 s) and
+    // Wait Until Keyword Succeeds (CONTENT_WAIT_TIMEOUT). It compares the text with its whitespace normalized.
+    await expect(loc(Element), str(final_msg)).toHaveText(str(Expected_text), {
+      ignoreCase: isTruthy(ignore_case),
+      useInnerText: true,
+      timeout: 10_000 + timeToMs(V.CONTENT_WAIT_TIMEOUT),
+    });
   },
 
   "Element Text Should Be": async (
@@ -872,18 +806,17 @@ Differences:
     return_status: RobotValue = "False"
   ) => {
     let Elements_text: RobotValue, status: RobotValue;
-    await BuiltIn["Sleep"]("1s");
     await BuiltIn["Log"](`Element: ${str(Element)}`);
     await BuiltIn["Log"](`Expected text: ${str(Expected_text)}`);
 
-    // Wait until the element is visible on the page
-    await Browser["Wait For Elements State"](Element, "visible", named({ timeout: "10s" }));
-
-    // Retrieve the text content of the element
-    Elements_text = await Browser["Get Text"](Element);
-
     // Return status boolean for loops vs fail test for assertions
     if (isTruthy(return_status)) {
+      // Wait until the element is visible on the page
+      await Browser["Wait For Elements State"](Element, "visible", named({ timeout: "10s" }));
+
+      // Retrieve the text content of the element
+      Elements_text = await Browser["Get Text"](Element);
+
       status = await BuiltIn["Run Keyword And Return Status"](
         BuiltIn["Should Contain"],
         Elements_text,
@@ -896,14 +829,11 @@ Differences:
       );
       return status;
     }
-    await BuiltIn["Should Contain"](
-      Elements_text,
-      Expected_text,
-      named({
-        strip_spaces: strip_spaces,
-        ignore_case: ignore_case,
-        msg: `Element text does not contain expected text. Element: ${str(Element)}`,
-      })
+    // Port: expect waits for the element and retries until its text contains the expected text, instead of the
+    // Sleep (1 s) and reading the text once. It compares the text with its whitespace normalized.
+    await expect(loc(Element), `Element text does not contain expected text. Element: ${str(Element)}`).toContainText(
+      str(Expected_text),
+      { ignoreCase: isTruthy(ignore_case), useInnerText: true, timeout: 10_000 }
     );
 
     //

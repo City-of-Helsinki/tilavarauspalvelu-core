@@ -3,11 +3,11 @@ import { randomUUID } from "node:crypto";
  * pabot's PabotLib keywords with the same names, for Playwright workers.
  *
  * Playwright workers are separate processes, like pabot's, so the shared state lives in files: a lock is a directory
- * created atomically with an owner file, a parallel value is a JSON file, and a value set is a lock on a section of
- * pabot_users.dat. Each run has a folder of its own under PABOT_SHARED_DIR, so a run never sees another run's state.
- * Locks a test still holds are released when it ends.
+ * created atomically with an owner file, and a parallel value is a JSON file. Each run has a folder of its own under
+ * PABOT_SHARED_DIR, so a run never sees another run's state. Locks a test still holds are released when it ends.
+ * pabot's value sets are not here: the testData fixture (TestSuites/fixtures.ts) picks each test's users.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { library, onTestEnd, pyRepr, sleepMs } from "./robot";
@@ -16,7 +16,6 @@ import type { RobotValue } from "./robot";
 const E2E_ROOT = resolve(import.meta.dirname, "..");
 /** The folder of the runs' shared state, one folder per run. */
 export const SHARED_BASE = process.env.PABOT_SHARED_DIR ?? join(E2E_ROOT, ".pabot-shared");
-const VALUE_SETS_FILE = process.env.PABOT_RESOURCE_FILE ?? join(E2E_ROOT, "TestSuites/Resources/pabot_users.dat");
 const RUN_DIR = /^run-(\d+)-\d+$/;
 /** Run folders older than this are removed at the start of a run. A newer one may belong to a run still going on. */
 const OLD_RUN_MS = 24 * 60 * 60_000;
@@ -31,7 +30,6 @@ interface LockOwner {
 
 /** How many times this process holds each lock: like pabot's, a lock can be taken again by the process holding it. */
 const heldLocks = new Map<string, number>();
-let currentValueSet: { name: string; values: Record<string, string> } | null = null;
 
 const safeName = (name: string) => encodeURIComponent(name).replaceAll("%", "_");
 
@@ -193,44 +191,12 @@ async function release(name: string): Promise<void> {
   await rm(lockDir(name), { recursive: true, force: true });
 }
 
-interface ValueSet {
-  name: string;
-  values: Record<string, string>;
-}
-
-/**
- * Reads pabot_users.dat, an INI file whose sections are value sets with a `tags` value.
- * The keys are lowercased, like Python's configparser that pabot reads it with.
- */
-export function readValueSets(file = VALUE_SETS_FILE): ValueSet[] {
-  const sets: ValueSet[] = [];
-  let current: ValueSet | null = null;
-  for (const raw of readFileSync(file, "utf8").split(/\r?\n/)) {
-    const line = raw.trim();
-    if (line === "" || line.startsWith("#") || line.startsWith(";")) {
-      continue;
-    }
-    const section = /^\[(.+)\]$/.exec(line);
-    if (section != null) {
-      current = { name: section[1] ?? "", values: {} };
-      sets.push(current);
-      continue;
-    }
-    const separator = line.indexOf("=");
-    if (current != null && separator > 0) {
-      current.values[line.slice(0, separator).trim().toLowerCase()] = line.slice(separator + 1).trim();
-    }
-  }
-  return sets;
-}
-
 onTestEnd(async () => {
   for (const name of heldLocks.keys()) {
     // oxlint-disable-next-line no-await-in-loop -- releasing one by one
     await rm(lockDir(name), { recursive: true, force: true });
   }
   heldLocks.clear();
-  currentValueSet = null;
 });
 
 export const PabotLib = library("PabotLib", {
@@ -258,57 +224,6 @@ export const PabotLib = library("PabotLib", {
       return "";
     }
     return JSON.parse(await readFile(file, "utf8"));
-  },
-
-  /** Takes the first free value set with all the given tags. Waits while they are all taken. */
-  "Acquire Value Set": async (...tags: RobotValue[]) => {
-    // The errors as pabot's lock server reports them
-    if (currentValueSet != null) {
-      throw new Error("ValueError: Caller has already reserved a value set.");
-    }
-    const wanted = tags.map(String);
-    const candidates = readValueSets().filter((set) => {
-      const setTags = new Set((set.values.tags ?? "").split(",").map((tag) => tag.trim()));
-      return wanted.every((tag) => setTags.has(tag));
-    });
-    if (candidates.length === 0) {
-      throw new Error("ValueError: No value set matching given tags exists.");
-    }
-    for (;;) {
-      for (const candidate of candidates) {
-        const name = `VALUE_SET_${candidate.name}`;
-        // oxlint-disable-next-line no-await-in-loop -- trying the sets one by one
-        if (!heldLocks.has(name) && (await tryTakeOrTakeOver(lockDir(name)))) {
-          heldLocks.set(name, 1);
-          currentValueSet = candidate;
-          return candidate.name;
-        }
-      }
-      // oxlint-disable-next-line no-await-in-loop -- waiting for a set to be released
-      await sleepMs(200);
-    }
-  },
-
-  /** Does nothing when no value set is reserved, like PabotLib. */
-  "Release Value Set": async () => {
-    if (currentValueSet == null) {
-      return;
-    }
-    const name = `VALUE_SET_${currentValueSet.name}`;
-    currentValueSet = null;
-    await release(name);
-  },
-
-  "Get Value From Set": (key: RobotValue) => {
-    if (currentValueSet == null) {
-      throw new Error("No value set reserved for caller process");
-    }
-    const lowered = String(key).toLowerCase();
-    const value = currentValueSet.values[lowered];
-    if (value == null) {
-      throw new Error(`No value for key "${lowered}"`);
-    }
-    return value;
   },
 });
 

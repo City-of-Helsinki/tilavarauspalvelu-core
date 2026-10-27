@@ -1,7 +1,8 @@
 /** Desktop browser tests for Admin functionality */
 import { Browser } from "../lib/Browser";
 import { BuiltIn } from "../lib/BuiltIn";
-import { V, test } from "../lib/robot";
+import { V } from "../lib/robot";
+import { test } from "./fixtures";
 import { admin_reservations } from "./PO/Admin/admin_reservations";
 import { django_admin } from "./PO/Admin/django_admin";
 import { app_admin } from "./PO/App/app_admin";

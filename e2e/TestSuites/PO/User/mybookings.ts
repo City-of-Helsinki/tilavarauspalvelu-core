@@ -1,8 +1,8 @@
 /** Port of PO/User/mybookings.robot */
-import { Browser } from "../../../lib/Browser";
+import { Browser, loc } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
 import { DateTime, parseDate, strftime } from "../../../lib/DateTime";
-import { V, chain, isTruthy, keywords, named, str } from "../../../lib/robot";
+import { V, chain, expect, isTruthy, keywords, named, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { String_ } from "../../../lib/String";
 import { quick_reservation } from "../../PO/User/quick_reservation";
@@ -31,27 +31,27 @@ export const mybookings = keywords("mybookings", {
     // Click  id=reason-toggle-button
     await Browser["Wait For Elements State"]("id=reservation-cancel__reason-label");
     await Browser["Click"]("id=reservation-cancel__reason-main-button");
-    await BuiltIn["Sleep"]("1s");
   },
 
   "Select Reason For Cancellation": async (reason: RobotValue) => {
     // Wait For Elements State  id=reason-item-0  visible
-    await Browser["Wait For Elements State"]("id=reservation-cancel__reason-option-2", "visible");
     await custom_keywords["Find And Click Element With Text"]("li", reason);
+    // An option picked within 200 ms of opening leaves the HDS Select list open over the cancel button
+    await custom_keywords["Close Select List If Open"]("id=reservation-cancel__reason-main-button");
   },
 
   "Click Cancel Button": async () => {
-    await BuiltIn["Sleep"]("1s");
-    await Browser["Wait For Elements State"]('[data-testid="reservation-cancel__button--cancel"]', "enabled");
+    // The click waits until the button is enabled
     await custom_keywords["Click And Wait For Page"]('[data-testid="reservation-cancel__button--cancel"]');
   },
 
   "Check Cancel Button Is Not Found In Reservations": async () => {
-    await BuiltIn["Sleep"]("1s");
-    await Browser["Wait For Elements State"](
-      '[data-testid="reservation-detail__button--cancel"]',
-      named({ state: "detached", timeout: "3s", message: "Cancel button is still present" })
-    );
+    // The reservation's content is rendered with its buttons, so the check sees the page
+    await expect(loc('[data-testid="reservation__content"]')).toBeVisible();
+    await expect(
+      loc('[data-testid="reservation-detail__button--cancel"]'),
+      "Cancel button is still present"
+    ).toHaveCount(0, { timeout: 3000 });
 
     //
     //
@@ -64,12 +64,10 @@ export const mybookings = keywords("mybookings", {
 
   "User Click Change Time": async () => {
     let reservations_loaded: RobotValue;
-    await Browser["Wait For Elements State"]("data-testid=reservation-detail__button--edit", "visible");
     // The free times on the edit page depend on the unit's existing reservations
     reservations_loaded = await quick_reservation["Start Waiting For Reservations Query"]();
     await Browser["Click"]("data-testid=reservation-detail__button--edit");
     await quick_reservation["Wait For Reservations Query"](reservations_loaded);
-    await BuiltIn["Sleep"]("1s"); // Wait for animation
 
     //
     // Reservations page
@@ -228,7 +226,6 @@ export const mybookings = keywords("mybookings", {
       "This step assumes that there are reservations in the list. Disabling strict mode here to make sure that selector exists."
     );
 
-    await BuiltIn["Sleep"]("2s");
     // Disable strict mode to ensure the selector can be located even if multiple matches are found
     await Browser["Set Strict Mode"]("False");
     // Wait until the reservation elements are visible on the page
@@ -305,19 +302,18 @@ export const mybookings = keywords("mybookings", {
 
   /** Reloads the reservation page until it shows the payment status, which the backend updates afterwards. */
   "Wait For Payment Status": async (payment_status: RobotValue) => {
-    await BuiltIn["Wait Until Keyword Succeeds"](
-      "60s",
-      "2s",
-      mybookings["Reload And Check Payment Status"],
-      payment_status
-    );
+    // Port: expect(...).toPass reloads every 2 s, instead of Wait Until Keyword Succeeds
+    await expect(async () => {
+      await mybookings["Reload And Check Payment Status"](payment_status);
+    }).toPass({ intervals: [2000], timeout: 60_000 });
   },
 
   "Reload And Check Payment Status": async (payment_status: RobotValue) => {
-    let status_text: RobotValue;
     await Browser["Reload"]();
-    status_text = await Browser["Get Text"]('[data-testid="reservation__payment-status"]');
-    await BuiltIn["Should Be Equal"](status_text, payment_status, named({ strip_spaces: "True" }));
+    await expect(loc('[data-testid="reservation__payment-status"]')).toHaveText(str(payment_status), {
+      useInnerText: true,
+      timeout: 5000,
+    });
   },
 
   /**

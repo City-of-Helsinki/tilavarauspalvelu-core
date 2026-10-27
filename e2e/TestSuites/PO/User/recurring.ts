@@ -1,7 +1,6 @@
 /** A resource file with top navigation keywords. */
-import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { keywords, named, str } from "../../../lib/robot";
+import { Browser, currentPage } from "../../../lib/Browser";
+import { expect, keywords, named, str, timeToMs } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
 import "../../Resources/variables";
@@ -11,7 +10,7 @@ import "../../Resources/serial_users";
 export const recurring = keywords("recurring", {
   "User Selects A Recurring Booking Round": async (name_of_the_recurring_reservation: RobotValue) => {
     let url_before: RobotValue;
-    url_before = await Browser["Get Url"]();
+    url_before = currentPage().url();
     await custom_keywords["Find And Click Element In Card Element By Text"](
       '[data-testid="recurring-lander__application-round-container--active"] >> .card--default',
       '[data-testid="card__heading"]',
@@ -19,13 +18,9 @@ export const recurring = keywords("recurring", {
       'a[href*="/recurring/"]:not([href*="/criteria"])'
     );
     // The round's page opens, its units are waited for when they are selected
-    await BuiltIn["Wait Until Keyword Succeeds"](
-      "20s",
-      "250ms",
-      custom_keywords["Url Should Have Changed"],
-      url_before,
-      ""
-    );
+    // Port: expect retries until the URL has changed, instead of Wait Until Keyword Succeeds with Url Should Have
+    // Changed
+    await expect(currentPage()).toHaveURL((url) => url.href !== url_before, { timeout: timeToMs("20s") });
   },
 
   "User Selects The Units For Recurring Reservation": async (name_of_the_recurring_unit: RobotValue) => {
@@ -41,9 +36,6 @@ export const recurring = keywords("recurring", {
       name_of_the_recurring_unit,
       '[data-testid="recurring-card__button--toggle"]'
     );
-
-    // For animation
-    await BuiltIn["Sleep"]("300ms");
   },
 
   "User Checks The Count Of Selected Units": async (expected_text: RobotValue) => {

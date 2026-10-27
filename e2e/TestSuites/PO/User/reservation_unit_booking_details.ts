@@ -1,6 +1,5 @@
 /** Port of PO/User/reservation_unit_booking_details.robot */
 import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
 import { keywords } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
@@ -18,9 +17,9 @@ export const reservation_unit_booking_details = keywords("reservation_unit_booki
 
   "Select The Purpose Of The Booking": async (purpose: RobotValue) => {
     await Browser["Click"]("id=reservation-form-field__purpose-main-button");
-    await BuiltIn["Sleep"]("1s"); // wait for dropdown to load
-    await Browser["Wait For Elements State"]("id=reservation-form-field__purpose-option-2", "visible");
     await custom_keywords["Find And Click Element With Text"]("li", purpose);
+    // An option picked within 200 ms of opening leaves the HDS Select list open
+    await custom_keywords["Close Select List If Open"]("id=reservation-form-field__purpose-main-button");
   },
 
   "Select The Number Of Participants": async (number_of_persons: RobotValue) => {
@@ -40,10 +39,8 @@ export const reservation_unit_booking_details = keywords("reservation_unit_booki
   },
 
   "Click And Select AgeGroup Button": async (age_group: RobotValue) => {
-    await Browser["Wait For Elements State"]("id=reservation-form-field__ageGroup-main-button", "visible");
     await Browser["Click"]("id=reservation-form-field__ageGroup-main-button");
-    await BuiltIn["Sleep"]("1s"); // wait for dropdown to load
     await custom_keywords["Find And Click Element With Text"]("li", age_group);
-    await BuiltIn["Sleep"]("1s");
+    await custom_keywords["Close Select List If Open"]("id=reservation-form-field__ageGroup-main-button");
   },
 });
