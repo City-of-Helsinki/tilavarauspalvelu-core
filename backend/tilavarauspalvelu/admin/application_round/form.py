@@ -3,12 +3,14 @@ from __future__ import annotations
 from typing import Any
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
+from tilavarauspalvelu.services.pricing.application_round_options import check_application_round_change
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
@@ -41,6 +43,30 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         self.base_fields["reservation_units"].queryset = ReservationUnit.objects.select_related("unit").all()
         self.base_fields["terms_of_use"].required = True
         super().__init__(*args, **kwargs)
+
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean()
+
+        price_option_fields = {"reservation_units", "reservation_period_begin_date", "reservation_period_end_date"}
+        if self.instance.pk is not None and not price_option_fields.intersection(self.changed_data):
+            return cleaned_data
+
+        reservation_units = cleaned_data.get("reservation_units")
+        period_begin = cleaned_data.get("reservation_period_begin_date")
+        period_end = cleaned_data.get("reservation_period_end_date")
+        if reservation_units is None or period_begin is None or period_end is None:
+            return cleaned_data
+
+        errors = check_application_round_change(
+            application_round_pk=self.instance.pk,
+            reservation_unit_pks=[reservation_unit.pk for reservation_unit in reservation_units],
+            period_begin=period_begin,
+            period_end=period_end,
+        )
+        if errors:
+            raise ValidationError([error.message for error in errors])
+
+        return cleaned_data
 
     class Meta:
         model = ApplicationRound
