@@ -73,7 +73,7 @@ admin.site.get_app_list = lambda request, app_label=None: (
     "connect-src": [SELF, "https://cdn.jsdelivr.net;"],
 })
 def graphql_view_with_csp_decorator(request: HttpRequest) -> HttpResponseBase:
-    return FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)(request)
+    return FileUploadGraphQLView.as_view(graphiql=settings.GRAPHIQL_ENABLED)(request)
 
 
 # --- URL Patterns ---------------------------------------------------------------------------------------------------

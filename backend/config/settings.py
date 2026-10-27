@@ -459,13 +459,15 @@ class Common(Environment):
         ],
     }
 
+    GRAPHIQL_ENABLED = values.BooleanValue(default=False)
+
     @classproperty
     def ALLOW_DID_YOU_MEAN_SUGGESTIONS(cls) -> bool:
-        return cls.DEBUG
+        return cls.GRAPHIQL_ENABLED
 
     @classproperty
     def ALLOW_INTROSPECTION_QUERIES(cls) -> bool:
-        return cls.DEBUG
+        return cls.GRAPHIQL_ENABLED
 
     # --- Django REST Framework settings -----------------------------------------------------------------------------
 
@@ -744,6 +746,7 @@ class Local(Common, overrides_from=LocalMixin):
     # --- Basic settings ---------------------------------------------------------------------------------------------
 
     DEBUG = True
+    GRAPHIQL_ENABLED = True
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
 
@@ -849,6 +852,7 @@ class Docker(Common, overrides_from=DockerMixin):
     """Settings for local Docker development."""
 
     DEBUG = True
+    GRAPHIQL_ENABLED = True
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
 
