@@ -10,12 +10,10 @@ type TableWrapperProps = {
   $colWidths?: string[];
 };
 
-// Required for overflow to work
+// NOTE: do not remove the wrapper because HDS spreads action container and table without a parent div
+// -> our flex gaps will affect the gap between action buttons and the table
 const Wrapper = styled.div`
-  display: grid;
-  flex-grow: 1;
-
-  [class*="actionContainer"] [class*="actionButtonContainer"] {
+  [class*="Table-module_actionContainer"] [class*="actionButtonContainer"] {
     width: 100%;
   }
 `;
