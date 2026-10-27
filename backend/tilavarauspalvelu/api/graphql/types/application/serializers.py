@@ -16,6 +16,7 @@ from tilavarauspalvelu.api.graphql.types.application_section.serializers import 
 from tilavarauspalvelu.enums import ApplicationStatusChoice, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
+from tilavarauspalvelu.services.pricing.application_round_options import application_round_price_options
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import TimeSlot, local_datetime, local_timedelta_string, merge_time_slots, time_difference
 from utils.fields.serializer import CurrentUserDefaultNullable
@@ -184,6 +185,9 @@ class ApplicationSendSerializer(NestingModelSerializer):
             errors.append(error)
             return
 
+        offered_options = application_round_price_options(self.instance.application_round)
+        offered_option_pks = {option.pk for option in offered_options}
+
         for section in sections:
             if not section.name:
                 msg = f"Application section {section.pk} name cannot be empty."
@@ -203,6 +207,16 @@ class ApplicationSendSerializer(NestingModelSerializer):
             if section.purpose is None:
                 msg = f"Application section {section.pk} must have its purpose set."
                 error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_PURPOSE_MISSING)
+                errors.append(error)
+
+            if offered_option_pks and section.price_option_id is None:
+                msg = f"Application section {section.pk} must have a price option selected."
+                error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_PRICE_OPTION_MISSING)
+                errors.append(error)
+
+            if section.price_option_id is not None and section.price_option_id not in offered_option_pks:
+                msg = f"Application section {section.pk} has a price option that the application round does not offer."
+                error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_PRICE_OPTION_NOT_OFFERED)
                 errors.append(error)
 
             self.validate_suitable_time_ranges(section, errors)
