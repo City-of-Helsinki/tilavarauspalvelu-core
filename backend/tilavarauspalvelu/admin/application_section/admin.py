@@ -102,6 +102,7 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "num_persons",
                     "age_group",
                     "purpose",
+                    "price_option",
                 ],
             },
         ],
@@ -132,6 +133,7 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "ext_uuid",
         "should_have_active_access_code",
         "application",
+        "price_option",
     ]
     inlines = [
         SuitableTimeRangeInline,
@@ -152,6 +154,7 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                 "application__user",
                 "age_group",
                 "purpose",
+                "price_option",
             )
         )
 

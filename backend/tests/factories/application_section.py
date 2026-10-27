@@ -49,6 +49,7 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
 
     purpose = ForeignKeyFactory("tests.factories.ReservationPurposeFactory", required=True)
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory", required=True)
+    price_option = ForeignKeyFactory("tests.factories.PriceOptionFactory")
 
     reservation_unit_options = ReverseForeignKeyFactory("tests.factories.ReservationUnitOptionFactory")
     suitable_time_ranges = ReverseForeignKeyFactory("tests.factories.SuitableTimeRangeFactory")
