@@ -209,15 +209,17 @@ A variable in the container environment has priority over the same variable in a
 
 ### Development setup
 
-The development setup has two profiles. Without a profile, only the database and Redis start.
+The development setup has three profiles. Without a profile, only the database and Redis start.
 
 | Profile | Services |
 |---------|----------|
 | `backend` | The backend, the Celery worker and the Celery scheduler |
 | `frontend` | The customer UI and the staff UI. Needs the `backend` profile. |
+| `frontend-release` | The customer UI and the staff UI in production mode. Needs the `backend` profile. Use it in place of `frontend`. |
 
 ```sh
 just stack up             # The backend and the frontends
+just stack up-release     # The backend and the frontends in production mode
 just stack up-backend     # The backend only. Run the frontends on the host with "just fe dev".
 just stack services       # The database and Redis only. Run the backend on the host.
 ```
@@ -232,6 +234,8 @@ For a command that has no recipe, use `just stack compose`.
   Compose watch skips the files in `backend/.dockerignore`, which lists the Dockerfile. After a change to the Dockerfile, run `just stack build`.
 - Compose watch restarts the backend, the worker and the scheduler when `backend/.env.docker` changes. This needs Docker Compose 2.32 or later.
 - Celery does not reload code. After a change to task code, run `just stack restart worker scheduler`.
+- The `frontend-release` profile runs `next build` and then `next start`. Use it to test the pages that Next.js makes at build time,
+  for example the 404 and 500 pages. The code does not reload. After a change, run `just stack restart customer-release` or `staff-release`.
 - The `frontend-install` service installs the frontend dependencies and generates the GraphQL types. Then it stops.
   After a change to `pnpm-lock.yaml` or `tilavaraus.graphql`, run `just stack install`.
 - The containers keep their own `node_modules` and `.next` in volumes. The packages on the host can be for another platform.
@@ -242,7 +246,7 @@ For a command that has no recipe, use `just stack compose`.
   Otherwise the user is `1000:1000`. For a root shell in the backend, run `just stack exec --user root backend bash`.
 
 A plain `docker compose` command in the repository root sees only the services of the active profiles.
-Without a profile, that is the database and Redis. The `just stack` commands use both profiles.
+Without a profile, that is the database and Redis. `just stack up` uses the `backend` and `frontend` profiles. The other `just stack` commands use all profiles.
 To choose the profiles, set `COMPOSE_PROFILES`, for example `COMPOSE_PROFILES=backend just stack up`
 or `COMPOSE_PROFILES=backend,frontend docker compose up`.
 
