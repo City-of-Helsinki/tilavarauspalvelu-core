@@ -12,6 +12,7 @@ from tilavarauspalvelu.services.pricing.changes import save_price_component_chan
 from tilavarauspalvelu.typing import error_codes
 
 from tests.factories import (
+    ApplicationRoundFactory,
     PriceComponentFactory,
     PriceOptionFactory,
     PricingGroupFactory,
@@ -434,3 +435,58 @@ def test_save_price_component_changes__coverage_includes_reservation_units():
             code=error_codes.PRICING_GROUP_BEGINS_BEFORE_COMPONENTS,
         ),
     ]
+
+
+# ── Application rounds ──
+
+
+def test_save_price_component_changes__option_removed_from_open_application_round():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
+    juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    adults_component = PriceComponentFactory.create(pricing_group=pricing_group, price_option=adults, valid_from=JAN_1)
+    juniors_component = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        price_option=juniors,
+        valid_from=JAN_1,
+    )
+    row = ReservationUnitPricingGroupFactory.create(pricing_group=pricing_group, begins=JAN_1)
+    application_round = ApplicationRoundFactory.create(
+        name="Kesä",
+        reservation_units=[row.reservation_unit],
+        application_period_begins_at=datetime.datetime(2026, 2, 1, tzinfo=datetime.UTC),
+        application_period_ends_at=datetime.datetime(2026, 3, 1, tzinfo=datetime.UTC),
+        reservation_period_begin_date=datetime.date(2026, 5, 1),
+        reservation_period_end_date=datetime.date(2026, 8, 31),
+    )
+
+    juniors_component.valid_until = datetime.date(2026, 6, 1)
+
+    with pytest.raises(ValidationError) as error:
+        save_price_component_changes(
+            pricing_group=pricing_group,
+            components=[adults_component, juniors_component],
+            deleted_component_pks=[],
+        )
+
+    assert error_details(error.value) == [
+        ErrorDetail(
+            (
+                f"Application round '{application_round.name}': "
+                f"Reservation unit {row.reservation_unit.pk} has price options 'Adults' on 2026-06-01, "
+                f"but reservation unit {row.reservation_unit.pk} has 'Adults', 'Juniors' on 2026-05-01. "
+                "All reservation units must have the same price options for the whole reservation period."
+            ),
+            code=error_codes.APPLICATION_ROUND_PRICE_OPTIONS_INCONSISTENT,
+        ),
+        ErrorDetail(
+            (
+                f"Application round '{application_round.name}': "
+                "The change removes price options 'Juniors' from the application round. "
+                "Applicants can select them until the reservations of the round are made."
+            ),
+            code=error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED,
+        ),
+    ]
+    assert PriceComponent.objects.get(pk=juniors_component.pk).valid_until is None
