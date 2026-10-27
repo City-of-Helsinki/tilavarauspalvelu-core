@@ -8,6 +8,7 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 from tilavarauspalvelu.models import PriceComponent, PricingGroup
 from tilavarauspalvelu.typing import error_codes
 
+from .application_round_options import check_pricing_change_keeps_round_options
 from .coverage import check_pricing_group_coverage
 
 if TYPE_CHECKING:
@@ -35,7 +36,8 @@ def save_price_component_changes(
     :param pricing_group: The pricing group to change.
     :param components: Changed components (with a pk) and new components (without a pk). Not saved yet.
     :param deleted_component_pks: Primary keys of the components to delete.
-    :raises ValidationError: If an edit rule, a constraint or the coverage check fails. Nothing is saved then.
+    :raises ValidationError: If an edit rule, a constraint, the coverage check or the application round check fails.
+                             Nothing is saved then.
     """
     with transaction.atomic():
         # Lock the group, so that two batches for the same group cannot both pass the coverage check.
@@ -151,6 +153,12 @@ def _validate_pricing_group(*, pricing_group: PricingGroup, components: list[Pri
         components=components,
         reservation_unit_begin_dates=reservation_unit_begin_dates,
     )
-    if coverage_errors:
-        details = [ErrorDetail(error.message, code=error.code) for error in coverage_errors]
+    round_errors = check_pricing_change_keeps_round_options(
+        pricing_group=pricing_group,
+        components=components,
+        reservation_unit_rows=None,
+    )
+    errors = [*coverage_errors, *round_errors]
+    if errors:
+        details = [ErrorDetail(error.message, code=error.code) for error in errors]
         raise ValidationError(details)

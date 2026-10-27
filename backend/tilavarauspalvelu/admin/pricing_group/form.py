@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING
 
 from django import forms
 from django.contrib import admin
@@ -11,11 +10,9 @@ from modeltranslation.admin import TranslationStackedInline
 from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
+from tilavarauspalvelu.services.pricing.application_round_options import check_pricing_change_keeps_round_options
 from tilavarauspalvelu.services.pricing.coverage import check_pricing_group_coverage
 from utils.utils import only_django_validation_errors
-
-if TYPE_CHECKING:
-    import datetime
 
 __all__ = [
     "PriceComponentInline",
@@ -80,15 +77,23 @@ class PriceComponentFormSet(BaseInlineFormSet):
 
             components.append(component)
 
-        reservation_unit_begin_dates = self._reservation_unit_begin_dates()
+        reservation_unit_rows = self._reservation_unit_rows()
         errors = check_pricing_group_coverage(
             components=components,
-            reservation_unit_begin_dates=reservation_unit_begin_dates,
+            reservation_unit_begin_dates=[row.begins for row in reservation_unit_rows],
         )
         if errors:
             raise ValidationError([error.message for error in errors])
 
-    def _reservation_unit_begin_dates(self) -> list[datetime.date]:
+        round_errors = check_pricing_change_keeps_round_options(
+            pricing_group=self.instance,
+            components=components,
+            reservation_unit_rows=reservation_unit_rows,
+        )
+        if round_errors:
+            raise ValidationError([error.message for error in round_errors])
+
+    def _reservation_unit_rows(self) -> list[ReservationUnitPricingGroup]:
         reservation_unit_formset = ReservationUnitPricingGroupDataFormSet(
             data=self.data,
             instance=self.instance,
@@ -98,10 +103,10 @@ class PriceComponentFormSet(BaseInlineFormSet):
             # The reservation unit inline shows its own errors. Check against the saved rows meanwhile.
             if self.instance.pk is None:
                 return []
-            return list(self.instance.reservation_unit_pricing_groups.values_list("begins", flat=True))
+            return list(self.instance.reservation_unit_pricing_groups.all())
 
         return [
-            form.cleaned_data["begins"]
+            form.instance
             for form in reservation_unit_formset.forms
             if form.cleaned_data and not reservation_unit_formset._should_delete_form(form)  # noqa: SLF001
         ]
