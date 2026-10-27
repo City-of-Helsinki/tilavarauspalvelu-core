@@ -16,6 +16,10 @@ const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 const HDS_COOKIE_CONSENT_IMPORT = "hds-core/lib/components/cookie-consent/cookieConsent";
 const HDS_COOKIE_CONSENT_TARGET = "hds-core/lib/components/cookie-consent/cookieConsent.ts";
 
+// Set NEXT_BUILD_CPUS to limit the build workers, for example in Docker where the CPU limit does not apply.
+const envCores = Number(process.env.NEXT_BUILD_CPUS);
+const numberOfCores = envCores > 0 ? envCores : availableParallelism();
+
 const { i18n } = i18nconfig;
 
 const nextConfig: NextConfig = {
@@ -24,7 +28,7 @@ const nextConfig: NextConfig = {
   // NOTE default worker count uses os.cpus() which ignores container CPU limits
   // and spawns too many workers (OOM in memory limited containers)
   experimental: {
-    cpus: availableParallelism(),
+    cpus: numberOfCores,
     serverSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
   },
   transpilePackages: ["ui", "hds-core", "hds-react"],

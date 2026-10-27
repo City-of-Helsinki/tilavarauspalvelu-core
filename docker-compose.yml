@@ -238,24 +238,39 @@ services:
       - >-
         pnpm --filter customer run build
         && pnpm --filter customer run start --hostname 0.0.0.0
-    environment:
+    environment: &frontend-release-environment
       TZ: Europe/Helsinki
+      # Node and Turbopack see all the CPUs of the host, not the limits of the container.
+      # The build uses a thread and memory for each CPU, and Docker can kill it when the memory runs out.
+      # Set FRONTEND_BUILD_THREADS to change the limit.
+      # next.config.ts reads NEXT_BUILD_CPUS for the number of build workers.
+      NEXT_BUILD_CPUS: ${FRONTEND_BUILD_THREADS:-4}
+      TOKIO_WORKER_THREADS: ${FRONTEND_BUILD_THREADS:-4}
+      RAYON_NUM_THREADS: ${FRONTEND_BUILD_THREADS:-4}
+    # Healthy after the build is done and the server runs. The build can take many minutes.
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/healthcheck').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15m
+      start_interval: 5s
 
+  # Builds after the customer UI, so the two builds do not use memory at the same time.
   staff-release:
     <<: *frontend
     profiles: [frontend-release]
     network_mode: service:frontend-net
     depends_on:
-      frontend-install:
-        condition: service_completed_successfully
+      customer-release:
+        condition: service_healthy
     command:
       - sh
       - -c
       - >-
         pnpm --filter staff run build
         && pnpm --filter staff run start --hostname 0.0.0.0
-    environment:
-      TZ: Europe/Helsinki
+    environment: *frontend-release-environment
 
 volumes:
   tvp-postgres:
