@@ -236,6 +236,8 @@ For a command that has no recipe, use `just stack compose`.
 - Celery does not reload code. After a change to task code, run `just stack restart worker scheduler`.
 - The `frontend-release` profile runs `next build` and then `next start`. Use it to test the pages that Next.js makes at build time,
   for example the 404 and 500 pages. The code does not reload. After a change, run `just stack restart customer-release` or `staff-release`.
+  The staff UI builds after the customer UI. Each build uses 4 threads. To change that, set `FRONTEND_BUILD_THREADS`,
+  for example `FRONTEND_BUILD_THREADS=2 just stack up-release`.
 - The `frontend-install` service installs the frontend dependencies and generates the GraphQL types. Then it stops.
   After a change to `pnpm-lock.yaml` or `tilavaraus.graphql`, run `just stack install`.
 - The containers keep their own `node_modules` and `.next` in volumes. The packages on the host can be for another platform.
