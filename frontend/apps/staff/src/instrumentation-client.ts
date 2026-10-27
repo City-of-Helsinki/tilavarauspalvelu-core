@@ -20,7 +20,7 @@ if (env.SENTRY_DSN) {
       Sentry.extraErrorDataIntegration({ depth: 3 }),
       thirdPartyErrorFilterIntegration({
         filterKeys: [SENTRY_APPLICATION_KEY],
-        behaviour: "drop-error-if-contains-third-party-frames",
+        behaviour: "drop-error-if-exclusively-contains-third-party-frames",
       }),
     ],
     dsn: env.SENTRY_DSN,
