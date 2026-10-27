@@ -75,6 +75,14 @@ jobs:
       - name: "Install project dependencies"
         uses: ./.github/actions/poetry
 
+      # Dependabot can write wrong dependency groups to the lock file. 'poetry check --lock' does not find them.
+      - name: "Test for outdated poetry.lock"
+        working-directory: backend
+        run: |
+          cp poetry.lock /tmp/poetry.lock.committed
+          poetry lock
+          diff -u /tmp/poetry.lock.committed poetry.lock
+
       - name: "Test for migration issues"
         working-directory: backend
         run: poetry run python manage.py makemigrations --check --no-color --no-input --dry-run
