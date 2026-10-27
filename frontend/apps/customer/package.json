@@ -27,7 +27,7 @@
     "graphql": "^16.14.1",
     "hds-core": "^6.0.6",
     "hds-react": "^6.0.6",
-    "i18next": "^26.5.2",
+    "i18next": "^26.5.3",
     "import-in-the-middle": "^3.5.1",
     "lodash-es": "^4.18.1",
     "next": "^16.4.2",
