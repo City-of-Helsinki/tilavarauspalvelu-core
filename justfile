@@ -28,13 +28,16 @@ claude-setup: claude-hooks
     @mkdir -p .claude
     @ln -sf ../.agents/skills .claude/skills
 
+# Claude Code reads .claude/settings.json only from the directory where the session starts.
 # Create Claude Code hooks from .agents/hooks. Run again after claude-hooks.json changes.
-claude-hooks:
-    @mkdir -p .claude
+claude-hooks: (_claude-hooks-in ".") (_claude-hooks-in "backend") (_claude-hooks-in "frontend")
     @ln -sfn ../.agents/hooks .claude/hooks
-    @[ -f .claude/settings.json ] || echo '{}' > .claude/settings.json
-    @jq --slurpfile hooks .agents/hooks/claude-hooks.json '.hooks = $hooks[0]' .claude/settings.json > .claude/settings.json.tmp
-    @mv .claude/settings.json.tmp .claude/settings.json
+
+_claude-hooks-in dir:
+    @mkdir -p {{ dir }}/.claude
+    @[ -f {{ dir }}/.claude/settings.json ] || echo '{}' > {{ dir }}/.claude/settings.json
+    @jq --slurpfile hooks .agents/hooks/claude-hooks.json '.hooks = $hooks[0]' {{ dir }}/.claude/settings.json > {{ dir }}/.claude/settings.json.tmp
+    @mv {{ dir }}/.claude/settings.json.tmp {{ dir }}/.claude/settings.json
 
 # Open bash in the backend container
 bash: stack::bash
