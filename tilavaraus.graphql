@@ -4267,7 +4267,6 @@ input UpdatePriceComponentInputSerializerInput {
   priceOption: Int
   amount: Decimal
   priceUnit: PriceUnit
-  accounting: Int
   canApplyForDiscount: Boolean
   materialPriceDescription: String
   materialPriceDescriptionFi: String
