@@ -2292,6 +2292,11 @@ msgstr "Etsi nimellä tai toimipisteen nimellä"
 msgid "current percentage"
 msgstr "nykyinen veroprosentti"
 
+#: tilavarauspalvelu/admin/tax_level/form.py
+msgid "At least one rate in effect today is required."
+msgstr ""
+"Verotasolla on oltava vähintään yksi tänään voimassa oleva veroprosentti."
+
 #: tilavarauspalvelu/admin/terms_of_use/admin.py
 msgid "Show PDF"
 msgstr "Näytä PDF"
