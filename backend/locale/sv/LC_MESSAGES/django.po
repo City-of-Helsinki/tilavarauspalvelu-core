@@ -2227,6 +2227,10 @@ msgstr ""
 msgid "Search by name or unit name"
 msgstr ""
 
+#: tilavarauspalvelu/admin/tax_level/admin.py
+msgid "current percentage"
+msgstr "nuvarande skattesats"
+
 #: tilavarauspalvelu/admin/terms_of_use/admin.py
 msgid "Show PDF"
 msgstr ""
