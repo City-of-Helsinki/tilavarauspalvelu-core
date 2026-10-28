@@ -14,7 +14,6 @@ from .create_reservation_related_things import (
     _create_reservation_purposes,
     _create_specific_terms_of_use,
     _create_tax_levels,
-    _create_tax_percentages,
 )
 from .create_reservation_units import _create_reservation_units
 from .create_reservations import _create_reservation_series, _create_reservations
@@ -35,14 +34,13 @@ def create_test_data(*, flush: bool = True) -> None:
     hauki_resources = _create_hauki_resources()
     terms_of_use = _create_specific_terms_of_use()
     cancellation_rules = _create_cancellation_rules()
-    tax_percentages = _create_tax_percentages()
-    _create_tax_levels()
+    tax_levels = _create_tax_levels()
 
     _create_reservation_units(
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,
-        tax_percentages=tax_percentages,
+        tax_levels=tax_levels,
     )
 
     reservation_purposes = _create_reservation_purposes()
@@ -57,7 +55,7 @@ def create_test_data(*, flush: bool = True) -> None:
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,
-        tax_percentage=tax_percentages["0"],
+        tax_level=tax_levels["0"],
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
     )

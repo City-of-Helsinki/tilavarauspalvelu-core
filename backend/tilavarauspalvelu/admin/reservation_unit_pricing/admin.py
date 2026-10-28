@@ -43,15 +43,15 @@ class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslatio
         "begins",
         "lowest_price",
         "highest_price",
-        "tax_percentage",
+        "tax_level",
         "price_unit",
     ]
     list_filter = [
         ("begins", DateRangeFilterBuilder()),
-        "tax_percentage",
+        "tax_level",
         ("reservation_unit", ReservationUnitFilter),
     ]
-    list_select_related = ["reservation_unit__unit", "tax_percentage"]
+    list_select_related = ["reservation_unit__unit", "tax_level"]
     autocomplete_fields = ["reservation_unit"]
     ordering = ["-begins"]
 
@@ -64,7 +64,7 @@ class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslatio
         ("highest_price", "highest_price_net"),
         "price_unit",
         "payment_type",
-        "tax_percentage",
+        "tax_level",
         "material_price_description",
     ]
     readonly_fields = [

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
@@ -10,15 +11,15 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from utils.auditlog_util import AuditLogger
+from utils.date_utils import local_date
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
     import datetime
-    from decimal import Decimal
 
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ReservationUnit, TaxPercentage
+    from tilavarauspalvelu.models import ReservationUnit, TaxLevel, TaxPercentage
 
     from .actions import ReservationUnitPricingActions
     from .queryset import ReservationUnitPricingManager
@@ -50,11 +51,19 @@ class ReservationUnitPricing(models.Model):
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
-    tax_percentage: TaxPercentage = models.ForeignKey(
+    tax_level: TaxLevel = models.ForeignKey(
+        "tilavarauspalvelu.TaxLevel",
+        related_name="reservation_unit_pricings",
+        on_delete=models.PROTECT,
+    )
+
+    # Not used. Kept so that migrations can be reversed. Removed in TILA-4558.
+    tax_percentage: TaxPercentage | None = models.ForeignKey(
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
-        limit_choices_to=models.Q(is_enabled=True),
+        null=True,
+        blank=True,
     )
 
     reservation_unit: ReservationUnit = models.ForeignKey(
@@ -92,22 +101,22 @@ class ReservationUnitPricing(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"
+        return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_level})"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.pk} ({self!s})>"
 
     @property
     def lowest_price_net(self) -> Decimal:
-        if self.tax_percentage == 0:
-            return self.lowest_price
-        return self.lowest_price / self.tax_percentage.multiplier
+        today = local_date()
+        tax_percentage = self.tax_level.actions.get_percentage(on_date=today)
+        return self.lowest_price / (1 + tax_percentage / Decimal(100))
 
     @property
     def highest_price_net(self) -> Decimal:
-        if self.tax_percentage == 0:
-            return self.highest_price
-        return self.highest_price / self.tax_percentage.multiplier
+        today = local_date()
+        tax_percentage = self.tax_level.actions.get_percentage(on_date=today)
+        return self.highest_price / (1 + tax_percentage / Decimal(100))
 
 
 AuditLogger.register(ReservationUnitPricing)

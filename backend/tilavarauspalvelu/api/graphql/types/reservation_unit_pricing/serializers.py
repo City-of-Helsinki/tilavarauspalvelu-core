@@ -15,7 +15,7 @@ class ReservationUnitPricingSerializer(NestingModelSerializer):
             "price_unit",
             "lowest_price",
             "highest_price",
-            "tax_percentage",
+            "tax_level",
             "material_price_description_fi",
             "material_price_description_en",
             "material_price_description_sv",

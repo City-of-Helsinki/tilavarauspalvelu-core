@@ -355,7 +355,7 @@ class ReservationNode(DjangoNode):
                         price_unit=models.F("price_unit"),
                         lowest_price=models.F("lowest_price"),
                         highest_price=models.F("highest_price"),
-                        tax_percentage=models.F("tax_percentage__value"),
+                        tax_percentage=L("tax_level__current_percentage"),
                         material_price_description_fi=models.F("material_price_description_fi"),
                         material_price_description_en=models.F("material_price_description_en"),
                         material_price_description_sv=models.F("material_price_description_sv"),

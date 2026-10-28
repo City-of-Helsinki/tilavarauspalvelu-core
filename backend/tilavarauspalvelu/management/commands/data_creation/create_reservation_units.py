@@ -85,7 +85,7 @@ if TYPE_CHECKING:
         PaymentMerchant,
         ReservationUnitCancellationRule,
         ReservationUnitType,
-        TaxPercentage,
+        TaxLevel,
         TermsOfUse,
     )
 
@@ -97,7 +97,7 @@ def _create_reservation_units(
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> list[ReservationUnit]:
     # --- Create dependencies for the reservation units  ------------------------------------------------------------
 
@@ -110,14 +110,14 @@ def _create_reservation_units(
         cancellation_rules,
         hauki_resources,
         terms_of_use,
-        tax_percentages,
+        tax_levels,
     )
 
     _create_paid_reservation_units(
         cancellation_rules,
         hauki_resources,
         terms_of_use,
-        tax_percentages,
+        tax_levels,
         merchants,
         accountings,
     )
@@ -126,48 +126,48 @@ def _create_reservation_units(
         cancellation_rules,
         hauki_resources,
         terms_of_use,
-        tax_percentages,
+        tax_levels,
     )
 
     _create_empty_reservation_units(
         cancellation_rules,
         terms_of_use,
-        tax_percentages,
+        tax_levels,
     )
 
     _create_archived_reservation_units(
         cancellation_rules,
         terms_of_use,
         hauki_resources,
-        tax_percentages,
+        tax_levels,
     )
 
     _create_single_reservation_per_user_reservation_units(
         cancellation_rules,
         terms_of_use,
         hauki_resources,
-        tax_percentages,
+        tax_levels,
     )
 
     _create_full_day_reservation_units(
         cancellation_rules,
         terms_of_use,
         hauki_resources,
-        tax_percentages,
+        tax_levels,
     )
 
     _create_reservation_units_in_space_hierarchies(
         cancellation_rules,
         terms_of_use,
         hauki_resources,
-        tax_percentages,
+        tax_levels,
     )
 
     _create_reservation_units_in_resource_hierarchies(
         cancellation_rules,
         terms_of_use,
         hauki_resources,
-        tax_percentages,
+        tax_levels,
     )
 
     if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS:
@@ -191,7 +191,7 @@ def _create_free_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> None:
     """
     Create reservation units that:
@@ -391,7 +391,7 @@ def _create_free_reservation_units(
             lowest_price=Decimal(0),
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
-            tax_percentage=tax_percentages["0"],
+            tax_level=tax_levels["0"],
             material_price_description=data.material_price_info.fi,
             material_price_description_en=data.material_price_info.en,
             material_price_description_sv=data.material_price_info.sv,
@@ -426,7 +426,7 @@ def _create_paid_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
     merchants: list[PaymentMerchant],
     accountings: list[PaymentAccounting],
 ) -> None:
@@ -618,7 +618,7 @@ def _create_paid_reservation_units(
             lowest_price=data.price_info.lowest_price,
             highest_price=data.price_info.highest_price,
             reservation_unit=reservation_unit,
-            tax_percentage=tax_percentages[data.tax_percentage_info.value],
+            tax_level=tax_levels[data.tax_percentage_info.value],
             payment_type=data.payment_type_info.payment_type,
             material_price_description="",
         )
@@ -653,7 +653,7 @@ def _create_seasonal_bookable_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> None:
     """
     Create reservation units that:
@@ -823,7 +823,7 @@ def _create_seasonal_bookable_reservation_units(
             lowest_price=Decimal(0),
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
-            tax_percentage=tax_percentages["0"],
+            tax_level=tax_levels["0"],
             material_price_description="",
         )
         pricings.append(pricing)
@@ -850,7 +850,7 @@ def _create_seasonal_bookable_reservation_units(
 def _create_empty_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> None:
     """Creates reservation units that have no spaces, resources, or hauki resource, making it "un-bookable"."""
     unit = UnitFactory.create(
@@ -888,7 +888,7 @@ def _create_empty_reservation_units(
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
-        tax_percentage=tax_percentages["0"],
+        tax_level=tax_levels["0"],
         material_price_description="",
     )
 
@@ -912,7 +912,7 @@ def _create_archived_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> None:
     """Creates reservation units that are archived, meaning it has been "soft-removed" from the system."""
     unit = UnitFactory.create(
@@ -958,7 +958,7 @@ def _create_archived_reservation_units(
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
-        tax_percentage=tax_percentages["0"],
+        tax_level=tax_levels["0"],
         material_price_description="",
     )
 
@@ -974,7 +974,7 @@ def _create_single_reservation_per_user_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> None:
     """Creates reservation units where one user can only have a single reservation at a time."""
     unit = UnitFactory.create(
@@ -1020,7 +1020,7 @@ def _create_single_reservation_per_user_reservation_units(
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
-        tax_percentage=tax_percentages["0"],
+        tax_level=tax_levels["0"],
         material_price_description="",
     )
 
@@ -1044,7 +1044,7 @@ def _create_full_day_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> None:
     """Creates reservation units where a single booking blocks all other reservations for the same day."""
     unit = UnitFactory.create(
@@ -1109,7 +1109,7 @@ def _create_full_day_reservation_units(
             lowest_price=Decimal(0),
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
-            tax_percentage=tax_percentages["0"],
+            tax_level=tax_levels["0"],
             material_price_description="",
         )
         pricings.append(pricing)
@@ -1142,7 +1142,7 @@ def _create_reservation_units_in_space_hierarchies(
     cancellation_rules: list[ReservationUnitCancellationRule],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> None:
     """
     Create reservation units which different parts of the same physical location.
@@ -1210,7 +1210,7 @@ def _create_reservation_units_in_space_hierarchies(
         price_unit=PriceUnit.FIXED,
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
-        tax_percentage=tax_percentages["0"],
+        tax_level=tax_levels["0"],
     )
 
     reservation_unit_access_type = ReservationUnitAccessTypeBuilder().set(
@@ -1512,7 +1512,7 @@ def _create_reservation_units_in_resource_hierarchies(
     cancellation_rules: list[ReservationUnitCancellationRule],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[Percentage, TaxPercentage],
+    tax_levels: dict[Percentage, TaxLevel],
 ) -> None:
     """
     Create reservation units that share some common resources but different locations.
@@ -1591,7 +1591,7 @@ def _create_reservation_units_in_resource_hierarchies(
         price_unit=PriceUnit.FIXED,
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
-        tax_percentage=tax_percentages["0"],
+        tax_level=tax_levels["0"],
     )
 
     reservation_unit_access_type = ReservationUnitAccessTypeBuilder().set(
@@ -1729,7 +1729,7 @@ def _create_reservation_unit_for_reservation_series(
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentage: TaxPercentage,
+    tax_level: TaxLevel,
 ) -> ReservationUnit:
     unit = UnitFactory.create(
         name="Toistuva",
@@ -1772,7 +1772,7 @@ def _create_reservation_unit_for_reservation_series(
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
-        tax_percentage=tax_percentage,
+        tax_level=tax_level,
         material_price_description="",
     )
 

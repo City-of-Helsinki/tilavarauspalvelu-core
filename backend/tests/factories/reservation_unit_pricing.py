@@ -27,14 +27,14 @@ class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPri
 
     material_price_description = ""
 
-    tax_percentage = ForeignKeyFactory("tests.factories.TaxPercentageFactory")
+    tax_level = ForeignKeyFactory("tests.factories.TaxLevelFactory")
     reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory", required=True)
 
     @classmethod
     def create_free(cls, **kwargs) -> ReservationUnitPricing:
         kwargs.setdefault("lowest_price", Decimal(0))
         kwargs.setdefault("highest_price", Decimal(0))
-        kwargs.setdefault("tax_percentage__value", Decimal(0))
+        kwargs.setdefault("tax_level__rates__percentage", Decimal(0))
 
         return cls.create(**kwargs)
 
