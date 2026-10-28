@@ -324,16 +324,16 @@ class ReservationUnitNode(DjangoNode):
     @staticmethod
     def optimize_num_active_user_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
         if optimizer.info.context.user.is_anonymous:
-            return queryset.annotate(num_active_user_reservations=models.Value(0))
+            optimizer.annotations["num_active_user_reservations"] = models.Value(0)
+            return queryset
 
-        return queryset.annotate(
-            num_active_user_reservations=SubqueryCount(
-                Reservation.objects.filter_for_user_num_active_reservations(
-                    reservation_unit=models.OuterRef("id"),
-                    user=optimizer.info.context.user,
-                ).values("id")
-            ),
+        optimizer.annotations["num_active_user_reservations"] = SubqueryCount(
+            Reservation.objects.filter_for_user_num_active_reservations(
+                reservation_unit=models.OuterRef("id"),
+                user=optimizer.info.context.user,
+            ).values("id")
         )
+        return queryset
 
     def resolve_num_active_user_reservations(root: ReservationUnit, info: GQLInfo) -> int:
         """

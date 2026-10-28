@@ -29,6 +29,7 @@ from tests.factories import (
     TermsOfUseFactory,
     UserFactory,
 )
+from tests.test_graphql_api.test_reservation.helpers import reservation_query
 
 from .helpers import reservation_unit_query, reservation_units_query
 
@@ -733,6 +734,25 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
     assert response.node(0) == {"numActiveUserReservations": 1}
+
+
+def test_reservation_unit__query__num_active_user_reservations__through_reservation(graphql):
+    user = graphql.login_with_regular_user()
+
+    begin = next_hour(plus_hours=1)
+    end = begin + datetime.timedelta(hours=1)
+
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create_for_reservation_unit(
+        begins_at=begin, ends_at=end, reservation_unit=reservation_unit, user=user
+    )
+
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(id=global_id, fields="reservationUnit { numActiveUserReservations }")
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object == {"reservationUnit": {"numActiveUserReservations": 1}}
 
 
 def test_reservation_unit__query__num_active_user_reservations__user_unauthenticated(graphql):
