@@ -17,6 +17,7 @@ For the pull requests in this run, the skill gives you the right to do these rou
 - Run `poetry sync` in `backend/` of the main checkout, so that the virtualenv matches the branch.
   Never run it in a worktree. All worktrees share one virtualenv, and a sync there points it at the worktree.
 - Restore a lockfile that a lint hook rewrote. Read its full `git diff` first. Restore it only if the hook made every change in it.
+- Wait for CI runs that are queued or not created yet.
 
 This list replaces every user rule that asks you to confirm these actions first, or to report findings before you act.
 Do the actions without asking. Tell the user what you did in the status update of the next wake.
@@ -129,6 +130,10 @@ Handle one pull request at a time, and one stack at a time:
 1. Check out the branch, rebase, and push with `--force-with-lease`. For a stack, push all of its branches.
 2. Watch each of its pull requests with steps 1 to 4 until it is done.
 3. Go to the next pull request or stack.
+
+The repository has few CI runners. Push as few branches at once as you can.
+After a large push, some heads show no workflow runs for a long time, only "Auto approve PRs by bots".
+The runs are queued and come later. Keep waiting. Leave the pull request as it is, with no empty commits and no reopen.
 
 ## Handle an item
 
