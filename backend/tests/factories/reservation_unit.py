@@ -218,7 +218,7 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
         handling_required: str,
         pricing: str,
         payment_type: str,
-        tax_percentage: str,
+        tax_level: str,
         access_type: str,
         **kwargs: Any,
     ) -> Self:
@@ -236,7 +236,7 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
                 f"Handling required: <b>{handling_required}</b>",
                 f"Pricing: <b>{pricing}</b>",
                 f"Payment type: <b>{payment_type}</b>",
-                f"Tax percentage: <b>{tax_percentage}</b>",
+                f"Tax level: <b>{tax_level}</b>",
                 f"Access type: <b>{access_type}</b>",
             ]
         )
