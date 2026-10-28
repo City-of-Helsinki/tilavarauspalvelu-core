@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tilavarauspalvelu", "0182_add_tax_level_to_reservation_unit_pricing"),
+        ("tilavarauspalvelu", "0183_migrate_tax_percentages_to_tax_levels"),
     ]
 
     operations = [
