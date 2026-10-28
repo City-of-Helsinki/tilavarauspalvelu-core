@@ -25,7 +25,6 @@ class ReservationUnitPricingNode(DjangoNode):
         fields = [
             "pk",
             "begins",
-            "is_activated_on_begins",
             "price_unit",
             "payment_type",
             "lowest_price",

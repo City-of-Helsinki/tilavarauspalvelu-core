@@ -25,8 +25,6 @@ class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPri
     lowest_price = Decimal(5)
     highest_price = Decimal(10)
 
-    is_activated_on_begins = False
-
     material_price_description = ""
 
     tax_percentage = ForeignKeyFactory("tests.factories.TaxPercentageFactory")

@@ -11,7 +11,6 @@ class ReservationUnitPricingSerializer(NestingModelSerializer):
         fields = [
             "pk",
             "begins",
-            "is_activated_on_begins",
             "payment_type",
             "price_unit",
             "lowest_price",
