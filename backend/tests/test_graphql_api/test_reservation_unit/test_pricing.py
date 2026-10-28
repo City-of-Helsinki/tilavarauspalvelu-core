@@ -5,18 +5,11 @@ from decimal import Decimal
 
 import pytest
 
-from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 
-from tests.factories import (
-    ReservationUnitAccessTypeFactory,
-    ReservationUnitFactory,
-    ReservationUnitPricingFactory,
-    SpaceFactory,
-    TaxPercentageFactory,
-)
+from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory, TaxLevelFactory, TaxLevelRateFactory
 
 from .helpers import (
     CREATE_MUTATION,
@@ -78,19 +71,25 @@ def test_reservation_unit__query__pricing__old_pricings_not_returned(graphql):
     }
 
 
-def test_reservation_unit__query__pricing__disabled_tax_percentage_returned(graphql):
-    tax_percentage = TaxPercentageFactory.create(is_enabled=False, value=24)
+def test_reservation_unit__query__pricing__tax_level_current_percentage(graphql):
+    today = local_date()
+
+    tax_level = TaxLevelFactory.create(
+        name="Yleinen", rates__percentage=Decimal(24), rates__begins=datetime.date(2000, 1, 1)
+    )
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=today, percentage=Decimal("25.5"))
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=today + datetime.timedelta(days=1), percentage=Decimal(27))
 
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
-        begins=local_date(),
-        tax_percentage=tax_percentage,
+        begins=today,
+        tax_level=tax_level,
     )
 
     graphql.login_with_superuser()
 
-    query = reservation_units_query(fields="pk pricings { taxPercentage { value isEnabled } }")
+    query = reservation_units_query(fields="pk pricings { taxLevel { nameFi currentPercentage } }")
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -100,9 +99,9 @@ def test_reservation_unit__query__pricing__disabled_tax_percentage_returned(grap
         "pk": reservation_unit.pk,
         "pricings": [
             {
-                "taxPercentage": {
-                    "value": "24.00",
-                    "isEnabled": False,
+                "taxLevel": {
+                    "nameFi": "Yleinen",
+                    "currentPercentage": "25.50",
                 },
             },
         ],
@@ -151,14 +150,14 @@ def test_reservation_unit__create__pricing__empty_list_is_blocked_for_non_drafts
 
 
 def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_information(graphql):
-    tax_percentage = TaxPercentageFactory.create(value=Decimal("0.0"))
+    tax_level = TaxLevelFactory.create(rates__percentage=Decimal("0.0"))
 
     graphql.login_with_superuser()
     data = get_create_draft_input_data(
         pricings=[
             {
                 "begins": local_date().isoformat(),
-                "taxPercentage": tax_percentage.id,
+                "taxLevel": tax_level.id,
             },
         ],
     )
@@ -175,7 +174,7 @@ def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_in
     assert pricing.highest_price == 0
     assert pricing.lowest_price_net == 0
     assert pricing.highest_price_net == 0
-    assert pricing.tax_percentage.value == 0
+    assert pricing.tax_level == tax_level
     assert pricing.payment_type is None
 
 
@@ -264,37 +263,6 @@ def test_reservation_unit__create__pricing__creating_future_pricing_without_acti
 
     assert response.has_errors is True, response
     assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING
-    assert ReservationUnit.objects.count() == 0
-
-
-def test_reservation_unit__create__pricing__cannot_use_disabled_tax_percentage(graphql):
-    tax_percentage = TaxPercentageFactory.create(is_enabled=False, value=Decimal("11.0"))
-
-    input_data = get_create_draft_input_data(
-        pricings=[
-            {
-                "begins": "2022-09-11",
-                "priceUnit": PriceUnit.PER_15_MINS.value.upper(),
-                "lowestPrice": "18.2",
-                "highestPrice": "21.5",
-                "taxPercentage": tax_percentage.id,
-                "paymentType": PaymentType.ONLINE_OR_INVOICE,
-            },
-        ],
-    )
-
-    graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
-
-    assert response.has_errors is True, response
-    assert response.error_message() == "Mutation was unsuccessful."
-
-    # Since "Pricing <-> Tax Percentage" relation has the "limit_choices_to" constraint,
-    # disabled pricings are treated as not existing in serializers.
-    assert response.field_error_messages("pricings.0.taxPercentage") == [
-        f'Invalid pk "{tax_percentage.pk}" - object does not exist.',
-    ]
-
     assert ReservationUnit.objects.count() == 0
 
 
@@ -550,37 +518,3 @@ def test_reservation_unit__update__pricing__empty_list_is_blocked_for_non_drafts
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.pricings.count() == 1
-
-
-def test_reservation_unit__update__pricing__cannot_use_disabled_tax_percentage(graphql):
-    space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(spaces=[space])
-    ReservationUnitAccessTypeFactory.create(reservation_unit=reservation_unit)
-
-    tax_percentage = TaxPercentageFactory.create(is_enabled=False, value=Decimal("10.0"))
-
-    update_data = {
-        "pk": reservation_unit.pk,
-        "pricings": [
-            {
-                "begins": "2022-09-11",
-                "priceUnit": PriceUnit.PER_15_MINS.value.upper(),
-                "lowestPrice": "18.2",
-                "highestPrice": "21.5",
-                "taxPercentage": tax_percentage.id,
-                "paymentType": PaymentType.ONLINE_OR_INVOICE,
-            },
-        ],
-    }
-
-    graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
-
-    assert response.has_errors is True, response
-    assert response.error_message() == "Mutation was unsuccessful."
-
-    # Since "Pricing <-> Tax Percentage" relation has the "limit_choices_to" constraint,
-    # disabled pricings are treated as not existing in serializers.
-    assert response.field_error_messages("pricings.0.taxPercentage") == [
-        f'Invalid pk "{tax_percentage.pk}" - object does not exist.',
-    ]

@@ -53,7 +53,7 @@ if TYPE_CHECKING:
         ReservationPurpose,
         ReservationSeries,
         ReservationUnitCancellationRule,
-        TaxPercentage,
+        TaxLevel,
         TermsOfUse,
     )
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
@@ -658,7 +658,7 @@ def _create_reservation_series(
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentage: TaxPercentage,
+    tax_level: TaxLevel,
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
 ) -> None:
@@ -668,7 +668,7 @@ def _create_reservation_series(
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,
-        tax_percentage=tax_percentage,
+        tax_level=tax_level,
     )
 
     _create_past_reservation_series(
@@ -843,6 +843,9 @@ def _create_reservations_for_series(
     pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
     assert pricing is not None, "Reservation unit must have at least one pricing"
 
+    today = local_date()
+    tax_percentage = pricing.tax_level.actions.get_percentage(on_date=today)
+
     weekdays: list[Weekday] = [Weekday(weekday) for weekday in series.weekdays]
 
     reservations: list[Reservation] = []
@@ -890,7 +893,7 @@ def _create_reservations_for_series(
                     price=price,
                     non_subsidised_price=pricing.highest_price,
                     unit_price=pricing.highest_price,
-                    tax_percentage_value=pricing.tax_percentage.value,
+                    tax_percentage_value=tax_percentage,
                     #
                     applying_for_free_of_charge=False,
                     free_of_charge_reason=None,

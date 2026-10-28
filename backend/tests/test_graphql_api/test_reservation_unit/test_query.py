@@ -309,8 +309,8 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
         pk
         pricings {
             begins
-            taxPercentage {
-                value
+            taxLevel {
+                currentPercentage
             }
         }
         images {
@@ -347,8 +347,8 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
         "pricings": [
             {
                 "begins": reservation_unit.pricings.first().begins.isoformat(),
-                "taxPercentage": {
-                    "value": str(reservation_unit.pricings.first().tax_percentage.value),
+                "taxLevel": {
+                    "currentPercentage": "25.50",
                 },
             },
         ],

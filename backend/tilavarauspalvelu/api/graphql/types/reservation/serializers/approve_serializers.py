@@ -16,7 +16,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFo
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -100,7 +100,8 @@ class ReservationApproveSerializer(NestingModelSerializer):
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
 
         # Tax percentage needs to be updated in case it has changed since the reservation was created
-        data["tax_percentage_value"] = pricing.tax_percentage.value
+        today = local_date()
+        data["tax_percentage_value"] = pricing.tax_level.actions.get_percentage(on_date=today)
 
         now = local_datetime()
         three_days_from_now = now + datetime.timedelta(days=3)

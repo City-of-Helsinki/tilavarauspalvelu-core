@@ -2368,7 +2368,7 @@ type ReservationUnitPricingNode implements Node {
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
-  taxPercentage: TaxPercentageNode!
+  taxLevel: TaxLevelNode!
 
   """The ID of the object"""
   id: ID!
@@ -2377,12 +2377,14 @@ type ReservationUnitPricingNode implements Node {
   pk: Int
 }
 
-type TaxPercentageNode implements Node {
-  value: Decimal!
-  isEnabled: Boolean!
+type TaxLevelNode implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """The ID of the object"""
   id: ID!
+  currentPercentage: Decimal
   pk: Int
 }
 
@@ -2756,6 +2758,15 @@ type TaxPercentageNodeEdge {
   cursor: String!
 }
 
+type TaxPercentageNode implements Node {
+  value: Decimal!
+  isEnabled: Boolean!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
 """Ordering fields for the 'TaxPercentage' model."""
 enum TaxPercentageOrderingChoices {
   pkAsc
@@ -2780,17 +2791,6 @@ type TaxLevelNodeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
-}
-
-type TaxLevelNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object"""
-  id: ID!
-  currentPercentage: Decimal
-  pk: Int
 }
 
 """Ordering fields for the 'TaxLevel' model."""
@@ -3977,7 +3977,7 @@ input ReservationUnitPricingSerializerInput {
   priceUnit: PriceUnit
   lowestPrice: Decimal
   highestPrice: Decimal
-  taxPercentage: Int!
+  taxLevel: Int!
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
@@ -4153,7 +4153,7 @@ input UpdateReservationUnitPricingSerializerInput {
   priceUnit: PriceUnit
   lowestPrice: Decimal
   highestPrice: Decimal
-  taxPercentage: Int
+  taxLevel: Int
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String

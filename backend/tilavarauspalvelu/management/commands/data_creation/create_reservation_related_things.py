@@ -22,7 +22,6 @@ from tilavarauspalvelu.models import (
     ReservationDenyReason,
     ReservationPurpose,
     ReservationUnitCancellationRule,
-    TaxPercentage,
     TermsOfUse,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
@@ -40,14 +39,14 @@ from tests.factories import (
     ReservationPurposeFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitImageFactory,
-    TaxPercentageFactory,
+    TaxLevelFactory,
     TermsOfUseFactory,
 )
 
 from .utils import IntendedUseData, fetch_image, get_image_path, with_logs
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit, ReservationUnitImage
+    from tilavarauspalvelu.models import ReservationUnit, ReservationUnitImage, TaxLevel
 
     from .utils import Percentage
 
@@ -202,13 +201,24 @@ def _create_intended_uses() -> list[IntendedUse]:
 
 
 @with_logs
-def _create_tax_percentages() -> dict[Percentage, TaxPercentage]:
-    tax_percentages: list[TaxPercentage] = [
-        TaxPercentageFactory.build(value=Decimal(percentage))  #
-        for percentage in ("0", "10", "14", "24", "25.5")
-    ]
-    tax_percentages = TaxPercentage.objects.bulk_create(tax_percentages)
-    return {str(tax.value): tax for tax in tax_percentages}  # type: ignore[return-value]
+def _create_tax_levels() -> dict[Percentage, TaxLevel]:
+    names: dict[Percentage, str] = {
+        "0": "Veroton",
+        "10": "Alennettu 10 %",
+        "14": "Alennettu 14 %",
+        "24": "Yleinen 24 %",
+        "25.5": "Yleinen 25,5 %",
+    }
+
+    return {
+        percentage: TaxLevelFactory.create(
+            name=name,
+            name_en=name,
+            name_sv=name,
+            rates__percentage=Decimal(percentage),
+        )
+        for percentage, name in names.items()
+    }
 
 
 @with_logs
