@@ -12,7 +12,6 @@ from tilavarauspalvelu.services.pricing.price_lines import build_price_lines, se
 from utils.date_utils import local_datetime
 
 from tests.factories import (
-    PaymentAccountingFactory,
     PriceComponentFactory,
     PriceOptionFactory,
     PricingGroupFactory,
@@ -20,7 +19,6 @@ from tests.factories import (
     ReservationPriceLineFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
-    UnitFactory,
     UnitGroupFactory,
 )
 from tests.helpers import exact
@@ -42,7 +40,7 @@ MAR_1 = datetime.date(2026, 3, 1)
 
 
 def test_build_price_lines__hourly_price():
-    reservation_unit = ReservationUnitFactory.create(payment_accounting=None, unit__payment_accounting=None)
+    reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
         reservation_unit=reservation_unit,
@@ -79,7 +77,6 @@ def test_build_price_lines__hourly_price():
     assert line.override_amount is None
     assert line.tax_percentage == Decimal(0)
     assert line.vat_code == ""
-    assert line.accounting is None
     assert line.payment_product is None
     assert result.calculation.total == Decimal("15.00")
 
@@ -165,79 +162,6 @@ def test_build_price_lines__no_pricing_group():
             begin=local_datetime(2026, 2, 1, 10),
             end=local_datetime(2026, 2, 1, 11),
         )
-
-
-# ── Accounting ──
-
-
-def test_build_price_lines__accounting_from_component():
-    component_accounting = PaymentAccountingFactory.create()
-    reservation_unit = ReservationUnitFactory.create(
-        payment_accounting=PaymentAccountingFactory.create(),
-        unit__payment_accounting=PaymentAccountingFactory.create(),
-    )
-    pricing_group = PricingGroupFactory.create()
-    ReservationUnitPricingGroupFactory.create(
-        reservation_unit=reservation_unit,
-        pricing_group=pricing_group,
-        begins=JAN_1,
-    )
-    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, accounting=component_accounting)
-
-    result = build_price_lines(
-        reservation_unit=reservation_unit,
-        price_option=None,
-        begin=local_datetime(2026, 2, 1, 10),
-        end=local_datetime(2026, 2, 1, 11),
-    )
-
-    assert result.lines[0].accounting == component_accounting
-
-
-def test_build_price_lines__accounting_from_reservation_unit():
-    reservation_unit_accounting = PaymentAccountingFactory.create()
-    reservation_unit = ReservationUnitFactory.create(
-        payment_accounting=reservation_unit_accounting,
-        unit__payment_accounting=PaymentAccountingFactory.create(),
-    )
-    pricing_group = PricingGroupFactory.create()
-    ReservationUnitPricingGroupFactory.create(
-        reservation_unit=reservation_unit,
-        pricing_group=pricing_group,
-        begins=JAN_1,
-    )
-    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, accounting=None)
-
-    result = build_price_lines(
-        reservation_unit=reservation_unit,
-        price_option=None,
-        begin=local_datetime(2026, 2, 1, 10),
-        end=local_datetime(2026, 2, 1, 11),
-    )
-
-    assert result.lines[0].accounting == reservation_unit_accounting
-
-
-def test_build_price_lines__accounting_from_unit():
-    unit_accounting = PaymentAccountingFactory.create()
-    unit = UnitFactory.create(payment_accounting=unit_accounting)
-    reservation_unit = ReservationUnitFactory.create(payment_accounting=None, unit=unit)
-    pricing_group = PricingGroupFactory.create()
-    ReservationUnitPricingGroupFactory.create(
-        reservation_unit=reservation_unit,
-        pricing_group=pricing_group,
-        begins=JAN_1,
-    )
-    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, accounting=None)
-
-    result = build_price_lines(
-        reservation_unit=reservation_unit,
-        price_option=None,
-        begin=local_datetime(2026, 2, 1, 10),
-        end=local_datetime(2026, 2, 1, 11),
-    )
-
-    assert result.lines[0].accounting == unit_accounting
 
 
 # ── Set reservation price lines ──

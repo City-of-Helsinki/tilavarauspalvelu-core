@@ -187,7 +187,6 @@ class ReservationPriceLineInline(admin.TabularInline):
         "override_amount",
         "tax_percentage",
         "vat_code",
-        "accounting",
         "price_component",
     ]
     readonly_fields = fields

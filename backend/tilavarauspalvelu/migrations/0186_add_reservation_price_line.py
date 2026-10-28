@@ -32,7 +32,6 @@ class Migration(migrations.Migration):
                 ('override_amount', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
                 ('tax_percentage', models.DecimalField(decimal_places=2, max_digits=5)),
                 ('vat_code', models.CharField(blank=True, default='', max_length=2)),
-                ('accounting', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='reservation_price_lines', to='tilavarauspalvelu.paymentaccounting')),
                 ('payment_product', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='reservation_price_lines', to='tilavarauspalvelu.paymentproduct')),
                 ('price_component', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='price_lines', to='tilavarauspalvelu.pricecomponent')),
                 ('reservation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='price_lines', to='tilavarauspalvelu.reservation')),
