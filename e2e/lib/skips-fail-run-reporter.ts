@@ -1,6 +1,5 @@
 /**
- * Fails the run when a test was skipped at runtime, like the Robot runners did: a skip means a test it needs
- * failed (e.g. "Check emails from reservations" skips when "User can make paid single booking" fails).
+ * Fails the run when a test was skipped at runtime, like the Robot runners did: a skipped test checked nothing.
  */
 import type { FullResult, Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 

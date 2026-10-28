@@ -2,11 +2,13 @@
  * Create robot test data for Harakka via API endpoint.
  * This is used for creating the necessary test data for test execution.
  */
+import { randomBytes } from "node:crypto";
 import { BuiltIn } from "../../lib/BuiltIn";
 import { RequestsLibrary } from "../../lib/RequestsLibrary";
-import { V, keywords, named, registerVariables, str } from "../../lib/robot";
+import { V, expect, keywords, named, registerVariables, str } from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
 import "../Resources/env_loader";
+import "../Resources/variables";
 
 export const create_data_variables = {
   BASE_URL: "https://varaamo.test.hel.ninja",
@@ -17,6 +19,36 @@ export const create_data_variables = {
 };
 registerVariables(create_data_variables);
 
+/**
+ * Port: the pk of the always free unit, or null when it can't be read. The backend deletes the test data and creates
+ * it again in one transaction, so a new pk means that all of the new data has been saved.
+ */
+async function freeUnitPk(): Promise<number | null> {
+  // Django accepts any CSRF token that is the same in the cookie and the header
+  const csrf_token = randomBytes(16).toString("hex");
+  let response: RobotValue;
+  try {
+    response = await RequestsLibrary["POST"](
+      `${str(V.BASE_URL)}/graphql/`,
+      named({
+        json: {
+          query: "query RobotUnit($name: String) { reservationUnits(nameFi: $name) { edges { node { pk nameFi } } } }",
+          variables: { name: V.ALWAYS_FREE_UNIT },
+        },
+        headers: { Cookie: `csrftoken=${csrf_token}`, "X-CSRFToken": csrf_token, Referer: `${str(V.BASE_URL)}/` },
+        expected_status: "any",
+      })
+    );
+  } catch {
+    return null;
+  }
+  if (response.status_code !== 200) {
+    return null;
+  }
+  const edges: RobotValue[] = response.json()?.data?.reservationUnits?.edges ?? [];
+  return edges.find((edge) => edge.node.nameFi === str(V.ALWAYS_FREE_UNIT))?.node.pk ?? null;
+}
+
 export const create_data = keywords("create_data", {
   "Create Robot Test Data DISABLED": async () => {
     await BuiltIn["Log"]("Disabled until backend data creation is ready");
@@ -25,7 +57,7 @@ export const create_data = keywords("create_data", {
   /**
    * Calls the endpoint to Create robot test data.
    * Backend returns 204 immediately and processes data asynchronously.
-   * Waits 3 minutes for backend processing to complete.
+   * Waits until the new data has been saved.
    */
   "Create Robot Test Data": async () => {
     let original_log_level: RobotValue,
@@ -61,6 +93,9 @@ export const create_data = keywords("create_data", {
     endpoint = str(endpoint) === "" ? V.ROBOT_API_ENDPOINT : endpoint;
     endpoint = str(endpoint) !== "" ? endpoint : V.DEFAULT_ENDPOINT;
 
+    // Port: read before the call, see the wait below
+    const old_pk = await freeUnitPk();
+
     await BuiltIn["Log"]("Creating robot test data");
     await BuiltIn["Log"](`URL: ${str(V.BASE_URL)}${str(endpoint)}`);
 
@@ -87,8 +122,28 @@ export const create_data = keywords("create_data", {
     // Handle response
     if (Number(response.status_code) === 204) {
       await BuiltIn["Log"]("SUCCESS: Robot test data creation request accepted (204 No Content)");
-      await BuiltIn["Log"]("Waiting 3 minutes for backend to complete data creation...", "WARN");
-      await BuiltIn["Sleep"]("180s"); // 3 minutes for backend processing
+      if (old_pk == null) {
+        await BuiltIn["Log"]("Waiting 3 minutes for backend to complete data creation...", "WARN");
+        await BuiltIn["Sleep"]("180s"); // 3 minutes for backend processing
+      } else {
+        // Port: waits until the new data has been saved instead of 3 minutes. The backend creates it in one
+        // transaction that ends by refreshing the reservation units' availability views, and until it commits, pages
+        // that need them hang or fail (502, the "503: Palaamme pian!" page). It can take longer than 3 minutes.
+        await BuiltIn["Log"]("Waiting for backend to complete data creation...");
+        try {
+          await expect
+            .poll(
+              async () => {
+                const pk = await freeUnitPk();
+                return pk != null && pk !== old_pk;
+              },
+              { intervals: [10_000], timeout: 300_000 }
+            )
+            .toBe(true);
+        } catch {
+          await BuiltIn["Log"]("The new test data wasn't seen in 5 minutes, continuing", "WARN");
+        }
+      }
       await BuiltIn["Log"]("Backend processing wait completed");
       return;
     } else if (Number(response.status_code) === 400) {

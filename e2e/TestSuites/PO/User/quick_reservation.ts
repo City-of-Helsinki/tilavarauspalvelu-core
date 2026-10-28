@@ -1,12 +1,12 @@
 /** Port of PO/User/quick_reservation.robot */
-import { Browser, loc } from "../../../lib/Browser";
+import { Browser, currentPage, loc } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
 import { Collections } from "../../../lib/Collections";
 import { V, chain, expect, isTruthy, keywords, named, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { String_ } from "../../../lib/String";
 import { custom_keywords } from "../../Resources/custom_keywords";
-import { parallel_test_data } from "../../Resources/parallel_test_data";
+import "../../Resources/parallel_test_data";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
@@ -17,7 +17,9 @@ export const quick_reservation = keywords("quick_reservation", {
     let all_free_quick_timeslots: RobotValue,
       total_slots: RobotValue,
       random_index: RobotValue,
-      time_of_selected_slot: RobotValue;
+      time_of_selected_slot: RobotValue,
+      date_value: RobotValue,
+      later_slots: number[];
     // DEVNOTE
     // This keyword/test cannot be run over midnight
     // Example -> Su 1.10.2023 klo 23:45-0:45, 1 t != La 30.9.2023 klo 23:45-su 1.10.20230:45, 1 t
@@ -48,8 +50,25 @@ export const quick_reservation = keywords("quick_reservation", {
       await BuiltIn["Fail"]("No free available slots in quick reservation slots");
     }
 
-    // Generate a random index between 0 and the number of slots - 1
-    random_index = Math.floor(Math.random() * (Number(total_slots) - 1 - 0 + 1)) + 0;
+    // Port: picks from the slots that start in 30 minutes or later, if there are any. A test can take minutes from
+    // booking to cancelling, and a reservation that has started can't be cancelled (the Robot keyword can pick them).
+    date_value = await quick_reservation["Get The Value From Date Input"]();
+    const [day = 0, month = 0, year = 0] = str(date_value).split(".").map(Number);
+    later_slots = [];
+    for (const [index, slot] of all_free_quick_timeslots.entries()) {
+      const [hours = 0, minutes = 0] = str(await Browser["Get Text"](slot))
+        .split(":")
+        .map(Number);
+      if (new Date(year, month - 1, day, hours, minutes).getTime() >= Date.now() + 30 * 60_000) {
+        later_slots.push(index);
+      }
+    }
+    if (later_slots.length === 0) {
+      later_slots = [...all_free_quick_timeslots.keys()];
+    }
+
+    // Pick one of them at random
+    random_index = later_slots[Math.floor(Math.random() * later_slots.length)];
     await BuiltIn["Log"](`Randomly selected slot index: ${str(random_index)}`);
 
     // Get the time of the randomly selected slot
@@ -66,7 +85,6 @@ export const quick_reservation = keywords("quick_reservation", {
       named({ message: "The clicked slot was not selected" })
     );
 
-    await parallel_test_data["Store Test Data Variable"]("TIME_OF_QUICK_RESERVATION_FREE_SLOT", time_of_selected_slot);
     V.TIME_OF_QUICK_RESERVATION_FREE_SLOT = time_of_selected_slot;
   },
 
@@ -151,9 +169,13 @@ export const quick_reservation = keywords("quick_reservation", {
    */
   "Reload Reservation Unit Page And Wait For Reservations": async () => {
     let reservations_loaded: RobotValue;
+    // Port: starts waiting once the reload has replaced the page, not before it. The page being replaced can start
+    // the same query just before the reload, and that response (whose body never finishes) was taken for the new one.
+    // The new page can't send its query before its scripts have loaded.
+    await currentPage().reload({ waitUntil: "commit" });
     reservations_loaded = await quick_reservation["Start Waiting For Reservations Query"]();
-    await Browser["Reload"]();
     await quick_reservation["Wait For Reservations Query"](reservations_loaded);
+    await Browser["Wait For Load State"]("load");
   },
 
   /** Starts waiting for the next AffectingReservations response. Call it before the action that opens the page. */
@@ -254,7 +276,6 @@ export const quick_reservation = keywords("quick_reservation", {
       "^\\d+$"
     );
     BOOKING_NUM_ONLY = reservation_number;
-    await parallel_test_data["Store Test Data Variable"]("BOOKING_NUM_ONLY", BOOKING_NUM_ONLY);
     V.BOOKING_NUM_ONLY = BOOKING_NUM_ONLY;
     BOOKING_NUM_ONLY = V.BOOKING_NUM_ONLY;
     await BuiltIn["Log"](BOOKING_NUM_ONLY);
@@ -278,7 +299,6 @@ export const quick_reservation = keywords("quick_reservation", {
     );
     // Add # at the end as it's required for access code entry in the system
     access_code_with_hash = `${str(access_code_numbers)}#`;
-    await parallel_test_data["Store Test Data Variable"]("ACCESS_CODE", access_code_with_hash);
     V.ACCESS_CODE = access_code_with_hash;
     await BuiltIn["Log"](`Saved access code (with #): ${str(V.ACCESS_CODE)}`);
   },
@@ -335,6 +355,12 @@ export const quick_reservation = keywords("quick_reservation", {
     await Browser["Wait For Elements State"]("id=quick-reservation__duration-main-button", "visible");
     // The free slots are rendered after the reservation form
     await expect(loc('[class*="slider-list"] >> [data-testid="quick-reservation__slot"]').first()).toBeVisible();
+    // Port: instead of Robot's Sleep 2s. The page shows the free slots before its AffectingReservations query returns
+    // and removes the booked ones, so wait until the slot is gone (the query can take over 10 s on the test env).
+    await expect(
+      loc(`[class*="slider-list"] >> [data-testid="quick-reservation__slot"]:text-is("${str(time_to_check)}")`),
+      `Slot '${str(time_to_check)}' is still available`
+    ).toHaveCount(0, { timeout: 20_000 });
 
     // 1 Collect all time slots
     elements = await Browser["Get Elements"]('[class*="slider-list"] >> [data-testid="quick-reservation__slot"]');

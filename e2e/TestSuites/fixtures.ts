@@ -1,5 +1,6 @@
 /**
- * The suites' `test`: Playwright's fixtures, plus the test data that each test's tags choose (`testData`).
+ * The suites' `test`: Playwright's fixtures, plus the test data that each test's tags choose (`testData`), and a
+ * staggered start for the first test of each parallel slot (`staggeredStart`).
  *
  * - A data set tag (e.g. `@desktop-test-data-set-0`) picks the test's users from the section with the same tag in
  *   `Resources/pabot_users.dat`. Only one test at a time uses a data set.
@@ -13,7 +14,9 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { PabotLib } from "../lib/PabotLib";
+import { mkdir } from "node:fs/promises";
+import { BuiltIn } from "../lib/BuiltIn";
+import { PabotLib, sharedDir } from "../lib/PabotLib";
 import { V, isSequential, str, test as base } from "../lib/robot";
 import type { RobotValue } from "../lib/robot";
 import "./Resources/serial_users";
@@ -239,7 +242,34 @@ export function resolveTestData(
   return { dataSet: null, suite, variables };
 }
 
-export const test = base.extend<{ testData: TestData }>({
+/** True for the run's first test in this parallel slot: that test creates the slot's folder in the run's folder. */
+async function firstInSlot(slot: number): Promise<boolean> {
+  const started = join(sharedDir(), "started");
+  await mkdir(started, { recursive: true });
+  try {
+    await mkdir(join(started, String(slot)));
+    return true;
+  } catch (err) {
+    if (err instanceof Error && "code" in err && err.code === "EEXIST") {
+      return false;
+    }
+    throw err;
+  }
+}
+
+export const test = base.extend<{ staggeredStart: void; testData: TestData }>({
+  // Like Apply Staggered Startup Strategy in devices.robot, the run's first test in each parallel slot waits 3 s times
+  // the slot's number, so the first tests don't all log in at once. Suomi.fi logins that ended at the same moment were
+  // refused (access_denied) or sent to Helsinki Profiili's email page. Later tests start at different times anyway.
+  staggeredStart: [
+    async ({ robotTest: _robotTest }, use, info) => {
+      if (info.parallelIndex > 0 && (await firstInSlot(info.parallelIndex))) {
+        await BuiltIn["Sleep"](`${info.parallelIndex * 3}s`);
+      }
+      await use();
+    },
+    { auto: true },
+  ],
   testData: [
     async ({ robotTest: _robotTest }, use, info) => {
       const data = resolveTestData(
