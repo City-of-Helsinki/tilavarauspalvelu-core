@@ -17,6 +17,8 @@ Code should follow the conventions as described in these docs:
 - `.agents/docs/backend-architecture.md`
 - `.agents/docs/backend-testing.md`
 
+Also invoke the `backend-orm-review` skill for the same target.
+
 Flag any inconsistency with the conventions, even if there is a precedent
 for ignoring the convention in the codebase. The goal is to align the codebase
 with the conventions, not to take shortcuts or follow bad practices from the past.
