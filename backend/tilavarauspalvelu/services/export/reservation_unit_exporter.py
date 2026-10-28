@@ -13,7 +13,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStartInterval,
 )
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing, TaxLevel
 from utils.date_utils import local_date
 
 from ._base_exporter import BaseCSVExporter, BaseExportRow
@@ -114,6 +114,9 @@ class ReservationUnitExporter(BaseCSVExporter):
 
     @property
     def queryset(self) -> models.QuerySet:
+        tax_levels = TaxLevel.objects.annotate(current_percentage=L("current_percentage"))
+        pricings = ReservationUnitPricing.objects.active().prefetch_related(models.Prefetch("tax_level", tax_levels))
+
         return (
             self._queryset
             .select_related(
@@ -134,7 +137,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "resources",
                 "intended_uses",
                 "equipments",
-                models.Prefetch("pricings", ReservationUnitPricing.objects.active().select_related("tax_level")),
+                models.Prefetch("pricings", pricings),
             )
             .annotate(
                 publishing_state=L("publishing_state"),
