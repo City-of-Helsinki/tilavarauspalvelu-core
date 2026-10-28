@@ -284,33 +284,38 @@ def test_reservation_unit__query__price_summary__query_count_does_not_grow_with_
 
 def test_reservation_unit__query__price_summary__through_foreign_key(graphql):
     today = local_date()
-    reservation_unit = ReservationUnitFactory.create()
-    pricing_group = PricingGroupFactory.create()
-    ReservationUnitPricingGroupFactory.create(
-        reservation_unit=reservation_unit,
-        pricing_group=pricing_group,
-        begins=today - datetime.timedelta(days=10),
-    )
-    PriceComponentFactory.create(
-        pricing_group=pricing_group,
-        valid_from=today - datetime.timedelta(days=10),
-        amount=Decimal("12.50"),
-        price_unit=PriceUnit.PER_HOUR,
-    )
-    ReservationFactory.create(reservation_unit=reservation_unit)
+    for amount in (Decimal("12.50"), Decimal(20), Decimal(30)):
+        reservation_unit = ReservationUnitFactory.create()
+        pricing_group = PricingGroupFactory.create()
+        ReservationUnitPricingGroupFactory.create(
+            reservation_unit=reservation_unit,
+            pricing_group=pricing_group,
+            begins=today - datetime.timedelta(days=10),
+        )
+        PriceComponentFactory.create(
+            pricing_group=pricing_group,
+            valid_from=today - datetime.timedelta(days=10),
+            amount=amount,
+            price_unit=PriceUnit.PER_HOUR,
+        )
+        ReservationFactory.create(reservation_unit=reservation_unit)
 
     graphql.login_with_superuser()
-    query = reservations_query(fields=f"reservationUnit {{ {FIELDS} }}")
+    query = reservations_query(fields=f"pk reservationUnit {{ {FIELDS} }}")
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "reservationUnit": {
-            "priceSummary": {
-                "isFree": False,
-                "lowestAmount": "12.50",
-                "priceUnit": PriceUnit.PER_HOUR.value,
-                "varies": False,
-            },
+    assert response.node(0)["reservationUnit"] == {
+        "priceSummary": {
+            "isFree": False,
+            "lowestAmount": "12.50",
+            "priceUnit": PriceUnit.PER_HOUR.value,
+            "varies": False,
         },
     }
+    assert [response.node(index)["reservationUnit"]["priceSummary"]["lowestAmount"] for index in range(3)] == [
+        "12.50",
+        "20.00",
+        "30.00",
+    ]
+    assert len(response.queries) == 6, response.query_log

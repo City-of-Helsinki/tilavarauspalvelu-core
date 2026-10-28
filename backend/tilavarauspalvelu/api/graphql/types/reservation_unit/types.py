@@ -394,22 +394,13 @@ class ReservationUnitNode(DjangoNode):
         return items
 
     @staticmethod
-    def optimize_price_summary(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:  # noqa: ARG004
-        return queryset.annotate(price_summary_components=_active_base_component_data())
+    def optimize_price_summary(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        # A queryset annotation is lost when the reservation unit comes through a foreign key. This one is not.
+        optimizer.annotations["price_summary_components"] = _active_base_component_data()
+        return queryset
 
     def resolve_price_summary(root: ReservationUnit, info: GQLInfo) -> PriceSummary | None:
-        # The optimizer cannot annotate a reservation unit that comes through a foreign key.
-        if hasattr(root, "price_summary_components"):
-            components: list[dict[str, str]] = root.price_summary_components
-        else:
-            components = (
-                ReservationUnit.objects
-                .filter(pk=root.pk)
-                .annotate(price_summary_components=_active_base_component_data())
-                .values_list("price_summary_components", flat=True)
-                .get()
-            )
-
+        components: list[dict[str, str]] = root.price_summary_components
         base_prices = [
             BasePrice(amount=Decimal(component["amount"]), price_unit=PriceUnit(component["price_unit"]))
             for component in components
