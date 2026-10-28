@@ -10,7 +10,7 @@ import { admin_notifications_create_page } from "../../PO/Admin/admin_notificati
 import { admin_reservations } from "../../PO/Admin/admin_reservations";
 import { custom_keywords } from "../../Resources/custom_keywords";
 import { data_modification } from "../../Resources/data_modification";
-import { parallel_test_data } from "../../Resources/parallel_test_data";
+import "../../Resources/parallel_test_data";
 import "../../Resources/variables";
 import "../../Resources/serial_users";
 import "../../Resources/texts_FI";
@@ -157,7 +157,6 @@ export const app_admin = keywords("app_admin", {
   "Admin Saves Access Code": async () => {
     let access_code: RobotValue;
     access_code = await Browser["Get Text"]('[data-testid="reservation__info--Ovikoodi"]');
-    await parallel_test_data["Store Test Data Variable"]("ACCESS_CODE_ADMINSIDE", access_code);
     V.ACCESS_CODE_ADMINSIDE = access_code;
     await BuiltIn["Log"](V.ACCESS_CODE_ADMINSIDE);
 

@@ -1,5 +1,6 @@
 /** Port of PO/User/reservation_unit_reserver_info.robot */
 import { Browser, loc } from "../../../lib/Browser";
+import { BuiltIn } from "../../../lib/BuiltIn";
 import { V, chain, expect, keywords, named, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
@@ -47,6 +48,9 @@ export const reservation_unit_reserver_info = keywords("reservation_unit_reserve
    */
   "Check Application Cannot Be Made Without Info": async () => {
     await Browser["Click"]('[data-testid="reservation__button--continue"]');
+    // Port: kept on purpose. The form validates and re-renders after the empty submit, and text typed into it at
+    // the same time can lose keys (the first name was saved as "Mar" instead of "Marja").
+    await BuiltIn["Sleep"]("1s");
 
     // Check that error notification banner is displayed
     await expect(loc(V.NOTIFICATION_TYPE_ERROR)).toBeVisible();

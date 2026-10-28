@@ -1,6 +1,6 @@
 /** Port of PO/App/mail.robot */
 import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, isTruthy, keywords, str } from "../../../lib/robot";
+import { V, expect, keywords, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { data_modification } from "../../Resources/data_modification";
 import { robot_email_test_tool } from "../../Resources/robot_email_test_tool";
@@ -12,7 +12,7 @@ import "../../Resources/parallel_test_data";
 export const mail = keywords("mail", {
   /** Verify confirmation email contains all required terms */
   "Verify Reservation Confirmation Email": async (reservation_number: RobotValue) => {
-    let expected_terms: RobotValue, result: RobotValue;
+    let expected_terms: RobotValue;
     await BuiltIn["Log"](`Verifying confirmation email for reservation: ${str(reservation_number)}`);
 
     // Build list of expected terms
@@ -24,17 +24,16 @@ export const mail = keywords("mail", {
       V.FORMATTED_ENDTIME_EMAIL,
     ];
 
-    // Use new API-based verification
-    result = await robot_email_test_tool.verify_reservation_email(reservation_number, expected_terms, false); // No attachment expected
-
-    if (!isTruthy(result)) {
-      await BuiltIn["Fail"]("Some required terms are missing in confirmation email");
-    }
+    // Port: the backend sends emails from a background task, so the email cache is checked until the email is there
+    await expect(async () => {
+      const result = await robot_email_test_tool.verify_reservation_email(reservation_number, expected_terms, false); // No attachment expected
+      expect(result, "Some required terms are missing in confirmation email").toBe(true);
+    }).toPass({ intervals: [5000], timeout: 120_000 });
   },
 
   /** Verify cancellation email contains all required terms */
   "Verify Reservation Cancellation Email": async (reservation_number: RobotValue) => {
-    let expected_terms: RobotValue, result: RobotValue;
+    let expected_terms: RobotValue;
     await BuiltIn["Log"](`Verifying cancellation email for reservation: ${str(reservation_number)}`);
 
     expected_terms = [
@@ -45,11 +44,11 @@ export const mail = keywords("mail", {
       V.FORMATTED_ENDTIME_EMAIL,
     ];
 
-    result = await robot_email_test_tool.verify_reservation_email(reservation_number, expected_terms, false); // No attachment expected
-
-    if (!isTruthy(result)) {
-      await BuiltIn["Fail"]("Some required terms are missing in cancellation email");
-    }
+    // Port: the email cache is checked until the email is there, see Verify Reservation Confirmation Email
+    await expect(async () => {
+      const result = await robot_email_test_tool.verify_reservation_email(reservation_number, expected_terms, false); // No attachment expected
+      expect(result, "Some required terms are missing in cancellation email").toBe(true);
+    }).toPass({ intervals: [5000], timeout: 120_000 });
   },
 
   /** Format reservation times for email verification */

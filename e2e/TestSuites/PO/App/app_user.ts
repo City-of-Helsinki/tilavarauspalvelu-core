@@ -24,7 +24,7 @@ import { singlebooking } from "../../PO/User/singlebooking";
 import { user_landingpage } from "../../PO/User/user_landingpage";
 import { custom_keywords } from "../../Resources/custom_keywords";
 import { data_modification } from "../../Resources/data_modification";
-import { parallel_test_data } from "../../Resources/parallel_test_data";
+import "../../Resources/parallel_test_data";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
@@ -131,8 +131,6 @@ export const app_user = keywords("app_user", {
       quick_reservation_current_date_value
     );
 
-    await parallel_test_data["Store Test Data Variable"]("TIME_OF_QUICK_RESERVATION", formatted_date);
-    await parallel_test_data["Store Test Data Variable"]("TIME_OF_QUICK_RESERVATION_MINUS_T", formatted_date_minus_t);
     V.TIME_OF_QUICK_RESERVATION = formatted_date;
     V.TIME_OF_QUICK_RESERVATION_MINUS_T = formatted_date_minus_t;
 
@@ -521,11 +519,6 @@ export const app_user = keywords("app_user", {
       date_value_from_calendar
     );
 
-    await parallel_test_data["Store Test Data Variable"]("TIME_OF_QUICK_RESERVATION_MODIFIED", formatted_date);
-    await parallel_test_data["Store Test Data Variable"](
-      "TIME_OF_QUICK_RESERVATION_MINUS_T_MODIFIED",
-      formatted_date_minus_t
-    );
     V.TIME_OF_QUICK_RESERVATION_MODIFIED = formatted_date;
     V.TIME_OF_QUICK_RESERVATION_MINUS_T_MODIFIED = formatted_date_minus_t;
 
