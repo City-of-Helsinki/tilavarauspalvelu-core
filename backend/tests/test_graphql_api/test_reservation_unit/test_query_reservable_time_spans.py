@@ -12,6 +12,7 @@ from graphql_relay import to_global_id
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
+from tests.test_graphql_api.test_reservation_unit.helpers import reservation_units_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -283,3 +284,46 @@ def test_reservation_unit__reservable_time_spans__all_timezones_are_in_default_t
             "endDatetime": rts3.end_datetime.astimezone(DEFAULT_TIMEZONE).isoformat(),
         },
     ]
+
+
+def test_reservation_unit__reservable_time_spans__many_reservation_units_in_one_query(graphql):
+    for day in [1, 2, 3]:
+        origin_hauki_resource = OriginHaukiResourceFactory.create(id=day)
+        ReservableTimeSpanFactory.create(
+            resource=origin_hauki_resource,
+            start_datetime=_get_date(day=day, hour=10),
+            end_datetime=_get_date(day=day, hour=12),
+        )
+        ReservationUnitFactory.create(origin_hauki_resource=origin_hauki_resource)
+
+    ReservationUnitFactory.create(origin_hauki_resource=None)
+
+    query = reservation_units_query(
+        fields="reservableTimeSpans { startDatetime endDatetime }",
+        reservable_time_spans__start_date="2023-05-01",
+        reservable_time_spans__end_date="2024-01-01",
+    )
+    graphql.login_with_superuser()
+    response = graphql(query)
+
+    assert not response.has_errors, response
+    response.assert_query_count(3)
+    assert response.node(0)["reservableTimeSpans"] == [
+        {
+            "startDatetime": f"2023-05-01T10:00:00+{UTCOFFSET}",
+            "endDatetime": f"2023-05-01T12:00:00+{UTCOFFSET}",
+        },
+    ]
+    assert response.node(1)["reservableTimeSpans"] == [
+        {
+            "startDatetime": f"2023-05-02T10:00:00+{UTCOFFSET}",
+            "endDatetime": f"2023-05-02T12:00:00+{UTCOFFSET}",
+        },
+    ]
+    assert response.node(2)["reservableTimeSpans"] == [
+        {
+            "startDatetime": f"2023-05-03T10:00:00+{UTCOFFSET}",
+            "endDatetime": f"2023-05-03T12:00:00+{UTCOFFSET}",
+        },
+    ]
+    assert response.node(3)["reservableTimeSpans"] is None
