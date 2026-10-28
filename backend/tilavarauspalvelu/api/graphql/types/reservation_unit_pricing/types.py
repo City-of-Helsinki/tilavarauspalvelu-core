@@ -31,7 +31,7 @@ class ReservationUnitPricingNode(DjangoNode):
             "lowest_price_net",
             "highest_price",
             "highest_price_net",
-            "tax_percentage",
+            "tax_level",
             "material_price_description_fi",
             "material_price_description_en",
             "material_price_description_sv",

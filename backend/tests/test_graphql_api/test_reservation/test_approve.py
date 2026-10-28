@@ -13,9 +13,15 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraS
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import PaymentOrder, Reservation
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
-from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory
+from tests.factories import (
+    PaymentOrderFactory,
+    ReservationFactory,
+    ReservationSeriesFactory,
+    ReservationUnitFactory,
+    TaxLevelRateFactory,
+)
 from tests.helpers import ResponseMock, patch_method
 
 from .helpers import APPROVE_MUTATION, get_approve_data
@@ -78,6 +84,9 @@ def test_reservation__approve__paid__on_site(graphql):
 def test_reservation__approve__paid__in_webshop(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
+    tax_level = reservation_unit.pricings.first().tax_level
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2024, 1, 10), percentage=Decimal(27))
+
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservation_unit=reservation_unit,
@@ -100,7 +109,7 @@ def test_reservation__approve__paid__in_webshop(graphql):
     # Reservation is confirmed, even though payment is not completed
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    # Tax percentage is taken from the latest pricing
+    # Tax percentage is the rate of the tax level on the approval date
     assert reservation.tax_percentage_value == Decimal("25.5")
 
     assert hasattr(reservation, "payment_order")
@@ -520,7 +529,7 @@ def test_reservation__approve__no_payment_product_if_paid_online(graphql):
     reservation_unit = ReservationUnitFactory.create(
         pricings__lowest_price=Decimal("10.00"),
         pricings__highest_price=Decimal("20.00"),
-        pricings__tax_percentage__value=Decimal("25.50"),
+        pricings__tax_level__rates__percentage=Decimal("25.50"),
         pricings__payment_type=PaymentType.ONLINE,
     )
 

@@ -19,7 +19,14 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
 )
 from tilavarauspalvelu.models import Reservation
-from utils.date_utils import datetime_difference, local_datetime, local_start_of_day, next_hour, utc_datetime
+from utils.date_utils import (
+    datetime_difference,
+    local_date,
+    local_datetime,
+    local_start_of_day,
+    next_hour,
+    utc_datetime,
+)
 from utils.decimal_utils import round_decimal
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseOneToOneFactory
@@ -321,7 +328,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs.setdefault("payment_product__id", uuid.uuid4())
         sub_kwargs.setdefault("pricings__lowest_price", Decimal(0))
         sub_kwargs.setdefault("pricings__highest_price", Decimal(20))
-        sub_kwargs.setdefault("pricings__tax_percentage__value", Decimal("25.5"))
+        sub_kwargs.setdefault("pricings__tax_level__rates__percentage", Decimal("25.5"))
         sub_kwargs.setdefault("pricings__payment_type", PaymentType.ONLINE)
 
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
@@ -467,11 +474,12 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
 
         if pricing is not None:
             duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
+            today = local_date()
             self.set(
                 price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
                 non_subsidised_price=pricing.highest_price,
                 unit_price=pricing.lowest_price if subsidised else pricing.highest_price,
-                tax_percentage_value=pricing.tax_percentage.value,
+                tax_percentage_value=pricing.tax_level.actions.get_percentage(on_date=today),
             )
 
         return self
@@ -495,10 +503,11 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
             raise ValueError(msg)
 
         duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
+        today = local_date()
         self.set(
             price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
             non_subsidised_price=pricing.highest_price,
             unit_price=pricing.lowest_price,
-            tax_percentage_value=pricing.tax_percentage.value,
+            tax_percentage_value=pricing.tax_level.actions.get_percentage(on_date=today),
         )
         return self
