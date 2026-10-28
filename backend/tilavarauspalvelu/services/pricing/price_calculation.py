@@ -100,7 +100,6 @@ def calculate_price(
     quantities: dict[int, Decimal] = {}
     components_by_pk: dict[int, PriceComponent] = {}
 
-    start_component = _component_for_date(components=components, date=begin_date)
     moment = begin
 
     while moment < end:
@@ -140,10 +139,12 @@ def calculate_price(
     total = sum((line.amount for line in lines), start=Decimal(0))
     can_apply_for_discount = any(line.component.can_apply_for_discount for line in lines)
 
+    payment_type = _first_payment_type(lines)
+
     return PriceCalculation(
         lines=lines,
         total=total,
-        payment_type=start_component.payment_type,
+        payment_type=payment_type,
         can_apply_for_discount=can_apply_for_discount,
     )
 
@@ -158,3 +159,11 @@ def _component_for_date(*, components: list[PriceComponent], date: datetime.date
 
     msg = f"Reservation unit has no price on {date.isoformat()}."
     raise PriceCalculationError(msg)
+
+
+def _first_payment_type(lines: list[PriceCalculationLine]) -> PaymentType | None:
+    """A reservation can begin on a free date, which has no payment type, and continue on a paid one."""
+    for line in lines:
+        if line.component.payment_type is not None:
+            return line.component.payment_type
+    return None
