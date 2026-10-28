@@ -37,6 +37,8 @@ from tests.factories import (
     ReservationSeriesFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
+    TaxLevelFactory,
+    TaxLevelRateFactory,
     UnitFactory,
     UnitGroupFactory,
     UserFactory,
@@ -436,7 +438,7 @@ def test_reservation__query__applied_pricing(graphql):
         begins=local_date(2024, 1, 1),
         lowest_price=Decimal(5),
         highest_price=Decimal(10),
-        tax_percentage__value=Decimal("24.0"),
+        tax_level__rates__percentage=Decimal("24.0"),
     )
 
     # Future pricing, which is applied to below reservation
@@ -445,7 +447,7 @@ def test_reservation__query__applied_pricing(graphql):
         begins=local_date(2024, 1, 2),
         lowest_price=Decimal(10),
         highest_price=Decimal(20),
-        tax_percentage__value=Decimal("25.5"),
+        tax_level__rates__percentage=Decimal("25.5"),
     )
 
     ReservationFactory.create_for_reservation_unit(
@@ -478,6 +480,34 @@ def test_reservation__query__applied_pricing(graphql):
             "taxPercentage": "25.5",
         }
     }
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation__query__applied_pricing__uses_tax_rate_of_today(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2024, 1, 2), percentage=Decimal(27))
+
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=local_date(2024, 1, 1),
+        tax_level=tax_level,
+    )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
+    )
+
+    graphql.login_with_superuser()
+    query = reservations_query(fields="appliedPricing { taxPercentage }")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"appliedPricing": {"taxPercentage": "25.5"}}
 
 
 # Pindora responses

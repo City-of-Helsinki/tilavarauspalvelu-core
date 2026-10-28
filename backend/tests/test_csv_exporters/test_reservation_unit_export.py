@@ -102,7 +102,7 @@ def test_reservation_unit_export__multiple():
     assert row_2[next(index)] == reservation_unit_1.pricings.first().price_unit
     assert row_2[next(index)] == reservation_unit_1.pricings.first().lowest_price
     assert row_2[next(index)] == reservation_unit_1.pricings.first().highest_price
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().tax_percentage
+    assert row_2[next(index)] == "25.50%"
     assert row_2[next(index)] == reservation_unit_1.pricings.first().material_price_description
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)

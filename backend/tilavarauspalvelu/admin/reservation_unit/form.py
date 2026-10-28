@@ -176,7 +176,7 @@ class ReservationUnitPricingInline(TranslationStackedInline):
         "highest_price",
         "price_unit",
         "payment_type",
-        "tax_percentage",
+        "tax_level",
         "material_price_description",
     ]
     form = ReservationUnitPricingForm
