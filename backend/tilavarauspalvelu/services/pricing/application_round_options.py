@@ -47,7 +47,8 @@ def application_round_price_options(application_round: ApplicationRound) -> list
         period_begin=application_round.reservation_period_begin_date,
         period_end=application_round.reservation_period_end_date,
     )
-    option_pks = _offered_option_pks(round_pricing)
+    option_sets = _option_sets_by_reservation_unit(round_pricing)
+    option_pks = _offered_option_pks(option_sets)
     return list(PriceOption.objects.filter(pk__in=option_pks).order_by("name"))
 
 
@@ -71,7 +72,8 @@ def check_application_round_change(
         period_begin=period_begin,
         period_end=period_end,
     )
-    errors = _check_consistency(new_pricing)
+    new_option_sets = _option_sets_by_reservation_unit(new_pricing)
+    errors = _check_consistency(round_pricing=new_pricing, option_sets=new_option_sets)
     if application_round_pk is None:
         return errors
 
@@ -85,7 +87,12 @@ def check_application_round_change(
         period_begin=saved_round.reservation_period_begin_date,
         period_end=saved_round.reservation_period_end_date,
     )
-    errors += _check_no_lost_options(saved_pricing=saved_pricing, new_pricing=new_pricing)
+    saved_option_sets = _option_sets_by_reservation_unit(saved_pricing)
+    errors += _check_no_lost_options(
+        saved_pricing=saved_pricing,
+        saved_option_sets=saved_option_sets,
+        new_option_sets=new_option_sets,
+    )
     return errors
 
 
@@ -281,9 +288,15 @@ def _check_round_change(
     saved_pricing: _RoundPricing,
     new_pricing: _RoundPricing,
 ) -> list[RoundOptionError]:
+    saved_option_sets = _option_sets_by_reservation_unit(saved_pricing)
+    new_option_sets = _option_sets_by_reservation_unit(new_pricing)
     round_errors = [
-        *_check_consistency(new_pricing),
-        *_check_no_lost_options(saved_pricing=saved_pricing, new_pricing=new_pricing),
+        *_check_consistency(round_pricing=new_pricing, option_sets=new_option_sets),
+        *_check_no_lost_options(
+            saved_pricing=saved_pricing,
+            saved_option_sets=saved_option_sets,
+            new_option_sets=new_option_sets,
+        ),
     ]
     return [
         RoundOptionError(code=error.code, message=f"Application round '{round_name}': {error.message}")
@@ -291,8 +304,11 @@ def _check_round_change(
     ]
 
 
-def _check_consistency(round_pricing: _RoundPricing) -> list[RoundOptionError]:
-    option_sets = _option_sets_by_reservation_unit(round_pricing)
+def _check_consistency(
+    *,
+    round_pricing: _RoundPricing,
+    option_sets: dict[int, list[frozenset[int]]],
+) -> list[RoundOptionError]:
     days = _days(round_pricing)
     if not option_sets or not days:
         return []
@@ -324,9 +340,10 @@ def _check_consistency(round_pricing: _RoundPricing) -> list[RoundOptionError]:
 def _check_no_lost_options(
     *,
     saved_pricing: _RoundPricing,
-    new_pricing: _RoundPricing,
+    saved_option_sets: dict[int, list[frozenset[int]]],
+    new_option_sets: dict[int, list[frozenset[int]]],
 ) -> list[RoundOptionError]:
-    lost_options = _offered_option_pks(saved_pricing) - _offered_option_pks(new_pricing)
+    lost_options = _offered_option_pks(saved_option_sets) - _offered_option_pks(new_option_sets)
     if not lost_options:
         return []
 
@@ -339,8 +356,7 @@ def _check_no_lost_options(
     return [error]
 
 
-def _offered_option_pks(round_pricing: _RoundPricing) -> set[int]:
-    option_sets = _option_sets_by_reservation_unit(round_pricing)
+def _offered_option_pks(option_sets: dict[int, list[frozenset[int]]]) -> set[int]:
     all_sets = [options for daily_options in option_sets.values() for options in daily_options]
     if not all_sets:
         return set()
