@@ -357,19 +357,6 @@ type Query {
     """Ordering"""
     orderBy: [ReservationUnitCancellationRuleOrderingChoices]
   ): ReservationUnitCancellationRuleNodeConnection
-  taxPercentages(
-    first: Int
-    last: Int
-    offset: Int
-    after: String
-    before: String
-    value: Decimal
-    isEnabled: Boolean
-    pk: [Int]
-
-    """Ordering"""
-    orderBy: [TaxPercentageOrderingChoices]
-  ): TaxPercentageNodeConnection
   taxLevels(
     first: Int
     last: Int
@@ -2738,41 +2725,6 @@ type ReservationUnitCancellationRuleNodeEdge {
 enum ReservationUnitCancellationRuleOrderingChoices {
   pkAsc
   pkDesc
-}
-
-type TaxPercentageNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [TaxPercentageNodeEdge]!
-  totalCount: Int
-}
-
-"""A Relay edge containing a `TaxPercentageNode` and its cursor."""
-type TaxPercentageNodeEdge {
-  """The item at the end of the edge"""
-  node: TaxPercentageNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-type TaxPercentageNode implements Node {
-  value: Decimal!
-  isEnabled: Boolean!
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
-"""Ordering fields for the 'TaxPercentage' model."""
-enum TaxPercentageOrderingChoices {
-  pkAsc
-  pkDesc
-  isEnabledAsc
-  isEnabledDesc
 }
 
 type TaxLevelNodeConnection {

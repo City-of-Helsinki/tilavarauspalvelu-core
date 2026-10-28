@@ -36,7 +36,6 @@ from .space import SpaceFactory
 from .suitable_time_range import SuitableTimeRangeFactory
 from .tax_level import TaxLevelFactory
 from .tax_level_rate import TaxLevelRateFactory
-from .tax_percentage import TaxPercentageFactory
 from .terms_of_use import TermsOfUseFactory
 from .unit import UnitFactory
 from .unit_group import UnitGroupFactory
@@ -88,7 +87,6 @@ __all__ = [
     "SuitableTimeRangeFactory",
     "TaxLevelFactory",
     "TaxLevelRateFactory",
-    "TaxPercentageFactory",
     "TermsOfUseFactory",
     "UnitFactory",
     "UnitGroupFactory",
