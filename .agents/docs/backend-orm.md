@@ -15,9 +15,9 @@ Rules for code that reaches the database. They apply when you write code and whe
 
 ## Hidden queries
 
-- A prefetch cache serves only `.all()`. A `.filter()`, `.exclude()`, `.order_by()`, `.first()`, `.exists()`
-  or `.count()` on a prefetched relation makes a new query. Use `Prefetch(..., to_attr=...)`
-  or work on the prefetched list in Python.
+- A prefetch cache serves `.all()`, `.count()` and `.exists()`. A `.filter()`, `.exclude()` or `.order_by()`
+  on a prefetched relation makes a new query. `.first()` makes a new query when the relation has no ordering.
+  Use `Prefetch(..., to_attr=...)` or work on the prefetched list in Python.
 - A field removed with `.only()` or `.defer()` makes one query per row when the code reads it.
 - Read a foreign key id with `obj.fk_id`, not `obj.fk.id`.
 - Evaluate a queryset once. Use `len()` on a queryset that the code iterates later.
@@ -56,9 +56,10 @@ A lookup property defines a value once as an ORM expression. It works as a Pytho
 
 ## Bulk writes
 
-- `bulk_create`, `bulk_update`, `queryset.update()` and `queryset.delete()` do not call `save()` or `delete()`,
-  and they do not send `pre_save`, `post_save` or `post_delete`.
-  Check the receivers in `tilavarauspalvelu/signals.py` and the model's `save()`.
+- `bulk_create`, `bulk_update` and `queryset.update()` do not call `save()`,
+  and they do not send `pre_save` or `post_save`.
+- `queryset.delete()` does not call the model's `delete()`. It still sends `pre_delete` and `post_delete`.
+- For these writes, check the receivers in `tilavarauspalvelu/signals.py` and the model's `save()`.
   If they do work that must happen, do that work in bulk in the same code path.
 - Models with an `AuditLogger` get their audit log from signals. A bulk write on these models writes no audit log.
   Treat this as a correctness issue, because these models hold personal data and payments.
