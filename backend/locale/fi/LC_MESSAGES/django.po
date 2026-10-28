@@ -2288,6 +2288,10 @@ msgstr ""
 msgid "Search by name or unit name"
 msgstr "Etsi nimellä tai toimipisteen nimellä"
 
+#: tilavarauspalvelu/admin/tax_level/admin.py
+msgid "current percentage"
+msgstr "nykyinen veroprosentti"
+
 #: tilavarauspalvelu/admin/terms_of_use/admin.py
 msgid "Show PDF"
 msgstr "Näytä PDF"

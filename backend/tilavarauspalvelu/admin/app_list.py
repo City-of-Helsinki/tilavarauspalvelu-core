@@ -79,6 +79,7 @@ ADMIN_APP_GROUPS: list[AdminAppGroup] = [
             "tilavarauspalvelu.PaymentOrder",
             "tilavarauspalvelu.PaymentMerchant",
             "tilavarauspalvelu.PaymentAccounting",
+            "tilavarauspalvelu.TaxLevel",
             "tilavarauspalvelu.TaxPercentage",
         ],
     ),
