@@ -168,6 +168,23 @@ def test_reservation_series__query__relations(graphql):
     }
 
 
+def test_reservation_series__query__reservations__archived_reservation_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_archived=True)
+    reservation_series = ReservationSeriesFactory.create(reservation_unit=reservation_unit)
+    ReservationFactory.create(reservation_series=reservation_series, reservation_unit=reservation_unit)
+    graphql.login_with_superuser()
+
+    global_id = to_global_id("ReservationSeriesNode", reservation_series.pk)
+    fields = "reservations { reservationUnit { pk numActiveUserReservations } }"
+    query = reservation_series_single_query(id=global_id, fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object == {
+        "reservations": [{"reservationUnit": {"pk": reservation_unit.pk, "numActiveUserReservations": 0}}],
+    }
+
+
 def pindora_response(series: ReservationSeries) -> PindoraReservationSeriesResponse:
     return PindoraReservationSeriesResponse(
         reservation_unit_id=series.reservation_unit.ext_uuid,
