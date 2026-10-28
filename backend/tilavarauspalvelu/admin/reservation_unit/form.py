@@ -172,7 +172,6 @@ class ReservationUnitPricingInline(TranslationStackedInline):
     model = ReservationUnitPricing
     fields = [
         "begins",
-        "is_activated_on_begins",
         "lowest_price",
         "highest_price",
         "price_unit",
