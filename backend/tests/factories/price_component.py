@@ -28,8 +28,6 @@ class PriceComponentFactory(GenericDjangoModelFactory[PriceComponent]):
     amount = Decimal(10)
     price_unit = PriceUnit.PER_HOUR
 
-    accounting = ForeignKeyFactory("tests.factories.PaymentAccountingFactory")
-
     can_apply_for_discount = False
     material_price_description = ""
     payment_type = PaymentType.ONLINE
