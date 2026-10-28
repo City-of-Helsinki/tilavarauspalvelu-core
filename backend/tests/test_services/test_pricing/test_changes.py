@@ -244,20 +244,55 @@ def test_save_price_component_changes__component_of_another_group():
     ]
 
 
-def test_save_price_component_changes__model_constraints_are_checked():
+@pytest.mark.parametrize(
+    ("component_fields", "message", "code"),
+    [
+        (
+            {"amount": Decimal(-1)},
+            "Amount cannot be negative.",
+            error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE,
+        ),
+        (
+            {"payment_type": None},
+            "Payment type is required for a paid component and not allowed for a free one.",
+            error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID,
+        ),
+        (
+            {"amount": Decimal(0)},
+            "Payment type is required for a paid component and not allowed for a free one.",
+            error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID,
+        ),
+        (
+            {"valid_until": JAN_1},
+            "Valid from must be before valid until.",
+            error_codes.PRICE_COMPONENT_VALID_UNTIL_NOT_AFTER_VALID_FROM,
+        ),
+    ],
+)
+def test_save_price_component_changes__model_constraints_are_checked(component_fields, message, code):
     pricing_group = PricingGroupFactory.create()
-    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=JAN_1, payment_type=None)
+    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=JAN_1, **component_fields)
 
     with pytest.raises(ValidationError) as error:
         save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
 
-    assert error_details(error.value) == [
-        ErrorDetail(
-            "Payment type is required for a paid component and not allowed for a free one.",
-            code=error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID,
-        ),
-    ]
+    assert error_details(error.value) == [ErrorDetail(message, code=code)]
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
+
+
+def test_save_price_component_changes__model_constraints_are_checked_for_changed_components():
+    pricing_group = PricingGroupFactory.create()
+    future = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=MAR_1)
+
+    future.amount = Decimal(-1)
+
+    with pytest.raises(ValidationError) as error:
+        save_price_component_changes(pricing_group=pricing_group, components=[future], deleted_component_pks=[])
+
+    assert error_details(error.value) == [
+        ErrorDetail("Amount cannot be negative.", code=error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE),
+    ]
+    assert PriceComponent.objects.get(pk=future.pk).amount == Decimal(10)
 
 
 # ── Price options ──
