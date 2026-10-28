@@ -5,6 +5,8 @@ import itertools
 from decimal import Decimal
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import (
@@ -264,3 +266,24 @@ def test_reservation_unit_export__subset():
     # - the writes contain only 3 rows (+header)
     writes = mock_writer.get_writes()
     assert len(writes) == 4, writes
+
+
+def test_reservation_unit_export__query_count_does_not_grow_with_reservation_units():
+    ReservationUnitFactory.create(
+        pricings__highest_price=Decimal(20),
+        access_types__access_type=AccessType.UNRESTRICTED,
+    )
+
+    with CaptureQueriesContext(connection) as one_reservation_unit, mock_csv_writer():
+        ReservationUnitExporter().write_csv()
+
+    ReservationUnitFactory.create_batch(
+        3,
+        pricings__highest_price=Decimal(20),
+        access_types__access_type=AccessType.UNRESTRICTED,
+    )
+
+    with CaptureQueriesContext(connection) as four_reservation_units, mock_csv_writer():
+        ReservationUnitExporter().write_csv()
+
+    assert len(four_reservation_units.captured_queries) == len(one_reservation_unit.captured_queries)
