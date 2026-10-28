@@ -73,7 +73,13 @@ class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslatio
     ]
 
     def lowest_price_net(self, obj: ReservationUnitPricing) -> str:
-        return f"{round_decimal(obj.lowest_price_net, 2)} €"
+        lowest_price_net = obj.lowest_price_net
+        if lowest_price_net is None:
+            return "-"
+        return f"{round_decimal(lowest_price_net, 2)} €"
 
     def highest_price_net(self, obj: ReservationUnitPricing) -> str:
-        return f"{round_decimal(obj.highest_price_net, 2)} €"
+        highest_price_net = obj.highest_price_net
+        if highest_price_net is None:
+            return "-"
+        return f"{round_decimal(highest_price_net, 2)} €"
