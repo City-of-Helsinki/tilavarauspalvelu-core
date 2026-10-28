@@ -3978,9 +3978,7 @@ input ReservationUnitPricingSerializerInput {
   paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
-  lowestPriceNet: String
   highestPrice: Decimal
-  highestPriceNet: String
   taxPercentage: Int!
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
@@ -4157,9 +4155,7 @@ input UpdateReservationUnitPricingSerializerInput {
   paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
-  lowestPriceNet: String
   highestPrice: Decimal
-  highestPriceNet: String
   taxPercentage: Int
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
