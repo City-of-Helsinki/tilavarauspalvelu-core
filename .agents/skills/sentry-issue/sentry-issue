@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # Fetch a Sentry issue with one of its events from the Sentry REST API.
 # The event is the one in the URL, or the latest event if the URL has none.
+# Tag keys after the issue add the top values of each tag over all events of the issue.
 # The token is read from 1Password.
-# Usage: sentry-issue <issue ID or URL>, e.g. sentry-issue 153768154
+# Usage: sentry-issue <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name
 set -euo pipefail
 
 usage() {
-  echo "Usage: sentry-issue <issue ID or URL>, e.g. sentry-issue 153768154" >&2
+  echo "Usage: sentry-issue <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name" >&2
   exit 2
 }
-[[ $# -eq 1 ]] || usage
+[[ $# -ge 1 ]] || usage
 
 org="city-of-helsinki"
 base_url="https://sentry.io/api/0/organizations/$org"
@@ -26,6 +27,14 @@ else
   echo "Not a Sentry issue ID or URL: $1" >&2
   usage
 fi
+shift
+
+for key in "$@"; do
+  if [[ ! "$key" =~ ^[A-Za-z0-9_.:-]+$ ]]; then
+    echo "Not a Sentry tag key: $key" >&2
+    usage
+  fi
+done
 
 : "${SENTRY_ISSUE_OP_ACCOUNT:?Set SENTRY_ISSUE_OP_ACCOUNT to your 1Password account, e.g. vincit.1password.eu}"
 : "${SENTRY_ISSUE_OP_VAULT:?Set SENTRY_ISSUE_OP_VAULT to the 1Password vault that has the item, e.g. Private}"
@@ -45,8 +54,9 @@ api() {
 
 issue="$(api "issues/$issue_id/")"
 event="$(api "issues/$issue_id/events/$event_id/")"
+tags="$(for key in "$@"; do api "issues/$issue_id/tags/$key/"; done | jq --slurp '.')"
 
-jq --slurp '.[0] as $issue | .[1] as $event | {
+jq --slurp '.[0] as $issue | .[1] as $event | .[2] as $tags | {
   id: $issue.id,
   short_id: $issue.shortId,
   url: $issue.permalink,
@@ -61,6 +71,12 @@ jq --slurp '.[0] as $issue | .[1] as $event | {
   last_seen: $issue.lastSeen,
   event_count: $issue.count,
   user_count: $issue.userCount,
+  tags: [$tags[] | {
+    key,
+    total: .totalValues,
+    unique: .uniqueValues,
+    top: [.topValues[] | {value, count}]
+  }],
   event: {
     id: $event.eventID,
     at: $event.dateCreated,
@@ -68,6 +84,13 @@ jq --slurp '.[0] as $issue | .[1] as $event | {
     tags: ([$event.tags[] | {(.key): .value}] | add),
     request: ([$event.entries[] | select(.type == "request") | .data | {method, url}] | first),
     # Frames are oldest first. Only in-app frames have code context.
+    # Performance issues, such as N+1 queries, have evidence instead of exceptions.
+    evidence: ($event.occurrence | if . then {
+      parent_span: .evidenceData.parentSpan,
+      repeating_spans: .evidenceData.repeatingSpansCompact,
+      repetitions: .evidenceData.numPatternRepetitions,
+      offending_spans: [.evidenceDisplay[]? | .value]
+    } else null end),
     exceptions: [$event.entries[] | select(.type == "exception") | .data.values[] | {
       type,
       value,
@@ -83,4 +106,4 @@ jq --slurp '.[0] as $issue | .[1] as $event | {
     breadcrumbs: ([$event.entries[] | select(.type == "breadcrumbs") | .data.values[]
       | {at: .timestamp, category, level, message}] | .[-20:])
   }
-}' <(printf '%s' "$issue") <(printf '%s' "$event")
+}' <(printf '%s' "$issue") <(printf '%s' "$event") <(printf '%s' "$tags")
