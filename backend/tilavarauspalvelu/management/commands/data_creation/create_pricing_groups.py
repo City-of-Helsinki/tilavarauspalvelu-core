@@ -66,7 +66,6 @@ def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit]) -> N
                 price_option=None,
                 amount=pricing.highest_price,
                 price_unit=pricing.price_unit,
-                accounting=None,
                 can_apply_for_discount=reservation_unit.can_apply_free_of_charge and pricing.highest_price > 0,
                 material_price_description_fi=pricing.material_price_description_fi or "",
                 material_price_description_en=pricing.material_price_description_en or "",
