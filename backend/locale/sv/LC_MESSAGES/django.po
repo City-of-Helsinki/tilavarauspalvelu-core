@@ -2236,6 +2236,10 @@ msgstr ""
 msgid "current percentage"
 msgstr "nuvarande skattesats"
 
+#: tilavarauspalvelu/admin/tax_level/form.py
+msgid "At least one rate in effect today is required."
+msgstr "Skattenivån måste ha minst en skattesats som gäller i dag."
+
 #: tilavarauspalvelu/admin/terms_of_use/admin.py
 msgid "Show PDF"
 msgstr ""
