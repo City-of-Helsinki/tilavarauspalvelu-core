@@ -1,8 +1,8 @@
 ---
 name: watch-pr
-description: Watch a pull request until it is done. Fix failed CI checks, answer review comments, and rebase onto the base branch as they come in.
+description: Watch a pull request, or all of the user's open pull requests, until each one is done. Fix failed CI checks, answer review comments, and rebase onto the base branch as they come in.
 disable-model-invocation: true
-argument-hint: <PR number or URL>
+argument-hint: <PR number or URL, or "all">
 ---
 
 The user ran this skill on purpose. It runs in **automatic mode**.
@@ -70,7 +70,7 @@ Then skip the CodeRabbit review. Do not wait for the limit to reset, and do not 
 
 Check `gh auth status`. If it fails, stop and ask the user to run `gh auth login`.
 
-Check that the current branch is the head branch of the pull request. If it is not, stop and ask the user.
+For one pull request, check out its head branch. For all pull requests, follow "Run on all open pull requests" first.
 
 Run the script from the repository root:
 
@@ -112,9 +112,23 @@ Run this with the Bash tool and `run_in_background: true`:
 Tell the user in two or three lines what you did since the last wake. Then end your turn. The command exits and wakes you:
 
 - **Exit 0**: news. The output lists each item. Handle each item, push, and run `wait` again.
-  If the pull request is done, stop the watch instead.
-- **Exit 3**: the watch ended. The output says why. Report to the user and stop.
+  If the pull request is done, stop the watch instead, and go to the next pull request of the run.
+- **Exit 3**: the watch ended. The output says why. Report to the user and go to the next pull request of the run.
 - **Other**: an error. Show the user the output and stop.
+
+## Run on all open pull requests
+
+The user can ask to rebase and watch all of their open pull requests. Include drafts. Any order is fine.
+
+List them with `gh pr list --author @me --state open --json number,headRefName,baseRefName,isDraft`.
+A pull request with a base other than `main` is stacked on the pull request that has that head branch.
+Keep each stack. Rebase its bottom branch onto `origin/main`, and move the rest with `git rebase --update-refs` on its top branch.
+
+Handle one pull request at a time, and one stack at a time:
+
+1. Check out the branch, rebase, and push with `--force-with-lease`. For a stack, push all of its branches.
+2. Watch each of its pull requests with steps 1 to 4 until it is done.
+3. Go to the next pull request or stack.
 
 ## Handle an item
 
@@ -147,7 +161,7 @@ Before you push changes under `backend/`, lint and test as the `backend` skill s
 
 The script spends about 30 GraphQL points per hour on an active pull request. Your own `gh` calls use the same quota.
 REST calls (`gh api repos/...`) have their own quota, so use them for reads and replies.
-`gh pr view`, `gh pr checks`, and `gh api graphql` spend GraphQL points.
+`gh pr view`, `gh pr checks`, `gh pr list`, and `gh api graphql` spend GraphQL points.
 
 Reply to a review comment:
 
