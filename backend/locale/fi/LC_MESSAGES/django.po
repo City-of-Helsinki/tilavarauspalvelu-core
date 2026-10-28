@@ -1853,6 +1853,11 @@ msgid "At least one active access type is required."
 msgstr "Varausyksiköllä on oltava vähintään yksi aktiivinen kulkutapa."
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
+msgid "This tax level has no rate in effect today."
+msgstr "Verotasolla ei ole tänään voimassa olevaa veroprosenttia."
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms are required for direct booking of paid reservation units"
 msgstr "Maksuehdot vaaditaan suoravaraamiseen maksullisille varausyksiköihin"
 
