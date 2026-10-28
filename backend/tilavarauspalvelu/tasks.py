@@ -5,7 +5,6 @@ import inspect
 import json
 import time
 import uuid
-from decimal import Decimal
 from functools import wraps
 from typing import TYPE_CHECKING
 
@@ -30,9 +29,7 @@ from tilavarauspalvelu.models import (
     ReservationUnit,
     ReservationUnitHierarchy,
     ReservationUnitImage,
-    ReservationUnitPricing,
     Space,
-    TaxPercentage,
     Unit,
     User,
 )
@@ -41,7 +38,7 @@ from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from collections.abc import Collection, Iterable
+    from collections.abc import Iterable
 
     from celery.contrib.django.task import Task
 
@@ -72,7 +69,6 @@ __all__ = [
     "update_pindora_access_code_is_active_task",
     "update_reservation_unit_hierarchy_task",
     "update_reservation_unit_image_urls_task",
-    "update_reservation_unit_pricings_tax_percentage_task",
     "update_reservation_unit_search_vectors_task",
     "update_units_from_tprek_task",
 ]
@@ -327,50 +323,6 @@ def update_affecting_time_spans_task(using: str | None = None) -> None:
 @app.task(name="create_statistics_for_reservations")
 def create_statistics_for_reservations_task(reservation_pks: list[int]) -> None:
     Reservation.objects.filter(pk__in=reservation_pks).upsert_statistics()
-
-
-@app.task(name="update_reservation_unit_pricings_tax_percentage")
-def update_reservation_unit_pricings_tax_percentage_task(
-    change_date: str,
-    current_tax: str,
-    future_tax: str,
-    ignored_company_codes: Collection[str] = (),
-) -> None:
-    SentryLogger.log_message(
-        message="Task `update_reservation_unit_pricings_tax_percentage` started",
-        details=f"Task was run with {change_date=}, {current_tax=}, {future_tax=}, {ignored_company_codes=}",
-        level="info",
-    )
-
-    change_date = datetime.date.fromisoformat(change_date)
-    current_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(current_tax))
-    future_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(future_tax))
-
-    ReservationUnitPricing.actions.add_new_pricings_for_tax_percentage(
-        future_tax_percentage=future_tax_percentage,
-        current_tax_percentage=current_tax_percentage,
-        change_date=change_date,
-        ignored_company_codes=ignored_company_codes,
-    )
-
-    # Log any unhandled future pricings
-    # PAID Pricings that begin on or after the change date
-    unhandled: list[ReservationUnitPricing] = list(
-        ReservationUnitPricing.objects.pricings_with_tax_percentage(
-            after_date=change_date,
-            tax_percentage=current_tax_percentage,
-        ).select_related("reservation_unit", "reservation_unit__unit")
-    )
-
-    if not unhandled:
-        return
-
-    info_str = ", ".join(f"<{pricing.id}: {pricing.reservation_unit}: {pricing}>" for pricing in unhandled)
-    SentryLogger.log_message(
-        message="Task `update_reservation_unit_pricings_tax_percentage` has unhandled future pricings",
-        details=f"Task found the following unhandled future pricings: {info_str}",
-        level="info",
-    )
 
 
 @app.task(
