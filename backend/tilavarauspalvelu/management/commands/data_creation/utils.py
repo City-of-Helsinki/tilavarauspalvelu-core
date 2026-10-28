@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     )
 
 
-type Percentage = Literal["0", "10", "14", "24", "25.5"]
+type TaxLevelKey = Literal["general", "reduced", "tax_free"]
 TQuerySet = TypeVar("TQuerySet", bound=models.QuerySet)
 
 
@@ -243,9 +243,8 @@ class HandlingInfo:
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
-class TaxPercentageInfo:
-    name: str
-    value: Literal["0", "10", "14", "24", "25.5"]
+class TaxLevelInfo:
+    key: TaxLevelKey
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
@@ -282,7 +281,7 @@ class PaidReservationUnitData:
     price_info: PriceInfo
     handling_info: HandlingInfo
     payment_type_info: PaymentTypeInfo
-    tax_percentage_info: TaxPercentageInfo
+    tax_level_info: TaxLevelInfo
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
