@@ -490,3 +490,31 @@ def test_save_price_component_changes__option_removed_from_open_application_roun
         ),
     ]
     assert PriceComponent.objects.get(pk=juniors_component.pk).valid_until is None
+
+
+def test_save_price_component_changes__own_group_in_inconsistent_application_round():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group)
+    shared_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=shared_group, price_option=adults, valid_from=JAN_1)
+    shared_row = ReservationUnitPricingGroupFactory.create(pricing_group=shared_group, begins=JAN_1)
+
+    own_group = PricingGroupFactory.create(unit_group=None)
+    own_component = PriceComponentFactory.create(pricing_group=own_group, valid_from=JAN_1)
+    own_row = ReservationUnitPricingGroupFactory.create(pricing_group=own_group, begins=JAN_1)
+
+    ApplicationRoundFactory.create(
+        reservation_units=[shared_row.reservation_unit, own_row.reservation_unit],
+        application_period_begins_at=datetime.datetime(2026, 2, 1, tzinfo=datetime.UTC),
+        application_period_ends_at=datetime.datetime(2026, 3, 1, tzinfo=datetime.UTC),
+        reservation_period_begin_date=datetime.date(2026, 5, 1),
+        reservation_period_end_date=datetime.date(2026, 8, 31),
+    )
+
+    own_component.valid_until = MAR_1
+    new = PriceComponentFactory.build(pricing_group=own_group, valid_from=MAR_1, amount=Decimal(20))
+
+    save_price_component_changes(pricing_group=own_group, components=[own_component, new], deleted_component_pks=[])
+
+    components = list(PriceComponent.objects.filter(pricing_group=own_group).order_by("valid_from"))
+    assert [component.amount for component in components] == [Decimal(10), Decimal(20)]

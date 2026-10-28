@@ -15,6 +15,8 @@ from .coverage import check_pricing_group_coverage
 if TYPE_CHECKING:
     from collections.abc import Collection
 
+    from .application_round_options import RoundOptionError
+
 __all__ = [
     "save_price_component_changes",
 ]
@@ -159,11 +161,16 @@ def _validate_pricing_group(*, pricing_group: PricingGroup, components: list[Pri
         components=components,
         reservation_unit_begin_dates=reservation_unit_begin_dates,
     )
-    round_errors = check_pricing_change_keeps_round_options(
-        pricing_group=pricing_group,
-        components=components,
-        reservation_unit_rows=None,
-    )
+    # An own pricing group offers no price options, and its reservation units do not change here.
+    # So a change to its components cannot change the options of an application round.
+    round_errors: list[RoundOptionError] = []
+    if pricing_group.unit_group_id is not None:
+        round_errors = check_pricing_change_keeps_round_options(
+            pricing_group=pricing_group,
+            components=components,
+            reservation_unit_rows=None,
+        )
+
     errors = [*coverage_errors, *round_errors]
     if errors:
         details = [ErrorDetail(error.message, code=error.code) for error in errors]
