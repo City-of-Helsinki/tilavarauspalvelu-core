@@ -30,6 +30,9 @@ if (env.SENTRY_DSN) {
     ignoreErrors: [
       "ResizeObserver loop completed with undelivered notifications",
       "ResizeObserver loop limit exceeded",
+      // iOS Safari throws this after a suspended background tab wakes up. A string would match any message
+      // that contains it, so match the exact type and value.
+      /^TypeError: Internal error$/,
     ],
     tracesSampleRate: parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE),
     tracePropagationTargets: env.SENTRY_TRACE_PROPAGATION_TARGETS
