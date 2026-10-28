@@ -139,6 +139,7 @@ class ReservationUnitExporter(BaseCSVExporter):
             .annotate(
                 publishing_state=L("publishing_state"),
                 reservation_state=L("reservation_state"),
+                current_access_type=L("current_access_type"),
             )
         )
 
