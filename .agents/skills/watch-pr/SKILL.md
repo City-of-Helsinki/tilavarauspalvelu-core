@@ -123,7 +123,7 @@ Tell the user in two or three lines what you did since the last wake. Then end y
 
 The user can ask to rebase and watch all of their open pull requests. Include drafts. Any order is fine.
 
-List them with `gh pr list --author @me --state open --json number,headRefName,baseRefName,isDraft`.
+List them with `gh pr list --author @me --state open --limit 100 --json number,headRefName,baseRefName,isDraft`.
 A pull request with a base other than `main` is stacked on the pull request that has that head branch.
 Keep each stack. Rebase its bottom branch onto `origin/main`, and move the rest with `git rebase --update-refs` on its top branch.
 
