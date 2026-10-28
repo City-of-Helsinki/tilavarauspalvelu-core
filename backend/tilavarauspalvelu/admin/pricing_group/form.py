@@ -94,7 +94,6 @@ class PriceComponentInline(TranslationStackedInline):
         "amount",
         "price_unit",
         "payment_type",
-        "accounting",
         "can_apply_for_discount",
         "material_price_description",
     ]
