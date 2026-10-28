@@ -57,7 +57,6 @@ class PricingGroupComponentsSerializer(NestingModelSerializer):
                     price_option=data.get("price_option", saved_component.price_option),
                     amount=data.get("amount", saved_component.amount),
                     price_unit=data.get("price_unit", saved_component.price_unit),
-                    accounting=data.get("accounting", saved_component.accounting),
                     can_apply_for_discount=data.get("can_apply_for_discount", saved_component.can_apply_for_discount),
                     material_price_description_fi=data.get(
                         "material_price_description_fi",
@@ -84,7 +83,6 @@ class PricingGroupComponentsSerializer(NestingModelSerializer):
                     price_option=data.get("price_option"),
                     amount=data.get("amount"),
                     price_unit=data.get("price_unit"),
-                    accounting=data.get("accounting"),
                     can_apply_for_discount=data.get("can_apply_for_discount", False),
                     material_price_description_fi=data.get("material_price_description_fi", ""),
                     material_price_description_en=data.get("material_price_description_en", ""),

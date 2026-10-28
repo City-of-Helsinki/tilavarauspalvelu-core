@@ -84,7 +84,6 @@ def save_own_pricings(*, reservation_unit: ReservationUnit, pricings: list[OwnPr
                 price_option=None,
                 amount=pricing.amount,
                 price_unit=pricing.price_unit,
-                accounting=None,
                 can_apply_for_discount=pricing.can_apply_for_discount,
                 material_price_description_fi=pricing.material_price_description_fi,
                 material_price_description_en=pricing.material_price_description_en,
