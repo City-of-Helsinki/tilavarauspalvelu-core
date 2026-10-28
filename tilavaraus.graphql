@@ -2363,7 +2363,6 @@ type ReservationUnitPricingNode implements Node {
   begins: Date!
   priceUnit: PriceUnit!
   paymentType: PaymentType
-  isActivatedOnBegins: Boolean!
   lowestPrice: Decimal!
   highestPrice: Decimal!
   materialPriceDescriptionFi: String
@@ -3974,7 +3973,6 @@ scalar Upload
 input ReservationUnitPricingSerializerInput {
   pk: Int
   begins: Date!
-  isActivatedOnBegins: Boolean
   paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
@@ -4151,7 +4149,6 @@ input UpdateReservationUnitImageFieldSerializerInput {
 input UpdateReservationUnitPricingSerializerInput {
   pk: Int
   begins: Date
-  isActivatedOnBegins: Boolean
   paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal

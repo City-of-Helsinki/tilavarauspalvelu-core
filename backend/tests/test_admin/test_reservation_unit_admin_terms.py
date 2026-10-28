@@ -327,7 +327,6 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     data |= management_form_data("pricings", total_forms=1, initial_forms=1)
     data["pricings-0-id"] = pricings.id
     data["pricings-0-begins"] = pricings.begins.isoformat()
-    data["pricings-0-is_activated_on_begins"] = pricings.is_activated_on_begins
     data["pricings-0-lowest_price"] = pricings.lowest_price
     data["pricings-0-highest_price"] = pricings.highest_price
     data["pricings-0-price_unit"] = pricings.price_unit.value
