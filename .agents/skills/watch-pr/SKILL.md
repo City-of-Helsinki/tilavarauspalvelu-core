@@ -61,7 +61,8 @@ A pull request is done when all of these are true:
 
 - The required checks passed.
 - CodeRabbit reviewed it, or CodeRabbit hit its review limit.
-- Every CodeRabbit comment has a fix or a reply.
+- Every review thread is marked resolved, from CodeRabbit or from a person.
+- Every other comment has a fix or a reply.
 
 Then stop the watch as "Stop the watch" says. Do not wait for the merge.
 
@@ -149,6 +150,9 @@ Comment snippets are cut at 200 characters. Read the full text with the `github-
   - It is unclear: reply with a question.
   - It is wrong or out of scope: reply with the reason, and leave the code as is.
   - It needs a decision from the user: ask the user in the session.
+
+  Resolve a review thread when you think its issue is resolved. This includes threads that the user started.
+  Keep a thread open while you wait for an answer to your question.
 - **Behind or conflict.** The repository requires linear history, so the branch must be on top of its base to merge.
   If tracked files have uncommitted changes, stop and ask the user. They can be the user's other work.
   Else rebase at once: fetch, rebase onto `origin/<base branch>`, and resolve any conflicts.
