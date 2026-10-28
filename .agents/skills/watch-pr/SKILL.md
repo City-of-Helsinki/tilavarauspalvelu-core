@@ -16,6 +16,7 @@ For the pull requests in this run, the skill gives you the right to do these rou
 - Post comments, reply to review comments, and resolve review threads.
 - Run `poetry sync` in `backend/` of the main checkout, so that the virtualenv matches the branch.
   Never run it in a worktree. All worktrees share one virtualenv, and a sync there points it at the worktree.
+- Run `pnpm install --frozen-lockfile` in `frontend/`, so that `node_modules` matches the branch. This is safe in a worktree too.
 - Restore a lockfile that a lint hook rewrote. Read its full `git diff` first. Restore it only if the hook made every change in it.
 - Wait for CI runs that are queued or not created yet.
 
