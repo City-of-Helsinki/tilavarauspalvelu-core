@@ -33,5 +33,4 @@ class ReservationPriceLineFactory(GenericDjangoModelFactory[ReservationPriceLine
     tax_percentage = Decimal(0)
     vat_code = ""
 
-    accounting = ForeignKeyFactory("tests.factories.PaymentAccountingFactory")
     payment_product = ForeignKeyFactory("tests.factories.PaymentProductFactory")
