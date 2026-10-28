@@ -10,6 +10,7 @@ from lookup_property import L
 from tilavarauspalvelu.enums import ApplicationRoundReservationCreationStatusChoice, PriceComponentKind
 from tilavarauspalvelu.models import ApplicationRound, PriceComponent, PriceOption, ReservationUnitPricingGroup
 from tilavarauspalvelu.typing import error_codes
+from utils.date_utils import local_date
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -119,6 +120,8 @@ def check_pricing_change_keeps_round_options(
         ApplicationRound.objects
         .filter(pk__in=ApplicationRound.objects.filter(reservation_units__in=reservation_unit_pks).values("pk"))
         .exclude(L(reservation_creation_status=ApplicationRoundReservationCreationStatusChoice.COMPLETED))
+        # A handled round without allocations never becomes completed.
+        .exclude(reservation_period_end_date__lt=local_date())
         .order_by("pk")
     )
 
@@ -179,6 +182,8 @@ def check_price_option_change_keeps_round_options(price_option: PriceOption) -> 
         ApplicationRound.objects
         .filter(pk__in=rounds_using_unit_groups.values("pk"))
         .exclude(L(reservation_creation_status=ApplicationRoundReservationCreationStatusChoice.COMPLETED))
+        # A handled round without allocations never becomes completed.
+        .exclude(reservation_period_end_date__lt=local_date())
         .order_by("pk")
     )
 
