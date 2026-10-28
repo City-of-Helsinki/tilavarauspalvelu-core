@@ -81,7 +81,10 @@ jobs:
         run: |
           cp poetry.lock /tmp/poetry.lock.committed
           poetry lock
-          diff -u /tmp/poetry.lock.committed poetry.lock
+          if ! diff -u /tmp/poetry.lock.committed poetry.lock; then
+            echo "::error file=backend/poetry.lock::poetry.lock is outdated. Run 'poetry lock' in backend/ locally and commit the result."
+            exit 1
+          fi
 
       - name: "Test for migration issues"
         working-directory: backend
