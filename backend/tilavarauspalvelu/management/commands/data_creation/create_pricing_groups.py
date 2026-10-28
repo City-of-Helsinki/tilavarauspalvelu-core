@@ -117,7 +117,7 @@ def _create_reservation_price_lines() -> None:
 
     components_by_pricing_group: dict[int, list[PriceComponent]] = defaultdict(list)
     price_options_by_pricing_group: dict[int, PriceOption] = {}
-    for component in PriceComponent.objects.select_related("price_option", "accounting").order_by("valid_from"):
+    for component in PriceComponent.objects.select_related("price_option").order_by("valid_from"):
         components_by_pricing_group[component.pricing_group_id].append(component)
 
         option = component.price_option
@@ -128,12 +128,7 @@ def _create_reservation_price_lines() -> None:
         if current_option is None or option.name < current_option.name:
             price_options_by_pricing_group[component.pricing_group_id] = option
 
-    reservations = Reservation.objects.filter(
-        reservation_unit__in=list(reservation_unit_pricing_groups),
-    ).select_related(
-        "reservation_unit__payment_accounting",
-        "reservation_unit__unit__payment_accounting",
-    )
+    reservations = Reservation.objects.filter(reservation_unit__in=list(reservation_unit_pricing_groups))
 
     price_lines: list[ReservationPriceLine] = []
     priced_reservations: list[Reservation] = []
@@ -182,10 +177,6 @@ def _create_reservation_price_lines() -> None:
         quantity = round_decimal(quantity, 4)
         amount = round_decimal(component.amount * quantity, 2)
 
-        accounting = component.accounting
-        if accounting is None:
-            accounting = reservation.reservation_unit.actions.get_accounting()
-
         line_option = component.price_option
 
         line = ReservationPriceLine(
@@ -203,7 +194,6 @@ def _create_reservation_price_lines() -> None:
             override_amount=None,
             tax_percentage=Decimal(0),
             vat_code="",
-            accounting=accounting,
             payment_product=None,
         )
         price_lines.append(line)
