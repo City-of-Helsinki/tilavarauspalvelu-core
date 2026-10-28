@@ -4215,6 +4215,30 @@ msgstr ""
 msgid "Begin and end times must be multiples of 15 minutes."
 msgstr ""
 
+#: tilavarauspalvelu/models/tax_level/model.py
+msgid "tax level"
+msgstr "skattenivå"
+
+#: tilavarauspalvelu/models/tax_level/model.py
+msgid "tax levels"
+msgstr "skattenivåer"
+
+#: tilavarauspalvelu/models/tax_level_rate/model.py
+msgid "tax level rate"
+msgstr "skattenivåns skattesats"
+
+#: tilavarauspalvelu/models/tax_level_rate/model.py
+msgid "tax level rates"
+msgstr "skattenivåns skattesatser"
+
+#: tilavarauspalvelu/models/tax_level_rate/model.py
+msgid "Rate already exists for this tax level and date"
+msgstr "Skattenivån har redan en skattesats för detta datum"
+
+#: tilavarauspalvelu/models/tax_level_rate/model.py
+msgid "Percentage must be between 0 and 100"
+msgstr "Procentsatsen måste vara mellan 0 och 100"
+
 #: tilavarauspalvelu/models/tax_percentage/model.py
 msgid "tax percentage"
 msgstr ""
