@@ -36,8 +36,7 @@ class ReservationUnitPricing(models.Model):
 
     payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
 
-    # True: This pricing is used for reservations that are created after the begins date
-    # False: This pricing is used for reservations that start after the begins date
+    # Not used. Kept so that migrations can be reversed. Removed in TILA-4558.
     is_activated_on_begins = models.BooleanField(default=False)
 
     lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
