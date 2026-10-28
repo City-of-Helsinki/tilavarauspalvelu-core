@@ -15,7 +15,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -88,9 +88,11 @@ class ReservationCreateSerializer(NestingModelSerializer):
         data["user"] = user
         data["reservee_used_ad_login"] = getattr(user.id_token, "is_ad_login", False)
 
+        today = local_date()
+
         data["price"] = pricing.actions.calculate_reservation_price(duration=duration)
         data["unit_price"] = pricing.highest_price
-        data["tax_percentage_value"] = pricing.tax_percentage.value
+        data["tax_percentage_value"] = pricing.tax_level.actions.get_percentage(on_date=today)
         data["non_subsidised_price"] = data["price"]
         data["access_type"] = reservation_unit.actions.get_access_type_at(begins_at, default=AccessType.UNRESTRICTED)
 

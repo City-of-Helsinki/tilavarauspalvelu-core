@@ -164,7 +164,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         kwargs.setdefault("unit", space.unit)
         kwargs.setdefault("pricings__lowest_price", 0)
         kwargs.setdefault("pricings__highest_price", 0)
-        kwargs.setdefault("pricings__tax_percentage__value", 0)
+        kwargs.setdefault("pricings__tax_level__rates__percentage", 0)
         reservation_unit = cls.create(**kwargs)
 
         ReservableTimeSpanFactory.create(
@@ -179,7 +179,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     def create_free(cls, **kwargs: Any) -> ReservationUnit:
         kwargs.setdefault("pricings__lowest_price", Decimal(0))
         kwargs.setdefault("pricings__highest_price", Decimal(0))
-        kwargs.setdefault("pricings__tax_percentage__value", Decimal(0))
+        kwargs.setdefault("pricings__tax_level__rates__percentage", Decimal(0))
         kwargs.setdefault("pricings__payment_type", None)
         return cls.create(**kwargs)
 
@@ -187,7 +187,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     def create_paid_on_site(cls, **kwargs: Any) -> ReservationUnit:
         kwargs.setdefault("pricings__lowest_price", Decimal("10.00"))
         kwargs.setdefault("pricings__highest_price", Decimal("20.00"))
-        kwargs.setdefault("pricings__tax_percentage__value", Decimal("25.50"))
+        kwargs.setdefault("pricings__tax_level__rates__percentage", Decimal("25.50"))
         kwargs.setdefault("pricings__payment_type", PaymentType.ON_SITE)
         return cls.create(**kwargs)
 
@@ -195,7 +195,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     def create_paid_in_webshop(cls, **kwargs: Any) -> ReservationUnit:
         kwargs.setdefault("pricings__lowest_price", Decimal("10.00"))
         kwargs.setdefault("pricings__highest_price", Decimal("20.00"))
-        kwargs.setdefault("pricings__tax_percentage__value", Decimal("25.50"))
+        kwargs.setdefault("pricings__tax_level__rates__percentage", Decimal("25.50"))
         kwargs.setdefault("pricings__payment_type", PaymentType.ONLINE)
         kwargs.setdefault("payment_product__id", uuid.uuid4())
         return cls.create(**kwargs)
@@ -279,7 +279,7 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
             pricings__price_unit=PriceUnit.FIXED,
             pricings__lowest_price=Decimal(0),
             pricings__highest_price=Decimal(0),
-            pricings__tax_percentage__value=Decimal(0),
+            pricings__tax_level__rates__percentage=Decimal(0),
         )
         if begin_date is not None:
             self.set(

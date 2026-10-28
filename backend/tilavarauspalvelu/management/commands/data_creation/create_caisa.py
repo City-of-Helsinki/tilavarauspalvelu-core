@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -29,7 +30,7 @@ from tests.factories import (
     ReservationUnitPricingFactory,
     ReservationUnitTypeFactory,
     SpaceFactory,
-    TaxPercentageFactory,
+    TaxLevelFactory,
     TermsOfUseFactory,
     UnitFactory,
 )
@@ -58,11 +59,11 @@ def _create_caisa() -> None:
     )
 
     ###########################################################################################################
-    # Create tax percentages and payment types
+    # Create tax levels and payment types
     ###########################################################################################################
 
-    tax_percentage_0 = TaxPercentageFactory.create(value=0.0)
-    tax_percentage_255 = TaxPercentageFactory.create(value=25.5)
+    tax_level_0 = TaxLevelFactory.create(name="Veroton", rates__percentage=Decimal("0.0"))
+    tax_level_255 = TaxLevelFactory.create(name="Yleinen", rates__percentage=Decimal("25.5"))
 
     ###########################################################################################################
     # Create payment terms
@@ -733,7 +734,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=40.0,
-        tax_percentage=tax_percentage_255,
+        tax_level=tax_level_255,
         payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
@@ -828,7 +829,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_level_0,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=maksuton_mankeli,
@@ -955,7 +956,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=40.0,
         highest_price=40.0,
-        tax_percentage=tax_percentage_255,
+        tax_level=tax_level_255,
         payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
@@ -1066,7 +1067,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
-        tax_percentage=tax_percentage_255,
+        tax_level=tax_level_255,
         payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
@@ -1154,7 +1155,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_level_0,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=perumiskelvoton_parveke,
@@ -1251,7 +1252,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
-        tax_percentage=tax_percentage_255,
+        tax_level=tax_level_255,
         payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
@@ -1356,7 +1357,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_level_0,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=toistuvien_varausten_toimisto,
@@ -1447,7 +1448,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_level_0,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=tauotettu_takkahuone,
@@ -1549,7 +1550,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_level_0,
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_kasiteltava_kammio,

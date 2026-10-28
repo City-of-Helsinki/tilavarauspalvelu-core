@@ -331,7 +331,7 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     data["pricings-0-highest_price"] = pricings.highest_price
     data["pricings-0-price_unit"] = pricings.price_unit.value
     data["pricings-0-payment_type"] = pricings.payment_type.value
-    data["pricings-0-tax_percentage"] = pricings.tax_percentage.id
+    data["pricings-0-tax_level"] = pricings.tax_level.id
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
 

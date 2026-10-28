@@ -24,7 +24,7 @@ from tests.factories import (
     ReservationUnitTypeFactory,
     ResourceFactory,
     SpaceFactory,
-    TaxPercentageFactory,
+    TaxLevelFactory,
     UnitFactory,
 )
 
@@ -63,7 +63,7 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
     resource = ResourceFactory.create(space=space)
     reservation_unit_type = ReservationUnitTypeFactory.create()
     rule = ReservationUnitCancellationRuleFactory.create()
-    tax_percentage = TaxPercentageFactory.create()
+    tax_level = TaxLevelFactory.create()
 
     today = local_date()
 
@@ -106,7 +106,7 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
                 "priceUnit": PriceUnit.PER_15_MINS.name,
                 "lowestPrice": "10.5",
                 "highestPrice": "18.8",
-                "taxPercentage": tax_percentage.id,
+                "taxLevel": tax_level.id,
                 "paymentType": PaymentType.ONLINE_OR_INVOICE,
             }
         ],
@@ -145,14 +145,14 @@ def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
 
 
 def get_pricing_data(**overrides: Any) -> dict[str, Any]:
-    tax_percentage = TaxPercentageFactory.create(value=Decimal("10.0"))
+    tax_level = TaxLevelFactory.create(rates__percentage=Decimal("10.0"))
 
     return {
         "begins": "2022-09-11",
         "priceUnit": PriceUnit.PER_15_MINS.name,
         "lowestPrice": "18.2",
         "highestPrice": "21.5",
-        "taxPercentage": tax_percentage.id,
+        "taxLevel": tax_level.id,
         "paymentType": PaymentType.ONLINE_OR_INVOICE,
         **overrides,
     }
