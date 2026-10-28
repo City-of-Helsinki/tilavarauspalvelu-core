@@ -114,6 +114,10 @@ Show the preview to the user. Run the same command without `--dry-run` only afte
 The allowed labels are `backend`, `frontend`, `operations`, `infra` and `design`.
 A key option takes a key or a URL.
 
+Write the summary, the description and the comments in Finnish.
+Keep technical terms in English, for example model and field names, query, data migration and Django admin.
+These read better and match the code.
+
 Write a description in Jira wiki markup, the same format that `jira-issue` prints.
 Write it to a new file in `/tmp`, then give the file path. A file keeps quotes and line breaks safe.
 
