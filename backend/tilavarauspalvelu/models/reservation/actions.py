@@ -5,6 +5,7 @@ import datetime
 from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
+from django.db import transaction
 from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 from rest_framework.exceptions import ValidationError
@@ -349,6 +350,18 @@ class ReservationActions:
             reservation_user_uuid=self.reservation.user.uuid,
             handled_payment_due_by=handled_payment_due_by,
         )
+
+    def update_tax_percentage(self, *, tax_percentage: Decimal) -> None:
+        """Update the tax percentage of the reservation and the tax amounts of its payment order."""
+        payment_order = self.reservation.payment_order
+
+        self.reservation.tax_percentage_value = tax_percentage
+        payment_order.price_net = self.reservation.price_net
+        payment_order.price_vat = self.reservation.price_vat_amount
+
+        with transaction.atomic():
+            self.reservation.save(update_fields=["tax_percentage_value"])
+            payment_order.save(update_fields=["price_net", "price_vat"])
 
     def create_order_in_verkkokauppa(self) -> Order:
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
