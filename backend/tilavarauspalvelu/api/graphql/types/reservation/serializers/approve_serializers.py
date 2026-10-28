@@ -99,10 +99,6 @@ class ReservationApproveSerializer(NestingModelSerializer):
             msg = "No pricing found for reservation's begin date."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
 
-        # Tax percentage needs to be updated in case it has changed since the reservation was created
-        today = local_date()
-        data["tax_percentage_value"] = pricing.tax_level.actions.get_percentage(on_date=today)
-
         now = local_datetime()
         three_days_from_now = now + datetime.timedelta(days=3)
         one_hour_before_begin = begin.astimezone(datetime.UTC) - datetime.timedelta(hours=1)
@@ -117,6 +113,11 @@ class ReservationApproveSerializer(NestingModelSerializer):
 
         if pricing.payment_type != PaymentType.ON_SITE:
             reservation_unit.validators.validate_has_payment_product()
+
+            # A webshop payment uses the tax rate of the date of sale.
+            # Other payments keep the tax rate from the date the reservation was created.
+            today = local_date()
+            data["tax_percentage_value"] = pricing.tax_level.actions.get_percentage(on_date=today)
 
         data["payment_type"] = PaymentType(pricing.payment_type)
         return data
@@ -168,7 +169,10 @@ class ReservationApproveSerializer(NestingModelSerializer):
 
         # Set price info on instance early so that payment order data is calculated correctly
         self.instance.price = validated_data["price"]
-        self.instance.tax_percentage_value = validated_data["tax_percentage_value"]
+
+        tax_percentage_value = validated_data.get("tax_percentage_value")
+        if tax_percentage_value is not None:
+            self.instance.tax_percentage_value = tax_percentage_value
 
         if validated_data["state"].should_create_payment_order:
             self.instance.actions.create_payment_order_paid_after_handling(
