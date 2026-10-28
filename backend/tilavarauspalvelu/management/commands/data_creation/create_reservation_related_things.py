@@ -22,6 +22,7 @@ from tilavarauspalvelu.models import (
     ReservationDenyReason,
     ReservationPurpose,
     ReservationUnitCancellationRule,
+    TaxLevelRate,
     TermsOfUse,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
@@ -40,6 +41,7 @@ from tests.factories import (
     ReservationUnitCancellationRuleFactory,
     ReservationUnitImageFactory,
     TaxLevelFactory,
+    TaxLevelRateFactory,
     TermsOfUseFactory,
 )
 
@@ -48,7 +50,7 @@ from .utils import IntendedUseData, fetch_image, get_image_path, with_logs
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit, ReservationUnitImage, TaxLevel
 
-    from .utils import Percentage
+    from .utils import TaxLevelKey
 
 
 @with_logs
@@ -201,24 +203,21 @@ def _create_intended_uses() -> list[IntendedUse]:
 
 
 @with_logs
-def _create_tax_levels() -> dict[Percentage, TaxLevel]:
-    names: dict[Percentage, str] = {
-        "0": "Veroton",
-        "10": "Alennettu 10 %",
-        "14": "Alennettu 14 %",
-        "24": "Yleinen 24 %",
-        "25.5": "Yleinen 25,5 %",
-    }
+def _create_tax_levels() -> dict[TaxLevelKey, TaxLevel]:
+    general = TaxLevelFactory.create(name="Yleinen", name_en="General", name_sv="Allmän", rates=[])
+    reduced = TaxLevelFactory.create(name="Alennettu", name_en="Reduced", name_sv="Reducerad", rates=[])
+    tax_free = TaxLevelFactory.create(name="Veroton", name_en="Tax free", name_sv="Skattefri", rates=[])
 
-    return {
-        percentage: TaxLevelFactory.create(
-            name=name,
-            name_en=name,
-            name_sv=name,
-            rates__percentage=Decimal(percentage),
-        )
-        for percentage, name in names.items()
-    }
+    TaxLevelRate.objects.bulk_create([
+        TaxLevelRateFactory.build(tax_level=general, begins=datetime.date(2000, 1, 1), percentage=Decimal(24)),
+        TaxLevelRateFactory.build(tax_level=general, begins=datetime.date(2024, 9, 1), percentage=Decimal("25.5")),
+        TaxLevelRateFactory.build(tax_level=reduced, begins=datetime.date(2000, 1, 1), percentage=Decimal(10)),
+        TaxLevelRateFactory.build(tax_level=reduced, begins=datetime.date(2025, 1, 1), percentage=Decimal(14)),
+        TaxLevelRateFactory.build(tax_level=reduced, begins=datetime.date(2026, 1, 1), percentage=Decimal("13.5")),
+        TaxLevelRateFactory.build(tax_level=tax_free, begins=datetime.date(2000, 1, 1), percentage=Decimal(0)),
+    ])
+
+    return {"general": general, "reduced": reduced, "tax_free": tax_free}
 
 
 @with_logs

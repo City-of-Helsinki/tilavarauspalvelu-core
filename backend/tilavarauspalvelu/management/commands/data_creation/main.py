@@ -55,7 +55,7 @@ def create_test_data(*, flush: bool = True) -> None:
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,
-        tax_level=tax_levels["0"],
+        tax_level=tax_levels["tax_free"],
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
     )
@@ -73,7 +73,7 @@ def create_test_data(*, flush: bool = True) -> None:
     _create_banner_notifications()
     _create_periodic_tasks()
 
-    _create_caisa()
+    _create_caisa(tax_levels=tax_levels)
 
 
 @with_logs
