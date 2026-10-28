@@ -4285,6 +4285,30 @@ msgstr "sopivat aikavälit"
 msgid "Begin and end times must be multiples of 15 minutes."
 msgstr "Alku- ja lopetusaikojen tulee olla 15 minuutin monikertoja."
 
+#: tilavarauspalvelu/models/tax_level/model.py
+msgid "tax level"
+msgstr "verotaso"
+
+#: tilavarauspalvelu/models/tax_level/model.py
+msgid "tax levels"
+msgstr "verotasot"
+
+#: tilavarauspalvelu/models/tax_level_rate/model.py
+msgid "tax level rate"
+msgstr "verotason veroprosentti"
+
+#: tilavarauspalvelu/models/tax_level_rate/model.py
+msgid "tax level rates"
+msgstr "verotason veroprosentit"
+
+#: tilavarauspalvelu/models/tax_level_rate/model.py
+msgid "Rate already exists for this tax level and date"
+msgstr "Verotasolla on jo veroprosentti tälle päivälle"
+
+#: tilavarauspalvelu/models/tax_level_rate/model.py
+msgid "Percentage must be between 0 and 100"
+msgstr "Prosentin tulee olla 0 ja 100 välillä"
+
 #: tilavarauspalvelu/models/tax_percentage/model.py
 msgid "tax percentage"
 msgstr "veroprosentti"
