@@ -15,7 +15,7 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PaymentAccounting, PaymentProduct, PriceComponent, Reservation
+    from tilavarauspalvelu.models import PaymentProduct, PriceComponent, Reservation
 
     from .actions import ReservationPriceLineActions
     from .queryset import ReservationPriceLineManager
@@ -64,13 +64,6 @@ class ReservationPriceLine(models.Model):
     tax_percentage: Decimal = models.DecimalField(max_digits=5, decimal_places=2)
     vat_code: str = models.CharField(max_length=2, blank=True, default="")
 
-    accounting: PaymentAccounting | None = models.ForeignKey(
-        "tilavarauspalvelu.PaymentAccounting",
-        related_name="reservation_price_lines",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
     payment_product: PaymentProduct | None = models.ForeignKey(
         "tilavarauspalvelu.PaymentProduct",
         related_name="reservation_price_lines",

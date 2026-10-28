@@ -50,15 +50,9 @@ def build_price_lines(
         end=end,
     )
 
-    reservation_unit_accounting = reservation_unit.actions.get_accounting()
-
     lines: list[ReservationPriceLine] = []
     for calculation_line in calculation.lines:
         component = calculation_line.component
-
-        accounting = component.accounting
-        if accounting is None:
-            accounting = reservation_unit_accounting
 
         # The calculation keeps only components with no option or with the selected option.
         line_option = price_option if component.price_option_id is not None else None
@@ -77,7 +71,6 @@ def build_price_lines(
             override_amount=None,
             tax_percentage=Decimal(0),
             vat_code="",
-            accounting=accounting,
             payment_product=None,
         )
         lines.append(line)
