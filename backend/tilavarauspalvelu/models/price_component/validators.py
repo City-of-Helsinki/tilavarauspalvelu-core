@@ -21,6 +21,28 @@ __all__ = [
 class PriceComponentValidator:
     price_component: PriceComponent
 
+    # These match the check constraints of the model, so that a batch save does not need a query for each one.
+
+    def validate_amount_not_negative(self) -> None:
+        if self.price_component.amount < 0:
+            msg = "Amount cannot be negative."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE)
+
+    def validate_payment_type_matches_amount(self) -> None:
+        amount = self.price_component.amount
+        payment_type = self.price_component.payment_type
+        is_paid_with_payment_type = amount > 0 and payment_type is not None
+        is_free_without_payment_type = amount == 0 and payment_type is None
+        if not is_paid_with_payment_type and not is_free_without_payment_type:
+            msg = "Payment type is required for a paid component and not allowed for a free one."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID)
+
+    def validate_valid_from_before_valid_until(self) -> None:
+        valid_until = self.price_component.valid_until
+        if valid_until is not None and self.price_component.valid_from >= valid_until:
+            msg = "Valid from must be before valid until."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_UNTIL_NOT_AFTER_VALID_FROM)
+
     def validate_option_belongs_to_pricing_group_unit_group(self) -> None:
         option = self.price_component.price_option
         if option is None:

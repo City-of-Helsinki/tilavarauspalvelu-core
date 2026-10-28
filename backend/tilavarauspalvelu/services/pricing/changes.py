@@ -2,14 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from tilavarauspalvelu.models import PriceComponent, PricingGroup
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
-from utils.utils import to_drf_validation_error
 
 from .coverage import check_pricing_group_coverage
 
@@ -100,10 +98,9 @@ def _validate_changed_component(
     component.pricing_group = pricing_group
     saved_component.validators.validate_change(component)
 
-    try:
-        component.validate_constraints()
-    except DjangoValidationError as error:
-        raise to_drf_validation_error(error) from error
+    component.validators.validate_amount_not_negative()
+    component.validators.validate_payment_type_matches_amount()
+    component.validators.validate_valid_from_before_valid_until()
 
     component.validators.validate_option_belongs_to_pricing_group_unit_group()
     if component.price_option_id != saved_component.price_option_id:
@@ -121,10 +118,9 @@ def _validate_new_component(
         raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_FROM_NOT_IN_FUTURE)
 
     component.pricing_group = pricing_group
-    try:
-        component.validate_constraints()
-    except DjangoValidationError as error:
-        raise to_drf_validation_error(error) from error
+    component.validators.validate_amount_not_negative()
+    component.validators.validate_payment_type_matches_amount()
+    component.validators.validate_valid_from_before_valid_until()
 
     component.validators.validate_option_belongs_to_pricing_group_unit_group()
     component.validators.validate_option_is_active()
