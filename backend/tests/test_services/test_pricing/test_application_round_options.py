@@ -3,12 +3,14 @@ from __future__ import annotations
 import datetime
 
 import pytest
+from freezegun import freeze_time
 
 from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup
 from tilavarauspalvelu.services.pricing.application_round_options import (
     RoundOptionError,
     application_round_price_options,
     check_application_round_change,
+    check_price_option_change_keeps_round_options,
     check_pricing_change_keeps_round_options,
 )
 from tilavarauspalvelu.typing import error_codes
@@ -523,3 +525,57 @@ def test_pricing_change__handled_round_without_reservations_is_checked():
     )
 
     assert [error.code for error in errors] == [error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED]
+
+
+def test_pricing_change__round_with_ended_reservation_period_is_not_checked():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group)
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=adults, valid_from=JAN_1)
+
+    application_round = create_round([create_unit_using(pricing_group)])
+    application_round.handled_at = local_datetime()
+    application_round.save()
+
+    with freeze_time(PERIOD_END + datetime.timedelta(days=1)):
+        errors = check_pricing_change_keeps_round_options(
+            pricing_group=pricing_group,
+            components=[],
+            reservation_unit_rows=None,
+        )
+
+    assert errors == []
+
+
+# ── Price option change ──
+
+
+def test_price_option_change__deactivated_implicit_option_is_checked():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group)
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=None, valid_from=JAN_1)
+    create_round([create_unit_using(pricing_group)])
+
+    adults.is_active = False
+
+    errors = check_price_option_change_keeps_round_options(adults)
+
+    assert [error.code for error in errors] == [error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED]
+
+
+def test_price_option_change__round_with_ended_reservation_period_is_not_checked():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group)
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=None, valid_from=JAN_1)
+    application_round = create_round([create_unit_using(pricing_group)])
+    application_round.handled_at = local_datetime()
+    application_round.save()
+
+    adults.is_active = False
+
+    with freeze_time(PERIOD_END + datetime.timedelta(days=1)):
+        errors = check_price_option_change_keeps_round_options(adults)
+
+    assert errors == []
