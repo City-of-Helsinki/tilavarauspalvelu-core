@@ -1,8 +1,6 @@
 /** Desktop browser tests */
 import { BuiltIn } from "../lib/BuiltIn";
-import { PabotLib } from "../lib/PabotLib";
-import { V, errorMessage, isTruthy, rethrowSkip, str } from "../lib/robot";
-import type { RobotValue } from "../lib/robot";
+import { V } from "../lib/robot";
 import { test } from "./fixtures";
 import { app_common } from "./PO/App/app_common";
 import { app_user } from "./PO/App/app_user";
@@ -15,7 +13,7 @@ import { recurring } from "./PO/User/recurring";
 import { reservation_lownav } from "./PO/User/reservation_lownav";
 import { user_landingpage } from "./PO/User/user_landingpage";
 import { common_setups_teardowns } from "./Resources/common_setups_teardowns";
-import { parallel_test_data } from "./Resources/parallel_test_data";
+import "./Resources/parallel_test_data";
 import "./Resources/devices";
 import "./Resources/variables";
 import "./Resources/har_recording";
@@ -170,76 +168,51 @@ test.describe(
     );
 
     test("User can make paid single booking", { tag: ["@desktop-test-data-set-4"] }, async () => {
-      let error: RobotValue;
-      await parallel_test_data["Mark Paid Booking Test Started"]();
+      await common_setups_teardowns["Complete Test Setup From Tags"]();
+      await app_common["User Logs In With Suomi Fi"]();
 
-      // Acquire lock to ensure email test waits
-      await PabotLib["Acquire Lock"]("PAID_BOOKING_EMAIL_SEQUENCE");
+      await BuiltIn["Log"]("User creates paid reservation");
+      await app_user["User Navigates To Single Booking Page"]();
+      await app_user["User Uses Search To Find Right Unit"](V.CURRENT_ALWAYS_PAID_UNIT);
+      await app_user["User Reserves A Free Quick Reservation Slot"]();
+      await app_user["User Fills The Reservation Info For Unit With Payment And Submits"]();
+      await app_user["User Checks The Paid Reservation Info Is Right And Submits"]();
 
-      try {
-        await common_setups_teardowns["Complete Test Setup From Tags"]();
-        await app_common["User Logs In With Suomi Fi"]();
+      await BuiltIn["Log"]("User pays the reservation");
+      await app_user["User Checks Info In Paid Checkout And Confirms Booking"]();
+      await app_user["User Checks The Paid Reservation Info Is Right After Checkout"]();
 
-        await BuiltIn["Log"]("User creates paid reservation");
-        await app_user["User Navigates To Single Booking Page"]();
-        await app_user["User Uses Search To Find Right Unit"](V.CURRENT_ALWAYS_PAID_UNIT);
-        await app_user["User Reserves A Free Quick Reservation Slot"]();
-        await app_user["User Fills The Reservation Info For Unit With Payment And Submits"]();
-        await app_user["User Checks The Paid Reservation Info Is Right And Submits"]();
+      await BuiltIn["Log"]("User verifies paid reservation in my bookings and paid status");
+      await topnav["Navigate To My Bookings"]();
+      await app_user["User Can See Upcoming Booking In List And Clicks It"](
+        V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
+        V.TIME_OF_QUICK_RESERVATION_MINUS_T
+      );
+      await app_user["User Checks The Paid Reservation Info Is Right In Reservations"](
+        V.MYBOOKINGS_STATUS_CONFIRMED,
+        V.MYBOOKINGS_STATUS_PAID_CONFIRMED,
+        V.SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+        V.TIME_OF_QUICK_RESERVATION,
+        V.BOOKING_NUM_ONLY
+      );
 
-        await BuiltIn["Log"]("User pays the reservation");
-        await app_user["User Checks Info In Paid Checkout And Confirms Booking"]();
-        await app_user["User Checks The Paid Reservation Info Is Right After Checkout"]();
+      await BuiltIn["Log"]("User cancels paid booking");
+      await app_user["User Cancel Booking In Reservations And Checks It Got Cancelled"]();
+      await mybookings["Wait For Payment Status"](V.MYBOOKINGS_STATUS_REFUNDED);
 
-        await BuiltIn["Log"]("User verifies paid reservation in my bookings and paid status");
-        await topnav["Navigate To My Bookings"]();
-        await app_user["User Can See Upcoming Booking In List And Clicks It"](
-          V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
-        );
-        await app_user["User Checks The Paid Reservation Info Is Right In Reservations"](
-          V.MYBOOKINGS_STATUS_CONFIRMED,
-          V.MYBOOKINGS_STATUS_PAID_CONFIRMED,
-          V.SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-          V.TIME_OF_QUICK_RESERVATION,
-          V.BOOKING_NUM_ONLY
-        );
-
-        await BuiltIn["Log"]("User cancels paid booking");
-        await app_user["User Cancel Booking In Reservations And Checks It Got Cancelled"]();
-        await mybookings["Wait For Payment Status"](V.MYBOOKINGS_STATUS_REFUNDED);
-
-        await BuiltIn["Log"]("User verifies cancellation and refund status");
-        await topnav["Navigate To My Bookings"]();
-        await app_user["User Checks Cancelled Booking Is Found"](
-          V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
-        );
-        await app_user["User Checks The Paid Reservation Info Is Right In Reservations"](
-          V.IN_RESERVATIONS_STATUS_CANCELED,
-          V.MYBOOKINGS_STATUS_REFUNDED,
-          V.SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-          V.TIME_OF_QUICK_RESERVATION,
-          V.BOOKING_NUM_ONLY
-        );
-
-        // Store mail data for email if test got this far successfully
-        await parallel_test_data["Store Test Data Variable"]("BOOKING_NUM_FOR_MAIL", V.BOOKING_NUM_ONLY);
-        await parallel_test_data["Store Test Data Variable"]("TIME_FOR_MAIL", V.TIME_OF_QUICK_RESERVATION_MINUS_T);
-        await parallel_test_data["Store Test Data Variable"]("UNIT_NAME_FOR_MAIL", V.CURRENT_ALWAYS_PAID_UNIT);
-
-        await parallel_test_data["Mark Paid Booking Test Completed"]();
-      } catch (err) {
-        rethrowSkip(err);
-        error = errorMessage(err);
-        await BuiltIn["Log"](`Paid booking test failed: ${str(error)}`);
-        // Mark test as failed so email test doesn't run
-        await parallel_test_data["Mark Paid Booking Test Failed"]();
-        await BuiltIn["Fail"](error);
-      } finally {
-        // Always release lock
-        await PabotLib["Release Lock"]("PAID_BOOKING_EMAIL_SEQUENCE");
-      }
+      await BuiltIn["Log"]("User verifies cancellation and refund status");
+      await topnav["Navigate To My Bookings"]();
+      await app_user["User Checks Cancelled Booking Is Found"](
+        V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
+        V.TIME_OF_QUICK_RESERVATION_MINUS_T
+      );
+      await app_user["User Checks The Paid Reservation Info Is Right In Reservations"](
+        V.IN_RESERVATIONS_STATUS_CANCELED,
+        V.MYBOOKINGS_STATUS_REFUNDED,
+        V.SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+        V.TIME_OF_QUICK_RESERVATION,
+        V.BOOKING_NUM_ONLY
+      );
     });
 
     test(
@@ -337,63 +310,37 @@ test.describe(
         annotation: {
           type: "Documentation",
           description:
-            "Waits for paid booking test to complete, then verifies reservation emails.\nThis test depends on 'User can make paid single booking' completing successfully first.\nUses synchronization with polling to ensure proper test ordering.",
+            "Makes a paid booking, pays it and cancels it, then verifies the reservation confirmation and cancellation\nemails of that booking.",
         },
       },
       async () => {
-        let skip_message: RobotValue,
-          status: RobotValue,
-          booking_num: RobotValue,
-          has_booking_data: RobotValue,
-          booking_num_for_mail: RobotValue,
-          time_for_mail: RobotValue;
-        // oxlint-disable-next-line eslint/no-unused-vars -- assigned but not read in the Robot keyword
-        let unit_name_for_mail: RobotValue;
-        skip_message = await BuiltIn["Catenate"](
-          "Test is being skipped because 'User can make paid single booking' test either failed or did not complete successfully.",
-          "Without a successful test, there may not be valid emails to verify."
+        await common_setups_teardowns["Complete Test Setup From Tags"]();
+        await app_common["User Logs In With Suomi Fi"]();
+
+        await BuiltIn["Log"]("User creates paid reservation");
+        await app_user["User Navigates To Single Booking Page"]();
+        await app_user["User Uses Search To Find Right Unit"](V.CURRENT_ALWAYS_PAID_UNIT);
+        await app_user["User Reserves A Free Quick Reservation Slot"]();
+        await app_user["User Fills The Reservation Info For Unit With Payment And Submits"]();
+        await app_user["User Checks The Paid Reservation Info Is Right And Submits"]();
+
+        await BuiltIn["Log"]("User pays the reservation");
+        await app_user["User Checks Info In Paid Checkout And Confirms Booking"]();
+        await app_user["User Checks The Paid Reservation Info Is Right After Checkout"]();
+
+        await BuiltIn["Log"]("User cancels paid booking");
+        await topnav["Navigate To My Bookings"]();
+        await app_user["User Can See Upcoming Booking In List And Clicks It"](
+          V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
+          V.TIME_OF_QUICK_RESERVATION_MINUS_T
         );
-
-        await BuiltIn["Log"]("Waiting for paid booking test to complete");
-        // Wait for the paid booking test to complete first
-        status = await parallel_test_data["Wait For Paid Booking Completion"](/* timeout= */ "300");
-
-        if (str(status) === "NOT_STARTED") {
-          await BuiltIn["Skip"]("Paid booking test is not part of this test run");
-        } else if (str(status) === "TIMEOUT") {
-          await BuiltIn["Skip"]("Paid booking test did not complete within timeout");
-        }
-
-        await BuiltIn["Log"]("Verifying test data availability");
-        // Now check if the test succeeded by checking for required data
-        booking_num = await parallel_test_data["Get Test Data Variable"]("BOOKING_NUM_FOR_MAIL", "");
-        has_booking_data = await BuiltIn["Run Keyword And Return Status"](BuiltIn["Should Not Be Empty"], booking_num);
-
-        if (!isTruthy(has_booking_data)) {
-          await BuiltIn["Log"]("No booking data found - paid booking test likely failed");
-          await BuiltIn["Skip"](skip_message);
-        }
-
-        // Now acquire the lock (paid booking test has finished successfully)
-        await BuiltIn["Log"]("Acquiring lock after paid booking test completion");
-        await PabotLib["Acquire Lock"]("PAID_BOOKING_EMAIL_SEQUENCE");
-
-        await BuiltIn["Log"]("Retrieving test data for email verification");
-        // Get data for mail test. This is set in the paid booking test.
-        booking_num_for_mail = await parallel_test_data["Get Test Data Variable"]("BOOKING_NUM_FOR_MAIL");
-        time_for_mail = await parallel_test_data["Get Test Data Variable"]("TIME_FOR_MAIL");
-        unit_name_for_mail = await parallel_test_data["Get Test Data Variable"]("UNIT_NAME_FOR_MAIL");
-
-        // Format reservation times for email verification
-        await mail["Format Reservation Time For Email Texts And Receipts"](time_for_mail);
+        await app_user["User Cancel Booking In Reservations And Checks It Got Cancelled"]();
 
         await BuiltIn["Log"]("Verifying reservation confirmation and cancellation emails");
-        // Verify all email types using the new API-based approach
-        // Each verification will check if emails exist and contain required terms
-        await mail["Verify Reservation Confirmation Email"](booking_num_for_mail);
-        await mail["Verify Reservation Cancellation Email"](booking_num_for_mail);
-
-        await PabotLib["Release Lock"]("PAID_BOOKING_EMAIL_SEQUENCE");
+        // Format reservation times for email verification
+        await mail["Format Reservation Time For Email Texts And Receipts"](V.TIME_OF_QUICK_RESERVATION_MINUS_T);
+        await mail["Verify Reservation Confirmation Email"](V.BOOKING_NUM_ONLY);
+        await mail["Verify Reservation Cancellation Email"](V.BOOKING_NUM_ONLY);
       }
     );
 

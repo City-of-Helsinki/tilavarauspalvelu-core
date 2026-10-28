@@ -4,7 +4,7 @@ import { BuiltIn } from "../../../lib/BuiltIn";
 import { V, exceptionMatches, isTruthy, keywords, named, rethrowSkip, str } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
-import { parallel_test_data } from "../../Resources/parallel_test_data";
+import "../../Resources/parallel_test_data";
 import "../../Resources/serial_users";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
@@ -87,7 +87,6 @@ export const checkout = keywords("checkout", {
     await BuiltIn["Log"](`Reservation number: ${str(reservation_number)}`);
 
     BOOKING_NUM_ONLY = reservation_number;
-    await parallel_test_data["Store Test Data Variable"]("BOOKING_NUM_ONLY", BOOKING_NUM_ONLY);
     V.BOOKING_NUM_ONLY = BOOKING_NUM_ONLY;
     BOOKING_NUM_ONLY = V.BOOKING_NUM_ONLY;
     await BuiltIn["Log"](BOOKING_NUM_ONLY);

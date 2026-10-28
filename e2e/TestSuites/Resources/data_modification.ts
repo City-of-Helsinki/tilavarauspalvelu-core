@@ -5,7 +5,7 @@ import { DateTime } from "../../lib/DateTime";
 import { V, keywords, named, str } from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
 import { String_ } from "../../lib/String";
-import { parallel_test_data } from "../Resources/parallel_test_data";
+import "../Resources/parallel_test_data";
 import { python_keywords } from "../Resources/python_keywords";
 import "../Resources/variables";
 import "../Resources/texts_FI";
@@ -15,10 +15,6 @@ export const data_modification = keywords("data_modification", {
   "Formats Reservation Number And Name For Admin Side": async () => {
     let bookingNumber_and_NameOfTheBooking: RobotValue;
     bookingNumber_and_NameOfTheBooking = await BuiltIn["Catenate"](`${str(V.BOOKING_NUM_ONLY)},`, V.SINGLEBOOKING_NAME);
-    await parallel_test_data["Store Test Data Variable"](
-      "BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED",
-      bookingNumber_and_NameOfTheBooking
-    );
     V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED = bookingNumber_and_NameOfTheBooking;
   },
 
@@ -56,7 +52,6 @@ export const data_modification = keywords("data_modification", {
     RESERVATION_TAG = str(RESERVATION_TAG).trim().split(/\s+/).join(" ");
 
     // Set the suite variable to hold the final formatted tagline
-    await parallel_test_data["Store Test Data Variable"]("RESERVATION_TAGLINE", RESERVATION_TAG);
     V.RESERVATION_TAGLINE = RESERVATION_TAG;
 
     // Log the final formatted tagline
@@ -112,7 +107,6 @@ export const data_modification = keywords("data_modification", {
     // 6: Use the same index to fetch the English full name
     english_day = await Collections["Get From List"](en_days, idx);
 
-    await parallel_test_data["Store Test Data Variable"]("ENGLISH_DAY", english_day);
     V.ENGLISH_DAY = english_day;
     english_day = V.ENGLISH_DAY;
   },
@@ -220,7 +214,6 @@ export const data_modification = keywords("data_modification", {
     await BuiltIn["Log"](`Final reservation slot ➔ ${str(full_slot)}`);
 
     // 11: Expose for suite use
-    await parallel_test_data["Store Test Data Variable"]("CALENDAR_TIMESLOT", full_slot);
     V.CALENDAR_TIMESLOT = full_slot;
   },
 

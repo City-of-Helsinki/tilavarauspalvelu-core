@@ -54,8 +54,8 @@ export const common_setups_teardowns = keywords("common_setups_teardowns", {
 
   /** Complete teardown with session cleanup */
   "Complete Test Teardown": async () => {
-    // Port: Playwright takes the failure screenshots of the open pages when the test fails (screenshot:
-    // "only-on-failure" in playwright.config.ts), so there's no Sleep and Take Screenshot here
+    // Port: Playwright takes full-page failure screenshots of the open pages when the test fails (the screenshot
+    // option in playwright.config.ts), so there's no Sleep and Take Screenshot here
     // imports: Browser
 
     // Cleanup process (the testData fixture releases the data set)

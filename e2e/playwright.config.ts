@@ -61,7 +61,7 @@ export default defineConfig({
     ["list"],
     ["html", { open: "never", outputFolder: "playwright-report" }],
     ["junit", { outputFile: "test-results/junit.xml" }],
-    // A skipped test fails the run, like in the Robot runners (e.g. the email test skips when its booking failed)
+    // A skipped test fails the run, like in the Robot runners
     ["./lib/skips-fail-run-reporter.ts"],
   ],
   use: {
@@ -75,7 +75,8 @@ export default defineConfig({
     // Set Browser Timeout    ${BROWSER_TIMEOUT_GLOBAL}
     actionTimeout: 40_000,
     navigationTimeout: 40_000,
-    screenshot: "only-on-failure",
+    // The whole page, not only the part in the viewport
+    screenshot: { mode: "only-on-failure", fullPage: true },
     video: "retain-on-failure",
     trace,
   },
@@ -85,8 +86,8 @@ export default defineConfig({
     {
       name: "create_data",
       testMatch: "create_data.setup.ts",
-      // [Timeout]    5 minutes in create_data.Create Robot Test Data
-      timeout: 6 * 60_000,
+      // create_data.Create Robot Test Data waits up to 5 minutes for the data, like its [Timeout] in Robot
+      timeout: 7 * 60_000,
       retries: 0,
     },
     suite("Tests_user_desktop_FI"),

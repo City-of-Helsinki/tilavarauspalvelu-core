@@ -48,7 +48,8 @@ export const devices = keywords("devices", {
     let context_config: RobotValue;
     // Port: the browser, context and page come from the project's `use` options in playwright.config.ts
     // (Chromium, 1440x900, locale, time zone), so traces, screenshots, video and --headed/--ui work. Playwright
-    // starts one browser per worker, so there's no staggered startup. A second call in a test opens a new context.
+    // starts one browser per worker; the staggered start of each slot's first test is the staggeredStart fixture
+    // (TestSuites/fixtures.ts). A second call in a test opens a new context.
     context_config = {};
     await devices["Apply Global Header To Context Config"](context_config);
     await openTestPage({ contextOptions: context_config });

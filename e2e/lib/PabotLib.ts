@@ -2,10 +2,10 @@ import { randomUUID } from "node:crypto";
 /**
  * pabot's PabotLib keywords with the same names, for Playwright workers.
  *
- * Playwright workers are separate processes, like pabot's, so the shared state lives in files: a lock is a directory
- * created atomically with an owner file, and a parallel value is a JSON file. Each run has a folder of its own under
- * PABOT_SHARED_DIR, so a run never sees another run's state. Locks a test still holds are released when it ends.
- * pabot's value sets are not here: the testData fixture (TestSuites/fixtures.ts) picks each test's users.
+ * Playwright workers are separate processes, like pabot's, so a lock is a directory created atomically with an owner
+ * file. Each run has a folder of its own under PABOT_SHARED_DIR, so a run never sees another run's state. Locks a
+ * test still holds are released when it ends. Only the locks are here: the testData fixture (TestSuites/fixtures.ts)
+ * picks each test's users instead of value sets, and the tests share no parallel values.
  */
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -40,10 +40,6 @@ export function sharedDir(): string {
 
 function lockDir(name: string): string {
   return join(sharedDir(), "locks", safeName(name));
-}
-
-function valueFile(key: string): string {
-  return join(sharedDir(), "values", `${safeName(key)}.json`);
 }
 
 function hasCode(err: unknown, code: string): boolean {
@@ -207,23 +203,6 @@ export const PabotLib = library("PabotLib", {
 
   "Release Lock": async (name: RobotValue) => {
     await release(String(name));
-  },
-
-  "Set Parallel Value For Key": async (key: RobotValue, value: RobotValue) => {
-    const file = valueFile(String(key));
-    await mkdir(dirname(file), { recursive: true });
-    const temporary = `${file}.${process.pid}.tmp`;
-    await writeFile(temporary, JSON.stringify(value));
-    await rename(temporary, file);
-  },
-
-  /** An empty string when the key has no value yet, like PabotLib. */
-  "Get Parallel Value For Key": async (key: RobotValue) => {
-    const file = valueFile(String(key));
-    if (!existsSync(file)) {
-      return "";
-    }
-    return JSON.parse(await readFile(file, "utf8"));
   },
 });
 

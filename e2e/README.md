@@ -35,7 +35,9 @@ One suite: `pnpm exec playwright test --project Tests_user_desktop_FI`. One test
 
 The test data is created once per run by the `create_data` project, which the suites depend on. It deletes and
 recreates everything under unit Harakka, so **never run two test runs against the test environment at the same
-time**. The endpoint also rejects a second call within 60 seconds.
+time**. The endpoint also rejects a second call within 60 seconds. The backend creates the data in one transaction,
+and pages fail or hang until it has been saved, so the project waits (up to 5 minutes) until the always free unit
+has a new id. If the id can't be read before the call, it waits 3 minutes like the Robot suite.
 
 Runs need `TZ=Europe/Helsinki`: the config sets it when it is unset.
 
@@ -101,15 +103,17 @@ the runtime offline.
 
 ## How it works
 
-- **Parallel runs:** the workers share locks and values through files in a folder of each run's own under
-  `.pabot-shared/`, so a run (or `pnpm selftest`) never touches another run's state. The locks keep a data set's
-  users and a unit's free times to one test at a time, and the values pass the paid booking to the email test.
-  Folders of runs started over a day ago are removed when a run starts. A worker can take a lock it already holds, and releasing a lock it
-  doesn't hold fails. Locks a test still holds are released when it ends, and a lock left by a worker that stopped
-  is taken over.
+- **Parallel runs:** the tests don't depend on each other, and they share only locks: files in a folder of each run's
+  own under `.pabot-shared/`, so a run (or `pnpm selftest`) never touches another run's state. The locks keep a data
+  set's users and a unit's free times to one test at a time. Folders of runs started over a day ago are removed when
+  a run starts. A worker can take a lock it already holds, and releasing a lock it doesn't hold fails. Locks a test
+  still holds are released when it ends, and a lock left by a worker that stopped is taken over. The first tests
+  start 3 seconds apart (the `staggeredStart` fixture, which marks each slot's first test in the same folder),
+  because Suomi.fi logins that end at the same moment can fail.
 - **Retries:** a failed test is retried once. A skipped test fails the run (`lib/skips-fail-run-reporter.ts`).
-  "Check emails from reservations" needs "User can make paid single booking": it waits for that test, also for its
-  retry, and is skipped when that test fails.
+- **Emails:** "Check emails from reservations" makes, pays and cancels a paid booking of its own, then checks the
+  confirmation and cancellation emails of that booking in the backend's robot email cache. The backend sends emails
+  from a background task, so the check polls the cache for up to 2 minutes.
 - **My bookings tabs:** `mybookings.Navigate To Cancelled/Past/Upcoming Bookings` focus the tab before clicking it
   and check that it got selected. The HDS tab list slides when a tab gets focus, and on mobile WebKit the slide could
   make a plain click miss.
@@ -122,11 +126,11 @@ the runtime offline.
   and navigations wait for the new URL (`waitForURL`). A logout waits for the app's `/auth/logout/` redirect, which
   comes after the session is destroyed. After a pick from an HDS Select, `Close Select List If Open` closes a list
   that stayed open (HDS ignores a close within 200 ms of opening). Fixed sleeps are left only where nothing on the
-  page tells when to go on: the 3-minute wait for the test data, the wait for the paid booking test, the pause
-  between login click retries, and a second for banners before a "no banner" check. The config's `baseURL` is the
-  test environment, so Playwright code can open pages with `page.goto("/…")`.
+  page tells when to go on: the pause between login click retries, a second after the empty booking form's submit,
+  and a second for banners before a "no banner" check. The config's `baseURL` is the test environment, so Playwright
+  code can open pages with `page.goto("/…")`.
 - **Reports:** the HTML report shows the keyword steps of each test, and `test-results/junit.xml` is for CI
-  summaries. A failed test has a screenshot of each open page and a video of its own page.
+  summaries. A failed test has a full-page screenshot of each open page and a video of its own page.
 
 ## Checks without the test environment
 

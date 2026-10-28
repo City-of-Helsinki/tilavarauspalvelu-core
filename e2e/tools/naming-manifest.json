@@ -119,7 +119,7 @@
         {
           "name": "Check emails from reservations",
           "tags": ["desktop-test-data-set-10"],
-          "documentation": "Waits for paid booking test to complete, then verifies reservation emails.\nThis test depends on 'User can make paid single booking' completing successfully first.\nUses synchronization with polling to ensure proper test ordering."
+          "documentation": "Makes a paid booking, pays it and cancels it, then verifies the reservation confirmation and cancellation\nemails of that booking."
         },
         {
           "name": "User makes recurring reservation",
@@ -4568,118 +4568,6 @@
           "robot": "${device_name}",
           "name": "device_name",
           "default": null,
-          "kind": "$"
-        }
-      ]
-    },
-    {
-      "file": "Resources/parallel_test_data.robot",
-      "module": "parallel_test_data",
-      "name": "Store Mail Test Data",
-      "arguments": [
-        {
-          "robot": "${reservation_number}",
-          "name": "reservation_number",
-          "default": null,
-          "kind": "$"
-        },
-        {
-          "robot": "${reservation_time}",
-          "name": "reservation_time",
-          "default": null,
-          "kind": "$"
-        },
-        {
-          "robot": "${unit_name}",
-          "name": "unit_name",
-          "default": null,
-          "kind": "$"
-        },
-        {
-          "robot": "${formatted_start_time}",
-          "name": "formatted_start_time",
-          "default": null,
-          "kind": "$"
-        },
-        {
-          "robot": "${formatted_end_time}",
-          "name": "formatted_end_time",
-          "default": null,
-          "kind": "$"
-        }
-      ]
-    },
-    {
-      "file": "Resources/parallel_test_data.robot",
-      "module": "parallel_test_data",
-      "name": "Get Mail Test Data",
-      "arguments": []
-    },
-    {
-      "file": "Resources/parallel_test_data.robot",
-      "module": "parallel_test_data",
-      "name": "Store Test Data Variable",
-      "arguments": [
-        {
-          "robot": "${variable_name}",
-          "name": "variable_name",
-          "default": null,
-          "kind": "$"
-        },
-        {
-          "robot": "${value}",
-          "name": "value",
-          "default": null,
-          "kind": "$"
-        }
-      ]
-    },
-    {
-      "file": "Resources/parallel_test_data.robot",
-      "module": "parallel_test_data",
-      "name": "Get Test Data Variable",
-      "arguments": [
-        {
-          "robot": "${variable_name}",
-          "name": "variable_name",
-          "default": null,
-          "kind": "$"
-        },
-        {
-          "robot": "${default_value}",
-          "name": "default_value",
-          "default": "${EMPTY}",
-          "kind": "$"
-        }
-      ]
-    },
-    {
-      "file": "Resources/parallel_test_data.robot",
-      "module": "parallel_test_data",
-      "name": "Mark Paid Booking Test Started",
-      "arguments": []
-    },
-    {
-      "file": "Resources/parallel_test_data.robot",
-      "module": "parallel_test_data",
-      "name": "Mark Paid Booking Test Completed",
-      "arguments": []
-    },
-    {
-      "file": "Resources/parallel_test_data.robot",
-      "module": "parallel_test_data",
-      "name": "Mark Paid Booking Test Failed",
-      "arguments": []
-    },
-    {
-      "file": "Resources/parallel_test_data.robot",
-      "module": "parallel_test_data",
-      "name": "Wait For Paid Booking Completion",
-      "arguments": [
-        {
-          "robot": "${timeout}",
-          "name": "timeout",
-          "default": "300",
           "kind": "$"
         }
       ]

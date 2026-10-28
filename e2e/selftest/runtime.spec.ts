@@ -311,12 +311,9 @@ test.describe("Runtime self-test", () => {
     );
   });
 
-  test("PabotLib locks and parallel values", async () => {
+  test("PabotLib locks", async () => {
     await PabotLib["Acquire Lock"]("SELFTEST_LOCK");
     await PabotLib["Release Lock"]("SELFTEST_LOCK");
-    expect(await PabotLib["Get Parallel Value For Key"]("SELFTEST_MISSING")).toBe("");
-    await PabotLib["Set Parallel Value For Key"]("SELFTEST_KEY", "value");
-    expect(await PabotLib["Get Parallel Value For Key"]("SELFTEST_KEY")).toBe("value");
   });
 
   test("PabotLib locks follow pabot's lock server", async () => {
