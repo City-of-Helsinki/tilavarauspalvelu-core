@@ -44,3 +44,15 @@ A hook blocks the command if it is in any other form. Run it as a single command
 
 Stack frames are oldest first. Only in-app frames have code context.
 Use the `release` and `environment` tags to find the code version the error came from.
+Performance issues, such as N+1 queries, have no exceptions. Their `evidence` field has the repeated queries.
+
+## 3. Check all events with tag counts
+
+One event can mislead. To see if a pattern holds for all events of the issue, add tag keys after the issue.
+The keys are the same as in the event `tags`, for example `browser.name`, `os.name`, `url` or `release`:
+
+```bash
+.agents/skills/sentry-issue/sentry-issue 153768154 browser.name os.name
+```
+
+The `tags` field then has the top values of each key over all events, with a count for each.
