@@ -358,8 +358,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
       '@types/sanitize-html':
-        specifier: ^2.16.1
-        version: 2.16.1
+        specifier: ^2.16.2
+        version: 2.16.2
       '@vitejs/plugin-react':
         specifier: ^5.2.0
         version: 5.2.0(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
@@ -500,8 +500,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
       '@types/sanitize-html':
-        specifier: ^2.16.1
-        version: 2.16.1
+        specifier: ^2.16.2
+        version: 2.16.2
       '@vitejs/plugin-react':
         specifier: ^5.2.0
         version: 5.2.0(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
@@ -2898,8 +2898,8 @@ packages:
   '@types/react@19.3.0':
     resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
 
-  '@types/sanitize-html@2.16.1':
-    resolution: {integrity: sha512-n9wjs8bCOTyN/ynwD8s/nTcTreIHB1vf31vhLMGqUPNHaweKC4/fAl4Dj+hUlCTKYgm4P3k83fmiFfzkZ6sgMA==}
+  '@types/sanitize-html@2.16.2':
+    resolution: {integrity: sha512-kuAbgDCFv418flrp3z4o/4ufLA/5ovmXRH0L419iZCPGO7w00znjeDI5Wy/KZWNIBpDQc7hucCK+J5almB6FyA==}
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
@@ -3631,30 +3631,17 @@ packages:
   dom-helpers@6.0.1:
     resolution: {integrity: sha512-IKySryuFwseGkrCA/pIqlwUPOD50w1Lj/B2Yief3vBOP18k5y4t+hTqKh55gULDVeJMRitcozve+g/wVFf4sFQ==}
 
-  dom-serializer@2.0.0:
-    resolution: {integrity: sha512-wIkAryiqt/nV5EQKqQpo3SToSOV9J0DnbJqwK7Wv/Trc92zIAYZ4FlMu+JPFW1DfGFt81ZTCGgDEabffXeLyJg==}
-
   dom-serializer@3.1.1:
     resolution: {integrity: sha512-4MEa38/QexBob6gFNwu+EGdWvhJ1OKuNwdYY3Y3NyeWDQfnGeDYQUDfIRzWu5B5gsv03so2Uxd28YC6zrsx3Lw==}
     engines: {node: '>=20.19.0'}
-
-  domelementtype@2.3.0:
-    resolution: {integrity: sha512-OLETBj6w0OsagBwdXnPdN0cnMfF9opN69co+7ZrbfPGrdpPVNBUj02spi6B1N7wChLQiPn4CSH/zJvXw56gmHw==}
 
   domelementtype@3.0.0:
     resolution: {integrity: sha512-umCQid3jKbDmVjx8jGaW7uUykm4DEUeyV21hPxNMo2nV955DhUThwqyOIDtreepP31hl84X7G5U9ZfsWvIB3Pg==}
     engines: {node: '>=20.19.0'}
 
-  domhandler@5.0.3:
-    resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
-    engines: {node: '>= 4'}
-
   domhandler@6.0.1:
     resolution: {integrity: sha512-gYzvtM72ZtxQO0T048kd6HWSbbGCNOUwcnfQ01cqIJ4X2IYKFFHZ5mKvrQETcFXxsRObZulDaKmy//R7TPtsBg==}
     engines: {node: '>=20.19.0'}
-
-  domutils@3.2.2:
-    resolution: {integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==}
 
   domutils@4.0.2:
     resolution: {integrity: sha512-qI4JLRKnSzqFqr7hAlS5xQDusBCjKSEG4t4+7aNrIQMHBcsC2TGEhuyABJdYkgSewL57PNLYEiibY2iPKhKpaA==}
@@ -3693,10 +3680,6 @@ packages:
   enhanced-resolve@5.26.0:
     resolution: {integrity: sha512-9vhedylFonb2YGogzUKX6+Ja72gOJbN1QHAqdrvqLwhdl/QWbKopzoUC9EbQNVsAns/bx/4uyqalrQAoy1IByw==}
     engines: {node: '>=10.13.0'}
-
-  entities@4.5.0:
-    resolution: {integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==}
-    engines: {node: '>=0.12'}
 
   entities@7.0.1:
     resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
@@ -4082,9 +4065,6 @@ packages:
   html-tags@5.1.0:
     resolution: {integrity: sha512-n6l5uca7/y5joxZ3LUePhzmBFUJ+U2YWzhMa8XUTecSeSlQiZdF5XAd/Q3/WUl0VsXgUwWi8I7CNIwdI5WN1SQ==}
     engines: {node: '>=20.10'}
-
-  htmlparser2@10.1.0:
-    resolution: {integrity: sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==}
 
   htmlparser2@12.0.0:
     resolution: {integrity: sha512-Tz7u1i95/g2x2jz81+x0FBVhBhY5aRTvD3tXXdFaljuNdzDLJ8UGNRrTcj2cgQvAg3iW/h77Fz15nLW0L0CrZw==}
@@ -7894,9 +7874,9 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
-  '@types/sanitize-html@2.16.1':
+  '@types/sanitize-html@2.16.2':
     dependencies:
-      htmlparser2: 10.1.0
+      htmlparser2: 12.0.0
 
   '@types/stack-utils@2.0.3': {}
 
@@ -8558,35 +8538,17 @@ snapshots:
       '@babel/runtime': 7.29.10
       csstype: 3.2.3
 
-  dom-serializer@2.0.0:
-    dependencies:
-      domelementtype: 2.3.0
-      domhandler: 5.0.3
-      entities: 4.5.0
-
   dom-serializer@3.1.1:
     dependencies:
       domelementtype: 3.0.0
       domhandler: 6.0.1
       entities: 8.1.0
 
-  domelementtype@2.3.0: {}
-
   domelementtype@3.0.0: {}
-
-  domhandler@5.0.3:
-    dependencies:
-      domelementtype: 2.3.0
 
   domhandler@6.0.1:
     dependencies:
       domelementtype: 3.0.0
-
-  domutils@3.2.2:
-    dependencies:
-      dom-serializer: 2.0.0
-      domelementtype: 2.3.0
-      domhandler: 5.0.3
 
   domutils@4.0.2:
     dependencies:
@@ -8623,8 +8585,6 @@ snapshots:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
-
-  entities@4.5.0: {}
 
   entities@7.0.1: {}
 
@@ -9057,13 +9017,6 @@ snapshots:
   html-parse-stringify@4.0.1: {}
 
   html-tags@5.1.0: {}
-
-  htmlparser2@10.1.0:
-    dependencies:
-      domelementtype: 2.3.0
-      domhandler: 5.0.3
-      domutils: 3.2.2
-      entities: 7.0.1
 
   htmlparser2@12.0.0:
     dependencies:
