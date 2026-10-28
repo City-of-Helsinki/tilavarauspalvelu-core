@@ -70,7 +70,6 @@ class Migration(migrations.Migration):
                 ('material_price_description_en', django_nh3.models.Nh3CharField(blank=True, default='', max_length=1000, null=True)),
                 ('material_price_description_sv', django_nh3.models.Nh3CharField(blank=True, default='', max_length=1000, null=True)),
                 ('payment_type', utils.fields.model.TextChoicesField(blank=True, choices=[('ON_SITE', 'On site'), ('ONLINE', 'Online'), ('ONLINE_OR_INVOICE', 'Online or invoice')], enum=tilavarauspalvelu.enums.PaymentType, max_length=17, null=True)),
-                ('accounting', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='price_components', to='tilavarauspalvelu.paymentaccounting')),
                 ('price_option', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='price_components', to='tilavarauspalvelu.priceoption')),
                 ('pricing_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='components', to='tilavarauspalvelu.pricinggroup')),
             ],

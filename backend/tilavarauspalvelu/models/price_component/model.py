@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PaymentAccounting, PriceOption, PricingGroup
+    from tilavarauspalvelu.models import PriceOption, PricingGroup
 
     from .actions import PriceComponentActions
     from .queryset import PriceComponentManager
@@ -54,14 +54,6 @@ class PriceComponent(models.Model):
     # Gross amount, VAT included
     amount: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
     price_unit: PriceUnit = TextChoicesField(enum=PriceUnit)
-
-    accounting: PaymentAccounting | None = models.ForeignKey(
-        "tilavarauspalvelu.PaymentAccounting",
-        related_name="price_components",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
 
     can_apply_for_discount: bool = models.BooleanField(default=False)
 
