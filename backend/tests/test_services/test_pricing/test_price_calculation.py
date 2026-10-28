@@ -295,6 +295,35 @@ def test_calculate_price__reservation_over_the_date_of_a_price_change():
     assert result.can_apply_for_discount is True
 
 
+def test_calculate_price__payment_type_from_paid_date_after_free_date():
+    row = create_pricing_group_row()
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    PriceComponentFactory.create_free(
+        pricing_group=pricing_group,
+        valid_from=JAN_1,
+        valid_until=MAR_2,
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=MAR_2,
+        amount=Decimal(20),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=PaymentType.ONLINE,
+    )
+
+    result = calculate_price(
+        reservation_unit=reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 3, 1, 22),
+        end=local_datetime(2026, 3, 2, 1),
+    )
+
+    assert result.total == Decimal("20.00")
+    assert result.payment_type == PaymentType.ONLINE
+
+
 def test_calculate_price__day_unit_is_charged_at_the_price_of_its_start():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
