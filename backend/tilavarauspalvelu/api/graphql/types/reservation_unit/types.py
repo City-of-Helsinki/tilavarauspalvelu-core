@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NamedTuple
+import datetime
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import graphene
+from django.contrib.postgres.expressions import ArraySubquery
 from django.db import models
 from django.db.models import Sum
+from django.db.models.functions import JSONObject
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.errors import GQLCodeError
 from lookup_property import L
@@ -14,7 +17,14 @@ from query_optimizer.optimizer import QueryOptimizer
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
-from tilavarauspalvelu.models import OriginHaukiResource, PaymentMerchant, Reservation, ReservationUnit, Unit
+from tilavarauspalvelu.models import (
+    OriginHaukiResource,
+    PaymentMerchant,
+    ReservableTimeSpan,
+    Reservation,
+    ReservationUnit,
+    Unit,
+)
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.db import SubqueryCount
@@ -23,8 +33,6 @@ from .filtersets import ReservationUnitAllFilterSet, ReservationUnitFilterSet
 from .permissions import ReservationUnitAllPermission, ReservationUnitPermission
 
 if TYPE_CHECKING:
-    import datetime
-
     from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
@@ -61,8 +69,8 @@ class ReservationUnitNode(DjangoNode):
 
     hauki_url = ManuallyOptimizedField(graphene.String)
 
-    reservable_time_spans = graphene.List(
-        graphene.NonNull(ReservableTimeSpanType),
+    reservable_time_spans = ManuallyOptimizedField(
+        graphene.List(graphene.NonNull(ReservableTimeSpanType)),
         start_date=graphene.Date(required=True),
         end_date=graphene.Date(required=True),
     )
@@ -309,24 +317,53 @@ class ReservationUnitNode(DjangoNode):
             organization_id=root.unit.hauki_department_id,
         )
 
+    @staticmethod
+    def optimize_reservable_time_spans(
+        queryset: models.QuerySet,
+        optimizer: QueryOptimizer,
+        start_date: datetime.date,
+        end_date: datetime.date,
+    ) -> models.QuerySet:
+        optimizer.related_fields.append("origin_hauki_resource_id")
+
+        optimizer.annotations["reservable_time_spans_in_period"] = ArraySubquery(
+            queryset=(
+                ReservableTimeSpan.objects
+                .filter(resource=models.OuterRef("origin_hauki_resource"))
+                .overlapping_with_period(start_date, end_date)
+                .annotate(
+                    data=JSONObject(
+                        start_datetime=models.F("start_datetime"),
+                        end_datetime=models.F("end_datetime"),
+                    ),
+                )
+                .values("data")
+            ),
+        )
+
+        return queryset
+
     def resolve_reservable_time_spans(
         root: ReservationUnit,
         info: GQLInfo,
-        start_date: datetime.date,
-        end_date: datetime.date,
+        **kwargs: Any,
     ) -> list[ReservableTimeSpanItem] | None:
-        if root.origin_hauki_resource is None:
+        if root.origin_hauki_resource_id is None:
             return None
 
-        return [
-            ReservableTimeSpanItem(
-                start_datetime=time_span.start_datetime.astimezone(DEFAULT_TIMEZONE),
-                end_datetime=time_span.end_datetime.astimezone(DEFAULT_TIMEZONE),
+        # `optimize_reservable_time_spans` filters the time spans by the field arguments.
+        # The annotation is JSON, so the datetimes are ISO 8601 strings.
+        items: list[ReservableTimeSpanItem] = []
+        for time_span in root.reservable_time_spans_in_period:
+            start_datetime = datetime.datetime.fromisoformat(time_span["start_datetime"])
+            end_datetime = datetime.datetime.fromisoformat(time_span["end_datetime"])
+            item = ReservableTimeSpanItem(
+                start_datetime=start_datetime.astimezone(DEFAULT_TIMEZONE),
+                end_datetime=end_datetime.astimezone(DEFAULT_TIMEZONE),
             )
-            for time_span in root.origin_hauki_resource.reservable_time_spans.all().overlapping_with_period(
-                start_date, end_date
-            )
-        ]
+            items.append(item)
+
+        return items
 
     @staticmethod
     def optimize_num_active_user_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
