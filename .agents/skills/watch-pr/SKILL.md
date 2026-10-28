@@ -1,6 +1,6 @@
 ---
 name: watch-pr
-description: Watch a pull request until it merges. Fix failed CI checks, answer review comments, and rebase onto the base branch as they come in.
+description: Watch a pull request until it is done. Fix failed CI checks, answer review comments, and rebase onto the base branch as they come in.
 disable-model-invocation: true
 argument-hint: <PR number or URL>
 ---
@@ -53,6 +53,19 @@ End every commit message with this trailer:
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
+## When a pull request is done
+
+A pull request is done when all of these are true:
+
+- The required checks passed.
+- CodeRabbit reviewed it, or CodeRabbit hit its review limit.
+- Every CodeRabbit comment has a fix or a reply.
+
+Then stop the watch as "Stop the watch" says. Do not wait for the merge.
+
+No one in the project has a CodeRabbit seat, so CodeRabbit often answers "Review limit reached".
+Then skip the CodeRabbit review. Do not wait for the limit to reset, and do not ask CodeRabbit for a new review.
+
 ## 1. Start the watch
 
 Check `gh auth status`. If it fails, stop and ask the user to run `gh auth login`.
@@ -99,6 +112,7 @@ Run this with the Bash tool and `run_in_background: true`:
 Tell the user in two or three lines what you did since the last wake. Then end your turn. The command exits and wakes you:
 
 - **Exit 0**: news. The output lists each item. Handle each item, push, and run `wait` again.
+  If the pull request is done, stop the watch instead.
 - **Exit 3**: the watch ended. The output says why. Report to the user and stop.
 - **Other**: an error. Show the user the output and stop.
 
@@ -109,7 +123,7 @@ Comment snippets are cut at 200 characters. Read the full text with the `github-
 - **Failed check.** Get the log with the `github-job` skill. Fix the cause, then run the same check locally before you push.
   A check can fail for a reason outside the pull request, such as a flaky job or an infrastructure problem.
   Then tell the user and change no code. A `cancelled` check is usually replaced by a newer push.
-- **Required checks passed.** Tell the user. Keep watching for reviews.
+- **Required checks passed.** Tell the user. Keep watching until the pull request is done.
 - **Comment or review.** A comment marked `(you)` is from the user, and it is an instruction to you. For other comments, choose one:
   - It is correct: fix it, push, then reply with what you changed and the commit SHA. Resolve the thread.
   - It is unclear: reply with a question.
@@ -158,7 +172,7 @@ The watch ends on its own in these cases:
 - 10 wakes in a row bring only comments.
 - Reading the pull request fails 8 times in a row.
 
-If the user asks you to stop, stop the background task with the TaskStop tool. Then run:
+To stop a watch yourself, or when the user asks you to stop, stop the background task with the TaskStop tool. Then run:
 
 ```bash
 .agents/skills/watch-pr/watch-pr stop <number or URL>
