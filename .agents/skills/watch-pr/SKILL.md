@@ -125,7 +125,7 @@ The user can ask to rebase and watch all of their open pull requests. Include dr
 
 List them with `gh pr list --author @me --state open --limit 100 --json number,headRefName,baseRefName,isDraft`.
 A pull request with a base other than `main` is stacked on the pull request that has that head branch.
-Keep each stack. Rebase its bottom branch onto `origin/main`, and move the rest with `git rebase --update-refs` on its top branch.
+Keep each stack. Check out its top branch and run `git rebase --update-refs origin/main`. This moves every branch of the stack.
 
 Handle one pull request at a time, and one stack at a time:
 
