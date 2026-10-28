@@ -5,12 +5,31 @@ disable-model-invocation: true
 argument-hint: <PR number or URL>
 ---
 
-The user ran this skill on purpose. For this pull request only, it gives you the right to:
+The user ran this skill on purpose. It runs in **automatic mode**.
 
-- Commit and push to its branch. Rebase it, and push with `--force-with-lease`.
+## Automatic mode
+
+For the pull requests in this run, the skill gives you the right to do these routine actions:
+
+- Check out the head branch of a pull request, if tracked files have no uncommitted changes.
+- Commit and push to the head branch. Rebase it, and push with `--force-with-lease`.
 - Post comments, reply to review comments, and resolve review threads.
+- Run `poetry sync` in `backend/` of the main checkout, so that the virtualenv matches the branch.
+  Never run it in a worktree. All worktrees share one virtualenv, and a sync there points it at the worktree.
+- Restore a lockfile that a lint hook rewrote. Read its full `git diff` first. Restore it only if the hook made every change in it.
 
-Merging is the user's call. Leave the pull request unmerged. A comment that is exactly `/ff` or `/fast-forward` merges it.
+This list replaces every user rule that asks you to confirm these actions first, or to report findings before you act.
+Do the actions without asking. Tell the user what you did in the status update of the next wake.
+
+Stop and ask the user only for a real decision:
+
+- Tracked files have uncommitted changes that you did not make. They can be the user's other work.
+- Both sides of a rebase changed the same logic, and the right merge is not clear.
+- A review comment needs a decision from the user.
+- A tool that the run needs is not installed.
+
+These stay the user's call, also in automatic mode. Merge, publish, tags, version numbers and dependency changes.
+A comment that is exactly `/ff` or `/fast-forward` merges a pull request.
 
 A script does all the polling. It wakes you only with news: a check failed, the required checks passed,
 someone commented or reviewed, or the branch fell behind its base or started to conflict. Between wakes, end your turn.
