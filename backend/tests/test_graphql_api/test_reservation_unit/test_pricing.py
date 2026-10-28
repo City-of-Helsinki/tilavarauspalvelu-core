@@ -266,6 +266,24 @@ def test_reservation_unit__create__pricing__creating_future_pricing_without_acti
     assert ReservationUnit.objects.count() == 0
 
 
+def test_reservation_unit__create__pricing__tax_level_without_rate_today_is_blocked(graphql):
+    tomorrow = local_date() + datetime.timedelta(days=1)
+    tax_level = TaxLevelFactory.create(rates__begins=tomorrow)
+
+    graphql.login_with_superuser()
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(begins=local_date().isoformat(), taxLevel=tax_level.pk),
+        ],
+    )
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_TAX_LEVEL_HAS_NO_RATE
+    assert ReservationUnit.objects.count() == 0
+
+
 def test_reservation_unit__create__pricing__material_pricing_allowed_tags(graphql):
     graphql.login_with_superuser()
 
