@@ -395,34 +395,21 @@ class ReservationUnitNode(DjangoNode):
 
     @staticmethod
     def optimize_price_summary(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:  # noqa: ARG004
-        today = local_date()
-
-        active_pricing_group = (
-            ReservationUnitPricingGroup.objects
-            .filter(reservation_unit=models.OuterRef(models.OuterRef("pk")), begins__lte=today)
-            .order_by("-begins")
-            .values("pricing_group")[:1]
-        )
-        active_base_components = (
-            PriceComponent.objects
-            .filter(
-                models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
-                models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
-                pricing_group=models.Subquery(active_pricing_group),
-                kind=PriceComponentKind.BASE,
-                valid_from__lte=today,
-            )
-            .order_by("amount", "pk")
-            .annotate(
-                # Amount as text, so that it does not go through a float in JSON.
-                data=JSONObject(amount=Cast("amount", models.CharField()), price_unit="price_unit"),
-            )
-            .values("data")
-        )
-        return queryset.annotate(price_summary_components=ArraySubquery(active_base_components))
+        return queryset.annotate(price_summary_components=_active_base_component_data())
 
     def resolve_price_summary(root: ReservationUnit, info: GQLInfo) -> PriceSummary | None:
-        components: list[dict[str, str]] = root.price_summary_components
+        # The optimizer cannot annotate a reservation unit that comes through a foreign key.
+        if hasattr(root, "price_summary_components"):
+            components: list[dict[str, str]] = root.price_summary_components
+        else:
+            components = (
+                ReservationUnit.objects
+                .filter(pk=root.pk)
+                .annotate(price_summary_components=_active_base_component_data())
+                .values_list("price_summary_components", flat=True)
+                .get()
+            )
+
         base_prices = [
             BasePrice(amount=Decimal(component["amount"]), price_unit=PriceUnit(component["price_unit"]))
             for component in components
@@ -468,3 +455,35 @@ class ReservationUnitAllNode(DjangoNode):
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         # Always hide archived reservation units
         return queryset.filter(is_archived=False)
+
+
+# Internals
+
+
+def _active_base_component_data() -> ArraySubquery:
+    """Amounts and price units of the base components that the reservation unit in the outer query has today."""
+    today = local_date()
+
+    active_pricing_group = (
+        ReservationUnitPricingGroup.objects
+        .filter(reservation_unit=models.OuterRef(models.OuterRef("pk")), begins__lte=today)
+        .order_by("-begins")
+        .values("pricing_group")[:1]
+    )
+    active_base_components = (
+        PriceComponent.objects
+        .filter(
+            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+            models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
+            pricing_group=models.Subquery(active_pricing_group),
+            kind=PriceComponentKind.BASE,
+            valid_from__lte=today,
+        )
+        .order_by("amount", "pk")
+        .annotate(
+            # Amount as text, so that it does not go through a float in JSON.
+            data=JSONObject(amount=Cast("amount", models.CharField()), price_unit="price_unit"),
+        )
+        .values("data")
+    )
+    return ArraySubquery(active_base_components)
