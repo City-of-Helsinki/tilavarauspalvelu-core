@@ -113,7 +113,8 @@ def _validate_new_component(
     has_saved_components: bool,
     pricing_group: PricingGroup,
 ) -> None:
-    if has_saved_components and component.valid_from <= local_date():
+    today = local_date()
+    if has_saved_components and component.valid_from <= today:
         msg = f"New price component must begin after today, not on {component.valid_from.isoformat()}."
         raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_FROM_NOT_IN_FUTURE)
 
