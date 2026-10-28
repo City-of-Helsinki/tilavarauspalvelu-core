@@ -450,8 +450,7 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
         raise ValidationError(msg, code="RESERVATION_UNIT_NO_ACTIVE_PRICING")
 
     # If creating a new payment order, tax percentage should be updated from the latest pricing
-    reservation.tax_percentage_value = pricing.tax_percentage.value
-    reservation.save(update_fields=["tax_percentage_value"])
+    reservation.actions.update_tax_percentage(tax_percentage=pricing.tax_percentage.value)
 
     try:
         verkkokauppa_order = reservation.actions.create_order_in_verkkokauppa()
