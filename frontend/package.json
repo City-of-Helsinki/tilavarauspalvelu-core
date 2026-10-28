@@ -31,7 +31,7 @@
     "@graphql-codegen/typescript": "^6.1.2",
     "@graphql-codegen/typescript-operations": "^6.1.10",
     "@graphql-codegen/typescript-react-apollo": "^5.0.0",
-    "@graphql-tools/graphql-tag-pluck": "^9.0.3",
+    "@graphql-tools/graphql-tag-pluck": "^9.0.5",
     "@parcel/watcher": "^2.6.0",
     "glob": "^13.0.6",
     "graphql-config": "^5.1.8",
