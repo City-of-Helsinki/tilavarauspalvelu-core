@@ -2,12 +2,8 @@
  * Unified setup and teardown keywords for all test suites
  * Simple approach: One setup does everything, one teardown cleans everything
  */
-import { V, robot, str, step, log } from "../../lib/robot";
-import type { RobotValue } from "../../lib/robot";
-import "../Resources/suite_specific_units";
-import "../Resources/variables";
-import "../Resources/serial_users";
-import "../Resources/devices";
+import { test } from "@playwright/test";
+import { step, log } from "../../lib/runtime";
 import { PageObject } from "../page-object";
 
 export class CommonSetupsTeardowns extends PageObject {
@@ -29,20 +25,16 @@ export class CommonSetupsTeardowns extends PageObject {
    */
   @step("common_setups_teardowns.Complete Test Setup From Tags")
   async completeTestSetupFromTags() {
-    let test_name: RobotValue;
-    test_name = robot.TEST_NAME ?? "unknown_test";
-    // Port: the testData fixture (TestSuites/fixtures.ts) chose the users and units from the tags before the test
+    const info = test.info();
+    // Port: the testData fixture (TestSuites/test-data.ts) chose the users and units from the tags before the test
     // started; this logs them
-    await log(`🚀 Test data for: ${str(test_name)}`);
-    await log(`🏷️ Tags: ${str(robot.TEST_TAGS)}`);
-    for (const name of [
-      "CURRENT_USER_FULLNAME",
-      "ADMIN_CURRENT_USER_FULLNAME",
-      "DJANGO_ADMIN_FULLNAME",
-      "PERMISSION_TARGET_ADMIN_FULLNAME",
-    ] as const) {
-      if (str(V[name] ?? "") !== "") {
-        await log(`👤 ${name}: ${V[name]}`);
+    await log(`🚀 Test data for: ${info.title}`);
+    await log(`🏷️ Tags: ${info.tags.join(", ")}`);
+    const { user, admin, djangoAdmin, permissionTarget } = this.testData;
+    for (const [kind, person] of Object.entries({ user, admin, djangoAdmin, permissionTarget })) {
+      if (person.fullName !== "") {
+        // oxlint-disable-next-line no-await-in-loop -- log lines in order
+        await log(`👤 ${kind}: ${person.fullName}`);
       }
     }
   }

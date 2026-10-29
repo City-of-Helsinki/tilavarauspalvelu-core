@@ -1,17 +1,16 @@
-import { randomUUID } from "node:crypto";
 /**
- * pabot's PabotLib keywords with the same names, for Playwright workers.
+ * Locks between the Playwright workers, which keep a data set's users and a unit's free times to one test at a time.
  *
- * Playwright workers are separate processes, like pabot's, so a lock is a directory created atomically with an owner
- * file. Each run has a folder of its own under PABOT_SHARED_DIR, so a run never sees another run's state. Locks a
- * test still holds are released when it ends. Only the locks are here: the testData fixture (TestSuites/fixtures.ts)
- * picks each test's users instead of value sets, and the tests share no parallel values.
+ * The workers are separate processes, so a lock is a directory created atomically with an owner file. Each run has a
+ * folder of its own under PABOT_SHARED_DIR, so a run never sees another run's state. Locks a test still holds are
+ * released when it ends.
  */
+import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
-import { library, onTestEnd, pyRepr, sleepMs } from "./robot";
-import type { RobotValue } from "./robot";
+import { setTimeout } from "node:timers/promises";
+import { onTestEnd } from "./runtime";
 
 const E2E_ROOT = resolve(import.meta.dirname, "..");
 /** The folder of the runs' shared state, one folder per run. */
@@ -28,7 +27,7 @@ interface LockOwner {
   token: string;
 }
 
-/** How many times this process holds each lock: like pabot's, a lock can be taken again by the process holding it. */
+/** How many times this process holds each lock: a lock can be taken again by the process holding it. */
 const heldLocks = new Map<string, number>();
 
 const safeName = (name: string) => encodeURIComponent(name).replaceAll("%", "_");
@@ -158,7 +157,7 @@ async function tryTakeOrTakeOver(dir: string): Promise<boolean> {
 }
 
 /** Takes a lock, waiting until it is free. Taking a lock this process already holds just counts it again. */
-async function acquire(name: string): Promise<void> {
+export async function acquireLock(name: string): Promise<void> {
   const held = heldLocks.get(name);
   if (held != null) {
     heldLocks.set(name, held + 1);
@@ -167,17 +166,18 @@ async function acquire(name: string): Promise<void> {
   // oxlint-disable-next-line no-await-in-loop -- waiting for the lock
   while (!(await tryTakeOrTakeOver(lockDir(name)))) {
     // oxlint-disable-next-line no-await-in-loop -- polling interval
-    await sleepMs(100);
+    await setTimeout(100);
   }
   heldLocks.set(name, 1);
 }
 
 /** Releases a lock once. It is freed when it has been released as many times as it was taken. */
-async function release(name: string): Promise<void> {
+export async function releaseLock(name: string): Promise<void> {
   const held = heldLocks.get(name);
   if (held == null) {
-    // How pabot's lock server fails: a KeyError for a lock nobody holds, an empty assert for another process's lock
-    throw new Error(existsSync(lockDir(name)) ? "AssertionError" : `KeyError: ${pyRepr(name)}`);
+    throw new Error(
+      existsSync(lockDir(name)) ? `Lock ${name} is held by another worker` : `Lock ${name} isn't held by any worker`
+    );
   }
   if (held > 1) {
     heldLocks.set(name, held - 1);
@@ -193,17 +193,6 @@ onTestEnd(async () => {
     await rm(lockDir(name), { recursive: true, force: true });
   }
   heldLocks.clear();
-});
-
-export const PabotLib = library("PabotLib", {
-  "Acquire Lock": async (name: RobotValue) => {
-    await acquire(String(name));
-    return true;
-  },
-
-  "Release Lock": async (name: RobotValue) => {
-    await release(String(name));
-  },
 });
 
 /**

@@ -1,28 +1,32 @@
 /** Port of PO/User/reservation_unit_reservation_receipt.robot */
-import { V, expect, step, log } from "../../../lib/robot";
-import "../../Resources/serial_users";
-import "../../Resources/texts_FI";
-import "../../Resources/parallel_test_data";
+import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import {
+  JUSTIFICATION_FOR_FREE_OF_CHARGE,
+  PURPOSE_OF_THE_BOOKING,
+  SINGLEBOOKING_DESCRIPTION,
+  SINGLEBOOKING_NAME,
+  SINGLEBOOKING_NUMBER_OF_PERSONS,
+} from "../../Resources/texts_FI";
 
 export class ReservationUnitReservationReceipt extends PageObject {
   /** Validates the reservation details of the user. */
   @step("reservation_unit_reservation_receipt.Check Reservation User Info")
   async checkReservationUserInfo() {
     await expect(this.page.getByTestId("reservation__summary-fields__reserveeFirstName")).toContainText(
-      V.CURRENT_USER_FIRST_NAME,
+      this.testData.user.firstName,
       { useInnerText: true }
     );
     await expect(this.page.getByTestId("reservation__summary-fields__reserveeLastName")).toContainText(
-      V.CURRENT_USER_LAST_NAME,
+      this.testData.user.lastName,
       { useInnerText: true }
     );
     await expect(this.page.getByTestId("reservation__summary-fields__reserveeEmail")).toContainText(
-      V.CURRENT_USER_EMAIL,
+      this.testData.user.email,
       { useInnerText: true }
     );
     await expect(this.page.getByTestId("reservation__summary-fields__reserveePhone")).toContainText(
-      V.CURRENT_USER_PHONE,
+      this.testData.user.phone,
       { useInnerText: true }
     );
   }
@@ -30,27 +34,21 @@ export class ReservationUnitReservationReceipt extends PageObject {
   /** Validates details for a free single booking. */
   @step("reservation_unit_reservation_receipt.Check Free Single Booking Info")
   async checkFreeSingleBookingInfo() {
-    await expect(this.page.getByTestId("reservation__summary-fields__name")).toContainText(V.SINGLEBOOKING_NAME, {
+    await expect(this.page.getByTestId("reservation__summary-fields__name")).toContainText(SINGLEBOOKING_NAME, {
       useInnerText: true,
     });
-    await expect(this.page.getByTestId("reservation__summary-fields__purpose")).toContainText(
-      V.PURPOSE_OF_THE_BOOKING,
-      {
-        useInnerText: true,
-      }
-    );
+    await expect(this.page.getByTestId("reservation__summary-fields__purpose")).toContainText(PURPOSE_OF_THE_BOOKING, {
+      useInnerText: true,
+    });
     await expect(this.page.getByTestId("reservation__summary-fields__description")).toContainText(
-      V.SINGLEBOOKING_DESCRIPTION,
+      SINGLEBOOKING_DESCRIPTION,
       { useInnerText: true }
     );
-    await expect(this.page.getByTestId("confirm_freeOfChargeReason")).toContainText(
-      V.JUSTIFICATION_FOR_FREE_OF_CHARGE,
-      {
-        useInnerText: true,
-      }
-    );
+    await expect(this.page.getByTestId("confirm_freeOfChargeReason")).toContainText(JUSTIFICATION_FOR_FREE_OF_CHARGE, {
+      useInnerText: true,
+    });
     await expect(this.page.getByTestId("reservation__summary-fields__numPersons")).toContainText(
-      V.SINGLEBOOKING_NUMBER_OF_PERSONS,
+      SINGLEBOOKING_NUMBER_OF_PERSONS,
       { useInnerText: true }
     );
   }
@@ -58,21 +56,18 @@ export class ReservationUnitReservationReceipt extends PageObject {
   /** Validates details for a single booking. */
   @step("reservation_unit_reservation_receipt.Check Single Booking Info")
   async checkSingleBookingInfo() {
-    await expect(this.page.getByTestId("reservation__summary-fields__name")).toContainText(V.SINGLEBOOKING_NAME, {
+    await expect(this.page.getByTestId("reservation__summary-fields__name")).toContainText(SINGLEBOOKING_NAME, {
       useInnerText: true,
     });
-    await expect(this.page.getByTestId("reservation__summary-fields__purpose")).toContainText(
-      V.PURPOSE_OF_THE_BOOKING,
-      {
-        useInnerText: true,
-      }
-    );
+    await expect(this.page.getByTestId("reservation__summary-fields__purpose")).toContainText(PURPOSE_OF_THE_BOOKING, {
+      useInnerText: true,
+    });
     await expect(this.page.getByTestId("reservation__summary-fields__description")).toContainText(
-      V.SINGLEBOOKING_DESCRIPTION,
+      SINGLEBOOKING_DESCRIPTION,
       { useInnerText: true }
     );
     await expect(this.page.getByTestId("reservation__summary-fields__numPersons")).toContainText(
-      V.SINGLEBOOKING_NUMBER_OF_PERSONS,
+      SINGLEBOOKING_NUMBER_OF_PERSONS,
       { useInnerText: true }
     );
   }
@@ -81,11 +76,11 @@ export class ReservationUnitReservationReceipt extends PageObject {
   @step("reservation_unit_reservation_receipt.Check Noncancelable Booking Info")
   async checkNoncancelableBookingInfo() {
     await expect(this.page.getByTestId("reservation__summary-fields__description")).toContainText(
-      V.SINGLEBOOKING_DESCRIPTION,
+      SINGLEBOOKING_DESCRIPTION,
       { useInnerText: true }
     );
     await expect(this.page.getByTestId("reservation__summary-fields__numPersons")).toContainText(
-      V.SINGLEBOOKING_NUMBER_OF_PERSONS,
+      SINGLEBOOKING_NUMBER_OF_PERSONS,
       { useInnerText: true }
     );
   }

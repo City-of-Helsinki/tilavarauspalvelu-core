@@ -1,29 +1,38 @@
 /** A resource file with keywords. */
-import { Collections } from "../../lib/Collections";
-import { DateTime } from "../../lib/DateTime";
-import { V, named, str, step, log, expect } from "../../lib/robot";
-import type { RobotValue } from "../../lib/robot";
-import { String_ } from "../../lib/String";
-import "../Resources/parallel_test_data";
+import { step, log, expect } from "../../lib/runtime";
 import { PageObject } from "../page-object";
-import "../Resources/variables";
-import "../Resources/texts_FI";
-import "../Resources/serial_users";
 import { python_keywords } from "../Resources/python_keywords";
+import { SINGLEBOOKING_NAME } from "./texts_FI";
+
+const pad2 = (value: number) => String(value).padStart(2, "0");
+
+/** A date as dd.mm.yyyy, e.g. 05.03.2026 */
+const ddmmyyyy = (date: Date) => `${pad2(date.getDate())}.${pad2(date.getMonth() + 1)}.${date.getFullYear()}`;
+
+/** The local time `days` and `hours` from `date`, by the clock: a day stays a day across a DST change */
+const addToDate = (date: Date, { days = 0, hours = 0 }) =>
+  new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate() + days,
+    date.getHours() + hours,
+    date.getMinutes(),
+    date.getSeconds()
+  );
+
+const LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class DataModification extends PageObject {
   @step("data_modification.Formats Reservation Number And Name For Admin Side")
   // oxlint-disable-next-line eslint/require-await -- keywords are async, each call is a report step
   async formatsReservationNumberAndNameForAdminSide() {
-    let bookingNumber_and_NameOfTheBooking: RobotValue;
-    bookingNumber_and_NameOfTheBooking = `${str(V.BOOKING_NUM_ONLY)}, ${str(V.SINGLEBOOKING_NAME)}`;
-    V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED = bookingNumber_and_NameOfTheBooking;
+    const bookingNumber_and_NameOfTheBooking = `${this.state.bookingNumOnly}, ${SINGLEBOOKING_NAME}`;
+    this.state.bookingNumOnlyBookingNameSubvented = bookingNumber_and_NameOfTheBooking;
   }
 
   /** Formats the given information as "Ma 25.11.2024 22:30–23:30, 1 t | Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju" */
   @step("data_modification.Formats Tagline For Admin Side")
-  async formatsTaglineForAdminSide(info_card_time_of_reservation: RobotValue, name_of_reservationunit: string) {
-    let RESERVATION_TAG_TIME: RobotValue, RESERVATION_TAG: RobotValue;
+  async formatsTaglineForAdminSide(info_card_time_of_reservation: string, name_of_reservationunit: string) {
     // Log the original time of reservation string
     await log(info_card_time_of_reservation);
     await log(name_of_reservationunit);
@@ -40,74 +49,65 @@ export class DataModification extends PageObject {
     // Log  ${RESERVATION_TAG_KLO_REMOVED}
 
     // Use the original time string directly (keeping 'klo' as the app now includes it)
-    RESERVATION_TAG_TIME = str(info_card_time_of_reservation).trim();
+    const RESERVATION_TAG_TIME = info_card_time_of_reservation.trim();
 
     // Log the result after stripping whitespace
     await log(RESERVATION_TAG_TIME);
 
     // Build tagline by default with location
-    RESERVATION_TAG = `${str(RESERVATION_TAG_TIME)} | ${name_of_reservationunit}`;
+    let RESERVATION_TAG = `${RESERVATION_TAG_TIME} | ${name_of_reservationunit}`;
 
     // Normalize whitespace: replace multiple spaces with a single space
-    RESERVATION_TAG = str(RESERVATION_TAG).trim().split(/\s+/).join(" ");
+    RESERVATION_TAG = RESERVATION_TAG.trim().split(/\s+/).join(" ");
 
-    // Set the suite variable to hold the final formatted tagline
-    V.RESERVATION_TAGLINE = RESERVATION_TAG;
+    // Save the final formatted tagline for the next keywords (state)
+    this.state.reservationTagline = RESERVATION_TAG;
 
     // Log the final formatted tagline
-    await log(V.RESERVATION_TAGLINE);
+    await log(this.state.reservationTagline);
   }
 
   @step("data_modification.Formats Calendar Event Content")
   async formatsCalendarEventContent(
     firstname_used_in_reservation_by_admin: string,
-    lastname_used_in_reservation_by_admin: RobotValue,
+    lastname_used_in_reservation_by_admin: string,
     prefix_fi: string
   ) {
-    let result: RobotValue;
     // This formats string like Puolesta| Puolesta a6
-    result = `${prefix_fi} ${firstname_used_in_reservation_by_admin} ${str(lastname_used_in_reservation_by_admin)}`;
-    await log(`Generated string: ${str(result)}`);
+    const result = `${prefix_fi} ${firstname_used_in_reservation_by_admin} ${lastname_used_in_reservation_by_admin}`;
+    await log(`Generated string: ${result}`);
     return result;
   }
 
   /** Converts Finnish short weekday (e.g. "Su") from a datetime string into full English name. */
   @step("data_modification.Convert Finnish Short Day To English")
-  async convertFinnishShortDayToEnglish(finnish_datetime: RobotValue) {
-    let parts: RobotValue,
-      short_day: RobotValue,
-      cleaned_shortday: RobotValue,
-      fi_days: RobotValue,
-      en_days: RobotValue,
-      idx: RobotValue,
-      english_day: RobotValue;
-    await log(`Finnish datetime: ${str(finnish_datetime)}`);
+  async convertFinnishShortDayToEnglish(finnish_datetime: string) {
+    await log(`Finnish datetime: ${finnish_datetime}`);
 
     // 1: Extract the Finnish short day (first token before the first space)
     // e.g. ['Su','4.5.2025','klo','02:15–02:45,','30','min']
-    parts = await String_["Split String"](finnish_datetime, " ");
+    const parts = finnish_datetime.split(" ");
 
     // 2: Take the first token as the short day. e.g. 'Su'
-    short_day = await Collections["Get From List"](parts, "0");
+    const short_day = parts[0] ?? "";
 
     // 3: Lowercase the short day e.g. 'Su' --> 'su'
-    cleaned_shortday = await String_["Convert To Lowercase"](short_day);
+    const cleaned_shortday = short_day.toLowerCase();
 
-    await log(`Normalized key ➔ ${str(cleaned_shortday)}`);
+    await log(`Normalized key ➔ ${cleaned_shortday}`);
 
     // 4: Define parallel lists of Finnish abbreviations and English full names
-    fi_days = ["ma", "ti", "ke", "to", "pe", "la", "su"];
-    en_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const fi_days = ["ma", "ti", "ke", "to", "pe", "la", "su"];
+    const en_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
     // 5: Look up the index of the Finnish short day
-    idx = await Collections["Get Index From List"](fi_days, cleaned_shortday);
-    expect(Number(idx), `Unknown Finnish day abbreviation "${str(cleaned_shortday)}"`).toBeGreaterThanOrEqual(0);
+    const idx = fi_days.indexOf(cleaned_shortday);
+    expect(idx, `Unknown Finnish day abbreviation "${cleaned_shortday}"`).toBeGreaterThanOrEqual(0);
 
     // 6: Use the same index to fetch the English full name
-    english_day = await Collections["Get From List"](en_days, idx);
+    const english_day = en_days[idx] ?? "";
 
-    V.ENGLISH_DAY = english_day;
-    english_day = V.ENGLISH_DAY;
+    this.state.englishDay = english_day;
   }
 
   /**
@@ -115,138 +115,88 @@ export class DataModification extends PageObject {
    * Durations over 90 min (like '1t 45min') are not supported.
    */
   @step("data_modification.Compute Reservation Time Slot")
-  async computeReservationTimeSlot(reservation_start_time: RobotValue, duration: string) {
-    let start_parts: RobotValue,
-      start_hour_raw: RobotValue,
-      start_min: RobotValue,
-      start_hour: RobotValue,
-      start_interval: RobotValue,
-      parts: RobotValue,
-      num_str: RobotValue,
-      duration_str: RobotValue,
-      end_timer: RobotValue,
-      end_parts: RobotValue,
-      end_hour: RobotValue,
-      end_min: RobotValue,
-      start_h_int: RobotValue,
-      end_h_int: RobotValue,
-      start_time: RobotValue,
-      end_time: RobotValue,
-      full_slot: RobotValue;
-    await log(`Reservation start time: ${str(reservation_start_time)}`);
+  async computeReservationTimeSlot(reservation_start_time: string, duration: string) {
+    await log(`Reservation start time: ${reservation_start_time}`);
     await log(`Duration: ${duration}`);
 
     // 1: Validate start time (H:MM or HH:MM with optional leading zeros, minutes 00–59)
     expect(
-      String(reservation_start_time),
+      reservation_start_time,
       'Start time must be "H:MM" or "HH:MM" (with optional leading zero) and valid minutes (00-59)'
     ).toMatch(/^(?:[0-1]?[0-9]|2[0-3]):[0-5][0-9]$/);
 
     // 2: Validate duration "<digits> min"
     expect(
-      String(duration),
+      duration,
       "Duration must be like \"60 min\". Durations over 90 min (like '1t 45min') are not supported."
     ).toMatch(/^\d+\s*min$/);
 
     // 3: Split the start time into hour and minute components
-    start_parts = await String_["Split String"](reservation_start_time, ":");
-    start_hour_raw = await Collections["Get From List"](start_parts, "0"); // e.g. "17" or "09"
-    start_min = await Collections["Get From List"](start_parts, "1"); // e.g. "30"
+    const [start_hour_raw = "", start_min = ""] = reservation_start_time.split(":"); // e.g. "17" or "09", and "30"
 
     // 3a: Remove leading zero from start hour
-    start_hour = Number.parseInt(String(start_hour_raw), 10);
-    await log(`Parsed start: ${str(start_hour)}h ${str(start_min)}m (leading zero removed if present)`);
+    const start_hour = Number.parseInt(start_hour_raw, 10);
+    await log(`Parsed start: ${start_hour}h ${start_min}m (leading zero removed if present)`);
 
     // 4: Build a time interval string for the start (e.g. "17 hours 30 minutes")
-    start_interval = `${str(start_hour)} hours ${str(start_min)} minutes`;
-    await log(`Start interval ➔ ${str(start_interval)}`);
+    const start_interval = `${start_hour} hours ${start_min} minutes`;
+    await log(`Start interval ➔ ${start_interval}`);
 
     // 5: Normalize duration to full words (e.g. "60 min" → "60 minutes")
-    parts = await String_["Split String"](duration, "min");
-    num_str = await Collections["Get From List"](parts, "0");
-    num_str = await String_["Replace String"](num_str, " ", "");
-    duration_str = `${str(num_str)} minutes`;
-    await log(`Normalized duration ➔ ${str(duration_str)}`);
+    const num_str = (duration.split("min")[0] ?? "").replaceAll(" ", "");
+    const duration_str = `${num_str} minutes`;
+    await log(`Normalized duration ➔ ${duration_str}`);
 
     // 6: Add start interval and duration to get raw end time "HH:MM:SS"
-    end_timer = await DateTime["Add Time To Time"](
-      start_interval,
-      duration_str,
-      named({ result_format: "timer", exclude_millis: "True" })
-    );
-    await log(`Raw timer end ➔ ${str(end_timer)}`);
+    const end_minutes = start_hour * 60 + Number(start_min) + Number(num_str);
+    const end_timer = `${pad2(Math.floor(end_minutes / 60))}:${pad2(end_minutes % 60)}:00`;
+    await log(`Raw timer end ➔ ${end_timer}`);
 
     // 7: Extract hour and minute from timer string
-    end_parts = await String_["Split String"](end_timer, ":");
-    end_hour = await Collections["Get From List"](end_parts, "0"); // e.g. "18"
-    end_min = await Collections["Get From List"](end_parts, "1"); // e.g. "30"
-    await log(`Computed end: ${str(end_hour)}h ${str(end_min)}m`);
+    const [end_hour_raw = "", end_min = ""] = end_timer.split(":"); // e.g. "18", and "30"
+    await log(`Computed end: ${end_hour_raw}h ${end_min}m`);
 
     // 8: Remove leading zero from end_hour
-    end_hour = Number.parseInt(String(end_hour), 10);
-    await log(`End hour without leading zero ➔ ${str(end_hour)}`);
+    const end_hour = Number.parseInt(end_hour_raw, 10);
+    await log(`End hour without leading zero ➔ ${end_hour}`);
 
     // 9: Ensure end time didn’t wrap past midnight
-    start_h_int = Number.parseInt(String(start_hour), 10);
-    end_h_int = Number.parseInt(String(end_hour), 10);
-
     // a) Must not exceed 23
-    expect(Number(end_h_int), `End hour ${str(end_h_int)} past midnight not supported`).toBeLessThanOrEqual(23);
+    expect(end_hour, `End hour ${end_hour} past midnight not supported`).toBeLessThanOrEqual(23);
     // b) Must not be before the start
-    expect(
-      Number(end_h_int),
-      `End hour ${str(end_h_int)} is before start hour ${str(start_h_int)}`
-    ).toBeGreaterThanOrEqual(Number(start_h_int));
+    expect(end_hour, `End hour ${end_hour} is before start hour ${start_hour}`).toBeGreaterThanOrEqual(start_hour);
 
     // 10: Combine into final slot (both times without leading zeros)
-    start_time = `${str(start_hour)}:${str(start_min)}`;
-    end_time = `${str(end_hour)}:${str(end_min)}`;
-    full_slot = `${str(start_time)}-${str(end_time)}`;
-    await log(`Final reservation slot ➔ ${str(full_slot)}`);
+    const start_time = `${start_hour}:${start_min}`;
+    const end_time = `${end_hour}:${end_min}`;
+    const full_slot = `${start_time}-${end_time}`;
+    await log(`Final reservation slot ➔ ${full_slot}`);
 
     // 11: Expose for suite use
-    V.CALENDAR_TIMESLOT = full_slot;
+    this.state.calendarTimeslot = full_slot;
   }
 
   /** Advances the current date by 1–15 days and adjusts start/end hours by random offsets between 1 and 5. */
   @step("data_modification.Get Modified Date And Time")
-  async getModifiedDateAndTime() {
-    let current_date: RobotValue,
-      number_day: RobotValue,
-      start_hour_subtraction: RobotValue,
-      date_plus_x_days: RobotValue,
-      start_hour: RobotValue,
-      end_hour: RobotValue;
+  async getModifiedDateAndTime(): Promise<[string, string, string]> {
     // Get the current date and time
-    current_date = await DateTime["Get Current Date"](named({ result_format: "%Y-%m-%d %H:%M:%S" }));
+    const current_date = new Date();
 
     // DEVNOTE to test this manually
     // ${current_date}=  Set Variable  2024-04-29 18:52:45
 
     // Generate random number for days to add (1-15 days)
-    number_day = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
+    const number_day = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
     await log(number_day);
 
     // Generate random number for the start hour subtraction (1-5 hours)
-    start_hour_subtraction = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
-    await log(`Start hour subtraction: ${str(start_hour_subtraction)}`);
+    const start_hour_subtraction = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
+    await log(`Start hour subtraction: ${start_hour_subtraction}`);
 
     // Calculate the modified date and times
-    date_plus_x_days = await DateTime["Add Time To Date"](
-      current_date,
-      `${str(number_day)} days`,
-      named({ result_format: "%d.%m.%Y" })
-    );
-    start_hour = await DateTime["Add Time To Date"](
-      current_date,
-      `-${str(start_hour_subtraction)} hours`,
-      named({ result_format: "%H" })
-    );
-    end_hour = await DateTime["Add Time To Date"](
-      current_date,
-      `-${str(Number(start_hour_subtraction) - 1)} hours`,
-      named({ result_format: "%H" })
-    );
+    const date_plus_x_days = ddmmyyyy(addToDate(current_date, { days: number_day }));
+    const start_hour = pad2(addToDate(current_date, { hours: -start_hour_subtraction }).getHours());
+    const end_hour = pad2(addToDate(current_date, { hours: -(start_hour_subtraction - 1) }).getHours());
 
     await log(date_plus_x_days);
     await log(start_hour);
@@ -261,18 +211,7 @@ export class DataModification extends PageObject {
    * It adds "Alkamisaika:" and "Päättymisaika:"
    */
   @step("data_modification.Formats Reservation Time To Start And End Time")
-  async formatsReservationTimeToStartAndEndTime(time_of_the_reservation: RobotValue) {
-    let date: RobotValue,
-      time_range: RobotValue,
-      day: RobotValue,
-      month: RobotValue,
-      year: RobotValue,
-      start_time: RobotValue,
-      end_time: RobotValue;
-    // oxlint-disable-next-line eslint/no-unused-vars -- assigned but not read in the Robot keyword
-    let time_format_is_valid: RobotValue;
-    // oxlint-disable-next-line eslint/no-unused-vars -- assigned but not read in the Robot keyword
-    let weekday: RobotValue;
+  async formatsReservationTimeToStartAndEndTime(time_of_the_reservation: string) {
     await log("This sets the FORMATTED_STARTTIME and FORMATTED_ENDTIME");
 
     // DEVNOTE For testing
@@ -280,30 +219,30 @@ export class DataModification extends PageObject {
     // This uses en dash (–)
 
     // Validate the format of the original time string --> "Pe 1.11.2024 klo 11:00–12:00"
-    time_format_is_valid = python_keywords.validate_timeformat(time_of_the_reservation);
+    // Port: the result isn't checked, like in the Robot keyword
+    python_keywords.validate_timeformat(time_of_the_reservation);
 
     // Extract the weekday, date, and time range
-    [weekday, date, time_range] = await String_["Split String"](time_of_the_reservation, " ", "2");
+    const [, date = "", ...time_range_words] = time_of_the_reservation.split(" ");
+    const time_range = time_range_words.join(" ");
 
     // Further split the date into day, month, and year
-    [day, month, year] = await String_["Split String"](date, ".");
+    const [day, month, year] = date.split(".");
 
     // Split the time range into start and end times
-    [start_time, end_time] = await String_["Split String"](time_range, "–");
+    const [start_with_klo = "", end_with_spaces = ""] = time_range.split("–");
 
     // Remove "klo" from start time if present
-    start_time = await String_["Remove String"](start_time, "klo");
-
     // Remove any leading/trailing spaces from the start and end times
-    start_time = await String_["Strip String"](start_time);
-    end_time = await String_["Strip String"](end_time);
+    const start_time = start_with_klo.replaceAll("klo", "").trim();
+    const end_time = end_with_spaces.trim();
 
     // Construct the formatted start and end times
-    V.FORMATTED_STARTTIME_EMAIL = `Alkamisaika: ${str(day)}.${str(month)}.${str(year)} klo ${str(start_time)}`;
-    V.FORMATTED_ENDTIME_EMAIL = `Päättymisaika: ${str(day)}.${str(month)}.${str(year)} klo ${str(end_time)}`;
+    this.state.formattedStarttimeEmail = `Alkamisaika: ${day}.${month}.${year} klo ${start_time}`;
+    this.state.formattedEndtimeEmail = `Päättymisaika: ${day}.${month}.${year} klo ${end_time}`;
 
-    await log(V.FORMATTED_STARTTIME_EMAIL);
-    await log(V.FORMATTED_ENDTIME_EMAIL);
+    await log(this.state.formattedStarttimeEmail);
+    await log(this.state.formattedEndtimeEmail);
   }
 
   /**
@@ -312,62 +251,56 @@ export class DataModification extends PageObject {
    * this keyword uses hard coded formatting to assume that reservation duration is 60min
    */
   @step("data_modification.Set Info Card Duration Time Info")
-  async setInfoCardDurationTimeInfo(Timeslot_to_format: RobotValue, Date_to_format: RobotValue) {
-    let formatted_date: RobotValue,
-      formatted_time: RobotValue,
-      date_time_string: RobotValue,
-      date_time: RobotValue,
-      year: RobotValue,
-      month: RobotValue,
-      day: RobotValue,
-      hour: RobotValue,
-      minute: RobotValue,
-      end_hour: RobotValue,
-      finnish_day: RobotValue,
-      finnish_date: RobotValue,
-      formatted_date_minus_t: RobotValue;
-    await log(`Timeslot to format: ${str(Timeslot_to_format)}`);
-    await log(`Date to format: ${str(Date_to_format)}`);
+  async setInfoCardDurationTimeInfo(Timeslot_to_format: string, Date_to_format: string): Promise<[string, string]> {
+    await log(`Timeslot to format: ${Timeslot_to_format}`);
+    await log(`Date to format: ${Date_to_format}`);
 
     // DEVNOTE For testing keyword
     // ${Timeslot_to_format}=  Set Variable  12.15
 
     // Convert the date from Finnish format to a format suitable for datetime conversion
-    formatted_date = await String_["Replace String"](Date_to_format, ".", "-");
+    let formatted_date = Date_to_format.replaceAll(".", "-");
 
     // Handle time format to ensure it uses colon as the separator
-    formatted_time = await String_["Replace String Using Regexp"](Timeslot_to_format, "[.:]", ":");
+    const formatted_time = Timeslot_to_format.replaceAll(/[.:]/g, ":");
 
     // Combine date and time into a single datetime string
-    date_time_string = `${str(formatted_date)} ${str(formatted_time)}`;
-
     // Strip any extra whitespace or hidden characters from the datetime string
-    date_time_string = await String_["Strip String"](date_time_string);
-    await log(`Formatted datetime string: ${str(date_time_string)}`);
+    const date_time_string = `${formatted_date} ${formatted_time}`.trim();
+    await log(`Formatted datetime string: ${date_time_string}`);
 
-    // Convert string to datetime object
-    date_time = await DateTime["Convert Date"](
-      date_time_string,
-      named({ result_format: "datetime", date_format: "%d-%m-%Y %H:%M" })
+    // Convert string to datetime object (dd-mm-yyyy hh:mm)
+    const parsed = /^(?<d>\d{1,2})-(?<m>\d{1,2})-(?<y>\d{4}) (?<H>\d{1,2}):(?<M>\d{1,2})$/.exec(
+      date_time_string
+    )?.groups;
+    if (parsed == null) {
+      throw new Error(`time data '${date_time_string}' does not match format '%d-%m-%Y %H:%M'`);
+    }
+    const date_time = new Date(
+      Number(parsed.y),
+      Number(parsed.m) - 1,
+      Number(parsed.d),
+      Number(parsed.H),
+      Number(parsed.M)
     );
 
     // Extracting components directly from a datetime object
-    year = date_time.year;
-    month = date_time.month;
-    day = date_time.day;
-    hour = String(date_time.hour).padStart(2, "0");
-    minute = String(date_time.minute).padStart(2, "0");
-    end_hour = String((date_time.hour + 1) % 24).padStart(2, "0");
+    const year = date_time.getFullYear();
+    const month = date_time.getMonth() + 1;
+    const day = date_time.getDate();
+    const hour = pad2(date_time.getHours());
+    const minute = pad2(date_time.getMinutes());
+    const end_hour = pad2((date_time.getHours() + 1) % 24);
 
     // Get the Finnish day name from the datetime object using the Python function
-    finnish_day = python_keywords.get_finnish_day(date_time);
+    const finnish_day = python_keywords.get_finnish_day(date_time);
 
     // Format the Finnish date and time into the desired format
     // HH:MM WITH ":" "–" "Ti 5.12.2023 klo 11:30–12:30"
     // 1t comes from duration of the reservation that is set in this test to 1h / 60min
-    finnish_date = `${str(day)}.${str(month)}.${str(year)}`;
-    formatted_date = `${str(finnish_day)} ${str(finnish_date)} klo ${str(hour)}:${str(minute)}–${str(end_hour)}:${str(minute)}, 1 t`;
-    formatted_date_minus_t = `${str(finnish_day)} ${str(finnish_date)} klo ${str(hour)}:${str(minute)}–${str(end_hour)}:${str(minute)}`;
+    const finnish_date = `${day}.${month}.${year}`;
+    formatted_date = `${finnish_day} ${finnish_date} klo ${hour}:${minute}–${end_hour}:${minute}, 1 t`;
+    const formatted_date_minus_t = `${finnish_day} ${finnish_date} klo ${hour}:${minute}–${end_hour}:${minute}`;
 
     // Return the formatted strings
     return [formatted_date, formatted_date_minus_t];
@@ -375,31 +308,21 @@ export class DataModification extends PageObject {
 
   @step("data_modification.Generate Random Letter And Number")
   async generateRandomLetterAndNumber() {
-    let letter: RobotValue, number: RobotValue, random_string: RobotValue;
-    letter = await String_["Generate Random String"]("1", "[LETTERS]");
-    number = await String_["Generate Random String"]("1", "[NUMBERS]");
-    random_string = `${str(letter)}${str(number)}`;
-    await log(`Generated random string: ${str(random_string)}`);
+    const letter = LETTERS[Math.floor(Math.random() * LETTERS.length)] ?? "";
+    const number = Math.floor(Math.random() * 10);
+    const random_string = `${letter}${number}`;
+    await log(`Generated random string: ${random_string}`);
     return random_string;
   }
 
   /** Sets the current date plus 60 days in format d.M.yyyy (e.g. 12.2.2012). */
   @step("data_modification.Get Date Plus 60 Days")
+  // oxlint-disable-next-line eslint/require-await -- keywords are async, each call is a report step
   async getDatePlus60Days() {
-    let current_date: RobotValue, date_plus_60_days: RobotValue, day: RobotValue, month: RobotValue, year: RobotValue;
-    current_date = await DateTime["Get Current Date"](named({ result_format: "%Y-%m-%d" }));
-    date_plus_60_days = await DateTime["Add Time To Date"](
-      current_date,
-      "60 days",
-      named({ result_format: "%d.%m.%Y" })
-    );
+    const current_date = new Date();
+    const date_plus_60_days = addToDate(current_date, { days: 60 });
 
-    // Remove leading zeros from day and month
-    [day, month, year] = await String_["Split String"](date_plus_60_days, ".");
-    day = Number.parseInt(String(day), 10);
-    month = Number.parseInt(String(month), 10);
-    date_plus_60_days = `${str(day)}.${str(month)}.${str(year)}`;
-
-    return date_plus_60_days;
+    // Without leading zeros in day and month
+    return `${date_plus_60_days.getDate()}.${date_plus_60_days.getMonth() + 1}.${date_plus_60_days.getFullYear()}`;
   }
 }

@@ -1,6 +1,6 @@
 /** Port of robot_email_test_tool.py: verifies emails from the backend's robot email cache API. */
-import { V, log } from "../../lib/robot";
-import type { RobotValue } from "../../lib/robot";
+import { log } from "../../lib/runtime";
+import { DJANGO_ROBO_MAIL, ROBOT_EMAIL } from "./variables";
 
 interface CachedEmail {
   timestamp?: string;
@@ -107,25 +107,15 @@ let emailTester: RobotEmailTester | null = null;
 export const robot_email_test_tool = {
   /** Verifies a reservation email. Creates the tester from ${DJANGO_ROBO_MAIL} and ${ROBOT_EMAIL} on first use. */
   verify_reservation_email: async (
-    reservation_number: RobotValue,
-    expected_terms: RobotValue,
-    require_attachment: RobotValue = false
+    reservation_number: string,
+    expected_terms: string[],
+    require_attachment = false
   ): Promise<boolean> => {
     try {
       if (emailTester == null) {
-        const apiEndpoint = String(V.DJANGO_ROBO_MAIL ?? "");
-        const robotEmail = String(V.ROBOT_EMAIL ?? "");
-        if (apiEndpoint === "" || robotEmail === "") {
-          await log("DJANGO_ROBO_MAIL and ROBOT_EMAIL must be set as variables.", { level: "ERROR" });
-          return false;
-        }
-        emailTester = new RobotEmailTester(apiEndpoint, robotEmail);
+        emailTester = new RobotEmailTester(DJANGO_ROBO_MAIL, ROBOT_EMAIL);
       }
-      return await emailTester.verify_reservation_email(
-        String(reservation_number),
-        (expected_terms as RobotValue[]).map(String),
-        require_attachment === true || String(require_attachment).toLowerCase() === "true"
-      );
+      return await emailTester.verify_reservation_email(reservation_number, expected_terms, require_attachment);
     } catch (err) {
       await log(`Error in verify_reservation_email: ${String(err)}`, { level: "ERROR" });
       return false;

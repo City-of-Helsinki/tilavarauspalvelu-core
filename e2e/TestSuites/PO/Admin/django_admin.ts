@@ -1,8 +1,5 @@
 /** Port of PO/Admin/django_admin.robot */
-import { expect, step } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/texts_FI";
-import "../../Resources/serial_users";
+import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class DjangoAdmin extends PageObject {

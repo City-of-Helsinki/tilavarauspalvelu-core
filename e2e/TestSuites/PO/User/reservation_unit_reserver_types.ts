@@ -1,5 +1,5 @@
 /** Port of PO/User/reservation_unit_reserver_types.robot */
-import { step } from "../../../lib/robot";
+import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class ReservationUnitReserverTypes extends PageObject {

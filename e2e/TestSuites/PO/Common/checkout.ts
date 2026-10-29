@@ -1,20 +1,16 @@
 /** Port of PO/Common/checkout.robot */
 import { errors } from "@playwright/test";
-import { V, isTruthy, str, step, expect, log } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import "../../Resources/parallel_test_data";
-import "../../Resources/serial_users";
-import "../../Resources/variables";
-import "../../Resources/texts_FI";
+import { step, expect, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import { SINGLEBOOKING_PAID_PRICE_CHECKOUT } from "../../Resources/texts_FI";
+import { URL_TEST } from "../../Resources/variables";
 
 export class Checkout extends PageObject {
   @step("checkout.Allow All Cookies If Visible")
   async allowAllCookiesIfVisible() {
-    let consent_saved: RobotValue;
     // The banner is not shown again once the consent is saved
-    consent_saved = await this.page.evaluate(() => document.cookie.includes("helfi-cookie-consents="));
-    if (isTruthy(consent_saved)) {
+    const consent_saved = await this.page.evaluate(() => document.cookie.includes("helfi-cookie-consents="));
+    if (consent_saved) {
       await log("Cookie consent already saved, the banner is not shown");
       return;
     }
@@ -53,7 +49,7 @@ export class Checkout extends PageObject {
   async checkUserDetailsInCheckout() {
     await this.pages.customKeywords.findTextFromElementsOrFail(
       ".customer-details-information >> td",
-      V.CURRENT_USER_EMAIL
+      this.testData.user.email
     );
   }
 
@@ -61,30 +57,29 @@ export class Checkout extends PageObject {
   async checkProductListHasAllTheInfo() {
     await this.pages.customKeywords.checkElementsText(
       ".product-summary >> span.cart-total.padded",
-      V.SINGLEBOOKING_PAID_PRICE_CHECKOUT
+      SINGLEBOOKING_PAID_PRICE_CHECKOUT
     );
   }
 
   @step("checkout.In Order Summary Get Booking Number From Product List")
   async inOrderSummaryGetBookingNumberFromProductList() {
-    let element_next_to_varausnumero: RobotValue, reservation_number: RobotValue, BOOKING_NUM_ONLY: RobotValue;
     await this.page.locator(".product-list").waitFor({ state: "visible" });
 
     // Get the next sibling element containing the reservation number
     // The checkout is not Varaamo's page: its classes are matched as substrings and the label by its own text node
-    element_next_to_varausnumero = this.page.locator(
+    const element_next_to_varausnumero = this.page.locator(
       "xpath=//div[contains(@class, 'product-list')]//div[contains(@class, 'meta-label') and text()='Varausnumero']/following-sibling::div[1]"
     );
 
     // Extract the text of the next sibling element
-    reservation_number = await element_next_to_varausnumero.innerText();
+    const reservation_number = await element_next_to_varausnumero.innerText();
 
     // Log the reservation number
-    await log(`Reservation number: ${str(reservation_number)}`);
+    await log(`Reservation number: ${reservation_number}`);
 
-    BOOKING_NUM_ONLY = reservation_number;
-    V.BOOKING_NUM_ONLY = BOOKING_NUM_ONLY;
-    BOOKING_NUM_ONLY = V.BOOKING_NUM_ONLY;
+    let BOOKING_NUM_ONLY = reservation_number;
+    this.state.bookingNumOnly = BOOKING_NUM_ONLY;
+    BOOKING_NUM_ONLY = this.state.bookingNumOnly;
     await log(BOOKING_NUM_ONLY);
   }
 
@@ -96,21 +91,21 @@ export class Checkout extends PageObject {
     await this.selectPaymentMethodOp();
     await this.clickSubmit();
     // Submitting the payment method opens the summary step
-    await this.pages.customKeywords.waitForUrlToContain("/summary", /* timeout= */ "20s");
+    await this.pages.customKeywords.waitForUrlToContain("/summary", /* timeout= */ 20_000);
     await this.checkProductListHasAllTheInfo();
     await this.inOrderSummaryGetBookingNumberFromProductList();
     await this.clickAcceptTerms();
     await this.clickSubmit();
     // Submitting the summary goes through the payment back to Varaamo
-    await this.page.waitForURL((url) => url.href.startsWith(V.URL_TEST), { timeout: 50_000 });
+    await this.page.waitForURL((url) => url.href.startsWith(URL_TEST), { timeout: 50_000 });
   }
 
   @step("checkout.Interrupted Checkout")
-  async interruptedCheckout(input_URL: RobotValue) {
+  async interruptedCheckout(input_URL: string) {
     // The checkout opens on its payment method step
     await this.page.locator("#OP").waitFor({ state: "visible", timeout: 30_000 });
     await this.allowAllCookiesIfVisible();
     // Go To waits for the page to load
-    await this.page.goto(String(input_URL));
+    await this.page.goto(input_URL);
   }
 }
