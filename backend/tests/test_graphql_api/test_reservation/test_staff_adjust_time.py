@@ -122,7 +122,7 @@ def test_reservation__staff_adjust_time__end_same_as_begin(graphql):
     assert response.field_error_messages() == ["Reservation must end after it begins"]
 
     reservation.refresh_from_db()
-    assert reservation.ends_at == original_ends_at
+    assert reservation.ends_at == original_ends_at.astimezone(datetime.UTC)
 
 
 def test_reservation__staff_adjust_time__begin_date_in_the_past(graphql):
@@ -162,8 +162,8 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past__today(graphql):
     assert response.has_errors is False, response.errors
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == begin
-    assert reservation.ends_at == end
+    assert reservation.begins_at == begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
 def test_reservation__staff_adjust_time__reservation_in_the_past(graphql):
@@ -208,8 +208,8 @@ def test_reservation__staff_adjust_time__reservation_in_the_past__timezone_check
     assert response.has_errors is False, response.errors
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == new_begin
-    assert reservation.ends_at == new_end
+    assert reservation.begins_at == new_begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == new_end.astimezone(datetime.UTC)
 
 
 @freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=0, minute=15, tzinfo=DEFAULT_TIMEZONE))
@@ -232,8 +232,8 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past__move_to_yesterd
     assert response.has_errors is False, response.errors
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == begin
-    assert reservation.ends_at == end
+    assert reservation.begins_at == begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
 def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graphql):
@@ -266,8 +266,8 @@ def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graph
     assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == begin
-    assert reservation.ends_at == end
+    assert reservation.begins_at == begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
 def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to_its_buffer(graphql):
@@ -304,8 +304,8 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
     assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == begin
-    assert reservation.ends_at == end
+    assert reservation.begins_at == begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
 def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_its_buffer(graphql):
@@ -342,8 +342,8 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
     assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == begin
-    assert reservation.ends_at == end
+    assert reservation.begins_at == begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
 def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to_own_buffer(graphql):
@@ -386,8 +386,8 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
     assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == begin
-    assert reservation.ends_at == end
+    assert reservation.begins_at == begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
 def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_own_buffer(graphql):
@@ -430,8 +430,8 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
     assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == begin
-    assert reservation.ends_at == end
+    assert reservation.begins_at == begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
 def test_reservation__staff_adjust_time__reservation_start_time_not_in_interval(graphql):
@@ -468,8 +468,8 @@ def test_reservation__staff_adjust_time__reservation_start_interval_over_30_trea
     assert response.has_errors is False, response.errors
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == begin
-    assert reservation.ends_at == end
+    assert reservation.begins_at == begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
 @freezegun.freeze_time("2021-01-01")
@@ -697,5 +697,5 @@ def test_reservation__staff_adjust_time__overlapping_reservation_created_at_the_
 
     # Reservation is not changed
     reservation.refresh_from_db()
-    assert reservation.begins_at == reservation_begin
-    assert reservation.ends_at == reservation_end
+    assert reservation.begins_at == reservation_begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == reservation_end.astimezone(datetime.UTC)

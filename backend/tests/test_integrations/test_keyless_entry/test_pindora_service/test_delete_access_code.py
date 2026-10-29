@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import uuid
 
 import pytest
@@ -85,7 +86,7 @@ def test_delete_access_code__reservation__in_series(settings):
         PindoraService.delete_access_code(obj=reservation_1)
 
     reservation_1.refresh_from_db()
-    assert reservation_1.access_code_generated_at == now
+    assert reservation_1.access_code_generated_at == now.astimezone(datetime.UTC)
     assert reservation_1.access_code_is_active is True
 
     reservation_2.refresh_from_db()
@@ -142,7 +143,7 @@ def test_delete_access_code__reservation__in_series__in_seasonal_booking(setting
         PindoraService.delete_access_code(obj=reservation_1)
 
     reservation_1.refresh_from_db()
-    assert reservation_1.access_code_generated_at == now
+    assert reservation_1.access_code_generated_at == now.astimezone(datetime.UTC)
     assert reservation_1.access_code_is_active is True
 
     reservation_2.refresh_from_db()
@@ -237,7 +238,7 @@ def test_delete_access_code__series__in_seasonal_booking(settings):
         PindoraService.delete_access_code(obj=series)
 
     reservation_1.refresh_from_db()
-    assert reservation_1.access_code_generated_at == now
+    assert reservation_1.access_code_generated_at == now.astimezone(datetime.UTC)
     assert reservation_1.access_code_is_active is True
 
     reservation_2.refresh_from_db()

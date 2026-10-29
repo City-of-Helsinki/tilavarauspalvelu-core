@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
@@ -71,7 +73,7 @@ def test_application_section__delete__staff__does_not_reset_application_sent_at(
     assert ApplicationSection.objects.filter(pk=section.pk).exists() is False
 
     application = Application.objects.get(pk=section.application.pk)
-    assert application.sent_at == sent_at
+    assert application.sent_at == sent_at.astimezone(datetime.UTC)
 
 
 def test_application_section__delete__application_round_not_open(graphql):

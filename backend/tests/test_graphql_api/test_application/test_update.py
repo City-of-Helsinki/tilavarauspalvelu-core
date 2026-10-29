@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import pytest
 
 from tilavarauspalvelu.enums import Priority, Weekday
@@ -71,7 +73,7 @@ def test_application__update__staff__does_not_reset_sent_at(graphql):
 
     application = Application.objects.get(pk=application.pk)
     assert application.additional_information == "bar"
-    assert application.sent_at == sent_at
+    assert application.sent_at == sent_at.astimezone(datetime.UTC)
 
 
 def test_application__update__application_sections__replace(graphql):
