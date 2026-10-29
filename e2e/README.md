@@ -84,7 +84,8 @@ the runtime offline.
 - `lib/`: the runtime. `robot.ts` has `keywords()`, the variables `V` and the `test` fixture. The keyword
   libraries are `Browser` (page actions), `BuiltIn` (logging, assertions, retries), `String`, `Collections`,
   `DateTime`, `OperatingSystem`, `RequestsLibrary` (HTTP) and `PabotLib` (locks and shared values between workers).
-- `tools/`: the checks and the report reader described below. See `tools/README.md` for the rest.
+- `tools/`: the report reader described below. `tools/README.md` lists how the suite differs from the Robot suite it
+  was converted from.
 
 ### Keywords, variables and tags
 
@@ -142,12 +143,8 @@ the runtime offline.
 
 ```bash
 pnpm lint      # oxlint with type checking, with the frontend's rules
-pnpm parity    # the names match tools/naming-manifest.json
 pnpm selftest  # the runtime and the keywords that need no test environment, against local pages
 ```
-
-`pnpm parity` checks the names of the suites, tests, tags, keywords, keyword arguments and variables, the tests'
-documentation and the values of plain variables.
 
 ## Reading a run's results
 

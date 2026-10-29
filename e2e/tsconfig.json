@@ -10,7 +10,7 @@
     "moduleDetection": "force",
     "types": ["node"],
     "strict": true,
-    // A stray return in a keyword would skip its remaining steps, which the parity check can't see
+    // A stray return in a keyword would skip its remaining steps without failing the test
     "allowUnreachableCode": false,
     "noUncheckedIndexedAccess": true,
     "isolatedModules": true,
@@ -19,6 +19,6 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["**/*.ts", "tools/naming-manifest.json"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules", "test-results", "playwright-report", "blob-report"]
 }
