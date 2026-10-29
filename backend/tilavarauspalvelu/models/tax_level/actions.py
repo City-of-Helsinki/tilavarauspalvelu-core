@@ -3,7 +3,9 @@ from __future__ import annotations
 import dataclasses
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.exceptions import TaxLevelHasNoRateError
+from rest_framework.exceptions import ValidationError
+
+from tilavarauspalvelu.typing import error_codes
 
 if TYPE_CHECKING:
     import datetime
@@ -26,6 +28,6 @@ class TaxLevelActions:
         rate = self.tax_level.rates.effective_on(on_date=on_date).first()
         if rate is None:
             msg = f"Tax level '{self.tax_level}' has no rate on {on_date.isoformat()}"
-            raise TaxLevelHasNoRateError(msg)
+            raise ValidationError(msg, code=error_codes.TAX_LEVEL_HAS_NO_RATE)
 
         return rate.percentage

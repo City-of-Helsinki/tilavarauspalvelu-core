@@ -43,10 +43,6 @@ class ReservationPriceCalculationError(Exception):
     """Error when calculating reservation price"""
 
 
-class TaxLevelHasNoRateError(Exception):
-    """Error when a tax level has no rate in effect on the given date"""
-
-
 class TimeSpanElementError(Exception):
     """Error when dealing with time span elements"""
 
