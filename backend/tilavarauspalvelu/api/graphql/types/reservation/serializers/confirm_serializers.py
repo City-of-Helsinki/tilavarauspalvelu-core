@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -73,12 +73,21 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         if pricing.payment_type != PaymentType.ON_SITE:
             reservation_unit.validators.validate_has_payment_product()
 
+            # A webshop payment uses the tax rate of the date of sale.
+            today = local_date()
+            data["tax_percentage_value"] = pricing.tax_level.actions.get_percentage(on_date=today)
+
         data["state"] = self.instance.actions.get_state_on_reservation_confirmed(payment_type=data["payment_type"])
 
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationConfirmData) -> Reservation:
         state = validated_data["state"]
+
+        # Set the tax rate on the instance early so that the payment order gets the right tax amounts.
+        tax_percentage_value = validated_data.get("tax_percentage_value")
+        if tax_percentage_value is not None:
+            self.instance.tax_percentage_value = tax_percentage_value
 
         if self.instance.price_net > 0 and state.should_create_payment_order:
             self.instance.actions.create_payment_order_paid_immediately(payment_type=validated_data["payment_type"])

@@ -24,13 +24,14 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentOrder
-from utils.date_utils import local_datetime
+from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     OrderFactory,
     PaymentOrderFactory,
     ReservationFactory,
     ReservationUnitPricingFactory,
+    TaxLevelRateFactory,
     UserFactory,
 )
 from tests.helpers import patch_method
@@ -339,6 +340,41 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
     assert orders[0].receipt_url == order.receipt_url
 
     assert VerkkokauppaAPIClient.create_order.called is True
+
+
+@freeze_time(local_datetime(2024, 1, 1, 0, 5))
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_date(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        created_at=local_datetime(2023, 12, 31, 23, 55),
+        tax_percentage_value=Decimal(24),
+        reservation_unit__pricings__payment_type=PaymentType.ONLINE,
+        reservation_unit__pricings__tax_level__rates__begins=local_date(2024, 1, 1),
+    )
+
+    tax_level = reservation.reservation_unit.pricings.first().tax_level
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2000, 1, 1), percentage=Decimal(24))
+
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.tax_percentage_value == Decimal("25.5")
+
+    payment_order = reservation.payment_order
+    assert payment_order.price_net == Decimal("9.88")
+    assert payment_order.price_vat == Decimal("2.52")
+    assert payment_order.price_total == Decimal("12.4")
+
+    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    assert order_params.items[0].vat_percentage == Decimal("25.5")
+    assert order_params.items[0].price_net == Decimal("9.88")
+    assert order_params.items[0].price_vat == Decimal("2.52")
 
 
 @patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Test exception"))

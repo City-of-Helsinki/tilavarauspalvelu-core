@@ -214,6 +214,7 @@ class ReservationConfirmData(TypedDict):
     confirmed_at: NotRequired[datetime.datetime]
     payment_type: NotRequired[PaymentType | None]
     state: NotRequired[ReservationStateChoice]
+    tax_percentage_value: NotRequired[Decimal]
 
 
 class ReservationAdjustTimeData(TypedDict):
