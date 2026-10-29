@@ -4,7 +4,7 @@ export HOST_GID := `id -g`
 
 # Commands like "down" and "exec" see only the services of the active profiles. Use all of them by default.
 # Override it for one command, for example "COMPOSE_PROFILES=backend just stack up".
-export COMPOSE_PROFILES := env("COMPOSE_PROFILES", "backend,frontend,frontend-release")
+export COMPOSE_PROFILES := env("COMPOSE_PROFILES", "backend,frontend,gateway,frontend-release")
 
 # "up" starts the development frontends, not the release frontends, unless COMPOSE_PROFILES is set.
 up_profiles := env("COMPOSE_PROFILES", "backend,frontend")
@@ -22,11 +22,15 @@ env:
 
 # Start the development setup, watch for changes and show the logs. Extra arguments go to "docker compose up".
 up *args: env
+    COMPOSE_PROFILES={{ up_profiles }},gateway docker compose up --build --watch {{ args }}
+
+# Start development setup without a gateway (so it doesn't hog your 8080 port)
+up-no-gateway *args: env
     COMPOSE_PROFILES={{ up_profiles }} docker compose up --build --watch {{ args }}
 
 # Start the backend and the frontends in production mode and show the logs. Restart a frontend to build it again.
 up-release *args: env
-    COMPOSE_PROFILES=backend,frontend-release docker compose up --build --watch {{ args }}
+    COMPOSE_PROFILES=gateway,backend,frontend-release docker compose up --build --watch {{ args }}
 
 # Start the backend only, watch for changes and show the logs. Run the frontends on the host.
 up-backend *args: env
