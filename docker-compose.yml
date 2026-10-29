@@ -169,6 +169,18 @@ services:
       - "127.0.0.1:3001:3001"
     command: ["socat", "TCP-LISTEN:8000,fork,reuseaddr", "TCP:backend:8000"]
 
+  # Puts the backend and the frontends behind one address, as on the server. See docker/Caddyfile.
+  # Then a relative URL like "/graphql/" works in the browser, for example on the error pages.
+  gateway:
+    image: "caddy:2.10-alpine"
+    profiles: [frontend, frontend-release]
+    depends_on:
+      - frontend-net
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+
   # Docker creates the named volumes owned by root. Give them to the host user, then stop.
   frontend-volumes:
     <<: *frontend
