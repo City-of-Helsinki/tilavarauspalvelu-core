@@ -23,10 +23,28 @@ __all__ = [
 ]
 
 
+def store_end_session_url(**kwargs: Unpack[PipelineArgs]) -> None:
+    """Copy of 'helusers.pipeline.store_end_session_url' that reads the request from the strategy."""
+    user = kwargs["user"]
+    backend = kwargs["backend"]
+    response = kwargs["response"]
+    request = kwargs["strategy"].request
+
+    if user is None or not user.is_authenticated or request is None:
+        return
+
+    end_session_url = backend.get_end_session_url(request, response["id_token"])
+    if not end_session_url:
+        return
+
+    request.session["social_auth_end_session_url"] = end_session_url
+    request.session["social_auth_id_token"] = response["id_token"]
+
+
 def fetch_additional_info_for_user_from_helsinki_profile(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
     user = kwargs["user"]
     response = kwargs["response"]
-    request = kwargs["request"]
+    request = kwargs["strategy"].request
 
     if user is None:
         return {"user": user}

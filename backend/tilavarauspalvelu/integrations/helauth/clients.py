@@ -4,7 +4,7 @@ import datetime
 import time
 from typing import TYPE_CHECKING
 
-from requests import HTTPError
+from social_core.exceptions import SocialAuthBaseException
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
@@ -75,21 +75,24 @@ class KeyCloakClient(BaseExternalServiceClient):
         try:
             # Delegate refresh to OAuth backend.
             response: RefreshResponse = cls.oidc_backend.refresh_token(token=keycloak_refresh_token)
-        except HTTPError as error:
-            try:
-                # Catch known error for expired keycloak refresh token. This cannot be solved without a
-                # logging out and back in again. Set a flag in the session which is used by the
-                # `KeycloakRefreshTokenExpiredMiddleware` middleware to set a response header to indicate
-                # to frontend that the token is expired.
-                error_data = error.response.json()
-                if "error" in error_data and error_data["error"] == "invalid_grant":
-                    session["keycloak_refresh_token_expired"] = True
+        except SocialAuthBaseException as error:
+            # Catch known error for expired keycloak refresh token. This cannot be solved without a
+            # logging out and back in again. Set a flag in the session which is used by the
+            # `KeycloakRefreshTokenExpiredMiddleware` middleware to set a response header to indicate
+            # to frontend that the token is expired.
+            if error.provider_code == "invalid_grant":
+                session["keycloak_refresh_token_expired"] = True
+                return None
 
-            except Exception:  # noqa: BLE001
-                details = {"user": user.pk, "error": error.response.text}
-                msg = "Unable to refresh keycloak token"
-                SentryLogger.log_message(msg, details=details, level="error")
-
+            details = {
+                "user": user.pk,
+                "code": error.code,
+                "provider_code": error.provider_code,
+                "status_code": error.status_code,
+                "detail": error.detail,
+            }
+            msg = "Unable to refresh keycloak token"
+            SentryLogger.log_message(msg, details=details, level="error")
             return None
 
         now = utc_datetime()
