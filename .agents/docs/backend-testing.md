@@ -56,6 +56,9 @@ Store tests run against a real Postgres. Assume the database is running first,
 and only start it with `just services` if you get database connection related
 errors during testing.
 
+Run `pytest` with `--reuse-db`. `tests/plugins.py` creates the database again when model or migration files change.
+Use `--create-db` to create it again by hand.
+
 Read a row back before asserting on it. A factory keeps the values it was seeded with,
 so it cannot show what the code under test changed.
 
