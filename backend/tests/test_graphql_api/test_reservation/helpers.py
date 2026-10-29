@@ -62,8 +62,8 @@ def mock_profile_reader(**kwargs: Any):
 def get_adjust_data(reservation: Reservation, **overrides: Any) -> dict[str, Any]:
     return {
         "pk": reservation.pk,
-        "beginsAt": (reservation.begins_at + datetime.timedelta(hours=2)).isoformat(),
-        "endsAt": (reservation.ends_at + datetime.timedelta(hours=2)).isoformat(),
+        "beginsAt": (reservation.begins_at.astimezone(datetime.UTC) + datetime.timedelta(hours=2)).isoformat(),
+        "endsAt": (reservation.ends_at.astimezone(datetime.UTC) + datetime.timedelta(hours=2)).isoformat(),
         **overrides,
     }
 
@@ -98,7 +98,7 @@ def get_staff_create_data(
     if begins_at is None:
         begins_at = next_hour(plus_hours=1)
     if ends_at is None:
-        ends_at = begins_at + datetime.timedelta(hours=1)
+        ends_at = begins_at.astimezone(datetime.UTC) + datetime.timedelta(hours=1)
 
     return {
         "type": ReservationTypeChoice.STAFF,
@@ -118,7 +118,7 @@ def get_create_data(
     if begins_at is None:
         begins_at = next_hour(plus_hours=1)
     if ends_at is None:
-        ends_at = begins_at + datetime.timedelta(hours=1)
+        ends_at = begins_at.astimezone(datetime.UTC) + datetime.timedelta(hours=1)
 
     return {
         "reservationUnit": reservation_unit.pk,
@@ -173,7 +173,7 @@ def get_staff_adjust_data(
     if begins_at is None:
         begins_at = next_hour(plus_hours=1)
     if ends_at is None:
-        ends_at = begins_at + datetime.timedelta(hours=1)
+        ends_at = begins_at.astimezone(datetime.UTC) + datetime.timedelta(hours=1)
 
     return {
         "pk": reservation.pk,
