@@ -12,7 +12,6 @@
     "test:sequential": "FORCE_SINGLE_USER=True playwright test --grep-invert @serialonly --project 'Tests_*' --project create_data --workers 1",
     "selftest": "playwright test --project selftest",
     "list": "playwright test --list",
-    "parity": "playwright test --list --reporter ./tools/naming-parity-reporter.ts",
     "report": "playwright show-report",
     "lint": "oxlint --type-aware --type-check",
     "lint:fix": "oxlint --type-aware --type-check --fix",

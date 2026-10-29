@@ -21,7 +21,7 @@ type Wrapped<T extends Record<string, KeywordImplementation>> = {
   [K in keyof T]: (...args: Parameters<T[K]>) => Promise<Awaited<ReturnType<T[K]>>>;
 };
 
-/** Keywords by `module.Keyword Name`, used by `Run Keyword` and the naming parity check. */
+/** Keywords by `module.Keyword Name`, used by `Run Keyword`. */
 export const KEYWORD_REGISTRY = new Map<
   string,
   { module: string; name: string; implementation: KeywordImplementation }
@@ -228,9 +228,6 @@ export interface Variables {}
 // Set Test Variable / Set Suite Variable. Reset before every test.
 const variables: Record<string, RobotValue> = {};
 export const V = variables as Variables;
-
-/** The variables by names known only at runtime, for the naming parity check. */
-export const variablesByName: Readonly<Record<string, RobotValue>> = variables;
 let defaults: Record<string, RobotValue> = {};
 
 export function registerVariables(values: Record<string, RobotValue>): void {

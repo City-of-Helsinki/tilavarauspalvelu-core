@@ -1,47 +1,14 @@
 # e2e tools
 
-| File                        | What it does                                                                                  |
-| --------------------------- | --------------------------------------------------------------------------------------------- |
-| `naming-manifest.json`      | The names of the Robot suite this one was converted from: suites, tests, tags, keywords, etc. |
-| `naming-parity-reporter.ts` | `pnpm parity`: checks the suite's names against the manifest                                  |
-| `report_summary.py`         | Summarizes a Playwright HTML report (see the main README)                                     |
-
-## Copying a fix from the Robot suite
-
-The suite was converted line by line from the Robot Framework suite in
-[tilavarauspalvelu-robot](https://github.com/City-of-Helsinki/tilavarauspalvelu-robot) (commit `dc72ec3`, recorded
-in the manifest), and is edited by hand since. While the Robot suite is still in use, a fix there is copied over by
-hand: find the keyword with the same name, and make the same change in Playwright terms. If the fix renames a test,
-tag, keyword, argument or variable, rename it here too and update `naming-manifest.json`, then run `pnpm parity`.
-
-Keywords that the port replaced were removed, with their manifest entries: the HAR recording keywords of
-`har_recording.robot` (HAR recording is the `contextOptions` fixture in `lib/robot.ts`), the polling helpers that
-Playwright's waits replaced (`Url Should Have Changed`, `Url Should Start With` and the two `… Landing Page H1 Should
-Contain`), `Teardown Browser With HAR Finalization`, `Create Robot Test Data DISABLED`, and copies of
-`Admin Verifies Notification Is Not Found` and `User Clicks The Specific Terms Of Use Checkbox` in modules that don't
-use them. Keywords that no test calls yet are kept. If a Robot fix starts using a removed keyword, add it back here and
-to the manifest.
-
-## Names
-
-Every Robot name is kept, and `pnpm parity` checks it:
-
-| Robot                                                             | TypeScript                                                                                                            |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `Tests_user_desktop_FI.robot`                                     | `TestSuites/Tests_user_desktop_FI.spec.ts`, project `Tests_user_desktop_FI`, `test.describe("Tests user desktop FI")` |
-| `PO/App/app_common.robot`                                         | `TestSuites/PO/App/app_common.ts`, exporting `app_common`                                                             |
-| keyword `User Logs In With Suomi Fi`                              | `app_common["User Logs In With Suomi Fi"]()`, report step `app_common.User Logs In With Suomi Fi`                     |
-| argument `${input_hetu}`, `${Expected text}`                      | parameter `input_hetu`, `Expected_text` (Robot treats spaces and underscores alike)                                   |
-| variable `${CURRENT_USER_HETU}`                                   | `V.CURRENT_USER_HETU`                                                                                                 |
-| tag `desktop-test-data-set-0`                                     | `@desktop-test-data-set-0` (Playwright tags need the `@`)                                                             |
-| `python_keywords.py`, `robot_email_test_tool.py`, `env_loader.py` | `.ts` files with the same function names                                                                              |
-| `pabot_users.dat`                                                 | the same file, read by the `testData` fixture                                                                         |
-
-The libraries in `lib/` have the keyword names of the Robot libraries the suite used: robotframework-browser 19.12
-(which is Playwright underneath, so the selectors are unchanged), BuiltIn, String, Collections, DateTime,
-OperatingSystem, RequestsLibrary and pabot 5.1.0's PabotLib.
+| File                | What it does                                              |
+| ------------------- | --------------------------------------------------------- |
+| `report_summary.py` | Summarizes a Playwright HTML report (see the main README) |
 
 ## Differences from the Robot suite
+
+The suite was converted from the Robot Framework suite in
+[tilavarauspalvelu-robot](https://github.com/City-of-Helsinki/tilavarauspalvelu-robot) (commit `dc72ec3`), which it
+has replaced. The tests, tags and keywords have the same names as there.
 
 - **Parallel runs:** pabot processes are Playwright workers, and PabotLib's lock server is the files under
   `.pabot-shared/`. Locks behave like pabot 5.1.0's. pabot's value sets are gone: the `testData` fixture
