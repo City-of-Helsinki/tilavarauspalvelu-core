@@ -188,6 +188,7 @@ The commands are in [`stack.just`](stack.just). Run `just stack` to see them.
 | Customer UI | http://localhost:3000 |
 | Staff UI | http://localhost:3001/kasittely |
 | Backend | http://localhost:8000 |
+| Gateway | http://localhost:8080 for the customer UI, http://localhost:8080/kasittely for the staff UI |
 | Database | `127.0.0.1:5555` |
 | Redis | `127.0.0.1:6379` |
 
@@ -260,6 +261,13 @@ The frontends use one backend URL for the server side rendering and for the brow
 So `http://localhost:8000` must be the backend both on the host and in the frontend containers.
 The frontends share the network namespace of the `frontend-net` service. That service publishes the frontend ports
 and forwards `localhost:8000` to the backend container.
+
+The `gateway` service runs [Caddy](https://caddyserver.com/) and puts the backend and the frontends behind one address,
+as on the server. Use it to test code that uses relative URLs, for example the error pages, where the browser
+can send GraphQL requests to `/graphql/`. The routes are in [`docker/Caddyfile`](docker/Caddyfile).
+When you add a backend path to `backend/config/urls.py`, add it to the Caddyfile too.
+The backend must allow `http://localhost:8080` in `CORS_ALLOWED_ORIGINS` and `CSRF_TRUSTED_ORIGINS`.
+`backend/.env.example` has it. If you made `backend/.env.docker` before, add it there.
 
 ## Backend
 
