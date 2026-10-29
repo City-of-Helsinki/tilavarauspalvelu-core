@@ -530,11 +530,12 @@ export class AppUser extends PageObject {
   async userCanSeeUpcomingBookingInListAndClicksIt(unitname: string, reservationtime: string) {
     await log(unitname);
     await log(reservationtime);
-    // The list is fetched once when the page opens, so reload it if the booking is not in it
+    // The list is fetched once when the page opens, so open it again if the booking is not in it. A slow "Näytä" can
+    // leave the browser on the reservation page, so the list page is opened rather than the current page reloaded.
     await this.pages.customKeywords.retryWithRecovery(
       () => this.pages.mybookings.checkUnitnameAndReservationTimeAndClickShow(unitname, reservationtime),
       async () => {
-        await this.page.reload();
+        await this.page.goto("/reservations");
       }
     );
   }
@@ -544,10 +545,11 @@ export class AppUser extends PageObject {
     await log(unitname);
     await log(reservationtime);
     await this.pages.mybookings.checkMyBookingsH1(MYBOOKINGS_FI);
+    // Opens the list page again if the booking is not in it, see User Can See Upcoming Booking In List And Clicks It
     await this.pages.customKeywords.retryWithRecovery(
       () => this.pages.mybookings.checkUnitnameAndReservationTimeAndVerifyNoCancelButton(unitname, reservationtime),
       async () => {
-        await this.page.reload();
+        await this.page.goto("/reservations");
       }
     );
     await this.pages.mybookings.checkUnitnameAndReservationTimeAndClickShow(unitname, reservationtime);

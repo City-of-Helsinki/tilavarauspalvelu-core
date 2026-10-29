@@ -1,8 +1,9 @@
 /**
  * Records what went wrong between the browser and the test environment while a test runs, as "backend error"
- * annotations of the test attempt: 5xx responses, failed requests, GraphQL errors, the apps' error pages ("503:
- * Palaamme pian!" is served with status 200), uncaught errors in the pages, and the requests still unanswered when a
- * failed test ends. A flaky test's report then shows whether the backend failed, and when.
+ * annotations of the test attempt: 5xx responses, failed requests, requests that took 10 s or more, GraphQL errors,
+ * the apps' error pages ("503: Palaamme pian!" is served with status 200), and uncaught errors in the pages. When a
+ * test fails, also the requests still unanswered and the open pages that show an error page (the customer app can
+ * render one in the browser). A flaky test's report then shows whether the backend failed, and when.
  *
  * Only page loads and API calls (document, fetch, xhr) to the test environment's services are watched: the pages
  * also call production and city APIs (the service map, Linked Events) and Sentry, which the browser often can't reach
@@ -10,7 +11,7 @@
  * recorded.
  */
 import { setTimeout as delay } from "node:timers/promises";
-import type { BrowserContext, Request, Response, TestInfo, WebError } from "@playwright/test";
+import type { BrowserContext, Page, Request, Response, TestInfo, WebError } from "@playwright/test";
 import { redact } from "./runtime";
 
 export const BACKEND_ERROR = "backend error";
@@ -19,14 +20,21 @@ export const BACKEND_ERROR = "backend error";
 const MAX_ANNOTATIONS = 20;
 /** A request unanswered this long when a failed test ends is reported */
 const PENDING_MS = 5000;
+/** A request that took this long is reported */
+const SLOW_MS = 10_000;
 /** How long a response body is read for, and how long the end of the test waits for the reads still going on */
 const BODY_MS = 5000;
 
 const WATCHED_TYPES = new Set(["document", "fetch", "xhr"]);
-/** A request that the page or Playwright cancelled, e.g. by navigating away, isn't an error */
-const ABORTED = /ERR_ABORTED|NS_BINDING_ABORTED|NS_ERROR_ABORT|cancell?ed/i;
+/** A request that the page or Playwright cancelled, e.g. by navigating away or redirecting, isn't an error */
+const ABORTED = /ERR_ABORTED|NS_BINDING_ABORTED|NS_ERROR_ABORT|cancell?ed|Frame load interrupted/i;
+/** WebKit reports a fetch that a navigation cancels as an uncaught access control error */
+const CANCELLED_FETCH = /due to access control checks/;
+/** URLs in error messages are shown without their query strings and fragments */
+const URL_QUERY = /(https?:\/\/[^\s?#"']+)[?#][^\s"']*/g;
 /** The ErrorContainer heading of the apps' error pages: `error__503--title` */
 const ERROR_PAGE = /data-testid="error__([^"]*?)--title"/;
+const ERROR_PAGE_HEADING = '[data-testid^="error__"][data-testid$="--title"]';
 
 /** The test environment's services (`*.test.hel.ninja`), like the apps, the backend and the login, but not Sentry */
 export function isTestEnvironment(url: URL): boolean {
@@ -78,31 +86,45 @@ export class BackendErrors {
   private readonly inFlight = new Map<Request, number>();
   /** The reads of response bodies, which the end of the test waits for */
   private readonly reads: Array<Promise<void>> = [];
+  private readonly contexts: BrowserContext[] = [];
+  /** The pages whose error page has been recorded */
+  private readonly errorPages = new Set<Page>();
 
   private readonly watched: (url: URL) => boolean;
   private readonly pendingMs: number;
+  private readonly slowMs: number;
 
-  /** `watched` picks the hosts to watch, and `pendingMs` how long a request can go unanswered (the selftest's own). */
+  /**
+   * `watched` picks the hosts to watch, `pendingMs` how long a request can go unanswered, and `slowMs` how long a
+   * request can take (the selftest's own).
+   */
   constructor(
     private readonly info: Pick<TestInfo, "status" | "expectedStatus" | "annotations">,
     {
       watched = isTestEnvironment,
       pendingMs = PENDING_MS,
-    }: { watched?: (url: URL) => boolean; pendingMs?: number } = {}
+      slowMs = SLOW_MS,
+    }: { watched?: (url: URL) => boolean; pendingMs?: number; slowMs?: number } = {}
   ) {
     this.watched = watched;
     this.pendingMs = pendingMs;
+    this.slowMs = slowMs;
   }
 
   /** Starts watching the requests and pages of a browser context. */
   watch(context: BrowserContext): void {
+    this.contexts.push(context);
     context.on("request", (request) => {
       if (this.isWatched(request)) {
         this.inFlight.set(request, Date.now());
       }
     });
     context.on("requestfinished", (request) => {
+      const sent = this.inFlight.get(request);
       this.inFlight.delete(request);
+      if (sent != null && Date.now() - sent >= this.slowMs) {
+        this.add(sent, `slow (${((Date.now() - sent) / 1000).toFixed(1)} s): ${describe(request)}`);
+      }
     });
     context.on("requestfailed", (request) => {
       const sent = this.inFlight.get(request);
@@ -125,7 +147,9 @@ export class BackendErrors {
       const page = error.page();
       const where = page == null ? "" : ` at ${new URL(page.url()).pathname}`;
       const message = error.error().message.split("\n")[0] ?? "";
-      this.add(Date.now(), `uncaught error in the page${where}: ${message.slice(0, 200)}`);
+      if (!CANCELLED_FETCH.test(message)) {
+        this.add(Date.now(), `uncaught error in the page${where}: ${message.slice(0, 200)}`);
+      }
     });
   }
 
@@ -143,9 +167,39 @@ export class BackendErrors {
     }
   }
 
+  /**
+   * Records the open pages that show one of the apps' error pages, if the test has failed. The customer app can render
+   * its error page in the browser, without an error response. Called before contexts close.
+   */
+  async noteErrorPages(): Promise<void> {
+    if (this.info.status === this.info.expectedStatus) {
+      return;
+    }
+    for (const page of this.contexts.flatMap((context) => context.pages())) {
+      if (page.isClosed() || this.errorPages.has(page)) {
+        continue;
+      }
+      try {
+        const heading = page.locator(ERROR_PAGE_HEADING).first();
+        // oxlint-disable-next-line no-await-in-loop -- one page at a time
+        if ((await heading.count()) > 0) {
+          // oxlint-disable-next-line no-await-in-loop -- one page at a time
+          const testId = (await heading.getAttribute("data-testid")) ?? "";
+          const code = /^error__(.*)--title$/.exec(testId)?.[1] ?? testId;
+          const url = new URL(page.url());
+          this.errorPages.add(page);
+          this.add(Date.now(), `the page shows the error page "${code}": ${url.host}${url.pathname}`);
+        }
+      } catch {
+        // The page closed
+      }
+    }
+  }
+
   /** Adds what was recorded to the attempt's annotations. Called when the test ends, before its contexts close. */
   async finish(): Promise<void> {
     this.notePending();
+    await this.noteErrorPages();
     const timer = new AbortController();
     try {
       await Promise.race([Promise.allSettled(this.reads), delay(BODY_MS, null, { signal: timer.signal })]);
@@ -170,7 +224,7 @@ export class BackendErrors {
   }
 
   private add(at: number, text: string): void {
-    this.entries.push({ at, text });
+    this.entries.push({ at, text: text.replaceAll(URL_QUERY, "$1") });
   }
 
   private checkResponse(response: Response): void {
@@ -180,7 +234,9 @@ export class BackendErrors {
     }
     const at = Date.now();
     if (response.status() >= 500) {
-      this.add(at, `${response.status()} ${response.statusText()}: ${describe(request)}`);
+      // The gateway's 502 comes without a status text
+      const status = `${response.status()} ${response.statusText()}`.trim();
+      this.add(at, `${status}: ${describe(request)}`);
       return;
     }
     const url = new URL(response.url());

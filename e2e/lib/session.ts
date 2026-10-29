@@ -108,8 +108,10 @@ export class Session {
    * context and page.
    */
   async close(): Promise<void> {
-    // Closing cancels the requests that are still going on, so a failed test's unanswered requests are noted first
+    // Closing cancels the requests that are still going on, so a failed test's unanswered requests and error pages
+    // are noted first
     this.backendErrors?.notePending();
+    await this.backendErrors?.noteErrorPages();
     // Every context is closed even if one fails, so their HAR files and traces aren't lost
     let failure: unknown = null;
     for (const entry of this.opened.splice(0)) {

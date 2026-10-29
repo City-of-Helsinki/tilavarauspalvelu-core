@@ -9,6 +9,18 @@ import {
 } from "../../Resources/texts_FI";
 
 export class AdminNotificationsCreatePage extends PageObject {
+  /**
+   * Picks an option of the form's HDS Select by the select's label. The select's button is a combobox whose name
+   * starts with the label, and the options are `option`s named by their text. The button shows the picked option;
+   * the list can stay open.
+   */
+  private async selectOption(label: string, option: string) {
+    const select = this.page.getByRole("combobox", { name: label });
+    await select.click();
+    await this.page.getByRole("option", { name: option, exact: true }).click();
+    await expect(select).toContainText(option, { timeout: 5000 });
+  }
+
   @step("admin_notifications_create_page.Admin Selects Immediate Validity Period")
   async adminSelectsImmediateValidityPeriod() {
     await this.page.locator('label[for="v-radio1"]').click();
@@ -44,14 +56,7 @@ export class AdminNotificationsCreatePage extends PageObject {
   // Ilmoituksen tyyppi
   @step("admin_notifications_create_page.Admin Selects Type Of Notification")
   async adminSelectsTypeOfNotification(notification_type: string) {
-    await this.page.locator('[aria-label*="Ilmoituksen tyyppi."]').click();
-    await this.pages.customKeywords.findAndClickElementWithText("form >> li >> span", notification_type);
-    // The button shows the picked option, the list can stay open
-    await this.page
-      .locator('[aria-label*="Ilmoituksen tyyppi."]')
-      .locator(`text="${notification_type}"`)
-      .first()
-      .waitFor({ state: "visible", timeout: 5000 });
+    await this.selectOption("Ilmoituksen tyyppi.", notification_type);
 
     // Admin selects type of notification warning
     // Click  css=[aria-label*="Ilmoituksen tyyppi."]
@@ -69,44 +74,17 @@ export class AdminNotificationsCreatePage extends PageObject {
   // Kohderyhmä
   @step("admin_notifications_create_page.Admin Selects Target Group All")
   async adminSelectsTargetGroupAll() {
-    await this.page.locator('[aria-label*="Kohderyhmä."]').click();
-    await this.pages.customKeywords.findAndClickElementWithText(
-      "form >> li >> span",
-      NOTIFICATION_BANNER_TARGET_GROUP_ALL
-    );
-    await this.page
-      .locator('[aria-label*="Kohderyhmä."]')
-      .locator(`text="${NOTIFICATION_BANNER_TARGET_GROUP_ALL}"`)
-      .first()
-      .waitFor({ state: "visible", timeout: 5000 });
+    await this.selectOption("Kohderyhmä.", NOTIFICATION_BANNER_TARGET_GROUP_ALL);
   }
 
   @step("admin_notifications_create_page.Admin Selects Target Group Admin")
   async adminSelectsTargetGroupAdmin() {
-    await this.page.locator('[aria-label*="Kohderyhmä."]').click();
-    await this.pages.customKeywords.findAndClickElementWithText(
-      "form >> li >> span",
-      NOTIFICATION_BANNER_TARGET_GROUP_ADMIN
-    );
-    await this.page
-      .locator('[aria-label*="Kohderyhmä."]')
-      .locator(`text="${NOTIFICATION_BANNER_TARGET_GROUP_ADMIN}"`)
-      .first()
-      .waitFor({ state: "visible", timeout: 5000 });
+    await this.selectOption("Kohderyhmä.", NOTIFICATION_BANNER_TARGET_GROUP_ADMIN);
   }
 
   @step("admin_notifications_create_page.Admin Selects Target Group User")
   async adminSelectsTargetGroupUser() {
-    await this.page.locator('[aria-label*="Kohderyhmä."]').click();
-    await this.pages.customKeywords.findAndClickElementWithText(
-      "form >> li >> span",
-      NOTIFICATION_BANNER_TARGET_GROUP_USER
-    );
-    await this.page
-      .locator('[aria-label*="Kohderyhmä."]')
-      .locator(`text="${NOTIFICATION_BANNER_TARGET_GROUP_USER}"`)
-      .first()
-      .waitFor({ state: "visible", timeout: 5000 });
+    await this.selectOption("Kohderyhmä.", NOTIFICATION_BANNER_TARGET_GROUP_USER);
   }
 
   // Viesti
@@ -149,7 +127,7 @@ export class AdminNotificationsCreatePage extends PageObject {
 
   @step("admin_notifications_create_page.Admin Deletes Notification")
   async adminDeletesNotification() {
-    await this.pages.customKeywords.findAndClickElementWithText("button", DELETE_NOTIFICATION_BUTTON_TEXT);
+    await this.page.getByRole("button", { name: DELETE_NOTIFICATION_BUTTON_TEXT, exact: true }).click();
     // Deleting returns to the list page, which has the create link
     await this.page.locator('[href="/kasittely/notifications/new"]').waitFor({ state: "visible", timeout: 15_000 });
   }

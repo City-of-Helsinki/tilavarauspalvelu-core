@@ -88,7 +88,10 @@ export class AppAdmin extends PageObject {
     await this.pages.adminReservations.adminClicksButtonInReservationPage(
       this.page.getByTestId("approval-buttons__return-to-handling-button").last()
     );
-    await this.pages.customKeywords.findAndClickElementWithText("#info-dialog >> span", RESERVATION_STATUS_DIALOG);
+    await this.page
+      .locator("#info-dialog")
+      .getByRole("button", { name: RESERVATION_STATUS_DIALOG, exact: true })
+      .click();
     await this.pages.adminReservations.adminChecksReservationStatus(ADMIN_STATUS_PROCESSED);
   }
 
@@ -463,8 +466,9 @@ export class AppAdmin extends PageObject {
       this.state.unavailableReservationDate
     );
     await this.page.getByTestId("CreateReservationModal__accept-reservation").scrollIntoViewIfNeeded();
-    await this.pages.customKeywords.checkElementsText(
-      '[data-testid="CreateReservationModal__collision-warning"] >> [class*="Notification-module_body__"]',
+    // The warning's label and body both have the text
+    await this.pages.customKeywords.checkElementContainsText(
+      this.page.getByTestId("CreateReservationModal__collision-warning"),
       RESERVATION_TIME_NOT_FREE
     );
     await this.page.getByTestId("CreateReservationModal__cancel-reservation").click();
