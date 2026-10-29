@@ -1,0 +1,28 @@
+# Gateway for the development setup in docker-compose.yml.
+# It puts the backend and the frontends behind one address, as on the server.
+# Then a relative URL like "/graphql/" works in the browser.
+
+{
+	# Local development only. No TLS and no admin API.
+	auto_https off
+	admin off
+}
+
+:8080 {
+	# The paths of the backend. Keep the list in sync with backend/config/urls.py.
+	# The customer UI uses "/monitoring" without a slash for the Sentry tunnel, so only "/monitoring/*" goes to the backend.
+	@backend path /graphql/* /admin/* /v1/* /helauth/* /pysocial/* /gdpr/* /tinymce/* /csrf/* /monitoring/* /mock_verkkokauppa/* /static/* /media/*
+	handle @backend {
+		reverse_proxy backend:8000
+	}
+
+	# The frontends share the network namespace of the "frontend-net" service.
+	@staff path /kasittely /kasittely/*
+	handle @staff {
+		reverse_proxy frontend-net:3001
+	}
+
+	handle {
+		reverse_proxy frontend-net:3000
+	}
+}
