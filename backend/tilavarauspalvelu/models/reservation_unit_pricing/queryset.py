@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from django.db import models
 from django.db.models.functions import RowNumber
 
 from tilavarauspalvelu.models import ReservationUnitPricing
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 from utils.date_utils import local_date
 
 if TYPE_CHECKING:
@@ -20,7 +20,11 @@ __all__ = [
 ]
 
 
-class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
+_TModel_co = TypeVar("_TModel_co", bound=ReservationUnitPricing, covariant=True, default=ReservationUnitPricing)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationUnitPricing)
+
+
+class ReservationUnitPricingQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def exclude_past(self) -> Self:
         """Return all currently active and future pricings."""
         today = local_date()
@@ -90,4 +94,4 @@ class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
         )
 
 
-class ReservationUnitPricingManager(ModelManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]): ...
+class ReservationUnitPricingManager(TranslatedModelManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]): ...

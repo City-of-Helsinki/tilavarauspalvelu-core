@@ -7,11 +7,9 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    import uuid
-
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PaymentMerchant, ReservationUnit
+    from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 
@@ -26,9 +24,9 @@ __all__ = [
 
 
 class PaymentProduct(models.Model):
-    id: uuid.UUID = models.UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True)
 
-    merchant: PaymentMerchant | None = models.ForeignKey(
+    merchant = models.ForeignKey(
         "tilavarauspalvelu.PaymentMerchant",
         related_name="products",
         on_delete=models.PROTECT,

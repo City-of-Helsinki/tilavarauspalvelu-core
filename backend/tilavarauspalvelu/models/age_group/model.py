@@ -25,8 +25,8 @@ __all__ = [
 
 
 class AgeGroup(models.Model):
-    minimum: int = models.PositiveIntegerField()
-    maximum: int | None = models.PositiveIntegerField(null=True, blank=True)
+    minimum = models.PositiveIntegerField()
+    maximum = models.PositiveIntegerField(null=True, blank=True)
 
     objects: ClassVar[AgeGroupManager] = LazyModelManager.new()
     actions: LazyAttribute[AgeGroupActions] = LazyModelAttribute.new()

@@ -13,12 +13,9 @@ from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
     from decimal import Decimal
 
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import ReservationUnit, TaxPercentage
 
     from .actions import ReservationUnitPricingActions
     from .queryset import ReservationUnitPricingManager
@@ -31,19 +28,19 @@ __all__ = [
 
 
 class ReservationUnitPricing(models.Model):
-    begins: datetime.date = models.DateField()
-    price_unit: PriceUnit = TextChoicesField(enum=PriceUnit, default=PriceUnit.PER_HOUR)
+    begins = models.DateField()
+    price_unit = TextChoicesField(enum=PriceUnit, default=PriceUnit.PER_HOUR)
 
-    payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
+    payment_type = TextChoicesField(enum=PaymentType, null=True, blank=True)
 
     # True: This pricing is used for reservations that are created after the begins date
     # False: This pricing is used for reservations that start after the begins date
     is_activated_on_begins = models.BooleanField(default=False)
 
-    lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    lowest_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    highest_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    material_price_description: str = Nh3CharField(
+    material_price_description = Nh3CharField(
         blank=True,
         default="",
         max_length=1000,  # Double of the limit of 500 chars in order to accommodate HTML tags
@@ -51,14 +48,14 @@ class ReservationUnitPricing(models.Model):
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
-    tax_percentage: TaxPercentage = models.ForeignKey(
+    tax_percentage = models.ForeignKey(
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
         limit_choices_to=models.Q(is_enabled=True),
     )
 
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="pricings",
         on_delete=models.CASCADE,

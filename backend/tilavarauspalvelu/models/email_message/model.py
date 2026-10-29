@@ -11,11 +11,7 @@ from tilavarauspalvelu.validators import validate_email_attachments
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.typing import EmailAttachment
 
     from .actions import EmailMessageActions
     from .queryset import EmailMessageManager
@@ -30,22 +26,22 @@ __all__ = [
 class EmailMessage(models.Model):
     """Stores an email message that could not be sent at the time of creation."""
 
-    subject: str = models.TextField()
-    recipients: list[str] = ArrayField(base_field=models.EmailField())
+    subject = models.TextField()
+    recipients = ArrayField(base_field=models.EmailField())
 
-    text_content: str = models.TextField()
-    html_content: str = models.TextField()
+    text_content = models.TextField()
+    html_content = models.TextField()
 
-    attachments: list[EmailAttachment] = ArrayField(
+    attachments = ArrayField(
         base_field=HStoreField(),
         blank=True,
         default=list,
         validators=[validate_email_attachments],
     )
 
-    valid_until: datetime.datetime = models.DateTimeField(db_index=True)
+    valid_until = models.DateTimeField(db_index=True)
 
-    created_at: datetime.datetime = models.DateTimeField(blank=True, default=local_datetime, db_index=True)
+    created_at = models.DateTimeField(blank=True, default=local_datetime, db_index=True)
 
     objects: ClassVar[EmailMessageManager] = LazyModelManager.new()
     actions: LazyAttribute[EmailMessageActions] = LazyModelAttribute.new()

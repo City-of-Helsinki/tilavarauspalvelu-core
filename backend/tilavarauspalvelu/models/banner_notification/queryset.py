@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from lookup_property import L
 
 from tilavarauspalvelu.enums import BannerNotificationTarget
 from tilavarauspalvelu.models import BannerNotification
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
@@ -17,7 +17,11 @@ __all__ = [
 ]
 
 
-class BannerNotificationQuerySet(ModelQuerySet[BannerNotification]):
+_TModel_co = TypeVar("_TModel_co", bound=BannerNotification, covariant=True, default=BannerNotification)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=BannerNotification)
+
+
+class BannerNotificationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def active(self) -> Self:
         return self.filter(L(is_active=True))
 
@@ -55,4 +59,4 @@ class BannerNotificationQuerySet(ModelQuerySet[BannerNotification]):
         return self.order_by(L("banner_target_sort_order").order_by(descending=desc))
 
 
-class BannerNotificationManager(ModelManager[BannerNotification, BannerNotificationQuerySet]): ...
+class BannerNotificationManager(TranslatedModelManager[BannerNotification, BannerNotificationQuerySet]): ...

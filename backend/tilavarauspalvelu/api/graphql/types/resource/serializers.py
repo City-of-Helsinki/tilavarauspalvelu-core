@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-class ResourceSerializer(NestingModelSerializer):
+class ResourceSerializer(NestingModelSerializer[Resource]):
     instance: Resource | None
 
     class Meta:

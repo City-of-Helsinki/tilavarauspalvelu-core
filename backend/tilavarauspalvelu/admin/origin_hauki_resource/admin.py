@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from typing import TYPE_CHECKING, Any
 
 from admin_extra_buttons.decorators import button
@@ -9,6 +10,7 @@ from django.contrib import admin
 from django.db.models import OuterRef
 from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
@@ -29,7 +31,7 @@ __all__ = [
 
 class ReservationUnitInline(admin.TabularInline):
     model = ReservationUnit
-    fields = ["id", "reservation_unit_link"]
+    fields = ("id", "reservation_unit_link")
     readonly_fields = fields
     can_delete = False
     extra = 0
@@ -47,13 +49,21 @@ class OriginHaukiResourceAdminForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if self.instance.opening_hours_hash == NEVER_ANY_OPENING_HOURS_HASH:
-            self.Meta.help_texts["opening_hours_hash"] += " " + _(
-                "OriginHaukiResources with this specific hash never have any opening hours."
-            )
+            # The admin reads the help texts of read-only fields from the form options, which all forms share.
+            # Give this form its own options, so that the note is not added to the shared help texts.
+            self._meta = copy.copy(self._meta)
+            self._meta.help_texts = {
+                **self._meta.help_texts,
+                "opening_hours_hash": format_lazy(
+                    "{} {}",
+                    self._meta.help_texts["opening_hours_hash"],
+                    _("OriginHaukiResources with this specific hash never have any opening hours."),
+                ),
+            }
 
     class Meta:
         model = OriginHaukiResource
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         help_texts = {
             "id": _("ID of the resource in Hauki."),
             "opening_hours_hash": _("Hash of the opening hours. Used to determine if the opening hours have changed."),
@@ -111,7 +121,9 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return getattr(obj, "reservable_time_spans_count", -1)
 
     def linked_reservation_units(self, obj: OriginHaukiResource) -> str:
-        return ", ".join(reservation_unit.name_fi for reservation_unit in obj.reservation_units.all())
+        return ", ".join(
+            reservation_unit.name_fi for reservation_unit in obj.reservation_units.all() if reservation_unit.name_fi
+        )
 
     @button(label=_("Update all reservable time spans"), change_list=True)
     def update_all_hauki_resources_reservable_time_spans(self, request: WSGIRequest) -> None:
@@ -124,6 +136,6 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         self.message_user(request, _("Reservable Time Spans updated."))
 
     def update_reservable_time_spans_action(self, request, queryset: QuerySet[OriginHaukiResource]) -> None:
-        ids: list[int] = queryset.values_list("id", flat=True)
+        ids = list(queryset.values_list("id", flat=True))
         HaukiResourceHashUpdater(ids).run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))

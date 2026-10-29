@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Any
 from graphene_django_extensions import CreateMutation, UpdateMutation
 
 from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.models import ReservationSeries
+from tilavarauspalvelu.typing import AnyUser
 from utils.date_utils import local_datetime
 
 from .permissions import ReservationSeriesPermission
@@ -20,7 +22,7 @@ from .serializers import (
 from .serializers.repair_access_code import ReservationSeriesRepairAccessCodeSerializer
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation, ReservationSeries
+    from tilavarauspalvelu.models import Reservation
 
 __all__ = [
     "ReservationSeriesAddMutation",
@@ -33,31 +35,31 @@ __all__ = [
 ]
 
 
-class ReservationSeriesCreateMutation(CreateMutation):
+class ReservationSeriesCreateMutation(CreateMutation[ReservationSeries, AnyUser]):
     class Meta:
         serializer_class = ReservationSeriesCreateSerializer
         permission_classes = [ReservationSeriesPermission]
 
 
-class ReservationSeriesUpdateMutation(UpdateMutation):
+class ReservationSeriesUpdateMutation(UpdateMutation[ReservationSeries, AnyUser]):
     class Meta:
         serializer_class = ReservationSeriesUpdateSerializer
         permission_classes = [ReservationSeriesPermission]
 
 
-class ReservationSeriesAddMutation(UpdateMutation):
+class ReservationSeriesAddMutation(UpdateMutation[ReservationSeries, AnyUser]):
     class Meta:
         serializer_class = ReservationSeriesAddReservationSerializer
         permission_classes = [ReservationSeriesPermission]
 
 
-class ReservationSeriesRescheduleMutation(UpdateMutation):
+class ReservationSeriesRescheduleMutation(UpdateMutation[ReservationSeries, AnyUser]):
     class Meta:
         serializer_class = ReservationSeriesRescheduleSerializer
         permission_classes = [ReservationSeriesPermission]
 
 
-class ReservationSeriesDenyMutation(UpdateMutation):
+class ReservationSeriesDenyMutation(UpdateMutation[ReservationSeries, AnyUser]):
     class Meta:
         serializer_class = ReservationSeriesDenyInputSerializer
         output_serializer_class = ReservationSeriesDenyOutputSerializer
@@ -72,7 +74,7 @@ class ReservationSeriesDenyMutation(UpdateMutation):
         }
 
 
-class ReservationSeriesChangeAccessCodeMutation(UpdateMutation):
+class ReservationSeriesChangeAccessCodeMutation(UpdateMutation[ReservationSeries, AnyUser]):
     class Meta:
         serializer_class = ReservationSeriesChangeAccessCodeSerializer
         permission_classes = [ReservationSeriesPermission]
@@ -86,7 +88,7 @@ class ReservationSeriesChangeAccessCodeMutation(UpdateMutation):
         }
 
 
-class ReservationSeriesRepairAccessCodeMutation(UpdateMutation):
+class ReservationSeriesRepairAccessCodeMutation(UpdateMutation[ReservationSeries, AnyUser]):
     class Meta:
         serializer_class = ReservationSeriesRepairAccessCodeSerializer
         permission_classes = [ReservationSeriesPermission]

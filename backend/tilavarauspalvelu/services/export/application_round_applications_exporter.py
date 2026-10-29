@@ -80,7 +80,7 @@ class ApplicationExportRow(BaseExportRow):
             setattr(self, key, new_value)
 
 
-class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
+class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter[ApplicationSection]):
     """Exports a CSV file containing application data for a single application round."""
 
     def __init__(self, application_round_id: int) -> None:
@@ -197,7 +197,7 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
             application_id=str(instance.application.id),
             application_status=instance.application_status,  # type: ignore[attr-defined]
             section_id=str(instance.id),
-            section_status=instance.status,  # type: ignore[attr-defined]
+            section_status=instance.status,
             section_name=instance.name,
             municipality=application.municipality or "",
             num_persons=str(instance.num_persons),

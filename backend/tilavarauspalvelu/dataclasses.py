@@ -75,7 +75,7 @@ class IDToken:
             sub=payload["sub"],
             aud=payload["aud"],
             jti=payload["jti"],
-            typ=payload.get("typ", ""),  # type: ignore[arg-type]
+            typ=payload.get("typ", ""),
             exp=payload["exp"],
             iat=payload["iat"],
             auth_time=payload["auth_time"],

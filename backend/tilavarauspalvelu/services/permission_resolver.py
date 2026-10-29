@@ -37,7 +37,7 @@ class PermissionResolver:
 
     user: AnyUser
 
-    def __get__(self, instance: AnyUser | None, owner: type[User]) -> Self:
+    def __get__(self, instance: AnyUser | None, owner: type[AnyUser]) -> Self:
         if instance is None:
             return self
 
@@ -50,7 +50,7 @@ class PermissionResolver:
 
     def has_any_role(self) -> bool:
         """Check if the user has any role or is a superuser."""
-        if self.is_user_anonymous_or_inactive():
+        if self.user.is_anonymous or not self.user.is_active:
             return False
         return (
             self.user.is_superuser
@@ -74,7 +74,7 @@ class PermissionResolver:
                                 Reservers are only supposed to be able to modify their own reservations,
                                 so this can be set to False if checking permissions for other user's reservations.
         """
-        if self.is_user_anonymous_or_inactive():
+        if self.user.is_anonymous or not self.user.is_active:
             return False
         if role_choices is None:  # Has any general role
             return any(
@@ -109,7 +109,7 @@ class PermissionResolver:
                                 Reservers are only supposed to be able to modify their own reservations,
                                 so this can be set to False if checking permissions for other user's reservations.
         """
-        if self.is_user_anonymous_or_inactive():
+        if self.user.is_anonymous or not self.user.is_active:
             return False
 
         if units is None:  # Check for any unit or unit group the user has roles in
@@ -169,6 +169,9 @@ class PermissionResolver:
     ) -> bool:
         from tilavarauspalvelu.models import Unit
 
+        if self.user.is_anonymous or not self.user.is_active:
+            return False
+
         unit_ids = list(unit_ids)
         if not unit_ids:  # Check for all units and unit groups the user has permissions for.
             unit_ids = list(self.user.active_unit_permissions.keys())
@@ -185,17 +188,17 @@ class PermissionResolver:
         # Has the given permission through their unit roles in the given units or their unit groups
         has_permission: bool = False
         for unit in units:
-            permissions = self.user.active_unit_permissions.get(unit.pk, [])
-            has_permission = permission in permissions
+            unit_permissions = self.user.active_unit_permissions.get(unit.pk, [])
+            has_permission = permission in unit_permissions
 
             # No permissions though units -> check through unit groups
             if not has_permission:
-                permissions = {
+                unit_group_permissions = {
                     permission
                     for unit_group in unit.unit_groups.all()
                     for permission in self.user.active_unit_group_permissions.get(unit_group.pk, [])
                 }
-                has_permission = permission in permissions
+                has_permission = permission in unit_group_permissions
 
             # If we require permissions for all units, we need to keep checking until all units have been checked.
             # If at any point we don't have permission for a unit or it's groups, we can stop early.
@@ -209,13 +212,15 @@ class PermissionResolver:
         return has_permission
 
     def is_user_anonymous_or_inactive(self) -> bool:
+        # Methods that read attributes of 'User' do this check inline, because the type checker
+        # cannot narrow the type of 'self.user' through a method call.
         return getattr(self, "user", None) is None or self.user.is_anonymous or not self.user.is_active
 
     # ID helpers
 
     def unit_ids_where_has_role(self, *, role_choices: Container[UserRoleChoice]) -> list[int]:
         """List unit ids where the user has any of the given roles."""
-        if self.is_user_anonymous_or_inactive():
+        if self.user.is_anonymous or not self.user.is_active:
             return []
         return [
             pk
@@ -225,7 +230,7 @@ class PermissionResolver:
 
     def unit_group_ids_where_has_role(self, *, role_choices: Container[UserRoleChoice]) -> list[int]:
         """List unit group ids where the user has any of the given roles."""
-        if self.is_user_anonymous_or_inactive():
+        if self.user.is_anonymous or not self.user.is_active:
             return []
         return [
             pk

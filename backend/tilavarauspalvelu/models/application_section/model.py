@@ -5,7 +5,7 @@ import uuid
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
-from django.db.models import Exists, OrderBy
+from django.db.models import Exists
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
@@ -21,13 +21,7 @@ from utils.mixins import SerializableModelMixin
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import (
-        AgeGroup,
-        Application,
-        ReservationPurpose,
-        ReservationUnitOption,
-        SuitableTimeRange,
-    )
+    from tilavarauspalvelu.models import ReservationUnitOption, SuitableTimeRange
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit_option.queryset import ReservationUnitOptionQuerySet
     from tilavarauspalvelu.models.suitable_time_range.queryset import SuitableTimeRangeQuerySet
@@ -48,31 +42,31 @@ class ApplicationSection(SerializableModelMixin, models.Model):
     and suitable time ranges that can be used fulfill the slot request included in it.
     """
 
-    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
+    ext_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
 
-    name: str = models.CharField(max_length=100)
-    num_persons: int = models.PositiveIntegerField()
-    reservations_begin_date: datetime.date = models.DateField()
-    reservations_end_date: datetime.date = models.DateField()
+    name = models.CharField(max_length=100)
+    num_persons = models.PositiveIntegerField()
+    reservations_begin_date = models.DateField()
+    reservations_end_date = models.DateField()
 
     # Slot request
-    reservation_min_duration: datetime.timedelta = models.DurationField()
-    reservation_max_duration: datetime.timedelta = models.DurationField()
-    applied_reservations_per_week: int = models.PositiveIntegerField()
+    reservation_min_duration = models.DurationField()
+    reservation_max_duration = models.DurationField()
+    applied_reservations_per_week = models.PositiveIntegerField()
 
-    application: Application = models.ForeignKey(
+    application = models.ForeignKey(
         "tilavarauspalvelu.Application",
         related_name="application_sections",
         on_delete=models.CASCADE,
     )
-    purpose: ReservationPurpose | None = models.ForeignKey(
+    purpose = models.ForeignKey(
         "tilavarauspalvelu.ReservationPurpose",
         related_name="application_sections",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    age_group: AgeGroup | None = models.ForeignKey(
+    age_group = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
         related_name="application_sections",
         on_delete=models.SET_NULL,
@@ -137,7 +131,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         suitable = (
             self.suitable_time_ranges
             .distinct()
-            .order_by(OrderBy(L("day_of_the_week_number")))
+            .order_by(L("day_of_the_week_number").order_by())
             .values_list("day_of_the_week", flat=True)
         )
         return [Weekday(day) for day in suitable]

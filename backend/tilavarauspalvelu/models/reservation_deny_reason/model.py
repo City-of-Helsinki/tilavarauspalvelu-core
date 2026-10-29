@@ -24,9 +24,9 @@ __all__ = [
 
 
 class ReservationDenyReason(models.Model):
-    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
+    rank = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 
-    reason: str = models.CharField(max_length=255)
+    reason = models.CharField(max_length=255)
 
     # Translated field hints
     reason_fi: str | None

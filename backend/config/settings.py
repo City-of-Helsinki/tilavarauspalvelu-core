@@ -21,7 +21,7 @@ except ImportError as error:
     if error.name != "local_settings":
         raise
 
-    class AutomatedTestMixin: ...
+    class AutomatedTestMixin: ...  # type: ignore[no-redef]
 
 
 try:
@@ -30,7 +30,7 @@ except ImportError as error:
     if error.name != "local_settings":
         raise
 
-    class DockerMixin: ...
+    class DockerMixin: ...  # type: ignore[no-redef]
 
 
 try:
@@ -39,7 +39,7 @@ except ImportError as error:
     if error.name != "local_settings":
         raise
 
-    class LocalMixin: ...
+    class LocalMixin: ...  # type: ignore[no-redef]
 
 
 class Common(Environment):
@@ -48,6 +48,9 @@ class Common(Environment):
     BASE_DIR = Path(__file__).resolve().parent.parent
 
     # --- Basic settings ---------------------------------------------------------------------------------------------
+
+    # Each environment sets its own value.
+    DEBUG: bool
 
     WSGI_APPLICATION = "config.wsgi.application"
     ROOT_URLCONF = "config.urls"
@@ -123,8 +126,8 @@ class Common(Environment):
 
     # --- Versioning settings ----------------------------------------------------------------------------------------
 
-    SOURCE_BRANCH_NAME: str = values.StringValue(default="")
-    SOURCE_VERSION: str = values.StringValue(default="")
+    SOURCE_BRANCH_NAME = values.StringValue(default="")
+    SOURCE_VERSION = values.StringValue(default="")
 
     @classproperty
     def APP_VERSION(cls) -> str:
@@ -554,13 +557,13 @@ class Common(Environment):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
-    SENTRY_ENABLED: bool = values.BooleanValue(default=False)
-    SENTRY_DSN: str = values.StringValue(default="")
-    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")
-    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)
-    SENTRY_RELEASE: str | None = values.StringValue(default=None)
-    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)
-    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(
+    SENTRY_ENABLED = values.BooleanValue(default=False)
+    SENTRY_DSN = values.StringValue(default="")
+    SENTRY_ENVIRONMENT = values.StringValue(default="local")
+    SENTRY_PROFILE_SESSION_SAMPLE_RATE = values.FloatValue(default=None)
+    SENTRY_RELEASE = values.StringValue(default=None)
+    SENTRY_TRACES_SAMPLE_RATE = values.FloatValue(default=None)
+    SENTRY_TRACES_IGNORE_PATHS = values.ListValue(
         default=[
             "/healthz",
             "/readiness",
@@ -693,14 +696,14 @@ class EmptyDefaults:
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
 
-    CORS_ALLOWED_ORIGINS = []
-    CSRF_TRUSTED_ORIGINS = []
+    CORS_ALLOWED_ORIGINS: list[str] = []
+    CSRF_TRUSTED_ORIGINS: list[str] = []
 
-    DATABASES = {}
+    DATABASES: dict[str, Any] = {}
     REDIS_URL = ""
 
-    STATIC_ROOT = Common.BASE_DIR / "staticroot"
-    MEDIA_ROOT = Common.BASE_DIR / "media"
+    STATIC_ROOT = str(Common.BASE_DIR / "staticroot")
+    MEDIA_ROOT = str(Common.BASE_DIR / "media")
 
     HAUKI_API_URL = ""
     HAUKI_ADMIN_UI_URL = ""
@@ -1079,14 +1082,14 @@ class Platta(Common, use_environ=True):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
-    SENTRY_ENABLED: bool = values.BooleanValue(default=True)
+    SENTRY_ENABLED = values.BooleanValue(default=True)
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
     REDIS_URL = ""  # Not used in Platta environments
-    REDIS_SENTINEL_SERVICE: str = values.StringValue()
-    REDIS_MASTER: str = values.StringValue()
-    REDIS_PASSWORD: str = values.StringValue()
+    REDIS_SENTINEL_SERVICE = values.StringValue()
+    REDIS_MASTER = values.StringValue()
+    REDIS_PASSWORD = values.StringValue()
 
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
 

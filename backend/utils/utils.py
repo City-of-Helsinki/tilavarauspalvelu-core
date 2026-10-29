@@ -27,9 +27,9 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from pathlib import Path
 
-    from django.http import HttpRequest
+    from rest_framework.exceptions import ErrorDetail
 
-    from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang
+    from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang, WSGIRequest
 
 __all__ = [
     "comma_sep_str",
@@ -135,7 +135,7 @@ class with_indices[T]:  # noqa: N801
         self.item_deleted = True
 
 
-def get_text_search_language(request: HttpRequest) -> TextSearchLang:
+def get_text_search_language(request: WSGIRequest) -> TextSearchLang:
     """
     Get appropriate text search language for the given request.
     Use preferred language if user is authenticated, otherwise use the language from the request.
@@ -144,7 +144,7 @@ def get_text_search_language(request: HttpRequest) -> TextSearchLang:
     return "swedish" if lang_code == "sv" else "english" if lang_code == "en" else "finnish"
 
 
-def get_request_language(request: HttpRequest) -> Lang:
+def get_request_language(request: WSGIRequest) -> Lang:
     referer = request.META.get("HTTP_REFERER")
     user: AnyUser = request.user
 
@@ -282,7 +282,8 @@ def get_jwt_payload(json_web_token: str) -> dict[str, Any]:
 
 def to_django_validation_error(error: ValidationError) -> DjangoValidationError:
     """Given a django-rest-framework ValidationError, return a Django ValidationError."""
-    return DjangoValidationError(message=str(error.detail[0]), code=error.detail[0].code)
+    details: list[ErrorDetail] = error.detail  # type: ignore[assignment]
+    return DjangoValidationError(message=str(details[0]), code=details[0].code)
 
 
 def to_drf_validation_error(error: DjangoValidationError) -> ValidationError:

@@ -12,8 +12,6 @@ from tilavarauspalvelu.enums import MunicipalityChoice, ReservationCancelReasonC
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import Reservation
@@ -36,80 +34,80 @@ class ReservationStatistic(models.Model):
 
     # Copied from Reservation
 
-    num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
-    state: str = models.CharField(max_length=255)
-    reservation_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
+    num_persons = models.PositiveIntegerField(null=True, blank=True)
+    state = models.CharField(max_length=255)
+    reservation_type = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
 
-    begin: datetime.datetime = models.DateTimeField()
-    end: datetime.datetime = models.DateTimeField()
-    buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    reservation_handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    reservation_confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    reservation_created_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=timezone.now)  # noqa: TID251
+    begin = models.DateTimeField()
+    end = models.DateTimeField()
+    buffer_time_before = models.DurationField(default=datetime.timedelta(), blank=True)
+    buffer_time_after = models.DurationField(default=datetime.timedelta(), blank=True)
+    reservation_handled_at = models.DateTimeField(null=True, blank=True)
+    reservation_confirmed_at = models.DateTimeField(null=True, blank=True)
+    reservation_created_at = models.DateTimeField(null=True, blank=True, default=timezone.now)  # noqa: TID251
 
-    price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
-    non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    non_subsidised_price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
-    tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    price_net = models.DecimalField(max_digits=20, decimal_places=6, default=0)
+    non_subsidised_price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    non_subsidised_price_net = models.DecimalField(max_digits=20, decimal_places=6, default=0)
+    tax_percentage_value = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
-    applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)
+    applying_for_free_of_charge = models.BooleanField(default=False, blank=True)
 
-    reservee_id: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_is_unregistered_association: bool = models.BooleanField(null=True, default=False, blank=True)
-    reservee_language: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
+    reservee_id = models.CharField(max_length=255, blank=True, default="")
+    reservee_organisation_name = models.CharField(max_length=255, blank=True, default="")
+    reservee_address_zip = models.CharField(max_length=255, blank=True, default="")
+    reservee_is_unregistered_association = models.BooleanField(null=True, default=False, blank=True)
+    reservee_language = models.CharField(max_length=255, blank=True, default="")
+    reservee_type = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
 
     # Access type information
 
-    access_type: str = models.CharField(max_length=255)
-    access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    access_type = models.CharField(max_length=255)
+    access_code_generated_at = models.DateTimeField(null=True, blank=True)
 
     # Static copies of values from other related models
 
-    primary_reservation_unit: int | None = models.BigIntegerField(null=True, blank=True)
-    primary_reservation_unit_name: str = models.CharField(max_length=255)
-    primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
-    primary_unit_name: str = models.CharField(max_length=255)
+    primary_reservation_unit = models.BigIntegerField(null=True, blank=True)
+    primary_reservation_unit_name = models.CharField(max_length=255)
+    primary_unit_tprek_id = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
+    primary_unit_name = models.CharField(max_length=255)
 
-    deny_reason: int | None = models.BigIntegerField(null=True, blank=True)
-    deny_reason_text: str = models.CharField(max_length=255)
+    deny_reason = models.BigIntegerField(null=True, blank=True)
+    deny_reason_text = models.CharField(max_length=255)
 
-    cancel_reason: int | None = models.BigIntegerField(null=True, blank=True)
-    cancel_reason_text: str = models.CharField(max_length=255)
+    cancel_reason = models.BigIntegerField(null=True, blank=True)
+    cancel_reason_text = models.CharField(max_length=255)
 
-    purpose: int | None = models.BigIntegerField(null=True, blank=True)
-    purpose_name: str = models.CharField(max_length=255, default="", blank=True)
+    purpose = models.BigIntegerField(null=True, blank=True)
+    purpose_name = models.CharField(max_length=255, default="", blank=True)
 
-    home_city: int | None = models.BigIntegerField(null=True, blank=True)
-    home_city_name: str = models.CharField(max_length=255, default="", blank=True)
-    home_city_municipality_code: str = models.CharField(max_length=255, default="")
+    home_city = models.BigIntegerField(null=True, blank=True)
+    home_city_name = models.CharField(max_length=255, default="", blank=True)
+    home_city_municipality_code = models.CharField(max_length=255, default="")
 
-    age_group: int | None = models.BigIntegerField(null=True, blank=True)
-    age_group_name: str = models.CharField(max_length=255, default="", blank=True)
+    age_group = models.BigIntegerField(null=True, blank=True)
+    age_group_name = models.CharField(max_length=255, default="", blank=True)
 
     # Removed from series model
-    ability_group: int | None = models.BigIntegerField(null=True, blank=True)
-    ability_group_name: str = models.CharField(max_length=255, default="", blank=True)
+    ability_group = models.BigIntegerField(null=True, blank=True)
+    ability_group_name = models.CharField(max_length=255, default="", blank=True)
 
     # Reservation statistics specific
 
-    updated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, auto_now=True)
-    priority: int | None = models.IntegerField(null=True, blank=True)
-    priority_name: str = models.CharField(max_length=255, default="", blank=True)
-    duration_minutes: int = models.IntegerField()
-    is_subsidised: bool = models.BooleanField(default=False)
-    is_recurring: bool = models.BooleanField(default=False)
-    recurrence_begin_date: datetime.date | None = models.DateField(null=True, blank=True)
-    recurrence_end_date: datetime.date | None = models.DateField(null=True, blank=True)
-    recurrence_uuid: str = models.CharField(max_length=255, default="", blank=True)
-    reservation_uuid: str = models.CharField(max_length=255, default="", blank=True)
-    reservee_uuid: str = models.CharField(max_length=255, default="", blank=True)
-    reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
-    is_applied: bool = models.BooleanField(default=False, blank=True)
+    updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)
+    priority = models.IntegerField(null=True, blank=True)
+    priority_name = models.CharField(max_length=255, default="", blank=True)
+    duration_minutes = models.IntegerField()
+    is_subsidised = models.BooleanField(default=False)
+    is_recurring = models.BooleanField(default=False)
+    recurrence_begin_date = models.DateField(null=True, blank=True)
+    recurrence_end_date = models.DateField(null=True, blank=True)
+    recurrence_uuid = models.CharField(max_length=255, default="", blank=True)
+    reservation_uuid = models.CharField(max_length=255, default="", blank=True)
+    reservee_uuid = models.CharField(max_length=255, default="", blank=True)
+    reservee_used_ad_login = models.BooleanField(default=False, blank=True)
+    is_applied = models.BooleanField(default=False, blank=True)
     """Is the reservation done through application process."""
 
     objects: ClassVar[ReservationStatisticManager] = LazyModelManager.new()

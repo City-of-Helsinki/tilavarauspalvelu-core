@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class IntendedUseSerializer(NestingModelSerializer):
+class IntendedUseSerializer(NestingModelSerializer[IntendedUse]):
     class Meta:
         model = IntendedUse
         fields = [

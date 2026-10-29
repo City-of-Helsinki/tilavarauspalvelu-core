@@ -46,9 +46,9 @@ def sentry_before_send_transaction(event: Event, _hint: Hint) -> Event:
     # The trace view shows span data, not the request headers of the transaction event.
     # Copy only allowlisted headers, so cookies, CSRF tokens and IP addresses stay out.
     allowed_header_names = ("Accept-Language", "Content-Type", "Origin", "User-Agent")
-    request_headers = event.get("request", {}).get("headers", {})
+    request_headers: dict[str, str] = event.get("request", {}).get("headers", {})  # type: ignore[assignment]
     trace_context = event.setdefault("contexts", {}).setdefault("trace", {})
-    trace_data = trace_context.setdefault("data", {})
+    trace_data: dict[str, object] = trace_context.setdefault("data", {})  # type: ignore[assignment]
 
     for header_name in allowed_header_names:
         header_value = request_headers.get(header_name)

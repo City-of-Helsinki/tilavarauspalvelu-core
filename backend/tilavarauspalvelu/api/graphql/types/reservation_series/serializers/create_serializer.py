@@ -21,7 +21,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationSeries
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import ReservationSeriesCreateData, error_codes
 from utils.external_service.errors import ExternalServiceError
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
 
@@ -29,14 +29,14 @@ if TYPE_CHECKING:
     import datetime
 
     from tilavarauspalvelu.models import ReservationUnit
-    from tilavarauspalvelu.typing import ReservationDetails, ReservationSeriesCreateData
+    from tilavarauspalvelu.typing import ReservationDetails
 
 __all__ = [
     "ReservationSeriesCreateSerializer",
 ]
 
 
-class ReservationSeriesReservationCreateSerializer(NestingModelSerializer):
+class ReservationSeriesReservationCreateSerializer(NestingModelSerializer[Reservation]):
     type = EnumFriendlyChoiceField(
         choices=ReservationTypeStaffChoice.choices,
         enum=ReservationTypeStaffChoice,
@@ -93,10 +93,8 @@ class ReservationSeriesReservationCreateSerializer(NestingModelSerializer):
         extra_kwargs = {field: {"required": field in {"type", "user"}} for field in fields}
 
 
-class ReservationSeriesCreateSerializer(NestingModelSerializer):
+class ReservationSeriesCreateSerializer(NestingModelSerializer[ReservationSeries, ReservationSeriesCreateData]):
     """Create the reservation series with all its reservations."""
-
-    instance: None
 
     weekdays = serializers.ListField(
         child=EnumFriendlyChoiceField(choices=Weekday.choices, enum=Weekday, required=False),

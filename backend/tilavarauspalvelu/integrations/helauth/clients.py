@@ -74,7 +74,8 @@ class KeyCloakClient(BaseExternalServiceClient):
 
         try:
             # Delegate refresh to OAuth backend.
-            response: RefreshResponse = cls.oidc_backend.refresh_token(token=keycloak_refresh_token)
+            # The OAuth backend types the response as a plain dict.
+            response: RefreshResponse = cls.oidc_backend.refresh_token(token=keycloak_refresh_token)  # type: ignore[assignment]
         except HTTPError as error:
             try:
                 # Catch known error for expired keycloak refresh token. This cannot be solved without a
@@ -86,7 +87,7 @@ class KeyCloakClient(BaseExternalServiceClient):
                     session["keycloak_refresh_token_expired"] = True
 
             except Exception:  # noqa: BLE001
-                details = {"user": user.pk, "error": error.response.text}
+                details = {"user": user.pk, "error": error.response.text if error.response is not None else ""}
                 msg = "Unable to refresh keycloak token"
                 SentryLogger.log_message(msg, details=details, level="error")
 

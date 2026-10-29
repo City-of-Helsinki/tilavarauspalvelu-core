@@ -9,7 +9,6 @@ from easy_thumbnails.fields import ThumbnailerImageField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from easy_thumbnails.files import ThumbnailerImageFieldFile
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import ReservationUnit
@@ -27,13 +26,11 @@ __all__ = [
 
 
 class IntendedUse(models.Model):
-    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
+    rank = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 
-    name: str = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
 
-    image: ThumbnailerImageFieldFile | None = ThumbnailerImageField(
-        upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True, blank=True
-    )
+    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True, blank=True)
 
     # Translated field hints
     name_fi: str | None

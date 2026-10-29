@@ -11,6 +11,7 @@ from query_optimizer import AnnotatedField, MultiField
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries
+from tilavarauspalvelu.typing import AnyUser
 from utils.date_utils import local_date
 
 from .filtersets import ReservationSeriesFilterSet
@@ -46,7 +47,7 @@ class PindoraSeriesInfoType(graphene.ObjectType):
     access_code_validity = graphene.List(graphene.NonNull(PindoraSeriesValidityInfoType), required=True)
 
 
-class ReservationSeriesNode(DjangoNode):
+class ReservationSeriesNode(DjangoNode[ReservationSeries, AnyUser]):
     access_type = AnnotatedField(
         graphene.Enum.from_enum(AccessTypeWithMultivalued),
         expression=L("access_type"),

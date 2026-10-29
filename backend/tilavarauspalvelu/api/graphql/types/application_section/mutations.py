@@ -7,6 +7,7 @@ from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMut
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.models import ApplicationSection
+from tilavarauspalvelu.typing import AnyUser
 
 from .permissions import (
     ApplicationSectionPermission,
@@ -22,7 +23,7 @@ from .serializers import (
 )
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser, GQLInfo
+    from tilavarauspalvelu.typing import GQLInfo
 
     from .serializers import CancellationOutput
 
@@ -35,19 +36,19 @@ __all__ = [
 ]
 
 
-class ApplicationSectionCreateMutation(CreateMutation):
+class ApplicationSectionCreateMutation(CreateMutation[ApplicationSection, AnyUser]):
     class Meta:
         serializer_class = ApplicationSectionSerializer
         permission_classes = [ApplicationSectionPermission]
 
 
-class ApplicationSectionUpdateMutation(UpdateMutation):
+class ApplicationSectionUpdateMutation(UpdateMutation[ApplicationSection, AnyUser]):
     class Meta:
         serializer_class = ApplicationSectionSerializer
         permission_classes = [ApplicationSectionPermission]
 
 
-class ApplicationSectionDeleteMutation(DeleteMutation):
+class ApplicationSectionDeleteMutation(DeleteMutation[ApplicationSection, AnyUser]):
     class Meta:
         model = ApplicationSection
         permission_classes = [ApplicationSectionPermission]
@@ -72,19 +73,19 @@ class ApplicationSectionDeleteMutation(DeleteMutation):
         instance.application.application_round.validators.validate_open_for_applications()
 
 
-class RejectAllSectionOptionsMutation(UpdateMutation):
+class RejectAllSectionOptionsMutation(UpdateMutation[ApplicationSection, AnyUser]):
     class Meta:
         serializer_class = RejectAllSectionOptionsSerializer
         permission_classes = [UpdateAllSectionOptionsPermission]
 
 
-class RestoreAllSectionOptionsMutation(UpdateMutation):
+class RestoreAllSectionOptionsMutation(UpdateMutation[ApplicationSection, AnyUser]):
     class Meta:
         serializer_class = RestoreAllSectionOptionsSerializer
         permission_classes = [UpdateAllSectionOptionsPermission]
 
 
-class ApplicationSectionReservationCancellationMutation(UpdateMutation):
+class ApplicationSectionReservationCancellationMutation(UpdateMutation[ApplicationSection, AnyUser]):
     """Cancel all reservations in the given application section that can be cancelled."""
 
     class Meta:

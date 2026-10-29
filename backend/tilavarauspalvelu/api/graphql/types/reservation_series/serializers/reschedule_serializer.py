@@ -16,21 +16,20 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries, ReservationStatistic
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
-from tilavarauspalvelu.typing import ReservationDetails, error_codes
+from tilavarauspalvelu.typing import ReservationDetails, ReservationSeriesRescheduleData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
 from utils.fields.serializer import input_only_field
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
-    from tilavarauspalvelu.typing import ReservationSeriesRescheduleData
 
 __all__ = [
     "ReservationSeriesRescheduleSerializer",
 ]
 
 
-class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
+class ReservationSeriesRescheduleSerializer(NestingModelSerializer[ReservationSeries, ReservationSeriesRescheduleData]):
     """Reschedule reservation series."""
 
     instance: ReservationSeries
@@ -93,7 +92,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
 
         # We know there is at least one future reservation, so we can safely assume
         # that we will have at least one reservation in the series
-        first_reservation: Reservation = self.instance.reservations.order_by("begins_at").first()  # type: ignore[attr-defined]
+        first_reservation: Reservation = self.instance.reservations.order_by("begins_at").first()
         if begin_date != self.instance.begin_date and first_reservation.begins_at < now:
             msg = (
                 "Reservation series' begin date cannot be changed after its "
@@ -124,7 +123,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         # Create both the reservation series and the reservations in a transaction.
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
-            instance = super().update(instance, validated_data)
+            super().update(instance, validated_data)
             reservations = self.recreate_reservations(
                 instance,
                 buffer_time_before=buffer_time_before,

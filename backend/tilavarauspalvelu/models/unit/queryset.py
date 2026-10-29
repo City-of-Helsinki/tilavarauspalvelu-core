@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Literal, Self
+from typing import Literal, Self, TypeVar
 
 from django.db import models
 
 from tilavarauspalvelu.models import Reservation, ReservationUnit, Unit, UnitGroup
-from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import TranslatedModelManager, TranslatedModelQuerySet
 from utils.db import SubqueryCount
 
 __all__ = [
@@ -14,7 +14,11 @@ __all__ = [
 ]
 
 
-class UnitQuerySet(TranslatedModelQuerySet[Unit]):
+_TModel_co = TypeVar("_TModel_co", bound=Unit, covariant=True, default=Unit)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=Unit)
+
+
+class UnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
     def order_by_unit_group_name(self, *, language: Literal["fi", "en", "sv"], desc: bool = False) -> Self:
         return self.alias(**{
             f"unit_group_name_{language}": models.Subquery(
@@ -43,4 +47,4 @@ class UnitQuerySet(TranslatedModelQuerySet[Unit]):
         ).order_by(models.OrderBy(models.F("reservation_count"), descending=desc))
 
 
-class UnitManager(ModelManager[Unit, UnitQuerySet]): ...
+class UnitManager(TranslatedModelManager[Unit, UnitQuerySet]): ...

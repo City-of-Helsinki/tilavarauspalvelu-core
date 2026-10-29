@@ -16,7 +16,7 @@ from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 
 
-class SetApplicationRoundHandledSerializer(NestingModelSerializer):
+class SetApplicationRoundHandledSerializer(NestingModelSerializer[ApplicationRound]):
     instance: ApplicationRound
 
     class Meta:
@@ -43,7 +43,7 @@ class SetApplicationRoundHandledSerializer(NestingModelSerializer):
         return instance
 
 
-class SetApplicationRoundResultsSentSerializer(NestingModelSerializer):
+class SetApplicationRoundResultsSentSerializer(NestingModelSerializer[ApplicationRound]):
     instance: ApplicationRound
 
     class Meta:

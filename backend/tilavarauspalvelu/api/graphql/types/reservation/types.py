@@ -25,6 +25,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationUnit, ReservationUnitPricing, User
+from tilavarauspalvelu.typing import AnyUser
 from utils.date_utils import utc_datetime
 from utils.db import SubqueryArray
 from utils.utils import ical_hmac_signature
@@ -34,7 +35,7 @@ from .permissions import ReservationPermission
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
-    from tilavarauspalvelu.typing import AnyUser, GQLInfo, PindoraReservationInfoData
+    from tilavarauspalvelu.typing import GQLInfo, PindoraReservationInfoData
 
 __all__ = [
     "ReservationNode",
@@ -91,7 +92,7 @@ def staff_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
     return True if result else None
 
 
-class ReservationNode(DjangoNode):
+class ReservationNode(DjangoNode[Reservation, AnyUser]):
     reservee_name = AnnotatedField(
         graphene.String,
         expression=L("reservee_name"),

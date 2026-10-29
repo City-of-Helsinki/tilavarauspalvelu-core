@@ -53,6 +53,23 @@ def test_application__create__with_application_sections(graphql):
     assert ReservationUnitOption.objects.count() == 1
 
 
+def test_application__create__with_application_sections__application_round_does_not_exist(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_open()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
+
+    input_data = get_application_create_data(application_round, create_sections=True)
+    missing_application_round_pk = application_round.pk + 1
+    input_data["applicationRound"] = missing_application_round_pk
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRound") == [
+        f'Invalid pk "{missing_application_round_pk}" - object does not exist.',
+    ]
+
+    assert Application.objects.count() == 0
+
+
 def test_application__create__with_application_sections__too_many(graphql, settings):
     settings.MAXIMUM_SECTIONS_PER_APPLICATION = 0
 

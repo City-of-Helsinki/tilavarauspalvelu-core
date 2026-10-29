@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Unit
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import Unit
+from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "UnitAllPermission",
@@ -14,7 +13,7 @@ __all__ = [
 ]
 
 
-class UnitPermission(BasePermission):
+class UnitPermission(BasePermission[Unit, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True
@@ -24,7 +23,7 @@ class UnitPermission(BasePermission):
         return user.permissions.can_manage_unit(instance)
 
 
-class UnitAllPermission(BasePermission):
+class UnitAllPermission(BasePermission[Unit, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True

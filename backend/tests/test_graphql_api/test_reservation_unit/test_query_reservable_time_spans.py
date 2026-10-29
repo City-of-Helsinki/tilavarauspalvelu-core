@@ -21,7 +21,9 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-UTCOFFSET = f"0{int(datetime.datetime(2021, 5, 1, tzinfo=DEFAULT_TIMEZONE).utcoffset().total_seconds() / 3600)}:00"
+UTCOFFSET_DELTA = datetime.datetime(2021, 5, 1, tzinfo=DEFAULT_TIMEZONE).utcoffset()
+assert UTCOFFSET_DELTA is not None
+UTCOFFSET = f"0{int(UTCOFFSET_DELTA.total_seconds() / 3600)}:00"
 
 
 @pytest.fixture
@@ -31,7 +33,7 @@ def reservation_unit() -> ReservationUnit:
         opening_hours_hash="test_hash",
         latest_fetched_date="2021-05-03",
     )
-    return ReservationUnitFactory(origin_hauki_resource=origin_hauki_resource)
+    return ReservationUnitFactory.create(origin_hauki_resource=origin_hauki_resource)
 
 
 def _get_date(*, day: int = 1, hour: int = 0, tzinfo: ZoneInfo | None = None):

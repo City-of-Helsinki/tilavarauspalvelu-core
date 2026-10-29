@@ -29,7 +29,7 @@ from tests.helpers import ResponseMock, exact, patch_method
 
 create_order_params: CreateOrderParams = CreateOrderParams(
     namespace="test-namespace",
-    user="test-user",
+    user=uuid.UUID("657d6cfc-f048-11ec-b6f9-0ed952b261b2"),
     language="fi",
     price_net=Decimal("100.0"),
     price_vat=Decimal("24.0"),
@@ -496,7 +496,7 @@ def test_verkkokauppa__cancel_order__returns_none_if_order_is_not_found():
     assert order is None
 
 
-@patch_method(VerkkokauppaAPIClient.request, return_value=ResponseMock(status_code=500, json_data={}, method="post"))
+@patch_method(VerkkokauppaAPIClient.request, return_value=ResponseMock(status_code=500, json_data={}, method="POST"))
 @patch_method(SentryLogger.log_message)
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__cancel_order__raises_exception_on_500_status():

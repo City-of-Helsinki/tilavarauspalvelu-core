@@ -30,7 +30,7 @@ class ReservationHandlingData(TypedDict):
     state: NotRequired[ReservationStateChoice]
 
 
-class ReservationRequiresHandlingSerializer(NestingModelSerializer):
+class ReservationRequiresHandlingSerializer(NestingModelSerializer[Reservation]):
     """Return a reservation to handling."""
 
     instance: Reservation
@@ -72,7 +72,7 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
             if payment_order.actions.has_no_payment_through_webshop():
                 payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
 
-        instance = super().update(instance=instance, validated_data=validated_data)
+        super().update(instance=instance, validated_data=validated_data)
 
         # If the reservation was changed from 'DENIED' to 'REQUIRES_HANDLING' in this mutation,
         # it means that the reservation is going to happen again. This is analogous to creating a new reservation,

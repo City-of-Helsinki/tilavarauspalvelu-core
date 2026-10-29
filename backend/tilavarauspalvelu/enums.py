@@ -5,7 +5,7 @@ import enum
 import operator
 from enum import StrEnum
 from inspect import cleandoc
-from typing import Literal
+from typing import TYPE_CHECKING
 
 from django.db import models
 from django.utils.functional import classproperty
@@ -13,6 +13,9 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 from tilavarauspalvelu.typing import permission
+
+if TYPE_CHECKING:
+    from django_stubs_ext import StrPromise
 
 __all__ = [
     "AccessType",
@@ -290,7 +293,12 @@ class UserRoleChoice(models.TextChoices):
 # There is the disadvantage that we don't get autocomplete of permissions like this,
 # but we also don't duplicate permissions from the roles above. This should be fine,
 # as the enum is not really used in our code but meant for the frontend.
-UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice.permission_choices())
+if TYPE_CHECKING:
+    # The type checker cannot read the members of an enum that is built at runtime.
+    class UserPermissionChoice(models.TextChoices): ...
+
+else:
+    UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice.permission_choices())
 
 
 class HaukiResourceState(models.TextChoices):
@@ -391,7 +399,7 @@ class ReservationStateChoice(models.TextChoices):
 
     @classproperty
     def states_going_to_occur(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CREATED.value,
             ReservationStateChoice.CONFIRMED.value,
             ReservationStateChoice.WAITING_FOR_PAYMENT.value,
@@ -400,14 +408,14 @@ class ReservationStateChoice(models.TextChoices):
 
     @classproperty
     def states_that_can_change_to_handling(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
             ReservationStateChoice.DENIED.value,
         ]
 
     @classproperty
     def states_that_can_change_to_deny(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.REQUIRES_HANDLING.value,
             ReservationStateChoice.CONFIRMED.value,
         ]
@@ -415,51 +423,51 @@ class ReservationStateChoice(models.TextChoices):
     @classproperty
     def states_that_can_be_deleted(cls) -> list[str]:
         # "Alustava varaus" / "tentative reservation"
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CREATED.value,
             ReservationStateChoice.WAITING_FOR_PAYMENT.value,
         ]
 
     @classproperty
     def states_that_can_be_edited_by_staff(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
     def states_that_can_be_rescheduled(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
     def states_that_can_be_approved(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.REQUIRES_HANDLING.value,
         ]
 
     @classproperty
     def states_that_can_be_cancelled(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
     def states_that_can_be_refunded(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CANCELLED.value,
             ReservationStateChoice.DENIED.value,
         ]
 
     @classproperty
     def states_that_can_change_access_code(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
     def doesnt_block_anonymization(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CANCELLED.value,
             ReservationStateChoice.DENIED.value,
         ]
@@ -481,35 +489,35 @@ class ReservationTypeChoice(models.TextChoices):
 
     @classproperty
     def types_that_can_be_rescheduled(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.BEHALF.value,
         ]
 
     @classproperty
     def should_not_anonymize(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.BLOCKED.value,
             ReservationTypeChoice.STAFF.value,
         ]
 
     @classproperty
     def types_that_can_be_cancelled(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.SEASONAL.value,
         ]
 
     @classproperty
     def types_created_by_the_reservee(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.SEASONAL.value,
         ]
 
     @classproperty
     def types_that_staff_can_create(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.BLOCKED.value,
             ReservationTypeChoice.STAFF.value,
             ReservationTypeChoice.BEHALF.value,
@@ -518,7 +526,7 @@ class ReservationTypeChoice(models.TextChoices):
 
     @classproperty
     def types_that_can_change_access_code(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.BEHALF.value,
             ReservationTypeChoice.STAFF.value,
@@ -549,13 +557,13 @@ class RejectionReadinessChoice(models.TextChoices):
 
 
 class CalendarProperty(StrEnum):
-    VERSION = "VERSION"  # type: str
+    VERSION = "VERSION"  # Value type: str
     """
     REQUIRED. Version of the iCalendar specification required to interpret the iCalendar object.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.7.4
     """
 
-    PRODID = "PRODID"  # type: str
+    PRODID = "PRODID"  # Value type: str
     """
     REQUIRED. The identifier for the product that created the iCalendar object.
     See: https://en.wikipedia.org/wiki/Formal_Public_Identifier
@@ -564,55 +572,55 @@ class CalendarProperty(StrEnum):
 
 
 class EventProperty(StrEnum):
-    UID = "UID"  # type: str
+    UID = "UID"  # Value type: str
     """
     The unique identifier for the calendar event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.4.7
     """
 
-    DTSTAMP = "DTSTAMP"  # type: datetime.datetime
+    DTSTAMP = "DTSTAMP"  # Value type: datetime.datetime
     """
     The date and time that the calendar event was created.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.7.2
     """
 
-    DTSTART = "DTSTART"  # type: datetime.datetime
+    DTSTART = "DTSTART"  # Value type: datetime.datetime
     """
     The date and time that the calendar event begins.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.4
     """
 
-    DTEND = "DTEND"  # type: datetime.datetime
+    DTEND = "DTEND"  # Value type: datetime.datetime
     """
     The date and time that the calendar event ends.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.2
     """
 
-    SUMMARY = "SUMMARY"  # type: str
+    SUMMARY = "SUMMARY"  # Value type: str
     """
     A short summary or subject for the event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.12
     """
 
-    DESCRIPTION = "DESCRIPTION"  # type: str
+    DESCRIPTION = "DESCRIPTION"  # Value type: str
     """
     A more complete description for the event than that provided by "SUMMARY".
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.5
     """
 
-    LOCATION = "LOCATION"  # type: str
+    LOCATION = "LOCATION"  # Value type: str
     """
     The intended venue for the event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.7
     """
 
-    GEO = "GEO"  # type: tuple[float, float]
+    GEO = "GEO"  # Value type: tuple[float, float]
     """
     Global position for the activity specified by a event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.6
     """
 
-    X_ALT_DESC = "X-ALT-DESC"  # type: str
+    X_ALT_DESC = "X-ALT-DESC"  # Value type: str
     """
     A more complete description for the event than that provided by "SUMMARY".
     Required for Outlook calendars to display HTML descriptions properly.
@@ -621,7 +629,7 @@ class EventProperty(StrEnum):
 
 
 class TimezoneProperty(StrEnum):
-    TZID = "TZID"  # type: str
+    TZID = "TZID"  # Value type: str
     """
     The timezone identifier for the time zone of the event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.2.19
@@ -629,26 +637,26 @@ class TimezoneProperty(StrEnum):
 
 
 class TimezoneRuleProperty(StrEnum):
-    DTSTART = "DTSTART"  # type: int
+    DTSTART = "DTSTART"  # Value type: int
     """
     Date and time after which this timezone rule is in effect.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.4
     """
 
-    RRULE = "RRULE"  # type: str
+    RRULE = "RRULE"  # Value type: str
     """
     Recurrence for the timezone change described by this rule.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.5.3
     """
 
-    TZOFFSETFROM = "TZOFFSETFROM"  # type: str
+    TZOFFSETFROM = "TZOFFSETFROM"  # Value type: str
     """
     In which timezone offset (e.g. +0200) the event should be considered in
     before moving to this rule (e.g. from standard to daylight savings time).
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.3.3
     """
 
-    TZOFFSETTO = "TZOFFSETTO"  # type: str
+    TZOFFSETTO = "TZOFFSETTO"  # Value type: str
     """
     To which timezone offset (e.g. +0300) the event should be converted to
     when moving to this rule (e.g. from standard to daylight savings time).
@@ -667,7 +675,7 @@ class ReservationUnitPublishingState(models.TextChoices):
 
     @classproperty
     def states_that_are_visible(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.PUBLISHED.value,
             cls.SCHEDULED_HIDING.value,
         ]
@@ -746,7 +754,7 @@ class ReservationCancelReasonChoice(models.TextChoices):
         """These reasons are selectable by the user"""
         values = list(cls)
         values.remove(cls.NOT_PAID)
-        return values  # type: ignore[return-type]
+        return values  # type: ignore[return-value]
 
 
 class ReservationKind(models.TextChoices):
@@ -756,14 +764,14 @@ class ReservationKind(models.TextChoices):
 
     @classproperty
     def allows_direct(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.DIRECT.value,
             cls.DIRECT_AND_SEASON.value,
         ]
 
     @classproperty
     def allows_season(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.SEASON.value,
             cls.DIRECT_AND_SEASON.value,
         ]
@@ -881,7 +889,7 @@ class Weekday(models.TextChoices):
     SUNDAY = "SUNDAY", _("Sunday")
 
     @classmethod
-    def from_iso_week_day(cls, weekday: Literal[1, 2, 3, 4, 5, 6, 7]) -> Weekday:
+    def from_iso_week_day(cls, weekday: int) -> Weekday:
         """ISO weekday number, starting from 1."""
         match weekday:
             case 1:
@@ -903,7 +911,7 @@ class Weekday(models.TextChoices):
                 raise ValueError(msg)
 
     @classmethod
-    def from_week_day(cls, weekday: Literal[0, 1, 2, 3, 4, 5, 6]) -> Weekday:
+    def from_week_day(cls, weekday: int) -> Weekday:
         """Weekday number, starting from 0."""
         match weekday:
             case 0:
@@ -1099,7 +1107,7 @@ class ApplicationStatusChoice(models.TextChoices):
 
     @classproperty
     def blocks_anonymization(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ApplicationStatusChoice.RECEIVED.value,
             ApplicationStatusChoice.IN_ALLOCATION.value,
             ApplicationStatusChoice.HANDLED.value,
@@ -1152,14 +1160,14 @@ class BannerNotificationTarget(models.TextChoices):
 
     @classproperty
     def for_staff(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.STAFF.value,
             cls.ALL.value,
         ]
 
     @classproperty
     def for_customers(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.USER.value,
             cls.ALL.value,
         ]
@@ -1213,9 +1221,13 @@ class AccessTypeWithMultivalued(models.TextChoices):
     MULTIVALUED = "MULTIVALUED", pgettext_lazy("AccessType", "multi-valued")
 
     @classproperty
-    def model_choices(cls) -> list[tuple[str, str]]:
+    def model_choices(cls) -> list[tuple[str, StrPromise]]:
         """Don't allow 'MULTIVALUED' to be set to models."""
-        return [(value, label) for value, label in cls.choices if value != cls.MULTIVALUED.value]
+        return [
+            (value, label)
+            for value, label in AccessTypeWithMultivalued.choices
+            if value != AccessTypeWithMultivalued.MULTIVALUED.value
+        ]
 
 
 class AccessCodeState(models.TextChoices):

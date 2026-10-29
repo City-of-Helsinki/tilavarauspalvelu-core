@@ -444,6 +444,9 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         pricing: ReservationUnitPricing | None = None,
     ) -> Self:
         """Add begin datetime and end datetime based on given reservation unit's allowed durations."""
+        assert reservation_unit.min_reservation_duration is not None
+        assert reservation_unit.max_reservation_duration is not None
+
         min_hours = math.ceil(reservation_unit.min_reservation_duration.total_seconds() / 3600)
         max_hours = math.ceil(reservation_unit.max_reservation_duration.total_seconds() / 3600)
 
@@ -466,9 +469,9 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         )
 
         if pricing is not None:
-            duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
+            reservation_duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
             self.set(
-                price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
+                price=round_decimal(pricing.actions.calculate_reservation_price(duration=reservation_duration), 2),
                 non_subsidised_price=pricing.highest_price,
                 unit_price=pricing.lowest_price if subsidised else pricing.highest_price,
                 tax_percentage_value=pricing.tax_percentage.value,

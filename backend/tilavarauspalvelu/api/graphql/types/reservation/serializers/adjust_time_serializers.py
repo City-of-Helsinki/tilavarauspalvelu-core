@@ -14,7 +14,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 
-class ReservationAdjustTimeSerializer(NestingModelSerializer):
+class ReservationAdjustTimeSerializer(NestingModelSerializer[Reservation, ReservationAdjustTimeData]):
     """Adjust the time of a reservation."""
 
     instance: Reservation
@@ -92,7 +92,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         )
 
         had_access_code = instance.access_type == AccessType.ACCESS_CODE
-        instance: Reservation = super().update(instance=instance, validated_data=validated_data)
+        super().update(instance=instance, validated_data=validated_data)
         has_access_code = instance.access_type == AccessType.ACCESS_CODE
 
         # After rescheduling the reservation, check for overlapping reservations again.

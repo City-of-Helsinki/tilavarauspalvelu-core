@@ -21,7 +21,7 @@ pytestmark = [
 
 class OrderingParams(NamedTuple):
     order_by: str
-    expected: list[dict[str, dict[str, str]]]
+    expected: list[dict[str, dict[str, str | None]]]
 
 
 @pytest.mark.parametrize(

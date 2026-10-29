@@ -4,6 +4,7 @@ import graphene
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import TermsOfUse
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import TermsOfUseFilterSet
 from .permissions import TermsOfUsePermission
@@ -13,7 +14,7 @@ __all__ = [
 ]
 
 
-class TermsOfUseNode(DjangoNode):
+class TermsOfUseNode(DjangoNode[TermsOfUse, AnyUser]):
     pk = graphene.String()
 
     class Meta:

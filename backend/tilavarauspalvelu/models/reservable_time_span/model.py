@@ -10,11 +10,7 @@ from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeS
 from utils.date_utils import DEFAULT_TIMEZONE
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import OriginHaukiResource
 
     from .actions import ReservableTimeSpanActions
     from .queryset import ReservableTimeSpanManager
@@ -29,13 +25,13 @@ __all__ = [
 class ReservableTimeSpan(models.Model):
     """A time period on which a ReservationUnit is reservable."""
 
-    resource: OriginHaukiResource = models.ForeignKey(
+    resource = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",
         related_name="reservable_time_spans",
         on_delete=models.CASCADE,
     )
-    start_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
-    end_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
+    start_datetime = models.DateTimeField(null=False, blank=False)
+    end_datetime = models.DateTimeField(null=False, blank=False)
 
     objects: ClassVar[ReservableTimeSpanManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservableTimeSpanActions] = LazyModelAttribute.new()

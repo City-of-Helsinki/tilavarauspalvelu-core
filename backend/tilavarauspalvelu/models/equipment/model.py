@@ -9,7 +9,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import EquipmentCategory, ReservationUnit
+    from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 
@@ -23,9 +23,9 @@ __all__ = [
 
 
 class Equipment(models.Model):
-    name: str = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
 
-    category: EquipmentCategory = models.ForeignKey(
+    category = models.ForeignKey(
         "tilavarauspalvelu.EquipmentCategory",
         related_name="equipment",
         on_delete=models.CASCADE,

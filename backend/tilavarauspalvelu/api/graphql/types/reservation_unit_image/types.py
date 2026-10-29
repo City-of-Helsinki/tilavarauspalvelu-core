@@ -8,6 +8,7 @@ from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.models import ReservationUnitImage
+from tilavarauspalvelu.typing import AnyUser
 
 from .permissions import ReservationUnitImagePermission
 
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import GQLInfo
 
 
-class ReservationUnitImageNode(DjangoNode):
+class ReservationUnitImageNode(DjangoNode[ReservationUnitImage, AnyUser]):
     image_url = AnnotatedField(graphene.String, expression=models.F("image"))
 
     small_url = graphene.String()

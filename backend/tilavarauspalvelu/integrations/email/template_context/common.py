@@ -19,6 +19,15 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from decimal import Decimal
 
+    from tilavarauspalvelu.integrations.email.typing import (
+        AccessCodeParams,
+        AccessCodeSectionParams,
+        AccessCodeSectionPlainParams,
+        AccessTypeChangeSectionParams,
+        BaseInfoParams,
+        PriceInfoParams,
+        PriceRangeInfoParams,
+    )
     from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, ReservationUnit, Unit
     from tilavarauspalvelu.typing import EmailContext, Lang
 
@@ -227,7 +236,7 @@ def get_contex_for_seasonal_reservation_check_details_url(
 # --- Params for contexts ------------------------------------------------------------------------------------------
 
 
-def params_for_base_info(*, reservation: Reservation, language: Lang) -> dict[str, Any]:
+def params_for_base_info(*, reservation: Reservation, language: Lang) -> BaseInfoParams:
     reservation_unit = reservation.reservation_unit
     unit: Unit = reservation_unit.unit
 
@@ -240,7 +249,7 @@ def params_for_base_info(*, reservation: Reservation, language: Lang) -> dict[st
     }
 
 
-def params_for_price_info(*, reservation: Reservation) -> dict[str, Any]:
+def params_for_price_info(*, reservation: Reservation) -> PriceInfoParams:
     return {
         "price": reservation.price,
         "tax_percentage": reservation.tax_percentage_value,
@@ -248,7 +257,7 @@ def params_for_price_info(*, reservation: Reservation) -> dict[str, Any]:
     }
 
 
-def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
+def params_for_price_range_info(*, reservation: Reservation) -> PriceRangeInfoParams:
     begin_datetime = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
     end_datetime = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
 
@@ -263,11 +272,11 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
     }
 
 
-def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str, Any]:
+def params_for_access_code_reservation(*, reservation: Reservation) -> AccessCodeParams:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
     from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 
-    params = {
+    params: AccessCodeParams = {
         "access_code": "",
         "access_code_is_used": False,
         "access_code_validity_period": "",
@@ -296,11 +305,11 @@ def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str,
     return params
 
 
-def params_for_access_code_series(*, series: ReservationSeries) -> dict[str, Any]:
+def params_for_access_code_series(*, series: ReservationSeries) -> AccessCodeParams:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
     from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 
-    params = {
+    params: AccessCodeParams = {
         "access_code": "",
         "access_code_is_used": False,
         "access_code_validity_period": "",
@@ -332,13 +341,13 @@ def params_for_access_code_series(*, series: ReservationSeries) -> dict[str, Any
     return params
 
 
-def params_for_access_code_section(*, section: ApplicationSection) -> dict[str, Any]:
+def params_for_access_code_section(*, section: ApplicationSection) -> AccessCodeSectionParams:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
     from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 
     all_allocations = _initialize_allocations_map(section)
 
-    params = {
+    params: AccessCodeSectionParams = {
         "access_code": "",
         "access_code_is_used": False,
         "allocations": _compile_allocations_map(all_allocations),
@@ -394,7 +403,7 @@ def params_for_access_code_section(*, section: ApplicationSection) -> dict[str, 
     return params
 
 
-def params_for_access_type_change_section(*, section: ApplicationSection) -> dict[str, Any]:
+def params_for_access_type_change_section(*, section: ApplicationSection) -> AccessTypeChangeSectionParams:
     reservation_units: Iterable[ReservationUnit] = (
         section.actions
         .get_reservation_units()
@@ -440,12 +449,12 @@ def params_for_access_type_change_section(*, section: ApplicationSection) -> dic
     }
 
 
-def params_for_access_code_section_plain(*, section: ApplicationSection) -> dict[str, Any]:
+def params_for_access_code_section_plain(*, section: ApplicationSection) -> AccessCodeSectionPlainParams:
     """Access code for email without allocation specific information"""
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
     from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 
-    params = {
+    params: AccessCodeSectionPlainParams = {
         "access_code": "",
         "access_code_is_used": False,
     }
@@ -548,8 +557,8 @@ def _initialize_allocations_map(section: ApplicationSection) -> AllocationsMap:
 
     series: ReservationSeries
     for series in section.actions.get_reservation_series():
-        begin_time = local_time_string(series.begin_time)  # type: ignore[arg-type]
-        end_time = local_time_string(series.end_time)  # type: ignore[arg-type]
+        begin_time = local_time_string(series.begin_time)
+        end_time = local_time_string(series.end_time)
 
         reservation = series.reservations.last()
         reservation_unit = series.reservation_unit
@@ -559,7 +568,7 @@ def _initialize_allocations_map(section: ApplicationSection) -> AllocationsMap:
                 "time_value": f"{begin_time}-{end_time}",
                 "access_code_validity_period": "",  # Can be filled in later if access codes are used
                 "series_url": get_staff_reservations_ext_link(reservation_id=reservation.pk),
-                "unit_name": reservation_unit.unit.name,  # type: ignore[union-attr]
+                "unit_name": reservation_unit.unit.name,
                 "unit_location": reservation_unit.unit.address,
                 "reservation_unit_name": reservation_unit.name,
             }

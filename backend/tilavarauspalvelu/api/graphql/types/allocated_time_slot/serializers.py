@@ -21,7 +21,7 @@ __all__ = [
 ]
 
 
-class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
+class AllocatedTimeSlotCreateSerializer(NestingModelSerializer[AllocatedTimeSlot]):
     force = serializers.BooleanField(default=False, required=False, write_only=True)
 
     class Meta:

@@ -81,29 +81,29 @@ def test_reservation_unit__create__unit_admin__resource_of_other_unit(graphql):
 # ── Hauki ──
 
 
-@patch_method(HaukiAPIClient.get_resource, return_value=HaukiAPIResource(id=123))
-@patch_method(
-    HaukiAPIClient.create_resource,
-    return_value=HaukiAPIResource(
-        id=123,
-        name=HaukiTranslatedField(fi="nameFi", sv="nameSv", en="nameEn"),
-        description=HaukiTranslatedField(fi="descFi", sv="descSv", en="descEn"),
-        address=HaukiTranslatedField(fi="addressFi", sv="addressSv", en="addressEn"),
-        resource_type="unit",
-        children=[],
-        parents=[],
-        organization="org",
-        origins=[],
-        last_modified_by=None,
-        created="2021-01-01T00:00:00Z",
-        modified="2021-01-01T00:00:00Z",
-        extra_data={},
-        is_public=True,
-        timezone="Europe/Helsinki",
-        date_periods_hash="hash",
-        date_periods_as_text="text",
-    ),
+HAUKI_RESOURCE = HaukiAPIResource(
+    id=123,
+    name=HaukiTranslatedField(fi="nameFi", sv="nameSv", en="nameEn"),
+    description=HaukiTranslatedField(fi="descFi", sv="descSv", en="descEn"),
+    address=HaukiTranslatedField(fi="addressFi", sv="addressSv", en="addressEn"),
+    resource_type="unit",
+    children=[],
+    parents=[],
+    organization="org",
+    origins=[],
+    last_modified_by=None,
+    created="2021-01-01T00:00:00Z",
+    modified="2021-01-01T00:00:00Z",
+    extra_data={},
+    is_public=True,
+    timezone="Europe/Helsinki",
+    date_periods_hash="hash",
+    date_periods_as_text="text",
 )
+
+
+@patch_method(HaukiAPIClient.get_resource, return_value=HAUKI_RESOURCE)
+@patch_method(HaukiAPIClient.create_resource, return_value=HAUKI_RESOURCE)
 def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
     settings.HAUKI_EXPORTS_ENABLED = True
 
@@ -129,7 +129,7 @@ def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
     assert reservation_unit.origin_hauki_resource.id == 123
 
 
-@patch_method(HaukiAPIClient.get_resource, return_value=HaukiAPIResource(id=123))
+@patch_method(HaukiAPIClient.get_resource, return_value=HAUKI_RESOURCE)
 @patch_method(HaukiAPIClient.create_resource, side_effect=HaukiAPIError("foo"))
 def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
     settings.HAUKI_EXPORTS_ENABLED = True

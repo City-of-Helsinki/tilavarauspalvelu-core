@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.permissions import BasePermission
 
+from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.typing import AnyUser
+
 if TYPE_CHECKING:
     from query_optimizer.typing import GraphQLFilterInfo
-
-    from tilavarauspalvelu.models import PaymentOrder
-    from tilavarauspalvelu.typing import AnyUser
 
 
 __all__ = [
@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-class PaymentOrderPermission(BasePermission):
+class PaymentOrderPermission(BasePermission[PaymentOrder, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return user.is_authenticated
@@ -25,9 +25,13 @@ class PaymentOrderPermission(BasePermission):
     def has_node_permission(cls, instance: PaymentOrder, user: AnyUser, filters: GraphQLFilterInfo) -> bool:
         if not user.is_authenticated:
             return False
-        if instance.reservation.user == user:
+
+        reservation = instance.reservation
+        if reservation is None:
+            return False
+        if reservation.user == user:
             return True
-        return user.permissions.can_view_reservation(instance.reservation)
+        return user.permissions.can_view_reservation(reservation)
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:

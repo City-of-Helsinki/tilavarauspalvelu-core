@@ -4,7 +4,9 @@ import uuid
 from typing import TYPE_CHECKING, ClassVar
 
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.postgres.fields.array import ArrayField, IndexTransform
+
+# django-stubs does not declare 'IndexTransform'.
+from django.contrib.postgres.fields.array import ArrayField, IndexTransform  # type: ignore[attr-defined]
 from django.db import models
 from django.db.models import Exists
 from django.db.models.functions import Coalesce
@@ -18,18 +20,9 @@ from utils.db import SubqueryArray
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import (
-        AgeGroup,
-        AllocatedTimeSlot,
-        RejectedOccurrence,
-        Reservation,
-        ReservationUnit,
-        User,
-    )
+    from tilavarauspalvelu.models import RejectedOccurrence, Reservation
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.rejected_occurrence.queryset import RejectedOccurrenceQuerySet
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
@@ -47,42 +40,42 @@ __all__ = [
 class ReservationSeries(models.Model):
     """Defines a series of reservations that are created using given recurrence rules."""
 
-    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    ext_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    name: str = models.CharField(max_length=255, blank=True, default="")
-    description: str = models.CharField(max_length=500, blank=True, default="")
+    name = models.CharField(max_length=255, blank=True, default="")
+    description = models.CharField(max_length=500, blank=True, default="")
 
-    begin_date: datetime.date = models.DateField()
-    begin_time: datetime.time = models.TimeField()
-    end_date: datetime.date = models.DateField()
-    end_time: datetime.time = models.TimeField()
+    begin_date = models.DateField()
+    begin_time = models.TimeField()
+    end_date = models.DateField()
+    end_time = models.TimeField()
 
-    recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)
+    recurrence_in_days = models.PositiveIntegerField(null=True, blank=True)
 
-    weekdays: list[Weekday] = ArrayField(TextChoicesField(enum=Weekday), size=7, default=list)
+    weekdays = ArrayField(TextChoicesField(enum=Weekday), size=7, default=list)
 
     # Relations
 
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservation_series",
         on_delete=models.PROTECT,
     )
-    user: User = models.ForeignKey(
+    user = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="reservation_series",
         on_delete=models.PROTECT,
     )
 
-    allocated_time_slot: AllocatedTimeSlot | None = models.OneToOneField(
+    allocated_time_slot = models.OneToOneField(
         "tilavarauspalvelu.AllocatedTimeSlot",
         related_name="reservation_series",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
-    age_group: AgeGroup | None = models.ForeignKey(
+    age_group = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
         related_name="reservation_series",
         on_delete=models.SET_NULL,
@@ -194,7 +187,7 @@ class ReservationSeries(models.Model):
 
     @access_type.override
     def _(self) -> AccessTypeWithMultivalued:
-        access_types: list[str] = self.used_access_types  # type: ignore[attr-defined]
+        access_types: list[AccessType] = self.used_access_types
         if len(access_types) == 0:
             return AccessTypeWithMultivalued.UNRESTRICTED
         if len(access_types) == 1:

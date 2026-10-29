@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import Self, TypeVar
 
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models.functions import Coalesce
 
 from tilavarauspalvelu.models import ApplicationRound, Unit
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 
 __all__ = [
     "ApplicationRoundManager",
@@ -15,7 +15,11 @@ __all__ = [
 ]
 
 
-class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
+_TModel_co = TypeVar("_TModel_co", bound=ApplicationRound, covariant=True, default=ApplicationRound)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ApplicationRound)
+
+
+class ApplicationRoundQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def active(self) -> Self:
         return self.filter(sent_at=None)
 
@@ -35,7 +39,8 @@ class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
 
-        items = list(self._result_cache)
+        # Only `with_permissions` sets the flag that runs this, and it is used on model querysets.
+        items: list[ApplicationRound] = list(self._result_cache or [])  # type: ignore[arg-type]
         if not items:
             return
 
@@ -63,4 +68,4 @@ class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
             item.units_for_permissions = [unit for unit in units if item.pk in unit.application_round_ids]
 
 
-class ApplicationRoundManager(ModelManager[ApplicationRound, ApplicationRoundQuerySet]): ...
+class ApplicationRoundManager(TranslatedModelManager[ApplicationRound, ApplicationRoundQuerySet]): ...

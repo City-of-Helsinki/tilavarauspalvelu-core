@@ -5,7 +5,7 @@ from graphene_django_extensions import NestingModelSerializer
 from tilavarauspalvelu.models import ReservationUnitPricing
 
 
-class ReservationUnitPricingSerializer(NestingModelSerializer):
+class ReservationUnitPricingSerializer(NestingModelSerializer[ReservationUnitPricing]):
     class Meta:
         model = ReservationUnitPricing
         fields = [

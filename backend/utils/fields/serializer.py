@@ -5,14 +5,15 @@ from typing import TYPE_CHECKING, Any
 from rest_framework.fields import SkipField
 
 if TYPE_CHECKING:
-    from graphene_django_extensions.typing import AnyUser
     from rest_framework import serializers
     from rest_framework.fields import Field
 
     from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "CurrentUserDefaultNullable",
+    "InputOnlyFieldValidator",
     "input_only_field",
 ]
 
@@ -35,7 +36,7 @@ class CurrentUserDefaultNullable:
         return f"{self.__class__.__name__}()"
 
 
-def input_only_field(value: Any, field: Field) -> None:
+class InputOnlyFieldValidator:
     """
     This is a bit of a hack, but adding this validator to any ModelSerializer field
     will exclude that field from `validated_data`. This can be used to create fields
@@ -49,8 +50,12 @@ def input_only_field(value: Any, field: Field) -> None:
     Additionally, fields should be marked as `write_only=True` to prevent them from being
     serialized in responses.
     """
-    field.parent.initial_data[field.field_name] = value  # Save the validated value
-    raise SkipField
+
+    requires_context: bool = True  # See. `rest_framework.fields.Field.run_validators`
+
+    def __call__(self, value: Any, field: Field) -> None:
+        field.parent.initial_data[field.field_name] = value  # Save the validated value
+        raise SkipField
 
 
-input_only_field.requires_context = True  # See. `rest_framework.fields.Field.run_validators`
+input_only_field = InputOnlyFieldValidator()

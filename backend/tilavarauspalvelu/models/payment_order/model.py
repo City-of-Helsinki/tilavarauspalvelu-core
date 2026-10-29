@@ -16,11 +16,8 @@ from utils.date_utils import utc_datetime
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import uuid
-
+    from django.utils.functional import Promise
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import Reservation
 
     from .actions import PaymentOrderActions
     from .queryset import PaymentOrderManager
@@ -33,7 +30,7 @@ __all__ = [
 
 
 class PaymentOrder(models.Model):
-    reservation: Reservation | None = models.OneToOneField(
+    reservation = models.OneToOneField(
         "tilavarauspalvelu.Reservation",
         related_name="payment_order",
         on_delete=models.SET_NULL,
@@ -41,25 +38,25 @@ class PaymentOrder(models.Model):
         blank=True,
     )
 
-    remote_id: uuid.UUID | None = models.UUIDField(blank=True, null=True)
-    payment_id: str = models.CharField(blank=True, default="", max_length=128)
-    refund_id: uuid.UUID | None = models.UUIDField(blank=True, null=True)
-    payment_type: PaymentType = TextChoicesField(enum=PaymentType)
-    status: OrderStatus = TextChoicesField(enum=OrderStatus, db_index=True)
+    remote_id = models.UUIDField(blank=True, null=True)
+    payment_id = models.CharField(blank=True, default="", max_length=128)
+    refund_id = models.UUIDField(blank=True, null=True)
+    payment_type = TextChoicesField(enum=PaymentType)
+    status = TextChoicesField(enum=OrderStatus, db_index=True)
 
-    price_net: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
-    price_vat: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
-    price_total: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
+    price_net = models.DecimalField(max_digits=10, decimal_places=2)
+    price_vat = models.DecimalField(max_digits=10, decimal_places=2)
+    price_total = models.DecimalField(max_digits=10, decimal_places=2)
 
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
-    processed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
     # Only set when reservation also requires handling, meaning user cannot pay directly during checkout.
-    handled_payment_due_by: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    handled_payment_due_by = models.DateTimeField(null=True, blank=True)
 
-    language: Language = TextChoicesField(enum=Language)
-    reservation_user_uuid: uuid.UUID | None = models.UUIDField(blank=True, null=True)
-    checkout_url: str = models.CharField(blank=True, default="", max_length=512)
-    receipt_url: str = models.CharField(blank=True, default="", max_length=512)
+    language = TextChoicesField(enum=Language)
+    reservation_user_uuid = models.UUIDField(blank=True, null=True)
+    checkout_url = models.CharField(blank=True, default="", max_length=512)
+    receipt_url = models.CharField(blank=True, default="", max_length=512)
 
     objects: ClassVar[PaymentOrderManager] = LazyModelManager.new()
     actions: LazyAttribute[PaymentOrderActions] = LazyModelAttribute.new()
@@ -90,7 +87,7 @@ class PaymentOrder(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self) -> None:
-        validation_errors = {}
+        validation_errors: dict[str, list[Promise]] = {}
 
         failsafe_price_net = self.price_net or Decimal("0.0")
         failsafe_price_vat = self.price_vat or Decimal("0.0")

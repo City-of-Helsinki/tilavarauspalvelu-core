@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import datetime
-from typing import Self
+from typing import Self, TypeVar
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
 
+from tilavarauspalvelu.models import User
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_date
@@ -19,7 +19,11 @@ __all__ = [
 ]
 
 
-class UserQuerySet(ModelQuerySet[User]):
+_TModel_co = TypeVar("_TModel_co", bound=User, covariant=True, default=User)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=User)
+
+
+class UserQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def remove_old_superuser_and_staff_permissions(self) -> None:
         """Remove superuser and staff permissions from inactive users."""
         self.should_deactivate_permissions().update(is_staff=False, is_superuser=False)
@@ -54,7 +58,7 @@ class UserQuerySet(ModelQuerySet[User]):
             & models.Q(last_login__date__lt=cutoff)
         )
 
-    def anonymize_inactive_users(self) -> None:
+    def anonymize_inactive_users(self: UserQuerySet) -> None:
         """Anonymize users who haven't logged in in a while and haven't been anonymized yet."""
         for user in self.should_anonymize_users():
             if user.actions.can_anonymize():
@@ -97,4 +101,4 @@ class UserManager(DjangoUserManager, ModelManager[User, UserQuerySet]):
     use_in_migrations = True
 
 
-class ProfileUserManager(SerializableModelManagerMixin, ModelManager[User, UserQuerySet]): ...
+class ProfileUserManager(SerializableModelManagerMixin, UserManager): ...

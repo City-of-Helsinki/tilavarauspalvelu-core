@@ -14,23 +14,21 @@ from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPr
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import ReservationCreateData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
-    from tilavarauspalvelu.typing import AnyUser, ReservationCreateData, WSGIRequest
+    from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 
 __all__ = [
     "ReservationCreateSerializer",
 ]
 
 
-class ReservationCreateSerializer(NestingModelSerializer):
+class ReservationCreateSerializer(NestingModelSerializer[Reservation, ReservationCreateData]):
     """Create a tentative reservation before moving to the checkout flow."""
-
-    instance: None
 
     pk = IntegerField(read_only=True)
     reservation_unit = IntegerPrimaryKeyField(queryset=ReservationUnit.objects, required=True, write_only=True)

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import UnitGroup
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import UnitGroupFilterSet
 from .permissions import UnitGroupPermission
@@ -19,7 +20,7 @@ __all__ = [
 ]
 
 
-class UnitGroupNode(DjangoNode):
+class UnitGroupNode(DjangoNode[UnitGroup, AnyUser]):
     class Meta:
         model = UnitGroup
         fields = [

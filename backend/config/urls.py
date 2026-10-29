@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 
 # Mock the `each_context` method to add some custom context variables.
 original_each_context = admin.site.each_context
-admin.site.each_context = lambda request: (
+admin.site.each_context = lambda request: (  # type: ignore[method-assign]
     original_each_context(request)
     | {
         "version": settings.APP_VERSION,
@@ -56,7 +56,7 @@ admin.site.each_context = lambda request: (
 # Group the models on the admin index page and in the sidebar by topic.
 # The app pages, such as '/admin/tilavarauspalvelu/', keep the default list.
 original_get_app_list = admin.site.get_app_list
-admin.site.get_app_list = lambda request, app_label=None: (
+admin.site.get_app_list = lambda request, app_label=None: (  # type: ignore[method-assign]
     group_admin_app_list(original_get_app_list(request))
     if app_label is None
     else original_get_app_list(request, app_label)
