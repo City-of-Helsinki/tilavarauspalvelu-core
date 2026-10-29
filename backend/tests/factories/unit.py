@@ -37,15 +37,15 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
     name_en = FakerEN("word")
     name_sv = FakerSV("word")
 
-    description = FakerFI("text")
+    description = factory.Sequence(lambda n: f"Description {n}.")
     description_fi = LazyAttribute(lambda i: i.description)
-    description_en = FakerEN("text")
-    description_sv = FakerSV("text")
+    description_en = factory.Sequence(lambda n: f"Description EN {n}.")
+    description_sv = factory.Sequence(lambda n: f"Description SV {n}.")
 
-    short_description = FakerFI("text")
-    short_description_fi = LazyAttribute(lambda i: i.description)
-    short_description_en = FakerEN("text")
-    short_description_sv = FakerSV("text")
+    short_description = factory.Sequence(lambda n: f"Short description {n}.")
+    short_description_fi = LazyAttribute(lambda i: i.short_description)
+    short_description_en = factory.Sequence(lambda n: f"Short description EN {n}.")
+    short_description_sv = factory.Sequence(lambda n: f"Short description SV {n}.")
 
     search_terms = LazyAttribute(lambda i: [])
 
