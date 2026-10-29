@@ -10,7 +10,6 @@ import { reservation_lownav } from "./PO/User/reservation_lownav";
 import { common_setups_teardowns } from "./Resources/common_setups_teardowns";
 import "./Resources/devices";
 import "./Resources/variables";
-import "./Resources/har_recording";
 import "./Resources/serial_users";
 import "./Resources/texts_FI";
 import "./Resources/create_data";

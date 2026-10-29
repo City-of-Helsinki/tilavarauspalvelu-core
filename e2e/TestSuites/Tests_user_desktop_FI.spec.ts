@@ -16,7 +16,6 @@ import { common_setups_teardowns } from "./Resources/common_setups_teardowns";
 import "./Resources/parallel_test_data";
 import "./Resources/devices";
 import "./Resources/variables";
-import "./Resources/har_recording";
 import "./Resources/serial_users";
 import "./Resources/texts_FI";
 import "./Resources/create_data";
@@ -71,7 +70,6 @@ test.describe(
       await app_user["User Checks The Reservation Info Is Right Before Submit"]();
       await reservation_lownav["Click Submit Button Continue"]();
       await app_user["User Checks The Reservation Info Is Right After Submit"]();
-      //
       await topnav["Navigate To My Bookings"]();
       await app_user["User Can See Upcoming Booking In List And Clicks It"](
         V.CURRENT_ALWAYS_FREE_UNIT_WITH_LOCATION,

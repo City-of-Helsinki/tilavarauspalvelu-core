@@ -35,10 +35,9 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
 
   "Admin Fills Notification Name": async (name: RobotValue) => {
     await Browser["Fill Text"]("id=notification-name", name);
-
-    // Ilmoituksen tyyppi
   },
 
+  // Ilmoituksen tyyppi
   "Admin Selects Type Of Notification": async (notification_type: RobotValue) => {
     await Browser["Click"]('css=[aria-label*="Ilmoituksen tyyppi."]');
     await custom_keywords["Find And Click Element With Text"]("form >> li >> span", notification_type);
@@ -60,12 +59,9 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
     // Sleep  500ms
     // custom_keywords.Find and click element with text  form >> li >> span  ${NOTIFICATION_BANNER_MESSAGE_ERROR}
     // Sleep  500ms
-
-    //
-
-    // Kohderyhmä
   },
 
+  // Kohderyhmä
   "Admin Selects Target Group All": async () => {
     await Browser["Click"]('css=[aria-label*="Kohderyhmä."]');
     await custom_keywords["Find And Click Element With Text"](
@@ -103,14 +99,10 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
       "visible",
       named({ timeout: "5s" })
     );
-
-    //
-
-    // Viesti
   },
 
+  // Viesti
   "Admin Clicks Notification Text Fi Container": async () => {
-    //
     await Browser["Click"]('[data-testid="Notification__Page--message-fi-input"]');
   },
 
@@ -157,10 +149,5 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
       "visible",
       named({ timeout: "15s" })
     );
-  },
-
-  /** Verifies that a notification with the specified name is NOT present in the notifications list */
-  "Admin Verifies Notification Is Not Found": async (notification_name: RobotValue) => {
-    await custom_keywords["Verify Element With Text Is Not Found"]("tbody >> a", notification_name);
   },
 });

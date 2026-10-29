@@ -81,12 +81,9 @@ export const topnav = keywords("topnav", {
   "Navigate To My Applications": async () => {
     await Browser["Click"](`header >> [href="/applications"]:text-is("${str(V.MYAPPLICATIONS_FI)}")`);
     await currentPage().waitForURL((url) => url.pathname === "/applications");
-
-    //
-    // MOBILE UI
-    //
   },
 
+  // MOBILE UI
   "Click Navigation Menu Mobile": async () => {
     // The clicks in the menu wait until its animation has ended
     await Browser["Click"]("id=Menu");
@@ -118,7 +115,6 @@ export const topnav = keywords("topnav", {
     // ${Topnav_menu_name_elements}=  Browser.Get Elements  id=hds-mobile-menu >> [data-testid="navigation__user-name"]
     // ${Topnav_menu_name_element_text}=  Get Text  ${Topnav_menu_name_elements}[1]
     // Should Be Equal  ${Topnav_menu_name_element_text}  ${Expected_name}
-    //
     // ${Topnav_menu_email_element_text}=  Get Text  id=hds-mobile-menu >> [data-testid="navigation-user-email"]
     // ${Topnav_menu_email_elements}=  Browser.Get Elements  id=hds-mobile-menu >> [data-testid="navigation-user-email"]
     // ${Topnav_menu_email_element_text}=  Get Text  ${Topnav_menu_email_elements}[1]

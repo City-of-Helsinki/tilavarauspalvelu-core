@@ -17,10 +17,6 @@ export const admin_landingpage = keywords("admin_landingpage", {
     await BuiltIn["Log"](expected_H1_text);
   },
 
-  "Admin Landing Page H1 Should Contain": async (expected_H1_text: RobotValue) => {
-    await expect(loc("css=H1")).toContainText(str(expected_H1_text), { timeout: 5000 });
-  },
-
   "Approve Cookies": async () => {
     await Browser["Click"]("css=.ch2-btn-text-sm");
   },

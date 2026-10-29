@@ -3,10 +3,9 @@ import { Browser, openTestPage } from "../../lib/Browser";
 import { BuiltIn } from "../../lib/BuiltIn";
 import { Collections } from "../../lib/Collections";
 import { DateTime } from "../../lib/DateTime";
-import { V, errorMessage, isTruthy, keywords, named, registerVariables, rethrowSkip, str } from "../../lib/robot";
+import { V, isTruthy, keywords, named, registerVariables, str } from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
 import "../Resources/variables";
-import "../Resources/har_recording";
 
 export const devices_variables = {
   BROWSER: "chromium",
@@ -131,24 +130,5 @@ export const devices = keywords("devices", {
     let fresh_cookies: RobotValue;
     fresh_cookies = await Browser["Get Cookies"](named({ return_type: "string" }));
     await BuiltIn["Log"](`"🔍 cookies: ${str(fresh_cookies)}"`);
-  },
-
-  /** Properly closes browser and finalizes HAR recording for pabot tests */
-  "Teardown Browser With HAR Finalization": async () => {
-    let error: RobotValue;
-    await BuiltIn["Log"]("🔄 Starting browser teardown...");
-
-    try {
-      await Browser["Close Browser"]();
-      await BuiltIn["Log"]("✅ Browser closed successfully");
-    } catch (err) {
-      rethrowSkip(err);
-      error = errorMessage(err);
-      await BuiltIn["Log"](`⚠️ Error closing browser: ${str(error)}`);
-    }
-
-    await BuiltIn["Log"]("🎉 Browser teardown completed");
-
-    // HAR recording is automatically enabled for all browser contexts
   },
 });
