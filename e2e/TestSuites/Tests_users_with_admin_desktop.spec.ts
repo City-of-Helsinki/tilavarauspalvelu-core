@@ -1,13 +1,14 @@
 /** Desktop browser tests */
-import { V, log } from "../lib/robot";
+import { log } from "../lib/runtime";
 import { test } from "./fixtures";
-import "./Resources/variables";
-import "./Resources/texts_FI";
-import "./Resources/serial_users";
-import "./Resources/parallel_test_data";
-import "./Resources/devices";
-import "./Resources/create_data";
-import "./Resources/suite_specific_units";
+import {
+  JUSTIFICATION_FOR_SUBVENTION,
+  MYBOOKINGS_STATUS_CONFIRMED,
+  MYBOOKINGS_STATUS_PROCESSED,
+  SINGLEBOOKING_NO_PAYMENT,
+  SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+  SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+} from "./Resources/texts_FI";
 
 test.describe(
   "Tests users with admin desktop",
@@ -41,6 +42,8 @@ test.describe(
         appUser,
         commonSetupsTeardowns,
         dataModification,
+        state,
+        testData,
         topnav,
       }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
@@ -48,27 +51,27 @@ test.describe(
 
         await log("User creates subvented reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_ALWAYS_PAID_UNIT_SUBVENTED);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnitSubvented);
         await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(V.JUSTIFICATION_FOR_SUBVENTION);
+        await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(JUSTIFICATION_FOR_SUBVENTION);
         await appUser.userChecksTheSubventedReservationInfoIsRightAndSubmits();
         await appUser.userChecksTheSubventedReservationInfoIsRightAfterSubmitting();
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_ALWAYS_PAID_UNIT_SUBVENTED_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.alwaysPaidUnitSubventedWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksBookingInfoInReservationsWithAllReservationInfo(
-          V.MYBOOKINGS_STATUS_PROCESSED,
-          V.SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-          V.TIME_OF_QUICK_RESERVATION
+          MYBOOKINGS_STATUS_PROCESSED,
+          SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+          state.timeOfQuickReservation
         );
 
         await log("Formats info of subvented reservation to admin side");
         await dataModification.formatsReservationNumberAndNameForAdminSide();
         await dataModification.formatsTaglineForAdminSide(
-          V.TIME_OF_QUICK_RESERVATION,
-          V.CURRENT_ALWAYS_PAID_UNIT_SUBVENTED_WITH_LOCATION
+          state.timeOfQuickReservation,
+          testData.units.alwaysPaidUnitSubventedWithLocation
         );
         await appCommon.userLogsOut();
 
@@ -77,8 +80,8 @@ test.describe(
         await appCommon.adminLogsInWithSuomiFi();
         await adminNavigationMenu.adminNavigatesToRequestedReservations();
         await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-          V.BOOKING_NUM_ONLY,
-          V.CURRENT_USER_FULLNAME
+          state.bookingNumOnly,
+          testData.user.fullName
         );
         await appAdmin.adminChecksTheInfoAndSetsReservationFreeAndApprovesIt();
         await appAdmin.adminEditsReservationTime();
@@ -89,8 +92,8 @@ test.describe(
         await appCommon.userLogsInWithSuomiFi();
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_ALWAYS_PAID_UNIT_SUBVENTED_WITH_LOCATION,
-          V.ADMIN_MODIFIES_TIME_OF_INFO_CARD_MINUS_T
+          testData.units.alwaysPaidUnitSubventedWithLocation,
+          state.adminModifiesTimeOfInfoCardMinusT
         );
         await appUser.userVerifiesDetailsOfSubventedReservationAfterAdminApprovalWithoutPayment();
       }
@@ -108,6 +111,8 @@ test.describe(
         commonSetupsTeardowns,
         dataModification,
         reservationLownav,
+        state,
+        testData,
         topnav,
       }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
@@ -115,7 +120,7 @@ test.describe(
 
         await log("User creates reservation that requires handling");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_UNIT_REQUIRES_ALWAYS_HANDLING);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.unitRequiresAlwaysHandling);
         await appUser.userReservesAFreeQuickReservationSlot();
         await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits();
         await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightBeforeSubmit();
@@ -123,20 +128,20 @@ test.describe(
         await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit();
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_UNIT_REQUIRES_ALWAYS_HANDLING_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.unitRequiresAlwaysHandlingWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksBookingInfoInReservationsWithNumberOfParticipantsAndDescriptionAndPurpose(
-          V.MYBOOKINGS_STATUS_PROCESSED,
-          V.SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-          V.TIME_OF_QUICK_RESERVATION
+          MYBOOKINGS_STATUS_PROCESSED,
+          SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+          state.timeOfQuickReservation
         );
 
         await log("Formats info of subvented reservation to admin side");
         await dataModification.formatsReservationNumberAndNameForAdminSide();
         await dataModification.formatsTaglineForAdminSide(
-          V.TIME_OF_QUICK_RESERVATION,
-          V.CURRENT_UNIT_REQUIRES_ALWAYS_HANDLING_WITH_LOCATION
+          state.timeOfQuickReservation,
+          testData.units.unitRequiresAlwaysHandlingWithLocation
         );
         await appCommon.userLogsOut();
 
@@ -145,8 +150,8 @@ test.describe(
         await appCommon.adminLogsInWithSuomiFi();
         await adminNavigationMenu.adminNavigatesToRequestedReservations();
         await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-          V.BOOKING_NUM_ONLY,
-          V.CURRENT_USER_FULLNAME
+          state.bookingNumOnly,
+          testData.user.fullName
         );
         await appAdmin.adminChecksTheInfoAndCancelsReservation();
         await appAdmin.adminReturnsReservationToHandlingStateFromRejectedState();
@@ -158,8 +163,8 @@ test.describe(
         await appCommon.userLogsInWithSuomiFi();
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_UNIT_REQUIRES_ALWAYS_HANDLING_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.unitRequiresAlwaysHandlingWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksTheRejectedReservationInfoIsRightAfterAdminHandling();
       }
@@ -176,6 +181,8 @@ test.describe(
         appUser,
         commonSetupsTeardowns,
         reservationLownav,
+        state,
+        testData,
         topnav,
       }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
@@ -183,7 +190,7 @@ test.describe(
 
         await log("User creates reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_UNIT_WITH_ACCESS_CODE);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.unitWithAccessCode);
         await appUser.userReservesAFreeQuickReservationSlot();
         await appUser.userFillsBookingDetailsAsIndividualForReservationWithAccessCodeAndSubmits();
         await appUser.userChecksTheReservationInfoIsRightBeforeSubmitWithAccessCode();
@@ -196,15 +203,15 @@ test.describe(
         await appCommon.adminLogsInWithSuomiFi();
         await adminNavigationMenu.adminNavigatesToRequestedReservations();
         await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-          V.BOOKING_NUM_ONLY,
-          V.CURRENT_USER_FULLNAME
+          state.bookingNumOnly,
+          testData.user.fullName
         );
 
         await log("Changing access code");
         await appAdmin.adminOpensAccessCodeModal();
-        await appAdmin.adminChecksAccessCodeMatches(V.ACCESS_CODE);
+        await appAdmin.adminChecksAccessCodeMatches(state.accessCode);
         await appAdmin.adminChangesAccessCode();
-        await appAdmin.adminChecksAccessCodeDoesNotMatch(V.ACCESS_CODE);
+        await appAdmin.adminChecksAccessCodeDoesNotMatch(state.accessCode);
         await appAdmin.adminSavesAccessCode();
         await appCommon.adminLogsOut();
 
@@ -213,14 +220,14 @@ test.describe(
         await appCommon.userLogsInWithSuomiFi();
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_UNIT_WITH_ACCESS_CODE_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.unitWithAccessCodeWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksBookingInfoInReservationsWithAccessCode(
-          V.MYBOOKINGS_STATUS_CONFIRMED,
-          V.SINGLEBOOKING_NO_PAYMENT,
-          V.TIME_OF_QUICK_RESERVATION,
-          V.ACCESS_CODE_ADMINSIDE
+          MYBOOKINGS_STATUS_CONFIRMED,
+          SINGLEBOOKING_NO_PAYMENT,
+          state.timeOfQuickReservation,
+          state.accessCodeAdminside
         );
       }
     );

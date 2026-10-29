@@ -1,11 +1,12 @@
 /** Port of PO/Admin/admin_notifications_create_page.robot */
-import { V, step, expect } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/serial_users";
-import "../../Resources/texts_FI";
-import "../../Resources/parallel_test_data";
+import { step, expect } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import {
+  DELETE_NOTIFICATION_BUTTON_TEXT,
+  NOTIFICATION_BANNER_TARGET_GROUP_ADMIN,
+  NOTIFICATION_BANNER_TARGET_GROUP_ALL,
+  NOTIFICATION_BANNER_TARGET_GROUP_USER,
+} from "../../Resources/texts_FI";
 
 export class AdminNotificationsCreatePage extends PageObject {
   @step("admin_notifications_create_page.Admin Selects Immediate Validity Period")
@@ -14,9 +15,9 @@ export class AdminNotificationsCreatePage extends PageObject {
   }
 
   @step("admin_notifications_create_page.Admin Selects Notification Active Until")
-  async adminSelectsNotificationActiveUntil(date: RobotValue) {
+  async adminSelectsNotificationActiveUntil(date: string) {
     await this.page.locator("#notification-active-until").clear();
-    await this.page.locator("#notification-active-until").pressSequentially(String(date));
+    await this.page.locator("#notification-active-until").pressSequentially(date);
 
     // Admin clicks notification active until time label
     // Click  id=notification-active-until-time-label
@@ -71,11 +72,11 @@ export class AdminNotificationsCreatePage extends PageObject {
     await this.page.locator('[aria-label*="Kohderyhmä."]').click();
     await this.pages.customKeywords.findAndClickElementWithText(
       "form >> li >> span",
-      V.NOTIFICATION_BANNER_TARGET_GROUP_ALL
+      NOTIFICATION_BANNER_TARGET_GROUP_ALL
     );
     await this.page
       .locator('[aria-label*="Kohderyhmä."]')
-      .locator(`text="${V.NOTIFICATION_BANNER_TARGET_GROUP_ALL}"`)
+      .locator(`text="${NOTIFICATION_BANNER_TARGET_GROUP_ALL}"`)
       .first()
       .waitFor({ state: "visible", timeout: 5000 });
   }
@@ -85,11 +86,11 @@ export class AdminNotificationsCreatePage extends PageObject {
     await this.page.locator('[aria-label*="Kohderyhmä."]').click();
     await this.pages.customKeywords.findAndClickElementWithText(
       "form >> li >> span",
-      V.NOTIFICATION_BANNER_TARGET_GROUP_ADMIN
+      NOTIFICATION_BANNER_TARGET_GROUP_ADMIN
     );
     await this.page
       .locator('[aria-label*="Kohderyhmä."]')
-      .locator(`text="${V.NOTIFICATION_BANNER_TARGET_GROUP_ADMIN}"`)
+      .locator(`text="${NOTIFICATION_BANNER_TARGET_GROUP_ADMIN}"`)
       .first()
       .waitFor({ state: "visible", timeout: 5000 });
   }
@@ -99,11 +100,11 @@ export class AdminNotificationsCreatePage extends PageObject {
     await this.page.locator('[aria-label*="Kohderyhmä."]').click();
     await this.pages.customKeywords.findAndClickElementWithText(
       "form >> li >> span",
-      V.NOTIFICATION_BANNER_TARGET_GROUP_USER
+      NOTIFICATION_BANNER_TARGET_GROUP_USER
     );
     await this.page
       .locator('[aria-label*="Kohderyhmä."]')
-      .locator(`text="${V.NOTIFICATION_BANNER_TARGET_GROUP_USER}"`)
+      .locator(`text="${NOTIFICATION_BANNER_TARGET_GROUP_USER}"`)
       .first()
       .waitFor({ state: "visible", timeout: 5000 });
   }
@@ -120,13 +121,13 @@ export class AdminNotificationsCreatePage extends PageObject {
   }
 
   @step("admin_notifications_create_page.Admin Fills Notification Text Eng")
-  async adminFillsNotificationTextEng(text_eng: RobotValue) {
-    await this.page.getByTestId("Notification__Page--message-en-input").fill(String(text_eng));
+  async adminFillsNotificationTextEng(text_eng: string) {
+    await this.page.getByTestId("Notification__Page--message-en-input").fill(text_eng);
   }
 
   @step("admin_notifications_create_page.Admin Fills Notification Text Sv")
-  async adminFillsNotificationTextSv(text_sv: RobotValue) {
-    await this.page.getByTestId("Notification__Page--message-sv-input").fill(String(text_sv));
+  async adminFillsNotificationTextSv(text_sv: string) {
+    await this.page.getByTestId("Notification__Page--message-sv-input").fill(text_sv);
   }
 
   @step("admin_notifications_create_page.Admin Publishes Notification")
@@ -148,7 +149,7 @@ export class AdminNotificationsCreatePage extends PageObject {
 
   @step("admin_notifications_create_page.Admin Deletes Notification")
   async adminDeletesNotification() {
-    await this.pages.customKeywords.findAndClickElementWithText("button", V.DELETE_NOTIFICATION_BUTTON_TEXT);
+    await this.pages.customKeywords.findAndClickElementWithText("button", DELETE_NOTIFICATION_BUTTON_TEXT);
     // Deleting returns to the list page, which has the create link
     await this.page.locator('[href="/kasittely/notifications/new"]').waitFor({ state: "visible", timeout: 15_000 });
   }

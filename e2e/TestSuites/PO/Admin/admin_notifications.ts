@@ -1,9 +1,5 @@
 /** Port of PO/Admin/admin_notifications.robot */
-import { step } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/serial_users";
-import "../../Resources/texts_FI";
-import "../../Resources/parallel_test_data";
+import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class AdminNotifications extends PageObject {

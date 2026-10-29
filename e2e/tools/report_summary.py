@@ -1,5 +1,6 @@
 """Summarizes a Playwright HTML report as text: the run's totals, warnings, and each failed or flaky test with
-its error, the keyword path to the failing step and the attachments.
+its error, the keyword path to the failing step, the attachments and the backend errors of each attempt
+(lib/backend-errors.ts).
 
 The HTML report keeps its data as a zip of JSON files inside index.html (`<template id="playwrightReportBase64">`).
 This reads it with the standard library, so a report downloaded from CI can be read without a browser.
@@ -22,6 +23,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
+BACKEND_ERROR = "backend error"
 
 
 def load(report: Path) -> dict[str, dict]:  # type: ignore[type-arg]
@@ -83,6 +85,19 @@ def main() -> None:
     for text, count in warnings.most_common():
         print(f"Warning ({count}x): {text}")
 
+    backend = [
+        (test, result)
+        for test in tests
+        for result in test["results"]
+        if any(annotation.get("type") == BACKEND_ERROR for annotation in result.get("annotations", []))
+    ]
+    if backend:
+        in_passed = sum(1 for test, _ in backend if test["outcome"] == "expected")
+        print(
+            f"Backend errors in {len(backend)} attempts, listed under each test"
+            + (f" ({in_passed} in tests that passed: --all lists them)" if in_passed and not show_all else "")
+        )
+
     order = {"unexpected": 0, "flaky": 1, "skipped": 2, "expected": 3}
     for test in sorted(tests, key=lambda test: (order.get(test["outcome"], 9), test["projectName"], test["title"])):
         if test["outcome"] == "expected" and not show_all:
@@ -105,6 +120,9 @@ def main() -> None:
                     print(
                         f"    {attachment['name']}: {report if report.is_dir() else report.parent}/{attachment['path']}"
                     )
+            for annotation in result.get("annotations", []):
+                if annotation.get("type") == BACKEND_ERROR:
+                    print(f"    backend: {annotation.get('description', '')}")
 
 
 if __name__ == "__main__":

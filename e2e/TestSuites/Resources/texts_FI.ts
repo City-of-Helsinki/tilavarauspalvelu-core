@@ -1,113 +1,94 @@
 /** A resource file with all the finnish texts */
-import { V, registerVariables } from "../../lib/robot";
-import "../Resources/serial_users";
 
-// Read when the file loads, like a variable in a Robot variable table. Typed here, because this file's variables are
-// part of V's type (variable-types.ts).
-const admin_first_name: string = V.ADMIN_CURRENT_USER_FIRST_NAME;
-
-export const texts_FI_variables = {
-  USER_LANDING_PAGE_H1_TEXT: "Varaa tiloja ja laitteita",
-  LOGIN_TEXT: "Kirjaudu",
-  SELECTED_LANGUAGE: "Suomeksi",
-  USER_LOGOUT_TEXT: "You have been logged out of City of Helsinki services.",
-  ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN: "Tilavarauskäsittely",
-  ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN: "Tervetuloa!",
-  ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN_WITH_USER_INFO: `Tervetuloa, ${admin_first_name}`,
-  LOGIN_TEXT_ADMIN: "Kirjaudu sisään",
-  PAYMENT_NOTIFICATION_BANNER_TITLE: "Varauksesi odottaa maksua",
-  NOTIFICATION_BANNER_MESSAGE_NORMAL: "Normaali (sininen)",
-  NOTIFICATION_BANNER_MESSAGE_ERROR: "Poikkeus (punainen)",
-  NOTIFICATION_BANNER_MESSAGE_WARNING: "Varoitus (keltainen)",
-  // Example: Normaali (sininen) ROBOTTINEN g4
-  NOTIFICATION_BANNER_MESSAGE_TEXT_FI_NORMAL: "",
-  // Example: Poikkeus (punainen) ROBOVIESTI g4
-  NOTIFICATION_BANNER_MESSAGE_TEXT_FI_ERROR: "",
-  // Example: Varoitus (keltainen) ROBOVIESTI g4
-  NOTIFICATION_BANNER_MESSAGE_TEXT_FI_WARNING: "",
-  NOTIFICATION_BANNER_CLEANUP_PATTERN: "ROBOVIESTI",
-  NOTIFICATION_BANNER_TARGET_GROUP_ALL: "Kaikki",
-  NOTIFICATION_BANNER_TARGET_GROUP_ADMIN: "Henkilökunta",
-  NOTIFICATION_BANNER_TARGET_GROUP_USER: "Asiakkaat",
-  DELETE_NOTIFICATION_BUTTON_TEXT: "Poista",
-  RESERVATION_STATUS_MSG_FI: "Varauksesi on vahvistettu",
-  RESERVATION_STATUS_REQUIRESHANDLING_MSG_FI: "Varauksesi on käsittelyssä",
-  SINGLEBOOKING_BUTTON_TEXT: "Tilan varaus",
-  MYBOOKINGS_FI: "Omat varaukset",
-  SINGLEBOOKING_FI: "Tilan varaus",
-  RECURRING_BOOKINGS_FI: "Kausivaraus",
-  MYAPPLICATIONS_FI: "Omat hakemukset",
-  SINGLEBOOKING_NAME: "Yksittäisvaraaja123",
-  SINGLEBOOKING_DESCRIPTION: "Yksittäisvaraaja varailee",
-  PURPOSE_OF_THE_BOOKING: "Muu toiminta",
-  JUSTIFICATION_FOR_FREE_OF_CHARGE: "En halua maksaa",
-  JUSTIFICATION_FOR_SUBVENTION: "Haluan alennusta -20",
-  HOME_CITY: "Helsinki",
-  SINGLEBOOKING_NUMBER_OF_PERSONS: "1",
-  AGEGROUP_OF_PERSONS: "18 - 24",
-  SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL: "Hinta: 40,00 € (sis. alv 25,5%)",
-  SINGLEBOOKING_PAID_PRICE_VAT_INCL: "Hinta: 40,00 € (sis. alv 25,5%)",
-  SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL: "Hinta: 0 - 30,00 € (sis. alv 25,5%)",
-  ALWAYS_REQUESTED_UNIT_PAID_PRICE_VAT_INCL: "Hinta: 40,00 € (sis. alv 25,5%)",
-  SINGLEBOOKING_NO_PAYMENT: "Hinta: Maksuton",
-  SINGLEBOOKING_PAID_PRICE_CHECKOUT: "40.00€",
-  NUM_FROM_TXT: "",
-  BOOKING_NUM_ONLY: "",
-  RESERVATION_NUMBER_ADMINSIDE: "",
-  PAID_BOOKINGNUMBER_FOR_MAIL: "",
-  REASON_FOR_CANCELLATION: "Muu syy",
-  ACCESS_CODE_TXT_BY_CODE: "Pääsy tilaan: Ovikoodi",
-  MYBOOKINGS_H1: "Omat varaukset",
-  MYBOOKINGS_NO_UPCOMING_FI: "Ei tulevia varauksia",
-  MYBOOKINGS_STATUS_CONFIRMED: "Hyväksytty",
-  MYBOOKINGS_STATUS_REJECTED: "Hylätty",
-  MYBOOKINGS_STATUS_REFUNDED: "Maksu palautettu",
-  MYBOOKINGS_STATUS_PROCESSED: "Käsiteltävänä",
-  MYBOOKINGS_STATUS_CANCELED: "Varauksesi on peruttu!",
-  IN_RESERVATIONS_STATUS_CANCELED: "Peruttu",
-  MYBOOKINGS_STATUS_PAID_CONFIRMED: "Maksettu",
-  ADMIN_STATUS_PROCESSED: "Käsittelyssä",
-  RECURRING_BOOKING_NAME: "Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)",
-  RECURRING_BOOKING_UNIT_COUNT_TEXT: "2 tilaa valittuna",
-  RECURRING_BOOKING_AGE_GROUP_TEXT: "18 - 24",
-  RECURRING_BOOKING_PURPOSE_TEXT: "Harrastustoiminta, muu",
-  RECURRING_BOOKING_RESERVATION_PER_WEEK: "1",
-  RECURRING_BOOKING_MIN_LENGTH_TEXT: "30 minuuttia",
-  RECURRING_BOOKING_MAX_LENGTH_TEXT: "2 tuntia",
-  RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY: "Valitse ensisijaiset aikatoiveet",
-  RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY: "Valitse muut aikatoiveet",
-  RECURRING_BOOKING_UNIT_NAME_KESKUSTA: "Harakka, piilokoju: KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  RECURRING_BOOKING_UNIT_NAME_MALMI: "Harakka, piilokoju: KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  RECURRING_BOOKING_SIZE_OF_GROUP: "5",
-  RECURRING_BOOKING_FIRST_NAME: "Matti",
-  RECURRING_BOOKING_LAST_NAME: "Meikäläinen",
-  RECURRING_BOOKING_STREET_ADDRESS: "Testikatu 123",
-  RECURRING_BOOKING_POST_CODE: "00100",
-  RECURRING_BOOKING_CITY: "Helsinki",
-  RECURRING_BOOKING_PHONE_NUMBER: "+358401234567",
-  RECURRING_BOOKING_EMAIL: "qfaksi@gmail.com",
-  RECURRING_BOOKING_ADDITIONAL_INFO: "Kausivaraus automaatiotestiin",
-  EMPTY_STATE_MESSAGE_RECURRING_APPLICATIONS: "Hakemuksia ei ole.",
-  REQUESTED_RESERVATIONS_FI: "Varaustoiveet",
-  SINGLEBOOKING_SUBVENTED_PRICE_ADMIN_SIDE: "30,00 €, hakee subventiota",
-  SINGLEBOOKING_NO_PAYMENT_ADMIN_SIDE: "maksuton, hakee subventiota",
-  SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP: "18-24 vuotiaat",
-  DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT: "40,00 €",
-  CALENDAR_CHANGE_TIME_FI: "Muuta aikaa",
-  RESERVATIONS_BY_UNITS_FI: "Varausyksiköittäin",
-  PREFIX_RESERVATIONS_BY_ADMIN_BEHALF_FI: "Puolesta|",
-  ADMIN_BEHALF_LASTNAME_FI: "",
-  ADMIN_BEHALF_FIRSTNAME_FI: "Puolesta",
-  ADMIN_BEHALF_PHONE_FI: "9876543210",
-  // Puolesta| Puolesta a6
-  CALENDAR_EVENT_NAME: "",
-  ADMIN_REASON_REJECTED: "Varaus on peruttu pyynnöstäsi",
-  RESERVATION_TIME_NOT_FREE: "Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika.",
-  RESERVATION_STATUS_DIALOG: "Palauta käsiteltäväksi",
-  CONFIRMATION_AND_RECEIPT_TEXT_IN_MAIL: "Tilausvahvistus ja kuitti",
-  CONFIRMATION_TEXT_IN_MAIL: "Olet tehnyt uuden varauksen.",
-  CANCELLATION_TEXT_IN_MAIL: "Varauksesi on peruttu",
-  CANCELLATION_AND_REFUND_TEXT_IN_MAIL: "Vahvistus ja kuitti maksun palautuksesta",
-  COOKIETEXT: "Hyväksy vain välttämättömät evästeet",
-};
-registerVariables(texts_FI_variables);
+export const USER_LANDING_PAGE_H1_TEXT = "Varaa tiloja ja laitteita";
+export const LOGIN_TEXT = "Kirjaudu";
+export const SELECTED_LANGUAGE = "Suomeksi";
+export const USER_LOGOUT_TEXT = "You have been logged out of City of Helsinki services.";
+export const ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN = "Tilavarauskäsittely";
+export const ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN = "Tervetuloa!";
+// The admin's first name follows, so the check accepts any admin
+export const ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN_WITH_USER_INFO = "Tervetuloa, ";
+export const LOGIN_TEXT_ADMIN = "Kirjaudu sisään";
+export const PAYMENT_NOTIFICATION_BANNER_TITLE = "Varauksesi odottaa maksua";
+export const NOTIFICATION_BANNER_MESSAGE_NORMAL = "Normaali (sininen)";
+export const NOTIFICATION_BANNER_MESSAGE_ERROR = "Poikkeus (punainen)";
+export const NOTIFICATION_BANNER_MESSAGE_WARNING = "Varoitus (keltainen)";
+export const NOTIFICATION_BANNER_CLEANUP_PATTERN = "ROBOVIESTI";
+export const NOTIFICATION_BANNER_TARGET_GROUP_ALL = "Kaikki";
+export const NOTIFICATION_BANNER_TARGET_GROUP_ADMIN = "Henkilökunta";
+export const NOTIFICATION_BANNER_TARGET_GROUP_USER = "Asiakkaat";
+export const DELETE_NOTIFICATION_BUTTON_TEXT = "Poista";
+export const RESERVATION_STATUS_MSG_FI = "Varauksesi on vahvistettu";
+export const RESERVATION_STATUS_REQUIRESHANDLING_MSG_FI = "Varauksesi on käsittelyssä";
+export const SINGLEBOOKING_BUTTON_TEXT = "Tilan varaus";
+export const MYBOOKINGS_FI = "Omat varaukset";
+export const SINGLEBOOKING_FI = "Tilan varaus";
+export const RECURRING_BOOKINGS_FI = "Kausivaraus";
+export const MYAPPLICATIONS_FI = "Omat hakemukset";
+export const SINGLEBOOKING_NAME = "Yksittäisvaraaja123";
+export const SINGLEBOOKING_DESCRIPTION = "Yksittäisvaraaja varailee";
+export const PURPOSE_OF_THE_BOOKING = "Muu toiminta";
+export const JUSTIFICATION_FOR_FREE_OF_CHARGE = "En halua maksaa";
+export const JUSTIFICATION_FOR_SUBVENTION = "Haluan alennusta -20";
+export const HOME_CITY = "Helsinki";
+export const SINGLEBOOKING_NUMBER_OF_PERSONS = "1";
+export const AGEGROUP_OF_PERSONS = "18 - 24";
+export const SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL = "Hinta: 40,00 € (sis. alv 25,5%)";
+export const SINGLEBOOKING_PAID_PRICE_VAT_INCL = "Hinta: 40,00 € (sis. alv 25,5%)";
+export const SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL = "Hinta: 0 - 30,00 € (sis. alv 25,5%)";
+export const ALWAYS_REQUESTED_UNIT_PAID_PRICE_VAT_INCL = "Hinta: 40,00 € (sis. alv 25,5%)";
+export const SINGLEBOOKING_NO_PAYMENT = "Hinta: Maksuton";
+export const SINGLEBOOKING_PAID_PRICE_CHECKOUT = "40.00€";
+export const REASON_FOR_CANCELLATION = "Muu syy";
+export const ACCESS_CODE_TXT_BY_CODE = "Pääsy tilaan: Ovikoodi";
+export const MYBOOKINGS_H1 = "Omat varaukset";
+export const MYBOOKINGS_NO_UPCOMING_FI = "Ei tulevia varauksia";
+export const MYBOOKINGS_STATUS_CONFIRMED = "Hyväksytty";
+export const MYBOOKINGS_STATUS_REJECTED = "Hylätty";
+export const MYBOOKINGS_STATUS_REFUNDED = "Maksu palautettu";
+export const MYBOOKINGS_STATUS_PROCESSED = "Käsiteltävänä";
+export const MYBOOKINGS_STATUS_CANCELED = "Varauksesi on peruttu!";
+export const IN_RESERVATIONS_STATUS_CANCELED = "Peruttu";
+export const MYBOOKINGS_STATUS_PAID_CONFIRMED = "Maksettu";
+export const ADMIN_STATUS_PROCESSED = "Käsittelyssä";
+export const RECURRING_BOOKING_NAME = "Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)";
+export const RECURRING_BOOKING_UNIT_COUNT_TEXT = "2 tilaa valittuna";
+export const RECURRING_BOOKING_AGE_GROUP_TEXT = "18 - 24";
+export const RECURRING_BOOKING_PURPOSE_TEXT = "Harrastustoiminta, muu";
+export const RECURRING_BOOKING_RESERVATION_PER_WEEK = "1";
+export const RECURRING_BOOKING_MIN_LENGTH_TEXT = "30 minuuttia";
+export const RECURRING_BOOKING_MAX_LENGTH_TEXT = "2 tuntia";
+export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY = "Valitse ensisijaiset aikatoiveet";
+export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY = "Valitse muut aikatoiveet";
+export const RECURRING_BOOKING_UNIT_NAME_KESKUSTA =
+  "Harakka, piilokoju: KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const RECURRING_BOOKING_UNIT_NAME_MALMI =
+  "Harakka, piilokoju: KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const RECURRING_BOOKING_SIZE_OF_GROUP = "5";
+export const RECURRING_BOOKING_FIRST_NAME = "Matti";
+export const RECURRING_BOOKING_LAST_NAME = "Meikäläinen";
+export const RECURRING_BOOKING_STREET_ADDRESS = "Testikatu 123";
+export const RECURRING_BOOKING_POST_CODE = "00100";
+export const RECURRING_BOOKING_CITY = "Helsinki";
+export const RECURRING_BOOKING_PHONE_NUMBER = "+358401234567";
+export const RECURRING_BOOKING_EMAIL = "qfaksi@gmail.com";
+export const RECURRING_BOOKING_ADDITIONAL_INFO = "Kausivaraus automaatiotestiin";
+export const EMPTY_STATE_MESSAGE_RECURRING_APPLICATIONS = "Hakemuksia ei ole.";
+export const REQUESTED_RESERVATIONS_FI = "Varaustoiveet";
+export const SINGLEBOOKING_SUBVENTED_PRICE_ADMIN_SIDE = "30,00 €, hakee subventiota";
+export const SINGLEBOOKING_NO_PAYMENT_ADMIN_SIDE = "maksuton, hakee subventiota";
+export const SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP = "18-24 vuotiaat";
+export const DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT = "40,00 €";
+export const CALENDAR_CHANGE_TIME_FI = "Muuta aikaa";
+export const RESERVATIONS_BY_UNITS_FI = "Varausyksiköittäin";
+export const PREFIX_RESERVATIONS_BY_ADMIN_BEHALF_FI = "Puolesta|";
+export const ADMIN_BEHALF_FIRSTNAME_FI = "Puolesta";
+export const ADMIN_BEHALF_PHONE_FI = "9876543210";
+export const ADMIN_REASON_REJECTED = "Varaus on peruttu pyynnöstäsi";
+export const RESERVATION_TIME_NOT_FREE = "Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika.";
+export const RESERVATION_STATUS_DIALOG = "Palauta käsiteltäväksi";
+export const CONFIRMATION_AND_RECEIPT_TEXT_IN_MAIL = "Tilausvahvistus ja kuitti";
+export const CONFIRMATION_TEXT_IN_MAIL = "Olet tehnyt uuden varauksen.";
+export const CANCELLATION_TEXT_IN_MAIL = "Varauksesi on peruttu";
+export const CANCELLATION_AND_REFUND_TEXT_IN_MAIL = "Vahvistus ja kuitti maksun palautuksesta";
+export const COOKIETEXT = "Hyväksy vain välttämättömät evästeet";

@@ -1,5 +1,5 @@
 /** Port of PO/Admin/admin_navigation_menu.robot */
-import { step } from "../../../lib/robot";
+import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class AdminNavigationMenu extends PageObject {

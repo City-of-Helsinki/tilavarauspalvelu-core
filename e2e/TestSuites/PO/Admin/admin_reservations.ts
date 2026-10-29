@@ -1,77 +1,71 @@
 /** Port of PO/Admin/admin_reservations.robot */
-import { V, expect, str, step, log } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/serial_users";
-import "../../Resources/texts_FI";
-import "../../Resources/parallel_test_data";
+import type { Locator } from "@playwright/test";
+import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import { BASIC_ADMIN_MALE } from "../../Resources/serial_users";
+import {
+  ADMIN_BEHALF_FIRSTNAME_FI,
+  ADMIN_BEHALF_PHONE_FI,
+  CALENDAR_CHANGE_TIME_FI,
+  JUSTIFICATION_FOR_SUBVENTION,
+  PREFIX_RESERVATIONS_BY_ADMIN_BEHALF_FI,
+} from "../../Resources/texts_FI";
 
 export class AdminReservations extends PageObject {
   /** This keyword types the reservation number and there should be only one match in the list */
   @step("admin_reservations.Admin Searches Reservation With Id Number And Clicks It From Name")
-  async adminSearchesReservationWithIdNumberAndClicksItFromName(booking_number: RobotValue, user_fullname: string) {
+  async adminSearchesReservationWithIdNumberAndClicksItFromName(booking_number: string, user_fullname: string) {
     await expect(
       this.page.locator("#search"),
       "Check we are on the page where admin can filter reservations"
     ).toBeVisible();
-    await this.page.locator("#search").fill(String(booking_number));
+    await this.page.locator("#search").fill(booking_number);
     await this.page.locator('[type="submit"]').click();
     // Check Elements Text waits until the search results show the reservation
-    await this.pages.customKeywords.checkElementsText(
-      '[data-testid="pk-0"]',
-      booking_number,
-      undefined,
-      undefined,
-      undefined,
-      /* message= */ "ERROR: Check from screenshot that the search worked and there is only one match in the list."
+    await this.pages.customKeywords.checkElementsText(this.page.getByTestId("pk-0"), booking_number, {
+      message: "ERROR: Check from screenshot that the search worked and there is only one match in the list.",
+    });
+    await this.pages.customKeywords.findAndClickElementWithText(
+      this.page.getByTestId("reservee_name-0").locator("a"),
+      user_fullname
     );
-    await this.pages.customKeywords.findAndClickElementWithText('[data-testid="reservee_name-0"] >> a', user_fullname);
     // The reservation's page opens
-    await this.page.waitForURL((url) => url.pathname.endsWith(`/reservations/${str(booking_number)}`), {
+    await this.page.waitForURL((url) => url.pathname.endsWith(`/reservations/${booking_number}`), {
       timeout: 15_000,
     });
   }
 
   @step("admin_reservations.Admin Searches Reservation With Id Number And Checks The Status")
-  async adminSearchesReservationWithIdNumberAndChecksTheStatus(
-    booking_number: RobotValue,
-    reservation_status: RobotValue
-  ) {
+  async adminSearchesReservationWithIdNumberAndChecksTheStatus(booking_number: string, reservation_status: string) {
     await expect(
       this.page.locator("#search"),
       "Check we are on the page where admin can filter reservations"
     ).toBeVisible();
     await this.page.locator('[type="submit"]').click();
     // Check Elements Text waits until the search results show the reservation
-    await this.pages.customKeywords.checkElementsText(
-      '[data-testid="pk-0"]',
-      booking_number,
-      undefined,
-      undefined,
-      undefined,
-      /* message= */ "ERROR: Check from screenshot that the search worked and there is only one match in the list."
-    );
-    await this.pages.customKeywords.checkElementsText('[data-testid="state-0"]', reservation_status);
+    await this.pages.customKeywords.checkElementsText(this.page.getByTestId("pk-0"), booking_number, {
+      message: "ERROR: Check from screenshot that the search worked and there is only one match in the list.",
+    });
+    await this.pages.customKeywords.checkElementsText(this.page.getByTestId("state-0"), reservation_status);
   }
 
   @step("admin_reservations.Admin Checks Reservation H1")
-  async adminChecksReservationH1(h1_reservationnumber_firstname_lastname: RobotValue) {
+  async adminChecksReservationH1(h1_reservationnumber_firstname_lastname: string) {
     await expect(this.page.getByTestId("reservation_title_section__reservation_state")).toBeVisible();
     await this.pages.customKeywords.checkElementsText("h1", h1_reservationnumber_firstname_lastname);
   }
 
   @step("admin_reservations.Admin Checks Reservation Title Tagline")
-  async adminChecksReservationTitleTagline(reservation_tagline: RobotValue) {
+  async adminChecksReservationTitleTagline(reservation_tagline: string) {
     // ${RESERVATION_TAGLINE} is set with keyword Formats tagline for admin side
     await this.pages.customKeywords.checkElementsText(
-      '[data-testid="reservation_title_section__tagline"]',
+      this.page.getByTestId("reservation_title_section__tagline"),
       reservation_tagline
     );
   }
 
   @step("admin_reservations.Admin Checks Reservation Info Dialog Time Tagline")
-  async adminChecksReservationInfoDialogTimeTagline(reservation_tagline: RobotValue) {
+  async adminChecksReservationInfoDialogTimeTagline(reservation_tagline: string) {
     // DEVNOTE: Not in use for now
     await this.pages.customKeywords.findTextFromElementsOrFail(
       '[class*="EditTimeModal__TimeInfoBox"] >> b',
@@ -83,12 +77,12 @@ export class AdminReservations extends PageObject {
   async adminChecksReservationUserInfo() {
     await this.pages.customKeywords.findAndClickElementWithText(".label", "Tilan käyttäjän tiedot");
     await this.pages.customKeywords.checkElementsText(
-      '[data-testid="reservation__info--Sukunimi"]',
-      V.ADMIN_BEHALF_LASTNAME_FI
+      this.page.getByTestId("reservation__info--Sukunimi"),
+      this.state.adminBehalfLastnameFi
     );
     await this.pages.customKeywords.checkElementsText(
-      '[data-testid="reservation__info--Etunimi"]',
-      V.ADMIN_BEHALF_FIRSTNAME_FI
+      this.page.getByTestId("reservation__info--Etunimi"),
+      ADMIN_BEHALF_FIRSTNAME_FI
     );
   }
 
@@ -96,12 +90,12 @@ export class AdminReservations extends PageObject {
   async adminChecksReservationMakerInfo() {
     await this.pages.customKeywords.findAndClickElementWithText(".label", "Varauksen tekijä");
     await this.pages.customKeywords.checkElementsText(
-      '[data-testid="reservation__info--Varauksen tekijä"]',
-      V.BASIC_ADMIN_MALE_FULLNAME
+      this.page.getByTestId("reservation__info--Varauksen tekijä"),
+      BASIC_ADMIN_MALE.fullName
     );
     await this.pages.customKeywords.checkElementsText(
-      '[data-testid="reservation__info--Sähköposti"]',
-      V.BASIC_ADMIN_MALE_EMAIL
+      this.page.getByTestId("reservation__info--Sähköposti"),
+      BASIC_ADMIN_MALE.email
     );
   }
 
@@ -112,8 +106,8 @@ export class AdminReservations extends PageObject {
     purpose_of_the_booking: string,
     singlebooking_description: string,
     singlebooking_number_of_participants: string,
-    singlebooking_age_group: RobotValue,
-    reason_of_rejection: RobotValue
+    singlebooking_age_group: string | null,
+    reason_of_rejection: string | null
   ) {
     // Check price if provided
     if (singlebooking_price !== "None") {
@@ -126,7 +120,7 @@ export class AdminReservations extends PageObject {
     // Check status if provided
     if (singlebooking_status !== "None") {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation_title_section__reservation_state"]',
+        this.page.getByTestId("reservation_title_section__reservation_state"),
         singlebooking_status
       );
     }
@@ -134,7 +128,7 @@ export class AdminReservations extends PageObject {
     // Check purpose if provided
     if (purpose_of_the_booking !== "None") {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Käyttötarkoitus"]',
+        this.page.getByTestId("reservation__summary--Käyttötarkoitus"),
         purpose_of_the_booking
       );
     }
@@ -142,7 +136,7 @@ export class AdminReservations extends PageObject {
     // Check description if provided
     if (singlebooking_description !== "None") {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Kuvaus"]',
+        this.page.getByTestId("reservation__summary--Kuvaus"),
         singlebooking_description
       );
     }
@@ -150,23 +144,23 @@ export class AdminReservations extends PageObject {
     // Check number of participants if provided
     if (singlebooking_number_of_participants !== "None") {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Osallistujamäärä"]',
+        this.page.getByTestId("reservation__summary--Osallistujamäärä"),
         singlebooking_number_of_participants
       );
     }
 
     // Check age group if provided
-    if (str(singlebooking_age_group) !== "None") {
+    if (singlebooking_age_group != null) {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Ikäryhmä"]',
+        this.page.getByTestId("reservation__summary--Ikäryhmä"),
         singlebooking_age_group
       );
     }
 
     // Check reason of rejection if provided
-    if (str(reason_of_rejection) !== "None") {
+    if (reason_of_rejection != null) {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Hylkäyksen syy"]',
+        this.page.getByTestId("reservation__summary--Hylkäyksen syy"),
         reason_of_rejection
       );
     }
@@ -179,7 +173,7 @@ export class AdminReservations extends PageObject {
     purpose_of_the_booking: string,
     singlebooking_description: string,
     singlebooking_number_of_participants: string,
-    singlebooking_age_group: RobotValue
+    singlebooking_age_group: string | null
   ) {
     // Check price if provided
     if (singlebooking_price !== "None") {
@@ -192,7 +186,7 @@ export class AdminReservations extends PageObject {
     // Check status if provided
     if (singlebooking_status !== "None") {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation_title_section__reservation_state"]',
+        this.page.getByTestId("reservation_title_section__reservation_state"),
         singlebooking_status
       );
     }
@@ -200,7 +194,7 @@ export class AdminReservations extends PageObject {
     // Check purpose if provided
     if (purpose_of_the_booking !== "None") {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Käyttötarkoitus"]',
+        this.page.getByTestId("reservation__summary--Käyttötarkoitus"),
         purpose_of_the_booking
       );
     }
@@ -208,7 +202,7 @@ export class AdminReservations extends PageObject {
     // Check description if provided
     if (singlebooking_description !== "None") {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Kuvaus"]',
+        this.page.getByTestId("reservation__summary--Kuvaus"),
         singlebooking_description
       );
     }
@@ -216,15 +210,15 @@ export class AdminReservations extends PageObject {
     // Check number of participants if provided
     if (singlebooking_number_of_participants !== "None") {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Osallistujamäärä"]',
+        this.page.getByTestId("reservation__summary--Osallistujamäärä"),
         singlebooking_number_of_participants
       );
     }
 
     // Check age group if provided
-    if (str(singlebooking_age_group) !== "None") {
+    if (singlebooking_age_group != null) {
       await this.pages.customKeywords.checkElementsText(
-        '[data-testid="reservation__summary--Ikäryhmä"]',
+        this.page.getByTestId("reservation__summary--Ikäryhmä"),
         singlebooking_age_group
       );
     }
@@ -235,29 +229,28 @@ export class AdminReservations extends PageObject {
     await log(status);
     // Check Elements Text waits until the page shows the status
     await this.pages.customKeywords.checkElementsText(
-      '[data-testid="reservation_title_section__reservation_state"]',
+      this.page.getByTestId("reservation_title_section__reservation_state"),
       status
     );
   }
 
   @step("admin_reservations.Admin Saves Reservation Number")
   async adminSavesReservationNumber() {
-    let reservation_number: RobotValue;
     // Opens the reservation details section
     await this.page.locator("#reservation__reservation-details-heading").click();
     await expect(this.page.getByTestId("reservation__info--Varaustunnus")).toBeVisible();
     // Gets the reservation number
-    reservation_number = await this.page.getByTestId("reservation__info--Varaustunnus").innerText();
-    V.RESERVATION_NUMBER_ADMINSIDE = reservation_number;
+    const reservation_number = await this.page.getByTestId("reservation__info--Varaustunnus").innerText();
+    this.state.reservationNumberAdminside = reservation_number;
   }
 
   @step("admin_reservations.Admin Clicks Button In Reservation Page")
-  async adminClicksButtonInReservationPage(button_data_id: string) {
-    await this.page.locator(button_data_id).click();
+  async adminClicksButtonInReservationPage(button_data_id: string | Locator) {
+    await this.locate(button_data_id).click();
   }
 
   @step("admin_reservations.Admin Selects Reservation Unit")
-  async adminSelectsReservationUnit(by_unit: RobotValue) {
+  async adminSelectsReservationUnit(by_unit: string) {
     await this.page.locator("#reservation-unit-toggle-button").click();
     await this.pages.customKeywords.findAndClickElementWithText("#reservation-unit-menu >> li", by_unit);
   }
@@ -283,7 +276,7 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Checks Reason For Subvention In Dialog")
   async adminChecksReasonForSubventionInDialog() {
-    await this.pages.customKeywords.findTextFromElementsOrFail("#info-dialog >> p", V.JUSTIFICATION_FOR_SUBVENTION);
+    await this.pages.customKeywords.findTextFromElementsOrFail("#info-dialog >> p", JUSTIFICATION_FOR_SUBVENTION);
   }
 
   @step("admin_reservations.Admin Clicks Set Reservation To Free")
@@ -294,23 +287,22 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Fills Reservation Details Behalf")
   async adminFillsReservationDetailsBehalf() {
-    let ADMIN_BEHALF_LASTNAME: RobotValue, Calendar_event_content_name: RobotValue;
     // this keyword generates a random letter and number and uses that string as last name
-    ADMIN_BEHALF_LASTNAME = await this.pages.dataModification.generateRandomLetterAndNumber();
-    V.ADMIN_BEHALF_LASTNAME_FI = ADMIN_BEHALF_LASTNAME;
+    const ADMIN_BEHALF_LASTNAME = await this.pages.dataModification.generateRandomLetterAndNumber();
+    this.state.adminBehalfLastnameFi = ADMIN_BEHALF_LASTNAME;
 
     // this keyword generates the info for checking calendar content
-    Calendar_event_content_name = await this.pages.dataModification.formatsCalendarEventContent(
-      V.ADMIN_BEHALF_FIRSTNAME_FI,
-      V.ADMIN_BEHALF_LASTNAME_FI,
-      V.PREFIX_RESERVATIONS_BY_ADMIN_BEHALF_FI
+    const Calendar_event_content_name = await this.pages.dataModification.formatsCalendarEventContent(
+      ADMIN_BEHALF_FIRSTNAME_FI,
+      this.state.adminBehalfLastnameFi,
+      PREFIX_RESERVATIONS_BY_ADMIN_BEHALF_FI
     );
-    V.CALENDAR_EVENT_NAME = Calendar_event_content_name;
+    this.state.calendarEventName = Calendar_event_content_name;
 
-    await this.page.locator('[name="reserveeFirstName"]').fill(V.ADMIN_BEHALF_FIRSTNAME_FI);
-    await this.page.locator('[name="reserveeLastName"]').fill(String(V.ADMIN_BEHALF_LASTNAME_FI));
-    await this.page.locator('[name="reserveeEmail"]').fill(V.BASIC_ADMIN_MALE_EMAIL);
-    await this.page.locator('[name="reserveePhone"]').fill(V.ADMIN_BEHALF_PHONE_FI);
+    await this.page.locator('[name="reserveeFirstName"]').fill(ADMIN_BEHALF_FIRSTNAME_FI);
+    await this.page.locator('[name="reserveeLastName"]').fill(this.state.adminBehalfLastnameFi);
+    await this.page.locator('[name="reserveeEmail"]').fill(BASIC_ADMIN_MALE.email);
+    await this.page.locator('[name="reserveePhone"]').fill(ADMIN_BEHALF_PHONE_FI);
   }
 
   /**
@@ -320,25 +312,25 @@ export class AdminReservations extends PageObject {
   @step("admin_reservations.Admin Enters Reservation Time And Type Of Reservation")
   async adminEntersReservationTimeAndTypeOfReservation(
     type_of_reservation: string,
-    startTime_hours: RobotValue,
-    endTime_hours: RobotValue,
-    date: RobotValue
+    startTime_hours: string,
+    endTime_hours: string,
+    date: string
   ) {
     // Click  ${type_of_reservation}
     // Type Text  id=ReservationDialog.startTime-hours  ${startTime-hours}
     await this.page.locator('[id="TimeInput.startTime-hours"]').clear();
-    await this.page.locator('[id="TimeInput.startTime-hours"]').pressSequentially(String(startTime_hours));
+    await this.page.locator('[id="TimeInput.startTime-hours"]').pressSequentially(startTime_hours);
     // Type Text  id=ReservationDialog.startTime-minutes  00
     await this.page.locator('[id="TimeInput.startTime-minutes"]').clear();
     await this.page.locator('[id="TimeInput.startTime-minutes"]').pressSequentially("00");
     // Type Text  id=ReservationDialog.endTime-hours  ${endTime-hours}
     await this.page.locator('[id="TimeInput.endTime-hours"]').clear();
-    await this.page.locator('[id="TimeInput.endTime-hours"]').pressSequentially(String(endTime_hours));
+    await this.page.locator('[id="TimeInput.endTime-hours"]').pressSequentially(endTime_hours);
     // Type Text  id=ReservationDialog.endTime-minutes  00
     await this.page.locator('[id="TimeInput.endTime-minutes"]').clear();
     await this.page.locator('[id="TimeInput.endTime-minutes"]').pressSequentially("00");
     await this.page.locator("#controlled-date-input__date").clear();
-    await this.page.locator("#controlled-date-input__date").pressSequentially(String(date));
+    await this.page.locator("#controlled-date-input__date").pressSequentially(date);
 
     await this.page.locator(type_of_reservation).click();
   }
@@ -372,22 +364,21 @@ export class AdminReservations extends PageObject {
    */
   @step("admin_reservations.Admin Opens Calendar And Changes Reservation Time")
   async adminOpensCalendarAndChangesReservationTime() {
-    let date_plus_x_days: RobotValue, start_hour: RobotValue, end_hour: RobotValue;
     await this.page.locator("#reservation__calendar-heading").click();
     await this.pages.customKeywords.findAndClickElementWithText(
       "#reservation__calendar-content >> button",
-      V.CALENDAR_CHANGE_TIME_FI
+      CALENDAR_CHANGE_TIME_FI
     );
 
     // Call the keyword and capture the returned values
-    [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
+    const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
-    V.MODIFIED_DATE_SUBVENTED_RESERVATION = date_plus_x_days;
-    V.MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION = start_hour;
-    V.MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION = end_hour;
+    this.state.modifiedDateSubventedReservation = date_plus_x_days;
+    this.state.modifiedHourStarttimeSubventedReservation = start_hour;
+    this.state.modifiedHourEndtimeSubventedReservation = end_hour;
 
     // This for the keyword Set and format the reservation finnish time
-    V.MODIFIED_STARTTIME_SUBVENTED_RESERVATION = `${str(start_hour)}.00`;
+    this.state.modifiedStarttimeSubventedReservation = `${start_hour}.00`;
 
     // Changes the reservation time with date and hours and minutes
     await log("This test uses 00 for minutes. So all the changed times will be 10:00–11:00 -> 15:00–17:00 etc");
@@ -395,19 +386,19 @@ export class AdminReservations extends PageObject {
     await this.page.locator('[id="TimeInput.startTime-hours"]').clear();
     await this.page
       .locator('[id="TimeInput.startTime-hours"]')
-      .pressSequentially(String(V.MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION));
+      .pressSequentially(this.state.modifiedHourStarttimeSubventedReservation);
     await this.page.locator('[id="TimeInput.startTime-minutes"]').clear();
     await this.page.locator('[id="TimeInput.startTime-minutes"]').pressSequentially("00");
     await this.page.locator('[id="TimeInput.endTime-hours"]').clear();
     await this.page
       .locator('[id="TimeInput.endTime-hours"]')
-      .pressSequentially(String(V.MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION));
+      .pressSequentially(this.state.modifiedHourEndtimeSubventedReservation);
     await this.page.locator('[id="TimeInput.endTime-minutes"]').clear();
     await this.page.locator('[id="TimeInput.endTime-minutes"]').pressSequentially("00");
     await this.page.locator("#controlled-date-input__date").clear();
     await this.page
       .locator("#controlled-date-input__date")
-      .pressSequentially(String(V.MODIFIED_DATE_SUBVENTED_RESERVATION));
+      .pressSequentially(this.state.modifiedDateSubventedReservation);
     await expect(
       this.page.locator('button[type="submit"]'),
       " Check that the modified time is available?"

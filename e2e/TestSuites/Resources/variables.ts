@@ -1,111 +1,62 @@
 /** A resource file with variables. */
-import { registerVariables } from "../../lib/robot";
-import "../Resources/env_loader";
-
-export const variables_variables = {
-  ENABLE_HAR_RECORDING: false,
-  URL_TEST: "https://varaamo.test.hel.ninja/",
-  URL_STAGE: "https://varaamo.test.hel.ninja/kasittely",
-  URL_PROD: "https://varaamo.hel.fi/",
-  URL_ADMIN: "https://varaamo.test.hel.ninja/kasittely",
-  URL_DJANGO_ADMIN: "https://varaamo.test.hel.ninja/admin/login/",
-  URL_MAIL: "https://www.google.com/intl/fi/gmail/about/",
-  DOWNLOAD_DIR: `${import.meta.dirname}/downloads`,
-  EMAIL_FILE_PATH: `${import.meta.dirname}/downloads/cleaned_emails.json`,
-  BROWSER_TIMEOUT_GLOBAL: "40s",
-  CONTENT_WAIT_TIMEOUT: "10s",
-  ROBOT_EMAIL: "django_email_robot@mailiposti.com",
-  DJANGO_ROBO_MAIL: "https://varaamo.test.hel.ninja/v1/robot_email_cache/",
-  WAIT_FOR_EMAIL_SECONDS: "5",
-  DOWNLOAD_ICS_FILE: `${import.meta.dirname}/downloads`,
-  ICS_TEXT: "",
-  START_TIME_FROM_ICS: "",
-  END_TIME_FROM_ICS: "",
-  ICS_TEXT_FROM_FILE: "",
-  // Monday
-  ENGLISH_DAY: "",
-  // 17:30-18:30
-  CALENDAR_TIMESLOT: "",
-  ALWAYS_FREE_UNIT: "Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  ALWAYS_FREE_UNIT_WITH_UNIT_LOCATION: "Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju",
-  UNIT_REQUIRES_ALWAYS_HANDLING: "Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  UNIT_REQUIRES_ALWAYS_HANDLING_WITH_UNIT_LOCATION:
-    "Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju",
-  UNIT_WITH_ACCESS_CODE: "Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  UNIT_WITH_ACCESS_CODE_WITH_UNIT_LOCATION:
-    "Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju",
-  FREE_UNIT_NO_CANCEL: "Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  FREE_UNIT_NO_CANCEL_WITH_UNIT_LOCATION:
-    "Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju",
-  ALWAYS_PAID_UNIT: "Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  ALWAYS_PAID_UNIT_WITH_UNIT_LOCATION: "Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju",
-  ALWAYS_PAID_UNIT_SUBVENTED: "Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  ALWAYS_PAID_UNIT_SUBVENTED_WITH_UNIT_LOCATION:
-    "Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju",
-  UNAVAILABLE_UNIT: "Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  UNAVAILABLE_UNIT_WITH_UNIT_LOCATION: "Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju",
-  RECURRING_UNIT_MALMI: "KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  RECURRING_UNIT_KESKUSTA: "KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)",
-  UNIT_LOCATION: "Harakka, piilokoju",
-  UNIT_NAME_FOR_PICTURE_TEST: "Maksuton Mankeli",
-  RECURRING_THU_22_23_OTHER: '[aria-label="Ei varattavissa: To 22 - 23"]',
-  RECURRING_THU_23_24_OTHER: '[aria-label="Ei varattavissa: To 23 - 24"]',
-  RECURRING_THU_09_10_PREFERRED: '[aria-label="Varattavissa: To 9 - 10"]',
-  RECURRING_THU_10_11_PREFERRED: '[aria-label="Varattavissa: To 10 - 11"]',
-  QUICK_RESERVATION_DURATION: "60 min",
-  TIME_OF_QUICK_RESERVATION_FREE_SLOT: "",
-  TIME_OF_QUICK_RESERVATION: "",
-  TIME_OF_QUICK_RESERVATION_MINUS_T: "",
-  TIME_OF_QUICK_RESERVATION_MODIFIED: "",
-  TIME_OF_RESERVATION_FOR_MAIL_TEST: "",
-  TIME_OF_QUICK_RESERVATION_MINUS_T_MODIFIED: "",
-  ADMIN_MODIFIES_TIME_OF_INFO_CARD: "",
-  ADMIN_MODIFIES_TIME_OF_INFO_CARD_MINUS_T: "",
-  CALENDAR_CONTROL_TIME_OF_FREE_SLOT: "",
-  FORMATTED_ICS_START: "",
-  FORMATTED_ICS_END: "",
-  RESERVATION_TIME_EMAIL_RECEIPT: "",
-  // Ke 10.4.2024 klo 17:15-18:15, 1 t Alennuskelpoinen aula, Caisa
-  RESERVATION_TAGLINE: "",
-  MODIFIED_DATE_SUBVENTED_RESERVATION: "",
-  MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION: "",
-  MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION: "",
-  UNAVAILABLE_RESERVATION_DATE: "",
-  UNAVAILABLE_RESERVATION_HOUR_STARTTIME: "",
-  UNAVAILABLE_RESERVATION_HOUR_ENDTIME: "",
-  BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED: "",
-  BOOKING_NUM_ONLY: "",
-  NUMBER_OF_RESERVATION_FOR_MAIL_TEST: "",
-  RESERVATION_INDIVIDUAL: "#reserveeType__INDIVIDUAL",
-  RESERVATION_NONPROFIT: "#reserveeType__NONPROFIT",
-  RESERVATION_BUSINESS: "#reserveeType__COMPANY",
-  RESERVATION_CARD: '[data-testid="reservation-card__container"]',
-  RESERVATION_CARDNAME: '[data-testid="reservation-card__name"]',
-  // 12.2.2024
-  NOTIFICATION_ACTIVE_UNTIL: "",
-  NOTIFICATION_TYPE_NORMAL: '[class*="Notification-module_notification__"]',
-  NOTIFICATION_TYPE_ERROR: '[class*="Notification-module_error__"]',
-  NOTIFICATION_TYPE_WARNING: '[class*="Notification-module_alert__"]',
-  // Normaali (sininen) + random value h5
-  NOTIFICATION_BANNER_MESSAGE_NAME: "",
-  // Normaali (sininen) + random value Z6
-  NOTIFICATION_BANNER_MESSAGE_TEXT_FI: "",
-  ADMIN_ROLE_ADMIN: "ADMIN",
-  ADMIN_ROLE_HANDLER: "HANDLER",
-  ADMIN_ROLE_VIEWER: "VIEWER",
-  ADMIN_ROLE_RESERVER: "RESERVER",
-  ADMIN_ROLE_NOTIFICATION_MANAGER: "NOTIFICATION_MANAGER",
-  PAGE1: "",
-  PAGE_ADMIN_SIDE: "",
-  PAGE_USER_SIDE: "",
-  MAIL_TEST_TRIGGER: "True",
-  ATTACHMENT_FILENAME: "asiointipalvelun-ehdot.pdf",
-  // Alkamisaika: ${day}.${month}.${year} klo ${start_time}
-  FORMATTED_STARTTIME_EMAIL: "",
-  // Päättymisaika: ${day}.${month}.${year} klo ${end_time}
-  FORMATTED_ENDTIME_EMAIL: "",
-  DOWNLOAD_TERMS_OF_USE_FILE: `${import.meta.dirname}/downloads/asiointipalvelun-ehdot.pdf`,
-  EXPECTED_ATTACHMENT_STATUS: true,
-  PABOTEXECUTIONPOOLID: "0",
-};
-registerVariables(variables_variables);
+export const URL_TEST = "https://varaamo.test.hel.ninja/";
+export const URL_STAGE = "https://varaamo.test.hel.ninja/kasittely";
+export const URL_PROD = "https://varaamo.hel.fi/";
+export const URL_ADMIN = "https://varaamo.test.hel.ninja/kasittely";
+export const URL_DJANGO_ADMIN = "https://varaamo.test.hel.ninja/admin/login/";
+export const URL_MAIL = "https://www.google.com/intl/fi/gmail/about/";
+export const DOWNLOAD_DIR = `${import.meta.dirname}/downloads`;
+export const EMAIL_FILE_PATH = `${import.meta.dirname}/downloads/cleaned_emails.json`;
+// Milliseconds, like Playwright's timeouts
+export const BROWSER_TIMEOUT_GLOBAL = 40_000;
+export const CONTENT_WAIT_TIMEOUT = 10_000;
+export const ROBOT_EMAIL = "django_email_robot@mailiposti.com";
+export const DJANGO_ROBO_MAIL = "https://varaamo.test.hel.ninja/v1/robot_email_cache/";
+export const WAIT_FOR_EMAIL_SECONDS = 5;
+export const DOWNLOAD_ICS_FILE = `${import.meta.dirname}/downloads`;
+export const ALWAYS_FREE_UNIT = "Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const ALWAYS_FREE_UNIT_WITH_UNIT_LOCATION = "Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju";
+export const UNIT_REQUIRES_ALWAYS_HANDLING = "Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const UNIT_REQUIRES_ALWAYS_HANDLING_WITH_UNIT_LOCATION =
+  "Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju";
+export const UNIT_WITH_ACCESS_CODE = "Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const UNIT_WITH_ACCESS_CODE_WITH_UNIT_LOCATION =
+  "Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju";
+export const FREE_UNIT_NO_CANCEL = "Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const FREE_UNIT_NO_CANCEL_WITH_UNIT_LOCATION =
+  "Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju";
+export const ALWAYS_PAID_UNIT = "Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const ALWAYS_PAID_UNIT_WITH_UNIT_LOCATION =
+  "Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju";
+export const ALWAYS_PAID_UNIT_SUBVENTED = "Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const ALWAYS_PAID_UNIT_SUBVENTED_WITH_UNIT_LOCATION =
+  "Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju";
+export const UNAVAILABLE_UNIT = "Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const UNAVAILABLE_UNIT_WITH_UNIT_LOCATION =
+  "Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju";
+export const RECURRING_UNIT_MALMI = "KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const RECURRING_UNIT_KESKUSTA = "KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)";
+export const UNIT_LOCATION = "Harakka, piilokoju";
+export const UNIT_NAME_FOR_PICTURE_TEST = "Maksuton Mankeli";
+export const RECURRING_THU_22_23_OTHER = '[aria-label="Ei varattavissa: To 22 - 23"]';
+export const RECURRING_THU_23_24_OTHER = '[aria-label="Ei varattavissa: To 23 - 24"]';
+export const RECURRING_THU_09_10_PREFERRED = '[aria-label="Varattavissa: To 9 - 10"]';
+export const RECURRING_THU_10_11_PREFERRED = '[aria-label="Varattavissa: To 10 - 11"]';
+export const QUICK_RESERVATION_DURATION = "60 min";
+export const RESERVATION_INDIVIDUAL = "#reserveeType__INDIVIDUAL";
+export const RESERVATION_NONPROFIT = "#reserveeType__NONPROFIT";
+export const RESERVATION_BUSINESS = "#reserveeType__COMPANY";
+export const RESERVATION_CARD = '[data-testid="reservation-card__container"]';
+export const RESERVATION_CARDNAME = '[data-testid="reservation-card__name"]';
+export const NOTIFICATION_TYPE_NORMAL = '[class*="Notification-module_notification__"]';
+export const NOTIFICATION_TYPE_ERROR = '[class*="Notification-module_error__"]';
+export const NOTIFICATION_TYPE_WARNING = '[class*="Notification-module_alert__"]';
+export const ADMIN_ROLE_ADMIN = "ADMIN";
+export const ADMIN_ROLE_HANDLER = "HANDLER";
+export const ADMIN_ROLE_VIEWER = "VIEWER";
+export const ADMIN_ROLE_RESERVER = "RESERVER";
+export const ADMIN_ROLE_NOTIFICATION_MANAGER = "NOTIFICATION_MANAGER";
+export const MAIL_TEST_TRIGGER = true;
+export const ATTACHMENT_FILENAME = "asiointipalvelun-ehdot.pdf";
+export const DOWNLOAD_TERMS_OF_USE_FILE = `${import.meta.dirname}/downloads/asiointipalvelun-ehdot.pdf`;
+export const EXPECTED_ATTACHMENT_STATUS = true;

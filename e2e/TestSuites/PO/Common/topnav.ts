@@ -1,10 +1,14 @@
 /** A resource file with top navigation keywords. */
 import type { Page } from "@playwright/test";
-import { V, expect, step, log } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/texts_FI";
-import "../../Resources/serial_users";
+import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import {
+  LOGIN_TEXT_ADMIN,
+  MYAPPLICATIONS_FI,
+  MYBOOKINGS_FI,
+  RECURRING_BOOKINGS_FI,
+  SINGLEBOOKING_FI,
+} from "../../Resources/texts_FI";
 
 /**
  * Clicks a logout button and waits until the logout is done: signOut (packages/ui) ends on the app's /auth/logout/,
@@ -31,7 +35,7 @@ export class Topnav extends PageObject {
   @step("topnav.Click Login Admin Side")
   async clickLoginAdminSide() {
     await this.page.locator("h1").waitFor({ state: "visible" });
-    await this.page.locator(`button >> span:text-is("${V.LOGIN_TEXT_ADMIN}") >> nth=-1`).click();
+    await this.page.locator(`button >> span:text-is("${LOGIN_TEXT_ADMIN}") >> nth=-1`).click();
   }
 
   @step("topnav.Click Logout")
@@ -64,29 +68,29 @@ export class Topnav extends PageObject {
   @step("topnav.Navigate To Single Booking Page")
   async navigateToSingleBookingPage() {
     await this.pages.customKeywords.clickAndWaitForPage(
-      `header >> [href="/search"]:text-is("${V.SINGLEBOOKING_FI}")`,
+      `header >> [href="/search"]:text-is("${SINGLEBOOKING_FI}")`,
       "/search"
     );
   }
 
   @step("topnav.Navigate To My Bookings")
   async navigateToMyBookings() {
-    await this.page.locator(`header >> [href="/reservations"]:text-is("${V.MYBOOKINGS_FI}")`).click();
+    await this.page.locator(`header >> [href="/reservations"]:text-is("${MYBOOKINGS_FI}")`).click();
 
     // Confirms page is loaded
-    await this.pages.mybookings.checkMyBookingsH1(V.MYBOOKINGS_FI);
+    await this.pages.mybookings.checkMyBookingsH1(MYBOOKINGS_FI);
     await this.pages.mybookings.waitForUpcomingBookingsToLoad();
   }
 
   @step("topnav.Navigate To Recurring Booking Page")
   async navigateToRecurringBookingPage() {
-    await this.page.locator(`header >> [href="/recurring"]:text-is("${V.RECURRING_BOOKINGS_FI}")`).click();
+    await this.page.locator(`header >> [href="/recurring"]:text-is("${RECURRING_BOOKINGS_FI}")`).click();
     await this.page.waitForURL((url) => url.pathname === "/recurring");
   }
 
   @step("topnav.Navigate To My Applications")
   async navigateToMyApplications() {
-    await this.page.locator(`header >> [href="/applications"]:text-is("${V.MYAPPLICATIONS_FI}")`).click();
+    await this.page.locator(`header >> [href="/applications"]:text-is("${MYAPPLICATIONS_FI}")`).click();
     await this.page.waitForURL((url) => url.pathname === "/applications");
   }
 
@@ -137,7 +141,7 @@ export class Topnav extends PageObject {
   async navigateToSingleBookingPageMobile() {
     await this.page.locator("#Menu").click();
     await this.pages.customKeywords.clickAndWaitForPage(
-      `header >> [href="/search"]:text-is("${V.SINGLEBOOKING_FI}")`,
+      `header >> [href="/search"]:text-is("${SINGLEBOOKING_FI}")`,
       "/search"
     );
   }

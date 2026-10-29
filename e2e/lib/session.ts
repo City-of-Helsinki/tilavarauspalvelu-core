@@ -1,6 +1,7 @@
 import { chromium, firefox, webkit } from "@playwright/test";
 import type { Browser, BrowserContext, BrowserContextOptions, Page, TestInfo } from "@playwright/test";
-import { harRecordingEnabled, redactHarFile, runStep } from "./robot";
+import type { BackendErrors } from "./backend-errors";
+import { harRecordingEnabled, redactHarFile, runStep } from "./runtime";
 
 const LAUNCHERS = { chromium, firefox, webkit };
 
@@ -24,10 +25,14 @@ export class Session {
   private testPageOpened = false;
   private readonly opened: Opened[] = [];
 
+  /** `backendErrors` watches the test's own context and each context the session opens. */
   constructor(
     private readonly own: { browser: Browser; context: BrowserContext; page: Page },
-    private readonly info: TestInfo
-  ) {}
+    private readonly info: TestInfo,
+    private readonly backendErrors: BackendErrors | null = null
+  ) {
+    backendErrors?.watch(own.context);
+  }
 
   /** The page the keywords act on. */
   get page(): Page {
@@ -69,6 +74,7 @@ export class Session {
     if (navigationTimeout != null) {
       context.setDefaultNavigationTimeout(navigationTimeout);
     }
+    this.backendErrors?.watch(context);
     this.opened.push({ context, browser: launched, harPath });
     this.current = await context.newPage();
     return this.current;
@@ -102,6 +108,8 @@ export class Session {
    * context and page.
    */
   async close(): Promise<void> {
+    // Closing cancels the requests that are still going on, so a failed test's unanswered requests are noted first
+    this.backendErrors?.notePending();
     // Every context is closed even if one fails, so their HAR files and traces aren't lost
     let failure: unknown = null;
     for (const entry of this.opened.splice(0)) {

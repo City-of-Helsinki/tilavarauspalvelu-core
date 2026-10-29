@@ -1,27 +1,17 @@
 # =============================================================================
-# PabotLib Value Sets for Parallel Test Data Distribution
+# Test users of the parallel runs
 # =============================================================================
-# This file is used when running tests WITH pabot library.
-# Each section below is a value set (user data for one test).
+# Each section below is the users of one data set. A test with the data set's
+# tag (e.g. desktop-test-data-set-0) gets its users from the section with the
+# same tags value (the testData fixture, TestSuites/test-data.ts), and only one
+# test at a time uses a data set.
 #
-# WHEN THIS FILE IS USED:
+# The tests use the shared users of serial_users.ts instead:
+#   - in sequential mode: FORCE_SINGLE_USER=True or one worker (pnpm test:sequential)
+#   - in tests without a data set tag, like the notification tests
 #
-# This file is used ONLY when running with pabot in PARALLEL mode:
-#    Behavior: Each test gets its own UNIQUE user, runs in parallel
-#    Example: Test A uses Ande, Test B uses Mikael (simultaneously)
+# The file keeps its name and format from the Robot suite's pabot value sets.
 #
-# WHEN SERIAL_USERS.ROBOT IS USED INSTEAD:
-# The system falls back to serial_users.robot when:
-#   - Running with robot command: robot --variable FORCE_SINGLE_USER:True
-#   - Value set acquisition from this file fails
-#   - PabotLib is not available
-#
-# NOTE: The docker-test script implements TWO modes:
-#   1. PARALLEL: pabot command → uses THIS file → unique users per test
-#   2. SEQUENTIAL: robot command → uses serial_users.robot → shared users
-#
-# =============================================================================
-
 # =============================================================================
 # DESKTOP USER TESTS - Tests_user_desktop_FI.robot (11 tests)
 # =============================================================================

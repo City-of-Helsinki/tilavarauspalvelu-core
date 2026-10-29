@@ -1,7 +1,5 @@
 /** Port of python_keywords.py. The functions keep their Python names. */
-import { PythonDatetime } from "../../lib/DateTime";
-import { log } from "../../lib/robot";
-import type { RobotValue } from "../../lib/robot";
+import { log } from "../../lib/runtime";
 
 const FINNISH_DAYS = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"];
 
@@ -17,18 +15,15 @@ interface Difference {
 
 export const python_keywords = {
   /** The abbreviated Finnish day name of a date: "Ma", "Ti", ... (fi_FI strftime("%a").capitalize()). */
-  get_finnish_day: (date_time: RobotValue): string => {
-    const date: Date = date_time instanceof PythonDatetime ? date_time.date : new Date(date_time);
-    return FINNISH_DAYS[date.getDay()] ?? "";
-  },
+  get_finnish_day: (date_time: Date): string => FINNISH_DAYS[date_time.getDay()] ?? "",
 
   /** Compares two texts character by character and logs the differences with their code points. */
   log_differences: async (
-    elementsText: RobotValue,
-    expectedText: RobotValue,
-    verbose: RobotValue = true,
-    name1: RobotValue = "elementsText",
-    name2: RobotValue = "expectedText"
+    elementsText: unknown,
+    expectedText: unknown,
+    verbose = true,
+    name1 = "elementsText",
+    name2 = "expectedText"
   ): Promise<Difference[]> => {
     if (typeof elementsText !== "string" || typeof expectedText !== "string") {
       await log("Both inputs must be strings.", { level: "WARN" });
@@ -50,11 +45,11 @@ export const python_keywords = {
       if (char1 !== char2) {
         const difference: Difference = {
           position,
-          [String(name1)]: describeChar(char1),
-          [String(name2)]: describeChar(char2),
+          [name1]: describeChar(char1),
+          [name2]: describeChar(char2),
         };
         differences.push(difference);
-        if (verbose === true || String(verbose).toLowerCase() === "true") {
+        if (verbose) {
           // oxlint-disable-next-line no-await-in-loop -- log lines in order
           await log(`Difference found at position ${position}: ${JSON.stringify(difference)}`);
         }
@@ -65,8 +60,8 @@ export const python_keywords = {
   },
 
   /** Validates a time like "Pe 13.9.2024 klo 11:45–12:45" (with an en dash). */
-  validate_timeformat: (original_time: RobotValue): boolean =>
-    /^[A-Za-z]{2}\s\d{1,2}\.\d{1,2}\.\d{4}\sklo\s\d{2}[:.]\d{2}–\d{2}[:.]\d{2}$/.test(String(original_time)),
+  validate_timeformat: (original_time: string): boolean =>
+    /^[A-Za-z]{2}\s\d{1,2}\.\d{1,2}\.\d{4}\sklo\s\d{2}[:.]\d{2}–\d{2}[:.]\d{2}$/.test(original_time),
 
   /** Extracts the time after the first delimiter found ("klo", "–" or "-"). */
   extract_time: (string: string, delimiters: string[]): string => {
@@ -116,8 +111,8 @@ export const python_keywords = {
    * "Ti 1.10.2024 klo 10.30 – 11.30" ->
    * ["DTSTART;TZID=Europe/Helsinki:20241001T103000", "DTEND;TZID=Europe/Helsinki:20241001T113000"]
    */
-  convert_booking_time_to_ics: (time_string: RobotValue): [string, string] => {
-    const text = String(time_string);
+  convert_booking_time_to_ics: (time_string: string): [string, string] => {
+    const text = time_string;
     const trimmed = text.replaceAll(" ", "");
     const dateMatch = /\b(\d{1,2}\.\d{1,2}\.\d{4})\b/.exec(text);
     if (dateMatch == null) {

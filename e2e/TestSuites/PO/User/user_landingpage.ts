@@ -1,31 +1,30 @@
 /** Port of PO/User/user_landingpage.robot */
-import { V, expect, str, timeToMs, step, log } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/serial_users";
+import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import { BASIC_USER_MALE } from "../../Resources/serial_users";
+import { BROWSER_TIMEOUT_GLOBAL } from "../../Resources/variables";
 
 export class UserLandingpage extends PageObject {
   @step("user_landingpage.Check The User Landing Page H1")
   async checkTheUserLandingPageH1(expected_h1_text: string) {
     // Port: expect retries until the heading has the text, instead of Wait Until Keyword Succeeds
     await expect(this.page.locator("h1")).toContainText(expected_h1_text, {
-      timeout: timeToMs(V.BROWSER_TIMEOUT_GLOBAL),
+      timeout: BROWSER_TIMEOUT_GLOBAL,
     });
     await log(expected_h1_text);
   }
 
   @step("user_landingpage.Check The Name In The Login Button")
   async checkTheNameInTheLoginButton() {
-    await log(V.BASIC_USER_MALE_FULLNAME);
-    await expect(this.page.locator("#userDropdown-button")).toHaveText(V.BASIC_USER_MALE_FULLNAME, {
+    await log(BASIC_USER_MALE.fullName);
+    await expect(this.page.locator("#userDropdown-button")).toHaveText(BASIC_USER_MALE.fullName, {
       useInnerText: true,
     });
   }
 
   @step("user_landingpage.Check The Interrupted Payment Notification")
-  async checkTheInterruptedPaymentNotification(banner_title: RobotValue) {
-    await expect(this.page.getByTestId("unpaid-reservation-notification__title")).toHaveText(str(banner_title), {
+  async checkTheInterruptedPaymentNotification(banner_title: string) {
+    await expect(this.page.getByTestId("unpaid-reservation-notification__title")).toHaveText(banner_title, {
       useInnerText: true,
     });
   }

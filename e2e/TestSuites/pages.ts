@@ -40,10 +40,19 @@ import { CustomKeywords } from "./Resources/custom_keywords";
 import { DataModification } from "./Resources/data_modification";
 import { Devices } from "./Resources/devices";
 import { GraphqlCommands } from "./Resources/graphql_commands";
+import { TestState } from "./state";
+import type { TestData } from "./test-data";
 
 export class Pages {
-  /** `session` is the test's pages; tests without a browser (create_data, selftest) have none. */
-  constructor(readonly session: Session | null = null) {}
+  /**
+   * `session` is the test's pages and `testData` the users and units its tags chose; tests without a browser
+   * (create_data, selftest) have neither. `state` keeps the values that keywords save while the test runs.
+   */
+  constructor(
+    readonly session: Session | null = null,
+    readonly testData: TestData | null = null,
+    readonly state = new TestState()
+  ) {}
 
   readonly adminLandingpage = new AdminLandingpage(this);
   readonly adminMyUnits = new AdminMyUnits(this);

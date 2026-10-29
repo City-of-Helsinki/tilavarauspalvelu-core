@@ -1,16 +1,11 @@
 /** A resource file with top navigation keywords. */
-import { expect, step } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/texts_FI";
-import "../../Resources/serial_users";
+import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class Recurring extends PageObject {
   @step("recurring.User Selects A Recurring Booking Round")
   async userSelectsARecurringBookingRound(name_of_the_recurring_reservation: string) {
-    let url_before: RobotValue;
-    url_before = this.page.url();
+    const url_before = this.page.url();
     await this.pages.customKeywords.findAndClickElementInCardElementByText(
       '[data-testid="recurring-lander__application-round-container--active"] >> .card--default',
       '[data-testid="card__heading"]',

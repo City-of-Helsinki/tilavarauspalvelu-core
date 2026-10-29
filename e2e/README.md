@@ -56,7 +56,7 @@ Environment variables:
   HTML report shows. It is ignored when `CI` is set.
 
 Use HAR files and traces for local debugging only, and don't upload them as CI artifacts. Other environment
-variables don't change the suite's variables, even with the same name (like `BROWSER`).
+variables don't change the suite's constants, even with the same name (like `BROWSER`).
 
 Playwright's own options work too: `--headed` shows the browsers, `--ui` opens the UI mode and `--debug` the
 inspector, e.g. `pnpm exec playwright test --project Tests_user_desktop_FI --headed`.
@@ -81,39 +81,42 @@ the runtime offline.
 - `TestSuites/PO/{Admin,App,Common,User}/`: page objects, one class per file (`PageObject` in
   `TestSuites/page-object.ts`). The tests call the workflow keywords in `PO/App/app_user.ts`, `app_admin.ts` and
   `app_common.ts`. `TestSuites/pages.ts` creates a test's page objects together, so they can call each other.
+- `TestSuites/test-data.ts`: the users and units that a test's tags choose. `TestSuites/state.ts`: the values that
+  keywords save while a test runs.
 - `TestSuites/Resources/`: shared keywords (`custom_keywords`, `devices` for the browsers and devices,
-  `common_setups_teardowns`, `parallel_test_data`, `create_data`, `graphql_commands`, `data_modification`, …),
-  variables and texts (`variables`, `texts_FI`, `suite_specific_units`, `serial_users`), the test users in
+  `common_setups_teardowns`, `create_data`, `graphql_commands`, `data_modification`, …), constants (`variables` for
+  URLs, units and selectors, `texts_FI`, `suite_specific_units`, `serial_users`), the test users in
   `pabot_users.dat`, and `env_loader.ts`, which loads the secrets.
-- `lib/`: the runtime. `robot.ts` has the `@step` decorator, `log()`, the variables `V` and the `test` fixture.
-  `session.ts` keeps a test's pages, `locators.ts`, `responses.ts` and `retry.ts` are small helpers for the
-  keywords, and `String`, `Collections`, `DateTime`, `OperatingSystem`, `RequestsLibrary` (HTTP) and `PabotLib`
-  (locks between workers) are the Robot libraries that are still to be replaced.
+- `lib/`: the runtime. `runtime.ts` has the `@step` decorator, `log()`, the secret redaction and the `test` fixture.
+  `session.ts` keeps a test's pages, `backend-errors.ts` records their backend errors into the report, `locks.ts`
+  has the locks between the workers, and `locators.ts`, `responses.ts` and `retry.ts` are small helpers for the
+  keywords.
 - `tools/`: the report reader described below. `tools/README.md` lists how the suite differs from the Robot suite it
   was converted from.
 
-### Keywords, variables and tags
+### Keywords, test data and tags
 
 - A keyword is a page object method marked with its name: `@step("app_common.User Logs In With Suomi Fi") async
-  userLogsInWithSuomiFi()`. Each call is a step with that name in the HTML report, so the report shows the tree of
-  keywords a test ran. The tests get the page objects as fixtures, `async ({ appCommon, appUser }) => { await
-  appCommon.userLogsInWithSuomiFi(); … }`, and a page object calls another one's keywords through `this.pages`.
+  userLogsInWithSuomiFi()`. Each call is a step with that name and its arguments in the HTML report, so the report
+  shows the tree of keywords a test ran. The tests get the page objects as fixtures, `async ({ appCommon, appUser })
+  => { await appCommon.userLogsInWithSuomiFi(); … }`, and a page object calls another one's keywords through
+  `this.pages`.
 - Keywords act on `this.page` with Playwright's locators, actions and `expect`. `log()` adds a message to the
-  report (a WARN message also to the test's annotations).
-- Variables are properties of `V`, e.g. `V.CURRENT_USER_HETU`. They are reset before each test.
-  `TestSuites/variable-types.ts` gives them their types, so a misspelled name fails `pnpm lint`. The variable files
-  are typed by their values. A variable that a keyword sets while a test runs goes in `RuntimeVariables` there, or in
-  `UntypedRuntimeVariables` when its value comes from the page or an untyped keyword.
-- Keyword parameters have a type (`string`) where every caller passes a value of that type. The others are
-  `RobotValue` (any value), like the values that library keywords return. `str()` formats a value the way Robot
-  prints it (`None`, `True`, Python lists), so it stays wherever a value may not be a string.
-- Tags choose the test data, through the `testData` fixture in `TestSuites/fixtures.ts`, before the test starts.
-  A data set tag like `@desktop-test-data-set-0` picks the users from the section with the same tag in
-  `pabot_users.dat`, and only one test at a time uses a data set. A data set tag that `pabot_users.dat` doesn't have
-  fails the test. A suite tag (`@desktop-suite`, `@admin-suite`, `@combined-suite`, `@android-suite`,
-  `@iphone-suite`) picks the units. In sequential mode, and in tests without a data set tag, the tests use the shared
-  users in `serial_users.ts`. The fixture sets the variables the keywords read (`V.CURRENT_USER_HETU`, …), and
-  `Complete Test Setup From Tags` logs the users it chose.
+  report (a WARN message also to the test's annotations). Timeouts are milliseconds, like Playwright's.
+- Texts, URLs, units and selectors are constants, imported by name: `import { URL_TEST } from
+  "../../Resources/variables"`.
+- The users and units of a test are in `testData`: `testData.user.hetu`, `testData.admin.fullName`,
+  `testData.units.alwaysFreeUnit`, `testData.units.alwaysFreeUnitWithLocation`. The tests get it as a fixture, the
+  page objects as `this.testData`. Reading a unit that the test's suite doesn't pick fails.
+- A value that a keyword saves for the keywords after it, like the time and number of a booking, is a field of
+  `state` (`TestSuites/state.ts`): `state.timeOfQuickReservationMinusT`, `this.state.bookingNumOnly` in a page
+  object. Each test gets a new one. Each field says which keywords set it.
+- Tags choose the test data before the test starts. A data set tag like `@desktop-test-data-set-0` picks the users
+  from the section with the same tag in `pabot_users.dat`, and only one test at a time uses a data set. A data set
+  tag that `pabot_users.dat` doesn't have fails the test. A suite tag (`@desktop-suite`, `@admin-suite`,
+  `@combined-suite`, `@android-suite`, `@iphone-suite`) picks the units. In sequential mode, and in tests without a
+  data set tag, the tests use the shared users in `serial_users.ts`. `Complete Test Setup From Tags` logs the users
+  it chose.
 
 ## How it works
 
@@ -145,8 +148,10 @@ the runtime offline.
   page tells when to go on: the pause between login click retries, a second after the empty booking form's submit,
   and a second for banners before a "no banner" check. The config's `baseURL` is the test environment, so Playwright
   code can open pages with `page.goto("/…")`.
-- **Reports:** the HTML report shows the keyword steps of each test, and `test-results/junit.xml` is for CI
-  summaries. A failed test has a full-page screenshot of each open page and a video of its own page.
+- **Reports:** the HTML report shows the keyword steps of each test, with the arguments (a locator as Playwright
+  describes it, like `getByTestId('reservation__status')`), and `test-results/junit.xml` is for CI summaries. A
+  failed test has a full-page screenshot of each open page and a video of its own page. Backend errors are
+  annotations of each attempt, see below.
 
 ## Checks without the test environment
 
@@ -162,3 +167,11 @@ flaky test with its error, the keyword path to the failing step and its screensh
 in the HTML report's `index.html`, so it works on a report downloaded from CI too. `--all` also lists the
 passed tests, and `--extract DIR` writes the report's JSON files. Each failure also has an `error-context.md`
 with the page's accessibility snapshot, next to its screenshot.
+
+**Backend errors:** while a test runs, `lib/backend-errors.ts` watches its page loads and API calls to the test
+environment's services (`*.test.hel.ninja`, except Sentry). It adds a "backend error" annotation to the
+attempt, with the time, for each 5xx response, failed request, GraphQL response with errors, error page of the apps
+("503: Palaamme pian!" comes with status 200) and uncaught error in a page, and, when the test fails, for each
+request that has had no answer for 5 s. The HTML report shows them at the top of the attempt, and
+`report_summary.py` under it. They show whether a flaky test met a backend failure, and when. URLs are shown without
+their query strings, and no headers or request bodies are recorded.

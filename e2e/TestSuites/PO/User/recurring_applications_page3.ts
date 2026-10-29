@@ -1,8 +1,5 @@
 /** A resource file with top navigation keywords. */
-import { step } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/texts_FI";
-import "../../Resources/serial_users";
+import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class RecurringApplicationsPage3 extends PageObject {

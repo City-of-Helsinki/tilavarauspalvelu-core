@@ -1,27 +1,23 @@
 /** Port of PO/App/mail.robot */
-import { V, expect, str, step, log } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
+import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
-import "../../Resources/variables";
-import "../../Resources/texts_FI";
-import "../../Resources/serial_users";
-import "../../Resources/parallel_test_data";
 import { robot_email_test_tool } from "../../Resources/robot_email_test_tool";
+import { CANCELLATION_TEXT_IN_MAIL, CONFIRMATION_TEXT_IN_MAIL } from "../../Resources/texts_FI";
+import { ALWAYS_PAID_UNIT } from "../../Resources/variables";
 
 export class Mail extends PageObject {
   /** Verify confirmation email contains all required terms */
   @step("mail.Verify Reservation Confirmation Email")
-  async verifyReservationConfirmationEmail(reservation_number: RobotValue) {
-    let expected_terms: RobotValue;
-    await log(`Verifying confirmation email for reservation: ${str(reservation_number)}`);
+  async verifyReservationConfirmationEmail(reservation_number: string) {
+    await log(`Verifying confirmation email for reservation: ${reservation_number}`);
 
     // Build list of expected terms
-    expected_terms = [
-      V.ALWAYS_PAID_UNIT,
-      V.CONFIRMATION_TEXT_IN_MAIL,
+    const expected_terms = [
+      ALWAYS_PAID_UNIT,
+      CONFIRMATION_TEXT_IN_MAIL,
       reservation_number,
-      V.FORMATTED_STARTTIME_EMAIL,
-      V.FORMATTED_ENDTIME_EMAIL,
+      this.state.formattedStarttimeEmail,
+      this.state.formattedEndtimeEmail,
     ];
 
     // Port: the backend sends emails from a background task, so the email cache is checked until the email is there
@@ -33,16 +29,15 @@ export class Mail extends PageObject {
 
   /** Verify cancellation email contains all required terms */
   @step("mail.Verify Reservation Cancellation Email")
-  async verifyReservationCancellationEmail(reservation_number: RobotValue) {
-    let expected_terms: RobotValue;
-    await log(`Verifying cancellation email for reservation: ${str(reservation_number)}`);
+  async verifyReservationCancellationEmail(reservation_number: string) {
+    await log(`Verifying cancellation email for reservation: ${reservation_number}`);
 
-    expected_terms = [
-      V.ALWAYS_PAID_UNIT,
-      V.CANCELLATION_TEXT_IN_MAIL,
+    const expected_terms = [
+      ALWAYS_PAID_UNIT,
+      CANCELLATION_TEXT_IN_MAIL,
       reservation_number,
-      V.FORMATTED_STARTTIME_EMAIL,
-      V.FORMATTED_ENDTIME_EMAIL,
+      this.state.formattedStarttimeEmail,
+      this.state.formattedEndtimeEmail,
     ];
 
     // Port: the email cache is checked until the email is there, see Verify Reservation Confirmation Email
@@ -54,7 +49,7 @@ export class Mail extends PageObject {
 
   /** Format reservation times for email verification */
   @step("mail.Format Reservation Time For Email Texts And Receipts")
-  async formatReservationTimeForEmailTextsAndReceipts(time_of_reservation: RobotValue) {
+  async formatReservationTimeForEmailTextsAndReceipts(time_of_reservation: string) {
     // This sets "Alkamisaika: 1.11.2024 klo 11:00" and "Päättymisaika: 1.11.2024 klo 12:00"
     await log('this formats variables "FORMATTED_STARTTIME" and "FORMATTED_ENDTIME"');
     await this.pages.dataModification.formatsReservationTimeToStartAndEndTime(time_of_reservation);
