@@ -1,112 +1,112 @@
 /** Port of PO/User/reservation_calendar.robot */
-import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, isTruthy, keywords, named, str } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import { custom_keywords } from "../../Resources/custom_keywords";
+import { reachesState } from "../../../lib/locators";
+import { V, isTruthy, str, step, expect, log } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
+import type { RobotValue } from "../../../lib/robot";
+import { PageObject } from "../../page-object";
 
-export const reservation_calendar = keywords("reservation_calendar", {
-  "Select Duration Calendar": async (duration: string) => {
+export class ReservationCalendar extends PageObject {
+  @step("reservation_calendar.Select Duration Calendar")
+  async selectDurationCalendar(duration: string) {
     // Click  [data-testid="reservation__input--duration"] >> id=duration-toggle-button
-    await Browser["Click"]('[data-testid="calendar-controls__duration"] >> id=calendar-controls__duration-main-button');
-    await Browser["Click"](`[role="option"] >> '${duration}'`);
+    await this.page
+      .getByTestId("calendar-controls__duration")
+      .locator("#calendar-controls__duration-main-button")
+      .click();
+    await this.page.locator('[role="option"]').locator(`text="${duration}"`).click();
     // An option picked within 200 ms of opening leaves the HDS Select list open
-    await custom_keywords["Close Select List If Open"]("id=calendar-controls__duration-main-button");
-  },
+    await this.pages.customKeywords.closeSelectListIfOpen("#calendar-controls__duration-main-button");
+  }
 
-  "Click And Store Free Reservation Time": async () => {
+  @step("reservation_calendar.Click And Store Free Reservation Time")
+  async clickAndStoreFreeReservationTime() {
     let time_slot_exists: RobotValue,
       available_slots: RobotValue,
       calendar_control_time_of_third_free_slot: RobotValue,
       is_current_time: RobotValue;
-    await Browser["Click"]("id=calendar-controls__time-main-button");
+    await this.page.locator("#calendar-controls__time-main-button").click();
     // The list is open when its options are shown
-    await Browser["Wait For Elements State"](
-      "id=calendar-controls__time-option-0",
-      "visible",
-      named({ timeout: "5s", message: "The time selection list did not open" })
-    );
+    await expect(
+      this.page.locator("#calendar-controls__time-option-0"),
+      "The time selection list did not open"
+    ).toBeVisible({ timeout: 5000 });
 
     // Check if enough time slots are available for the current day
-    time_slot_exists = await BuiltIn["Run Keyword And Return Status"](
-      Browser["Get Element"],
-      "id=calendar-controls__time-option-2"
-    );
+    time_slot_exists = await reachesState(this.page.locator("#calendar-controls__time-option-2"), "attached");
     if (!isTruthy(time_slot_exists)) {
-      available_slots = await Browser["Get Element Count"]('css=[id^="calendar-controls__time-option-"]');
-      await BuiltIn["Fail"](
+      available_slots = await this.page.locator('[id^="calendar-controls__time-option-"]').count();
+      throw new Error(
         `Not enough available time slots for the current day. Expected at least 3 slots, but found ${str(available_slots)}. Try selecting a different date or time range.`
       );
     }
 
-    calendar_control_time_of_third_free_slot = await Browser["Get Text"]("id=calendar-controls__time-option-2");
+    calendar_control_time_of_third_free_slot = await this.page.locator("#calendar-controls__time-option-2").innerText();
     V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT = calendar_control_time_of_third_free_slot;
     // Clicking the current time would unselect it and keep the continue button disabled
-    is_current_time = await Browser["Get Element Count"](
-      `id=calendar-controls__time-main-button >> text="${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)}"`
-    );
+    const selected_time = this.page
+      .locator("#calendar-controls__time-main-button")
+      .locator(`text="${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)}"`);
+    is_current_time = await selected_time.count();
     if (Number(is_current_time) > 0) {
-      await BuiltIn["Log"](
-        `${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)} is the current time, changing to a different time`
-      );
-      await reservation_calendar["Changing Time Again"]();
+      await log(`${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)} is the current time, changing to a different time`);
+      await this.changingTimeAgain();
     } else {
-      await BuiltIn["Log"](`Attempting to select time: ${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)}`);
-      await Browser["Click"]("id=calendar-controls__time-option-2");
+      await log(`Attempting to select time: ${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)}`);
+      await this.page.locator("#calendar-controls__time-option-2").click();
     }
-    await Browser["Wait For Elements State"](
-      `id=calendar-controls__time-main-button >> text="${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)}" >> nth=0`,
-      "visible",
-      named({ timeout: "5s" })
-    );
-    await custom_keywords["Close Select List If Open"]("id=calendar-controls__time-main-button");
-  },
+    await this.page
+      .locator("#calendar-controls__time-main-button")
+      .locator(`text="${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)}"`)
+      .first()
+      .waitFor({ state: "visible", timeout: 5000 });
+    await this.pages.customKeywords.closeSelectListIfOpen("#calendar-controls__time-main-button");
+  }
 
-  "Changing Time Again": async () => {
+  @step("reservation_calendar.Changing Time Again")
+  async changingTimeAgain() {
     let time_slot_exists: RobotValue,
       available_slots: RobotValue,
       calendar_control_time_of_fourth_free_slot: RobotValue;
     // Check if the 4th time slot is available
-    time_slot_exists = await BuiltIn["Run Keyword And Return Status"](
-      Browser["Get Element"],
-      "id=calendar-controls__time-option-3"
-    );
+    time_slot_exists = await reachesState(this.page.locator("#calendar-controls__time-option-3"), "attached");
     if (!isTruthy(time_slot_exists)) {
-      available_slots = await Browser["Get Element Count"]('css=[id^="calendar-controls__time-option-"]');
-      await BuiltIn["Fail"](
+      available_slots = await this.page.locator('[id^="calendar-controls__time-option-"]').count();
+      throw new Error(
         `Not enough available time slots to change time. Expected at least 4 slots, but found ${str(available_slots)}. Try selecting a different date or time range.`
       );
     }
 
-    calendar_control_time_of_fourth_free_slot = await Browser["Get Text"]("id=calendar-controls__time-option-3");
+    calendar_control_time_of_fourth_free_slot = await this.page
+      .locator("#calendar-controls__time-option-3")
+      .innerText();
     V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT = calendar_control_time_of_fourth_free_slot;
-    await BuiltIn["Log"](`Selecting alternative time: ${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)}`);
-    await Browser["Click"]("id=calendar-controls__time-option-3");
-  },
+    await log(`Selecting alternative time: ${str(V.CALENDAR_CONTROL_TIME_OF_FREE_SLOT)}`);
+    await this.page.locator("#calendar-controls__time-option-3").click();
+  }
 
-  "Get Current Date From Datepicker": async () => {
+  @step("reservation_calendar.Get Current Date From Datepicker")
+  async getCurrentDateFromDatepicker() {
     let value: RobotValue;
     // ${value}=  Browser.Get Attribute  id=reservationDialog.date  value
-    value = await Browser["Get Attribute"]("id=controlled-date-input__date", "value");
-    await BuiltIn["Log"](`The value of the quick reservation date is: ${str(value)}`);
+    value = await this.page.locator("#controlled-date-input__date").inputValue();
+    await log(`The value of the quick reservation date is: ${str(value)}`);
     return value;
-  },
+  }
 
-  "Click Continue Button": async () => {
-    await Browser["Click"]('[data-testid="reservation__button--continue"]');
+  @step("reservation_calendar.Click Continue Button")
+  async clickContinueButton() {
+    await this.page.getByTestId("reservation__button--continue").click();
     // Continuing opens the terms step of the edit
-    await Browser["Wait For Elements State"](
-      '[for="cancellation-and-payment-terms-terms-accepted"]',
-      "visible",
-      named({ timeout: "15s" })
-    );
-  },
+    await this.page
+      .locator('[for="cancellation-and-payment-terms-terms-accepted"]')
+      .waitFor({ state: "visible", timeout: 15_000 });
+  }
 
-  "User Click Reservation Calendar Toggle Button": async () => {
+  @step("reservation_calendar.User Click Reservation Calendar Toggle Button")
+  async userClickReservationCalendarToggleButton() {
     // The next click waits until the calendar's animation has ended
-    await Browser["Click"]('[data-testid="calendar-controls__toggle-button"]');
-  },
-});
+    await this.page.getByTestId("calendar-controls__toggle-button").click();
+  }
+}

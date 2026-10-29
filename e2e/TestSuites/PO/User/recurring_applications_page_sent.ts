@@ -1,12 +1,13 @@
 /** A resource file with top navigation keywords. */
-import { keywords } from "../../../lib/robot";
-import { custom_keywords } from "../../Resources/custom_keywords";
+import { step } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
+import { PageObject } from "../../page-object";
 
-export const recurring_applications_page_sent = keywords("recurring_applications_page_sent", {
-  "User Checks H1 Of The Sent Page": async () => {
-    await custom_keywords["Check Elements Text"]("h1", "Kiitos hakemuksesta!");
-  },
-});
+export class RecurringApplicationsPageSent extends PageObject {
+  @step("recurring_applications_page_sent.User Checks H1 Of The Sent Page")
+  async userChecksH1OfTheSentPage() {
+    await this.pages.customKeywords.checkElementsText("h1", "Kiitos hakemuksesta!");
+  }
+}

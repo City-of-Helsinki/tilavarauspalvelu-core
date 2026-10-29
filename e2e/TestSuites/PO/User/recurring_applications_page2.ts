@@ -1,34 +1,38 @@
 /** A resource file with top navigation keywords. */
-import { Browser } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { keywords } from "../../../lib/robot";
-import { custom_keywords } from "../../Resources/custom_keywords";
+import { step, log } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
+import { PageObject } from "../../page-object";
 
-export const recurring_applications_page2 = keywords("recurring_applications_page2", {
-  "User Selects Type Of The Booking Request": async (type_of_booking_request_txt: string) => {
-    await Browser["Click"]('css=[aria-label*="Aikatoiveen tyyppi. "]');
-    await custom_keywords["Find And Click Element With Text"]("ul >> span", type_of_booking_request_txt);
+export class RecurringApplicationsPage2 extends PageObject {
+  @step("recurring_applications_page2.User Selects Type Of The Booking Request")
+  async userSelectsTypeOfTheBookingRequest(type_of_booking_request_txt: string) {
+    await this.page.locator('[aria-label*="Aikatoiveen tyyppi. "]').click();
+    await this.pages.customKeywords.findAndClickElementWithText("ul >> span", type_of_booking_request_txt);
     // An option picked within 200 ms of opening leaves the HDS Select list open
-    await custom_keywords["Close Select List If Open"]('[aria-haspopup="listbox"][aria-label*="Aikatoiveen tyyppi. "]');
-  },
+    await this.pages.customKeywords.closeSelectListIfOpen(
+      '[aria-haspopup="listbox"][aria-label*="Aikatoiveen tyyppi. "]'
+    );
+  }
 
-  "User Clicks Available Seasonal Booking Times For": async (name_of_the_unit: string) => {
-    await Browser["Click"]('css=[aria-label*="Näytä kausivarattavat "]');
-    await custom_keywords["Find And Click Element With Text"]("ul >> span", name_of_the_unit);
-    await custom_keywords["Close Select List If Open"](
+  @step("recurring_applications_page2.User Clicks Available Seasonal Booking Times For")
+  async userClicksAvailableSeasonalBookingTimesFor(name_of_the_unit: string) {
+    await this.page.locator('[aria-label*="Näytä kausivarattavat "]').click();
+    await this.pages.customKeywords.findAndClickElementWithText("ul >> span", name_of_the_unit);
+    await this.pages.customKeywords.closeSelectListIfOpen(
       '[aria-haspopup="listbox"][aria-label*="Näytä kausivarattavat "]'
     );
-  },
+  }
 
-  "User Selects The Times For Recurring Application": async (selector_for_time_of_the_booking: string) => {
-    await Browser["Click"](selector_for_time_of_the_booking);
-  },
+  @step("recurring_applications_page2.User Selects The Times For Recurring Application")
+  async userSelectsTheTimesForRecurringApplication(selector_for_time_of_the_booking: string) {
+    await this.page.locator(selector_for_time_of_the_booking).click();
+  }
 
-  "User Clicks Continue Button": async () => {
-    await BuiltIn["Log"]("this is the same in the page 3");
-    await custom_keywords["Click And Wait For Page"]("id=button__application--next");
-  },
-});
+  @step("recurring_applications_page2.User Clicks Continue Button")
+  async userClicksContinueButton() {
+    await log("this is the same in the page 3");
+    await this.pages.customKeywords.clickAndWaitForPage("#button__application--next");
+  }
+}

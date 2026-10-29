@@ -1,6 +1,6 @@
 /**
- * Offline self-test of the port's runtime: the library shims and the keywords that don't need the test
- * environment. Runs against local data: pages, so it needs no secrets or network.
+ * Offline self-test of the suite's runtime: the keyword steps, the helpers in lib/, the test pages (Session) and the
+ * keywords that don't need the test environment. Runs against local pages, so it needs no secrets or network.
  */
 import { once } from "node:events";
 import { existsSync } from "node:fs";
@@ -8,12 +8,13 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { basename, dirname, join } from "node:path";
 import { errors } from "@playwright/test";
-import { mkdir, readdir, readFile, rm, stat, utimes, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, utimes, writeFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
-import { Browser, currentPage, openTestPage, within } from "../lib/Browser";
-import { BuiltIn } from "../lib/BuiltIn";
 import { DateTime } from "../lib/DateTime";
+import { elementsOf, reachesState } from "../lib/locators";
 import { PabotLib, SHARED_BASE, resetSharedState, sharedDir } from "../lib/PabotLib";
+import { graphqlErrorsIn } from "../lib/responses";
+import { retry } from "../lib/retry";
 import {
   V,
   errorMessage,
@@ -25,21 +26,31 @@ import {
   redact,
   resetVariables,
   robot,
+  step,
   str,
   testWithoutBrowser as test,
-  test as testWithPage,
+  test as testWithBrowser,
   timeToMs,
 } from "../lib/robot";
-import type { RobotValue } from "../lib/robot";
+import { Session } from "../lib/session";
 import { resolveTestData } from "../TestSuites/fixtures";
-import { custom_keywords } from "../TestSuites/Resources/custom_keywords";
-import { data_modification } from "../TestSuites/Resources/data_modification";
+import { Pages } from "../TestSuites/pages";
 import { python_keywords } from "../TestSuites/Resources/python_keywords";
 import "../TestSuites/Resources/variables";
 import "../TestSuites/Resources/serial_users";
 import "../TestSuites/Resources/devices";
 
-const page = (html: string) => `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+const dataPage = (html: string) => `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+
+const { dataModification } = new Pages();
+
+/** A keyword that fails, to see what `@step` does with the error. */
+class FailingKeywords {
+  @step("selftest.Fail With")
+  failWith(error: Error): Promise<never> {
+    return Promise.reject(error);
+  }
+}
 
 /** Puts back environment variables a test changed. */
 function restoreEnv(previous: Record<string, string | undefined>): void {
@@ -153,22 +164,16 @@ test.describe("Runtime self-test", () => {
     expect(errorMessage(timeout)).toBe("TimeoutError: locator.waitFor: Timeout 20000ms exceeded.");
     expect(exceptionMatches(timeout, "TimeoutError*", "glob")).toBe(true);
     expect(exceptionMatches(new Error("Element not found"), "TimeoutError*", "glob")).toBe(false);
-    expect(await BuiltIn["Run Keyword And Ignore Error"](() => Promise.reject(timeout))).toEqual([
-      "FAIL",
-      "TimeoutError: locator.waitFor: Timeout 20000ms exceeded.",
-    ]);
 
-    // Wait Until Keyword Succeeds: attempts of an always failing keyword, counted with Robot Framework 7.3.2
+    // retry(): an always failing action is tried the given number of times, and fails with its last error
     let attempts = 0;
     const alwaysFail = () => {
       attempts++;
-      return Promise.reject(new Error("nope"));
+      return Promise.reject(new Error(`nope ${attempts}`));
     };
-    await BuiltIn["Run Keyword And Ignore Error"](BuiltIn["Wait Until Keyword Succeeds"], "1s", "300ms", alwaysFail);
-    expect(attempts).toBe(5);
-    attempts = 0;
-    await BuiltIn["Run Keyword And Ignore Error"](BuiltIn["Wait Until Keyword Succeeds"], "3x", "10ms", alwaysFail);
+    await expect(retry(3, 10, alwaysFail)).rejects.toThrow("nope 3");
     expect(attempts).toBe(3);
+    expect(await retry(3, 10, () => Promise.resolve("first"))).toBe("first");
 
     // Add Time To Date across daylight saving changes, from Robot Framework 7.3.2 with TZ=Europe/Helsinki
     const dates: Array<[string, string, string, string]> = [
@@ -208,56 +213,39 @@ test.describe("Runtime self-test", () => {
     const previous = { ROBOT_API_TOKEN: process.env.ROBOT_API_TOKEN };
     process.env.ROBOT_API_TOKEN = "selftest-secret";
     try {
-      const failed = await failureOf(BuiltIn["Fail"]("Token selftest-secret was rejected"));
+      const keywords = new FailingKeywords();
+      const failed = await failureOf(keywords.failWith(new Error("Token selftest-secret was rejected")));
       expect(failed).toBeInstanceOf(Error);
       expect((failed as Error).message).toBe("Token *** was rejected");
       expect((failed as Error).stack).not.toContain("selftest-secret");
       // Also in the errors it was caused by, and in errors whose message is read-only
       const caused = await failureOf(
-        BuiltIn["Run Keyword"](() => {
-          throw new Error("Request failed", { cause: new DOMException("Header selftest-secret", "AbortError") });
-        })
+        keywords.failWith(
+          new Error("Request failed", { cause: new DOMException("Header selftest-secret", "AbortError") })
+        )
       );
       expect(((caused as Error).cause as Error).message).toBe("Header ***");
-      expect(await BuiltIn["Run Keyword And Ignore Error"](BuiltIn["Fail"], "selftest-secret")).toEqual([
-        "FAIL",
-        "***",
-      ]);
     } finally {
       restoreEnv(previous);
     }
   });
 
-  test("A wait with a time limit gives up like a keyword timeout", async () => {
-    // Never settles, like a response body that doesn't finish
-    const never = once(new EventTarget(), "never");
-    const started = Date.now();
-    expect(await within(never, 50, "expired")).toBe("expired");
-    expect(Date.now() - started).toBeGreaterThanOrEqual(45);
-    expect(await within(Promise.resolve("body"), 50, "expired")).toBe("body");
-    // 0 means no limit, like Playwright's timeouts
-    expect(await within(delay(80, "later"), 0, "expired")).toBe("later");
-  });
-
   test("Date and time keywords format like the Robot suite", async () => {
-    const [formatted, minusT] = await data_modification["Set Info Card Duration Time Info"]("11.30", "5.12.2023");
+    const [formatted, minusT] = await dataModification.setInfoCardDurationTimeInfo("11.30", "5.12.2023");
     expect(formatted).toBe("Ti 5.12.2023 klo 11:30–12:30, 1 t");
     expect(minusT).toBe("Ti 5.12.2023 klo 11:30–12:30");
 
-    await data_modification["Compute Reservation Time Slot"]("17:30", "60 min");
+    await dataModification.computeReservationTimeSlot("17:30", "60 min");
     expect(V.CALENDAR_TIMESLOT).toBe("17:30-18:30");
 
-    await data_modification["Formats Reservation Time To Start And End Time"]("Pe 1.11.2024 klo 11:00–12:00");
+    await dataModification.formatsReservationTimeToStartAndEndTime("Pe 1.11.2024 klo 11:00–12:00");
     expect(V.FORMATTED_STARTTIME_EMAIL).toBe("Alkamisaika: 1.11.2024 klo 11:00");
     expect(V.FORMATTED_ENDTIME_EMAIL).toBe("Päättymisaika: 1.11.2024 klo 12:00");
 
-    await data_modification["Convert Finnish Short Day To English"]("Su 4.5.2025 klo 02:15–02:45, 30 min");
+    await dataModification.convertFinnishShortDayToEnglish("Su 4.5.2025 klo 02:15–02:45, 30 min");
     expect(V.ENGLISH_DAY).toBe("Sunday");
 
-    await data_modification["Formats Tagline For Admin Side"](
-      "Ma 25.11.2024 klo 22:30–23:30, 1 t ",
-      "Harakka,  piilokoju"
-    );
+    await dataModification.formatsTaglineForAdminSide("Ma 25.11.2024 klo 22:30–23:30, 1 t ", "Harakka,  piilokoju");
     expect(V.RESERVATION_TAGLINE).toBe("Ma 25.11.2024 klo 22:30–23:30, 1 t | Harakka, piilokoju");
   });
 
@@ -351,7 +339,7 @@ test.describe("Runtime self-test", () => {
     );
     await expect(PabotLib["Release Lock"]("SELFTEST_LIVE_OWNER")).rejects.toThrow(/^AssertionError$/);
     const waiting = PabotLib["Acquire Lock"]("SELFTEST_LIVE_OWNER");
-    expect(await within(waiting, 500, "waiting")).toBe("waiting");
+    expect(await Promise.race([waiting, delay(500, "waiting")])).toBe("waiting");
     await rm(lockPath("SELFTEST_LIVE_OWNER"), { recursive: true });
     expect(await waiting).toBe(true);
     await PabotLib["Release Lock"]("SELFTEST_LIVE_OWNER");
@@ -379,65 +367,60 @@ test.describe("Runtime self-test", () => {
     }
   });
 
-  test("Browser keywords keep the Browser library's semantics", async () => {
-    await Browser["New Browser"]("chromium", true);
-    await Browser["New Context"](named({ viewport: "{'width': 800, 'height': 600}", acceptDownloads: "True" }));
-    await Browser["New Page"](
-      page(`
-        <h1>Otsikko teksti</h1>
-        <input id="name" value="alku">
+  testWithBrowser(
+    "Keywords read, wait and click with Playwright's locators",
+    async ({ browser, context, page }, info) => {
+      const session = new Session({ browser, context, page }, info);
+      const { customKeywords } = new Pages(session);
+      await session.openPage();
+      await page.goto(
+        dataPage(`
+        <h1>Otsikko&nbsp;teksti</h1>
+        <p id="number">Varausnumero 123</p>
         <ul id="list"><li><span>Yksi</span></li><li><span>Kaksi</span></li></ul>
         <button id="later" hidden>Myöhemmin</button>
-        <div class="card"><b>Harakka</b><button>Peru</button></div>
+        <div class="card"><b>Harakka</b><button onclick="this.textContent = 'Peruttu'">Peru</button></div>
         <script>setTimeout(() => document.getElementById("later").hidden = false, 300)</script>
       `)
-    );
-    // Get Text: innerText for elements, the value for inputs
-    expect(await Browser["Get Text"]("h1")).toBe("Otsikko teksti");
-    expect(await custom_keywords["Remove Non-breaking Space"](await Browser["Get Text"]("h1"))).toBe("Otsikko teksti");
-    expect(await Browser["Get Text"]("id=name")).toBe("alku");
-    await Browser["Type Text"]("id=name", "uusi");
-    expect(await Browser["Get Text"]("id=name")).toBe("uusi");
+      );
+      expect(await customKeywords.removeNonBreakingSpace(await page.locator("h1").innerText())).toBe("Otsikko teksti");
+      expect(await customKeywords.getNumberFromElementText("#number")).toBe("123");
+      await customKeywords.checkElementsText("#list >> li >> nth=1", "Kaksi");
+      expect(await customKeywords.checkElementsText("#list >> li >> nth=1", "Yksi", "True", "False", "True")).toBe(
+        false
+      );
+      await customKeywords.findAndClickElementInCardElementByText(".card", "b", "Harakka", "button");
+      await expect(page.locator(".card button")).toHaveText("Peruttu");
 
-    // Waits and counts
-    await Browser["Wait For Elements State"]("id=later", "visible", named({ timeout: "5s" }));
-    expect(await Browser["Get Element Count"]("#list >> li")).toBe(2);
-    await custom_keywords["Check Elements Text"]("#list >> li >> nth=1", "Kaksi");
+      // elementsOf waits for the first match, and gives an empty list when none appear in time
+      expect(await elementsOf(page.locator("#list >> li"))).toHaveLength(2);
+      expect(await elementsOf(page.locator(".missing"), 500)).toEqual([]);
+      // reachesState waits, and answers instead of failing
+      expect(await reachesState(page.locator("id=later"), "visible", 5000)).toBe(true);
+      expect(await reachesState(page.locator(".missing"), "attached", 200)).toBe(false);
+      // A locator prints as its selector in step titles and logs
+      expect(str(page.locator(".card").first())).toBe(".card >> nth=0");
+      await session.close();
+    }
+  );
 
-    // Element references from Get Elements chain with >>
-    const cards = await Browser["Get Elements"](".card");
-    await custom_keywords["Find And Click Element In Card Element By Text"](".card", "b", "Harakka", "button");
-    expect(cards).toHaveLength(1);
-    // An element reference prints as its selector, like the Browser library's references
-    expect(str(cards[0])).toBe(".card >> nth=0");
-    // Switch Page fails on an unknown id, with the Browser library's message
-    await expect(Browser["Switch Page"]("page=unknown")).rejects.toThrow(
-      "No page with requested id 'page=unknown' found."
-    );
-    // No cookies is an empty list, whatever the return type
-    expect(await Browser["Get Cookies"](named({ return_type: "string" }))).toEqual([]);
-    await Browser["Set Browser Timeout"]("1s");
-    expect(await Browser["Get Elements"](".missing")).toEqual([]);
-
-    // Assertion operators retry like the Browser library
-    expect(await Browser["Get Attribute"]("id=name", "id", "==", "name")).toBe("name");
-
-    // Robot's failure semantics
-    expect(await BuiltIn["Run Keyword And Return Status"](Browser["Get Text"], "h1", "==", "Väärä")).toBe(false);
-    await Browser["Close Browser"]();
-  });
-
-  test("Wait For Response continues without a body that never finishes", async () => {
+  testWithBrowser("A GraphQL response's body is read for a limited time", async ({ browser, context, page }, info) => {
     // /hangs sends the headers but never ends the body, like a response from a page that is being reloaded.
     // The page comes from the same server: Chromium holds a fetch from a data: page to 127.0.0.1 for a local
     // network access permission that a headless browser never gets.
     const server = createServer((request, response) => {
       if (request.url === "/") {
         response.writeHead(200, { "content-type": "text/html" });
-        response.end(`<button onclick="fetch('/hangs')">Hae</button>`);
+        response.end(
+          `<button id="hangs" onclick="fetch('/hangs')">Hae</button>` +
+            `<button id="errors" onclick="fetch('/errors')">Virhe</button>`
+        );
       } else if (request.url === "/hangs") {
         response.writeHead(200, { "content-type": "application/json" });
         response.write('{"data":');
+      } else if (request.url === "/errors") {
+        response.writeHead(200, { "content-type": "application/json" });
+        response.end('{"errors":[{"message":"nope"}]}');
       } else {
         response.writeHead(404).end();
       }
@@ -445,27 +428,29 @@ test.describe("Runtime self-test", () => {
     await once(server.listen(0, "127.0.0.1"), "listening");
     const { port } = server.address() as AddressInfo;
     try {
-      await Browser["New Browser"]("chromium", true);
-      await Browser["New Page"](`http://127.0.0.1:${port}/`);
-      const loaded = await Browser["Promise To"](
-        Browser["Wait For Response"],
-        named({ matcher: (response: RobotValue) => response.url().includes("/hangs"), timeout: "1s" })
-      );
-      await Browser["Click"]("button");
+      const session = new Session({ browser, context, page }, info);
+      await session.openPage();
+      await page.goto(`http://127.0.0.1:${port}/`);
+      const [hanging] = await Promise.all([
+        page.waitForResponse((response) => response.url().includes("/hangs")),
+        page.locator("id=hangs").click(),
+      ]);
       const started = Date.now();
-      const response = await Browser["Wait For"](loaded);
-      expect(response.ok).toBe(true);
-      expect(response.body).toBeNull();
+      expect(await graphqlErrorsIn(hanging, 1000)).toBe(false);
       expect(Date.now() - started).toBeLessThan(10_000);
-      expect(test.info().annotations.some((annotation) => annotation.description?.includes("/hangs"))).toBe(true);
-      await Browser["Close Browser"]();
+      expect(info.annotations.some((annotation) => annotation.description?.includes("/hangs"))).toBe(true);
+      const [failed] = await Promise.all([
+        page.waitForResponse((response) => response.url().includes("/errors")),
+        page.locator("id=errors").click(),
+      ]);
+      expect(await graphqlErrorsIn(failed, 1000)).toBe(true);
     } finally {
       server.closeAllConnections();
       server.close();
     }
   });
 
-  test("Navigation and text helpers wait for the page", async () => {
+  testWithBrowser("Navigation and text helpers wait for the page", async ({ browser, context, page }, info) => {
     // The list and the URL change 300 ms late, like a page that is still rendering
     const server = createServer((request, response) => {
       if (request.url === "/") {
@@ -491,82 +476,74 @@ test.describe("Runtime self-test", () => {
     await once(server.listen(0, "127.0.0.1"), "listening");
     const { port } = server.address() as AddressInfo;
     try {
-      await Browser["New Browser"]("chromium", true);
-      await Browser["New Page"](`http://127.0.0.1:${port}/`);
-      await custom_keywords["Find Text From Elements Or Fail"]("#list >> li", "Kaksi");
-      await custom_keywords["Verify Element With Text Is Not Found"]("#list >> li", "Poistuva");
+      const session = new Session({ browser, context, page }, info);
+      const { customKeywords } = new Pages(session);
+      await session.openPage();
+      await page.goto(`http://127.0.0.1:${port}/`);
+      await customKeywords.findTextFromElementsOrFail("#list >> li", "Kaksi");
+      await customKeywords.verifyElementWithTextIsNotFound("#list >> li", "Poistuva");
       // A client side navigation (history.pushState) after the click
-      await custom_keywords["Click And Wait For Page"]("id=push");
-      expect(currentPage().url()).toBe(`http://127.0.0.1:${port}/pushed`);
-      await custom_keywords["Wait For Url To Contain"]("/pushed", "5s");
+      await customKeywords.clickAndWaitForPage("id=push");
+      expect(page.url()).toBe(`http://127.0.0.1:${port}/pushed`);
+      await customKeywords.waitForUrlToContain("/pushed", "5s");
       // A full navigation, whose target element shows up after the page has loaded
-      await custom_keywords["Click And Wait For Navigation With Retry"]("id=next", "id=target", "2", "5s");
-      expect(currentPage().url()).toBe(`http://127.0.0.1:${port}/next`);
-      await Browser["Close Browser"]();
+      await customKeywords.clickAndWaitForNavigationWithRetry("id=next", "id=target", "2", "5s");
+      expect(page.url()).toBe(`http://127.0.0.1:${port}/next`);
     } finally {
       server.closeAllConnections();
       server.close();
     }
   });
 
-  test("Closing a browser saves its HAR file", async () => {
-    // har_recording.robot passes recordHar to New Context; with ENABLE_HAR_RECORDING=True every context records one
-    const har = test.info().outputPath("selftest.har");
-    const previous = { ENABLE_HAR_RECORDING: process.env.ENABLE_HAR_RECORDING };
-    try {
-      await Browser["New Browser"]("chromium", true);
-      await Browser["New Context"](named({ recordHar: { path: har, omitContent: false } }));
-      await Browser["New Page"](page("<h1>HAR</h1>"));
-      process.env.ENABLE_HAR_RECORDING = "True";
-      await Browser["New Context"]();
-      await Browser["New Page"](page("<h1>ENABLE_HAR_RECORDING</h1>"));
-      await Browser["Close Browser"]();
-    } finally {
-      restoreEnv(previous);
+  testWithBrowser(
+    "The session opens the test's own page first, then contexts of their own",
+    async ({ browser, context, page }, info) => {
+      // The server echoes a header, like the WAF bypass header that devices.ts adds to every context
+      const server = createServer((request, response) => {
+        response.writeHead(200, { "content-type": "text/html" });
+        response.end(`<p>${String(request.headers["x-selftest-header"])}</p>`);
+      });
+      await once(server.listen(0, "127.0.0.1"), "listening");
+      const { port } = server.address() as AddressInfo;
+      const headers = { extraHTTPHeaders: { "X-Selftest-Header": "header" } };
+      const session = new Session({ browser, context, page }, info);
+      try {
+        // The first one is Playwright's page, made with the project's `use` options
+        expect(await session.openPage({ contextOptions: headers })).toBe(page);
+        await session.page.goto(`http://127.0.0.1:${port}/`);
+        await expect(session.page.locator("p")).toHaveText("header");
+
+        // A later one is a new context, in the same browser or in another one
+        const second = await session.openPage({ contextOptions: headers });
+        expect(second.context()).not.toBe(page.context());
+        expect(session.page).toBe(second);
+        await second.goto(`http://127.0.0.1:${port}/`);
+        await expect(second.locator("p")).toHaveText("header");
+        const firefoxPage = await session.openPage({ browserName: "firefox" });
+        expect(firefoxPage.context().browser()?.browserType().name()).toBe("firefox");
+
+        // A new tab, and switching between pages
+        const tab = await session.newPage();
+        expect(tab.context()).toBe(firefoxPage.context());
+        await session.switchTo(page);
+        expect(session.page).toBe(page);
+        await session.switchTo(session.latestPage());
+        expect(session.page).toBe(page);
+
+        // Closing closes what the session opened. Playwright closes its own page after the test.
+        await session.close();
+        expect(page.isClosed()).toBe(false);
+        expect(second.isClosed()).toBe(true);
+        expect(firefoxPage.isClosed()).toBe(true);
+      } finally {
+        await session.close();
+        server.closeAllConnections();
+        server.close();
+      }
     }
-    const recorded = JSON.parse(await readFile(har, "utf8")) as { log: { entries: unknown[] } };
-    expect(Array.isArray(recorded.log.entries)).toBe(true);
-    const recordedByDefault = (await readdir(test.info().outputDir)).filter((name) => /^context-\d+\.har$/.test(name));
-    expect(recordedByDefault).toHaveLength(1);
-    expect((await stat(test.info().outputPath(recordedByDefault[0] ?? ""))).size).toBeGreaterThan(0);
-  });
+  );
 
-  testWithPage("Set Up keywords open the test's own page first, then a session of their own", async ({ page }) => {
-    // The server echoes a header, like the WAF bypass header that devices.robot adds to every context
-    const server = createServer((request, response) => {
-      response.writeHead(200, { "content-type": "text/html" });
-      response.end(`<p>${String(request.headers["x-selftest-header"])}</p>`);
-    });
-    await once(server.listen(0, "127.0.0.1"), "listening");
-    const { port } = server.address() as AddressInfo;
-    const headers = { extraHTTPHeaders: { "X-Selftest-Header": "header" } };
-    try {
-      // The first one is Playwright's page, made with the project's `use` options
-      await openTestPage({ contextOptions: headers });
-      expect(currentPage()).toBe(page);
-      await Browser["Go To"](`http://127.0.0.1:${port}/`);
-      expect(await Browser["Get Text"]("p")).toBe("header");
-
-      // A later one is a new context, in the same browser or in another one
-      await openTestPage({ contextOptions: headers });
-      expect(currentPage().context()).not.toBe(page.context());
-      await Browser["Go To"](`http://127.0.0.1:${port}/`);
-      expect(await Browser["Get Text"]("p")).toBe("header");
-      await openTestPage({ browserName: "firefox" });
-      expect(currentPage().context().browser()?.browserType().name()).toBe("firefox");
-      expect(await Browser["Get Browser Ids"]()).toHaveLength(2);
-
-      // Closing the browsers closes what the keywords opened. Playwright closes its own page after the test.
-      await Browser["Close Browser"]("ALL");
-      expect(page.isClosed()).toBe(false);
-      expect(await Browser["Get Browser Ids"]()).toEqual([]);
-    } finally {
-      server.closeAllConnections();
-      server.close();
-    }
-  });
-
-  test("HAR files hide secrets like the logs", async () => {
+  testWithBrowser("HAR files are saved and hide secrets like the logs", async ({ browser, context, page }, info) => {
     // The server echoes the header back, so the secret is in a request header and in a response body
     const server = createServer((request, response) => {
       if (request.url === "/") {
@@ -578,31 +555,36 @@ test.describe("Runtime self-test", () => {
     });
     await once(server.listen(0, "127.0.0.1"), "listening");
     const { port } = server.address() as AddressInfo;
-    const har = test.info().outputPath("secret.har");
-    const previous = { WAF_BYPASS_SECRET: process.env.WAF_BYPASS_SECRET };
+    const previous = {
+      WAF_BYPASS_SECRET: process.env.WAF_BYPASS_SECRET,
+      ENABLE_HAR_RECORDING: process.env.ENABLE_HAR_RECORDING,
+    };
     process.env.WAF_BYPASS_SECRET = "selftest-har-secret";
+    // With ENABLE_HAR_RECORDING=True every context the session opens records a HAR file into the test's results
+    process.env.ENABLE_HAR_RECORDING = "True";
+    const session = new Session({ browser, context, page }, info);
     try {
-      await Browser["New Browser"]("chromium", true);
-      await Browser["New Context"](
-        named({
-          extraHTTPHeaders: { "X-Selftest-Secret": "selftest-har-secret" },
-          recordHar: { path: har, omitContent: false },
-        })
-      );
-      await Browser["New Page"](`http://127.0.0.1:${port}/`);
-      expect(await Browser["Get Text"]("p")).toBe("selftest-har-secret");
-      await Browser["Close Browser"]();
+      await session.openPage();
+      const recorded = await session.openPage({
+        contextOptions: { extraHTTPHeaders: { "X-Selftest-Secret": "selftest-har-secret" } },
+      });
+      await recorded.goto(`http://127.0.0.1:${port}/`);
+      await expect(recorded.locator("p")).toHaveText("selftest-har-secret");
+      await session.close();
     } finally {
+      await session.close();
       restoreEnv(previous);
       server.closeAllConnections();
       server.close();
     }
-    const text = await readFile(har, "utf8");
+    const files = (await readdir(info.outputDir)).filter((name) => /^context-\d+\.har$/.test(name));
+    expect(files).toHaveLength(1);
+    const text = await readFile(info.outputPath(files[0] ?? ""), "utf8");
     expect(text).not.toContain("selftest-har-secret");
-    const recorded = JSON.parse(text) as {
+    const har = JSON.parse(text) as {
       log: { entries: Array<{ request: { url: string; headers: Array<{ name: string; value: string }> } }> };
     };
-    const entry = recorded.log.entries.find((candidate) => candidate.request.url === `http://127.0.0.1:${port}/`);
+    const entry = har.log.entries.find((candidate) => candidate.request.url === `http://127.0.0.1:${port}/`);
     const header = entry?.request.headers.find((candidate) => candidate.name.toLowerCase() === "x-selftest-secret");
     expect(header?.value).toBe("***");
     expect(text).toContain("<p>***</p>");

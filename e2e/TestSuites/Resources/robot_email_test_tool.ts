@@ -1,6 +1,5 @@
 /** Port of robot_email_test_tool.py: verifies emails from the backend's robot email cache API. */
-import { BuiltIn } from "../../lib/BuiltIn";
-import { V } from "../../lib/robot";
+import { V, log } from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
 
 interface CachedEmail {
@@ -30,17 +29,17 @@ export class RobotEmailTester {
       params.set("subject", subject);
     }
     try {
-      await BuiltIn.Log(`Fetching emails from: ${this.api_endpoint}`);
+      await log(`Fetching emails from: ${this.api_endpoint}`);
       const query = params.size > 0 ? `?${params.toString()}` : "";
       const response = await fetch(`${this.api_endpoint}${query}`, { signal: AbortSignal.timeout(10_000) });
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText}`);
       }
       const emails = (await response.json()) as CachedEmail[];
-      await BuiltIn.Log(`Retrieved ${emails.length} emails from cache (sorted newest-first)`);
+      await log(`Retrieved ${emails.length} emails from cache (sorted newest-first)`);
       return emails;
     } catch (err) {
-      await BuiltIn.Log(`Failed to retrieve emails from cache: ${String(err)}`, "ERROR");
+      await log(`Failed to retrieve emails from cache: ${String(err)}`, { level: "ERROR" });
       return [];
     }
   }
@@ -51,11 +50,11 @@ export class RobotEmailTester {
     expected_terms: string[],
     require_attachment = false
   ): Promise<boolean> {
-    await BuiltIn.Log(`Verifying email for reservation: ${reservation_number}`);
-    await BuiltIn.Log(`Expected terms: ${JSON.stringify(expected_terms)}`);
+    await log(`Verifying email for reservation: ${reservation_number}`);
+    await log(`Expected terms: ${JSON.stringify(expected_terms)}`);
     const emails = await this.get_emails(this.robot_email);
     if (emails.length === 0) {
-      await BuiltIn.Log(`No emails found for recipient: ${this.robot_email}`, "ERROR");
+      await log(`No emails found for recipient: ${this.robot_email}`, { level: "ERROR" });
       return false;
     }
     const matching = emails.filter(
@@ -63,15 +62,15 @@ export class RobotEmailTester {
         (email.subject ?? "").includes(reservation_number) || (email.text_content ?? "").includes(reservation_number)
     );
     if (matching.length === 0) {
-      await BuiltIn.Log(`No emails found containing reservation number: ${reservation_number}`, "ERROR");
+      await log(`No emails found containing reservation number: ${reservation_number}`, { level: "ERROR" });
       return false;
     }
-    await BuiltIn.Log(`Found ${matching.length} emails matching reservation number ${reservation_number}`);
+    await log(`Found ${matching.length} emails matching reservation number ${reservation_number}`);
     if (matching.length > 2) {
-      await BuiltIn.Log(
+      await log(
         `Found ${matching.length} emails for reservation ${reservation_number} (expected 1-2). ` +
           "This might indicate duplicate emails or test data issues",
-        "WARN"
+        { level: "WARN" }
       );
     }
     for (const [index, email] of matching.entries()) {
@@ -80,24 +79,24 @@ export class RobotEmailTester {
       const missing = expected_terms.filter((term) => term !== "" && !text.toLowerCase().includes(term.toLowerCase()));
       if (require_attachment && attachments.length === 0) {
         // oxlint-disable-next-line no-await-in-loop -- log lines in order
-        await BuiltIn.Log(`Email [${index}] is missing required attachment`, "WARN");
+        await log(`Email [${index}] is missing required attachment`, { level: "WARN" });
         continue;
       }
       if (missing.length === 0) {
         // oxlint-disable-next-line no-await-in-loop -- log lines in order
-        await BuiltIn.Log(
+        await log(
           `Email verification passed! (Email [${index}] from ${email.timestamp ?? ""}: ${email.subject ?? ""})`
         );
         return true;
       }
       // oxlint-disable-next-line no-await-in-loop -- log lines in order
-      await BuiltIn.Log(`Email [${index}] is missing terms: ${missing.join(", ")}`, "WARN");
+      await log(`Email [${index}] is missing terms: ${missing.join(", ")}`, { level: "WARN" });
     }
     const sample = (matching[0]?.text_content ?? "").slice(0, 300);
-    await BuiltIn.Log(
+    await log(
       `No email found matching all criteria. Reservation number: ${reservation_number}, ` +
         `matching emails: ${matching.length}. Sample from most recent email: ${sample}...`,
-      "ERROR"
+      { level: "ERROR" }
     );
     return false;
   }
@@ -117,7 +116,7 @@ export const robot_email_test_tool = {
         const apiEndpoint = String(V.DJANGO_ROBO_MAIL ?? "");
         const robotEmail = String(V.ROBOT_EMAIL ?? "");
         if (apiEndpoint === "" || robotEmail === "") {
-          await BuiltIn.Log("DJANGO_ROBO_MAIL and ROBOT_EMAIL must be set as variables.", "ERROR");
+          await log("DJANGO_ROBO_MAIL and ROBOT_EMAIL must be set as variables.", { level: "ERROR" });
           return false;
         }
         emailTester = new RobotEmailTester(apiEndpoint, robotEmail);
@@ -128,7 +127,7 @@ export const robot_email_test_tool = {
         require_attachment === true || String(require_attachment).toLowerCase() === "true"
       );
     } catch (err) {
-      await BuiltIn.Log(`Error in verify_reservation_email: ${String(err)}`, "ERROR");
+      await log(`Error in verify_reservation_email: ${String(err)}`, { level: "ERROR" });
       return false;
     }
   },

@@ -3,6 +3,9 @@
   "extends": ["../frontend/.oxlintrc.json"],
   "ignorePatterns": ["node_modules/", "test-results/", "playwright-report/", "blob-report/"],
   "rules": {
-    "vitest/no-standalone-expect": "off"
+    "vitest/no-standalone-expect": "off",
+    // The rule is for the DOM property. Playwright's locator.innerText() reads the text as the user sees it, like the
+    // Get Text of the Robot suite did, which textContent() doesn't (it includes hidden text).
+    "unicorn/prefer-dom-node-text-content": "off"
   }
 }

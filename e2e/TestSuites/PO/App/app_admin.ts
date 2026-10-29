@@ -1,27 +1,20 @@
 /** Port of PO/App/app_admin.robot */
-import { Browser, loc } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, expect, keywords, str } from "../../../lib/robot";
+import { V, expect, str, step, log } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
-import { admin_my_units } from "../../PO/Admin/admin_my_units";
-import { admin_navigation_menu } from "../../PO/Admin/admin_navigation_menu";
-import { admin_notifications } from "../../PO/Admin/admin_notifications";
-import { admin_notifications_create_page } from "../../PO/Admin/admin_notifications_create_page";
-import { admin_reservations } from "../../PO/Admin/admin_reservations";
-import { custom_keywords } from "../../Resources/custom_keywords";
-import { data_modification } from "../../Resources/data_modification";
 import "../../Resources/parallel_test_data";
 import "../../Resources/variables";
 import "../../Resources/serial_users";
 import "../../Resources/texts_FI";
 import "../../Resources/devices";
 import "../../Resources/create_data";
+import { PageObject } from "../../page-object";
 
-export const app_admin = keywords("app_admin", {
-  "Admin Checks The Info And Sets Reservation Free And Approves It": async () => {
-    await admin_reservations["Admin Checks Reservation H1"](V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
-    await admin_reservations["Admin Checks Reservation Title Tagline"](V.RESERVATION_TAGLINE);
-    await admin_reservations["Admin Checks Reservation Info Before Handling"](
+export class AppAdmin extends PageObject {
+  @step("app_admin.Admin Checks The Info And Sets Reservation Free And Approves It")
+  async adminChecksTheInfoAndSetsReservationFreeAndApprovesIt() {
+    await this.pages.adminReservations.adminChecksReservationH1(V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
+    await this.pages.adminReservations.adminChecksReservationTitleTagline(V.RESERVATION_TAGLINE);
+    await this.pages.adminReservations.adminChecksReservationInfoBeforeHandling(
       V.SINGLEBOOKING_SUBVENTED_PRICE_ADMIN_SIDE,
       V.ADMIN_STATUS_PROCESSED,
       V.PURPOSE_OF_THE_BOOKING,
@@ -29,17 +22,17 @@ export const app_admin = keywords("app_admin", {
       V.SINGLEBOOKING_NUMBER_OF_PERSONS,
       V.SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP
     );
-    await admin_reservations["Admin Clicks Button In Reservation Page"](
+    await this.pages.adminReservations.adminClicksButtonInReservationPage(
       '[data-testid="approval-buttons__approve-button"]'
     );
     // Waits for the approval dialog
-    await admin_reservations["Admin Checks Reason For Subvention In Dialog"]();
-    await admin_reservations["Admin Clicks Set Reservation To Free"]();
-    await admin_reservations["Admin Clicks Button In Reservation Page"](
+    await this.pages.adminReservations.adminChecksReasonForSubventionInDialog();
+    await this.pages.adminReservations.adminClicksSetReservationToFree();
+    await this.pages.adminReservations.adminClicksButtonInReservationPage(
       '[data-testid="approval-dialog__accept-button"]'
     );
     // The checks wait until the payment status is updated
-    await admin_reservations["Admin Checks Reservation Info After Handling"](
+    await this.pages.adminReservations.adminChecksReservationInfoAfterHandling(
       V.SINGLEBOOKING_NO_PAYMENT_ADMIN_SIDE,
       V.MYBOOKINGS_STATUS_CONFIRMED,
       V.PURPOSE_OF_THE_BOOKING,
@@ -48,12 +41,13 @@ export const app_admin = keywords("app_admin", {
       V.SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP,
       null
     );
-  },
+  }
 
-  "Admin Checks The Info And Cancels Reservation": async () => {
-    await admin_reservations["Admin Checks Reservation H1"](V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
-    await admin_reservations["Admin Checks Reservation Title Tagline"](V.RESERVATION_TAGLINE);
-    await admin_reservations["Admin Checks Reservation Info Before Handling"](
+  @step("app_admin.Admin Checks The Info And Cancels Reservation")
+  async adminChecksTheInfoAndCancelsReservation() {
+    await this.pages.adminReservations.adminChecksReservationH1(V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
+    await this.pages.adminReservations.adminChecksReservationTitleTagline(V.RESERVATION_TAGLINE);
+    await this.pages.adminReservations.adminChecksReservationInfoBeforeHandling(
       V.DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT,
       V.ADMIN_STATUS_PROCESSED,
       V.PURPOSE_OF_THE_BOOKING,
@@ -61,9 +55,9 @@ export const app_admin = keywords("app_admin", {
       V.SINGLEBOOKING_NUMBER_OF_PERSONS,
       null
     );
-    await app_admin["Admin Rejects Reservation And Checks The Status"]();
-    await admin_reservations["Admin Saves Reservation Number"]();
-    await admin_reservations["Admin Checks Reservation Info After Handling"](
+    await this.adminRejectsReservationAndChecksTheStatus();
+    await this.pages.adminReservations.adminSavesReservationNumber();
+    await this.pages.adminReservations.adminChecksReservationInfoAfterHandling(
       V.DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT,
       V.MYBOOKINGS_STATUS_REJECTED,
       V.PURPOSE_OF_THE_BOOKING,
@@ -72,254 +66,281 @@ export const app_admin = keywords("app_admin", {
       null,
       V.ADMIN_REASON_REJECTED
     );
-  },
+  }
 
-  "Admin Returns Reservation To Handling State From Rejected State": async () => {
+  @step("app_admin.Admin Returns Reservation To Handling State From Rejected State")
+  async adminReturnsReservationToHandlingStateFromRejectedState() {
     // When UI is scrolled down, a sticky header appears with the same selector name
     // Using nth=-1 to target the last element
-    await admin_reservations["Admin Clicks Button In Reservation Page"](
+    await this.pages.adminReservations.adminClicksButtonInReservationPage(
       '[data-testid="approval-buttons__return-to-handling-button"] >> nth=-1'
     );
-    await custom_keywords["Find And Click Element With Text"]("id=info-dialog >> span", V.RESERVATION_STATUS_DIALOG);
-    await admin_reservations["Admin Checks Reservation Status"](V.ADMIN_STATUS_PROCESSED);
-  },
+    await this.pages.customKeywords.findAndClickElementWithText("#info-dialog >> span", V.RESERVATION_STATUS_DIALOG);
+    await this.pages.adminReservations.adminChecksReservationStatus(V.ADMIN_STATUS_PROCESSED);
+  }
 
-  "Admin Edits Reservation Time": async () => {
+  @step("app_admin.Admin Edits Reservation Time")
+  async adminEditsReservationTime() {
     let admin_modified_formatted_date: RobotValue, admin_modified_formatted_date_minus_t: RobotValue;
-    await BuiltIn["Log"]("Reservation needs to be approved first in order to do this step");
+    await log("Reservation needs to be approved first in order to do this step");
 
     // This sets the variables for ${MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION}, ${MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION}, ${MODIFIED_DATE_SUBVENTED_RESERVATION}, ${MODIFIED_STARTTIME_SUBVENTED_RESERVATION}
-    await admin_reservations["Admin Opens Calendar And Changes Reservation Time"]();
-    await data_modification["Set Info Card Duration Time Info"](
+    await this.pages.adminReservations.adminOpensCalendarAndChangesReservationTime();
+    await this.pages.dataModification.setInfoCardDurationTimeInfo(
       V.MODIFIED_STARTTIME_SUBVENTED_RESERVATION,
       V.MODIFIED_DATE_SUBVENTED_RESERVATION
     );
-    [admin_modified_formatted_date, admin_modified_formatted_date_minus_t] = await data_modification[
-      "Set Info Card Duration Time Info"
-    ](V.MODIFIED_STARTTIME_SUBVENTED_RESERVATION, V.MODIFIED_DATE_SUBVENTED_RESERVATION);
+    [admin_modified_formatted_date, admin_modified_formatted_date_minus_t] =
+      await this.pages.dataModification.setInfoCardDurationTimeInfo(
+        V.MODIFIED_STARTTIME_SUBVENTED_RESERVATION,
+        V.MODIFIED_DATE_SUBVENTED_RESERVATION
+      );
 
     V.ADMIN_MODIFIES_TIME_OF_INFO_CARD = admin_modified_formatted_date;
     V.ADMIN_MODIFIES_TIME_OF_INFO_CARD_MINUS_T = admin_modified_formatted_date_minus_t;
 
     // This sets ${RESERVATION_TAGLINE} back to client side.
-    await data_modification["Formats Tagline For Admin Side"](
+    await this.pages.dataModification.formatsTaglineForAdminSide(
       V.ADMIN_MODIFIES_TIME_OF_INFO_CARD,
       V.ALWAYS_PAID_UNIT_SUBVENTED_WITH_UNIT_LOCATION
     );
-    await admin_reservations["Admin Checks Reservation H1"](V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
-    await admin_reservations["Admin Checks Reservation Title Tagline"](V.RESERVATION_TAGLINE);
-    await admin_reservations["Admin Checks Reservation Status"](V.MYBOOKINGS_STATUS_CONFIRMED);
-  },
+    await this.pages.adminReservations.adminChecksReservationH1(V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
+    await this.pages.adminReservations.adminChecksReservationTitleTagline(V.RESERVATION_TAGLINE);
+    await this.pages.adminReservations.adminChecksReservationStatus(V.MYBOOKINGS_STATUS_CONFIRMED);
+  }
 
-  "Admin Navigates To Own Units And Selects Unit Group": async (unit_group_name: string) => {
-    await admin_navigation_menu["Admin Navigates To My Units"]();
-    await admin_my_units["Admin Searches Own Unit And Clicks It"](unit_group_name);
-  },
+  @step("app_admin.Admin Navigates To Own Units And Selects Unit Group")
+  async adminNavigatesToOwnUnitsAndSelectsUnitGroup(unit_group_name: string) {
+    await this.pages.adminNavigationMenu.adminNavigatesToMyUnits();
+    await this.pages.adminMyUnits.adminSearchesOwnUnitAndClicksIt(unit_group_name);
+  }
 
-  "Admin Opens Make Reservation Modal And Selects Unit": async (unit_name: string) => {
-    await admin_my_units["Admin Clicks Make Reservation"]();
-    await admin_my_units["Admin Selects Unit From Reservation Units Dropdown"](unit_name);
-  },
+  @step("app_admin.Admin Opens Make Reservation Modal And Selects Unit")
+  async adminOpensMakeReservationModalAndSelectsUnit(unit_name: string) {
+    await this.pages.adminMyUnits.adminClicksMakeReservation();
+    await this.pages.adminMyUnits.adminSelectsUnitFromReservationUnitsDropdown(unit_name);
+  }
 
-  "Admin Checks That Reservation Cannot Be Made": async () => {
-    await admin_my_units["Admin Checks Make Reservation Button Is Disabled"]();
-  },
+  @step("app_admin.Admin Checks That Reservation Cannot Be Made")
+  async adminChecksThatReservationCannotBeMade() {
+    await this.pages.adminMyUnits.adminChecksMakeReservationButtonIsDisabled();
+  }
 
   // Access code
-  "Admin Opens Access Code Modal": async () => {
-    await admin_reservations["Admin Open Access Code Modal"]();
-  },
+  @step("app_admin.Admin Opens Access Code Modal")
+  async adminOpensAccessCodeModal() {
+    await this.pages.adminReservations.adminOpenAccessCodeModal();
+  }
 
-  "Admin Changes Access Code": async () => {
-    await admin_reservations["Admin Changes Access Code"]();
-    await admin_reservations["Admin Clicks Confirm Access Code Button"]();
+  @step("app_admin.Admin Changes Access Code")
+  async adminChangesAccessCode() {
+    await this.pages.adminReservations.adminChangesAccessCode();
+    await this.pages.adminReservations.adminClicksConfirmAccessCodeButton();
     // Admin Checks Access Code Does Not Match waits until the access code has changed
-    await expect(loc('[data-testid="reservation__info--Ovikoodi"]')).toBeVisible({ timeout: 10_000 });
-  },
+    await expect(this.page.getByTestId("reservation__info--Ovikoodi")).toBeVisible({ timeout: 10_000 });
+  }
 
   /** Verifies that the access code matches the expected value (extracts numbers only). */
-  "Admin Checks Access Code Matches": async (access_code: RobotValue) => {
-    await custom_keywords["Check Elements Text"]('[data-testid="reservation__info--Ovikoodi"]', access_code);
-  },
+  @step("app_admin.Admin Checks Access Code Matches")
+  async adminChecksAccessCodeMatches(access_code: RobotValue) {
+    await this.pages.customKeywords.checkElementsText('[data-testid="reservation__info--Ovikoodi"]', access_code);
+  }
 
   /** Verifies that the access code does NOT match the expected value (extracts numbers only). */
-  "Admin Checks Access Code Does Not Match": async (access_code: RobotValue) => {
-    await custom_keywords["Verify Element With Text Is Not Found"](
+  @step("app_admin.Admin Checks Access Code Does Not Match")
+  async adminChecksAccessCodeDoesNotMatch(access_code: RobotValue) {
+    await this.pages.customKeywords.verifyElementWithTextIsNotFound(
       '[data-testid="reservation__info--Ovikoodi"]',
       access_code
     );
-  },
+  }
 
-  "Admin Saves Access Code": async () => {
+  @step("app_admin.Admin Saves Access Code")
+  async adminSavesAccessCode() {
     let access_code: RobotValue;
-    access_code = await Browser["Get Text"]('[data-testid="reservation__info--Ovikoodi"]');
+    access_code = await this.page.getByTestId("reservation__info--Ovikoodi").innerText();
     V.ACCESS_CODE_ADMINSIDE = access_code;
-    await BuiltIn["Log"](V.ACCESS_CODE_ADMINSIDE);
+    await log(V.ACCESS_CODE_ADMINSIDE);
 
     // Top navigation
-  },
+  }
 
   // Basic permissions
-  "Admin Checks Top Navigation For Notification Manager": async () => {
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations/requested"]');
-  },
+  @step("app_admin.Admin Checks Top Navigation For Notification Manager")
+  async adminChecksTopNavigationForNotificationManager() {
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservations/requested"]');
+  }
 
-  "Admin Checks Top Navigation For Reserver": async () => {
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-  },
+  @step("app_admin.Admin Checks Top Navigation For Reserver")
+  async adminChecksTopNavigationForReserver() {
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+  }
 
-  "Admin Checks Top Navigation For Viewer": async () => {
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-  },
+  @step("app_admin.Admin Checks Top Navigation For Viewer")
+  async adminChecksTopNavigationForViewer() {
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+  }
 
-  "Admin Checks Top Navigation For Handler": async () => {
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+  @step("app_admin.Admin Checks Top Navigation For Handler")
+  async adminChecksTopNavigationForHandler() {
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Admin": async () => {
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/units"]');
-  },
+  @step("app_admin.Admin Checks Top Navigation For Admin")
+  async adminChecksTopNavigationForAdmin() {
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/units"]');
+  }
 
   // Unit permissions
-  "Admin Checks Top Navigation For Notification Manager With Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Notification Manager With Unit Permissions")
+  async adminChecksTopNavigationForNotificationManagerWithUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Viewer With Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Viewer With Unit Permissions")
+  async adminChecksTopNavigationForViewerWithUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Reserver With Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Reserver With Unit Permissions")
+  async adminChecksTopNavigationForReserverWithUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Handler With Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Handler With Unit Permissions")
+  async adminChecksTopNavigationForHandlerWithUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Admin With Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Admin With Unit Permissions")
+  async adminChecksTopNavigationForAdminWithUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+  }
 
   // Group unit permissions
-  "Admin Checks Top Navigation For Notification Manager With Group Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Notification Manager With Group Unit Permissions")
+  async adminChecksTopNavigationForNotificationManagerWithGroupUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Viewer With Group Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Viewer With Group Unit Permissions")
+  async adminChecksTopNavigationForViewerWithGroupUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Reserver With Group Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Reserver With Group Unit Permissions")
+  async adminChecksTopNavigationForReserverWithGroupUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Handler With Group Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Handler With Group Unit Permissions")
+  async adminChecksTopNavigationForHandlerWithGroupUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/units"]');
-  },
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/units"]');
+  }
 
-  "Admin Checks Top Navigation For Admin With Group Unit Permissions": async () => {
+  @step("app_admin.Admin Checks Top Navigation For Admin With Group Unit Permissions")
+  async adminChecksTopNavigationForAdminWithGroupUnitPermissions() {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/application-rounds"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservation-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
-    await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
-    await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/application-rounds"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservation-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/my-units"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations"]');
+    await this.pages.customKeywords.verifyElementIsFound('[href="/kasittely/reservations/requested"]');
+    await this.pages.customKeywords.verifyElementIsNotFound('[href="/kasittely/notifications"]');
 
     // Not currently in use
     // This was used to navigate to reservations through calendar view
@@ -331,165 +352,176 @@ export const app_admin = keywords("app_admin", {
     // app_common.Switch To New Tab From Current Page
     // admin_reservations.Admin Checks Reservation Title Tagline  ${RESERVATION_TAGLINE}
     // admin_reservations.Admin Checks Reservation User Info
-  },
+  }
 
-  "Admin Clicks Make Reservation And Checks Dialog Opens": async () => {
-    await admin_my_units["Admin Clicks Make Reservation"]();
+  @step("app_admin.Admin Clicks Make Reservation And Checks Dialog Opens")
+  async adminClicksMakeReservationAndChecksDialogOpens() {
+    await this.pages.adminMyUnits.adminClicksMakeReservation();
     await expect(
-      loc("id=info-dialog"),
+      this.page.locator("#info-dialog"),
       "Info dialog should be visible after clicking make reservation button"
     ).toBeVisible({ timeout: 10_000 });
-  },
+  }
 
-  "Admin Rejects Reservation And Checks The Status": async () => {
+  @step("app_admin.Admin Rejects Reservation And Checks The Status")
+  async adminRejectsReservationAndChecksTheStatus() {
     // Click the last one to avoid strict mode violation that might happen when accordion is open
-    await Browser["Click"]('[data-testid="approval-buttons__reject-button"] >> nth=-1');
-    await admin_reservations["Admin Selects Reason For Rejection"](V.ADMIN_REASON_REJECTED);
-    await Browser["Click"]('[data-testid="deny-dialog__deny-button"]');
-    await admin_reservations["Admin Checks Reservation Status"](V.MYBOOKINGS_STATUS_REJECTED);
-  },
+    await this.page.getByTestId("approval-buttons__reject-button").last().click();
+    await this.pages.adminReservations.adminSelectsReasonForRejection(V.ADMIN_REASON_REJECTED);
+    await this.page.getByTestId("deny-dialog__deny-button").click();
+    await this.pages.adminReservations.adminChecksReservationStatus(V.MYBOOKINGS_STATUS_REJECTED);
+  }
 
-  "Admin Makes Reservation For Behalf And Clicks Submit": async () => {
+  @step("app_admin.Admin Makes Reservation For Behalf And Clicks Submit")
+  async adminMakesReservationForBehalfAndClicksSubmit() {
     let date_plus_x_days: RobotValue, start_hour: RobotValue, end_hour: RobotValue;
-    await BuiltIn["Log"](
+    await log(
       "This sets variables for MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION, MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION, MODIFIED_DATE_SUBVENTED_RESERVATION and MODIFIED_STARTTIME_SUBVENTED_RESERVATION"
     );
 
     // Call the keyword and capture the returned values
-    [date_plus_x_days, start_hour, end_hour] = await data_modification["Get Modified Date And Time"]();
+    [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
     V.UNAVAILABLE_RESERVATION_DATE = date_plus_x_days;
     V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME = start_hour;
     V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME = end_hour;
 
-    await admin_reservations["Admin Enters Reservation Time And Type Of Reservation"](
+    await this.pages.adminReservations.adminEntersReservationTimeAndTypeOfReservation(
       "[for=BEHALF]",
       V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME,
       V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
       V.UNAVAILABLE_RESERVATION_DATE
     );
-    await admin_reservations["Admin Fills Reservation Details Behalf"](); // this keyword generates the info for checking calendar content
-    await admin_reservations["Admin Clicks Button In Reservation Page"](
+    await this.pages.adminReservations.adminFillsReservationDetailsBehalf(); // this keyword generates the info for checking calendar content
+    await this.pages.adminReservations.adminClicksButtonInReservationPage(
       '[data-testid="CreateReservationModal__accept-reservation"]'
     );
-    await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
-  },
+    await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
+  }
 
-  "Admin Makes Reservation For Closed And Clicks Submit": async () => {
+  @step("app_admin.Admin Makes Reservation For Closed And Clicks Submit")
+  async adminMakesReservationForClosedAndClicksSubmit() {
     let date_plus_x_days: RobotValue, start_hour: RobotValue, end_hour: RobotValue;
     // Call the keyword and capture the returned values
-    [date_plus_x_days, start_hour, end_hour] = await data_modification["Get Modified Date And Time"]();
+    [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
     V.UNAVAILABLE_RESERVATION_DATE = date_plus_x_days;
     V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME = start_hour;
     V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME = end_hour;
 
-    await admin_reservations["Admin Enters Reservation Time And Type Of Reservation"](
+    await this.pages.adminReservations.adminEntersReservationTimeAndTypeOfReservation(
       "[for=BLOCKED]",
       V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME,
       V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
       V.UNAVAILABLE_RESERVATION_DATE
     );
-    await admin_reservations["Admin Clicks Button In Reservation Page"](
+    await this.pages.adminReservations.adminClicksButtonInReservationPage(
       '[data-testid="CreateReservationModal__accept-reservation"]'
     );
-    await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
-  },
+    await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
+  }
 
-  "Admin Makes Reservation For Staff And Clicks Submit": async () => {
+  @step("app_admin.Admin Makes Reservation For Staff And Clicks Submit")
+  async adminMakesReservationForStaffAndClicksSubmit() {
     let date_plus_x_days: RobotValue, start_hour: RobotValue, end_hour: RobotValue;
     // Call the keyword and capture the returned values
-    [date_plus_x_days, start_hour, end_hour] = await data_modification["Get Modified Date And Time"]();
+    [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
     V.UNAVAILABLE_RESERVATION_DATE = date_plus_x_days;
     V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME = start_hour;
     V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME = end_hour;
 
-    await admin_reservations["Admin Enters Reservation Time And Type Of Reservation"](
+    await this.pages.adminReservations.adminEntersReservationTimeAndTypeOfReservation(
       "[for=STAFF]",
       V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME,
       V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
       V.UNAVAILABLE_RESERVATION_DATE
     );
-    await admin_reservations["Admin Clicks Button In Reservation Page"](
+    await this.pages.adminReservations.adminClicksButtonInReservationPage(
       '[data-testid="CreateReservationModal__accept-reservation"]'
     );
-    await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
-  },
+    await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
+  }
 
-  "Admin Attempts To Make An Unavailable Reservation And Clicks Cancel": async () => {
-    await admin_reservations["Admin Enters Reservation Time And Type Of Reservation"](
+  @step("app_admin.Admin Attempts To Make An Unavailable Reservation And Clicks Cancel")
+  async adminAttemptsToMakeAnUnavailableReservationAndClicksCancel() {
+    await this.pages.adminReservations.adminEntersReservationTimeAndTypeOfReservation(
       '[for="BEHALF"]',
       V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME,
       V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
       V.UNAVAILABLE_RESERVATION_DATE
     );
-    await Browser["Scroll To Element"]('[data-testid="CreateReservationModal__accept-reservation"]');
-    await custom_keywords["Check Elements Text"](
+    await this.page.getByTestId("CreateReservationModal__accept-reservation").scrollIntoViewIfNeeded();
+    await this.pages.customKeywords.checkElementsText(
       '[data-testid="CreateReservationModal__collision-warning"] >> [class*="Notification-module_body__"]',
       V.RESERVATION_TIME_NOT_FREE
     );
-    await Browser["Click"]("data-testid=CreateReservationModal__cancel-reservation");
-    await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
-  },
+    await this.page.getByTestId("CreateReservationModal__cancel-reservation").click();
+    await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
+  }
 
   // Notifications
-  "Admin Creates Normal Notification For User And Admin Side": async () => {
+  @step("app_admin.Admin Creates Normal Notification For User And Admin Side")
+  async adminCreatesNormalNotificationForUserAndAdminSide() {
     let date_plus_60_days: RobotValue, randomvalue: RobotValue;
-    await admin_notifications["Admin Clicks Create Notification Button"]();
-    await admin_notifications_create_page["Admin Selects Immediate Validity Period"]();
-    date_plus_60_days = await data_modification["Get Date Plus 60 Days"]();
+    await this.pages.adminNotifications.adminClicksCreateNotificationButton();
+    await this.pages.adminNotificationsCreatePage.adminSelectsImmediateValidityPeriod();
+    date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
     V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
+    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(V.NOTIFICATION_ACTIVE_UNTIL);
     // if the notification name exist already we cannot publish the notification
-    randomvalue = await data_modification["Generate Random Letter And Number"]();
+    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     V.NOTIFICATION_BANNER_MESSAGE_NAME = `${V.NOTIFICATION_BANNER_MESSAGE_NORMAL} ${str(randomvalue)}`;
-    await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME);
-    await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_NORMAL);
-    await admin_notifications_create_page["Admin Selects Target Group All"]();
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(V.NOTIFICATION_BANNER_MESSAGE_NAME);
+    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(V.NOTIFICATION_BANNER_MESSAGE_NORMAL);
+    await this.pages.adminNotificationsCreatePage.adminSelectsTargetGroupAll();
 
-    randomvalue = await data_modification["Generate Random Letter And Number"]();
+    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_NORMAL} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
-    await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
-    await admin_notifications_create_page["Admin Publishes Notification"]();
-  },
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
+    await this.pages.adminNotificationsCreatePage.adminPublishesNotification();
+  }
 
-  "Admin Creates Warning Notification For User And Admin Side": async () => {
+  @step("app_admin.Admin Creates Warning Notification For User And Admin Side")
+  async adminCreatesWarningNotificationForUserAndAdminSide() {
     let date_plus_60_days: RobotValue, randomvalue: RobotValue;
-    await admin_notifications["Admin Clicks Create Notification Button"]();
-    await admin_notifications_create_page["Admin Selects Immediate Validity Period"]();
-    date_plus_60_days = await data_modification["Get Date Plus 60 Days"]();
+    await this.pages.adminNotifications.adminClicksCreateNotificationButton();
+    await this.pages.adminNotificationsCreatePage.adminSelectsImmediateValidityPeriod();
+    date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
     V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
+    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(V.NOTIFICATION_ACTIVE_UNTIL);
     // if the notification name exist already we cannot publish the notification
-    randomvalue = await data_modification["Generate Random Letter And Number"]();
+    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING = `${V.NOTIFICATION_BANNER_MESSAGE_WARNING} ${str(randomvalue)}`;
-    await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING);
-    await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_WARNING);
-    await admin_notifications_create_page["Admin Selects Target Group All"]();
-    randomvalue = await data_modification["Generate Random Letter And Number"]();
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(
+      V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING
+    );
+    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(V.NOTIFICATION_BANNER_MESSAGE_WARNING);
+    await this.pages.adminNotificationsCreatePage.adminSelectsTargetGroupAll();
+    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_WARNING} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
-    await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
-    await admin_notifications_create_page["Admin Publishes Notification"]();
-  },
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
+    await this.pages.adminNotificationsCreatePage.adminPublishesNotification();
+  }
 
-  "Admin Creates Error Notification For User And Admin Side": async () => {
+  @step("app_admin.Admin Creates Error Notification For User And Admin Side")
+  async adminCreatesErrorNotificationForUserAndAdminSide() {
     let date_plus_60_days: RobotValue, randomvalue: RobotValue;
-    await admin_notifications["Admin Clicks Create Notification Button"]();
-    await admin_notifications_create_page["Admin Selects Immediate Validity Period"]();
-    date_plus_60_days = await data_modification["Get Date Plus 60 Days"]();
+    await this.pages.adminNotifications.adminClicksCreateNotificationButton();
+    await this.pages.adminNotificationsCreatePage.adminSelectsImmediateValidityPeriod();
+    date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
     V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
+    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(V.NOTIFICATION_ACTIVE_UNTIL);
     // if the notification name exist already we cannot publish the notification
-    randomvalue = await data_modification["Generate Random Letter And Number"]();
+    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR = `${V.NOTIFICATION_BANNER_MESSAGE_ERROR} ${str(randomvalue)}`;
-    await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR);
-    await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_ERROR);
-    await admin_notifications_create_page["Admin Selects Target Group All"]();
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR);
+    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(V.NOTIFICATION_BANNER_MESSAGE_ERROR);
+    await this.pages.adminNotificationsCreatePage.adminSelectsTargetGroupAll();
 
-    randomvalue = await data_modification["Generate Random Letter And Number"]();
+    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_ERROR} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
-    await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
-    await admin_notifications_create_page["Admin Publishes Notification"]();
-  },
-});
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
+    await this.pages.adminNotificationsCreatePage.adminPublishesNotification();
+  }
+}
