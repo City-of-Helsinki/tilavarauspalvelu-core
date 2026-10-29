@@ -36,7 +36,7 @@ const USER_KEYS = [
   "CURRENT_USER_HETU",
   "CURRENT_USER_PHONE",
   "CURRENT_PASSWORD",
-];
+] as const;
 const ADMIN_KEYS = [
   "ADMIN_CURRENT_USER_EMAIL",
   "ADMIN_CURRENT_USER_FIRST_NAME",
@@ -44,7 +44,7 @@ const ADMIN_KEYS = [
   "ADMIN_CURRENT_USER_HETU",
   "ADMIN_CURRENT_USER_FULLNAME",
   "ADMIN_CURRENT_USER_PASSWORD",
-];
+] as const;
 const DJANGO_ADMIN_KEYS = [
   "DJANGO_ADMIN_EMAIL",
   "DJANGO_ADMIN_FIRST_NAME",
@@ -52,7 +52,7 @@ const DJANGO_ADMIN_KEYS = [
   "DJANGO_ADMIN_HETU",
   "DJANGO_ADMIN_FULLNAME",
   "DJANGO_ADMIN_DJANGO_USERNAME",
-];
+] as const;
 const PERMISSION_TARGET_KEYS = [
   "PERMISSION_TARGET_ADMIN_EMAIL",
   "PERMISSION_TARGET_ADMIN_FIRST_NAME",
@@ -60,10 +60,29 @@ const PERMISSION_TARGET_KEYS = [
   "PERMISSION_TARGET_ADMIN_HETU",
   "PERMISSION_TARGET_ADMIN_FULLNAME",
   "PERMISSION_TARGET_DJANGO_USERNAME",
-];
+] as const;
+
+/** The units of suite_specific_units that the suite tags pick. */
+type Unit =
+  | "ALWAYS_FREE_UNIT"
+  | "ALWAYS_PAID_UNIT"
+  | "ALWAYS_PAID_UNIT_SUBVENTED"
+  | "FREE_UNIT_NO_CANCEL"
+  | "UNAVAILABLE_UNIT"
+  | "UNIT_REQUIRES_ALWAYS_HANDLING"
+  | "UNIT_WITH_ACCESS_CODE";
+
+/** The Robot variables this fixture sets: a data set's users and a suite's units (see variable-types.ts). */
+export type TestDataVariableName =
+  | (typeof USER_KEYS)[number]
+  | (typeof ADMIN_KEYS)[number]
+  | (typeof DJANGO_ADMIN_KEYS)[number]
+  | (typeof PERMISSION_TARGET_KEYS)[number]
+  | `CURRENT_${Unit}`
+  | `CURRENT_${Unit}_WITH_LOCATION`;
 
 /** `CURRENT_<unit>` and `CURRENT_<unit>_WITH_LOCATION` from the units of suite_specific_units with this prefix. */
-function units(prefix: string, names: string[]): Record<string, string> {
+function units(prefix: string, names: ReadonlyArray<Unit>): Record<string, string> {
   return Object.fromEntries(
     names.flatMap((unit) => [
       [`CURRENT_${unit}`, `${prefix}_${unit}`],
@@ -72,7 +91,7 @@ function units(prefix: string, names: string[]): Record<string, string> {
   );
 }
 
-const MOBILE_UNITS = [
+const MOBILE_UNITS: Unit[] = [
   "ALWAYS_FREE_UNIT",
   "ALWAYS_PAID_UNIT",
   "UNIT_WITH_ACCESS_CODE",
@@ -183,7 +202,7 @@ export function resolveTestData(
     if (values == null) {
       throw new Error(`No section with tags=${dataSet} in pabot_users.dat`);
     }
-    let keys = user ? USER_KEYS : [];
+    let keys: ReadonlyArray<string> = user ? USER_KEYS : [];
     if (admin) {
       keys = [...keys, ...(permissionTest == null ? ADMIN_KEYS : [...DJANGO_ADMIN_KEYS, ...PERMISSION_TARGET_KEYS])];
     }

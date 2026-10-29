@@ -105,7 +105,7 @@ export const checkout = keywords("checkout", {
     await checkout["Click Accept Terms"]();
     await checkout["Click Submit"]();
     // Submitting the summary goes through the payment back to Varaamo
-    await currentPage().waitForURL((url) => url.href.startsWith(str(V.URL_TEST)), { timeout: 50_000 });
+    await currentPage().waitForURL((url) => url.href.startsWith(V.URL_TEST), { timeout: 50_000 });
   },
 
   "Interrupted Checkout": async (input_URL: RobotValue) => {

@@ -21,7 +21,7 @@ export const data_modification = keywords("data_modification", {
   /** Formats the given information as "Ma 25.11.2024 22:30–23:30, 1 t | Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju" */
   "Formats Tagline For Admin Side": async (
     info_card_time_of_reservation: RobotValue,
-    name_of_reservationunit: RobotValue
+    name_of_reservationunit: string
   ) => {
     let RESERVATION_TAG_TIME: RobotValue, RESERVATION_TAG: RobotValue;
     // Log the original time of reservation string
@@ -46,7 +46,7 @@ export const data_modification = keywords("data_modification", {
     await BuiltIn["Log"](RESERVATION_TAG_TIME);
 
     // Build tagline by default with location
-    RESERVATION_TAG = await BuiltIn["Catenate"](`${str(RESERVATION_TAG_TIME)} | ${str(name_of_reservationunit)}`);
+    RESERVATION_TAG = await BuiltIn["Catenate"](`${str(RESERVATION_TAG_TIME)} | ${name_of_reservationunit}`);
 
     // Normalize whitespace: replace multiple spaces with a single space
     RESERVATION_TAG = str(RESERVATION_TAG).trim().split(/\s+/).join(" ");
@@ -59,13 +59,13 @@ export const data_modification = keywords("data_modification", {
   },
 
   "Formats Calendar Event Content": async (
-    firstname_used_in_reservation_by_admin: RobotValue,
+    firstname_used_in_reservation_by_admin: string,
     lastname_used_in_reservation_by_admin: RobotValue,
-    prefix_fi: RobotValue
+    prefix_fi: string
   ) => {
     let result: RobotValue;
     // This formats string like Puolesta| Puolesta a6
-    result = `${str(prefix_fi)} ${str(firstname_used_in_reservation_by_admin)} ${str(lastname_used_in_reservation_by_admin)}`;
+    result = `${prefix_fi} ${firstname_used_in_reservation_by_admin} ${str(lastname_used_in_reservation_by_admin)}`;
     await BuiltIn["Log"](`Generated string: ${str(result)}`);
     return result;
   },
@@ -115,7 +115,7 @@ export const data_modification = keywords("data_modification", {
    * Given a start time (HH:MM) and duration (e.g. "60 min"), formats to "HH:MM-HH:MM".
    * Durations over 90 min (like '1t 45min') are not supported.
    */
-  "Compute Reservation Time Slot": async (reservation_start_time: RobotValue, duration: RobotValue) => {
+  "Compute Reservation Time Slot": async (reservation_start_time: RobotValue, duration: string) => {
     let start_parts: RobotValue,
       start_hour_raw: RobotValue,
       start_min: RobotValue,
@@ -134,7 +134,7 @@ export const data_modification = keywords("data_modification", {
       end_time: RobotValue,
       full_slot: RobotValue;
     await BuiltIn["Log"](`Reservation start time: ${str(reservation_start_time)}`);
-    await BuiltIn["Log"](`Duration: ${str(duration)}`);
+    await BuiltIn["Log"](`Duration: ${duration}`);
 
     // 1: Validate start time (H:MM or HH:MM with optional leading zeros, minutes 00–59)
     await BuiltIn["Should Match Regexp"](
@@ -160,18 +160,14 @@ export const data_modification = keywords("data_modification", {
     await BuiltIn["Log"](`Parsed start: ${str(start_hour)}h ${str(start_min)}m (leading zero removed if present)`);
 
     // 4: Build a time interval string for the start (e.g. "17 hours 30 minutes")
-    start_interval = await BuiltIn["Catenate"](
-      `SEPARATOR=${str(" ")}`,
-      `${str(start_hour)} hours`,
-      `${str(start_min)} minutes`
-    );
+    start_interval = await BuiltIn["Catenate"](`SEPARATOR= `, `${str(start_hour)} hours`, `${str(start_min)} minutes`);
     await BuiltIn["Log"](`Start interval ➔ ${str(start_interval)}`);
 
     // 5: Normalize duration to full words (e.g. "60 min" → "60 minutes")
     parts = await String_["Split String"](duration, "min");
     num_str = await Collections["Get From List"](parts, "0");
     num_str = await String_["Replace String"](num_str, " ", "");
-    duration_str = await BuiltIn["Catenate"](`SEPARATOR=${str(" ")}`, num_str, "minutes");
+    duration_str = await BuiltIn["Catenate"](`SEPARATOR= `, num_str, "minutes");
     await BuiltIn["Log"](`Normalized duration ➔ ${str(duration_str)}`);
 
     // 6: Add start interval and duration to get raw end time "HH:MM:SS"
@@ -345,10 +341,7 @@ export const data_modification = keywords("data_modification", {
     formatted_time = await String_["Replace String Using Regexp"](Timeslot_to_format, "[.:]", ":");
 
     // Combine date and time into a single datetime string
-    date_time_string = await BuiltIn["Catenate"](
-      `SEPARATOR=${str("")}`,
-      `${str(formatted_date)} ${str(formatted_time)}`
-    );
+    date_time_string = await BuiltIn["Catenate"](`SEPARATOR=`, `${str(formatted_date)} ${str(formatted_time)}`);
 
     // Strip any extra whitespace or hidden characters from the datetime string
     date_time_string = await String_["Strip String"](date_time_string);
@@ -374,13 +367,13 @@ export const data_modification = keywords("data_modification", {
     // Format the Finnish date and time into the desired format
     // HH:MM WITH ":" "–" "Ti 5.12.2023 klo 11:30–12:30"
     // 1t comes from duration of the reservation that is set in this test to 1h / 60min
-    finnish_date = await BuiltIn["Catenate"](`SEPARATOR=${str("")}`, `${str(day)}.${str(month)}.${str(year)}`);
+    finnish_date = await BuiltIn["Catenate"](`SEPARATOR=`, `${str(day)}.${str(month)}.${str(year)}`);
     formatted_date = await BuiltIn["Catenate"](
-      `SEPARATOR=${str("")}`,
+      `SEPARATOR=`,
       `${str(finnish_day)} ${str(finnish_date)} klo ${str(hour)}:${str(minute)}–${str(end_hour)}:${str(minute)}, 1 t`
     );
     formatted_date_minus_t = await BuiltIn["Catenate"](
-      `SEPARATOR=${str("")}`,
+      `SEPARATOR=`,
       `${str(finnish_day)} ${str(finnish_date)} klo ${str(hour)}:${str(minute)}–${str(end_hour)}:${str(minute)}`
     );
 

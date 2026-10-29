@@ -1,6 +1,6 @@
 /** A resource file with top navigation keywords. */
 import { Browser, currentPage } from "../../../lib/Browser";
-import { expect, keywords, named, str, timeToMs } from "../../../lib/robot";
+import { expect, keywords, named, timeToMs } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
 import "../../Resources/variables";
@@ -8,7 +8,7 @@ import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
 
 export const recurring = keywords("recurring", {
-  "User Selects A Recurring Booking Round": async (name_of_the_recurring_reservation: RobotValue) => {
+  "User Selects A Recurring Booking Round": async (name_of_the_recurring_reservation: string) => {
     let url_before: RobotValue;
     url_before = currentPage().url();
     await custom_keywords["Find And Click Element In Card Element By Text"](
@@ -23,10 +23,10 @@ export const recurring = keywords("recurring", {
     await expect(currentPage()).toHaveURL((url) => url.href !== url_before, { timeout: timeToMs("20s") });
   },
 
-  "User Selects The Units For Recurring Reservation": async (name_of_the_recurring_unit: RobotValue) => {
+  "User Selects The Units For Recurring Reservation": async (name_of_the_recurring_unit: string) => {
     // The units are loaded after the page opens
     await Browser["Wait For Elements State"](
-      `[class*="Card__CardContent"] >> [data-testid="card__heading"] >> text="${str(name_of_the_recurring_unit)}" >> nth=0`,
+      `[class*="Card__CardContent"] >> [data-testid="card__heading"] >> text="${name_of_the_recurring_unit}" >> nth=0`,
       "visible",
       named({ timeout: "20s" })
     );
@@ -38,7 +38,7 @@ export const recurring = keywords("recurring", {
     );
   },
 
-  "User Checks The Count Of Selected Units": async (expected_text: RobotValue) => {
+  "User Checks The Count Of Selected Units": async (expected_text: string) => {
     await custom_keywords["Check Elements Text"]("id=reservationUnitCount", expected_text);
   },
 

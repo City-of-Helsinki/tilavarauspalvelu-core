@@ -31,13 +31,13 @@ export const graphql_commands = keywords("graphql_commands", {
       "Content-Type": "application/json",
       "x-csrftoken": csrf_token,
       Cookie: `csrftoken=${str(csrf_token)}; sessionid=${str(sessionid)}`,
-      Referer: `${str(V.URL_TEST)}kasittely/notifications`,
+      Referer: `${V.URL_TEST}kasittely/notifications`,
       Origin: origin,
     };
 
     // Make GraphQL request using RequestsLibrary
     response = await RequestsLibrary["POST"](
-      `${str(V.URL_TEST)}graphql/`,
+      `${V.URL_TEST}graphql/`,
       named({ data: body, headers: headers, expected_status: "any" })
     );
 
@@ -154,7 +154,7 @@ export const graphql_commands = keywords("graphql_commands", {
    * Includes both DRAFT and ACTIVE notifications in the deletion
    * Requires user to be logged in as admin
    */
-  "Delete Notifications By Name Pattern": async (name_pattern: RobotValue) => {
+  "Delete Notifications By Name Pattern": async (name_pattern: string) => {
     let notifications: RobotValue,
       notification_count: RobotValue,
       deleted_count: RobotValue,
@@ -179,7 +179,7 @@ export const graphql_commands = keywords("graphql_commands", {
       variables: RobotValue;
     // oxlint-disable-next-line eslint/no-unused-vars -- assigned but not read in the Robot keyword
     let result: RobotValue;
-    await BuiltIn["Log"](`Deleting notifications with pattern: "${str(name_pattern)}"`, named({ console: "True" }));
+    await BuiltIn["Log"](`Deleting notifications with pattern: "${name_pattern}"`, named({ console: "True" }));
     notifications = await graphql_commands["Get Filtered Banner Notifications"]("DRAFT", "ACTIVE");
     notification_count = await BuiltIn["Get Length"](notifications);
 
@@ -196,7 +196,7 @@ export const graphql_commands = keywords("graphql_commands", {
       message_sv = await Collections["Get From Dictionary"](node, "messageSv", named({ default: "" }));
 
       // Check if pattern appears in name or any message field (case-insensitive)
-      pattern_upper = str(name_pattern).toUpperCase();
+      pattern_upper = name_pattern.toUpperCase();
       name_upper = str(name).toUpperCase();
       message_fi_upper = str(message_fi).toUpperCase();
       message_en_upper = str(message_en).toUpperCase();

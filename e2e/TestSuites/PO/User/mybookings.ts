@@ -12,7 +12,7 @@ import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
 
 export const mybookings = keywords("mybookings", {
-  "Check My Bookings H1": async (bookingstatus: RobotValue) => {
+  "Check My Bookings H1": async (bookingstatus: string) => {
     await Browser["Wait For Elements State"]("h1", "visible", named({ timeout: "15s" }));
     await custom_keywords["Check Elements Text"]("h1", bookingstatus);
   },
@@ -30,7 +30,7 @@ export const mybookings = keywords("mybookings", {
     await Browser["Click"]("id=reservation-cancel__reason-main-button");
   },
 
-  "Select Reason For Cancellation": async (reason: RobotValue) => {
+  "Select Reason For Cancellation": async (reason: string) => {
     // Wait For Elements State  id=reason-item-0  visible
     await custom_keywords["Find And Click Element With Text"]("li", reason);
     // An option picked within 200 ms of opening leaves the HDS Select list open over the cancel button
@@ -81,7 +81,7 @@ export const mybookings = keywords("mybookings", {
     );
   },
 
-  "Check Number Of Participants": async (reservation_number_participants: RobotValue) => {
+  "Check Number Of Participants": async (reservation_number_participants: string) => {
     await custom_keywords["Check Elements Text"](
       '[data-testid="reservation__summary-fields__numPersons"]',
       reservation_number_participants
@@ -92,7 +92,7 @@ export const mybookings = keywords("mybookings", {
     await custom_keywords["Check Elements Text"]('[data-testid="reservation__time"]', reservation_time);
   },
 
-  "Check Reservation Description": async (reservation_description: RobotValue) => {
+  "Check Reservation Description": async (reservation_description: string) => {
     await custom_keywords["Check Elements Text"](
       '[data-testid="reservation__summary-fields__description"]',
       reservation_description
@@ -106,42 +106,42 @@ export const mybookings = keywords("mybookings", {
     );
   },
 
-  "Check Reservation Booker First Name": async (reservation_bookerFirstName: RobotValue) => {
+  "Check Reservation Booker First Name": async (reservation_bookerFirstName: string) => {
     await custom_keywords["Check Elements Text"](
       '[data-testid="reservation__summary-fields__reserveeFirstName"]',
       reservation_bookerFirstName
     );
   },
 
-  "Check Reservation Booker Last Name": async (reservation_bookerLastName: RobotValue) => {
+  "Check Reservation Booker Last Name": async (reservation_bookerLastName: string) => {
     await custom_keywords["Check Elements Text"](
       '[data-testid="reservation__summary-fields__reserveeLastName"]',
       reservation_bookerLastName
     );
   },
 
-  "Check Reservation Booker Phone": async (reservation_bookerPhone: RobotValue) => {
+  "Check Reservation Booker Phone": async (reservation_bookerPhone: string) => {
     await custom_keywords["Check Elements Text"](
       '[data-testid="reservation__summary-fields__reserveePhone"]',
       reservation_bookerPhone
     );
   },
 
-  "Check Reservation Booker Email": async (reservation_bookerEmail: RobotValue) => {
+  "Check Reservation Booker Email": async (reservation_bookerEmail: string) => {
     await custom_keywords["Check Elements Text"](
       '[data-testid="reservation__summary-fields__reserveeEmail"]',
       reservation_bookerEmail
     );
   },
 
-  "Check Reservation Purpose": async (reservation_purpose: RobotValue) => {
+  "Check Reservation Purpose": async (reservation_purpose: string) => {
     await custom_keywords["Check Elements Text"](
       '[data-testid="reservation__summary-fields__purpose"]',
       reservation_purpose
     );
   },
 
-  "Check Reservation Age Group": async (age_group: RobotValue) => {
+  "Check Reservation Age Group": async (age_group: string) => {
     await custom_keywords["Check Elements Text"]('[data-testid="reservation__summary-fields__ageGroup"]', age_group);
   },
 
@@ -272,7 +272,7 @@ export const mybookings = keywords("mybookings", {
   "Wait For Upcoming Bookings To Load": async () => {
     let card_count: RobotValue;
     await Browser["Wait For Elements State"](
-      `css=[data-testid="reservation-card__container"], div:text-is("${str(V.MYBOOKINGS_NO_UPCOMING_FI)}") >> nth=0`,
+      `css=[data-testid="reservation-card__container"], div:text-is("${V.MYBOOKINGS_NO_UPCOMING_FI}") >> nth=0`,
       "visible",
       named({ timeout: "15s" })
     );
@@ -282,7 +282,7 @@ export const mybookings = keywords("mybookings", {
   },
 
   /** Reloads the reservation page until it shows the payment status, which the backend updates afterwards. */
-  "Wait For Payment Status": async (payment_status: RobotValue) => {
+  "Wait For Payment Status": async (payment_status: string) => {
     // Port: expect(...).toPass reloads every 2 s, instead of Wait Until Keyword Succeeds
     await expect(async () => {
       await mybookings["Reload And Check Payment Status"](payment_status);

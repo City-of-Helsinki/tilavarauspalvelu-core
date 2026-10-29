@@ -111,12 +111,12 @@ export const app_admin = keywords("app_admin", {
     await admin_reservations["Admin Checks Reservation Status"](V.MYBOOKINGS_STATUS_CONFIRMED);
   },
 
-  "Admin Navigates To Own Units And Selects Unit Group": async (unit_group_name: RobotValue) => {
+  "Admin Navigates To Own Units And Selects Unit Group": async (unit_group_name: string) => {
     await admin_navigation_menu["Admin Navigates To My Units"]();
     await admin_my_units["Admin Searches Own Unit And Clicks It"](unit_group_name);
   },
 
-  "Admin Opens Make Reservation Modal And Selects Unit": async (unit_name: RobotValue) => {
+  "Admin Opens Make Reservation Modal And Selects Unit": async (unit_name: string) => {
     await admin_my_units["Admin Clicks Make Reservation"]();
     await admin_my_units["Admin Selects Unit From Reservation Units Dropdown"](unit_name);
   },
@@ -443,13 +443,13 @@ export const app_admin = keywords("app_admin", {
     await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
     // if the notification name exist already we cannot publish the notification
     randomvalue = await data_modification["Generate Random Letter And Number"]();
-    V.NOTIFICATION_BANNER_MESSAGE_NAME = `${str(V.NOTIFICATION_BANNER_MESSAGE_NORMAL)} ${str(randomvalue)}`;
+    V.NOTIFICATION_BANNER_MESSAGE_NAME = `${V.NOTIFICATION_BANNER_MESSAGE_NORMAL} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME);
     await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_NORMAL);
     await admin_notifications_create_page["Admin Selects Target Group All"]();
 
     randomvalue = await data_modification["Generate Random Letter And Number"]();
-    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${str(V.NOTIFICATION_BANNER_MESSAGE_NORMAL)} ${str(V.NOTIFICATION_BANNER_CLEANUP_PATTERN)} ${str(randomvalue)}`;
+    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_NORMAL} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
     await admin_notifications_create_page["Admin Publishes Notification"]();
   },
@@ -463,12 +463,12 @@ export const app_admin = keywords("app_admin", {
     await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
     // if the notification name exist already we cannot publish the notification
     randomvalue = await data_modification["Generate Random Letter And Number"]();
-    V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING = `${str(V.NOTIFICATION_BANNER_MESSAGE_WARNING)} ${str(randomvalue)}`;
+    V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING = `${V.NOTIFICATION_BANNER_MESSAGE_WARNING} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING);
     await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_WARNING);
     await admin_notifications_create_page["Admin Selects Target Group All"]();
     randomvalue = await data_modification["Generate Random Letter And Number"]();
-    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${str(V.NOTIFICATION_BANNER_MESSAGE_WARNING)} ${str(V.NOTIFICATION_BANNER_CLEANUP_PATTERN)} ${str(randomvalue)}`;
+    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_WARNING} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
     await admin_notifications_create_page["Admin Publishes Notification"]();
   },
@@ -482,13 +482,13 @@ export const app_admin = keywords("app_admin", {
     await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
     // if the notification name exist already we cannot publish the notification
     randomvalue = await data_modification["Generate Random Letter And Number"]();
-    V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR = `${str(V.NOTIFICATION_BANNER_MESSAGE_ERROR)} ${str(randomvalue)}`;
+    V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR = `${V.NOTIFICATION_BANNER_MESSAGE_ERROR} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR);
     await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_ERROR);
     await admin_notifications_create_page["Admin Selects Target Group All"]();
 
     randomvalue = await data_modification["Generate Random Letter And Number"]();
-    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${str(V.NOTIFICATION_BANNER_MESSAGE_ERROR)} ${str(V.NOTIFICATION_BANNER_CLEANUP_PATTERN)} ${str(randomvalue)}`;
+    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_ERROR} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
     await admin_notifications_create_page["Admin Publishes Notification"]();
   },

@@ -30,7 +30,7 @@ export const custom_keywords = keywords("custom_keywords", {
    * It waits for such an element to appear, so slowly rendered lists are waited for.
    * The text has to be inside one element, text split over several child elements is not matched.
    */
-  "Find And Click Element With Text": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
+  "Find And Click Element With Text": async (element_with_text: string, wanted_text: RobotValue) => {
     let target: RobotValue;
     target = chain(element_with_text, `text="${str(wanted_text)}" >> nth=0`);
     // Port: Click waits for the element to be visible and enabled (Playwright's auto-waiting), so there's no
@@ -46,16 +46,16 @@ export const custom_keywords = keywords("custom_keywords", {
    */
   "Click And Wait For Navigation With Retry": async (
     click_selector: RobotValue,
-    target_element_selector: RobotValue,
-    max_attempts: RobotValue = "2",
-    nav_timeout: RobotValue = "10s"
+    target_element_selector: string,
+    max_attempts: string = "2",
+    nav_timeout: string = "10s"
   ) => {
     let url_before: RobotValue, attempt: RobotValue, target_exists: RobotValue, url_after: RobotValue;
     // Get URL before click to detect if navigation happened
     url_before = currentPage().url();
 
     for (attempt = 1; attempt < Number(max_attempts) + 1; attempt++) {
-      await BuiltIn["Log"](`Attempt ${str(attempt)} of ${str(max_attempts)}: Clicking ${str(click_selector)}`);
+      await BuiltIn["Log"](`Attempt ${str(attempt)} of ${max_attempts}: Clicking ${str(click_selector)}`);
 
       // Port: the click scrolls the element into view and waits until it's stable and enabled (Playwright's
       // auto-waiting), so there's no Scroll To Element and Wait For Elements State before it
@@ -92,7 +92,7 @@ export const custom_keywords = keywords("custom_keywords", {
     }
 
     await BuiltIn["Fail"](
-      `ERROR: Failed to navigate after ${str(max_attempts)} attempts. Target element '${str(target_element_selector)}' not found. Check screenshot.`
+      `ERROR: Failed to navigate after ${max_attempts} attempts. Target element '${target_element_selector}' not found. Check screenshot.`
     );
   },
 
@@ -101,9 +101,9 @@ export const custom_keywords = keywords("custom_keywords", {
    * Content of the new page is waited for by the keywords that use it.
    */
   "Click And Wait For Page": async (
-    click_selector: RobotValue,
+    click_selector: string,
     url_part: RobotValue = "",
-    timeout: RobotValue = V.BROWSER_TIMEOUT_GLOBAL
+    timeout: string = V.BROWSER_TIMEOUT_GLOBAL
   ) => {
     let url_before: RobotValue;
     url_before = currentPage().url();
@@ -116,10 +116,10 @@ export const custom_keywords = keywords("custom_keywords", {
     );
   },
 
-  "Wait For Url To Contain": async (url_part: RobotValue, timeout: RobotValue = "20s") => {
+  "Wait For Url To Contain": async (url_part: string, timeout: string = "20s") => {
     // Port: expect retries until the URL contains url_part, instead of Wait Until Keyword Succeeds with Url Should
     // Have Changed
-    await expect(currentPage()).toHaveURL((url) => url.href.includes(str(url_part)), { timeout: timeToMs(timeout) });
+    await expect(currentPage()).toHaveURL((url) => url.href.includes(url_part), { timeout: timeToMs(timeout) });
   },
 
   /** An HDS Select ignores a close within 200 ms of opening, so its list can stay open after the pick. */
@@ -167,8 +167,8 @@ export const custom_keywords = keywords("custom_keywords", {
   },
 
   /** This keyword verifies that an element containing the specified text is NOT found within a list of elements identified by the given selector. */
-  "Verify Element With Text Is Not Found": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
-    await BuiltIn["Log"](`Verifying that ${str(element_with_text)} with text: ${str(wanted_text)} is NOT found`);
+  "Verify Element With Text Is Not Found": async (element_with_text: string, wanted_text: RobotValue) => {
+    await BuiltIn["Log"](`Verifying that ${element_with_text} with text: ${str(wanted_text)} is NOT found`);
     // Port: expect.poll reads the elements' texts (stripped, for webkit) again until none of them is the text,
     // instead of reading them once in a loop
     await expect
@@ -179,29 +179,29 @@ export const custom_keywords = keywords("custom_keywords", {
   },
 
   /** This keyword verifies that an element identified by the given selector is NOT found on the page. */
-  "Verify Element Is Not Found": async (element_selector: RobotValue) => {
-    await BuiltIn["Log"](`Verifying that element ${str(element_selector)} is NOT found`);
+  "Verify Element Is Not Found": async (element_selector: string) => {
+    await BuiltIn["Log"](`Verifying that element ${element_selector} is NOT found`);
 
     // Port: waits until the element is gone (expect's timeout) instead of counting the elements once
     await expect(
       allElements(element_selector),
-      `Element "${str(element_selector)}" was found but should not be present`
+      `Element "${element_selector}" was found but should not be present`
     ).toHaveCount(0);
 
-    await BuiltIn["Log"](`Element "${str(element_selector)}" is correctly not present on the page`);
+    await BuiltIn["Log"](`Element "${element_selector}" is correctly not present on the page`);
   },
 
   /** This keyword verifies that an element identified by the given selector IS found on the page. */
-  "Verify Element Is Found": async (element_selector: RobotValue) => {
-    await BuiltIn["Log"](`Verifying that element ${str(element_selector)} IS found`);
+  "Verify Element Is Found": async (element_selector: string) => {
+    await BuiltIn["Log"](`Verifying that element ${element_selector} IS found`);
 
     // Port: waits until the element is there (expect's timeout) instead of counting the elements once
     await expect(
       allElements(element_selector),
-      `Element "${str(element_selector)}" was not found but should be present`
+      `Element "${element_selector}" was not found but should be present`
     ).not.toHaveCount(0);
 
-    await BuiltIn["Log"](`Element "${str(element_selector)}" is correctly present on the page`);
+    await BuiltIn["Log"](`Element "${element_selector}" is correctly present on the page`);
   },
 
   "Find And Click Element With Exact Text Using JS": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
@@ -282,10 +282,10 @@ export const custom_keywords = keywords("custom_keywords", {
    * ${text_element} with text ${text}. If so, clicks ${element_to_click} inside that card.
    */
   "Find And Click Element In Card Element By Text": async (
-    card_element: RobotValue,
-    text_element: RobotValue,
+    card_element: string,
+    text_element: string,
     text: RobotValue,
-    element_to_click: RobotValue
+    element_to_click: string
   ) => {
     let cards: RobotValue,
       count: RobotValue,
@@ -293,7 +293,7 @@ export const custom_keywords = keywords("custom_keywords", {
       index: RobotValue,
       text_element_exists: RobotValue,
       el_text: RobotValue;
-    await BuiltIn["Log"](`Searching for cards: ${str(card_element)}`);
+    await BuiltIn["Log"](`Searching for cards: ${card_element}`);
     cards = await Browser["Get Elements"](card_element);
     count = await BuiltIn["Get Length"](cards);
     await BuiltIn["Log"](`Found ${str(count)} card containers.`);
@@ -317,7 +317,7 @@ export const custom_keywords = keywords("custom_keywords", {
           await BuiltIn["Log"](`Found matching text '${str(text)}' in card at index ${str(index)}`);
           // Found the card with the desired text, now click the target element inside this card
           await Browser["Click"](chain(cards[index], element_to_click));
-          await BuiltIn["Log"](`Clicked element '${str(element_to_click)}' in card containing text '${str(text)}'`);
+          await BuiltIn["Log"](`Clicked element '${element_to_click}' in card containing text '${str(text)}'`);
           found = "True";
           break;
         }
@@ -325,7 +325,7 @@ export const custom_keywords = keywords("custom_keywords", {
     }
 
     if (!isTruthy(found)) {
-      await BuiltIn["Fail"](`No card element found with text '${str(text)}' in '${str(text_element)}'`);
+      await BuiltIn["Fail"](`No card element found with text '${str(text)}' in '${text_element}'`);
     }
   },
 
@@ -335,14 +335,14 @@ export const custom_keywords = keywords("custom_keywords", {
    * specified text. If both conditions are met, clicks the specified button.
    */
   "Find And Click Button In Group With Matching Conditions": async (
-    group_wrapper_selector: RobotValue,
-    group_text: RobotValue,
-    card_selector: RobotValue,
-    heading_selector: RobotValue,
-    heading_text: RobotValue,
-    tags_selector: RobotValue,
-    tags_text: RobotValue,
-    button_text: RobotValue
+    group_wrapper_selector: string,
+    group_text: string,
+    card_selector: string,
+    heading_selector: string,
+    heading_text: string,
+    tags_selector: string,
+    tags_text: string,
+    button_text: string
   ) => {
     let group_wrappers: RobotValue,
       group_count: RobotValue,
@@ -357,7 +357,7 @@ export const custom_keywords = keywords("custom_keywords", {
       found_match: RobotValue,
       card: RobotValue,
       is_match: RobotValue;
-    await BuiltIn["Log"](`Searching for group wrapper containing "${str(group_text)}"`);
+    await BuiltIn["Log"](`Searching for group wrapper containing "${group_text}"`);
 
     // Find all group wrappers
     group_wrappers = await Browser["Get Elements"](group_wrapper_selector);
@@ -373,17 +373,17 @@ export const custom_keywords = keywords("custom_keywords", {
       wrapper_text = await String_["Strip String"](wrapper_text);
       await BuiltIn["Log"](`Checking group wrapper text: ${str(wrapper_text)}`);
 
-      contains_group_text = str(wrapper_text).includes(str(group_text));
+      contains_group_text = str(wrapper_text).includes(group_text);
       if (isTruthy(contains_group_text)) {
         target_group_wrapper = wrapper;
         found_target_group = "True";
-        await BuiltIn["Log"](`Found target group wrapper containing "${str(group_text)}"`);
+        await BuiltIn["Log"](`Found target group wrapper containing "${group_text}"`);
         break;
       }
     }
 
     if (!isTruthy(found_target_group)) {
-      await BuiltIn["Fail"](`No group wrapper found containing "${str(group_text)}" text`);
+      await BuiltIn["Fail"](`No group wrapper found containing "${group_text}" text`);
     }
 
     // Find card elements within the target group wrapper and reverse to find last match efficiently
@@ -409,7 +409,7 @@ export const custom_keywords = keywords("custom_keywords", {
 
     if (!isTruthy(found_match)) {
       await BuiltIn["Fail"](
-        `No card found with matching conditions: heading contains '${str(heading_text)}' and tags contain '${str(tags_text)}'`
+        `No card found with matching conditions: heading contains '${heading_text}' and tags contain '${tags_text}'`
       );
     }
 
@@ -482,7 +482,7 @@ export const custom_keywords = keywords("custom_keywords", {
    * 3. After cancellation, there should be NO other applications remaining
    * 4. An appropriate empty state message should be displayed
    */
-  "Verify Card Not Found In Group With Matching Conditions": async (empty_state_message: RobotValue) => {
+  "Verify Card Not Found In Group With Matching Conditions": async (empty_state_message: string) => {
     let message_selector: RobotValue,
       message_elements: RobotValue,
       element_count: RobotValue,
@@ -492,7 +492,7 @@ export const custom_keywords = keywords("custom_keywords", {
     let message_found: RobotValue;
     // oxlint-disable-next-line eslint/no-unused-vars -- assigned but not read in the Robot keyword
     let found_text: RobotValue;
-    await BuiltIn["Log"](`Starting verification for empty state message: "${str(empty_state_message)}"`);
+    await BuiltIn["Log"](`Starting verification for empty state message: "${empty_state_message}"`);
     await BuiltIn["Log"]("Context: Test creates 1 application, cancels it, then verifies no applications remain");
 
     // Get all elements that could contain the message
@@ -515,21 +515,21 @@ export const custom_keywords = keywords("custom_keywords", {
       element_text = await String_["Strip String"](element_text);
 
       // Check for exact match
-      if (str(element_text) === str(empty_state_message)) {
+      if (str(element_text) === empty_state_message) {
         message_found = "True";
         found_text = element_text;
-        await BuiltIn["Log"](`SUCCESS: Found expected empty state message: "${str(empty_state_message)}"`);
+        await BuiltIn["Log"](`SUCCESS: Found expected empty state message: "${empty_state_message}"`);
         return;
       }
     }
 
     // If message not found, raise error (message should exist after cancellation)
     await BuiltIn["Fail"](
-      `Expected empty state message "${str(empty_state_message)}" not found. This indicates applications still exist after cancellation, but none should remain.`
+      `Expected empty state message "${empty_state_message}" not found. This indicates applications still exist after cancellation, but none should remain.`
     );
   },
 
-  "Find Text From Elements Or Fail": async (element_with_text: RobotValue, wanted_text: RobotValue) => {
+  "Find Text From Elements Or Fail": async (element_with_text: string, wanted_text: RobotValue) => {
     await BuiltIn["Log"](`Searching for text: ${str(wanted_text)}`);
     // Port: expect.poll reads the elements' texts again until one of them is the wanted text (both stripped),
     // instead of reading them once in a loop
@@ -577,7 +577,7 @@ export const custom_keywords = keywords("custom_keywords", {
   },
 
   /** Verifies if a number extracted from the specified text element matches the expected value. */
-  "Check Number From Text Is Equal To": async (text_element: RobotValue, number_equalTo: RobotValue) => {
+  "Check Number From Text Is Equal To": async (text_element: string, number_equalTo: RobotValue) => {
     let number_element_string: RobotValue, number_element_string_num_only: RobotValue, NUM_FROM_TXT: RobotValue;
     await BuiltIn["Log"](number_equalTo);
     await Browser["Wait For Elements State"](text_element, "visible");
@@ -608,7 +608,7 @@ export const custom_keywords = keywords("custom_keywords", {
    * Extracts only numeric characters from an element's text and returns the number.
    * Returns empty string if no numbers are found.
    */
-  "Get Number From Element Text": async (text_element: RobotValue) => {
+  "Get Number From Element Text": async (text_element: string) => {
     let element_text: RobotValue, numbers_only: RobotValue;
     await Browser["Wait For Elements State"](text_element, "visible");
     element_text = await Browser["Get Text"](text_element);
@@ -618,8 +618,8 @@ export const custom_keywords = keywords("custom_keywords", {
     return numbers_only;
   },
 
-  "Check Elements Text With Remove Non-breaking Space": async (Element: RobotValue, Expected_text: RobotValue) => {
-    await BuiltIn["Log"](`Element: ${str(Element)}`);
+  "Check Elements Text With Remove Non-breaking Space": async (Element: string, Expected_text: RobotValue) => {
+    await BuiltIn["Log"](`Element: ${Element}`);
     await BuiltIn["Log"](`Expected text: ${str(Expected_text)}`);
 
     // Port: expect waits until the text matches. It normalizes whitespace, non-breaking spaces included.
@@ -702,7 +702,7 @@ export const custom_keywords = keywords("custom_keywords", {
     timestamp = await BuiltIn["Get Time"](named({ format: "timestamp" }));
 
     // Create the header
-    header = `Test Name: ${str(robot.TEST_NAME)}
+    header = `Test Name: ${robot.TEST_NAME}
 Timestamp: ${str(timestamp)}
 Differences:
 `;
@@ -719,11 +719,11 @@ Differences:
     content = `${str(header)}${str(formatted_differences)}`;
 
     // Write to file
-    await OperatingSystem["Append To File"](`debug_${str(robot.TEST_NAME)}.txt`, content);
+    await OperatingSystem["Append To File"](`debug_${robot.TEST_NAME}.txt`, content);
 
     // Fail the test with a descriptive message
     await BuiltIn["Fail"](
-      `Texts still do not match after normalization. Differences logged to debug_${str(robot.TEST_NAME)}.txt.`
+      `Texts still do not match after normalization. Differences logged to debug_${robot.TEST_NAME}.txt.`
     );
   },
 
@@ -793,7 +793,7 @@ Differences:
     Expected_text: RobotValue,
     strip_spaces: RobotValue = "True",
     ignore_case: RobotValue = "False",
-    return_status: RobotValue = "False"
+    return_status: string = "False"
   ) => {
     let Elements_text: RobotValue, status: RobotValue;
     await BuiltIn["Log"](`Element: ${str(Element)}`);
@@ -922,8 +922,8 @@ Differences:
       named({ msg: `No reservation labels found. There should be at least one ${str(DAY_TO_CHECK)}` })
     );
 
-    // initialize found so it always exists
-    V.found = false;
+    // Port: a local flag, Set Test Variable in the Robot suite (nothing else reads it)
+    let found = false;
 
     for (lbl of labels) {
       txt = await Browser["Get Text"](lbl);
@@ -932,15 +932,15 @@ Differences:
       txt = await String_["Replace String"](txt, " ", "");
       await BuiltIn["Log"](`Normalized label ➔ ${str(txt)}`);
       if (str(txt) === str(normTime)) {
-        V.found = true;
+        found = true;
         await BuiltIn["Log"]("Match found!");
         break;
       }
     }
 
-    await BuiltIn["Log"](`Final result: ${str(V.found)}`);
+    await BuiltIn["Log"](`Final result: ${str(found)}`);
     await BuiltIn["Should Be True"](
-      isTruthy(V.found),
+      found,
       named({ msg: `Reservation not found for ${str(DAY_TO_CHECK)} at ${str(TIME_TO_CHECK)}` })
     );
 

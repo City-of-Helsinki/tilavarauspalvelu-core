@@ -43,7 +43,7 @@ export const devices = keywords("devices", {
 
   /** Sets up Chromium desktop browser */
   // oxlint-disable-next-line eslint/no-unused-vars -- Promise To Wait For Download saves the downloads
-  "Set Up Chromium Desktop Browser And Open Url": async (input_URL: RobotValue, DOWNLOAD_DIR: RobotValue) => {
+  "Set Up Chromium Desktop Browser And Open Url": async (input_URL: RobotValue, DOWNLOAD_DIR: string) => {
     let context_config: RobotValue;
     // Port: the browser, context and page come from the project's `use` options in playwright.config.ts
     // (Chromium, 1440x900, locale, time zone), so traces, screenshots, video and --headed/--ui work. Playwright
@@ -63,7 +63,7 @@ export const devices = keywords("devices", {
 
   /** Sets up Firefox browser for permission tests - separate session from Django admin and Admin UI */
   // oxlint-disable-next-line eslint/no-unused-vars -- Promise To Wait For Download saves the downloads
-  "Set Up Firefox Desktop Browser And Open Url": async (input_URL: RobotValue, DOWNLOAD_DIR: RobotValue) => {
+  "Set Up Firefox Desktop Browser And Open Url": async (input_URL: RobotValue, DOWNLOAD_DIR: string) => {
     let context_config: RobotValue;
     // DEVNOTE: This is used for permission tests
     // Port: a Firefox context with the project's `use` options in playwright.config.ts, see Set Up Chromium Desktop
@@ -83,7 +83,7 @@ export const devices = keywords("devices", {
   },
 
   /** Sets up iPhone 14 simulation */
-  "Set Up Iphone 14 And Open Url": async (input_URL: RobotValue) => {
+  "Set Up Iphone 14 And Open Url": async (input_URL: string) => {
     let context_config: RobotValue;
     // Port: WebKit with the iPhone 14 device (390x664) comes from the project's `use` options in
     // playwright.config.ts, see Set Up Chromium Desktop Browser And Open Url
@@ -92,7 +92,7 @@ export const devices = keywords("devices", {
     await openTestPage({ contextOptions: context_config });
 
     await Browser["Set Browser Timeout"](V.BROWSER_TIMEOUT_GLOBAL, named({ scope: "Global" }));
-    await BuiltIn["Log"](`🌐 Navigating to: ${str(input_URL)}`);
+    await BuiltIn["Log"](`🌐 Navigating to: ${input_URL}`);
     // Go To waits for the page to load
     await Browser["Go To"](input_URL);
 
@@ -101,7 +101,7 @@ export const devices = keywords("devices", {
   },
 
   /** Sets up Android Pixel 5 simulation */
-  "Set Up Android Pixel 5 And Open Url": async (input_URL: RobotValue) => {
+  "Set Up Android Pixel 5 And Open Url": async (input_URL: string) => {
     let context_config: RobotValue;
     // Port: Chromium with the Pixel 5 device (393x727) comes from the project's `use` options in
     // playwright.config.ts, see Set Up Chromium Desktop Browser And Open Url
@@ -110,7 +110,7 @@ export const devices = keywords("devices", {
     await openTestPage({ contextOptions: context_config });
 
     await Browser["Set Browser Timeout"](V.BROWSER_TIMEOUT_GLOBAL, named({ scope: "Global" }));
-    await BuiltIn["Log"](`🌐 Navigating to: ${str(input_URL)}`);
+    await BuiltIn["Log"](`🌐 Navigating to: ${input_URL}`);
     // Go To waits for the page to load
     await Browser["Go To"](input_URL);
 
