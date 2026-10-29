@@ -1,8 +1,7 @@
 /** A resource file with top navigation keywords. */
 import { Browser, currentPage, loc } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, expect, keywords, str } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
+import { V, expect, keywords } from "../../../lib/robot";
 import { mybookings } from "../../PO/User/mybookings";
 import { custom_keywords } from "../../Resources/custom_keywords";
 import "../../Resources/variables";
@@ -33,7 +32,7 @@ export const topnav = keywords("topnav", {
 
   "Click Login Admin Side": async () => {
     await Browser["Wait For Elements State"]("h1", "visible");
-    await Browser["Click"](`button >> span:text-is("${str(V.LOGIN_TEXT_ADMIN)}") >> nth=-1`);
+    await Browser["Click"](`button >> span:text-is("${V.LOGIN_TEXT_ADMIN}") >> nth=-1`);
   },
 
   "Click Logout": async () => {
@@ -52,21 +51,21 @@ export const topnav = keywords("topnav", {
     await Browser["Click"]("id=Menu");
   },
 
-  "Check Dropdown Menu Has User Info": async (name: RobotValue) => {
+  "Check Dropdown Menu Has User Info": async (name: string) => {
     // DEVNOTE Enable this when the profile bug no longer empties the name info
     await BuiltIn["Log"](name);
-    await expect(loc("id=user-menu")).toHaveText(str(name), { useInnerText: true });
+    await expect(loc("id=user-menu")).toHaveText(name, { useInnerText: true });
   },
 
   "Navigate To Single Booking Page": async () => {
     await custom_keywords["Click And Wait For Page"](
-      `header >> [href="/search"]:text-is("${str(V.SINGLEBOOKING_FI)}")`,
+      `header >> [href="/search"]:text-is("${V.SINGLEBOOKING_FI}")`,
       "/search"
     );
   },
 
   "Navigate To My Bookings": async () => {
-    await Browser["Click"](`header >> [href="/reservations"]:text-is("${str(V.MYBOOKINGS_FI)}")`);
+    await Browser["Click"](`header >> [href="/reservations"]:text-is("${V.MYBOOKINGS_FI}")`);
 
     // Confirms page is loaded
     await mybookings["Check My Bookings H1"](V.MYBOOKINGS_FI);
@@ -74,12 +73,12 @@ export const topnav = keywords("topnav", {
   },
 
   "Navigate To Recurring Booking Page": async () => {
-    await Browser["Click"](`header >> [href="/recurring"]:text-is("${str(V.RECURRING_BOOKINGS_FI)}")`);
+    await Browser["Click"](`header >> [href="/recurring"]:text-is("${V.RECURRING_BOOKINGS_FI}")`);
     await currentPage().waitForURL((url) => url.pathname === "/recurring");
   },
 
   "Navigate To My Applications": async () => {
-    await Browser["Click"](`header >> [href="/applications"]:text-is("${str(V.MYAPPLICATIONS_FI)}")`);
+    await Browser["Click"](`header >> [href="/applications"]:text-is("${V.MYAPPLICATIONS_FI}")`);
     await currentPage().waitForURL((url) => url.pathname === "/applications");
   },
 
@@ -124,7 +123,7 @@ export const topnav = keywords("topnav", {
   "Navigate To Single Booking Page Mobile": async () => {
     await Browser["Click"]("id=Menu");
     await custom_keywords["Click And Wait For Page"](
-      `header >> [href="/search"]:text-is("${str(V.SINGLEBOOKING_FI)}")`,
+      `header >> [href="/search"]:text-is("${V.SINGLEBOOKING_FI}")`,
       "/search"
     );
   },

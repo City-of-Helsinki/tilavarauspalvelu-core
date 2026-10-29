@@ -93,6 +93,12 @@ the runtime offline.
 - Library keywords work the same way: `await Browser["Click"]("id=login")`. Named arguments go in a trailing
   `named()`: `named({ timeout: "10s" })`.
 - Variables are properties of `V`, e.g. `V.CURRENT_USER_HETU`. They are reset before each test.
+  `TestSuites/variable-types.ts` gives them their types, so a misspelled name fails `pnpm lint`. The variable files
+  are typed by their values. A variable that a keyword sets while a test runs goes in `RuntimeVariables` there, or in
+  `UntypedRuntimeVariables` when its value comes from the page or an untyped keyword.
+- Keyword parameters have a type (`string`) where every caller passes a value of that type. The others are
+  `RobotValue` (any value), like the values that library keywords return. `str()` formats a value the way Robot
+  prints it (`None`, `True`, Python lists), so it stays wherever a value may not be a string.
 - Tags choose the test data, through the `testData` fixture in `TestSuites/fixtures.ts`, before the test starts.
   A data set tag like `@desktop-test-data-set-0` picks the users from the section with the same tag in
   `pabot_users.dat`, and only one test at a time uses a data set. A data set tag that `pabot_users.dat` doesn't have

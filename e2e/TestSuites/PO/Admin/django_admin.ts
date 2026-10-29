@@ -1,22 +1,21 @@
 /** Port of PO/Admin/django_admin.robot */
 import { Browser, currentPage, loc } from "../../../lib/Browser";
-import { expect, keywords, str } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
+import { expect, keywords } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
 
 export const django_admin = keywords("django_admin", {
-  "Admin Changes Permissions": async (role_value: RobotValue) => {
+  "Admin Changes Permissions": async (role_value: string) => {
     // Port: Select Options By picks the option of the native select without opening it
     await Browser["Select Options By"]("id=id_role", "value", role_value);
   },
 
-  "Admin Checks Permission Is Not Present": async (role_value: RobotValue) => {
+  "Admin Checks Permission Is Not Present": async (role_value: string) => {
     // The options of the native select are in the page from the start
     await expect(
-      loc(`id=id_role >> option[value="${str(role_value)}"]`),
-      `Option with value "${str(role_value)}" should not be present`
+      loc(`id=id_role >> option[value="${role_value}"]`),
+      `Option with value "${role_value}" should not be present`
     ).toHaveCount(0);
   },
 
@@ -26,11 +25,11 @@ export const django_admin = keywords("django_admin", {
     await currentPage().waitForURL((url) => !url.pathname.endsWith("/change/"));
   },
 
-  "Admin Searches The User By Email": async (user_email: RobotValue) => {
+  "Admin Searches The User By Email": async (user_email: string) => {
     await Browser["Type Text"]("id=searchbar", user_email);
     await Browser["Click"]('input[type="submit"]');
     // The search results page
-    await currentPage().waitForURL((url) => url.searchParams.get("q") === str(user_email));
+    await currentPage().waitForURL((url) => url.searchParams.get("q") === user_email);
   },
 
   /** Clicks the role link in the search results. Should be used after searching by email to ensure only one match exists. */

@@ -3,7 +3,8 @@
  *
  * Every Robot keyword keeps its exact name as a string key, e.g. `app_common["User Logs In With Suomi Fi"]()`.
  * `keywords()` wraps each one in a `test.step` titled `module.Keyword Name`, so the Playwright report shows the
- * same keyword tree as the Robot log. Robot variables keep their names as properties of `V`.
+ * same keyword tree as the Robot log. Robot variables keep their names as properties of `V`, typed by
+ * `TestSuites/variable-types.ts`.
  */
 import { existsSync } from "node:fs";
 import { test as base, errors } from "@playwright/test";
@@ -216,9 +217,20 @@ export function keywords<T extends Record<string, KeywordImplementation>>(module
 /** Library keywords (Browser, BuiltIn, ...) are wrapped the same way, titled e.g. `Browser.Click    id=login`. */
 export const library = keywords;
 
+/**
+ * The Robot variables by name. `TestSuites/variable-types.ts` declares their names and types here (declaration
+ * merging), so a misspelled variable fails the type check.
+ */
+// oxlint-disable-next-line typescript/no-empty-interface, typescript/no-empty-object-type -- filled by declaration merging
+export interface Variables {}
+
 // Robot variables: defaults from the variable files, plus everything set at runtime with
 // Set Test Variable / Set Suite Variable. Reset before every test.
-export const V: Record<string, RobotValue> = {};
+const variables: Record<string, RobotValue> = {};
+export const V = variables as Variables;
+
+/** The variables by names known only at runtime, for the naming parity check. */
+export const variablesByName: Readonly<Record<string, RobotValue>> = variables;
 let defaults: Record<string, RobotValue> = {};
 
 export function registerVariables(values: Record<string, RobotValue>): void {
@@ -235,16 +247,16 @@ export function registerVariables(values: Record<string, RobotValue>): void {
 const COMMAND_LINE_VARIABLES = ["ENABLE_HAR_RECORDING", "FORCE_SINGLE_USER"];
 
 export function resetVariables(): void {
-  for (const name of Object.keys(V)) {
-    Reflect.deleteProperty(V, name);
+  for (const name of Object.keys(variables)) {
+    Reflect.deleteProperty(variables, name);
   }
-  Object.assign(V, structuredClone(defaults));
+  Object.assign(variables, structuredClone(defaults));
   // Like `robot --variable NAME:value`, an environment variable overrides one of these. Only the variables the Robot
   // runners pass on the command line: an unrelated environment variable like BROWSER must not change the suite.
   for (const name of COMMAND_LINE_VARIABLES) {
     const override = process.env[name];
     if (override != null) {
-      V[name] = override;
+      variables[name] = override;
     }
   }
 }

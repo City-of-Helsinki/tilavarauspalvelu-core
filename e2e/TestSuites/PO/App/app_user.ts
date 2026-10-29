@@ -55,13 +55,13 @@ export const app_user = keywords("app_user", {
     await checkout["Check The Info In Checkout"]();
   },
 
-  "User Interrupts Paid Checkout": async (input_URL: RobotValue) => {
+  "User Interrupts Paid Checkout": async (input_URL: string) => {
     await checkout["Interrupted Checkout"](input_URL);
     await user_landingpage["Check The User Landing Page H1"](V.USER_LANDING_PAGE_H1_TEXT);
   },
 
   // Singlebooking
-  "User Uses Search To Find Right Unit": async (nameoftheunit: RobotValue) => {
+  "User Uses Search To Find Right Unit": async (nameoftheunit: string) => {
     // This checks if the search element is visible; if it isn’t, it clicks the "advanced search" toggle button to make it visible.
     await singlebooking["Click Advanced Search If Search Not Visible"]();
     await singlebooking["Search Units By Name"](nameoftheunit);
@@ -215,9 +215,7 @@ export const app_user = keywords("app_user", {
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
-  "User Fills Subvented Booking Details As Individual And Submits": async (
-    justification_for_not_paying: RobotValue
-  ) => {
+  "User Fills Subvented Booking Details As Individual And Submits": async (justification_for_not_paying: string) => {
     // Checks that "jatka" button has been loaded
     await Browser["Wait For Elements State"](
       '[data-testid="reservation__button--continue"]',
@@ -504,7 +502,7 @@ export const app_user = keywords("app_user", {
   },
 
   "User Checks Cancelled Booking Is Found": async (
-    unitname_mybookings: RobotValue,
+    unitname_mybookings: string,
     time_of_quick_reservation_minusT: RobotValue
   ) => {
     await BuiltIn["Log"]("This checks the canceled booking is not found in upcoming reservations");
@@ -522,7 +520,7 @@ export const app_user = keywords("app_user", {
     );
   },
 
-  "User Can See Upcoming Booking In List And Clicks It": async (unitname: RobotValue, reservationtime: RobotValue) => {
+  "User Can See Upcoming Booking In List And Clicks It": async (unitname: string, reservationtime: RobotValue) => {
     await BuiltIn["Log"](unitname);
     await BuiltIn["Log"](reservationtime);
     // The list is fetched once when the page opens, so reload it if the booking is not in it
@@ -535,7 +533,7 @@ export const app_user = keywords("app_user", {
   },
 
   "User Can See Upcoming Noncancelable Booking In List And Clicks It": async (
-    unitname: RobotValue,
+    unitname: string,
     reservationtime: RobotValue
   ) => {
     await BuiltIn["Log"](unitname);
@@ -556,9 +554,9 @@ export const app_user = keywords("app_user", {
 
   // Reservations
   "User Checks The Paid Reservation Info Is Right In Reservations": async (
-    booking_status: RobotValue,
-    payment_status: RobotValue,
-    booking_price: RobotValue,
+    booking_status: string,
+    payment_status: string,
+    booking_price: string,
     time_in_quickreservations: RobotValue,
     reservation_number: RobotValue
   ) => {
@@ -578,8 +576,8 @@ export const app_user = keywords("app_user", {
   },
 
   "User Checks Booking Info In Reservations With Number Of Participants And Description And Purpose": async (
-    booking_status: RobotValue,
-    booking_price: RobotValue,
+    booking_status: string,
+    booking_price: string,
     time_in_quickreservations: RobotValue
   ) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__content"]', "visible");
@@ -599,8 +597,8 @@ export const app_user = keywords("app_user", {
   },
 
   "User Checks Booking Info In Reservations": async (
-    booking_status: RobotValue,
-    booking_price: RobotValue,
+    booking_status: string,
+    booking_price: string,
     time_in_quickreservations: RobotValue
   ) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__reservation-info-card__content"]', "visible");
@@ -617,8 +615,8 @@ export const app_user = keywords("app_user", {
   },
 
   "User Checks Booking Info In Reservations With Access Code": async (
-    booking_status: RobotValue,
-    booking_price: RobotValue,
+    booking_status: string,
+    booking_price: string,
     time_in_quickreservations: RobotValue,
     access_code: RobotValue
   ) => {
@@ -637,8 +635,8 @@ export const app_user = keywords("app_user", {
   },
 
   "User Checks Booking Info In Reservations With All Reservation Info": async (
-    booking_status: RobotValue,
-    booking_price: RobotValue,
+    booking_status: string,
+    booking_price: string,
     time_in_quickreservations: RobotValue
   ) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__content"]', "visible");
@@ -720,7 +718,7 @@ export const app_user = keywords("app_user", {
    * This formats example like Ti 1.10.2024 klo 10:30–11:30
    * to DTSTART;TZID=Europe/Helsinki:20241001T103000, DTEND;TZID=Europe/Helsinki:20241001T113000
    */
-  "User Saves File And Formats Booking Time To ICS": async (file_path: RobotValue) => {
+  "User Saves File And Formats Booking Time To ICS": async (file_path: string) => {
     let download_promise: RobotValue, file_obj: RobotValue, content: RobotValue, ICS_TEXT: RobotValue;
     // Ensure the directory exists
     await OperatingSystem["Create Directory"](file_path);
@@ -897,7 +895,7 @@ export const app_user = keywords("app_user", {
   },
 
   "User Checks Cancelled Booking Is Found Mobile": async (
-    unitname_mybookings: RobotValue,
+    unitname_mybookings: string,
     time_of_quick_reservation_minusT: RobotValue
   ) => {
     await topnav["Click Tablist Scroll Button To Right Mobile"]();
@@ -913,7 +911,7 @@ export const app_user = keywords("app_user", {
   },
 
   // Misc
-  "User Checks That Reservation Unit Picture Is Loaded": async (unit_name: RobotValue) => {
+  "User Checks That Reservation Unit Picture Is Loaded": async (unit_name: string) => {
     let img_selector: RobotValue,
       src: RobotValue,
       complete: RobotValue,
@@ -922,13 +920,13 @@ export const app_user = keywords("app_user", {
       width: RobotValue,
       height: RobotValue;
     // Target the image by its alt text - this is the most reliable selector
-    img_selector = `img[alt*="${str(unit_name)}"]`;
+    img_selector = `img[alt*="${unit_name}"]`;
 
     // Wait for the image element to be attached
     await Browser["Wait For Elements State"](
       chain(img_selector, "nth=0"),
       "attached",
-      named({ timeout: "5s", message: `Reservation unit picture for ${str(unit_name)} is not present` })
+      named({ timeout: "5s", message: `Reservation unit picture for ${unit_name} is not present` })
     );
 
     // Verify the src attribute is present

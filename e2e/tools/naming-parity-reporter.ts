@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { FullResult, Reporter, Suite } from "@playwright/test/reporter";
-import { KEYWORD_REGISTRY, V } from "../lib/robot";
+import { KEYWORD_REGISTRY, variablesByName } from "../lib/robot";
 
 interface ManifestArgument {
   robot: string;
@@ -229,7 +229,7 @@ class NamingParityReporter implements Reporter {
     }
     for (const variable of manifest.variables) {
       this.checked.variables++;
-      if (!(variable.name in V)) {
+      if (!(variable.name in variablesByName)) {
         this.problems.push(`Variable missing: \${${variable.name}} (${variable.file})`);
         continue;
       }
@@ -245,9 +245,9 @@ class NamingParityReporter implements Reporter {
         }
         continue;
       }
-      if (literal != null && V[variable.name] !== literal) {
+      if (literal != null && variablesByName[variable.name] !== literal) {
         this.problems.push(
-          `Value of \${${variable.name}} (${variable.file}): ${JSON.stringify(V[variable.name])} should be ${JSON.stringify(literal)}`
+          `Value of \${${variable.name}} (${variable.file}): ${JSON.stringify(variablesByName[variable.name])} should be ${JSON.stringify(literal)}`
         );
       }
     }

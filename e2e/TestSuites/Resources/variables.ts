@@ -1,5 +1,5 @@
 /** A resource file with variables. */
-import { registerVariables, str } from "../../lib/robot";
+import { registerVariables } from "../../lib/robot";
 import "../Resources/env_loader";
 
 export const variables_variables = {
@@ -10,14 +10,14 @@ export const variables_variables = {
   URL_ADMIN: "https://varaamo.test.hel.ninja/kasittely",
   URL_DJANGO_ADMIN: "https://varaamo.test.hel.ninja/admin/login/",
   URL_MAIL: "https://www.google.com/intl/fi/gmail/about/",
-  DOWNLOAD_DIR: `${str(import.meta.dirname)}${str("/")}downloads`,
-  EMAIL_FILE_PATH: `${str(import.meta.dirname)}${str("/")}downloads${str("/")}cleaned_emails.json`,
+  DOWNLOAD_DIR: `${import.meta.dirname}/downloads`,
+  EMAIL_FILE_PATH: `${import.meta.dirname}/downloads/cleaned_emails.json`,
   BROWSER_TIMEOUT_GLOBAL: "40s",
   CONTENT_WAIT_TIMEOUT: "10s",
   ROBOT_EMAIL: "django_email_robot@mailiposti.com",
   DJANGO_ROBO_MAIL: "https://varaamo.test.hel.ninja/v1/robot_email_cache/",
   WAIT_FOR_EMAIL_SECONDS: "5",
-  DOWNLOAD_ICS_FILE: `${str(import.meta.dirname)}${str("/")}downloads`,
+  DOWNLOAD_ICS_FILE: `${import.meta.dirname}/downloads`,
   ICS_TEXT: "",
   START_TIME_FROM_ICS: "",
   END_TIME_FROM_ICS: "",
@@ -104,7 +104,7 @@ export const variables_variables = {
   FORMATTED_STARTTIME_EMAIL: "",
   // Päättymisaika: ${day}.${month}.${year} klo ${end_time}
   FORMATTED_ENDTIME_EMAIL: "",
-  DOWNLOAD_TERMS_OF_USE_FILE: `${str(import.meta.dirname)}${str("/")}downloads/asiointipalvelun-ehdot.pdf`,
+  DOWNLOAD_TERMS_OF_USE_FILE: `${import.meta.dirname}/downloads/asiointipalvelun-ehdot.pdf`,
   EXPECTED_ATTACHMENT_STATUS: true,
   PABOTEXECUTIONPOOLID: "0",
 };

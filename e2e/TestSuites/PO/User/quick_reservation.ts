@@ -208,19 +208,19 @@ export const quick_reservation = keywords("quick_reservation", {
     );
   },
 
-  "Select Duration": async (duration: RobotValue) => {
+  "Select Duration": async (duration: string) => {
     let main_button: RobotValue, already_selected: RobotValue;
     await BuiltIn["Log"](duration);
     // Click  id=quick-reservation >> css=.Select-module_selectAndListContainer__vSJEv
     main_button = "id=quick-reservation__duration-main-button";
     // Clicking the selected duration would unselect it
-    already_selected = await Browser["Get Element Count"](chain(main_button, `text="${str(duration)}"`));
+    already_selected = await Browser["Get Element Count"](chain(main_button, `text="${duration}"`));
     if (Number(already_selected) === 0) {
       await Browser["Click"](`id=quick-reservation >> ${str(main_button)}`);
-      await Browser["Click"](`[role="option"] >> '${str(duration)}'`);
+      await Browser["Click"](`[role="option"] >> '${duration}'`);
     }
     await Browser["Wait For Elements State"](
-      chain(main_button, `text="${str(duration)}" >> nth=0`),
+      chain(main_button, `text="${duration}" >> nth=0`),
       "visible",
       named({ timeout: "5s" })
     );

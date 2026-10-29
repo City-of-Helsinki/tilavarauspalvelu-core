@@ -1,6 +1,10 @@
 /** A resource file with all the finnish texts */
-import { V, registerVariables, str } from "../../lib/robot";
+import { V, registerVariables } from "../../lib/robot";
 import "../Resources/serial_users";
+
+// Read when the file loads, like a variable in a Robot variable table. Typed here, because this file's variables are
+// part of V's type (variable-types.ts).
+const admin_first_name: string = V.ADMIN_CURRENT_USER_FIRST_NAME;
 
 export const texts_FI_variables = {
   USER_LANDING_PAGE_H1_TEXT: "Varaa tiloja ja laitteita",
@@ -9,7 +13,7 @@ export const texts_FI_variables = {
   USER_LOGOUT_TEXT: "You have been logged out of City of Helsinki services.",
   ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN: "Tilavarauskäsittely",
   ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN: "Tervetuloa!",
-  ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN_WITH_USER_INFO: `Tervetuloa, ${str(V.ADMIN_CURRENT_USER_FIRST_NAME)}`,
+  ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN_WITH_USER_INFO: `Tervetuloa, ${admin_first_name}`,
   LOGIN_TEXT_ADMIN: "Kirjaudu sisään",
   PAYMENT_NOTIFICATION_BANNER_TITLE: "Varauksesi odottaa maksua",
   NOTIFICATION_BANNER_MESSAGE_NORMAL: "Normaali (sininen)",

@@ -14,7 +14,7 @@ export const admin_reservations = keywords("admin_reservations", {
   /** This keyword types the reservation number and there should be only one match in the list */
   "Admin Searches Reservation With Id Number And Clicks It From Name": async (
     booking_number: RobotValue,
-    user_fullname: RobotValue
+    user_fullname: string
   ) => {
     await expect(loc("id=search"), "Check we are on the page where admin can filter reservations").toBeVisible();
     await Browser["Type Text"]("id=search", booking_number);
@@ -99,16 +99,16 @@ export const admin_reservations = keywords("admin_reservations", {
   },
 
   "Admin Checks Reservation Info After Handling": async (
-    singlebooking_price: RobotValue,
-    singlebooking_status: RobotValue,
-    purpose_of_the_booking: RobotValue,
-    singlebooking_description: RobotValue,
-    singlebooking_number_of_participants: RobotValue,
+    singlebooking_price: string,
+    singlebooking_status: string,
+    purpose_of_the_booking: string,
+    singlebooking_description: string,
+    singlebooking_number_of_participants: string,
     singlebooking_age_group: RobotValue,
     reason_of_rejection: RobotValue
   ) => {
     // Check price if provided
-    if (str(singlebooking_price) !== "None") {
+    if (singlebooking_price !== "None") {
       await custom_keywords["Check Elements Text With Remove Non-breaking Space"](
         '[data-testid="reservation__summary--Hinta"]',
         singlebooking_price
@@ -116,7 +116,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
 
     // Check status if provided
-    if (str(singlebooking_status) !== "None") {
+    if (singlebooking_status !== "None") {
       await custom_keywords["Check Elements Text"](
         '[data-testid="reservation_title_section__reservation_state"]',
         singlebooking_status
@@ -124,7 +124,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
 
     // Check purpose if provided
-    if (str(purpose_of_the_booking) !== "None") {
+    if (purpose_of_the_booking !== "None") {
       await custom_keywords["Check Elements Text"](
         '[data-testid="reservation__summary--Käyttötarkoitus"]',
         purpose_of_the_booking
@@ -132,7 +132,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
 
     // Check description if provided
-    if (str(singlebooking_description) !== "None") {
+    if (singlebooking_description !== "None") {
       await custom_keywords["Check Elements Text"](
         '[data-testid="reservation__summary--Kuvaus"]',
         singlebooking_description
@@ -140,7 +140,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
 
     // Check number of participants if provided
-    if (str(singlebooking_number_of_participants) !== "None") {
+    if (singlebooking_number_of_participants !== "None") {
       await custom_keywords["Check Elements Text"](
         '[data-testid="reservation__summary--Osallistujamäärä"]',
         singlebooking_number_of_participants
@@ -165,15 +165,15 @@ export const admin_reservations = keywords("admin_reservations", {
   },
 
   "Admin Checks Reservation Info Before Handling": async (
-    singlebooking_price: RobotValue,
-    singlebooking_status: RobotValue,
-    purpose_of_the_booking: RobotValue,
-    singlebooking_description: RobotValue,
-    singlebooking_number_of_participants: RobotValue,
+    singlebooking_price: string,
+    singlebooking_status: string,
+    purpose_of_the_booking: string,
+    singlebooking_description: string,
+    singlebooking_number_of_participants: string,
     singlebooking_age_group: RobotValue
   ) => {
     // Check price if provided
-    if (str(singlebooking_price) !== "None") {
+    if (singlebooking_price !== "None") {
       await custom_keywords["Check Elements Text With Remove Non-breaking Space"](
         '[data-testid="reservation__summary--Hinta"]',
         singlebooking_price
@@ -181,7 +181,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
 
     // Check status if provided
-    if (str(singlebooking_status) !== "None") {
+    if (singlebooking_status !== "None") {
       await custom_keywords["Check Elements Text"](
         '[data-testid="reservation_title_section__reservation_state"]',
         singlebooking_status
@@ -189,7 +189,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
 
     // Check purpose if provided
-    if (str(purpose_of_the_booking) !== "None") {
+    if (purpose_of_the_booking !== "None") {
       await custom_keywords["Check Elements Text"](
         '[data-testid="reservation__summary--Käyttötarkoitus"]',
         purpose_of_the_booking
@@ -197,7 +197,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
 
     // Check description if provided
-    if (str(singlebooking_description) !== "None") {
+    if (singlebooking_description !== "None") {
       await custom_keywords["Check Elements Text"](
         '[data-testid="reservation__summary--Kuvaus"]',
         singlebooking_description
@@ -205,7 +205,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
 
     // Check number of participants if provided
-    if (str(singlebooking_number_of_participants) !== "None") {
+    if (singlebooking_number_of_participants !== "None") {
       await custom_keywords["Check Elements Text"](
         '[data-testid="reservation__summary--Osallistujamäärä"]',
         singlebooking_number_of_participants
@@ -221,7 +221,7 @@ export const admin_reservations = keywords("admin_reservations", {
     }
   },
 
-  "Admin Checks Reservation Status": async (status: RobotValue) => {
+  "Admin Checks Reservation Status": async (status: string) => {
     await BuiltIn["Log"](status);
     // Check Elements Text waits until the page shows the status
     await custom_keywords["Check Elements Text"](
@@ -240,7 +240,7 @@ export const admin_reservations = keywords("admin_reservations", {
     V.RESERVATION_NUMBER_ADMINSIDE = reservation_number;
   },
 
-  "Admin Clicks Button In Reservation Page": async (button_data_id: RobotValue) => {
+  "Admin Clicks Button In Reservation Page": async (button_data_id: string) => {
     await Browser["Click"](button_data_id);
   },
 
@@ -258,7 +258,7 @@ export const admin_reservations = keywords("admin_reservations", {
   },
 
   // Dialog window
-  "Admin Selects Reason For Rejection": async (reason_of_rejection: RobotValue) => {
+  "Admin Selects Reason For Rejection": async (reason_of_rejection: string) => {
     await Browser["Click"]("id=denyReason-main-button");
     await custom_keywords["Find And Click Element With Text"]("id=denyReason-list >> li", reason_of_rejection);
     // An option picked within 200 ms of opening leaves the HDS Select list open
@@ -299,7 +299,7 @@ export const admin_reservations = keywords("admin_reservations", {
    * This test uses 00 for minutes. So all the changed times will be 10:00–11:00 -> 15:00–17:00 etc.
    */
   "Admin Enters Reservation Time And Type Of Reservation": async (
-    type_of_reservation: RobotValue,
+    type_of_reservation: string,
     startTime_hours: RobotValue,
     endTime_hours: RobotValue,
     date: RobotValue
