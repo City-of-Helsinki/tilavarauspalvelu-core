@@ -1,10 +1,11 @@
 import React, { useMemo } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import type { Control } from "react-hook-form";
+import { Controller, useController, useFormContext, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
-import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize, RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
-import { WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar/styles";
+import { arrow, WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar/styles";
 import type { WeeklyPatternCellInfo, WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/types";
 import { WeeklyPatternCalendar } from "@ui/components/WeeklyPatternCalendar/WeeklyPatternCalendar";
 import { ErrorText } from "ui/src/components/ErrorText";
@@ -20,16 +21,12 @@ import {
   toPattern,
 } from "ui/src/modules/suitableTimes";
 import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
-import { AutoGrid, Flex, H4 } from "ui/src/styled";
+import { Flex } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
 import { TimePreview } from "@/components/application/funnel/TimePreview";
 import type { ApplicationPage2FormValues } from "./form";
 import { SuitableTimeRangeForm } from "./SuitableTimeRangeForm";
-
-const CenterHeader = styled(H4)`
-  text-align: center;
-`;
 
 export type TimeSelectorProps = {
   index: number;
@@ -49,8 +46,9 @@ export function TimeSelectorForm({
   sectionOpeningHours,
 }: TimeSelectorProps): React.ReactElement | null {
   const { t, i18n } = useTranslation();
-  const { control, getValues, setValue, watch } = useFormContext<ApplicationPage2FormValues>();
-
+  const { control, getValues, setValue } = useFormContext<ApplicationPage2FormValues>();
+  const applicationSections = useWatch({ name: "applicationSections", control });
+  const priority = useWatch({ name: `applicationSections.${index}.priority`, control }) as Priority;
   const availability = useMemo(() => toAvailability(reservationUnitOpeningHours), [reservationUnitOpeningHours]);
   const paintable = useMemo(() => toAvailability(sectionOpeningHours), [sectionOpeningHours]);
 
@@ -70,13 +68,9 @@ export function TimeSelectorForm({
     });
   };
 
-  const priority = watch(`applicationSections.${index}.priority`);
   const formId = `time-selector__form-${index}`;
-  const reservationUnitName = reservationUnitOptions.find(
-    (option) => option.value === watch(`applicationSections.${index}.reservationUnitPk`)
-  )?.label;
 
-  const enableCopyCells = filterNonNullable(watch("applicationSections")).length > 1;
+  const enableCopyCells = filterNonNullable(applicationSections).length > 1;
   const onChange = (pattern: WeeklyPatternValue<SuitableTimeData>) => {
     setValue(`applicationSections.${index}.suitableTimeRanges`, fromPattern(pattern), {
       shouldDirty: true,
@@ -93,10 +87,13 @@ export function TimeSelectorForm({
       <Notification label={t("application:Page2.info")} size={NotificationSize.Small} type="info">
         {t("application:Page2.info")}
       </Notification>
-      <OptionSelector reservationUnitOptions={reservationUnitOptions} index={index} />
-      <CenterHeader $noMargin data-testid={`time-selector__heading-${index}`}>
-        {reservationUnitName}:
-      </CenterHeader>
+      <PrioritySelector index={index} control={control} />
+      <ControlledSelect
+        name={`applicationSections.${index}.reservationUnitPk`}
+        label={t("application:Page2.reservationUnitSelectLabel")}
+        control={control}
+        options={reservationUnitOptions}
+      />
       <Controller
         control={control}
         name={`applicationSections.${index}.suitableTimeRanges`}
@@ -128,21 +125,12 @@ export function TimeSelectorForm({
       />
       <WeeklyPatternLegend
         items={[
-          {
-            state: "primary",
-            label: t("application:TimeSelector.legend.primary"),
-            current: priority === Priority.Primary,
-          },
-          {
-            state: "secondary",
-            label: t("application:TimeSelector.legend.secondary"),
-            current: priority === Priority.Secondary,
-          },
           { state: "open", label: t("application:TimeSelector.legend.open") },
           { state: "closed", label: t("application:TimeSelector.legend.closed") },
           { state: "unavailable", label: t("application:TimeSelector.legend.unavailable") },
         ]}
       />
+
       <SuitableTimeRangeForm id={formId} index={index} openingHours={sectionOpeningHours} />
       <div data-testid={`time-selector__preview-${index}`}>
         <TimePreview index={index} />
@@ -164,33 +152,76 @@ export function TimeSelectorForm({
   );
 }
 
-function OptionSelector({
-  reservationUnitOptions,
-  index,
-}: Pick<TimeSelectorProps, "reservationUnitOptions" | "index">) {
-  const { t } = useTranslation();
-  const { control } = useFormContext<ApplicationPage2FormValues>();
+const RadioGroup = styled.fieldset`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border: none;
+  padding: 0;
+  margin: 0;
+  gap: 80px;
+`;
 
+const PriorityRadioButton = styled(RadioButton)`
+  position: relative;
+  width: 50%;
+  && {
+    margin-top: 0;
+  }
+  &:before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: var(--color-bus);
+    color: var(--color-white);
+  }
+  &:after {
+    ${arrow};
+    left: auto;
+    right: 11px;
+    top: 3px;
+    border-bottom: 10px solid var(--color-white);
+  }
+  &:last-of-type {
+    &:before {
+      background-color: var(--color-engel);
+      border: 1px solid var(--color-black);
+    }
+    &:after {
+      border-bottom: none;
+      border-top: 10px solid var(--color-black);
+    }
+  }
+`;
+
+function PrioritySelector({ index, control }: { index: number; control: Control<ApplicationPage2FormValues> }) {
+  const { t } = useTranslation();
+  const name = `applicationSections.${index}.priority` as const;
+  const { field } = useController({ name, control });
   const priorityOptions = [Priority.Primary, Priority.Secondary].map((n) => ({
     label: t(`application:Page2.priorityLabels.${priorityKey(n)}`),
     value: n,
   }));
-
   return (
-    <AutoGrid $minWidth="20rem" data-testid={`time-selector__options-${index}`}>
-      <ControlledSelect
-        name={`applicationSections.${index}.reservationUnitPk`}
-        label={t("application:Page2.reservationUnitSelectLabel")}
-        control={control}
-        options={reservationUnitOptions}
-      />
-      <ControlledSelect
-        name={`applicationSections.${index}.priority`}
-        label={t("application:Page2.prioritySelectLabel")}
-        control={control}
-        options={priorityOptions}
-      />
-    </AutoGrid>
+    <RadioGroup>
+      {priorityOptions.map((opt) => {
+        const checked = field.value === opt.value;
+        return (
+          <PriorityRadioButton
+            id={`${name}.${opt.label}`}
+            name={name}
+            key={opt.label + checked}
+            label={opt.label}
+            onChange={() => field.onChange(opt.value)}
+            checked={checked}
+          />
+        );
+      })}
+    </RadioGroup>
   );
 }
 

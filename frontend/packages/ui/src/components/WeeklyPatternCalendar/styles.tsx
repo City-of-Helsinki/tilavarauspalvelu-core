@@ -8,7 +8,7 @@ import type { CellAppearance } from "./types";
 export type LegendState = CellAppearance | "open" | "closed" | "unavailable";
 export type LegendItem = { state: LegendState; label: string; current?: boolean };
 
-const arrow = css`
+export const arrow = css`
   content: "";
   position: absolute;
   left: 8px;
@@ -100,7 +100,7 @@ export const WeeklyPatternRoot = styled.div`
 
   position: relative;
   overflow-x: auto;
-  height: 600px;
+  height: auto;
 
   /* 
     The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
@@ -138,6 +138,7 @@ export const WeeklyPatternRoot = styled.div`
     vertical-align: middle;
     white-space: nowrap;
     z-index: 2;
+    border-top: 1px solid var(--color-black-20);
   }
 
   tbody td {

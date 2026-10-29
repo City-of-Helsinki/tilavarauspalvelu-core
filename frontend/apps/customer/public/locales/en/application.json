@@ -63,11 +63,11 @@
   "TimeSelector": {
     "calendarLabel": "Select time slots from the calendar",
     "legend": {
-      "unavailable": "Not available",
+      "unavailable": "Not available in any space on this application",
       "closed": "Not available in this space",
       "primary": "Preferred time slots",
       "secondary": "Other request",
-      "open": "Reservable"
+      "open": "Reservable in this space"
     },
     "skipToForm": "Skip to the form for adding times",
     "announcements": {
@@ -101,7 +101,7 @@
     "reservationUnitSelectLabel": "Available seasonal booking times for",
     "priorityLabels": {
       "primary": "Select preferred time slots",
-      "secondary": "Select other time slots"
+      "secondary": "Select other suitable time slots"
     },
     "notification": {
       "copyCells": "Times copied to all booking requests"

@@ -63,11 +63,11 @@
   "TimeSelector": {
     "calendarLabel": "Valitse aikatoiveet kalenterista",
     "legend": {
-      "unavailable": "Ei varattavissa",
+      "unavailable": "Ei varattavissa missään hakemukselle valituista tiloista",
       "closed": "Ei varattavissa tässä tilassa",
       "primary": "Ensisijainen toive",
       "secondary": "Muu toive",
-      "open": "Varattavissa"
+      "open": "Varattavissa tässä tilassa"
     },
     "skipToForm": "Siirry lomakkeeseen, jolla voit lisätä aikoja",
     "announcements": {
@@ -101,7 +101,7 @@
     "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
     "priorityLabels": {
       "primary": "Valitse ensisijaiset aikatoiveet",
-      "secondary": "Valitse muut aikatoiveet"
+      "secondary": "Valitse vaihtoehtoiset aikatoiveet"
     },
     "notification": {
       "copyCells": "Ajat kopioitu kaikille varaustoiveille"

@@ -9,7 +9,6 @@ import { Priority, Weekday } from "@gql/gql-types";
 import type { ApplicationPage2Query, TimeSelectorFragment } from "@gql/gql-types";
 import { createMockApplicationFragment } from "@test/application.mocks";
 import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { selectOption } from "@test/test.utils";
 import { convertApplicationPage2 } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from "./TimeSelector";
@@ -143,21 +142,23 @@ describe("TimeSelector render single section", () => {
     expect(info).toHaveLength(2);
   });
 
-  test("should have priority select", () => {
+  test("should have priority radio buttons", () => {
     const view = customRender();
-    const options = view.getByTestId("time-selector__options-0");
+    const group = view.getByRole("group", { name: "application:Page2.prioritySelectLabel" });
     expect(
-      within(options).getByLabelText("application:Page2.prioritySelectLabel", {
-        selector: "button",
-      })
-    ).toBeInTheDocument();
+      within(group)
+        .getAllByRole("radio")
+        .map((radio) => radio.getAttribute("id"))
+    ).toEqual([
+      `applicationSections.0.priority.${Priority.Primary}`,
+      `applicationSections.0.priority.${Priority.Secondary}`,
+    ]);
   });
 
   test("should have reservation unit select", () => {
     const view = customRender();
-    const options = view.getByTestId("time-selector__options-0");
     expect(
-      within(options).getByLabelText("application:Page2.reservationUnitSelectLabel", {
+      view.getByLabelText("application:Page2.reservationUnitSelectLabel", {
         selector: "button",
       })
     ).toBeInTheDocument();
@@ -195,10 +196,9 @@ describe("TimeSelector render single section", () => {
     expect(open).toBeInTheDocument();
     const unavailable = within(legend).getByText("application:TimeSelector.legend.unavailable");
     expect(unavailable).toBeInTheDocument();
-    const secondary = within(legend).getByText("application:TimeSelector.legend.secondary");
-    expect(secondary).toBeInTheDocument();
-    const primary = within(legend).getByText("application:TimeSelector.legend.primary");
-    expect(primary).toBeInTheDocument();
+    // The priority radio buttons show what Primary and Secondary look like, so the legend leaves them out.
+    expect(within(legend).queryByText("application:TimeSelector.legend.secondary")).not.toBeInTheDocument();
+    expect(within(legend).queryByText("application:TimeSelector.legend.primary")).not.toBeInTheDocument();
   });
 
   test.for([
@@ -474,28 +474,28 @@ describe("TimeSelector calendar select", () => {
 });
 
 describe("TimeSelector priority select", () => {
+  function priorityRadio(view: ReturnType<typeof render>, priority: "primary" | "secondary") {
+    return view.getByRole("radio", { name: `application:Page2.priorityLabels.${priority}` });
+  }
+
   test("should preselect primary time", () => {
     const view = customRender({ page: "page2" });
-    const selectBtn = view.getByLabelText("application:Page2.prioritySelectLabel", {
-      selector: "button",
-    });
-    expect(selectBtn).toBeInTheDocument();
-    expect(selectBtn).toHaveTextContent("application:Page2.priorityLabels.primary");
+    expect(priorityRadio(view, "primary")).toBeChecked();
+    expect(priorityRadio(view, "secondary")).not.toBeChecked();
   });
   test("priority select can be changed", async () => {
+    const user = userEvent.setup();
     const view = customRender({ page: "page2" });
-    await selectOption(view, "application:Page2.prioritySelectLabel", /Page2.priorityLabels.secondary/);
-    const selectBtn = view.getByLabelText("application:Page2.prioritySelectLabel", {
-      selector: "button",
-    });
-    expect(selectBtn).toHaveTextContent("application:Page2.priorityLabels.secondary");
+    await user.click(priorityRadio(view, "secondary"));
+    expect(priorityRadio(view, "secondary")).toBeChecked();
+    expect(priorityRadio(view, "primary")).not.toBeChecked();
   });
 
   test("selected time slots take the chosen priority", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     const view = customRender({ onSubmit });
-    await selectOption(view, "application:Page2.prioritySelectLabel", /Page2.priorityLabels.secondary/);
+    await user.click(priorityRadio(view, "secondary"));
 
     await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Friday, 12 * 60)));
     await user.click(view.getByRole("button", { name: "submit" }));
