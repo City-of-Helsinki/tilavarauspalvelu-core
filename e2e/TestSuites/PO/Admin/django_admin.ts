@@ -1,51 +1,58 @@
 /** Port of PO/Admin/django_admin.robot */
-import { Browser, currentPage, loc } from "../../../lib/Browser";
-import { expect, keywords } from "../../../lib/robot";
+import { expect, step } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
+import { PageObject } from "../../page-object";
 
-export const django_admin = keywords("django_admin", {
-  "Admin Changes Permissions": async (role_value: string) => {
+export class DjangoAdmin extends PageObject {
+  @step("django_admin.Admin Changes Permissions")
+  async adminChangesPermissions(role_value: string) {
     // Port: Select Options By picks the option of the native select without opening it
-    await Browser["Select Options By"]("id=id_role", "value", role_value);
-  },
+    await this.page.locator("#id_role").selectOption({ value: role_value });
+  }
 
-  "Admin Checks Permission Is Not Present": async (role_value: string) => {
+  @step("django_admin.Admin Checks Permission Is Not Present")
+  async adminChecksPermissionIsNotPresent(role_value: string) {
     // The options of the native select are in the page from the start
     await expect(
-      loc(`id=id_role >> option[value="${role_value}"]`),
+      this.page.locator(`#id_role >> option[value="${role_value}"]`),
       `Option with value "${role_value}" should not be present`
     ).toHaveCount(0);
-  },
+  }
 
-  "Admin Saves Changes": async () => {
-    await Browser["Click"]('input[value="Tallenna ja poistu"]');
+  @step("django_admin.Admin Saves Changes")
+  async adminSavesChanges() {
+    await this.page.locator('input[value="Tallenna ja poistu"]').click();
     // Saving returns to the list page once the change is stored
-    await currentPage().waitForURL((url) => !url.pathname.endsWith("/change/"));
-  },
+    await this.page.waitForURL((url) => !url.pathname.endsWith("/change/"));
+  }
 
-  "Admin Searches The User By Email": async (user_email: string) => {
-    await Browser["Type Text"]("id=searchbar", user_email);
-    await Browser["Click"]('input[type="submit"]');
+  @step("django_admin.Admin Searches The User By Email")
+  async adminSearchesTheUserByEmail(user_email: string) {
+    await this.page.locator("#searchbar").fill(user_email);
+    await this.page.locator('input[type="submit"]').click();
     // The search results page
-    await currentPage().waitForURL((url) => url.searchParams.get("q") === user_email);
-  },
+    await this.page.waitForURL((url) => url.searchParams.get("q") === user_email);
+  }
 
   /** Clicks the role link in the search results. Should be used after searching by email to ensure only one match exists. */
-  "Admin Clicks First User": async () => {
-    await Browser["Click"](".field-role a");
+  @step("django_admin.Admin Clicks First User")
+  async adminClicksFirstUser() {
+    await this.page.locator(".field-role a").click();
     // The role's change page
-    await currentPage().waitForURL((url) => url.pathname.endsWith("/change/"));
-  },
+    await this.page.waitForURL((url) => url.pathname.endsWith("/change/"));
+  }
 
-  "Admin Navigates To General Role Page": async () => {
+  @step("django_admin.Admin Navigates To General Role Page")
+  async adminNavigatesToGeneralRolePage() {
     // Go To waits for the page to load
-    await Browser["Go To"]("https://varaamo.test.hel.ninja/admin/tilavarauspalvelu/generalrole/");
-  },
+    await this.page.goto("/admin/tilavarauspalvelu/generalrole/");
+  }
 
-  "Admin Navigates To Unit Role Page": async () => {
+  @step("django_admin.Admin Navigates To Unit Role Page")
+  async adminNavigatesToUnitRolePage() {
     // Go To waits for the page to load
-    await Browser["Go To"]("https://varaamo.test.hel.ninja/admin/tilavarauspalvelu/unitrole/");
-  },
-});
+    await this.page.goto("/admin/tilavarauspalvelu/unitrole/");
+  }
+}

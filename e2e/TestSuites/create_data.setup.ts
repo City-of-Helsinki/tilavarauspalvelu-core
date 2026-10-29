@@ -3,8 +3,8 @@
  * project, so the test data is created once per run before any of them start.
  */
 import { testWithoutBrowser as test } from "../lib/robot";
-import { create_data } from "./Resources/create_data";
+import { Pages } from "./pages";
 
 test("Run Only Once    create_data.Create Robot Test Data", async () => {
-  await create_data["Create Robot Test Data"]();
+  await new Pages().createData.createRobotTestData();
 });

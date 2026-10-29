@@ -1,14 +1,14 @@
 /** Port of PO/User/reservation_lownav.robot */
-import { Browser } from "../../../lib/Browser";
-import { keywords } from "../../../lib/robot";
-import { custom_keywords } from "../../Resources/custom_keywords";
+import { step } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
+import { PageObject } from "../../page-object";
 
-export const reservation_lownav = keywords("reservation_lownav", {
-  "Click Submit Button Continue": async () => {
-    await Browser["Wait For Elements State"]('[data-testid="reservation__button--continue"]', "enabled");
-    await custom_keywords["Click And Wait For Page"]('[data-testid="reservation__button--continue"]');
-  },
-});
+export class ReservationLownav extends PageObject {
+  @step("reservation_lownav.Click Submit Button Continue")
+  async clickSubmitButtonContinue() {
+    // The click waits until the button is enabled
+    await this.pages.customKeywords.clickAndWaitForPage('[data-testid="reservation__button--continue"]');
+  }
+}

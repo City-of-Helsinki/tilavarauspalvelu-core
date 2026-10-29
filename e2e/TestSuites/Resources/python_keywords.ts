@@ -1,6 +1,6 @@
 /** Port of python_keywords.py. The functions keep their Python names. */
-import { BuiltIn } from "../../lib/BuiltIn";
 import { PythonDatetime } from "../../lib/DateTime";
+import { log } from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
 
 const FINNISH_DAYS = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"];
@@ -31,11 +31,11 @@ export const python_keywords = {
     name2: RobotValue = "expectedText"
   ): Promise<Difference[]> => {
     if (typeof elementsText !== "string" || typeof expectedText !== "string") {
-      await BuiltIn.Log("Both inputs must be strings.", "WARN");
+      await log("Both inputs must be strings.", { level: "WARN" });
       return [];
     }
     if (elementsText === "" && expectedText === "") {
-      await BuiltIn.Log("Both strings are empty. Nothing to compare.", "WARN");
+      await log("Both strings are empty. Nothing to compare.", { level: "WARN" });
       return [];
     }
     const differences: Difference[] = [];
@@ -56,11 +56,11 @@ export const python_keywords = {
         differences.push(difference);
         if (verbose === true || String(verbose).toLowerCase() === "true") {
           // oxlint-disable-next-line no-await-in-loop -- log lines in order
-          await BuiltIn.Log(`Difference found at position ${position}: ${JSON.stringify(difference)}`);
+          await log(`Difference found at position ${position}: ${JSON.stringify(difference)}`);
         }
       }
     }
-    await BuiltIn.Log(differences.length > 0 ? `${differences.length} differences found.` : "No differences found.");
+    await log(differences.length > 0 ? `${differences.length} differences found.` : "No differences found.");
     return differences;
   },
 

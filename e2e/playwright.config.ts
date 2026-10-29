@@ -86,8 +86,9 @@ export default defineConfig({
     {
       name: "create_data",
       testMatch: "create_data.setup.ts",
-      // create_data.Create Robot Test Data waits up to 5 minutes for the data, like its [Timeout] in Robot
-      timeout: 7 * 60_000,
+      // create_data.Create Robot Test Data waits up to 5 minutes for the data, like its [Timeout] in Robot, and then up
+      // to 2 minutes until the site answers normally
+      timeout: 10 * 60_000,
       retries: 0,
     },
     suite("Tests_user_desktop_FI"),

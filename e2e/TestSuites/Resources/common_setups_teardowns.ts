@@ -2,16 +2,15 @@
  * Unified setup and teardown keywords for all test suites
  * Simple approach: One setup does everything, one teardown cleans everything
  */
-import { Browser } from "../../lib/Browser";
-import { BuiltIn } from "../../lib/BuiltIn";
-import { V, keywords, robot, str } from "../../lib/robot";
+import { V, robot, str, step, log } from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
 import "../Resources/suite_specific_units";
 import "../Resources/variables";
 import "../Resources/serial_users";
 import "../Resources/devices";
+import { PageObject } from "../page-object";
 
-export const common_setups_teardowns = keywords("common_setups_teardowns", {
+export class CommonSetupsTeardowns extends PageObject {
   // =============================================================================
   // TAG-BASED UNIFIED TEST SETUP
   // =============================================================================
@@ -28,13 +27,14 @@ export const common_setups_teardowns = keywords("common_setups_teardowns", {
    * desktop-suite
    * smoke
    */
-  "Complete Test Setup From Tags": async () => {
+  @step("common_setups_teardowns.Complete Test Setup From Tags")
+  async completeTestSetupFromTags() {
     let test_name: RobotValue;
     test_name = robot.TEST_NAME ?? "unknown_test";
     // Port: the testData fixture (TestSuites/fixtures.ts) chose the users and units from the tags before the test
     // started; this logs them
-    await BuiltIn["Log"](`🚀 Test data for: ${str(test_name)}`);
-    await BuiltIn["Log"](`🏷️ Tags: ${str(robot.TEST_TAGS)}`);
+    await log(`🚀 Test data for: ${str(test_name)}`);
+    await log(`🏷️ Tags: ${str(robot.TEST_TAGS)}`);
     for (const name of [
       "CURRENT_USER_FULLNAME",
       "ADMIN_CURRENT_USER_FULLNAME",
@@ -42,21 +42,25 @@ export const common_setups_teardowns = keywords("common_setups_teardowns", {
       "PERMISSION_TARGET_ADMIN_FULLNAME",
     ] as const) {
       if (str(V[name] ?? "") !== "") {
-        await BuiltIn["Log"](`👤 ${name}: ${V[name]}`);
+        await log(`👤 ${name}: ${V[name]}`);
       }
     }
-  },
+  }
 
   // =============================================================================
   // TEST TEARDOWN
   // =============================================================================
   /** Complete teardown with session cleanup */
-  "Complete Test Teardown": async () => {
+  @step("common_setups_teardowns.Complete Test Teardown")
+  async completeTestTeardown() {
     // Port: Playwright takes full-page failure screenshots of the open pages when the test fails (the screenshot
     // option in playwright.config.ts), so there's no Sleep and Take Screenshot here
-    // imports: Browser
-
-    // Cleanup process (the testData fixture releases the data set)
-    await BuiltIn["Run Keyword And Ignore Error"](Browser["Close Browser"]);
-  },
-});
+    // Cleanup process (the testData fixture releases the data set). Closes the contexts and browsers the test opened
+    // itself; Playwright closes its own. An error is ignored, like Run Keyword And Ignore Error.
+    try {
+      await this.pages.session?.close();
+    } catch {
+      // ignored
+    }
+  }
+}

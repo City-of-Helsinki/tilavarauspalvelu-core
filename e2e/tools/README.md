@@ -10,6 +10,12 @@ The suite was converted from the Robot Framework suite in
 [tilavarauspalvelu-robot](https://github.com/City-of-Helsinki/tilavarauspalvelu-robot) (commit `dc72ec3`), which it
 has replaced. The tests, tags and keywords have the same names as there.
 
+- **Keywords:** each resource file is a page object class, and each keyword a method of it whose `@step` title is the
+  Robot keyword's name (`app_common.User Logs In With Suomi Fi`). The tests call the same keywords in the same
+  order. The Browser and BuiltIn library keywords are Playwright's locators, actions and `expect`, and plain
+  TypeScript: Get Text is `innerText()`, Wait For Elements State is `waitFor()` or `expect`, Run Keyword And Return
+  Status is a `try`/`catch`, and Wait Until Keyword Succeeds is `retry()` (`lib/retry.ts`) or `expect().toPass()`.
+
 - **Parallel runs:** pabot processes are Playwright workers, and PabotLib's lock server is the files under
   `.pabot-shared/`. Locks behave like pabot 5.1.0's. pabot's value sets are gone: the `testData` fixture
   (`TestSuites/fixtures.ts`) reads each test's users from `pabot_users.dat` by its data set tag, and the workers no
@@ -28,12 +34,14 @@ has replaced. The tests, tags and keywords have the same names as there.
   the replaced page's. The Robot suite has the same three issues.
 - **Browsers:** the browser and device of each suite are the project's `use` options in `playwright.config.ts`. The
   "Set Up … And Open Url" keywords open Playwright's page instead of New Browser, New Context and New Page, without
-  the Chrome arguments (`devices`). The staggered startup is the `staggeredStart` fixture (`TestSuites/fixtures.ts`):
-  the run's first test in each parallel slot waits 3 s times the slot's number.
+  the Chrome arguments (`devices`). Switch Browser and Switch Page are `session.switchTo(page)`. The staggered startup
+  is the `staggeredStart` fixture (`TestSuites/fixtures.ts`): the run's first test in each parallel slot waits 3 s
+  times the slot's number.
 - **Waiting:** Playwright waits for elements, texts and URLs (actions' auto-waiting, `expect`, `waitForURL`) instead
   of `Sleep`, checks that read the page once, and Wait Until Keyword Succeeds loops.
 - **Suite Setup** `Run Only Once    create_data.Create Robot Test Data` is the `create_data` project. It waits until
-  the new data has been saved (the always free unit has a new id) instead of sleeping 3 minutes.
+  the new data has been saved (the always free unit has a new id) instead of sleeping 3 minutes, and then until the
+  site answers normally.
 - **Settings** that were Robot variables (`--variable NAME:value`) are environment variables.
 - **Time zone:** the config sets `TZ=Europe/Helsinki`, which the Robot Docker image did.
 - **Reports:** the HTML report's keyword steps match Robot's log. Playwright takes the failure screenshots and video

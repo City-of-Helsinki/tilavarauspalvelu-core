@@ -1,108 +1,121 @@
 /** A resource file with top navigation keywords. */
-import { Browser, currentPage, loc } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, expect, keywords } from "../../../lib/robot";
-import { mybookings } from "../../PO/User/mybookings";
-import { custom_keywords } from "../../Resources/custom_keywords";
+import type { Page } from "@playwright/test";
+import { V, expect, step, log } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
+import { PageObject } from "../../page-object";
 
 /**
  * Clicks a logout button and waits until the logout is done: signOut (packages/ui) ends on the app's /auth/logout/,
  * which redirects back to the app after the session is destroyed.
  */
-async function clickAndWaitForLogout(logout_button: string): Promise<void> {
-  const page = currentPage();
+async function clickAndWaitForLogout(page: Page, logout_button: string): Promise<void> {
   const app_host = new URL(page.url()).host;
   // Waiting together, so a failed click doesn't leave the response wait unhandled
   await Promise.all([
     page.waitForResponse((response) => new URL(response.url()).pathname.endsWith("/auth/logout/"), {
       timeout: 30_000,
     }),
-    Browser["Click"](logout_button),
+    page.locator(logout_button).click(),
   ]);
   await page.waitForURL((url) => url.host === app_host && !url.pathname.endsWith("/auth/logout/"));
 }
 
-export const topnav = keywords("topnav", {
-  "Click Login": async () => {
-    await Browser["Click"]("id=login");
-  },
+export class Topnav extends PageObject {
+  @step("topnav.Click Login")
+  async clickLogin() {
+    await this.page.locator("#login").click();
+  }
 
-  "Click Login Admin Side": async () => {
-    await Browser["Wait For Elements State"]("h1", "visible");
-    await Browser["Click"](`button >> span:text-is("${V.LOGIN_TEXT_ADMIN}") >> nth=-1`);
-  },
+  @step("topnav.Click Login Admin Side")
+  async clickLoginAdminSide() {
+    await this.page.locator("h1").waitFor({ state: "visible" });
+    await this.page.locator(`button >> span:text-is("${V.LOGIN_TEXT_ADMIN}") >> nth=-1`).click();
+  }
 
-  "Click Logout": async () => {
-    await clickAndWaitForLogout('css=[aria-label="Kirjaudu ulos"]');
-  },
+  @step("topnav.Click Logout")
+  async clickLogout() {
+    await clickAndWaitForLogout(this.page, '[aria-label="Kirjaudu ulos"]');
+  }
 
-  "Click Logout Admin Side": async () => {
-    await clickAndWaitForLogout('css=[aria-label="signout"]');
-  },
+  @step("topnav.Click Logout Admin Side")
+  async clickLogoutAdminSide() {
+    await clickAndWaitForLogout(this.page, '[aria-label="signout"]');
+  }
 
-  "Click User Menu": async () => {
-    await Browser["Click"]("id=user-menu");
-  },
+  @step("topnav.Click User Menu")
+  async clickUserMenu() {
+    await this.page.locator("#user-menu").click();
+  }
 
-  "Click Close Navigation Menu": async () => {
-    await Browser["Click"]("id=Menu");
-  },
+  @step("topnav.Click Close Navigation Menu")
+  async clickCloseNavigationMenu() {
+    await this.page.locator("#Menu").click();
+  }
 
-  "Check Dropdown Menu Has User Info": async (name: string) => {
+  @step("topnav.Check Dropdown Menu Has User Info")
+  async checkDropdownMenuHasUserInfo(name: string) {
     // DEVNOTE Enable this when the profile bug no longer empties the name info
-    await BuiltIn["Log"](name);
-    await expect(loc("id=user-menu")).toHaveText(name, { useInnerText: true });
-  },
+    await log(name);
+    await expect(this.page.locator("#user-menu")).toHaveText(name, { useInnerText: true });
+  }
 
-  "Navigate To Single Booking Page": async () => {
-    await custom_keywords["Click And Wait For Page"](
+  @step("topnav.Navigate To Single Booking Page")
+  async navigateToSingleBookingPage() {
+    await this.pages.customKeywords.clickAndWaitForPage(
       `header >> [href="/search"]:text-is("${V.SINGLEBOOKING_FI}")`,
       "/search"
     );
-  },
+  }
 
-  "Navigate To My Bookings": async () => {
-    await Browser["Click"](`header >> [href="/reservations"]:text-is("${V.MYBOOKINGS_FI}")`);
+  @step("topnav.Navigate To My Bookings")
+  async navigateToMyBookings() {
+    await this.page.locator(`header >> [href="/reservations"]:text-is("${V.MYBOOKINGS_FI}")`).click();
 
     // Confirms page is loaded
-    await mybookings["Check My Bookings H1"](V.MYBOOKINGS_FI);
-    await mybookings["Wait For Upcoming Bookings To Load"]();
-  },
+    await this.pages.mybookings.checkMyBookingsH1(V.MYBOOKINGS_FI);
+    await this.pages.mybookings.waitForUpcomingBookingsToLoad();
+  }
 
-  "Navigate To Recurring Booking Page": async () => {
-    await Browser["Click"](`header >> [href="/recurring"]:text-is("${V.RECURRING_BOOKINGS_FI}")`);
-    await currentPage().waitForURL((url) => url.pathname === "/recurring");
-  },
+  @step("topnav.Navigate To Recurring Booking Page")
+  async navigateToRecurringBookingPage() {
+    await this.page.locator(`header >> [href="/recurring"]:text-is("${V.RECURRING_BOOKINGS_FI}")`).click();
+    await this.page.waitForURL((url) => url.pathname === "/recurring");
+  }
 
-  "Navigate To My Applications": async () => {
-    await Browser["Click"](`header >> [href="/applications"]:text-is("${V.MYAPPLICATIONS_FI}")`);
-    await currentPage().waitForURL((url) => url.pathname === "/applications");
-  },
+  @step("topnav.Navigate To My Applications")
+  async navigateToMyApplications() {
+    await this.page.locator(`header >> [href="/applications"]:text-is("${V.MYAPPLICATIONS_FI}")`).click();
+    await this.page.waitForURL((url) => url.pathname === "/applications");
+  }
 
   // MOBILE UI
-  "Click Navigation Menu Mobile": async () => {
+  @step("topnav.Click Navigation Menu Mobile")
+  async clickNavigationMenuMobile() {
     // The clicks in the menu wait until its animation has ended
-    await Browser["Click"]("id=Menu");
-  },
+    await this.page.locator("#Menu").click();
+  }
 
-  "Click User Menu Mobile": async () => {
-    await Browser["Click"]("id=user-menu");
-  },
+  @step("topnav.Click User Menu Mobile")
+  async clickUserMenuMobile() {
+    await this.page.locator("#user-menu").click();
+  }
 
-  "Click Login Mobile": async () => {
-    await Browser["Click"]("id=login");
-  },
+  @step("topnav.Click Login Mobile")
+  async clickLoginMobile() {
+    await this.page.locator("#login").click();
+  }
 
-  "Click Logout Mobile": async () => {
-    await clickAndWaitForLogout('css=[aria-label="Kirjaudu ulos"]');
-  },
+  @step("topnav.Click Logout Mobile")
+  async clickLogoutMobile() {
+    await clickAndWaitForLogout(this.page, '[aria-label="Kirjaudu ulos"]');
+  }
 
-  "Click Tablist Scroll Button To Right Mobile": async () => {
+  @step("topnav.Click Tablist Scroll Button To Right Mobile")
+  async clickTablistScrollButtonToRightMobile() {
     // The next click waits until the tab list has stopped sliding
-    await Browser["Click"]('[class*=Tabs-module_scrollButton__] >> [aria-label="angle-right"]');
+    await this.page.locator("[class*=Tabs-module_scrollButton__]").locator('[aria-label="angle-right"]').click();
     // Check menu has user info mobile
     // DEVNOTE - Waiting for fixes for the test environment from another team
     // this step will be enabled when the test environment is fixed
@@ -118,19 +131,21 @@ export const topnav = keywords("topnav", {
     // ${Topnav_menu_email_elements}=  Browser.Get Elements  id=hds-mobile-menu >> [data-testid="navigation-user-email"]
     // ${Topnav_menu_email_element_text}=  Get Text  ${Topnav_menu_email_elements}[1]
     // Should Be Equal  ${Topnav_menu_email_element_text}  ${Expected_email}
-  },
+  }
 
-  "Navigate To Single Booking Page Mobile": async () => {
-    await Browser["Click"]("id=Menu");
-    await custom_keywords["Click And Wait For Page"](
+  @step("topnav.Navigate To Single Booking Page Mobile")
+  async navigateToSingleBookingPageMobile() {
+    await this.page.locator("#Menu").click();
+    await this.pages.customKeywords.clickAndWaitForPage(
       `header >> [href="/search"]:text-is("${V.SINGLEBOOKING_FI}")`,
       "/search"
     );
-  },
+  }
 
-  "Navigate To My Bookings Mobile": async () => {
-    await topnav["Click Navigation Menu Mobile"]();
-    await topnav["Navigate To My Bookings"]();
-    await Browser["Wait For Elements State"]("h1", "visible");
-  },
-});
+  @step("topnav.Navigate To My Bookings Mobile")
+  async navigateToMyBookingsMobile() {
+    await this.clickNavigationMenuMobile();
+    await this.navigateToMyBookings();
+    await this.page.locator("h1").waitFor({ state: "visible" });
+  }
+}

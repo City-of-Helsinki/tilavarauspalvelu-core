@@ -1,15 +1,16 @@
 /**
- * Runtime for the Robot Framework port.
+ * The suite's runtime: keyword steps, logging, the variables and the `test` fixtures.
  *
- * Every Robot keyword keeps its exact name as a string key, e.g. `app_common["User Logs In With Suomi Fi"]()`.
- * `keywords()` wraps each one in a `test.step` titled `module.Keyword Name`, so the Playwright report shows the
- * same keyword tree as the Robot log. Robot variables keep their names as properties of `V`, typed by
- * `TestSuites/variable-types.ts`.
+ * A page object method marked with `@step("module.Keyword Name")` is a keyword: each call is a `test.step` with that
+ * title, so the Playwright report shows the tree of keywords a test ran, like the Robot log did. The variables keep
+ * their Robot names as properties of `V`, typed by `TestSuites/variable-types.ts`. The library keywords that are
+ * still in `lib/` (DateTime, String, Collections, OperatingSystem, RequestsLibrary, PabotLib) are made with
+ * `library()`.
  */
 import { existsSync } from "node:fs";
 import { test as base, errors } from "@playwright/test";
 import { readFile, writeFile } from "node:fs/promises";
-import type { BrowserContext, Page, Browser as PlaywrightBrowser, TestInfo } from "@playwright/test";
+import type { TestInfo } from "@playwright/test";
 
 // Robot Framework values are dynamically typed, and a line-by-line port keeps that.
 // oxlint-disable-next-line typescript/no-explicit-any
@@ -20,12 +21,6 @@ export type Keyword = (...args: RobotValue[]) => Promise<RobotValue>;
 type Wrapped<T extends Record<string, KeywordImplementation>> = {
   [K in keyof T]: (...args: Parameters<T[K]>) => Promise<Awaited<ReturnType<T[K]>>>;
 };
-
-/** Keywords by `module.Keyword Name`, used by `Run Keyword`. */
-export const KEYWORD_REGISTRY = new Map<
-  string,
-  { module: string; name: string; implementation: KeywordImplementation }
->();
 
 const SECRET_NAMES = ["WAF_BYPASS_SECRET", "ROBOT_API_TOKEN", "DJANGO_ADMIN_PASSWORD"];
 
@@ -62,18 +57,7 @@ export function harRecordingEnabled(): boolean {
   return process.env.ENABLE_HAR_RECORDING === "True";
 }
 
-export function isSecret(value: unknown): boolean {
-  return (
-    typeof value === "string" &&
-    value.length > 0 &&
-    SECRET_NAMES.some((name) => process.env[name] != null && process.env[name] === value)
-  );
-}
-
-/**
- * The selector of an element reference. The Browser library's references are selector strings like
- * `tbody >> a >> nth=0`; the port's are Playwright Locators, whose selector is the same string.
- */
+/** The selector of a Playwright Locator, e.g. `tbody >> a >> nth=0`, which is how a locator prints. */
 function elementSelector(value: unknown): string | undefined {
   const candidate = value as { _selector?: unknown; click?: unknown } | null;
   if (typeof candidate === "object" && candidate != null && typeof candidate.click === "function") {
@@ -196,26 +180,41 @@ async function redactingErrors<T>(body: () => T | Promise<T>): Promise<T> {
  * Runs `body` as a report step. Outside a test (e.g. while listing tests) it just runs the body.
  * Secrets are hidden in the error the step fails with, so they don't reach the report.
  */
-export function step<T>(title: string, body: () => T | Promise<T>): Promise<T> {
+export function runStep<T>(title: string, body: () => T | Promise<T>): Promise<T> {
   if (currentTestInfo == null) {
     return redactingErrors(body);
   }
   return base.step(title, () => redactingErrors(body));
 }
 
-/** Defines the keywords of one Robot resource file. The keys are the Robot keyword names. */
-export function keywords<T extends Record<string, KeywordImplementation>>(module: string, definitions: T): Wrapped<T> {
+/**
+ * Makes a page object method a keyword: each call is a report step titled with the keyword's name and arguments,
+ * e.g. `app_common.User Logs In With Suomi Fi`, so the report shows the tree of keywords a test ran. Secrets are
+ * hidden in the title and in the error the step fails with.
+ */
+export function step(name: string) {
+  return function decorate<This, Args extends RobotValue[], Return>(
+    method: (this: This, ...args: Args) => Promise<Return>,
+    _context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Promise<Return>>
+  ): (this: This, ...args: Args) => Promise<Return> {
+    return function keyword(this: This, ...args: Args): Promise<Return> {
+      return runStep(stepTitle(name, args), () => method.apply(this, args));
+    };
+  };
+}
+
+/**
+ * Defines the keywords of one Robot library that is still in `lib/`. The keys are the Robot keyword names, and each
+ * call is a step titled e.g. `DateTime.Get Current Date    result_format=%Y%m%d`.
+ */
+export function library<T extends Record<string, KeywordImplementation>>(module: string, definitions: T): Wrapped<T> {
   const wrapped: Record<string, Keyword> = {};
   for (const [name, implementation] of Object.entries(definitions)) {
     const qualified = `${module}.${name}`;
-    KEYWORD_REGISTRY.set(qualified, { module, name, implementation });
-    wrapped[name] = (...args: RobotValue[]) => step(stepTitle(qualified, args), () => implementation(...args));
+    wrapped[name] = (...args: RobotValue[]) => runStep(stepTitle(qualified, args), () => implementation(...args));
   }
   return wrapped as Wrapped<T>;
 }
-
-/** Library keywords (Browser, BuiltIn, ...) are wrapped the same way, titled e.g. `Browser.Click    id=login`. */
-export const library = keywords;
 
 /**
  * The Robot variables by name. `TestSuites/variable-types.ts` declares their names and types here (declaration
@@ -258,10 +257,6 @@ export function resetVariables(): void {
   }
 }
 
-export function clearVariableDefaults(): void {
-  defaults = {};
-}
-
 // Robot's built-in variables for the running test
 let currentTestInfo: TestInfo | null = null;
 let currentSuiteName = "";
@@ -271,10 +266,35 @@ export function logLevel(): string {
   return currentLogLevel;
 }
 
+/** Changes the log level and returns the previous one. At NONE, keyword steps leave out their arguments too. */
 export function setLogLevel(level: string): string {
   const previous = currentLogLevel;
   currentLogLevel = level.toUpperCase();
   return previous;
+}
+
+const LOG_LEVELS = ["TRACE", "DEBUG", "INFO", "HTML", "WARN", "ERROR", "NONE"];
+
+/**
+ * Logs a message as a report step titled `Log    message`, with secrets hidden. A WARN or ERROR message is also an
+ * annotation of the test, which the report shows at the top. Messages below the log level are left out.
+ */
+export async function log(
+  message: unknown,
+  options: { level?: "DEBUG" | "INFO" | "WARN" | "ERROR"; console?: boolean } = {}
+): Promise<void> {
+  const level = options.level ?? "INFO";
+  if (LOG_LEVELS.indexOf(level) < LOG_LEVELS.indexOf(currentLogLevel)) {
+    return;
+  }
+  const text = redact(formatValue(message));
+  if (level === "WARN" || level === "ERROR") {
+    testInfo().annotations.push({ type: level === "WARN" ? "warning" : "error", description: text });
+  }
+  if (options.console === true) {
+    process.stdout.write(`${text}\n`);
+  }
+  await runStep(`Log    ${text.length > 200 ? `${text.slice(0, 197)}...` : text}`, () => undefined);
 }
 
 export function testInfo(): TestInfo {
@@ -331,23 +351,6 @@ export function onTestEnd(hook: TestEndHook): void {
   testEndHooks.push(hook);
 }
 
-/** Playwright's browser, context and page of the running test. */
-export interface TestFixtures {
-  browser: PlaywrightBrowser;
-  context: BrowserContext;
-  page: Page;
-}
-
-let currentFixtures: TestFixtures | null = null;
-
-/** The running test's browser, context and page, which `openTestPage` in Browser.ts starts from. */
-export function testFixtures(): TestFixtures {
-  if (currentFixtures == null) {
-    throw new Error("This test has no page: tests that open pages use `test` from lib/robot");
-  }
-  return currentFixtures;
-}
-
 /** The Playwright `test` of tests that open no pages (create_data, selftest). Sets up Robot's per-test state. */
 export const testWithoutBrowser = base.extend<{ robotTest: undefined }>({
   robotTest: [
@@ -368,12 +371,10 @@ export const testWithoutBrowser = base.extend<{ robotTest: undefined }>({
 });
 
 /**
- * The Playwright `test` used by the ported suites. It also gives the Browser library keywords Playwright's browser,
- * context and page, which the project's `use` options in playwright.config.ts make, so traces, screenshots and video
- * work like in any Playwright test.
+ * The Playwright `test` of the suites: tests that open pages. With ENABLE_HAR_RECORDING=True, the test's context
+ * records a HAR file into the test's results folder.
  */
-export const test = testWithoutBrowser.extend<{ robotPage: undefined }>({
-  // ENABLE_HAR_RECORDING=True: the test's context records a HAR file into the test's results folder
+export const test = testWithoutBrowser.extend({
   contextOptions: [
     async ({ contextOptions }, use, info) => {
       const path = harRecordingEnabled() ? info.outputPath("context.har") : null;
@@ -384,14 +385,6 @@ export const test = testWithoutBrowser.extend<{ robotPage: undefined }>({
       }
     },
     { scope: "test" },
-  ],
-  robotPage: [
-    async ({ browser, context, page }, use) => {
-      currentFixtures = { browser, context, page };
-      await use(undefined);
-      currentFixtures = null;
-    },
-    { auto: true },
   ],
 });
 
@@ -462,20 +455,6 @@ export function isTruthy(value: RobotValue): boolean {
   if (typeof value === "string") {
     const text = value.trim().toLowerCase();
     return !["", "false", "none", "no", "off", "0"].includes(text);
-  }
-  return Boolean(value);
-}
-
-/** Python truthiness, for `$var` in an expression: "", 0, None and empty lists are false. */
-export function pyBool(value: RobotValue): boolean {
-  if (value == null) {
-    return false;
-  }
-  if (Array.isArray(value) || typeof value === "string") {
-    return value.length > 0;
-  }
-  if (typeof value === "object") {
-    return Object.keys(value).length > 0;
   }
   return Boolean(value);
 }
@@ -594,12 +573,4 @@ export function namedOnly(
     return [rest.slice(0, -1), { ...defaults, ...last.values }];
   }
   return [rest, { ...defaults }];
-}
-
-/** Joins a Robot selector that starts with an element reference: `${element} >> child`. */
-export function chain(element: RobotValue, rest: string): RobotValue {
-  if (typeof element === "string") {
-    return `${element} >> ${rest}`;
-  }
-  return element.locator(rest);
 }
