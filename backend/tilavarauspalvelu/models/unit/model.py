@@ -136,12 +136,13 @@ class Unit(models.Model):
         # When merchant changes, update reservation_units that are using
         # the merchant information from the Unit. This will update their
         # product mapping.
-        if old_values is None or old_values.payment_merchant != self.payment_merchant:
+        if old_values is None or old_values.payment_merchant_id != self.payment_merchant_id:
             from tilavarauspalvelu.tasks import refresh_reservation_unit_product_mapping_task
 
-            reservation_units = self.reservation_units.filter(payment_merchant__isnull=True).all()
-            for runit in reservation_units:
-                refresh_reservation_unit_product_mapping_task.delay(runit.pk)
+            reservation_units = self.reservation_units.filter(payment_merchant__isnull=True)
+            reservation_unit_pks = reservation_units.values_list("pk", flat=True)
+            for reservation_unit_pk in reservation_unit_pks:
+                refresh_reservation_unit_product_mapping_task.delay_on_commit(reservation_unit_pk)
 
         return result
 
