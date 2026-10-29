@@ -15,12 +15,9 @@ export const mybookings = keywords("mybookings", {
   "Check My Bookings H1": async (bookingstatus: RobotValue) => {
     await Browser["Wait For Elements State"]("h1", "visible", named({ timeout: "15s" }));
     await custom_keywords["Check Elements Text"]("h1", bookingstatus);
-
-    //
-    // Cancel
-    //
   },
 
+  // Cancel
   "User Cancel Booking": async () => {
     await Browser["Wait For Elements State"]("data-testid=reservation-detail__button--cancel", "visible");
     await custom_keywords["Click And Wait For Page"]("data-testid=reservation-detail__button--cancel");
@@ -52,28 +49,18 @@ export const mybookings = keywords("mybookings", {
       loc('[data-testid="reservation-detail__button--cancel"]'),
       "Cancel button is still present"
     ).toHaveCount(0, { timeout: 3000 });
-
-    //
-    //
-    //
-
-    //
-    // Modify booking
-    //
   },
 
+  // Modify booking
   "User Click Change Time": async () => {
     let reservations_loaded: RobotValue;
     // The free times on the edit page depend on the unit's existing reservations
     reservations_loaded = await quick_reservation["Start Waiting For Reservations Query"]();
     await Browser["Click"]("data-testid=reservation-detail__button--edit");
     await quick_reservation["Wait For Reservations Query"](reservations_loaded);
-
-    //
-    // Reservations page
-    //
   },
 
+  // Reservations page
   "Check Reservation Status": async (reservation_status: RobotValue) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__content"]', "visible");
     await custom_keywords["Check Elements Text"]('[data-testid="reservation__status"]', reservation_status);
@@ -163,12 +150,9 @@ export const mybookings = keywords("mybookings", {
       '[data-testid="reservation__reservation-info-card__accessType"]',
       access_code
     );
-
-    //
-    // Tablist
-    //
   },
 
+  // Tablist
   "Navigate To Cancelled Bookings": async () => {
     // Port: the HDS tab list slides when a tab gets focus. On mobile WebKit the slide can move the tab away between
     // mousedown and mouseup, so the click is lost and the tab is only focused, not selected. Focus first so that
@@ -208,12 +192,9 @@ export const mybookings = keywords("mybookings", {
         named({ timeout: "2s", message: "The upcoming bookings tab is not selected after the click" })
       );
     });
-
-    //
-    // Additional checks
-    //
   },
 
+  // Additional checks
   "Validate Reservations Are Not For Today Or Later": async () => {
     let today: RobotValue,
       reservations: RobotValue,
@@ -658,8 +639,6 @@ export const mybookings = keywords("mybookings", {
     // Log completion of the check for the absence of the reservation card
     await BuiltIn["Log"]("Completed validation for reservation card absence.");
 
-    //
     // MOBILE
-    //
   },
 });

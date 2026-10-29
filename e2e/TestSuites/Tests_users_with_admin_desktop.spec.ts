@@ -16,7 +16,6 @@ import "./Resources/texts_FI";
 import "./Resources/serial_users";
 import "./Resources/parallel_test_data";
 import "./Resources/devices";
-import "./Resources/har_recording";
 import "./Resources/create_data";
 import "./Resources/suite_specific_units";
 
@@ -57,7 +56,6 @@ test.describe(
         );
         await app_user["User Checks The Subvented Reservation Info Is Right And Submits"]();
         await app_user["User Checks The Subvented Reservation Info Is Right After Submitting"]();
-        //
         await topnav["Navigate To My Bookings"]();
         await app_user["User Can See Upcoming Booking In List And Clicks It"](
           V.CURRENT_ALWAYS_PAID_UNIT_SUBVENTED_WITH_LOCATION,
@@ -75,7 +73,6 @@ test.describe(
           V.TIME_OF_QUICK_RESERVATION,
           V.CURRENT_ALWAYS_PAID_UNIT_SUBVENTED_WITH_LOCATION
         );
-        //
         await app_common["User Logs Out"]();
 
         await BuiltIn["Log"]("Admin logs in and approves reservation");
@@ -88,7 +85,6 @@ test.describe(
         );
         await app_admin["Admin Checks The Info And Sets Reservation Free And Approves It"]();
         await app_admin["Admin Edits Reservation Time"]();
-        //
         await app_common["Admin Logs Out"]();
 
         await BuiltIn["Log"]("User logs in and verifies approved reservation");
@@ -137,7 +133,6 @@ test.describe(
           V.TIME_OF_QUICK_RESERVATION,
           V.CURRENT_UNIT_REQUIRES_ALWAYS_HANDLING_WITH_LOCATION
         );
-        //
         await app_common["User Logs Out"]();
 
         await BuiltIn["Log"]("Admin logs in and rejects reservation");
@@ -151,7 +146,6 @@ test.describe(
         await app_admin["Admin Checks The Info And Cancels Reservation"]();
         await app_admin["Admin Returns Reservation To Handling State From Rejected State"]();
         await app_admin["Admin Rejects Reservation And Checks The Status"]();
-        //
         await app_common["Admin Logs Out"]();
 
         await BuiltIn["Log"]("User logs in and verifies rejected reservation");
@@ -181,7 +175,6 @@ test.describe(
         await app_user["User Checks The Reservation Info Is Right Before Submit With Access Code"]();
         await reservation_lownav["Click Submit Button Continue"]();
         await app_user["User Checks The Reservation Info Is Right After Submit With Access Code"]();
-        //
         await app_common["User Logs Out"]();
 
         await BuiltIn["Log"]("Admin logs in and changes access code");
@@ -199,7 +192,6 @@ test.describe(
         await app_admin["Admin Changes Access Code"]();
         await app_admin["Admin Checks Access Code Does Not Match"](V.ACCESS_CODE);
         await app_admin["Admin Saves Access Code"]();
-        //
         await app_common["Admin Logs Out"]();
 
         await BuiltIn["Log"]("User logs in and checks access code was changed");
@@ -210,7 +202,6 @@ test.describe(
           V.CURRENT_UNIT_WITH_ACCESS_CODE_WITH_LOCATION,
           V.TIME_OF_QUICK_RESERVATION_MINUS_T
         );
-        //
         await app_user["User Checks Booking Info In Reservations With Access Code"](
           V.MYBOOKINGS_STATUS_CONFIRMED,
           V.SINGLEBOOKING_NO_PAYMENT,

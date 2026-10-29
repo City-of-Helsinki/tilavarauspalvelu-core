@@ -90,9 +90,6 @@ export const checkout = keywords("checkout", {
     V.BOOKING_NUM_ONLY = BOOKING_NUM_ONLY;
     BOOKING_NUM_ONLY = V.BOOKING_NUM_ONLY;
     await BuiltIn["Log"](BOOKING_NUM_ONLY);
-
-    //
-    //
   },
 
   "Check The Info In Checkout": async () => {
@@ -109,12 +106,6 @@ export const checkout = keywords("checkout", {
     await checkout["Click Submit"]();
     // Submitting the summary goes through the payment back to Varaamo
     await currentPage().waitForURL((url) => url.href.startsWith(str(V.URL_TEST)), { timeout: 50_000 });
-  },
-
-  "Url Should Start With": async (prefix: RobotValue) => {
-    let url: RobotValue;
-    url = await Browser["Get Url"]();
-    await BuiltIn["Should Start With"](url, prefix);
   },
 
   "Interrupted Checkout": async (input_URL: RobotValue) => {

@@ -334,12 +334,9 @@ export const quick_reservation = keywords("quick_reservation", {
     value = await Browser["Get Attribute"]("id=quick-reservation__date", "value");
     await BuiltIn["Log"](`The value of the quick reservation date is: ${str(value)}`);
     return value;
-
-    //
-    // MOBILE
-    //
   },
 
+  // MOBILE
   "Select Duration Mobile": async (duration: RobotValue) => {
     // Set to 1h
     await Browser["Click"]("id=mobile-quick-reservation-duration-toggle-button");

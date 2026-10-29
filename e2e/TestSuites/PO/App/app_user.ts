@@ -30,9 +30,7 @@ import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
 
 export const app_user = keywords("app_user", {
-  //
   // Front page
-  //
   "User Navigates To Single Booking Page": async () => {
     await topnav["Navigate To Single Booking Page"]();
   },
@@ -43,25 +41,15 @@ export const app_user = keywords("app_user", {
 
   "User Navigates To Recurring Booking Page": async () => {
     await topnav["Navigate To Recurring Booking Page"]();
-
-    //
-
-    //
-    // Payment notification banner
-    //
   },
 
+  // Payment notification banner
   "User Accepts Payment To Checkout": async () => {
     await BuiltIn["Log"]("This clicks approve button from notification banner");
     await user_landingpage["Approve Interrupted Payment"]();
-
-    //
-
-    //
-    // Checkout
-    //
   },
 
+  // Checkout
   "User Checks Info In Paid Checkout And Confirms Booking": async () => {
     await BuiltIn["Log"]("This step gets the reservation number");
     await checkout["Check The Info In Checkout"]();
@@ -70,13 +58,9 @@ export const app_user = keywords("app_user", {
   "User Interrupts Paid Checkout": async (input_URL: RobotValue) => {
     await checkout["Interrupted Checkout"](input_URL);
     await user_landingpage["Check The User Landing Page H1"](V.USER_LANDING_PAGE_H1_TEXT);
-    //
-
-    //
-    // Singlebooking
-    //
   },
 
+  // Singlebooking
   "User Uses Search To Find Right Unit": async (nameoftheunit: RobotValue) => {
     // This checks if the search element is visible; if it isn’t, it clicks the "advanced search" toggle button to make it visible.
     await singlebooking["Click Advanced Search If Search Not Visible"]();
@@ -196,14 +180,12 @@ export const app_user = keywords("app_user", {
           "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered.",
       })
     );
-    //
     await reservation_unit_reserver_info["Check Application Cannot Be Made Without Info"]();
     await reservation_unit_reserver_info["Enter First Name"](V.CURRENT_USER_FIRST_NAME);
     await reservation_unit_reserver_info["Enter Last Name"](V.CURRENT_USER_LAST_NAME);
     await reservation_unit_reserver_info["Enter Email"](V.CURRENT_USER_EMAIL);
     await reservation_unit_reserver_info["Enter Phone Number"](V.CURRENT_USER_PHONE);
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
-    //
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
@@ -219,7 +201,6 @@ export const app_user = keywords("app_user", {
           "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered.",
       })
     );
-    //
     await reservation_unit_booking_details["Type The Name Of The Booking"](V.SINGLEBOOKING_NAME);
     await reservation_unit_booking_details["Select The Purpose Of The Booking"](V.PURPOSE_OF_THE_BOOKING);
     await reservation_unit_booking_details["Select The Number Of Participants"](V.SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -231,7 +212,6 @@ export const app_user = keywords("app_user", {
     await reservation_unit_reserver_info["Enter Phone Number"](V.CURRENT_USER_PHONE);
     await reservation_unit_reserver_info["Select Home City"](V.HOME_CITY);
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
-    //
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
@@ -248,7 +228,6 @@ export const app_user = keywords("app_user", {
           "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered.",
       })
     );
-    //
     await reservation_unit_booking_details["Type The Name Of The Booking"](V.SINGLEBOOKING_NAME);
     await reservation_unit_booking_details["Select The Purpose Of The Booking"](V.PURPOSE_OF_THE_BOOKING);
     await reservation_unit_booking_details["Select The Number Of Participants"](V.SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -263,7 +242,6 @@ export const app_user = keywords("app_user", {
     await reservation_unit_reserver_info["Enter Phone Number"](V.CURRENT_USER_PHONE);
     await reservation_unit_reserver_info["Select Home City"](V.HOME_CITY);
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
-    //
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
@@ -278,7 +256,6 @@ export const app_user = keywords("app_user", {
           "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered.",
       })
     );
-    //
     await reservation_unit_booking_details["Select The Number Of Participants"](V.SINGLEBOOKING_NUMBER_OF_PERSONS);
     await reservation_unit_booking_details["Type The Description Of The Booking"](V.SINGLEBOOKING_DESCRIPTION);
     await reservation_unit_reserver_types["Select Reserver Type"](V.RESERVATION_INDIVIDUAL);
@@ -287,7 +264,6 @@ export const app_user = keywords("app_user", {
     await reservation_unit_reserver_info["Enter Email"](V.CURRENT_USER_EMAIL);
     await reservation_unit_reserver_info["Enter Phone Number"](V.CURRENT_USER_PHONE);
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
-    //
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
@@ -302,7 +278,6 @@ export const app_user = keywords("app_user", {
           "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered.",
       })
     );
-    //
     await reservation_unit_booking_details["Type The Name Of The Booking"](V.SINGLEBOOKING_NAME);
     await reservation_unit_booking_details["Select The Purpose Of The Booking"](V.PURPOSE_OF_THE_BOOKING);
     await reservation_unit_booking_details["Select The Number Of Participants"](V.SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -313,7 +288,6 @@ export const app_user = keywords("app_user", {
     await reservation_unit_reserver_info["Enter Email"](V.CURRENT_USER_EMAIL);
     await reservation_unit_reserver_info["Enter Phone Number"](V.CURRENT_USER_PHONE);
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
-    //
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
@@ -328,7 +302,6 @@ export const app_user = keywords("app_user", {
           "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered.",
       })
     );
-    //
     await reservation_unit_booking_details["Type The Name Of The Booking"](V.SINGLEBOOKING_NAME);
     await reservation_unit_booking_details["Select The Purpose Of The Booking"](V.PURPOSE_OF_THE_BOOKING);
     await reservation_unit_booking_details["Select The Number Of Participants"](V.SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -341,7 +314,6 @@ export const app_user = keywords("app_user", {
     await reservation_unit_reserver_info["Enter Phone Number"](V.CURRENT_USER_PHONE);
     await reservation_unit_reserver_info["Select Home City"](V.HOME_CITY);
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
-    //
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
@@ -388,7 +360,6 @@ export const app_user = keywords("app_user", {
     await reservation_unit_reservation_receipt["Click The Checkbox Accepted Terms"]();
     await reservation_unit_reservation_receipt["Click The Checkbox Generic Terms"]();
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
-    //
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
@@ -400,7 +371,6 @@ export const app_user = keywords("app_user", {
     await quick_reservation["Check The Price Of Quick Reservation"](
       V.SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
     );
-    //
     await reservation_lownav["Click Submit Button Continue"]();
   },
 
@@ -417,7 +387,6 @@ export const app_user = keywords("app_user", {
     await reservation_unit_reservation_receipt["Click The Checkbox Accepted Terms"]();
     await reservation_unit_reservation_receipt["Click The Checkbox Generic Terms"]();
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
-    //
     await reservation_lownav["Click Submit Button Continue"]();
     await reservation_unit_reservation_receipt["Check The Reservation Status Message"](
       V.RESERVATION_STATUS_REQUIRESHANDLING_MSG_FI
@@ -436,7 +405,6 @@ export const app_user = keywords("app_user", {
     await reservation_unit_reservation_receipt["Check Reservation User Info"]();
     await reservation_unit_reservation_receipt["Click The Checkbox Accepted Terms"]();
     await reservation_unit_reservation_receipt["Click The Checkbox Generic Terms"]();
-    //
   },
 
   "User Checks The Reservation Info Is Right After Submit": async () => {
@@ -474,7 +442,6 @@ export const app_user = keywords("app_user", {
   "User Checks The Modified Reservation Info Is Right And Clicks Continue": async () => {
     await reservation_unit_reservation_receipt["Click The Checkbox Accepted Terms"]();
     await reservation_unit_reservation_receipt["Click The Checkbox Generic Terms"]();
-    //
     await BuiltIn["Log"](V.TIME_OF_QUICK_RESERVATION_MODIFIED);
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION_MODIFIED);
     // TODO: Separate the submit and the next page check into their own keywords
@@ -495,7 +462,6 @@ export const app_user = keywords("app_user", {
     await mybookings["Click Reason For Cancellation"]();
     await mybookings["Select Reason For Cancellation"](V.REASON_FOR_CANCELLATION);
     await mybookings["Click Cancel Button"]();
-    //
     await mybookings["Check Reservation Status"](V.IN_RESERVATIONS_STATUS_CANCELED);
     await quick_reservation["Check Booking Number"](V.BOOKING_NUM_ONLY);
   },
@@ -586,12 +552,9 @@ export const app_user = keywords("app_user", {
 
   "User Navigates To Unit From Bookings List": async () => {
     await topnav["Navigate To My Bookings"]();
-
-    //
-    // Reservations
-    //
   },
 
+  // Reservations
   "User Checks The Paid Reservation Info Is Right In Reservations": async (
     booking_status: RobotValue,
     payment_status: RobotValue,
@@ -600,7 +563,6 @@ export const app_user = keywords("app_user", {
     reservation_number: RobotValue
   ) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__content"]', "visible");
-    //
     await quick_reservation["Check The Quick Reservation Time"](time_in_quickreservations);
     await quick_reservation["Check The Price Of Quick Reservation"](booking_price);
     await mybookings["Check Reservation Status"](booking_status);
@@ -621,7 +583,6 @@ export const app_user = keywords("app_user", {
     time_in_quickreservations: RobotValue
   ) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__content"]', "visible");
-    //
     await quick_reservation["Check The Quick Reservation Time"](time_in_quickreservations);
     await quick_reservation["Check Booking Number"](V.BOOKING_NUM_ONLY);
     await quick_reservation["Check The Price Of Quick Reservation"](booking_price);
@@ -643,7 +604,6 @@ export const app_user = keywords("app_user", {
     time_in_quickreservations: RobotValue
   ) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__reservation-info-card__content"]', "visible");
-    //
     await quick_reservation["Check The Quick Reservation Time"](time_in_quickreservations);
     await quick_reservation["Check Booking Number"](V.BOOKING_NUM_ONLY);
     await quick_reservation["Check The Price Of Quick Reservation"](booking_price);
@@ -663,7 +623,6 @@ export const app_user = keywords("app_user", {
     access_code: RobotValue
   ) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__content"]', "visible");
-    //
     await quick_reservation["Check The Quick Reservation Time"](time_in_quickreservations);
     await quick_reservation["Check Booking Number"](V.BOOKING_NUM_ONLY);
     await quick_reservation["Check The Price Of Quick Reservation"](booking_price);
@@ -683,7 +642,6 @@ export const app_user = keywords("app_user", {
     time_in_quickreservations: RobotValue
   ) => {
     await Browser["Wait For Elements State"]('[data-testid="reservation__content"]', "visible");
-    //
     await quick_reservation["Check The Quick Reservation Time"](time_in_quickreservations);
     await quick_reservation["Check Booking Number"](V.BOOKING_NUM_ONLY);
     await quick_reservation["Check The Price Of Quick Reservation"](booking_price);
@@ -726,13 +684,11 @@ export const app_user = keywords("app_user", {
     await quick_reservation["Check The Quick Reservation Time"](V.ADMIN_MODIFIES_TIME_OF_INFO_CARD);
     await quick_reservation["Check The Price Of Quick Reservation"](V.SINGLEBOOKING_NO_PAYMENT);
     await mybookings["Check Reservation Status"](V.MYBOOKINGS_STATUS_CONFIRMED);
-    //
     await mybookings["Check Reservation Number From H1 Text"](V.BOOKING_NUM_ONLY);
     await mybookings["Check Reservation Purpose"](V.PURPOSE_OF_THE_BOOKING);
     await mybookings["Check Number Of Participants"](V.SINGLEBOOKING_NUMBER_OF_PERSONS);
     await mybookings["Check Reservation Age Group"](V.AGEGROUP_OF_PERSONS);
     await mybookings["Check Reservation Description"](V.SINGLEBOOKING_DESCRIPTION);
-    //
     await mybookings["Check Reservation Booker First Name"](V.CURRENT_USER_FIRST_NAME);
     await mybookings["Check Reservation Booker Last Name"](V.CURRENT_USER_LAST_NAME);
     await mybookings["Check Reservation Booker Phone"](V.CURRENT_USER_PHONE);
@@ -749,22 +705,17 @@ export const app_user = keywords("app_user", {
     await quick_reservation["Check The Quick Reservation Time"](V.TIME_OF_QUICK_RESERVATION);
     await quick_reservation["Check The Price Of Quick Reservation"](V.ALWAYS_REQUESTED_UNIT_PAID_PRICE_VAT_INCL);
     await mybookings["Check Reservation Status"](V.MYBOOKINGS_STATUS_REJECTED);
-    //
     await mybookings["Check Reservation Number From H1 Text"](V.BOOKING_NUM_ONLY);
     await mybookings["Check Reservation Purpose"](V.PURPOSE_OF_THE_BOOKING);
     await mybookings["Check Number Of Participants"](V.SINGLEBOOKING_NUMBER_OF_PERSONS);
     await mybookings["Check Reservation Description"](V.SINGLEBOOKING_DESCRIPTION);
-    //
     await mybookings["Check Reservation Booker First Name"](V.CURRENT_USER_FIRST_NAME);
     await mybookings["Check Reservation Booker Last Name"](V.CURRENT_USER_LAST_NAME);
     await mybookings["Check Reservation Booker Phone"](V.CURRENT_USER_PHONE);
     await mybookings["Check Reservation Booker Email"](V.CURRENT_USER_EMAIL);
-
-    //
-    // Calendar usage
-    //
   },
 
+  // Calendar usage
   /**
    * This formats example like Ti 1.10.2024 klo 10:30–11:30
    * to DTSTART;TZID=Europe/Helsinki:20241001T103000, DTEND;TZID=Europe/Helsinki:20241001T113000
@@ -835,17 +786,11 @@ export const app_user = keywords("app_user", {
         "Additional info: Check custom_keywords.Convert booking time to ICS format if variables don't match"
       );
     }
-
-    //
-
-    //
-    // Recurring
-    //
   },
 
+  // Recurring
   "User Fills In The Application Details For Recurring Application": async () => {
     await recurring_applications["User Selects The Default Time Period For The Recurring Reservation"]();
-    //
     await recurring_applications["User Fills The Recurring Reservation Name"](V.RECURRING_BOOKING_NAME);
     await recurring_applications["User Fills The Number Of People In The Recurring Reservation"](
       V.RECURRING_BOOKING_SIZE_OF_GROUP
@@ -856,7 +801,6 @@ export const app_user = keywords("app_user", {
     await recurring_applications["User Chooses The Purpose Of The Recurring Reservation"](
       V.RECURRING_BOOKING_PURPOSE_TEXT
     );
-    //
     await recurring_applications["User Selects The Minimum Length For The Recurring Reservation"](
       V.RECURRING_BOOKING_MIN_LENGTH_TEXT
     );
@@ -866,7 +810,6 @@ export const app_user = keywords("app_user", {
     await recurring_applications["User Selects The Amount Of Reservations Per Week"](
       V.RECURRING_BOOKING_RESERVATION_PER_WEEK
     );
-    //
     await recurring_applications["User Clicks Continue Button"]();
   },
 
@@ -874,35 +817,28 @@ export const app_user = keywords("app_user", {
     await recurring_applications_page2["User Selects Type Of The Booking Request"](
       V.RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY
     );
-    //
     await recurring_applications_page2["User Clicks Available Seasonal Booking Times For"](
       V.RECURRING_BOOKING_UNIT_NAME_KESKUSTA
     );
-    //
     await recurring_applications_page2["User Selects The Times For Recurring Application"](V.RECURRING_THU_22_23_OTHER);
     await recurring_applications_page2["User Selects The Times For Recurring Application"](V.RECURRING_THU_23_24_OTHER);
-    //
     await recurring_applications_page2["User Clicks Available Seasonal Booking Times For"](
       V.RECURRING_BOOKING_UNIT_NAME_MALMI
     );
-    //
     await recurring_applications_page2["User Selects Type Of The Booking Request"](
       V.RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY
     );
-    //
     await recurring_applications_page2["User Selects The Times For Recurring Application"](
       V.RECURRING_THU_09_10_PREFERRED
     );
     await recurring_applications_page2["User Selects The Times For Recurring Application"](
       V.RECURRING_THU_10_11_PREFERRED
     );
-    //
     await recurring_applications_page2["User Clicks Continue Button"]();
   },
 
   "User Fills In The Application User Info Details": async () => {
     await recurring_applications_page3["User Selects Who Is The Application Created For"]("INDIVIDUAL");
-    //
     await recurring_applications_page3["User Types First Name"](V.RECURRING_BOOKING_FIRST_NAME);
     await recurring_applications_page3["User Types Last Name"](V.RECURRING_BOOKING_LAST_NAME);
     await recurring_applications_page3["User Types Street Address"](V.RECURRING_BOOKING_STREET_ADDRESS);
@@ -953,12 +889,9 @@ export const app_user = keywords("app_user", {
     await custom_keywords["Verify Card Not Found In Group With Matching Conditions"](
       V.EMPTY_STATE_MESSAGE_RECURRING_APPLICATIONS
     );
-
-    //
-    // MOBILE
-    //
   },
 
+  // MOBILE
   "User Navigates To Single Booking Page Mobile": async () => {
     await topnav["Navigate To Single Booking Page Mobile"]();
   },
@@ -977,12 +910,9 @@ export const app_user = keywords("app_user", {
       unitname_mybookings,
       time_of_quick_reservation_minusT
     );
-
-    //
-    // Misc
-    //
   },
 
+  // Misc
   "User Checks That Reservation Unit Picture Is Loaded": async (unit_name: RobotValue) => {
     let img_selector: RobotValue,
       src: RobotValue,

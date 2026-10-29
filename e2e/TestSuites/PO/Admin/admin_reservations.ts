@@ -255,12 +255,9 @@ export const admin_reservations = keywords("admin_reservations", {
 
   "Admin Changes Access Code": async () => {
     await Browser["Click"]('[data-testid="AccessCodeChangeRepairButton--open-dialog"]');
-
-    //
-    // Dialog window
-    //
   },
 
+  // Dialog window
   "Admin Selects Reason For Rejection": async (reason_of_rejection: RobotValue) => {
     await Browser["Click"]("id=denyReason-main-button");
     await custom_keywords["Find And Click Element With Text"]("id=denyReason-list >> li", reason_of_rejection);
@@ -338,12 +335,9 @@ export const admin_reservations = keywords("admin_reservations", {
       loc("id=info-dialog"),
       "Reservation modal did not close correctly: id=info-dialog is still visible"
     ).toBeHidden({ timeout: 15_000 });
-
-    //
-    // Reservation calendar
-    //
   },
 
+  // Reservation calendar
   /**
    * This keyword opens the reservation calendar and changes the reservation time.
    * It uses the keyword 'Admin enters reservation time and type of reservation' to set the new time.
@@ -376,9 +370,7 @@ export const admin_reservations = keywords("admin_reservations", {
     await Browser["Type Text"]("id=TimeInput.endTime-hours", V.MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION);
     await Browser["Type Text"]("id=TimeInput.endTime-minutes", "00");
     await Browser["Type Text"]("id=controlled-date-input__date", V.MODIFIED_DATE_SUBVENTED_RESERVATION);
-    //
     await expect(loc('button[type="submit"]'), " Check that the modified time is available?").toBeEnabled();
-    //
     await Browser["Focus"]('button[type="submit"]');
     await Browser["Click"]('button[type="submit"]');
     // Saving the new time closes the dialog
