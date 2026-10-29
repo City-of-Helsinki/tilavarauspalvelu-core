@@ -168,6 +168,27 @@ jobs:
           name: test_durations
           path: backend
 
+      # Restoring a dump of the migrated test database is much faster than running the migrations.
+      # The schema hash lets 'tests/plugins.py' reuse the restored database.
+      - name: "Load cached test database dump"
+        id: test-database
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            backend/.test_database.dump
+            backend/.pytest_cache/v/tilavarauspalvelu/test_database_schema_hash/main
+          key: test-database-pg17-${{ hashFiles('backend/**/model.py', 'backend/**/models.py', 'backend/**/migrations/**/*.py', 'backend/poetry.lock', '!backend/.venv/**') }}
+
+      - name: "Restore test database"
+        if: steps.test-database.outputs.cache-hit == 'true'
+        run: |
+          createdb test_tvp
+          pg_restore --no-owner --dbname test_tvp backend/.test_database.dump
+        env:
+          PGHOST: postgres
+          PGUSER: tvp
+          PGPASSWORD: tvp
+
       - name: "Run pytest with coverage"
         working-directory: backend
         run: |
@@ -175,6 +196,7 @@ jobs:
             --branch \
             -m pytest \
               --disable-warnings \
+              --reuse-db \
               --splits 8 \
               --splitting-algorithm least_duration \
               --group ${{ matrix.group }}
@@ -183,6 +205,25 @@ jobs:
           DATABASE_URL: postgis://tvp:tvp@postgres:5432/tvp
           REDIS_URL: redis://redis:6379/0
           COVERAGE_FILE: .coverage.${{ matrix.group }}
+
+      # Tests roll back their changes, so the database has only the migrated schema and data after the tests.
+      - name: "Dump test database"
+        if: steps.test-database.outputs.cache-hit != 'true'
+        run: pg_dump --format custom --file backend/.test_database.dump test_tvp
+        env:
+          PGHOST: postgres
+          PGUSER: tvp
+          PGPASSWORD: tvp
+
+      # All groups try to save the same key on a cache miss. Only the first one succeeds, the others print a warning.
+      - name: "Save test database dump to cache"
+        if: steps.test-database.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            backend/.test_database.dump
+            backend/.pytest_cache/v/tilavarauspalvelu/test_database_schema_hash/main
+          key: ${{ steps.test-database.outputs.cache-primary-key }}
 
       # Invalid characters in artifact name: " :  < > | * ? \r \n \ /
       - name: "Create artifact name"

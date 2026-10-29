@@ -11,6 +11,7 @@ FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core-base:python-3.13-slim-trixi
 # - libcurl4-openssl-dev: for building uWSGI
 # - libpcre2-dev: for uWSGI internal routing support
 # - libpq-dev: for building psycopg2
+# - postgresql-client: for saving and restoring the test database dump
 RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential \
       curl \
@@ -20,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libcurl4-openssl-dev \
       libpcre2-dev \
       libpq-dev \
+      postgresql-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
