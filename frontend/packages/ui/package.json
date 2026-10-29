@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@apollo/client": "^3.14.1",
-    "@happy-dom/jest-environment": "^21.0.3",
+    "@happy-dom/jest-environment": "^21.0.4",
     "@sentry/nextjs": "^10.76.2",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
