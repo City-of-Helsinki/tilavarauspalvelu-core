@@ -6,8 +6,8 @@ export class AdminMyUnits extends PageObject {
   @step("admin_my_units.Admin Searches Own Unit And Clicks It")
   async adminSearchesOwnUnitAndClicksIt(units_location: string) {
     await this.page.locator("#search").fill(units_location);
-    // Find And Click Element With Text waits for the search results
-    await this.pages.customKeywords.findAndClickElementWithText("td >> a", units_location);
+    // The click waits for the search results
+    await this.page.locator("td").getByRole("link", { name: units_location, exact: true }).click();
     // The unit's page opens; its content is waited for by the keywords that use it
     await this.page.waitForURL((url) => /\/my-units\/\d+/.test(url.pathname));
   }
@@ -29,12 +29,12 @@ export class AdminMyUnits extends PageObject {
 
   @step("admin_my_units.Admin Clicks Make Reservation")
   async adminClicksMakeReservation() {
-    await this.page.locator('span:has-text("Tee varaus")').click();
+    await this.page.getByRole("button", { name: "Tee varaus", exact: true }).click();
   }
 
   @step("admin_my_units.Admin Checks Make Reservation Button Is Disabled")
   async adminChecksMakeReservationButtonIsDisabled() {
-    const make_reservation = this.page.locator('button:has-text("Tee varaus")');
+    const make_reservation = this.page.getByRole("button", { name: "Tee varaus", exact: true });
 
     // Verify button is visible and disabled (the unit's page may still be loading)
     await expect(make_reservation).toBeVisible({ timeout: 15_000 });
@@ -45,9 +45,11 @@ export class AdminMyUnits extends PageObject {
 
   @step("admin_my_units.Admin Selects Unit From Reservation Units Dropdown")
   async adminSelectsUnitFromReservationUnitsDropdown(units_location: string) {
-    await this.page.locator('[aria-label*="Varausyksikkö"]').click();
-    await this.pages.customKeywords.findAndClickElementWithText("li >> span", units_location);
+    // The HDS Select's button is a combobox named by its label, and its options are named by their text
+    const select = this.page.getByRole("combobox", { name: "Varausyksikkö" });
+    await select.click();
+    await this.page.getByRole("option", { name: units_location, exact: true }).click();
     // An option picked within 200 ms of opening leaves the HDS Select list open
-    await this.pages.customKeywords.closeSelectListIfOpen('[aria-haspopup="listbox"][aria-label*="Varausyksikkö"]');
+    await this.pages.customKeywords.closeSelectListIfOpen(select);
   }
 }

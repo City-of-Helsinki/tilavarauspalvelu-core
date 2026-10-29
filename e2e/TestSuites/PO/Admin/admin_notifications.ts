@@ -1,5 +1,5 @@
 /** Port of PO/Admin/admin_notifications.robot */
-import { step } from "../../../lib/runtime";
+import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class AdminNotifications extends PageObject {
@@ -11,7 +11,7 @@ export class AdminNotifications extends PageObject {
 
   @step("admin_notifications.Admin Clicks Notification Name")
   async adminClicksNotificationName(notification_name: string) {
-    await this.pages.customKeywords.findAndClickElementWithText("tbody >> a", notification_name);
+    await this.page.locator("tbody").getByRole("link", { name: notification_name, exact: true }).click();
     // The form renders only after the notification has loaded
     await this.page.getByTestId("Notification__Page--publish-button").waitFor({ state: "visible", timeout: 15_000 });
   }
@@ -19,6 +19,9 @@ export class AdminNotifications extends PageObject {
   /** Verifies that a notification with the specified name is NOT present in the notifications list */
   @step("admin_notifications.Admin Verifies Notification Is Not Found")
   async adminVerifiesNotificationIsNotFound(notification_name: string) {
-    await this.pages.customKeywords.verifyElementWithTextIsNotFound("tbody >> a", notification_name);
+    await expect(
+      this.page.locator("tbody").getByRole("link", { name: notification_name, exact: true }),
+      `Notification "${notification_name}" was found but should not be present`
+    ).toHaveCount(0);
   }
 }

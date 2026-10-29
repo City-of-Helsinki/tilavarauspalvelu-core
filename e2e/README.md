@@ -169,9 +169,11 @@ passed tests, and `--extract DIR` writes the report's JSON files. Each failure a
 with the page's accessibility snapshot, next to its screenshot.
 
 **Backend errors:** while a test runs, `lib/backend-errors.ts` watches its page loads and API calls to the test
-environment's services (`*.test.hel.ninja`, except Sentry). It adds a "backend error" annotation to the
-attempt, with the time, for each 5xx response, failed request, GraphQL response with errors, error page of the apps
-("503: Palaamme pian!" comes with status 200) and uncaught error in a page, and, when the test fails, for each
-request that has had no answer for 5 s. The HTML report shows them at the top of the attempt, and
+environment's services (`*.test.hel.ninja`, except Sentry). It adds a "backend error" annotation to the attempt,
+with the time, for each 5xx response, failed request, request that took 10 s or more, GraphQL response with errors,
+error page of the apps ("503: Palaamme pian!" comes with status 200) and uncaught error in a page. When the test
+fails, it also adds each request that has had no answer for 5 s, and each open page that shows an error page (the
+customer app can render one in the browser). The HTML report shows them at the top of the attempt, and
 `report_summary.py` under it. They show whether a flaky test met a backend failure, and when. URLs are shown without
-their query strings, and no headers or request bodies are recorded.
+their query strings, and no headers or request bodies are recorded. Cancelled requests are left out, as are the
+access control errors that WebKit reports for fetches a navigation cancels.
