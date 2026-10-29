@@ -400,7 +400,7 @@ def append_payment_method_to_checkout_url(checkout_url: str, request: WSGIReques
 
 @require_GET
 @redirect_back_on_error
-def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:
+def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:  # noqa: PLR0915
     """Redirect user to verkkokauppa for paying pending reservations."""
     reservation: Reservation | None = Reservation.objects.filter(pk=pk).first()
     if reservation is None:
@@ -451,7 +451,12 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
 
     # The tax rate can change between the approval and the payment.
     today = local_date()
-    tax_percentage = pricing.tax_level.actions.get_percentage(on_date=today)
+    try:
+        tax_percentage = pricing.tax_level.actions.get_percentage(on_date=today)
+    except DRFValidationError as error:
+        msg = "Reservation unit pricing has no tax rate in effect today"
+        raise ValidationError(msg, code="TAX_LEVEL_HAS_NO_RATE") from error
+
     reservation.actions.update_tax_percentage(tax_percentage=tax_percentage)
 
     try:
