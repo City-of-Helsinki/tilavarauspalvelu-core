@@ -13,6 +13,7 @@ import pytest
 @pytest.hookimpl(tryfirst=True)
 def pytest_load_initial_conftests(early_config: pytest.Config, parser: pytest.Parser, args: list[str]) -> None:
     setup_now_tt()
+    keep_fold_in_freezegun_datetimes()
 
 
 def setup_now_tt():
@@ -68,6 +69,31 @@ def setup_now_tt():
     mocked_freeze_factory = patch("freezegun.api._freeze_time", MockFreezeTime)
     mocked_freeze_factory.start()
     return mocked_freeze_factory
+
+
+def keep_fold_in_freezegun_datetimes():
+    """
+    Keep the 'fold' attribute when freezegun converts a datetime to its fake datetime.
+    Without it, a time in the repeated hour of a daylight saving time change gets the wrong UTC offset.
+    """
+    from freezegun.api import FakeDatetime
+
+    def datetime_to_fakedatetime(value: datetime.datetime) -> FakeDatetime:
+        return FakeDatetime(
+            value.year,
+            value.month,
+            value.day,
+            value.hour,
+            value.minute,
+            value.second,
+            value.microsecond,
+            value.tzinfo,
+            fold=value.fold,
+        )
+
+    mocked_datetime_to_fakedatetime = patch("freezegun.api.datetime_to_fakedatetime", datetime_to_fakedatetime)
+    mocked_datetime_to_fakedatetime.start()
+    return mocked_datetime_to_fakedatetime
 
 
 @pytest.hookimpl()
