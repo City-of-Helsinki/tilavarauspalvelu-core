@@ -1,9 +1,5 @@
 /** Port of PO/User/reservation_unit_booking_details.robot */
-import { step } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import "../../Resources/variables";
-import "../../Resources/texts_FI";
-import "../../Resources/serial_users";
+import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class ReservationUnitBookingDetails extends PageObject {
@@ -37,8 +33,8 @@ export class ReservationUnitBookingDetails extends PageObject {
   }
 
   @step("reservation_unit_booking_details.Type Justification For Free Of Charge")
-  async typeJustificationForFreeOfCharge(reason: RobotValue) {
-    await this.page.locator("#reservation-form-field__freeOfChargeReason").fill(String(reason));
+  async typeJustificationForFreeOfCharge(reason: string) {
+    await this.page.locator("#reservation-form-field__freeOfChargeReason").fill(reason);
   }
 
   @step("reservation_unit_booking_details.Click And Select AgeGroup Button")

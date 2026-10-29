@@ -1,13 +1,28 @@
 /** Desktop browser tests */
-import { V, log } from "../lib/robot";
+import { log } from "../lib/runtime";
 import { test } from "./fixtures";
-import "./Resources/parallel_test_data";
-import "./Resources/devices";
-import "./Resources/variables";
-import "./Resources/serial_users";
-import "./Resources/texts_FI";
-import "./Resources/create_data";
-import "./Resources/suite_specific_units";
+import {
+  COOKIETEXT,
+  IN_RESERVATIONS_STATUS_CANCELED,
+  JUSTIFICATION_FOR_SUBVENTION,
+  MYBOOKINGS_STATUS_CONFIRMED,
+  MYBOOKINGS_STATUS_PAID_CONFIRMED,
+  MYBOOKINGS_STATUS_PROCESSED,
+  MYBOOKINGS_STATUS_REFUNDED,
+  RECURRING_BOOKING_NAME,
+  RECURRING_BOOKING_UNIT_COUNT_TEXT,
+  SINGLEBOOKING_NO_PAYMENT,
+  SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+  SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+  USER_LANDING_PAGE_H1_TEXT,
+} from "./Resources/texts_FI";
+import {
+  DOWNLOAD_ICS_FILE,
+  RECURRING_UNIT_KESKUSTA,
+  RECURRING_UNIT_MALMI,
+  UNIT_NAME_FOR_PICTURE_TEST,
+  URL_TEST,
+} from "./Resources/variables";
 
 test.describe(
   "Tests user desktop FI",
@@ -48,16 +63,16 @@ test.describe(
     test(
       "User can make free single booking and modifies it",
       { tag: ["@desktop-test-data-set-1"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, topnav }) => {
+      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, state, testData, topnav }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User navigates to reservation unit page");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_ALWAYS_FREE_UNIT);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysFreeUnit);
 
         await log("User checks that reservation unit picture is loaded");
-        await appUser.userChecksThatReservationUnitPictureIsLoaded(V.UNIT_NAME_FOR_PICTURE_TEST);
+        await appUser.userChecksThatReservationUnitPictureIsLoaded(UNIT_NAME_FOR_PICTURE_TEST);
 
         await log("User creates reservation");
         await appUser.userReservesAFreeQuickReservationSlot();
@@ -67,8 +82,8 @@ test.describe(
         await appUser.userChecksTheReservationInfoIsRightAfterSubmit();
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_ALWAYS_FREE_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.alwaysFreeUnitWithLocation,
+          state.timeOfQuickReservationMinusT
         );
 
         await log("User modifies reservation");
@@ -79,13 +94,13 @@ test.describe(
         await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
         await topnav.navigateToMyBookings();
         await appUser.userChecksCancelledBookingIsFound(
-          V.CURRENT_ALWAYS_FREE_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T_MODIFIED
+          testData.units.alwaysFreeUnitWithLocation,
+          state.timeOfQuickReservationMinusTModified
         );
         await appUser.userChecksBookingInfoInReservations(
-          V.IN_RESERVATIONS_STATUS_CANCELED,
-          V.SINGLEBOOKING_NO_PAYMENT,
-          V.TIME_OF_QUICK_RESERVATION_MODIFIED
+          IN_RESERVATIONS_STATUS_CANCELED,
+          SINGLEBOOKING_NO_PAYMENT,
+          state.timeOfQuickReservationModified
         );
       }
     );
@@ -93,16 +108,26 @@ test.describe(
     test(
       "User can create non-cancelable booking",
       { tag: ["@desktop-test-data-set-2"] },
-      async ({ appUser, commonSetupsTeardowns, login, popups, reservationLownav, topnav, userLandingpage }) => {
+      async ({
+        appUser,
+        commonSetupsTeardowns,
+        login,
+        popups,
+        reservationLownav,
+        state,
+        testData,
+        topnav,
+        userLandingpage,
+      }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
         await topnav.clickLogin();
-        await login.loginSuomiFi(V.CURRENT_USER_HETU);
-        await userLandingpage.checkTheUserLandingPageH1(V.USER_LANDING_PAGE_H1_TEXT);
-        await popups.userAcceptsCookiesIfDialogIsVisible(V.COOKIETEXT);
+        await login.loginSuomiFi(testData.user.hetu);
+        await userLandingpage.checkTheUserLandingPageH1(USER_LANDING_PAGE_H1_TEXT);
+        await popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
 
         await log("User creates reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_FREE_UNIT_NO_CANCEL);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.freeUnitNoCancel);
         await appUser.userReservesAFreeQuickReservationSlot();
         await appUser.userFillsNoncancelableBookingDetailsAsIndividualAndSubmits();
         await appUser.userChecksTheNoncancelableReservationInfoIsRightBeforeSubmit();
@@ -112,8 +137,8 @@ test.describe(
         await log("User checks reservation cannot be canceled");
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingNoncancelableBookingInListAndClicksIt(
-          V.CURRENT_FREE_UNIT_NO_CANCEL_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.freeUnitNoCancelWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksBookingInfoInReservationsForNoncancelableBooking();
       }
@@ -122,19 +147,19 @@ test.describe(
     test(
       "User can make paid single booking with interrupted checkout",
       { tag: ["@desktop-test-data-set-3"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, topnav }) => {
+      async ({ appCommon, appUser, commonSetupsTeardowns, state, testData, topnav }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_ALWAYS_PAID_UNIT);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnit);
         await appUser.userReservesAFreeQuickReservationSlot();
         await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
         await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
 
         await log("User pays the reservation");
-        await appUser.userInterruptsPaidCheckout(V.URL_TEST);
+        await appUser.userInterruptsPaidCheckout(URL_TEST);
         await appUser.userAcceptsPaymentToCheckout();
         await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking();
         await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout();
@@ -142,15 +167,15 @@ test.describe(
         await log("User checks that paid reservation is found");
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.alwaysPaidUnitWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksThePaidReservationInfoIsRightInReservations(
-          V.MYBOOKINGS_STATUS_CONFIRMED,
-          V.MYBOOKINGS_STATUS_PAID_CONFIRMED,
-          V.SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-          V.TIME_OF_QUICK_RESERVATION,
-          V.BOOKING_NUM_ONLY
+          MYBOOKINGS_STATUS_CONFIRMED,
+          MYBOOKINGS_STATUS_PAID_CONFIRMED,
+          SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+          state.timeOfQuickReservation,
+          state.bookingNumOnly
         );
 
         await log("User cancel booking");
@@ -159,8 +184,8 @@ test.describe(
         await log("User verifies cancelled booking is found");
         await topnav.navigateToMyBookings();
         await appUser.userChecksCancelledBookingIsFound(
-          V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.alwaysPaidUnitWithLocation,
+          state.timeOfQuickReservationMinusT
         );
       }
     );
@@ -168,13 +193,13 @@ test.describe(
     test(
       "User can make paid single booking",
       { tag: ["@desktop-test-data-set-4"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, mybookings, topnav }) => {
+      async ({ appCommon, appUser, commonSetupsTeardowns, mybookings, state, testData, topnav }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates paid reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_ALWAYS_PAID_UNIT);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnit);
         await appUser.userReservesAFreeQuickReservationSlot();
         await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
         await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
@@ -186,33 +211,33 @@ test.describe(
         await log("User verifies paid reservation in my bookings and paid status");
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.alwaysPaidUnitWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksThePaidReservationInfoIsRightInReservations(
-          V.MYBOOKINGS_STATUS_CONFIRMED,
-          V.MYBOOKINGS_STATUS_PAID_CONFIRMED,
-          V.SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-          V.TIME_OF_QUICK_RESERVATION,
-          V.BOOKING_NUM_ONLY
+          MYBOOKINGS_STATUS_CONFIRMED,
+          MYBOOKINGS_STATUS_PAID_CONFIRMED,
+          SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+          state.timeOfQuickReservation,
+          state.bookingNumOnly
         );
 
         await log("User cancels paid booking");
         await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
-        await mybookings.waitForPaymentStatus(V.MYBOOKINGS_STATUS_REFUNDED);
+        await mybookings.waitForPaymentStatus(MYBOOKINGS_STATUS_REFUNDED);
 
         await log("User verifies cancellation and refund status");
         await topnav.navigateToMyBookings();
         await appUser.userChecksCancelledBookingIsFound(
-          V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.alwaysPaidUnitWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksThePaidReservationInfoIsRightInReservations(
-          V.IN_RESERVATIONS_STATUS_CANCELED,
-          V.MYBOOKINGS_STATUS_REFUNDED,
-          V.SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-          V.TIME_OF_QUICK_RESERVATION,
-          V.BOOKING_NUM_ONLY
+          IN_RESERVATIONS_STATUS_CANCELED,
+          MYBOOKINGS_STATUS_REFUNDED,
+          SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+          state.timeOfQuickReservation,
+          state.bookingNumOnly
         );
       }
     );
@@ -220,27 +245,27 @@ test.describe(
     test(
       "User can make subvented single booking that requires handling",
       { tag: ["@desktop-test-data-set-5"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, topnav }) => {
+      async ({ appCommon, appUser, commonSetupsTeardowns, state, testData, topnav }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates subvented reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_ALWAYS_PAID_UNIT_SUBVENTED);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnitSubvented);
         await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(V.JUSTIFICATION_FOR_SUBVENTION);
+        await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(JUSTIFICATION_FOR_SUBVENTION);
         await appUser.userChecksThePaidReservationThatRequiresHandlingInfoIsRightAndSubmits();
 
         await log("User verifies reservation requires handling");
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_ALWAYS_PAID_UNIT_SUBVENTED_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.alwaysPaidUnitSubventedWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userChecksBookingInfoInReservationsWithAllReservationInfo(
-          V.MYBOOKINGS_STATUS_PROCESSED,
-          V.SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-          V.TIME_OF_QUICK_RESERVATION
+          MYBOOKINGS_STATUS_PROCESSED,
+          SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+          state.timeOfQuickReservation
         );
       }
     );
@@ -248,13 +273,13 @@ test.describe(
     test(
       "User checks that reserved time is not available anymore",
       { tag: ["@desktop-test-data-set-7"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav }) => {
+      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, state, testData }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_UNAVAILABLE_UNIT);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.unavailableUnit);
         await appUser.userReservesAFreeQuickReservationSlot();
         await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits();
         await appUser.userChecksTheReservationInfoIsRightBeforeSubmit();
@@ -263,8 +288,8 @@ test.describe(
 
         await log("User verifies reserved time is no longer available");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_UNAVAILABLE_UNIT);
-        await appUser.userChecksThatQuickReservationDoesNotHaveReservedTime(V.TIME_OF_QUICK_RESERVATION_FREE_SLOT);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.unavailableUnit);
+        await appUser.userChecksThatQuickReservationDoesNotHaveReservedTime(state.timeOfQuickReservationFreeSlot);
         await appUser.userChecksThatReservationCalendarDoesNotHaveReservedTimeSlotAvailable();
       }
     );
@@ -286,13 +311,13 @@ test.describe(
     test(
       "User can make free single booking and check info from downloaded calendar file",
       { tag: ["@desktop-test-data-set-9"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav }) => {
+      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, testData }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_ALWAYS_FREE_UNIT);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysFreeUnit);
         await appUser.userReservesAFreeQuickReservationSlot();
         await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits();
         await appUser.userChecksTheReservationInfoIsRightBeforeSubmit();
@@ -300,7 +325,7 @@ test.describe(
         await appUser.userChecksTheReservationInfoIsRightAfterSubmit();
 
         await log("User downloads and verifies calendar file");
-        await appUser.userSavesFileAndFormatsBookingTimeToIcs(V.DOWNLOAD_ICS_FILE);
+        await appUser.userSavesFileAndFormatsBookingTimeToIcs(DOWNLOAD_ICS_FILE);
         await appUser.userChecksThatCalendarFileMatchesBookingTime();
       }
     );
@@ -315,13 +340,13 @@ test.describe(
             "Makes a paid booking, pays it and cancels it, then verifies the reservation confirmation and cancellation\nemails of that booking.",
         },
       },
-      async ({ appCommon, appUser, commonSetupsTeardowns, mail, topnav }) => {
+      async ({ appCommon, appUser, commonSetupsTeardowns, mail, state, testData, topnav }) => {
         await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates paid reservation");
         await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(V.CURRENT_ALWAYS_PAID_UNIT);
+        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnit);
         await appUser.userReservesAFreeQuickReservationSlot();
         await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
         await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
@@ -333,16 +358,16 @@ test.describe(
         await log("User cancels paid booking");
         await topnav.navigateToMyBookings();
         await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          V.CURRENT_ALWAYS_PAID_UNIT_WITH_LOCATION,
-          V.TIME_OF_QUICK_RESERVATION_MINUS_T
+          testData.units.alwaysPaidUnitWithLocation,
+          state.timeOfQuickReservationMinusT
         );
         await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
 
         await log("Verifying reservation confirmation and cancellation emails");
         // Format reservation times for email verification
-        await mail.formatReservationTimeForEmailTextsAndReceipts(V.TIME_OF_QUICK_RESERVATION_MINUS_T);
-        await mail.verifyReservationConfirmationEmail(V.BOOKING_NUM_ONLY);
-        await mail.verifyReservationCancellationEmail(V.BOOKING_NUM_ONLY);
+        await mail.formatReservationTimeForEmailTextsAndReceipts(state.timeOfQuickReservationMinusT);
+        await mail.verifyReservationConfirmationEmail(state.bookingNumOnly);
+        await mail.verifyReservationCancellationEmail(state.bookingNumOnly);
       }
     );
 
@@ -356,10 +381,10 @@ test.describe(
         await appUser.userNavigatesToRecurringBookingPage();
 
         await log("User selects a recurring booking and units");
-        await recurring.userSelectsARecurringBookingRound(V.RECURRING_BOOKING_NAME);
-        await recurring.userSelectsTheUnitsForRecurringReservation(V.RECURRING_UNIT_MALMI);
-        await recurring.userSelectsTheUnitsForRecurringReservation(V.RECURRING_UNIT_KESKUSTA);
-        await recurring.userChecksTheCountOfSelectedUnits(V.RECURRING_BOOKING_UNIT_COUNT_TEXT);
+        await recurring.userSelectsARecurringBookingRound(RECURRING_BOOKING_NAME);
+        await recurring.userSelectsTheUnitsForRecurringReservation(RECURRING_UNIT_MALMI);
+        await recurring.userSelectsTheUnitsForRecurringReservation(RECURRING_UNIT_KESKUSTA);
+        await recurring.userChecksTheCountOfSelectedUnits(RECURRING_BOOKING_UNIT_COUNT_TEXT);
         await recurring.userClicksContinueButton();
 
         await log("User fills the reservation info for recurring reservation");

@@ -15,11 +15,18 @@ has replaced. The tests, tags and keywords have the same names as there.
   order. The Browser and BuiltIn library keywords are Playwright's locators, actions and `expect`, and plain
   TypeScript: Get Text is `innerText()`, Wait For Elements State is `waitFor()` or `expect`, Run Keyword And Return
   Status is a `try`/`catch`, and Wait Until Keyword Succeeds is `retry()` (`lib/retry.ts`) or `expect().toPass()`.
+  The String, Collections, DateTime and OperatingSystem keywords are plain TypeScript, and RequestsLibrary is
+  Playwright's API requests, or Node's `fetch` for the requests that carry a token or the session cookie.
+- **Variables:** the variable files' variables are constants, imported by name. The users and units are the
+  `testData` fixture (`TestSuites/test-data.ts`), and the values that keywords set with Set Test Variable are fields
+  of the `state` fixture (`TestSuites/state.ts`), in camelCase (`${TIME_OF_QUICK_RESERVATION_MINUS_T}` is
+  `state.timeOfQuickReservationMinusT`). The empty placeholders of runtime variables are gone. Robot's time strings
+  (`"10s"`) are milliseconds, and its `True`/`False` arguments booleans.
 
 - **Parallel runs:** pabot processes are Playwright workers, and PabotLib's lock server is the files under
-  `.pabot-shared/`. Locks behave like pabot 5.1.0's. pabot's value sets are gone: the `testData` fixture
-  (`TestSuites/fixtures.ts`) reads each test's users from `pabot_users.dat` by its data set tag, and the workers no
-  longer take turns for their first navigation.
+  `.pabot-shared/` (`lib/locks.ts`). A worker can take a lock it holds again, like with pabot 5.1.0. pabot's value
+  sets are gone: the `testData` fixture reads each test's users from `pabot_users.dat` by its data set tag, and the
+  workers no longer take turns for their first navigation.
 - **Rerun of failed tests:** `retries: 1` instead of the rerun at the end of the run. A skipped test still fails
   the run.
 - **Independent tests:** "Check emails from reservations" makes, pays and cancels a paid booking of its own and
@@ -44,5 +51,6 @@ has replaced. The tests, tags and keywords have the same names as there.
   site answers normally.
 - **Settings** that were Robot variables (`--variable NAME:value`) are environment variables.
 - **Time zone:** the config sets `TZ=Europe/Helsinki`, which the Robot Docker image did.
-- **Reports:** the HTML report's keyword steps match Robot's log. Playwright takes the failure screenshots and video
+- **Reports:** the HTML report's keyword steps match Robot's log. Locator arguments show as Playwright describes them
+  (`getByTestId('reservation__status')`), objects as JSON. Playwright takes the failure screenshots and video
   instead of `Complete Test Teardown`.

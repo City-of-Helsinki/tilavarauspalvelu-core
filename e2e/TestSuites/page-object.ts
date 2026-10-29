@@ -1,6 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
 import type { Session } from "../lib/session";
 import type { Pages } from "./pages";
+import type { TestState } from "./state";
+import type { TestData } from "./test-data";
 
 /**
  * The base of the page objects. Each page object holds the keywords of one module as methods marked with
@@ -15,6 +17,19 @@ export class PageObject {
       throw new Error("This test has no browser");
     }
     return this.pages.session;
+  }
+
+  /** The users and units that the test's tags chose (`TestSuites/test-data.ts`). */
+  protected get testData(): TestData {
+    if (this.pages.testData == null) {
+      throw new Error("This test has no test data");
+    }
+    return this.pages.testData;
+  }
+
+  /** The values that keywords have saved while the test runs (`TestSuites/state.ts`). */
+  protected get state(): TestState {
+    return this.pages.state;
   }
 
   /** The page the keywords act on: the session's current page. */

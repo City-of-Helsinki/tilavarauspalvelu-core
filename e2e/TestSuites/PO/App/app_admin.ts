@@ -1,70 +1,83 @@
 /** Port of PO/App/app_admin.robot */
-import { V, expect, str, step, log } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import "../../Resources/parallel_test_data";
-import "../../Resources/variables";
-import "../../Resources/serial_users";
-import "../../Resources/texts_FI";
-import "../../Resources/devices";
-import "../../Resources/create_data";
+import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import {
+  ADMIN_REASON_REJECTED,
+  ADMIN_STATUS_PROCESSED,
+  DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT,
+  MYBOOKINGS_STATUS_CONFIRMED,
+  MYBOOKINGS_STATUS_REJECTED,
+  NOTIFICATION_BANNER_CLEANUP_PATTERN,
+  NOTIFICATION_BANNER_MESSAGE_ERROR,
+  NOTIFICATION_BANNER_MESSAGE_NORMAL,
+  NOTIFICATION_BANNER_MESSAGE_WARNING,
+  PURPOSE_OF_THE_BOOKING,
+  RESERVATION_STATUS_DIALOG,
+  RESERVATION_TIME_NOT_FREE,
+  SINGLEBOOKING_DESCRIPTION,
+  SINGLEBOOKING_NO_PAYMENT_ADMIN_SIDE,
+  SINGLEBOOKING_NUMBER_OF_PERSONS,
+  SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP,
+  SINGLEBOOKING_SUBVENTED_PRICE_ADMIN_SIDE,
+} from "../../Resources/texts_FI";
+import { ALWAYS_PAID_UNIT_SUBVENTED_WITH_UNIT_LOCATION } from "../../Resources/variables";
 
 export class AppAdmin extends PageObject {
   @step("app_admin.Admin Checks The Info And Sets Reservation Free And Approves It")
   async adminChecksTheInfoAndSetsReservationFreeAndApprovesIt() {
-    await this.pages.adminReservations.adminChecksReservationH1(V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
-    await this.pages.adminReservations.adminChecksReservationTitleTagline(V.RESERVATION_TAGLINE);
+    await this.pages.adminReservations.adminChecksReservationH1(this.state.bookingNumOnlyBookingNameSubvented);
+    await this.pages.adminReservations.adminChecksReservationTitleTagline(this.state.reservationTagline);
     await this.pages.adminReservations.adminChecksReservationInfoBeforeHandling(
-      V.SINGLEBOOKING_SUBVENTED_PRICE_ADMIN_SIDE,
-      V.ADMIN_STATUS_PROCESSED,
-      V.PURPOSE_OF_THE_BOOKING,
-      V.SINGLEBOOKING_DESCRIPTION,
-      V.SINGLEBOOKING_NUMBER_OF_PERSONS,
-      V.SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP
+      SINGLEBOOKING_SUBVENTED_PRICE_ADMIN_SIDE,
+      ADMIN_STATUS_PROCESSED,
+      PURPOSE_OF_THE_BOOKING,
+      SINGLEBOOKING_DESCRIPTION,
+      SINGLEBOOKING_NUMBER_OF_PERSONS,
+      SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP
     );
     await this.pages.adminReservations.adminClicksButtonInReservationPage(
-      '[data-testid="approval-buttons__approve-button"]'
+      this.page.getByTestId("approval-buttons__approve-button")
     );
     // Waits for the approval dialog
     await this.pages.adminReservations.adminChecksReasonForSubventionInDialog();
     await this.pages.adminReservations.adminClicksSetReservationToFree();
     await this.pages.adminReservations.adminClicksButtonInReservationPage(
-      '[data-testid="approval-dialog__accept-button"]'
+      this.page.getByTestId("approval-dialog__accept-button")
     );
     // The checks wait until the payment status is updated
     await this.pages.adminReservations.adminChecksReservationInfoAfterHandling(
-      V.SINGLEBOOKING_NO_PAYMENT_ADMIN_SIDE,
-      V.MYBOOKINGS_STATUS_CONFIRMED,
-      V.PURPOSE_OF_THE_BOOKING,
-      V.SINGLEBOOKING_DESCRIPTION,
-      V.SINGLEBOOKING_NUMBER_OF_PERSONS,
-      V.SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP,
+      SINGLEBOOKING_NO_PAYMENT_ADMIN_SIDE,
+      MYBOOKINGS_STATUS_CONFIRMED,
+      PURPOSE_OF_THE_BOOKING,
+      SINGLEBOOKING_DESCRIPTION,
+      SINGLEBOOKING_NUMBER_OF_PERSONS,
+      SINGLEBOOKING_SUBVENTED_ADMIN_SIDE_AGE_GROUP,
       null
     );
   }
 
   @step("app_admin.Admin Checks The Info And Cancels Reservation")
   async adminChecksTheInfoAndCancelsReservation() {
-    await this.pages.adminReservations.adminChecksReservationH1(V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
-    await this.pages.adminReservations.adminChecksReservationTitleTagline(V.RESERVATION_TAGLINE);
+    await this.pages.adminReservations.adminChecksReservationH1(this.state.bookingNumOnlyBookingNameSubvented);
+    await this.pages.adminReservations.adminChecksReservationTitleTagline(this.state.reservationTagline);
     await this.pages.adminReservations.adminChecksReservationInfoBeforeHandling(
-      V.DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT,
-      V.ADMIN_STATUS_PROCESSED,
-      V.PURPOSE_OF_THE_BOOKING,
-      V.SINGLEBOOKING_DESCRIPTION,
-      V.SINGLEBOOKING_NUMBER_OF_PERSONS,
+      DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT,
+      ADMIN_STATUS_PROCESSED,
+      PURPOSE_OF_THE_BOOKING,
+      SINGLEBOOKING_DESCRIPTION,
+      SINGLEBOOKING_NUMBER_OF_PERSONS,
       null
     );
     await this.adminRejectsReservationAndChecksTheStatus();
     await this.pages.adminReservations.adminSavesReservationNumber();
     await this.pages.adminReservations.adminChecksReservationInfoAfterHandling(
-      V.DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT,
-      V.MYBOOKINGS_STATUS_REJECTED,
-      V.PURPOSE_OF_THE_BOOKING,
-      V.SINGLEBOOKING_DESCRIPTION,
-      V.SINGLEBOOKING_NUMBER_OF_PERSONS,
+      DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT,
+      MYBOOKINGS_STATUS_REJECTED,
+      PURPOSE_OF_THE_BOOKING,
+      SINGLEBOOKING_DESCRIPTION,
+      SINGLEBOOKING_NUMBER_OF_PERSONS,
       null,
-      V.ADMIN_REASON_REJECTED
+      ADMIN_REASON_REJECTED
     );
   }
 
@@ -73,40 +86,39 @@ export class AppAdmin extends PageObject {
     // When UI is scrolled down, a sticky header appears with the same selector name
     // Using nth=-1 to target the last element
     await this.pages.adminReservations.adminClicksButtonInReservationPage(
-      '[data-testid="approval-buttons__return-to-handling-button"] >> nth=-1'
+      this.page.getByTestId("approval-buttons__return-to-handling-button").last()
     );
-    await this.pages.customKeywords.findAndClickElementWithText("#info-dialog >> span", V.RESERVATION_STATUS_DIALOG);
-    await this.pages.adminReservations.adminChecksReservationStatus(V.ADMIN_STATUS_PROCESSED);
+    await this.pages.customKeywords.findAndClickElementWithText("#info-dialog >> span", RESERVATION_STATUS_DIALOG);
+    await this.pages.adminReservations.adminChecksReservationStatus(ADMIN_STATUS_PROCESSED);
   }
 
   @step("app_admin.Admin Edits Reservation Time")
   async adminEditsReservationTime() {
-    let admin_modified_formatted_date: RobotValue, admin_modified_formatted_date_minus_t: RobotValue;
     await log("Reservation needs to be approved first in order to do this step");
 
     // This sets the variables for ${MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION}, ${MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION}, ${MODIFIED_DATE_SUBVENTED_RESERVATION}, ${MODIFIED_STARTTIME_SUBVENTED_RESERVATION}
     await this.pages.adminReservations.adminOpensCalendarAndChangesReservationTime();
     await this.pages.dataModification.setInfoCardDurationTimeInfo(
-      V.MODIFIED_STARTTIME_SUBVENTED_RESERVATION,
-      V.MODIFIED_DATE_SUBVENTED_RESERVATION
+      this.state.modifiedStarttimeSubventedReservation,
+      this.state.modifiedDateSubventedReservation
     );
-    [admin_modified_formatted_date, admin_modified_formatted_date_minus_t] =
+    const [admin_modified_formatted_date, admin_modified_formatted_date_minus_t] =
       await this.pages.dataModification.setInfoCardDurationTimeInfo(
-        V.MODIFIED_STARTTIME_SUBVENTED_RESERVATION,
-        V.MODIFIED_DATE_SUBVENTED_RESERVATION
+        this.state.modifiedStarttimeSubventedReservation,
+        this.state.modifiedDateSubventedReservation
       );
 
-    V.ADMIN_MODIFIES_TIME_OF_INFO_CARD = admin_modified_formatted_date;
-    V.ADMIN_MODIFIES_TIME_OF_INFO_CARD_MINUS_T = admin_modified_formatted_date_minus_t;
+    this.state.adminModifiesTimeOfInfoCard = admin_modified_formatted_date;
+    this.state.adminModifiesTimeOfInfoCardMinusT = admin_modified_formatted_date_minus_t;
 
     // This sets ${RESERVATION_TAGLINE} back to client side.
     await this.pages.dataModification.formatsTaglineForAdminSide(
-      V.ADMIN_MODIFIES_TIME_OF_INFO_CARD,
-      V.ALWAYS_PAID_UNIT_SUBVENTED_WITH_UNIT_LOCATION
+      this.state.adminModifiesTimeOfInfoCard,
+      ALWAYS_PAID_UNIT_SUBVENTED_WITH_UNIT_LOCATION
     );
-    await this.pages.adminReservations.adminChecksReservationH1(V.BOOKING_NUM_ONLY_BOOKING_NAME_SUBVENTED);
-    await this.pages.adminReservations.adminChecksReservationTitleTagline(V.RESERVATION_TAGLINE);
-    await this.pages.adminReservations.adminChecksReservationStatus(V.MYBOOKINGS_STATUS_CONFIRMED);
+    await this.pages.adminReservations.adminChecksReservationH1(this.state.bookingNumOnlyBookingNameSubvented);
+    await this.pages.adminReservations.adminChecksReservationTitleTagline(this.state.reservationTagline);
+    await this.pages.adminReservations.adminChecksReservationStatus(MYBOOKINGS_STATUS_CONFIRMED);
   }
 
   @step("app_admin.Admin Navigates To Own Units And Selects Unit Group")
@@ -142,25 +154,27 @@ export class AppAdmin extends PageObject {
 
   /** Verifies that the access code matches the expected value (extracts numbers only). */
   @step("app_admin.Admin Checks Access Code Matches")
-  async adminChecksAccessCodeMatches(access_code: RobotValue) {
-    await this.pages.customKeywords.checkElementsText('[data-testid="reservation__info--Ovikoodi"]', access_code);
+  async adminChecksAccessCodeMatches(access_code: string) {
+    await this.pages.customKeywords.checkElementsText(
+      this.page.getByTestId("reservation__info--Ovikoodi"),
+      access_code
+    );
   }
 
   /** Verifies that the access code does NOT match the expected value (extracts numbers only). */
   @step("app_admin.Admin Checks Access Code Does Not Match")
-  async adminChecksAccessCodeDoesNotMatch(access_code: RobotValue) {
+  async adminChecksAccessCodeDoesNotMatch(access_code: string) {
     await this.pages.customKeywords.verifyElementWithTextIsNotFound(
-      '[data-testid="reservation__info--Ovikoodi"]',
+      this.page.getByTestId("reservation__info--Ovikoodi"),
       access_code
     );
   }
 
   @step("app_admin.Admin Saves Access Code")
   async adminSavesAccessCode() {
-    let access_code: RobotValue;
-    access_code = await this.page.getByTestId("reservation__info--Ovikoodi").innerText();
-    V.ACCESS_CODE_ADMINSIDE = access_code;
-    await log(V.ACCESS_CODE_ADMINSIDE);
+    const access_code = await this.page.getByTestId("reservation__info--Ovikoodi").innerText();
+    this.state.accessCodeAdminside = access_code;
+    await log(this.state.accessCodeAdminside);
 
     // Top navigation
   }
@@ -367,78 +381,75 @@ export class AppAdmin extends PageObject {
   async adminRejectsReservationAndChecksTheStatus() {
     // Click the last one to avoid strict mode violation that might happen when accordion is open
     await this.page.getByTestId("approval-buttons__reject-button").last().click();
-    await this.pages.adminReservations.adminSelectsReasonForRejection(V.ADMIN_REASON_REJECTED);
+    await this.pages.adminReservations.adminSelectsReasonForRejection(ADMIN_REASON_REJECTED);
     await this.page.getByTestId("deny-dialog__deny-button").click();
-    await this.pages.adminReservations.adminChecksReservationStatus(V.MYBOOKINGS_STATUS_REJECTED);
+    await this.pages.adminReservations.adminChecksReservationStatus(MYBOOKINGS_STATUS_REJECTED);
   }
 
   @step("app_admin.Admin Makes Reservation For Behalf And Clicks Submit")
   async adminMakesReservationForBehalfAndClicksSubmit() {
-    let date_plus_x_days: RobotValue, start_hour: RobotValue, end_hour: RobotValue;
     await log(
       "This sets variables for MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION, MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION, MODIFIED_DATE_SUBVENTED_RESERVATION and MODIFIED_STARTTIME_SUBVENTED_RESERVATION"
     );
 
     // Call the keyword and capture the returned values
-    [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
+    const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
-    V.UNAVAILABLE_RESERVATION_DATE = date_plus_x_days;
-    V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME = start_hour;
-    V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME = end_hour;
+    this.state.unavailableReservationDate = date_plus_x_days;
+    this.state.unavailableReservationHourStarttime = start_hour;
+    this.state.unavailableReservationHourEndtime = end_hour;
 
     await this.pages.adminReservations.adminEntersReservationTimeAndTypeOfReservation(
       "[for=BEHALF]",
-      V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME,
-      V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
-      V.UNAVAILABLE_RESERVATION_DATE
+      this.state.unavailableReservationHourStarttime,
+      this.state.unavailableReservationHourEndtime,
+      this.state.unavailableReservationDate
     );
     await this.pages.adminReservations.adminFillsReservationDetailsBehalf(); // this keyword generates the info for checking calendar content
     await this.pages.adminReservations.adminClicksButtonInReservationPage(
-      '[data-testid="CreateReservationModal__accept-reservation"]'
+      this.page.getByTestId("CreateReservationModal__accept-reservation")
     );
     await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
   }
 
   @step("app_admin.Admin Makes Reservation For Closed And Clicks Submit")
   async adminMakesReservationForClosedAndClicksSubmit() {
-    let date_plus_x_days: RobotValue, start_hour: RobotValue, end_hour: RobotValue;
     // Call the keyword and capture the returned values
-    [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
+    const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
-    V.UNAVAILABLE_RESERVATION_DATE = date_plus_x_days;
-    V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME = start_hour;
-    V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME = end_hour;
+    this.state.unavailableReservationDate = date_plus_x_days;
+    this.state.unavailableReservationHourStarttime = start_hour;
+    this.state.unavailableReservationHourEndtime = end_hour;
 
     await this.pages.adminReservations.adminEntersReservationTimeAndTypeOfReservation(
       "[for=BLOCKED]",
-      V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME,
-      V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
-      V.UNAVAILABLE_RESERVATION_DATE
+      this.state.unavailableReservationHourStarttime,
+      this.state.unavailableReservationHourEndtime,
+      this.state.unavailableReservationDate
     );
     await this.pages.adminReservations.adminClicksButtonInReservationPage(
-      '[data-testid="CreateReservationModal__accept-reservation"]'
+      this.page.getByTestId("CreateReservationModal__accept-reservation")
     );
     await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
   }
 
   @step("app_admin.Admin Makes Reservation For Staff And Clicks Submit")
   async adminMakesReservationForStaffAndClicksSubmit() {
-    let date_plus_x_days: RobotValue, start_hour: RobotValue, end_hour: RobotValue;
     // Call the keyword and capture the returned values
-    [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
+    const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
-    V.UNAVAILABLE_RESERVATION_DATE = date_plus_x_days;
-    V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME = start_hour;
-    V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME = end_hour;
+    this.state.unavailableReservationDate = date_plus_x_days;
+    this.state.unavailableReservationHourStarttime = start_hour;
+    this.state.unavailableReservationHourEndtime = end_hour;
 
     await this.pages.adminReservations.adminEntersReservationTimeAndTypeOfReservation(
       "[for=STAFF]",
-      V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME,
-      V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
-      V.UNAVAILABLE_RESERVATION_DATE
+      this.state.unavailableReservationHourStarttime,
+      this.state.unavailableReservationHourEndtime,
+      this.state.unavailableReservationDate
     );
     await this.pages.adminReservations.adminClicksButtonInReservationPage(
-      '[data-testid="CreateReservationModal__accept-reservation"]'
+      this.page.getByTestId("CreateReservationModal__accept-reservation")
     );
     await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
   }
@@ -447,14 +458,14 @@ export class AppAdmin extends PageObject {
   async adminAttemptsToMakeAnUnavailableReservationAndClicksCancel() {
     await this.pages.adminReservations.adminEntersReservationTimeAndTypeOfReservation(
       '[for="BEHALF"]',
-      V.UNAVAILABLE_RESERVATION_HOUR_STARTTIME,
-      V.UNAVAILABLE_RESERVATION_HOUR_ENDTIME,
-      V.UNAVAILABLE_RESERVATION_DATE
+      this.state.unavailableReservationHourStarttime,
+      this.state.unavailableReservationHourEndtime,
+      this.state.unavailableReservationDate
     );
     await this.page.getByTestId("CreateReservationModal__accept-reservation").scrollIntoViewIfNeeded();
     await this.pages.customKeywords.checkElementsText(
       '[data-testid="CreateReservationModal__collision-warning"] >> [class*="Notification-module_body__"]',
-      V.RESERVATION_TIME_NOT_FREE
+      RESERVATION_TIME_NOT_FREE
     );
     await this.page.getByTestId("CreateReservationModal__cancel-reservation").click();
     await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
@@ -463,65 +474,76 @@ export class AppAdmin extends PageObject {
   // Notifications
   @step("app_admin.Admin Creates Normal Notification For User And Admin Side")
   async adminCreatesNormalNotificationForUserAndAdminSide() {
-    let date_plus_60_days: RobotValue, randomvalue: RobotValue;
     await this.pages.adminNotifications.adminClicksCreateNotificationButton();
     await this.pages.adminNotificationsCreatePage.adminSelectsImmediateValidityPeriod();
-    date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
-    V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(V.NOTIFICATION_ACTIVE_UNTIL);
+    const date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
+    this.state.notificationActiveUntil = date_plus_60_days;
+    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(
+      this.state.notificationActiveUntil
+    );
     // if the notification name exist already we cannot publish the notification
-    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
-    V.NOTIFICATION_BANNER_MESSAGE_NAME = `${V.NOTIFICATION_BANNER_MESSAGE_NORMAL} ${str(randomvalue)}`;
-    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(V.NOTIFICATION_BANNER_MESSAGE_NAME);
-    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(V.NOTIFICATION_BANNER_MESSAGE_NORMAL);
+    let randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
+    this.state.notificationBannerMessageName = `${NOTIFICATION_BANNER_MESSAGE_NORMAL} ${randomvalue}`;
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(this.state.notificationBannerMessageName);
+    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(NOTIFICATION_BANNER_MESSAGE_NORMAL);
     await this.pages.adminNotificationsCreatePage.adminSelectsTargetGroupAll();
 
     randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
-    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_NORMAL} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
-    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
+    this.state.notificationBannerMessageTextFi = `${NOTIFICATION_BANNER_MESSAGE_NORMAL} ${NOTIFICATION_BANNER_CLEANUP_PATTERN} ${randomvalue}`;
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(
+      this.state.notificationBannerMessageTextFi
+    );
     await this.pages.adminNotificationsCreatePage.adminPublishesNotification();
   }
 
   @step("app_admin.Admin Creates Warning Notification For User And Admin Side")
   async adminCreatesWarningNotificationForUserAndAdminSide() {
-    let date_plus_60_days: RobotValue, randomvalue: RobotValue;
     await this.pages.adminNotifications.adminClicksCreateNotificationButton();
     await this.pages.adminNotificationsCreatePage.adminSelectsImmediateValidityPeriod();
-    date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
-    V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(V.NOTIFICATION_ACTIVE_UNTIL);
-    // if the notification name exist already we cannot publish the notification
-    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
-    V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING = `${V.NOTIFICATION_BANNER_MESSAGE_WARNING} ${str(randomvalue)}`;
-    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(
-      V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING
+    const date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
+    this.state.notificationActiveUntil = date_plus_60_days;
+    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(
+      this.state.notificationActiveUntil
     );
-    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(V.NOTIFICATION_BANNER_MESSAGE_WARNING);
+    // if the notification name exist already we cannot publish the notification
+    let randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
+    this.state.notificationBannerMessageNameWarning = `${NOTIFICATION_BANNER_MESSAGE_WARNING} ${randomvalue}`;
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(
+      this.state.notificationBannerMessageNameWarning
+    );
+    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(NOTIFICATION_BANNER_MESSAGE_WARNING);
     await this.pages.adminNotificationsCreatePage.adminSelectsTargetGroupAll();
     randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
-    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_WARNING} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
-    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
+    this.state.notificationBannerMessageTextFi = `${NOTIFICATION_BANNER_MESSAGE_WARNING} ${NOTIFICATION_BANNER_CLEANUP_PATTERN} ${randomvalue}`;
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(
+      this.state.notificationBannerMessageTextFi
+    );
     await this.pages.adminNotificationsCreatePage.adminPublishesNotification();
   }
 
   @step("app_admin.Admin Creates Error Notification For User And Admin Side")
   async adminCreatesErrorNotificationForUserAndAdminSide() {
-    let date_plus_60_days: RobotValue, randomvalue: RobotValue;
     await this.pages.adminNotifications.adminClicksCreateNotificationButton();
     await this.pages.adminNotificationsCreatePage.adminSelectsImmediateValidityPeriod();
-    date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
-    V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(V.NOTIFICATION_ACTIVE_UNTIL);
+    const date_plus_60_days = await this.pages.dataModification.getDatePlus60Days();
+    this.state.notificationActiveUntil = date_plus_60_days;
+    await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(
+      this.state.notificationActiveUntil
+    );
     // if the notification name exist already we cannot publish the notification
-    randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
-    V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR = `${V.NOTIFICATION_BANNER_MESSAGE_ERROR} ${str(randomvalue)}`;
-    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR);
-    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(V.NOTIFICATION_BANNER_MESSAGE_ERROR);
+    let randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
+    this.state.notificationBannerMessageNameError = `${NOTIFICATION_BANNER_MESSAGE_ERROR} ${randomvalue}`;
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(
+      this.state.notificationBannerMessageNameError
+    );
+    await this.pages.adminNotificationsCreatePage.adminSelectsTypeOfNotification(NOTIFICATION_BANNER_MESSAGE_ERROR);
     await this.pages.adminNotificationsCreatePage.adminSelectsTargetGroupAll();
 
     randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
-    V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${V.NOTIFICATION_BANNER_MESSAGE_ERROR} ${V.NOTIFICATION_BANNER_CLEANUP_PATTERN} ${str(randomvalue)}`;
-    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
+    this.state.notificationBannerMessageTextFi = `${NOTIFICATION_BANNER_MESSAGE_ERROR} ${NOTIFICATION_BANNER_CLEANUP_PATTERN} ${randomvalue}`;
+    await this.pages.adminNotificationsCreatePage.adminFillsNotificationTextFi(
+      this.state.notificationBannerMessageTextFi
+    );
     await this.pages.adminNotificationsCreatePage.adminPublishesNotification();
   }
 }
