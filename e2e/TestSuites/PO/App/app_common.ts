@@ -85,13 +85,10 @@ export const app_common = keywords("app_common", {
     await Browser["Wait For Elements State"]("id=social-suomi_fi", "visible");
   },
 
-  "Verify Notification Banner Message": async (
-    notification_banner_message: RobotValue,
-    notification_type: RobotValue
-  ) => {
-    await Browser["Wait For Elements State"](`section${str(notification_type)}`, "visible", named({ timeout: "10s" }));
+  "Verify Notification Banner Message": async (notification_banner_message: string, notification_type: string) => {
+    await Browser["Wait For Elements State"](`section${notification_type}`, "visible", named({ timeout: "10s" }));
 
-    await custom_keywords["Check Elements Text"](`section${str(notification_type)}`, notification_banner_message);
+    await custom_keywords["Check Elements Text"](`section${notification_type}`, notification_banner_message);
   },
 
   /** Fails if a notification banner is shown. Use after the banners have loaded. */
@@ -217,7 +214,7 @@ export const app_common = keywords("app_common", {
     await Browser["Wait For Load State"]("load", named({ timeout: "15s" }));
   },
 
-  "Open New Window From Admin Side To User Side And Saves Both Windows": async (url: RobotValue) => {
+  "Open New Window From Admin Side To User Side And Saves Both Windows": async (url: string) => {
     let all_pages_before: RobotValue, admin_id: RobotValue, user_handle: RobotValue;
     // Save the current page
     all_pages_before = await Browser["Get Page Ids"]();
@@ -237,7 +234,7 @@ export const app_common = keywords("app_common", {
   },
 
   /** Sets up two separate browsers: Firefox for Django admin and Chromium for app admin */
-  "Open Django Admin In Firefox And App Admin In Chromium": async (django_url: RobotValue, app_url: RobotValue) => {
+  "Open Django Admin In Firefox And App Admin In Chromium": async (django_url: string, app_url: string) => {
     let firefox_browsers: RobotValue,
       firefox_browser_id: RobotValue,
       chromium_browsers: RobotValue,

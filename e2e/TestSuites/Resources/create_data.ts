@@ -29,13 +29,13 @@ async function freeUnitPk(): Promise<number | null> {
   let response: RobotValue;
   try {
     response = await RequestsLibrary["POST"](
-      `${str(V.BASE_URL)}/graphql/`,
+      `${V.BASE_URL}/graphql/`,
       named({
         json: {
           query: "query RobotUnit($name: String) { reservationUnits(nameFi: $name) { edges { node { pk nameFi } } } }",
           variables: { name: V.ALWAYS_FREE_UNIT },
         },
-        headers: { Cookie: `csrftoken=${csrf_token}`, "X-CSRFToken": csrf_token, Referer: `${str(V.BASE_URL)}/` },
+        headers: { Cookie: `csrftoken=${csrf_token}`, "X-CSRFToken": csrf_token, Referer: `${V.BASE_URL}/` },
         expected_status: "any",
       })
     );
@@ -46,7 +46,7 @@ async function freeUnitPk(): Promise<number | null> {
     return null;
   }
   const edges: RobotValue[] = response.json()?.data?.reservationUnits?.edges ?? [];
-  return edges.find((edge) => edge.node.nameFi === str(V.ALWAYS_FREE_UNIT))?.node.pk ?? null;
+  return edges.find((edge) => edge.node.nameFi === V.ALWAYS_FREE_UNIT)?.node.pk ?? null;
 }
 
 export const create_data = keywords("create_data", {
@@ -93,7 +93,7 @@ export const create_data = keywords("create_data", {
     const old_pk = await freeUnitPk();
 
     await BuiltIn["Log"]("Creating robot test data");
-    await BuiltIn["Log"](`URL: ${str(V.BASE_URL)}${str(endpoint)}`);
+    await BuiltIn["Log"](`URL: ${V.BASE_URL}${str(endpoint)}`);
 
     // Create session
     await RequestsLibrary["Create Session"]("api", V.BASE_URL, named({ verify: true }));

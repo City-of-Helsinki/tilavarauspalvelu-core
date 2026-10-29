@@ -40,9 +40,9 @@ export const common_setups_teardowns = keywords("common_setups_teardowns", {
       "ADMIN_CURRENT_USER_FULLNAME",
       "DJANGO_ADMIN_FULLNAME",
       "PERMISSION_TARGET_ADMIN_FULLNAME",
-    ]) {
+    ] as const) {
       if (str(V[name] ?? "") !== "") {
-        await BuiltIn["Log"](`👤 ${name}: ${str(V[name])}`);
+        await BuiltIn["Log"](`👤 ${name}: ${V[name]}`);
       }
     }
   },

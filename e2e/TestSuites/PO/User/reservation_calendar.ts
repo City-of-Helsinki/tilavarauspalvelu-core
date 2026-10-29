@@ -9,10 +9,10 @@ import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
 
 export const reservation_calendar = keywords("reservation_calendar", {
-  "Select Duration Calendar": async (duration: RobotValue) => {
+  "Select Duration Calendar": async (duration: string) => {
     // Click  [data-testid="reservation__input--duration"] >> id=duration-toggle-button
     await Browser["Click"]('[data-testid="calendar-controls__duration"] >> id=calendar-controls__duration-main-button');
-    await Browser["Click"](`[role="option"] >> '${str(duration)}'`);
+    await Browser["Click"](`[role="option"] >> '${duration}'`);
     // An option picked within 200 ms of opening leaves the HDS Select list open
     await custom_keywords["Close Select List If Open"]("id=calendar-controls__duration-main-button");
   },

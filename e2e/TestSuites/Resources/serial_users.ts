@@ -4,7 +4,7 @@
  * - in tests without a data set tag, like the notification tests
  * In parallel runs, the other tests get their own users from pabot_users.dat.
  */
-import { registerVariables, str } from "../../lib/robot";
+import { registerVariables } from "../../lib/robot";
 
 export const serial_users_variables = {
   CURRENT_USER_EMAIL: "",
@@ -30,7 +30,7 @@ export const serial_users_variables = {
   BASIC_USER_MALE_LASTNAME: "AutomaatioTesteri",
   // A getter reads the variables above it in this table, like Robot resolves them
   get BASIC_USER_MALE_FULLNAME() {
-    return `${str(this.BASIC_USER_MALE_FIRSTNAME)} ${str(this.BASIC_USER_MALE_LASTNAME)}`;
+    return `${this.BASIC_USER_MALE_FIRSTNAME} ${this.BASIC_USER_MALE_LASTNAME}`;
   },
   BASIC_USER_MALE_PASSWORD: "AutomaatioTesteri",
   BASIC_ADMIN_MALE_EMAIL: "qfaksi+tirehtoori@gmail.com",
@@ -38,7 +38,7 @@ export const serial_users_variables = {
   BASIC_ADMIN_MALE_FIRSTNAME: "Tirehtoori",
   BASIC_ADMIN_MALE_LASTNAME: "Tötterstrom",
   get BASIC_ADMIN_MALE_FULLNAME() {
-    return `${str(this.BASIC_ADMIN_MALE_FIRSTNAME)} ${str(this.BASIC_ADMIN_MALE_LASTNAME)}`;
+    return `${this.BASIC_ADMIN_MALE_FIRSTNAME} ${this.BASIC_ADMIN_MALE_LASTNAME}`;
   },
   BASIC_ADMIN_MALE_PASSWORD: "Tötterstrom",
   BASIC_DJANGO_ADMIN_EMAIL: "qfaksi+kari@gmail.com",
@@ -46,7 +46,7 @@ export const serial_users_variables = {
   BASIC_DJANGO_ADMIN_FIRSTNAME: "Kari",
   BASIC_DJANGO_ADMIN_LASTNAME: "Kekkonen",
   get BASIC_DJANGO_ADMIN_FULLNAME() {
-    return `${str(this.BASIC_DJANGO_ADMIN_FIRSTNAME)} ${str(this.BASIC_DJANGO_ADMIN_LASTNAME)}`;
+    return `${this.BASIC_DJANGO_ADMIN_FIRSTNAME} ${this.BASIC_DJANGO_ADMIN_LASTNAME}`;
   },
   BASIC_DJANGO_ADMIN_PASSWORD: "Kekkonen",
   BASIC_DJANGO_ADMIN_DJANGO_USERNAME: "u-synoynteknhu5f4oky5komlxz4",
@@ -56,7 +56,7 @@ export const serial_users_variables = {
   BASIC_PERMISSION_TARGET_ADMIN_FIRSTNAME: "Marika",
   BASIC_PERMISSION_TARGET_ADMIN_LASTNAME: "Salminen",
   get BASIC_PERMISSION_TARGET_ADMIN_FULLNAME() {
-    return `${str(this.BASIC_PERMISSION_TARGET_ADMIN_FIRSTNAME)} ${str(this.BASIC_PERMISSION_TARGET_ADMIN_LASTNAME)}`;
+    return `${this.BASIC_PERMISSION_TARGET_ADMIN_FIRSTNAME} ${this.BASIC_PERMISSION_TARGET_ADMIN_LASTNAME}`;
   },
   USERMAIL_EMAIL: "qfaksi@gmail.com",
 };

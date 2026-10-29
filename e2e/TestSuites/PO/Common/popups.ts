@@ -10,19 +10,19 @@ export const popups = keywords("popups", {
    * If the dialog with role="dialog" is visible, clicks the button.
    * Otherwise, continues the test without failing.
    */
-  "User Accepts Cookies If Dialog Is Visible": async (cookie_text: RobotValue) => {
+  "User Accepts Cookies If Dialog Is Visible": async (cookie_text: string) => {
     let dialog_visible: RobotValue;
     dialog_visible = await BuiltIn["Run Keyword And Return Status"](
       Browser["Wait For Elements State"],
-      `button:has-text("${str(cookie_text)}")`,
+      `button:has-text("${cookie_text}")`,
       "stable",
       named({ timeout: "10s" })
     );
 
     if (isTruthy(dialog_visible)) {
-      await BuiltIn["Log"](`Dialog is visible. Checking for the button with text "${str(cookie_text)}".`);
-      await Browser["Click"](`.hds-cc__buttons >> button:has-text("${str(cookie_text)}")`);
-      await BuiltIn["Log"](`Clicked the "${str(cookie_text)}" button.`);
+      await BuiltIn["Log"](`Dialog is visible. Checking for the button with text "${cookie_text}".`);
+      await Browser["Click"](`.hds-cc__buttons >> button:has-text("${cookie_text}")`);
+      await BuiltIn["Log"](`Clicked the "${cookie_text}" button.`);
       await Browser["Wait For Elements State"](".hds-cc__buttons", "hidden", named({ timeout: "5s" }));
     } else {
       await BuiltIn["Log"]("Dialog is not visible. Continuing the test.");

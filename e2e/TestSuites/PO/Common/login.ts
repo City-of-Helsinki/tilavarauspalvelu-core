@@ -1,7 +1,7 @@
 /** Port of PO/Common/login.robot */
 import { Browser } from "../../../lib/Browser";
 import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, keywords, named, str } from "../../../lib/robot";
+import { V, keywords, named } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
 import { custom_keywords } from "../../Resources/custom_keywords";
 import "../../Resources/serial_users";
@@ -10,7 +10,7 @@ import "../../Resources/parallel_test_data";
 import "../../Resources/texts_FI";
 
 export const login = keywords("login", {
-  "Login Suomi Fi": async (input_hetu: RobotValue) => {
+  "Login Suomi Fi": async (input_hetu: string) => {
     // Wait for Suomi.fi login button
     await Browser["Wait For Elements State"]("id=social-suomi_fi", "visible", named({ timeout: "10s" }));
 
@@ -46,9 +46,9 @@ export const login = keywords("login", {
   },
 
   /** The input_password argument is kept for backward compatibility but is not used */
-  "Login Django Admin": async (input_username: RobotValue, input_password: RobotValue = "") => {
+  "Login Django Admin": async (input_username: string, input_password: string = "") => {
     let typed_username: RobotValue, original_log_level: RobotValue, typed_password: RobotValue;
-    if (str(input_password) !== "") {
+    if (input_password !== "") {
       await BuiltIn["Log"](
         "Login Django Admin: input_password argument is ignored (using DJANGO_ADMIN_PASSWORD)",
         named({ level: "DEBUG" })
@@ -79,7 +79,7 @@ export const login = keywords("login", {
     );
   },
 
-  "Login Suomi Fi Mobile": async (input_hetu: RobotValue) => {
+  "Login Suomi Fi Mobile": async (input_hetu: string) => {
     // Wait for Suomi.fi login button
     await Browser["Wait For Elements State"]("id=social-suomi_fi", "visible", named({ timeout: "15s" }));
 
