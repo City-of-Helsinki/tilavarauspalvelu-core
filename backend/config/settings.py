@@ -1028,6 +1028,9 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     DOWNLOAD_IMAGES_FOR_TEST_DATA = False
     # Turn off statistics saving during tests for performance reasons
     SAVE_RESERVATION_STATISTICS = False
+    # Turn off space tree rebuilds from signals during tests. Each rebuild reads all spaces.
+    # The tests in 'tests/test_models/test_space.py' turn it on to test the rebuild.
+    REBUILD_SPACE_HIERARCHY = False
     # Always re-raise silenced Sentry errors during testing for better debugging
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
     # Enable feature flag for testing
