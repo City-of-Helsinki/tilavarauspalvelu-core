@@ -168,6 +168,10 @@ class GenericDjangoModelFactory[TModel: Model](DjangoModelFactory):
     as well as some convenience methods for creating custom builder-methods.
     """
 
+    class Meta:
+        # Post-generation hooks that change the instance must save it themselves.
+        skip_postgeneration_save = True
+
     @classmethod
     def build(cls, **kwargs: Any) -> TModel:
         return super().build(**kwargs)

@@ -132,6 +132,7 @@ class UserSocialAuthFactory(GenericDjangoModelFactory[UserSocialAuth]):
         if not create:
             return
         self.extra_data = extra_data or get_extra_data(self, **kwargs)
+        self.save(update_fields=["extra_data"])
 
 
 class ADGroupFactory(GenericDjangoModelFactory[ADGroup]):
