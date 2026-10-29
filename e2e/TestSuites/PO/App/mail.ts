@@ -1,19 +1,19 @@
 /** Port of PO/App/mail.robot */
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, expect, keywords, str } from "../../../lib/robot";
+import { V, expect, str, step, log } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
-import { data_modification } from "../../Resources/data_modification";
-import { robot_email_test_tool } from "../../Resources/robot_email_test_tool";
+import { PageObject } from "../../page-object";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
 import "../../Resources/parallel_test_data";
+import { robot_email_test_tool } from "../../Resources/robot_email_test_tool";
 
-export const mail = keywords("mail", {
+export class Mail extends PageObject {
   /** Verify confirmation email contains all required terms */
-  "Verify Reservation Confirmation Email": async (reservation_number: RobotValue) => {
+  @step("mail.Verify Reservation Confirmation Email")
+  async verifyReservationConfirmationEmail(reservation_number: RobotValue) {
     let expected_terms: RobotValue;
-    await BuiltIn["Log"](`Verifying confirmation email for reservation: ${str(reservation_number)}`);
+    await log(`Verifying confirmation email for reservation: ${str(reservation_number)}`);
 
     // Build list of expected terms
     expected_terms = [
@@ -29,12 +29,13 @@ export const mail = keywords("mail", {
       const result = await robot_email_test_tool.verify_reservation_email(reservation_number, expected_terms, false); // No attachment expected
       expect(result, "Some required terms are missing in confirmation email").toBe(true);
     }).toPass({ intervals: [5000], timeout: 120_000 });
-  },
+  }
 
   /** Verify cancellation email contains all required terms */
-  "Verify Reservation Cancellation Email": async (reservation_number: RobotValue) => {
+  @step("mail.Verify Reservation Cancellation Email")
+  async verifyReservationCancellationEmail(reservation_number: RobotValue) {
     let expected_terms: RobotValue;
-    await BuiltIn["Log"](`Verifying cancellation email for reservation: ${str(reservation_number)}`);
+    await log(`Verifying cancellation email for reservation: ${str(reservation_number)}`);
 
     expected_terms = [
       V.ALWAYS_PAID_UNIT,
@@ -49,12 +50,13 @@ export const mail = keywords("mail", {
       const result = await robot_email_test_tool.verify_reservation_email(reservation_number, expected_terms, false); // No attachment expected
       expect(result, "Some required terms are missing in cancellation email").toBe(true);
     }).toPass({ intervals: [5000], timeout: 120_000 });
-  },
+  }
 
   /** Format reservation times for email verification */
-  "Format Reservation Time For Email Texts And Receipts": async (time_of_reservation: RobotValue) => {
+  @step("mail.Format Reservation Time For Email Texts And Receipts")
+  async formatReservationTimeForEmailTextsAndReceipts(time_of_reservation: RobotValue) {
     // This sets "Alkamisaika: 1.11.2024 klo 11:00" and "Päättymisaika: 1.11.2024 klo 12:00"
-    await BuiltIn["Log"]('this formats variables "FORMATTED_STARTTIME" and "FORMATTED_ENDTIME"');
-    await data_modification["Formats Reservation Time To Start And End Time"](time_of_reservation);
-  },
-});
+    await log('this formats variables "FORMATTED_STARTTIME" and "FORMATTED_ENDTIME"');
+    await this.pages.dataModification.formatsReservationTimeToStartAndEndTime(time_of_reservation);
+  }
+}

@@ -1,14 +1,28 @@
+import { randomBytes } from "node:crypto";
 /**
  * Create robot test data for Harakka via API endpoint.
  * This is used for creating the necessary test data for test execution.
  */
-import { randomBytes } from "node:crypto";
-import { BuiltIn } from "../../lib/BuiltIn";
+import { request } from "@playwright/test";
+import { setTimeout } from "node:timers/promises";
+import type { APIRequestContext } from "@playwright/test";
 import { RequestsLibrary } from "../../lib/RequestsLibrary";
-import { V, expect, keywords, named, registerVariables, str } from "../../lib/robot";
+import {
+  V,
+  errorMessage,
+  expect,
+  log,
+  named,
+  registerVariables,
+  runStep,
+  setLogLevel,
+  step,
+  str,
+} from "../../lib/robot";
 import type { RobotValue } from "../../lib/robot";
 import "../Resources/env_loader";
 import "../Resources/variables";
+import { PageObject } from "../page-object";
 
 export const create_data_variables = {
   BASE_URL: "https://varaamo.test.hel.ninja",
@@ -49,24 +63,80 @@ async function freeUnitPk(): Promise<number | null> {
   return edges.find((edge) => edge.node.nameFi === V.ALWAYS_FREE_UNIT)?.node.pk ?? null;
 }
 
-export const create_data = keywords("create_data", {
+/**
+ * Whether the site answers normally: the customer landing page renders (it isn't the error page that the customer app
+ * shows when its server side rendering fails), and GraphQL answers the unit query. Logs what failed.
+ */
+async function siteAnswers(api: APIRequestContext): Promise<boolean> {
+  try {
+    // The landing page goes through the app's /csrf/ redirect, which needs the cookie that the API context keeps
+    const landing = await api.get("/", { failOnStatusCode: false, timeout: 30_000 });
+    if (landing.status() !== 200) {
+      await log(`The landing page answered ${landing.status()}`);
+      return false;
+    }
+    if (/data-testid="error__[^"]*--title"/.test(await landing.text())) {
+      await log("The landing page is the error page");
+      return false;
+    }
+  } catch (err) {
+    await log(`The landing page didn't answer: ${errorMessage(err)}`);
+    return false;
+  }
+  if ((await freeUnitPk()) == null) {
+    await log("GraphQL didn't answer the unit query");
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Waits until the site has answered normally three times in a row, 5 s apart, for at most 2 minutes. Right after the
+ * test data has been saved, the backend can still fail for a while (a 502, the customer app's error page), and the
+ * first tests failed on that. After 2 minutes the tests start anyway, with a warning.
+ */
+async function waitUntilTheSiteAnswers(): Promise<void> {
+  await runStep("Wait until the site answers normally", async () => {
+    // These requests need no secret headers, so none are sent
+    const api = await request.newContext({ baseURL: V.BASE_URL });
+    let answers_in_a_row = 0;
+    try {
+      await expect
+        .poll(
+          async () => {
+            answers_in_a_row = (await siteAnswers(api)) ? answers_in_a_row + 1 : 0;
+            return answers_in_a_row;
+          },
+          { intervals: [5000], timeout: 120_000 }
+        )
+        .toBeGreaterThanOrEqual(3);
+      await log("The site answers normally");
+    } catch {
+      await log("The site didn't answer normally 3 times in a row in 2 minutes, continuing", { level: "WARN" });
+    } finally {
+      await api.dispose();
+    }
+  });
+}
+
+export class CreateData extends PageObject {
   /**
    * Calls the endpoint to Create robot test data.
    * Backend returns 204 immediately and processes data asynchronously.
-   * Waits until the new data has been saved.
+   * Waits until the new data has been saved, and then until the site answers normally.
    */
-  "Create Robot Test Data": async () => {
+  @step("create_data.Create Robot Test Data")
+  async createRobotTestData() {
     let original_log_level: RobotValue,
       token: RobotValue,
       headers: RobotValue,
       endpoint: RobotValue,
       current_log_level: RobotValue,
-      status: RobotValue,
       response: RobotValue,
       body: RobotValue;
     // [Timeout]    5 minutes
     // Temporarily suppress logging
-    original_log_level = await BuiltIn["Set Log Level"]("NONE");
+    original_log_level = setLogLevel("NONE");
 
     // Retrieve token from Robot Framework variables (loaded by env_loader.py)
     // Priority: $TOKEN (if defined) > $ROBOT_API_TOKEN from env_loader.py > empty
@@ -77,10 +147,10 @@ export const create_data = keywords("create_data", {
     headers = { Authorization: token, "Content-Type": "application/json", "X-Robot-API-Secret": token };
 
     // Restore original log level after all sensitive operations
-    await BuiltIn["Set Log Level"](original_log_level);
+    setLogLevel(original_log_level);
 
     if (str(token) === "") {
-      await BuiltIn["Fail"]("ROBOT_API_TOKEN not provided in TOKEN variable nor .env file");
+      throw new Error("ROBOT_API_TOKEN not provided in TOKEN variable nor .env file");
     }
 
     // Get endpoint from Robot Framework variables or use default
@@ -92,40 +162,40 @@ export const create_data = keywords("create_data", {
     // Port: read before the call, see the wait below
     const old_pk = await freeUnitPk();
 
-    await BuiltIn["Log"]("Creating robot test data");
-    await BuiltIn["Log"](`URL: ${V.BASE_URL}${str(endpoint)}`);
+    await log("Creating robot test data");
+    await log(`URL: ${V.BASE_URL}${str(endpoint)}`);
 
     // Create session
     await RequestsLibrary["Create Session"]("api", V.BASE_URL, named({ verify: true }));
 
     // Suppress logging during POST request to avoid logging sensitive headers
-    current_log_level = await BuiltIn["Set Log Level"]("WARN");
-    [status, response] = await BuiltIn["Run Keyword And Ignore Error"](
-      RequestsLibrary["POST On Session"],
-      "api",
-      endpoint,
-      named({ headers: headers, json: {}, expected_status: "any" })
-    );
-    await BuiltIn["Set Log Level"](current_log_level);
-
-    // Check if request was successful
-    if (str(status) !== "PASS") {
-      await BuiltIn["Fail"](`Request failed: ${str(response)}`);
+    current_log_level = setLogLevel("WARN");
+    try {
+      response = await RequestsLibrary["POST On Session"](
+        "api",
+        endpoint,
+        named({ headers: headers, json: {}, expected_status: "any" })
+      );
+    } catch (err) {
+      // Check if request was successful
+      throw new Error(`Request failed: ${errorMessage(err)}`, { cause: err });
+    } finally {
+      setLogLevel(current_log_level);
     }
 
-    await BuiltIn["Log"](`Response status: ${str(response.status_code)}`);
+    await log(`Response status: ${str(response.status_code)}`);
 
     // Handle response
     if (Number(response.status_code) === 204) {
-      await BuiltIn["Log"]("SUCCESS: Robot test data creation request accepted (204 No Content)");
+      await log("SUCCESS: Robot test data creation request accepted (204 No Content)");
       if (old_pk == null) {
-        await BuiltIn["Log"]("Waiting 3 minutes for backend to complete data creation...", "WARN");
-        await BuiltIn["Sleep"]("180s"); // 3 minutes for backend processing
+        await log("Waiting 3 minutes for backend to complete data creation...", { level: "WARN" });
+        await setTimeout(180_000); // 3 minutes for backend processing
       } else {
         // Port: waits until the new data has been saved instead of 3 minutes. The backend creates it in one
         // transaction that ends by refreshing the reservation units' availability views, and until it commits, pages
         // that need them hang or fail (502, the "503: Palaamme pian!" page). It can take longer than 3 minutes.
-        await BuiltIn["Log"]("Waiting for backend to complete data creation...");
+        await log("Waiting for backend to complete data creation...");
         try {
           await expect
             .poll(
@@ -137,19 +207,20 @@ export const create_data = keywords("create_data", {
             )
             .toBe(true);
         } catch {
-          await BuiltIn["Log"]("The new test data wasn't seen in 5 minutes, continuing", "WARN");
+          await log("The new test data wasn't seen in 5 minutes, continuing", { level: "WARN" });
         }
       }
-      await BuiltIn["Log"]("Backend processing wait completed");
+      await log("Backend processing wait completed");
+      await waitUntilTheSiteAnswers();
       return;
     } else if (Number(response.status_code) === 400) {
       body = response.json();
       if (str(body).includes("ReservationUnitType matching query does not exist")) {
-        await BuiltIn["Fail"]("PREREQUISITE DATA MISSING: Required objects don't exist in database");
+        throw new Error("PREREQUISITE DATA MISSING: Required objects don't exist in database");
       }
-      await BuiltIn["Fail"](`Bad Request: ${str(body)}`);
+      throw new Error(`Bad Request: ${str(body)}`);
     } else {
-      await BuiltIn["Fail"](`Unexpected status ${str(response.status_code)}: ${str(response.text)}`);
+      throw new Error(`Unexpected status ${str(response.status_code)}: ${str(response.text)}`);
     }
-  },
-});
+  }
+}

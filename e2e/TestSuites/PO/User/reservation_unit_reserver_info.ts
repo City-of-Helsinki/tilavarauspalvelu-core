@@ -1,58 +1,58 @@
 /** Port of PO/User/reservation_unit_reserver_info.robot */
-import { Browser, loc } from "../../../lib/Browser";
-import { BuiltIn } from "../../../lib/BuiltIn";
-import { V, chain, expect, keywords, named } from "../../../lib/robot";
-import type { RobotValue } from "../../../lib/robot";
-import { custom_keywords } from "../../Resources/custom_keywords";
+import { V, expect, step } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
+import { PageObject } from "../../page-object";
 
-export const reservation_unit_reserver_info = keywords("reservation_unit_reserver_info", {
-  "Enter First Name": async (firstname: string) => {
-    await Browser["Type Text"]("id=reservation-form-field__reserveeFirstName", firstname);
-  },
+export class ReservationUnitReserverInfo extends PageObject {
+  @step("reservation_unit_reserver_info.Enter First Name")
+  async enterFirstName(firstname: string) {
+    await this.page.locator("#reservation-form-field__reserveeFirstName").fill(firstname);
+  }
 
-  "Enter Last Name": async (lastname: string) => {
-    await Browser["Type Text"]("id=reservation-form-field__reserveeLastName", lastname);
-  },
+  @step("reservation_unit_reserver_info.Enter Last Name")
+  async enterLastName(lastname: string) {
+    await this.page.locator("#reservation-form-field__reserveeLastName").fill(lastname);
+  }
 
-  "Enter Email": async (email: string) => {
-    await Browser["Type Text"]("id=reservation-form-field__reserveeEmail", email);
-  },
+  @step("reservation_unit_reserver_info.Enter Email")
+  async enterEmail(email: string) {
+    await this.page.locator("#reservation-form-field__reserveeEmail").fill(email);
+  }
 
-  "Enter Phone Number": async (phonenumber: string) => {
-    await Browser["Type Text"]("id=reservation-form-field__reserveePhone", phonenumber);
-  },
+  @step("reservation_unit_reserver_info.Enter Phone Number")
+  async enterPhoneNumber(phonenumber: string) {
+    await this.page.locator("#reservation-form-field__reserveePhone").fill(phonenumber);
+  }
 
-  "Select Home City": async (homecity: string) => {
-    let main_button: RobotValue, already_selected: RobotValue;
-    main_button = "id=reservation-form-field__municipality-main-button";
+  @step("reservation_unit_reserver_info.Select Home City")
+  async selectHomeCity(homecity: string) {
+    const main_button = "#reservation-form-field__municipality-main-button";
+    const selected_city = this.page.locator(main_button).locator(`text="${homecity}"`);
     // Clicking the selected city would unselect it
-    already_selected = await Browser["Get Element Count"](chain(main_button, `text="${homecity}"`));
-    if (Number(already_selected) === 0) {
-      await Browser["Click"](main_button);
-      await custom_keywords["Find And Click Element With Text"]("li", homecity);
+    if ((await selected_city.count()) === 0) {
+      await this.page.locator(main_button).click();
+      await this.pages.customKeywords.findAndClickElementWithText("li", homecity);
     }
-    await Browser["Wait For Elements State"](
-      chain(main_button, `text="${homecity}" >> nth=0`),
-      "visible",
-      named({ timeout: "5s" })
-    );
-    await custom_keywords["Close Select List If Open"](main_button);
-  },
+    await selected_city.first().waitFor({ state: "visible", timeout: 5000 });
+    await this.pages.customKeywords.closeSelectListIfOpen(main_button);
+  }
 
   /**
    * Checks for the error notification banner that appears when required
    * fields are missing.
    */
-  "Check Application Cannot Be Made Without Info": async () => {
-    await Browser["Click"]('[data-testid="reservation__button--continue"]');
+  @step("reservation_unit_reserver_info.Check Application Cannot Be Made Without Info")
+  async checkApplicationCannotBeMadeWithoutInfo() {
+    await this.page.getByTestId("reservation__button--continue").click();
     // Port: kept on purpose. The form validates and re-renders after the empty submit, and text typed into it at
     // the same time can lose keys (the first name was saved as "Mar" instead of "Marja").
-    await BuiltIn["Sleep"]("1s");
+    await this.page.waitForTimeout(1000);
 
     // Check that error notification banner is displayed
-    await expect(loc(V.NOTIFICATION_TYPE_ERROR)).toBeVisible();
-  },
-});
+    // The form's own notification, in the page's main content: an error toast (like a 502 from the backend) has the
+    // same style
+    await expect(this.page.getByRole("main").locator(V.NOTIFICATION_TYPE_ERROR)).toBeVisible();
+  }
+}

@@ -1,45 +1,48 @@
 /** Port of PO/Admin/admin_navigation_menu.robot */
-import { Browser, currentPage } from "../../../lib/Browser";
-import { keywords, named } from "../../../lib/robot";
+import { step } from "../../../lib/robot";
+import { PageObject } from "../../page-object";
 
-export const admin_navigation_menu = keywords("admin_navigation_menu", {
-  "Admin Navigates To Requested Reservations": async () => {
-    await Browser["Click"]('[href="/kasittely/reservations/requested"]');
-    await currentPage().waitForURL((url) => url.pathname === "/kasittely/reservations/requested");
-  },
+export class AdminNavigationMenu extends PageObject {
+  @step("admin_navigation_menu.Admin Navigates To Requested Reservations")
+  async adminNavigatesToRequestedReservations() {
+    await this.page.locator('[href="/kasittely/reservations/requested"]').click();
+    await this.page.waitForURL((url) => url.pathname === "/kasittely/reservations/requested");
+  }
 
-  "Admin Navigates To Reservations": async () => {
-    await Browser["Click"]('[href="/kasittely/reservations"]');
-    await currentPage().waitForURL((url) => url.pathname === "/kasittely/reservations");
-  },
+  @step("admin_navigation_menu.Admin Navigates To Reservations")
+  async adminNavigatesToReservations() {
+    await this.page.locator('[href="/kasittely/reservations"]').click();
+    await this.page.waitForURL((url) => url.pathname === "/kasittely/reservations");
+  }
 
-  "Admin Navigates To Application Rounds": async () => {
-    await Browser["Click"]('[href="/kasittely/application-rounds"]');
-    await currentPage().waitForURL((url) => url.pathname === "/kasittely/application-rounds");
-  },
+  @step("admin_navigation_menu.Admin Navigates To Application Rounds")
+  async adminNavigatesToApplicationRounds() {
+    await this.page.locator('[href="/kasittely/application-rounds"]').click();
+    await this.page.waitForURL((url) => url.pathname === "/kasittely/application-rounds");
+  }
 
-  "Admin Navigates To Reservation Units": async () => {
-    await Browser["Click"]('[href="/kasittely/reservation-units"]');
-    await currentPage().waitForURL((url) => url.pathname === "/kasittely/reservation-units");
-  },
+  @step("admin_navigation_menu.Admin Navigates To Reservation Units")
+  async adminNavigatesToReservationUnits() {
+    await this.page.locator('[href="/kasittely/reservation-units"]').click();
+    await this.page.waitForURL((url) => url.pathname === "/kasittely/reservation-units");
+  }
 
-  "Admin Navigates To Units": async () => {
-    await Browser["Click"]('[href="/kasittely/units"]');
-    await currentPage().waitForURL((url) => url.pathname === "/kasittely/units");
-  },
+  @step("admin_navigation_menu.Admin Navigates To Units")
+  async adminNavigatesToUnits() {
+    await this.page.locator('[href="/kasittely/units"]').click();
+    await this.page.waitForURL((url) => url.pathname === "/kasittely/units");
+  }
 
-  "Admin Navigates To My Units": async () => {
-    await Browser["Click"]('[href="/kasittely/my-units"]');
-    await currentPage().waitForURL((url) => url.pathname === "/kasittely/my-units");
-  },
+  @step("admin_navigation_menu.Admin Navigates To My Units")
+  async adminNavigatesToMyUnits() {
+    await this.page.locator('[href="/kasittely/my-units"]').click();
+    await this.page.waitForURL((url) => url.pathname === "/kasittely/my-units");
+  }
 
-  "Admin Navigates To Notifications": async () => {
-    await Browser["Click"]('[href="/kasittely/notifications"]');
+  @step("admin_navigation_menu.Admin Navigates To Notifications")
+  async adminNavigatesToNotifications() {
+    await this.page.locator('[href="/kasittely/notifications"]').click();
     // The create link is only on the notifications list page
-    await Browser["Wait For Elements State"](
-      '[href="/kasittely/notifications/new"]',
-      "visible",
-      named({ timeout: "15s" })
-    );
-  },
-});
+    await this.page.locator('[href="/kasittely/notifications/new"]').waitFor({ state: "visible", timeout: 15_000 });
+  }
+}

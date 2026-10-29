@@ -37,7 +37,10 @@ The test data is created once per run by the `create_data` project, which the su
 recreates everything under unit Harakka, so **never run two test runs against the test environment at the same
 time**. The endpoint also rejects a second call within 60 seconds. The backend creates the data in one transaction,
 and pages fail or hang until it has been saved, so the project waits (up to 5 minutes) until the always free unit
-has a new id. If the id can't be read before the call, it waits 3 minutes like the Robot suite.
+has a new id. If the id can't be read before the call, it waits 3 minutes like the Robot suite. The backend can
+still fail for a while after that (a 502, the customer app's error page), so the project then waits until the
+customer landing page and GraphQL answer normally three times in a row, 5 seconds apart. After 2 minutes the tests
+start anyway, with a warning in the report.
 
 Runs need `TZ=Europe/Helsinki`: the config sets it when it is unset.
 
@@ -75,24 +78,28 @@ the runtime offline.
 ## Layout
 
 - `TestSuites/Tests_*.spec.ts`: the suites, one file per project. They use the `test` of `TestSuites/fixtures.ts`.
-- `TestSuites/PO/{Admin,App,Common,User}/`: page objects. The tests call the workflow keywords in
-  `PO/App/app_user.ts`, `app_admin.ts` and `app_common.ts`.
+- `TestSuites/PO/{Admin,App,Common,User}/`: page objects, one class per file (`PageObject` in
+  `TestSuites/page-object.ts`). The tests call the workflow keywords in `PO/App/app_user.ts`, `app_admin.ts` and
+  `app_common.ts`. `TestSuites/pages.ts` creates a test's page objects together, so they can call each other.
 - `TestSuites/Resources/`: shared keywords (`custom_keywords`, `devices` for the browsers and devices,
   `common_setups_teardowns`, `parallel_test_data`, `create_data`, `graphql_commands`, `data_modification`, …),
   variables and texts (`variables`, `texts_FI`, `suite_specific_units`, `serial_users`), the test users in
   `pabot_users.dat`, and `env_loader.ts`, which loads the secrets.
-- `lib/`: the runtime. `robot.ts` has `keywords()`, the variables `V` and the `test` fixture. The keyword
-  libraries are `Browser` (page actions), `BuiltIn` (logging, assertions, retries), `String`, `Collections`,
-  `DateTime`, `OperatingSystem`, `RequestsLibrary` (HTTP) and `PabotLib` (locks and shared values between workers).
+- `lib/`: the runtime. `robot.ts` has the `@step` decorator, `log()`, the variables `V` and the `test` fixture.
+  `session.ts` keeps a test's pages, `locators.ts`, `responses.ts` and `retry.ts` are small helpers for the
+  keywords, and `String`, `Collections`, `DateTime`, `OperatingSystem`, `RequestsLibrary` (HTTP) and `PabotLib`
+  (locks between workers) are the Robot libraries that are still to be replaced.
 - `tools/`: the report reader described below. `tools/README.md` lists how the suite differs from the Robot suite it
   was converted from.
 
 ### Keywords, variables and tags
 
-- A keyword is called by its name: `await app_common["User Logs In With Suomi Fi"]()`. Each call is a step named
-  `app_common.User Logs In With Suomi Fi` in the HTML report, so the report shows the tree of keywords a test ran.
-- Library keywords work the same way: `await Browser["Click"]("id=login")`. Named arguments go in a trailing
-  `named()`: `named({ timeout: "10s" })`.
+- A keyword is a page object method marked with its name: `@step("app_common.User Logs In With Suomi Fi") async
+  userLogsInWithSuomiFi()`. Each call is a step with that name in the HTML report, so the report shows the tree of
+  keywords a test ran. The tests get the page objects as fixtures, `async ({ appCommon, appUser }) => { await
+  appCommon.userLogsInWithSuomiFi(); … }`, and a page object calls another one's keywords through `this.pages`.
+- Keywords act on `this.page` with Playwright's locators, actions and `expect`. `log()` adds a message to the
+  report (a WARN message also to the test's annotations).
 - Variables are properties of `V`, e.g. `V.CURRENT_USER_HETU`. They are reset before each test.
   `TestSuites/variable-types.ts` gives them their types, so a misspelled name fails `pnpm lint`. The variable files
   are typed by their values. A variable that a keyword sets while a test runs goes in `RuntimeVariables` there, or in
@@ -127,8 +134,10 @@ the runtime offline.
 - **Browsers:** each project's browser and device are in its `use` options in `playwright.config.ts`: Chromium at
   1440×900 on desktop, Pixel 5 and iPhone 14 on mobile. Playwright starts one browser per worker and gives each test
   a new context and page, which the "Set Up … And Open Url" keywords in `devices` open. A second one in a test opens
-  a new context, a session of its own; the permission tests open Django admin in Firefox. Whatever a test opens
-  itself is closed after it.
+  a new context, a session of its own; the permission tests open Django admin in Firefox. The `session` fixture
+  (`lib/session.ts`) keeps these pages and the one the keywords act on: a test switches with
+  `session.switchTo(page)`, like the Robot suite's Switch Browser and Switch Page. Whatever a test opens itself is
+  closed after it.
 - **Waiting:** keywords wait for what they need: actions wait for their element, checks use Playwright's `expect`,
   and navigations wait for the new URL (`waitForURL`). A logout waits for the app's `/auth/logout/` redirect, which
   comes after the session is destroyed. After a pick from an HDS Select, `Close Select List If Open` closes a list

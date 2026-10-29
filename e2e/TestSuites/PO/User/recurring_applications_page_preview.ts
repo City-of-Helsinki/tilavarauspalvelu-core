@@ -1,22 +1,25 @@
 /** A resource file with top navigation keywords. */
-import { Browser, currentPage } from "../../../lib/Browser";
-import { keywords } from "../../../lib/robot";
+import { step } from "../../../lib/robot";
 import "../../Resources/variables";
 import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
+import { PageObject } from "../../page-object";
 
-export const recurring_applications_page_preview = keywords("recurring_applications_page_preview", {
-  "User Clicks The Accept Terms Of Use Checkbox": async () => {
-    await Browser["Click"]("id=preview.acceptTermsOfUse-terms-accepted");
-  },
+export class RecurringApplicationsPagePreview extends PageObject {
+  @step("recurring_applications_page_preview.User Clicks The Accept Terms Of Use Checkbox")
+  async userClicksTheAcceptTermsOfUseCheckbox() {
+    await this.page.locator('[id="preview.acceptTermsOfUse-terms-accepted"]').check();
+  }
 
-  "User Clicks The Specific Terms Of Use Checkbox": async () => {
-    await Browser["Click"]("id=preview.acceptServiceSpecificTerms-terms-accepted");
-  },
+  @step("recurring_applications_page_preview.User Clicks The Specific Terms Of Use Checkbox")
+  async userClicksTheSpecificTermsOfUseCheckbox() {
+    await this.page.locator('[id="preview.acceptServiceSpecificTerms-terms-accepted"]').check();
+  }
 
-  "User Clicks The Submit Button": async () => {
-    await Browser["Click"]("id=button__application--submit");
+  @step("recurring_applications_page_preview.User Clicks The Submit Button")
+  async userClicksTheSubmitButton() {
+    await this.page.locator("#button__application--submit").click();
     // Sending the application opens its sent page
-    await currentPage().waitForURL((url) => url.pathname.endsWith("/sent"));
-  },
-});
+    await this.page.waitForURL((url) => url.pathname.endsWith("/sent"));
+  }
+}

@@ -1,20 +1,22 @@
 /** Port of PO/Admin/admin_notifications_create_page.robot */
-import { Browser } from "../../../lib/Browser";
-import { V, keywords, named } from "../../../lib/robot";
+import { V, step, expect } from "../../../lib/robot";
 import type { RobotValue } from "../../../lib/robot";
-import { custom_keywords } from "../../Resources/custom_keywords";
 import "../../Resources/variables";
 import "../../Resources/serial_users";
 import "../../Resources/texts_FI";
 import "../../Resources/parallel_test_data";
+import { PageObject } from "../../page-object";
 
-export const admin_notifications_create_page = keywords("admin_notifications_create_page", {
-  "Admin Selects Immediate Validity Period": async () => {
-    await Browser["Click"]('css=label[for="v-radio1"]');
-  },
+export class AdminNotificationsCreatePage extends PageObject {
+  @step("admin_notifications_create_page.Admin Selects Immediate Validity Period")
+  async adminSelectsImmediateValidityPeriod() {
+    await this.page.locator('label[for="v-radio1"]').click();
+  }
 
-  "Admin Selects Notification Active Until": async (date: RobotValue) => {
-    await Browser["Type Text"]("id=notification-active-until", date);
+  @step("admin_notifications_create_page.Admin Selects Notification Active Until")
+  async adminSelectsNotificationActiveUntil(date: RobotValue) {
+    await this.page.locator("#notification-active-until").clear();
+    await this.page.locator("#notification-active-until").pressSequentially(String(date));
 
     // Admin clicks notification active until time label
     // Click  id=notification-active-until-time-label
@@ -31,22 +33,24 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
     // Admin clicks notification active until time minutes
     // Click  id=notification-active-until-time-minutes
     // Sleep  500ms
-  },
+  }
 
-  "Admin Fills Notification Name": async (name: string) => {
-    await Browser["Fill Text"]("id=notification-name", name);
-  },
+  @step("admin_notifications_create_page.Admin Fills Notification Name")
+  async adminFillsNotificationName(name: string) {
+    await this.page.locator("#notification-name").fill(name);
+  }
 
   // Ilmoituksen tyyppi
-  "Admin Selects Type Of Notification": async (notification_type: string) => {
-    await Browser["Click"]('css=[aria-label*="Ilmoituksen tyyppi."]');
-    await custom_keywords["Find And Click Element With Text"]("form >> li >> span", notification_type);
+  @step("admin_notifications_create_page.Admin Selects Type Of Notification")
+  async adminSelectsTypeOfNotification(notification_type: string) {
+    await this.page.locator('[aria-label*="Ilmoituksen tyyppi."]').click();
+    await this.pages.customKeywords.findAndClickElementWithText("form >> li >> span", notification_type);
     // The button shows the picked option, the list can stay open
-    await Browser["Wait For Elements State"](
-      `css=[aria-label*="Ilmoituksen tyyppi."] >> text="${notification_type}" >> nth=0`,
-      "visible",
-      named({ timeout: "5s" })
-    );
+    await this.page
+      .locator('[aria-label*="Ilmoituksen tyyppi."]')
+      .locator(`text="${notification_type}"`)
+      .first()
+      .waitFor({ state: "visible", timeout: 5000 });
 
     // Admin selects type of notification warning
     // Click  css=[aria-label*="Ilmoituksen tyyppi."]
@@ -59,95 +63,93 @@ export const admin_notifications_create_page = keywords("admin_notifications_cre
     // Sleep  500ms
     // custom_keywords.Find and click element with text  form >> li >> span  ${NOTIFICATION_BANNER_MESSAGE_ERROR}
     // Sleep  500ms
-  },
+  }
 
   // Kohderyhmä
-  "Admin Selects Target Group All": async () => {
-    await Browser["Click"]('css=[aria-label*="Kohderyhmä."]');
-    await custom_keywords["Find And Click Element With Text"](
+  @step("admin_notifications_create_page.Admin Selects Target Group All")
+  async adminSelectsTargetGroupAll() {
+    await this.page.locator('[aria-label*="Kohderyhmä."]').click();
+    await this.pages.customKeywords.findAndClickElementWithText(
       "form >> li >> span",
       V.NOTIFICATION_BANNER_TARGET_GROUP_ALL
     );
-    await Browser["Wait For Elements State"](
-      `css=[aria-label*="Kohderyhmä."] >> text="${V.NOTIFICATION_BANNER_TARGET_GROUP_ALL}" >> nth=0`,
-      "visible",
-      named({ timeout: "5s" })
-    );
-  },
+    await this.page
+      .locator('[aria-label*="Kohderyhmä."]')
+      .locator(`text="${V.NOTIFICATION_BANNER_TARGET_GROUP_ALL}"`)
+      .first()
+      .waitFor({ state: "visible", timeout: 5000 });
+  }
 
-  "Admin Selects Target Group Admin": async () => {
-    await Browser["Click"]('css=[aria-label*="Kohderyhmä."]');
-    await custom_keywords["Find And Click Element With Text"](
+  @step("admin_notifications_create_page.Admin Selects Target Group Admin")
+  async adminSelectsTargetGroupAdmin() {
+    await this.page.locator('[aria-label*="Kohderyhmä."]').click();
+    await this.pages.customKeywords.findAndClickElementWithText(
       "form >> li >> span",
       V.NOTIFICATION_BANNER_TARGET_GROUP_ADMIN
     );
-    await Browser["Wait For Elements State"](
-      `css=[aria-label*="Kohderyhmä."] >> text="${V.NOTIFICATION_BANNER_TARGET_GROUP_ADMIN}" >> nth=0`,
-      "visible",
-      named({ timeout: "5s" })
-    );
-  },
+    await this.page
+      .locator('[aria-label*="Kohderyhmä."]')
+      .locator(`text="${V.NOTIFICATION_BANNER_TARGET_GROUP_ADMIN}"`)
+      .first()
+      .waitFor({ state: "visible", timeout: 5000 });
+  }
 
-  "Admin Selects Target Group User": async () => {
-    await Browser["Click"]('css=[aria-label*="Kohderyhmä."]');
-    await custom_keywords["Find And Click Element With Text"](
+  @step("admin_notifications_create_page.Admin Selects Target Group User")
+  async adminSelectsTargetGroupUser() {
+    await this.page.locator('[aria-label*="Kohderyhmä."]').click();
+    await this.pages.customKeywords.findAndClickElementWithText(
       "form >> li >> span",
       V.NOTIFICATION_BANNER_TARGET_GROUP_USER
     );
-    await Browser["Wait For Elements State"](
-      `css=[aria-label*="Kohderyhmä."] >> text="${V.NOTIFICATION_BANNER_TARGET_GROUP_USER}" >> nth=0`,
-      "visible",
-      named({ timeout: "5s" })
-    );
-  },
+    await this.page
+      .locator('[aria-label*="Kohderyhmä."]')
+      .locator(`text="${V.NOTIFICATION_BANNER_TARGET_GROUP_USER}"`)
+      .first()
+      .waitFor({ state: "visible", timeout: 5000 });
+  }
 
   // Viesti
-  "Admin Clicks Notification Text Fi Container": async () => {
-    await Browser["Click"]('[data-testid="Notification__Page--message-fi-input"]');
-  },
+  @step("admin_notifications_create_page.Admin Clicks Notification Text Fi Container")
+  async adminClicksNotificationTextFiContainer() {
+    await this.page.getByTestId("Notification__Page--message-fi-input").click();
+  }
 
-  "Admin Fills Notification Text Fi": async (text_fi: string) => {
-    await Browser["Fill Text"]('[data-testid="Notification__Page--message-fi-input"] >> p', text_fi);
-  },
+  @step("admin_notifications_create_page.Admin Fills Notification Text Fi")
+  async adminFillsNotificationTextFi(text_fi: string) {
+    await this.page.getByTestId("Notification__Page--message-fi-input").locator("p").fill(text_fi);
+  }
 
-  "Admin Fills Notification Text Eng": async (text_eng: RobotValue) => {
-    await Browser["Fill Text"]('[data-testid="Notification__Page--message-en-input"]', text_eng);
-  },
+  @step("admin_notifications_create_page.Admin Fills Notification Text Eng")
+  async adminFillsNotificationTextEng(text_eng: RobotValue) {
+    await this.page.getByTestId("Notification__Page--message-en-input").fill(String(text_eng));
+  }
 
-  "Admin Fills Notification Text Sv": async (text_sv: RobotValue) => {
-    await Browser["Fill Text"]('[data-testid="Notification__Page--message-sv-input"]', text_sv);
-  },
+  @step("admin_notifications_create_page.Admin Fills Notification Text Sv")
+  async adminFillsNotificationTextSv(text_sv: RobotValue) {
+    await this.page.getByTestId("Notification__Page--message-sv-input").fill(String(text_sv));
+  }
 
-  "Admin Publishes Notification": async () => {
-    await Browser["Click"]('[data-testid="Notification__Page--publish-button"]');
+  @step("admin_notifications_create_page.Admin Publishes Notification")
+  async adminPublishesNotification() {
+    await this.page.getByTestId("Notification__Page--publish-button").click();
     // Publishing returns to the list page, which has the create link
-    await Browser["Wait For Elements State"](
-      '[href="/kasittely/notifications/new"]',
-      "visible",
-      named({
-        timeout: "15s",
-        message: "Notifications list did not open after publishing - notification publish may have failed",
-      })
-    );
-  },
+    await expect(
+      this.page.locator('[href="/kasittely/notifications/new"]'),
+      "Notifications list did not open after publishing - notification publish may have failed"
+    ).toBeVisible({ timeout: 15_000 });
+  }
 
-  "Admin Drafts Notification": async () => {
-    await Browser["Click"]('[data-testid="Notification__Page--save-draft-button"]');
+  @step("admin_notifications_create_page.Admin Drafts Notification")
+  async adminDraftsNotification() {
+    await this.page.getByTestId("Notification__Page--save-draft-button").click();
     // Saving returns to the list page, which has the create link
-    await Browser["Wait For Elements State"](
-      '[href="/kasittely/notifications/new"]',
-      "visible",
-      named({ timeout: "15s" })
-    );
-  },
+    await this.page.locator('[href="/kasittely/notifications/new"]').waitFor({ state: "visible", timeout: 15_000 });
+  }
 
-  "Admin Deletes Notification": async () => {
-    await custom_keywords["Find And Click Element With Text"]("button", V.DELETE_NOTIFICATION_BUTTON_TEXT);
+  @step("admin_notifications_create_page.Admin Deletes Notification")
+  async adminDeletesNotification() {
+    await this.pages.customKeywords.findAndClickElementWithText("button", V.DELETE_NOTIFICATION_BUTTON_TEXT);
     // Deleting returns to the list page, which has the create link
-    await Browser["Wait For Elements State"](
-      '[href="/kasittely/notifications/new"]',
-      "visible",
-      named({ timeout: "15s" })
-    );
-  },
-});
+    await this.page.locator('[href="/kasittely/notifications/new"]').waitFor({ state: "visible", timeout: 15_000 });
+  }
+}
