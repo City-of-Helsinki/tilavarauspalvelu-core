@@ -39,7 +39,7 @@ def test_create_test_data(settings):
     for model in all_models:
         assert not model.objects.exists(), f"Model {model.__name__} is not empty"
 
-    create_test_data(flush=False)
+    create_test_data(flush=False, number_of_days_that_have_reservations=3)
 
     for model in all_models:
         if model in models_that_should_be_empty:

@@ -63,10 +63,12 @@ if TYPE_CHECKING:
 def _create_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
+    number_of_days_that_have_reservations: int,
 ) -> None:
     _create_normal_reservations(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
+        number_of_days_that_have_reservations=number_of_days_that_have_reservations,
     )
 
     _create_full_day_reservations(
@@ -84,6 +86,7 @@ def _create_reservations(
 def _create_normal_reservations(
     reservation_purposes: list[ReservationPurpose],
     age_groups: list[AgeGroup],
+    number_of_days_that_have_reservations: int,
 ) -> None:
     """
     Create reservations for all reservation units that:
@@ -145,7 +148,6 @@ def _create_normal_reservations(
 
     # Create some reservations in the past, but mostly in the future
     start_date = local_date() - datetime.timedelta(days=3)
-    number_of_days_that_have_reservations: int = 14
 
     for reservation_unit in reservation_units:
         # 1/10 of reservation units are "busy", meaning that there are more reservations per day.
