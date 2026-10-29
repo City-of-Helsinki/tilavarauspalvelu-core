@@ -29,6 +29,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIEr
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from tilavarauspalvelu.models.reservation.actions import ReservationActions
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_start_of_day, next_hour
 
 from tests.factories import (
@@ -847,6 +848,32 @@ def test_reservation__create__price_calculation__tax_rate_on_creation_date(graph
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.price == Decimal(10)
     assert reservation.tax_percentage_value == Decimal(24)
+
+
+def test_reservation__create__price_calculation__tax_level_has_no_rate_today(graphql):
+    now = local_start_of_day()
+    tomorrow = now.date() + datetime.timedelta(days=1)
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        payment_product__id=uuid.uuid4(),
+        pricings__begins=now,
+        pricings__price_unit=PriceUnit.FIXED,
+        pricings__lowest_price=Decimal(5),
+        pricings__highest_price=Decimal(10),
+        pricings__tax_level__name="Yleinen",
+        pricings__tax_level__rates__begins=tomorrow,
+        pricings__payment_type=PaymentType.ONLINE,
+    )
+
+    graphql.login_with_superuser()
+    data = get_create_data(reservation_unit, begins_at=now + datetime.timedelta(days=1, hours=1))
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_messages() == [f"Tax level 'Yleinen' has no rate on {now.date().isoformat()}"]
+    assert response.field_error_codes() == [error_codes.TAX_LEVEL_HAS_NO_RATE]
+
+    assert Reservation.objects.count() == 0
 
 
 def test_reservation__create__price_calculation__on_site_doesnt_require_payment_product(graphql):
