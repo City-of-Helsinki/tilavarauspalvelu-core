@@ -13,14 +13,14 @@ export class DjangoAdmin extends PageObject {
   async adminChecksPermissionIsNotPresent(role_value: string) {
     // The options of the native select are in the page from the start
     await expect(
-      this.page.locator(`#id_role >> option[value="${role_value}"]`),
+      this.page.locator("#id_role").locator(`option[value="${role_value}"]`),
       `Option with value "${role_value}" should not be present`
     ).toHaveCount(0);
   }
 
   @step("django_admin.Admin Saves Changes")
   async adminSavesChanges() {
-    await this.page.locator('input[value="Tallenna ja poistu"]').click();
+    await this.page.getByRole("button", { name: "Tallenna ja poistu", exact: true }).click();
     // Saving returns to the list page once the change is stored
     await this.page.waitForURL((url) => !url.pathname.endsWith("/change/"));
   }

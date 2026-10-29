@@ -413,8 +413,8 @@ test.describe("Runtime self-test", () => {
   });
 
   testWithBrowser("Backend errors are recorded for the report", async ({ context, page }) => {
-    // The server answers like a failing backend: a 500, GraphQL errors, the apps' 503 page (served with status 200)
-    // and a request that never answers, and the page throws an uncaught error
+    // The server answers like a failing backend: a 500, GraphQL errors, a slow answer, the apps' 503 page (served
+    // with status 200) and a request that never answers, and the page throws an uncaught error
     const server = createServer((request, response) => {
       if (request.url === "/") {
         response.writeHead(200, { "content-type": "text/html" });
@@ -426,7 +426,8 @@ test.describe("Runtime self-test", () => {
             body: JSON.stringify({ operationName: "SelftestQuery", query: "{ x }" }),
           });
           fetch("/hangs");
-          setTimeout(() => { throw new Error("selftest uncaught"); }, 100);
+          fetch("/slow");
+          setTimeout(() => { throw new Error("selftest uncaught https://example.com/x?token=selftest-query"); }, 100);
         </script>`);
       } else if (request.url?.startsWith("/boom") === true) {
         response.writeHead(500).end();
@@ -436,6 +437,8 @@ test.describe("Runtime self-test", () => {
       } else if (request.url === "/error-page") {
         response.writeHead(200, { "content-type": "text/html" });
         response.end('<h1 data-testid="error__503--title">503: Palaamme pian!</h1>');
+      } else if (request.url === "/slow") {
+        setTimeout(() => response.writeHead(200).end("slow"), 300);
       } else if (request.url !== "/hangs") {
         response.writeHead(404).end();
       }
@@ -448,7 +451,7 @@ test.describe("Runtime self-test", () => {
       expectedStatus: "passed" as const,
       annotations: [] as Array<{ type: string; description?: string }>,
     };
-    const backendErrors = new BackendErrors(info, { watched: () => true, pendingMs: 0 });
+    const backendErrors = new BackendErrors(info, { watched: () => true, pendingMs: 0, slowMs: 200 });
     backendErrors.watch(context);
     try {
       const uncaught = page.waitForEvent("pageerror");
@@ -456,12 +459,14 @@ test.describe("Runtime self-test", () => {
         page.waitForResponse((response) => response.url().includes("/boom")),
         page.waitForResponse((response) => response.url().endsWith("/graphql/")),
         page.waitForRequest((request) => request.url().endsWith("/hangs")),
+        page.waitForEvent("requestfinished", (request) => request.url().endsWith("/slow")),
         page.goto(`http://127.0.0.1:${port}/`),
       ]);
       await uncaught;
       // Before the next page load cancels the request that has no answer
       backendErrors.notePending();
       await page.goto(`http://127.0.0.1:${port}/error-page`);
+      // The failed test's open page that shows an error page
       await backendErrors.finish();
     } finally {
       server.closeAllConnections();
@@ -474,8 +479,10 @@ test.describe("Runtime self-test", () => {
       `500 Internal Server Error: GET ${host}/boom`,
       `GraphQL errors: POST ${host}/graphql/ (SelftestQuery): selftest error`,
       `GET ${host}/hangs`,
+      `GET ${host}/slow`,
       `error page "503" (status 200): GET ${host}/error-page`,
-      "uncaught error in the page at /: selftest uncaught",
+      `the page shows the error page "503": ${host}/error-page`,
+      "uncaught error in the page at /: selftest uncaught https://example.com/x",
     ]) {
       expect(
         recorded.some((description) => description.endsWith(expected)),

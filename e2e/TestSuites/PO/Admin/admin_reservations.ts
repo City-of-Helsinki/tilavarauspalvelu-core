@@ -67,8 +67,9 @@ export class AdminReservations extends PageObject {
   @step("admin_reservations.Admin Checks Reservation Info Dialog Time Tagline")
   async adminChecksReservationInfoDialogTimeTagline(reservation_tagline: string) {
     // DEVNOTE: Not in use for now
+    // The time boxes of the edit time dialog are paragraphs with the time in bold
     await this.pages.customKeywords.findTextFromElementsOrFail(
-      '[class*="EditTimeModal__TimeInfoBox"] >> b',
+      this.page.locator("#info-dialog").locator("p > b"),
       reservation_tagline
     );
   }
@@ -252,7 +253,10 @@ export class AdminReservations extends PageObject {
   @step("admin_reservations.Admin Selects Reservation Unit")
   async adminSelectsReservationUnit(by_unit: string) {
     await this.page.locator("#reservation-unit-toggle-button").click();
-    await this.pages.customKeywords.findAndClickElementWithText("#reservation-unit-menu >> li", by_unit);
+    await this.pages.customKeywords.findAndClickElementWithText(
+      this.page.locator("#reservation-unit-menu").locator("li"),
+      by_unit
+    );
   }
 
   @step("admin_reservations.Admin Open Access Code Modal")
@@ -269,14 +273,17 @@ export class AdminReservations extends PageObject {
   @step("admin_reservations.Admin Selects Reason For Rejection")
   async adminSelectsReasonForRejection(reason_of_rejection: string) {
     await this.page.locator("#denyReason-main-button").click();
-    await this.pages.customKeywords.findAndClickElementWithText("#denyReason-list >> li", reason_of_rejection);
+    await this.page.locator("#denyReason-list").getByRole("option", { name: reason_of_rejection, exact: true }).click();
     // An option picked within 200 ms of opening leaves the HDS Select list open
     await this.pages.customKeywords.closeSelectListIfOpen("#denyReason-main-button");
   }
 
   @step("admin_reservations.Admin Checks Reason For Subvention In Dialog")
   async adminChecksReasonForSubventionInDialog() {
-    await this.pages.customKeywords.findTextFromElementsOrFail("#info-dialog >> p", JUSTIFICATION_FOR_SUBVENTION);
+    await this.pages.customKeywords.findTextFromElementsOrFail(
+      this.page.locator("#info-dialog").locator("p"),
+      JUSTIFICATION_FOR_SUBVENTION
+    );
   }
 
   @step("admin_reservations.Admin Clicks Set Reservation To Free")
@@ -365,10 +372,11 @@ export class AdminReservations extends PageObject {
   @step("admin_reservations.Admin Opens Calendar And Changes Reservation Time")
   async adminOpensCalendarAndChangesReservationTime() {
     await this.page.locator("#reservation__calendar-heading").click();
-    await this.pages.customKeywords.findAndClickElementWithText(
-      "#reservation__calendar-content >> button",
-      CALENDAR_CHANGE_TIME_FI
-    );
+    // By its text: the calendar's toolbar is aria-hidden in the app, so its buttons have no role to find them by
+    await this.page
+      .locator("#reservation__calendar-content")
+      .getByText(CALENDAR_CHANGE_TIME_FI, { exact: true })
+      .click();
 
     // Call the keyword and capture the returned values
     const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
