@@ -56,32 +56,32 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     name_en = FakerEN("word")
     name_sv = FakerSV("word")
 
-    description = FakerFI("p_tags")
+    description = factory.Sequence(lambda n: f"<p>Description {n}.</p>")
     description_fi = LazyAttribute(lambda i: i.description)
-    description_en = FakerEN("p_tags")
-    description_sv = FakerSV("p_tags")
+    description_en = factory.Sequence(lambda n: f"<p>Description EN {n}.</p>")
+    description_sv = factory.Sequence(lambda n: f"<p>Description SV {n}.</p>")
 
     contact_information = FakerFI("sentence")
 
-    notes_when_applying = FakerFI("p_tags")
+    notes_when_applying = factory.Sequence(lambda n: f"<p>Notes when applying {n}.</p>")
     notes_when_applying_fi = LazyAttribute(lambda i: i.notes_when_applying)
-    notes_when_applying_en = FakerEN("p_tags")
-    notes_when_applying_sv = FakerSV("p_tags")
+    notes_when_applying_en = factory.Sequence(lambda n: f"<p>Notes when applying EN {n}.</p>")
+    notes_when_applying_sv = factory.Sequence(lambda n: f"<p>Notes when applying SV {n}.</p>")
 
-    reservation_pending_instructions = FakerFI("p_tags")
+    reservation_pending_instructions = factory.Sequence(lambda n: f"<p>Pending instructions {n}.</p>")
     reservation_pending_instructions_fi = LazyAttribute(lambda i: i.reservation_pending_instructions)
-    reservation_pending_instructions_en = FakerEN("p_tags")
-    reservation_pending_instructions_sv = FakerSV("p_tags")
+    reservation_pending_instructions_en = factory.Sequence(lambda n: f"<p>Pending instructions EN {n}.</p>")
+    reservation_pending_instructions_sv = factory.Sequence(lambda n: f"<p>Pending instructions SV {n}.</p>")
 
-    reservation_confirmed_instructions = FakerFI("p_tags")
+    reservation_confirmed_instructions = factory.Sequence(lambda n: f"<p>Confirmed instructions {n}.</p>")
     reservation_confirmed_instructions_fi = LazyAttribute(lambda i: i.reservation_confirmed_instructions)
-    reservation_confirmed_instructions_en = FakerEN("p_tags")
-    reservation_confirmed_instructions_sv = FakerSV("p_tags")
+    reservation_confirmed_instructions_en = factory.Sequence(lambda n: f"<p>Confirmed instructions EN {n}.</p>")
+    reservation_confirmed_instructions_sv = factory.Sequence(lambda n: f"<p>Confirmed instructions SV {n}.</p>")
 
-    reservation_cancelled_instructions = FakerFI("p_tags")
+    reservation_cancelled_instructions = factory.Sequence(lambda n: f"<p>Cancelled instructions {n}.</p>")
     reservation_cancelled_instructions_fi = LazyAttribute(lambda i: i.reservation_cancelled_instructions)
-    reservation_cancelled_instructions_en = FakerEN("p_tags")
-    reservation_cancelled_instructions_sv = FakerSV("p_tags")
+    reservation_cancelled_instructions_en = factory.Sequence(lambda n: f"<p>Cancelled instructions EN {n}.</p>")
+    reservation_cancelled_instructions_sv = factory.Sequence(lambda n: f"<p>Cancelled instructions SV {n}.</p>")
 
     # Integers
     surface_area = FuzzyInteger(low=100, high=1000)
