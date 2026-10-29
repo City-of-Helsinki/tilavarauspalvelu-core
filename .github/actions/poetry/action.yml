@@ -10,9 +10,11 @@ runs:
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       with:
         path: backend/.venv
-        key: cache-venv-${{ hashFiles('backend/docker/Dockerfile.ci') }}-${{ hashFiles('**/poetry.lock') }}-v2
+        key: cache-venv-${{ hashFiles('backend/docker/Dockerfile.ci') }}-${{ hashFiles('**/poetry.lock') }}-v3
 
+    # The job that saves the cache imports only some packages. Without '--compile',
+    # every other job compiles the rest of the packages again on import.
     - name: "Install dependencies"
       working-directory: backend
-      run: poetry install
+      run: poetry install --compile
       shell: bash
