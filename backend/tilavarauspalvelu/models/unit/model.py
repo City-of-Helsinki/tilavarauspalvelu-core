@@ -127,15 +127,16 @@ class Unit(models.Model):
         return self.name
 
     def save(self, *args: Any, **kwargs: Any) -> None:
+        if not settings.UPDATE_PRODUCT_MAPPING:
+            return super().save(*args, **kwargs)
+
         old_values = Unit.objects.filter(pk=self.pk).first()
         result = super().save(*args, **kwargs)
 
         # When merchant changes, update reservation_units that are using
         # the merchant information from the Unit. This will update their
         # product mapping.
-        if settings.UPDATE_PRODUCT_MAPPING and (
-            old_values is None or old_values.payment_merchant != self.payment_merchant
-        ):
+        if old_values is None or old_values.payment_merchant != self.payment_merchant:
             from tilavarauspalvelu.tasks import refresh_reservation_unit_product_mapping_task
 
             reservation_units = self.reservation_units.filter(payment_merchant__isnull=True).all()
