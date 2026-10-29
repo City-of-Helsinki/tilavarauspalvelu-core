@@ -905,6 +905,11 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     APP_LOGGING_LEVEL = values.StringValue(default="INFO")
     AUDIT_LOGGING_ENABLED = False
 
+    # --- Password settings ------------------------------------------------------------------------------------------
+
+    # The default hasher is slow on purpose. Tests do not need that.
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
     # --- Email settings ---------------------------------------------------------------------------------------------
 
     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
