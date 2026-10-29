@@ -24,7 +24,7 @@ from .utils import defer_reservation_unit_create_operations, with_logs
 
 @with_logs
 @defer_reservation_unit_create_operations
-def create_test_data(*, flush: bool = True) -> None:
+def create_test_data(*, flush: bool = True, number_of_days_that_have_reservations: int = 14) -> None:
     if flush:
         _clear_database()
 
@@ -49,6 +49,7 @@ def create_test_data(*, flush: bool = True) -> None:
     _create_reservations(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
+        number_of_days_that_have_reservations=number_of_days_that_have_reservations,
     )
 
     _create_reservation_series(
