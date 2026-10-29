@@ -50,10 +50,6 @@ async function freeUnitPk(): Promise<number | null> {
 }
 
 export const create_data = keywords("create_data", {
-  "Create Robot Test Data DISABLED": async () => {
-    await BuiltIn["Log"]("Disabled until backend data creation is ready");
-  },
-
   /**
    * Calls the endpoint to Create robot test data.
    * Backend returns 204 immediately and processes data asynchronously.

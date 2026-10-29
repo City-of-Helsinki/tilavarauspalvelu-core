@@ -29,8 +29,6 @@ export const recurring_applications = keywords("recurring_applications", {
     await custom_keywords["Close Select List If Open"](
       '[aria-haspopup="listbox"][aria-label*="Varauksen käyttötarkoitus. "]'
     );
-
-    //
   },
 
   "User Selects The Default Time Period For The Recurring Reservation": async () => {

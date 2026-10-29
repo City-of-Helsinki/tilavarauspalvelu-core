@@ -122,16 +122,6 @@ export const custom_keywords = keywords("custom_keywords", {
     await expect(currentPage()).toHaveURL((url) => url.href.includes(str(url_part)), { timeout: timeToMs(timeout) });
   },
 
-  "Url Should Have Changed": async (url_before: RobotValue, url_part: RobotValue) => {
-    let url: RobotValue;
-    url = await Browser["Get Url"]();
-    if (url_part !== "") {
-      await BuiltIn["Should Contain"](url, url_part);
-    } else {
-      await BuiltIn["Should Not Be Equal"](url, url_before);
-    }
-  },
-
   /** An HDS Select ignores a close within 200 ms of opening, so its list can stay open after the pick. */
   "Close Select List If Open": async (main_button: RobotValue) => {
     // Port: expect(...).toPass retries every 300 ms, instead of Wait Until Keyword Succeeds
@@ -835,12 +825,9 @@ Differences:
       str(Expected_text),
       { ignoreCase: isTruthy(ignore_case), useInnerText: true, timeout: 10_000 }
     );
-
-    //
-    // Calendar extraction
-    //
   },
 
+  // Calendar extraction
   /** Converts a booking time string to ICS format with time zone information. */
   "Convert Booking Time To ICS Format": async (time_string: RobotValue) => {
     let timezone: RobotValue, ics_start: RobotValue, ics_end: RobotValue;
@@ -957,8 +944,6 @@ Differences:
       named({ msg: `Reservation not found for ${str(DAY_TO_CHECK)} at ${str(TIME_TO_CHECK)}` })
     );
 
-    //
     // Calendar extraction
-    //
   },
 });

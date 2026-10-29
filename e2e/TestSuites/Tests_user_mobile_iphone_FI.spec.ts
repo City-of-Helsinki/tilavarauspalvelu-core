@@ -13,7 +13,6 @@ import "./Resources/serial_users";
 import "./Resources/parallel_test_data";
 import "./Resources/suite_specific_units";
 import "./Resources/devices";
-import "./Resources/har_recording";
 import "./Resources/create_data";
 
 test.describe(

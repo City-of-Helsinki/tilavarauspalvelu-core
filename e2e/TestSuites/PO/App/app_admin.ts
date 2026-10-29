@@ -15,7 +15,6 @@ import "../../Resources/variables";
 import "../../Resources/serial_users";
 import "../../Resources/texts_FI";
 import "../../Resources/devices";
-import "../../Resources/har_recording";
 import "../../Resources/create_data";
 
 export const app_admin = keywords("app_admin", {
@@ -124,12 +123,9 @@ export const app_admin = keywords("app_admin", {
 
   "Admin Checks That Reservation Cannot Be Made": async () => {
     await admin_my_units["Admin Checks Make Reservation Button Is Disabled"]();
-
-    //
-    // Access code
-    //
   },
 
+  // Access code
   "Admin Opens Access Code Modal": async () => {
     await admin_reservations["Admin Open Access Code Modal"]();
   },
@@ -160,18 +156,10 @@ export const app_admin = keywords("app_admin", {
     V.ACCESS_CODE_ADMINSIDE = access_code;
     await BuiltIn["Log"](V.ACCESS_CODE_ADMINSIDE);
 
-    //
-    //
-
-    //
     // Top navigation
-    //
-
-    //
-    // Basic permissions
-    //
   },
 
+  // Basic permissions
   "Admin Checks Top Navigation For Notification Manager": async () => {
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/notifications"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/reservations"]');
@@ -220,14 +208,9 @@ export const app_admin = keywords("app_admin", {
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/notifications"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservation-units"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/units"]');
-    //
-    //
-
-    //
-    // Unit permissions
-    //
   },
 
+  // Unit permissions
   "Admin Checks Top Navigation For Notification Manager With Unit Permissions": async () => {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
@@ -281,15 +264,9 @@ export const app_admin = keywords("app_admin", {
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-
-    //
-    //
-
-    //
-    // Group unit permissions
-    //
   },
 
+  // Group unit permissions
   "Admin Checks Top Navigation For Notification Manager With Group Unit Permissions": async () => {
     // The Found checks wait for the navigation, so the Not Found checks see it rendered
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/my-units"]');
@@ -343,9 +320,6 @@ export const app_admin = keywords("app_admin", {
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations"]');
     await custom_keywords["Verify Element Is Found"]('[href="/kasittely/reservations/requested"]');
     await custom_keywords["Verify Element Is Not Found"]('[href="/kasittely/notifications"]');
-
-    //
-    //
 
     // Not currently in use
     // This was used to navigate to reservations through calendar view
@@ -457,95 +431,65 @@ export const app_admin = keywords("app_admin", {
     );
     await Browser["Click"]("data-testid=CreateReservationModal__cancel-reservation");
     await admin_reservations["Admin Verifies Reservation Modal Is Closed"]();
-
-    //
-    // Notifications
-    //
   },
 
+  // Notifications
   "Admin Creates Normal Notification For User And Admin Side": async () => {
     let date_plus_60_days: RobotValue, randomvalue: RobotValue;
     await admin_notifications["Admin Clicks Create Notification Button"]();
-    //
     await admin_notifications_create_page["Admin Selects Immediate Validity Period"]();
-    //
     date_plus_60_days = await data_modification["Get Date Plus 60 Days"]();
     V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    //
     await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
-    //
     // if the notification name exist already we cannot publish the notification
     randomvalue = await data_modification["Generate Random Letter And Number"]();
     V.NOTIFICATION_BANNER_MESSAGE_NAME = `${str(V.NOTIFICATION_BANNER_MESSAGE_NORMAL)} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME);
-    //
     await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_NORMAL);
-    //
     await admin_notifications_create_page["Admin Selects Target Group All"]();
-    //
 
     randomvalue = await data_modification["Generate Random Letter And Number"]();
     V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${str(V.NOTIFICATION_BANNER_MESSAGE_NORMAL)} ${str(V.NOTIFICATION_BANNER_CLEANUP_PATTERN)} ${str(randomvalue)}`;
-    //
     await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
-    //
     await admin_notifications_create_page["Admin Publishes Notification"]();
   },
 
   "Admin Creates Warning Notification For User And Admin Side": async () => {
     let date_plus_60_days: RobotValue, randomvalue: RobotValue;
     await admin_notifications["Admin Clicks Create Notification Button"]();
-    //
     await admin_notifications_create_page["Admin Selects Immediate Validity Period"]();
-    //
     date_plus_60_days = await data_modification["Get Date Plus 60 Days"]();
     V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    //
     await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
-    //
     // if the notification name exist already we cannot publish the notification
     randomvalue = await data_modification["Generate Random Letter And Number"]();
     V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING = `${str(V.NOTIFICATION_BANNER_MESSAGE_WARNING)} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME_WARNING);
-    //
     await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_WARNING);
-    //
     await admin_notifications_create_page["Admin Selects Target Group All"]();
-    //
     randomvalue = await data_modification["Generate Random Letter And Number"]();
     V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${str(V.NOTIFICATION_BANNER_MESSAGE_WARNING)} ${str(V.NOTIFICATION_BANNER_CLEANUP_PATTERN)} ${str(randomvalue)}`;
-    //
     await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
-    //
     await admin_notifications_create_page["Admin Publishes Notification"]();
   },
 
   "Admin Creates Error Notification For User And Admin Side": async () => {
     let date_plus_60_days: RobotValue, randomvalue: RobotValue;
     await admin_notifications["Admin Clicks Create Notification Button"]();
-    //
     await admin_notifications_create_page["Admin Selects Immediate Validity Period"]();
-    //
     date_plus_60_days = await data_modification["Get Date Plus 60 Days"]();
     V.NOTIFICATION_ACTIVE_UNTIL = date_plus_60_days;
-    //
     await admin_notifications_create_page["Admin Selects Notification Active Until"](V.NOTIFICATION_ACTIVE_UNTIL);
-    //
     // if the notification name exist already we cannot publish the notification
     randomvalue = await data_modification["Generate Random Letter And Number"]();
     V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR = `${str(V.NOTIFICATION_BANNER_MESSAGE_ERROR)} ${str(randomvalue)}`;
     await admin_notifications_create_page["Admin Fills Notification Name"](V.NOTIFICATION_BANNER_MESSAGE_NAME_ERROR);
-    //
     await admin_notifications_create_page["Admin Selects Type Of Notification"](V.NOTIFICATION_BANNER_MESSAGE_ERROR);
-    //
     await admin_notifications_create_page["Admin Selects Target Group All"]();
-    //
 
     randomvalue = await data_modification["Generate Random Letter And Number"]();
     V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI = `${str(V.NOTIFICATION_BANNER_MESSAGE_ERROR)} ${str(V.NOTIFICATION_BANNER_CLEANUP_PATTERN)} ${str(randomvalue)}`;
-    //
     await admin_notifications_create_page["Admin Fills Notification Text Fi"](V.NOTIFICATION_BANNER_MESSAGE_TEXT_FI);
-    //
     await admin_notifications_create_page["Admin Publishes Notification"]();
   },
 });

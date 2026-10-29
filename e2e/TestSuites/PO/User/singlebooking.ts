@@ -9,7 +9,6 @@ export const singlebooking = keywords("singlebooking", {
     await Browser["Type Text"]("input#search", search_text);
     // The search reads the typed text from the input
     await Browser["Get Property"]("input#search", "value", "==", search_text);
-    //
     // Click  button[type="submit"]
     await Browser["Click"]('[data-testid="searchButton"]');
     await Browser["Wait For Load State"]("load", named({ timeout: "15s" }));

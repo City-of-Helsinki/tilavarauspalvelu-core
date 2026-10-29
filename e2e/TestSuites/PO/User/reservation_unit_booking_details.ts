@@ -8,9 +8,7 @@ import "../../Resources/texts_FI";
 import "../../Resources/serial_users";
 
 export const reservation_unit_booking_details = keywords("reservation_unit_booking_details", {
-  //
   // BOOKING DETAILS
-  //
   "Type The Name Of The Booking": async (name_of_the_booking: RobotValue) => {
     await Browser["Type Text"]("id=reservation-form-field__name", name_of_the_booking);
   },

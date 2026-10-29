@@ -12,18 +12,15 @@ import { user_landingpage } from "../../PO/User/user_landingpage";
 import { custom_keywords } from "../../Resources/custom_keywords";
 import { devices } from "../../Resources/devices";
 import "../../Resources/variables";
-import "../../Resources/har_recording";
 import "../../Resources/serial_users";
 import "../../Resources/texts_FI";
 import "../../Resources/create_data";
 import "../../Resources/parallel_test_data";
 
 export const app_common = keywords("app_common", {
-  //
   // USER TEST SET UP
   // Desktop - iPhone - Android
   // LANGUAGE FI
-  //
   "User Opens Desktop Browser To Django Admin": async () => {
     // Default is chrome
     await devices["Set Up Chromium Desktop Browser And Open Url"](V.URL_DJANGO_ADMIN, V.DOWNLOAD_DIR);
@@ -54,15 +51,10 @@ export const app_common = keywords("app_common", {
     // Default is firefox
     await devices["Set Up Firefox Desktop Browser And Open Url"](V.URL_MAIL, V.DOWNLOAD_DIR);
 
-    //
     // END OF USER TEST SET UP
-    //
-
-    //
-    // USER
-    //
   },
 
+  // USER
   "User Logs In With Suomi Fi": async () => {
     await topnav["Click Login"]();
     await login["Login Suomi Fi"](V.CURRENT_USER_HETU);
@@ -114,12 +106,9 @@ export const app_common = keywords("app_common", {
       "0",
       named({ msg: "A notification banner is visible but should not be" })
     );
-
-    //
-    // Mobile
-    //
   },
 
+  // Mobile
   "User Logs Out Mobile": async () => {
     await topnav["Click Navigation Menu Mobile"]();
     await topnav["Click User Menu Mobile"]();
@@ -148,17 +137,12 @@ export const app_common = keywords("app_common", {
     // TODO enable these steps when the dropdown has user info again
     // topnav.Check dropdown menu has user info  ${BASIC_USER_MALE_FULLNAME}
 
-    //
     // END OF USER
-    //
-
-    //
-    // ADMIN TEST SET UP
-    // Desktop for now.
-    // LANGUAGE FI
-    //
   },
 
+  // ADMIN TEST SET UP
+  // Desktop for now.
+  // LANGUAGE FI
   "Admin Opens Desktop Browser To Landing Page": async () => {
     // Default is chrome
     // create_data.Create robot test data
@@ -219,15 +203,10 @@ export const app_common = keywords("app_common", {
     // Go To waits for the page to load
     await Browser["Go To"](V.URL_DJANGO_ADMIN);
 
-    //
     // END OF ADMIN TEST SET UP
-    //
-
-    //
-    // SWITCH PAGE
-    //
   },
 
+  // SWITCH PAGE
   "Switch To New Tab From Current Page": async () => {
     let page1: RobotValue;
     page1 = await Browser["Get Page Ids"]("ACTIVE", "ACTIVE", "ACTIVE");
@@ -321,8 +300,6 @@ export const app_common = keywords("app_common", {
       named({ msg: "Banner query returned errors" })
     );
 
-    //
     // END OF SWITCH PAGE
-    //
   },
 });

@@ -13,10 +13,6 @@ export const user_landingpage = keywords("user_landingpage", {
     await BuiltIn["Log"](expected_h1_text);
   },
 
-  "Landing Page H1 Should Contain": async (expected_h1_text: RobotValue) => {
-    await expect(loc("css=h1")).toContainText(str(expected_h1_text), { timeout: 15_000 });
-  },
-
   "Check The Name In The Login Button": async () => {
     await BuiltIn["Log"](V.BASIC_USER_MALE_FULLNAME);
     await expect(loc("id=userDropdown-button")).toHaveText(str(V.BASIC_USER_MALE_FULLNAME), { useInnerText: true });

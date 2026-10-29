@@ -14,7 +14,6 @@ import "./Resources/serial_users";
 import "./Resources/texts_FI";
 import "./Resources/parallel_test_data";
 import "./Resources/devices";
-import "./Resources/har_recording";
 import "./Resources/create_data";
 import "./Resources/suite_specific_units";
 
@@ -91,27 +90,21 @@ test.describe(
         await app_common["Permission Target Admin Logs In With Suomi Fi"]();
         await app_admin["Admin Checks Top Navigation For Notification Manager"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
 
         await BuiltIn["Log"]("Django admin changes permissions to viewer");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
         await django_admin["Admin Clicks First User"]();
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_VIEWER);
         await django_admin["Admin Saves Changes"]();
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Viewer"]();
         await app_admin["Admin Navigates To Own Units And Selects Unit Group"](V.UNIT_LOCATION);
         await app_admin["Admin Checks That Reservation Cannot Be Made"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
 
         await BuiltIn["Log"]("Django admin changes permissions to reserver");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
@@ -119,46 +112,36 @@ test.describe(
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_RESERVER);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Reserver"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();
         await admin_reservations["Admin Closes Dialog Modal"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
         await BuiltIn["Log"]("Django admin changes permissions to handler");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
         await django_admin["Admin Clicks First User"]();
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_HANDLER);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Handler"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();
         await admin_reservations["Admin Closes Dialog Modal"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
         await BuiltIn["Log"]("Django admin changes permissions to admin");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
         await django_admin["Admin Clicks First User"]();
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_ADMIN);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Admin"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();
@@ -187,20 +170,16 @@ test.describe(
         await BuiltIn["Log"]("Django admin changes permissions to viewer");
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_VIEWER);
         await django_admin["Admin Saves Changes"]();
-        //
         // Switch to Chromium browser for app admin checks
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
 
         await BuiltIn["Log"]("Checking permissions for viewer");
         await app_common["Permission Target Admin Logs In With Suomi Fi"]();
-        //
         await app_admin["Admin Checks Top Navigation For Viewer With Unit Permissions"]();
         await app_admin["Admin Navigates To Own Units And Selects Unit Group"](V.UNIT_LOCATION);
         await app_admin["Admin Checks That Reservation Cannot Be Made"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
 
         await BuiltIn["Log"]("Django admin changes permissions to reserver");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
@@ -208,46 +187,36 @@ test.describe(
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_RESERVER);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Reserver With Unit Permissions"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();
         await admin_reservations["Admin Closes Dialog Modal"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
         await BuiltIn["Log"]("Django admin changes permissions to handler");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
         await django_admin["Admin Clicks First User"]();
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_HANDLER);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Handler With Unit Permissions"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();
         await admin_reservations["Admin Closes Dialog Modal"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
         await BuiltIn["Log"]("Django admin changes permissions to admin");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
         await django_admin["Admin Clicks First User"]();
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_ADMIN);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Admin With Unit Permissions"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();
@@ -277,20 +246,16 @@ test.describe(
         await BuiltIn["Log"]("Django admin changes permissions to viewer");
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_VIEWER);
         await django_admin["Admin Saves Changes"]();
-        //
         // Switch to Chromium browser for app admin checks
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
 
         await BuiltIn["Log"]("Checking permissions for viewer");
         await app_common["Permission Target Admin Logs In With Suomi Fi"]();
-        //
         await app_admin["Admin Checks Top Navigation For Viewer With Group Unit Permissions"]();
         await app_admin["Admin Navigates To Own Units And Selects Unit Group"](V.UNIT_LOCATION);
         await app_admin["Admin Checks That Reservation Cannot Be Made"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
 
         await BuiltIn["Log"]("Django admin changes permissions to reserver");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
@@ -298,46 +263,36 @@ test.describe(
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_RESERVER);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Reserver With Group Unit Permissions"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();
         await admin_reservations["Admin Closes Dialog Modal"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
         await BuiltIn["Log"]("Django admin changes permissions to handler");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
         await django_admin["Admin Clicks First User"]();
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_HANDLER);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Handler With Group Unit Permissions"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();
         await admin_reservations["Admin Closes Dialog Modal"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_ADMIN_SIDE);
-        //
         await BuiltIn["Log"]("Django admin changes permissions to admin");
         await django_admin["Admin Searches The User By Email"](V.PERMISSION_TARGET_ADMIN_EMAIL);
         await django_admin["Admin Clicks First User"]();
         await django_admin["Admin Changes Permissions"](V.ADMIN_ROLE_ADMIN);
         await django_admin["Admin Saves Changes"]();
 
-        //
         await Browser["Switch Browser"](V.BROWSER_USER_SIDE);
         await app_common["Reload Page"]();
-        //
         await BuiltIn["Log"]("Checking permissions");
         await app_admin["Admin Checks Top Navigation For Admin With Group Unit Permissions"]();
         await app_admin["Admin Clicks Make Reservation And Checks Dialog Opens"]();

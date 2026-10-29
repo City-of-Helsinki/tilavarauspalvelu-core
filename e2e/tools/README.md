@@ -14,6 +14,14 @@ in the manifest), and is edited by hand since. While the Robot suite is still in
 hand: find the keyword with the same name, and make the same change in Playwright terms. If the fix renames a test,
 tag, keyword, argument or variable, rename it here too and update `naming-manifest.json`, then run `pnpm parity`.
 
+Keywords that the port replaced were removed, with their manifest entries: the HAR recording keywords of
+`har_recording.robot` (HAR recording is the `contextOptions` fixture in `lib/robot.ts`), the polling helpers that
+Playwright's waits replaced (`Url Should Have Changed`, `Url Should Start With` and the two `… Landing Page H1 Should
+Contain`), `Teardown Browser With HAR Finalization`, `Create Robot Test Data DISABLED`, and copies of
+`Admin Verifies Notification Is Not Found` and `User Clicks The Specific Terms Of Use Checkbox` in modules that don't
+use them. Keywords that no test calls yet are kept. If a Robot fix starts using a removed keyword, add it back here and
+to the manifest.
+
 ## Names
 
 Every Robot name is kept, and `pnpm parity` checks it:

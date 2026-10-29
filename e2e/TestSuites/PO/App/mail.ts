@@ -56,9 +56,5 @@ export const mail = keywords("mail", {
     // This sets "Alkamisaika: 1.11.2024 klo 11:00" and "Päättymisaika: 1.11.2024 klo 12:00"
     await BuiltIn["Log"]('this formats variables "FORMATTED_STARTTIME" and "FORMATTED_ENDTIME"');
     await data_modification["Formats Reservation Time To Start And End Time"](time_of_reservation);
-
-    //
-    //
-    //
   },
 });

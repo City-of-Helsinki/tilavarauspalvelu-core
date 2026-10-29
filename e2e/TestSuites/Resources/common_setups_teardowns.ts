@@ -10,7 +10,6 @@ import "../Resources/suite_specific_units";
 import "../Resources/variables";
 import "../Resources/serial_users";
 import "../Resources/devices";
-import "../Resources/har_recording";
 
 export const common_setups_teardowns = keywords("common_setups_teardowns", {
   // =============================================================================
@@ -46,12 +45,11 @@ export const common_setups_teardowns = keywords("common_setups_teardowns", {
         await BuiltIn["Log"](`👤 ${name}: ${str(V[name])}`);
       }
     }
-
-    // =============================================================================
-    // TEST TEARDOWN
-    // =============================================================================
   },
 
+  // =============================================================================
+  // TEST TEARDOWN
+  // =============================================================================
   /** Complete teardown with session cleanup */
   "Complete Test Teardown": async () => {
     // Port: Playwright takes full-page failure screenshots of the open pages when the test fails (the screenshot
