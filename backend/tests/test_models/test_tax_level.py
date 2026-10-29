@@ -5,11 +5,11 @@ from decimal import Decimal
 
 import pytest
 from django.db import IntegrityError
+from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.exceptions import TaxLevelHasNoRateError
+from tilavarauspalvelu.typing import error_codes
 
 from tests.factories import TaxLevelFactory, TaxLevelRateFactory
-from tests.helpers import exact
 
 # Applied to all tests
 pytestmark = [
@@ -30,9 +30,11 @@ def test_tax_level__get_percentage():
 def test_tax_level__get_percentage__no_rate_in_effect():
     tax_level = TaxLevelFactory.create(name="Yleinen", rates__begins=datetime.date(2024, 1, 1))
 
-    msg = "Tax level 'Yleinen' has no rate on 2023-12-31"
-    with pytest.raises(TaxLevelHasNoRateError, match=exact(msg)):
+    with pytest.raises(ValidationError) as error:
         tax_level.actions.get_percentage(on_date=datetime.date(2023, 12, 31))
+
+    assert error.value.detail == ["Tax level 'Yleinen' has no rate on 2023-12-31"]
+    assert error.value.detail[0].code == error_codes.TAX_LEVEL_HAS_NO_RATE
 
 
 def test_tax_level__name_is_unique():

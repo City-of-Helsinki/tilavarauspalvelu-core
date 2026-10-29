@@ -6,11 +6,12 @@ from decimal import Decimal
 
 import pytest
 from django.urls import reverse
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.date_utils import next_hour
+from utils.date_utils import local_date, local_datetime, next_hour
 from utils.utils import get_query_params, update_query_params
 
 from tests.factories import OrderFactory, ReservationFactory, ReservationUnitFactory
@@ -356,6 +357,33 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_cl
         "error_message": "Reservation unit has no active pricing information",
         "error_code": "RESERVATION_UNIT_NO_ACTIVE_PRICING",
     }
+
+
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
+    reservation = ReservationFactory.create_with_pending_payment(tax_percentage_value=Decimal("25.5"))
+
+    tax_level = reservation.reservation_unit.pricings.first().tax_level
+    tax_level.rates.update(begins=local_date(2024, 1, 2))
+
+    url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
+    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
+
+    api_client.force_login(reservation.user)
+    response = api_client.get(url)
+
+    query_params = get_query_params(response.url)
+
+    assert response.status_code == 302
+    assert query_params == {
+        "error_message": "Reservation unit pricing has no tax rate in effect today",
+        "error_code": "TAX_LEVEL_HAS_NO_RATE",
+    }
+
+    reservation.refresh_from_db()
+    assert reservation.tax_percentage_value == Decimal("25.5")
 
 
 @patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Error"))
