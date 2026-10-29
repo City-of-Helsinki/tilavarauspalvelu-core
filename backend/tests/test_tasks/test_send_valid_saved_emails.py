@@ -66,7 +66,7 @@ def test_send_valid_saved_emails__sending_fails__copy_created(outbox, settings) 
     assert messages[0].html_content == email_message.html_content
     assert messages[0].recipients == email_message.recipients
     assert messages[0].valid_until == email_message.valid_until
-    assert messages[0].created_at == email_message.created_at
+    assert messages[0].created_at == email_message.created_at.astimezone(datetime.UTC)
 
 
 @pytest.mark.django_db
@@ -103,4 +103,4 @@ def test_send_valid_saved_emails__partial_success__copy_created(outbox, settings
     assert messages[0].html_content == email_message.html_content
     assert messages[0].recipients == ["user2@example.com", "user3@example.com"]  # Recipients only ones that failed
     assert messages[0].valid_until == email_message.valid_until
-    assert messages[0].created_at == email_message.created_at
+    assert messages[0].created_at == email_message.created_at.astimezone(datetime.UTC)

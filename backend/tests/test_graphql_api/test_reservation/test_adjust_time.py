@@ -179,7 +179,7 @@ def test_reservation__adjust_time__no_active_pricing_in_new_time(graphql):
     ]
 
     reservation.refresh_from_db()
-    assert reservation.begins_at == reservation_begin
+    assert reservation.begins_at == reservation_begin.astimezone(datetime.UTC)
 
 
 def test_reservation__adjust_time__reservation_unit_not_reservable_in_new_time(graphql):
@@ -732,5 +732,5 @@ def test_reservation__adjust_time__overlapping_reservation_created_at_the_same_t
 
     # Reservation is not changed
     reservation.refresh_from_db()
-    assert reservation.begins_at == reservation_begin
-    assert reservation.ends_at == reservation_end
+    assert reservation.begins_at == reservation_begin.astimezone(datetime.UTC)
+    assert reservation.ends_at == reservation_end.astimezone(datetime.UTC)

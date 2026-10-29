@@ -95,7 +95,7 @@ def test_application_section__update__staff__does_not_reset_application_sent_at(
     assert response.has_errors is False, response
 
     application = Application.objects.get(pk=application_section.application.pk)
-    assert application.sent_at == sent_at
+    assert application.sent_at == sent_at.astimezone(datetime.UTC)
 
 
 # ── Application round ──

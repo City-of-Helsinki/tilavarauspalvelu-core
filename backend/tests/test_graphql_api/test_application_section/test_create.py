@@ -81,7 +81,7 @@ def test_application_section__create__staff__does_not_reset_application_sent_at(
     assert response.has_errors is False, response
 
     application = Application.objects.get(pk=application.pk)
-    assert application.sent_at == sent_at
+    assert application.sent_at == sent_at.astimezone(datetime.UTC)
 
 
 def test_application_section__create__too_many_sections(graphql, settings):

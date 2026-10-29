@@ -102,7 +102,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings, d
     assert stat.recurrence_uuid == str(reservation_series.ext_uuid)
     assert stat.reservation == reservation
     assert stat.reservation_confirmed_at == reservation.confirmed_at
-    assert stat.reservation_created_at == reservation.created_at
+    assert stat.reservation_created_at == reservation.created_at.astimezone(datetime.UTC)
     assert stat.reservation_handled_at == reservation.handled_at
     assert stat.reservation_type == reservation.type
     assert stat.reservee_address_zip == ""
