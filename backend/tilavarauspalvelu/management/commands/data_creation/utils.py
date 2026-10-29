@@ -18,7 +18,7 @@ from django.db import models
 from django.test import override_settings
 
 from tilavarauspalvelu.enums import ReservationFormType
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy, Space
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Sequence, Sized
@@ -96,8 +96,8 @@ def with_logs[**P, T](func: Callable[P, T]) -> Callable[P, T]:
 
 def defer_reservation_unit_create_operations[**P](func: Callable[P, None]) -> Callable[P, None]:
     """
-    Defer some operations that would trigger from reservation unit creation through signals.
-    Otherwise we would run these operations too many times when creating a lot of reservation units.
+    Defer some operations that would trigger from reservation unit and space creation through signals.
+    Otherwise we would run these operations too many times when creating a lot of reservation units and spaces.
     """
 
     @wraps(func)
@@ -107,8 +107,11 @@ def defer_reservation_unit_create_operations[**P](func: Callable[P, None]) -> Ca
             UPDATE_RESERVATION_UNIT_HIERARCHY=False,
             SAVE_RESERVATION_STATISTICS=False,
             UPDATE_SEARCH_VECTORS=False,
+            REBUILD_SPACE_HIERARCHY=False,
         ):
             func(*args, **kwargs)
+            print("Rebuilding space hierarchy...")  # noqa: T201
+            Space.objects.rebuild()
             print("Refreshing reservation unit hierarchy...")  # noqa: T201
             ReservationUnitHierarchy.refresh()
             print("Refreshing affecting time spans...")  # noqa: T201
