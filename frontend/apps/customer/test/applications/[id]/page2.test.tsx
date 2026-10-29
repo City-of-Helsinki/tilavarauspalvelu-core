@@ -82,11 +82,7 @@ describe("Application Page2", () => {
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
     expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
 
-    expect(
-      view.getByLabelText("application:Page2.prioritySelectLabel", {
-        selector: "button",
-      })
-    ).toBeInTheDocument();
+    expect(view.getByRole("group", { name: "application:Page2.prioritySelectLabel" })).toBeInTheDocument();
     expect(
       view.getByLabelText("application:Page2.reservationUnitSelectLabel", {
         selector: "button",
