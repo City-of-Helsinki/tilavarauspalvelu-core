@@ -157,7 +157,8 @@ def recreate_stale_test_database(config: pytest.Config) -> None:
     Recreate a reused test database with migrations if the model or migration files
     have changed since it was last created, e.g., after switching branches.
     """
-    if not config.option.reuse_db or config.cache is None:
+    # 'config.cache' does not exist when the cache plugin is off, e.g., with '-p no:cacheprovider'.
+    if not config.option.reuse_db or not config.pluginmanager.has_plugin("cacheprovider"):
         return
 
     if config.option.create_db:
@@ -193,7 +194,7 @@ def recreate_stale_test_database(config: pytest.Config) -> None:
 
 
 def save_test_database_schema_hash(config: pytest.Config, *, exitstatus: int) -> None:
-    if config.cache is None:
+    if not config.pluginmanager.has_plugin("cacheprovider"):
         return
 
     cache_key = get_schema_hash_cache_key(config)
