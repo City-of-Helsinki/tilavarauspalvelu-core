@@ -16,6 +16,7 @@ from tests.factories import (
     PriceOptionFactory,
     PricingGroupFactory,
     ReservationUnitPricingGroupFactory,
+    TaxLevelFactory,
     UnitGroupFactory,
 )
 
@@ -56,7 +57,9 @@ def test_save_price_component_changes__price_change_from_a_future_date():
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, amount=Decimal(10))
 
     active.valid_until = MAR_1
-    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=MAR_1, amount=Decimal(20))
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=MAR_1, amount=Decimal(20)
+    )
 
     save_price_component_changes(pricing_group=pricing_group, components=[active, new], deleted_component_pks=[])
 
@@ -73,7 +76,7 @@ def test_save_price_component_changes__price_change_from_a_future_date():
 
 def test_save_price_component_changes__first_components_can_begin_in_the_past():
     pricing_group = PricingGroupFactory.create()
-    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=JAN_1)
+    new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=JAN_1)
 
     save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
 
@@ -169,11 +172,30 @@ def test_save_price_component_changes__active_component_amount_cannot_be_changed
     assert PriceComponent.objects.get(pk=active.pk).amount == Decimal(10)
 
 
+def test_save_price_component_changes__active_component_tax_level_cannot_be_changed():
+    pricing_group = PricingGroupFactory.create()
+    active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
+    tax_level = active.tax_level
+
+    active.tax_level = TaxLevelFactory.create()
+
+    with pytest.raises(ValidationError) as error:
+        save_price_component_changes(pricing_group=pricing_group, components=[active], deleted_component_pks=[])
+
+    assert error_details(error.value) == [
+        ErrorDetail(
+            f"Price component {active.pk} is active. Only its end date can be changed.",
+            code=error_codes.PRICE_COMPONENT_ACTIVE_CHANGED,
+        ),
+    ]
+    assert PriceComponent.objects.get(pk=active.pk).tax_level == tax_level
+
+
 @pytest.mark.parametrize("valid_until", [FEB_1, FEB_15])
 def test_save_price_component_changes__active_component_end_must_be_in_the_future(valid_until):
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
-    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=APR_1)
+    new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=APR_1)
 
     active.valid_until = valid_until
 
@@ -212,7 +234,9 @@ def test_save_price_component_changes__active_component_cannot_be_deleted():
 def test_save_price_component_changes__new_component_must_begin_after_today(valid_from):
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
-    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=valid_from)
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=valid_from
+    )
 
     active.valid_until = MAR_1
 
@@ -271,7 +295,9 @@ def test_save_price_component_changes__component_of_another_group():
 )
 def test_save_price_component_changes__model_constraints_are_checked(component_fields, message, code):
     pricing_group = PricingGroupFactory.create()
-    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=JAN_1, **component_fields)
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=JAN_1, **component_fields
+    )
 
     with pytest.raises(ValidationError) as error:
         save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
@@ -301,7 +327,9 @@ def test_save_price_component_changes__model_constraints_are_checked_for_changed
 def test_save_price_component_changes__option_of_another_unit_group():
     pricing_group = PricingGroupFactory.create(unit_group=UnitGroupFactory.create())
     option = PriceOptionFactory.create(unit_group=UnitGroupFactory.create())
-    new = PriceComponentFactory.build(pricing_group=pricing_group, price_option=option, valid_from=JAN_1)
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), price_option=option, valid_from=JAN_1
+    )
 
     with pytest.raises(ValidationError) as error:
         save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
@@ -318,7 +346,9 @@ def test_save_price_component_changes__option_of_another_unit_group():
 def test_save_price_component_changes__own_group_cannot_use_options():
     pricing_group = PricingGroupFactory.create(unit_group=None)
     option = PriceOptionFactory.create()
-    new = PriceComponentFactory.build(pricing_group=pricing_group, price_option=option, valid_from=JAN_1)
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), price_option=option, valid_from=JAN_1
+    )
 
     with pytest.raises(ValidationError) as error:
         save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
@@ -335,7 +365,9 @@ def test_save_price_component_changes__inactive_option():
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     option = PriceOptionFactory.create(unit_group=unit_group, is_active=False)
-    new = PriceComponentFactory.build(pricing_group=pricing_group, price_option=option, valid_from=JAN_1)
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), price_option=option, valid_from=JAN_1
+    )
 
     with pytest.raises(ValidationError) as error:
         save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
@@ -354,7 +386,9 @@ def test_save_price_component_changes__existing_component_can_keep_an_inactive_o
     option.save()
 
     active.valid_until = MAR_1
-    new = PriceComponentFactory.build(pricing_group=pricing_group, price_option=None, valid_from=MAR_1)
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), price_option=None, valid_from=MAR_1
+    )
 
     save_price_component_changes(pricing_group=pricing_group, components=[active, new], deleted_component_pks=[])
 
@@ -367,7 +401,9 @@ def test_save_price_component_changes__existing_component_can_keep_an_inactive_o
 def test_save_price_component_changes__coverage_errors_save_nothing():
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
-    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=APR_1, amount=Decimal(20))
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=APR_1, amount=Decimal(20)
+    )
 
     active.valid_until = MAR_1
 
@@ -387,7 +423,7 @@ def test_save_price_component_changes__coverage_errors_save_nothing():
 def test_save_price_component_changes__coverage_includes_reservation_units():
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(pricing_group=pricing_group, begins=JAN_1)
-    new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=MAR_1)
+    new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=MAR_1)
 
     with pytest.raises(ValidationError) as error:
         save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
