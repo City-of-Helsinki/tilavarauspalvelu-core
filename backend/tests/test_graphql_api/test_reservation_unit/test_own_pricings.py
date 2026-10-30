@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -15,10 +16,14 @@ from tests.factories import (
     PricingGroupFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
+    TaxLevelFactory,
     UnitGroupFactory,
 )
 
 from .helpers import CREATE_MUTATION, UPDATE_MUTATION, get_create_draft_input_data
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import TaxLevel
 
 # Applied to all tests
 pytestmark = [
@@ -29,12 +34,13 @@ pytestmark = [
 # ── Helpers ──
 
 
-def own_pricing_input(*, begins: datetime.date, amount: str, pk: int | None = None) -> dict:
+def own_pricing_input(*, begins: datetime.date, amount: str, tax_level: TaxLevel, pk: int | None = None) -> dict:
     data = {
         "begins": begins.isoformat(),
         "amount": amount,
         "priceUnit": PriceUnit.PER_HOUR,
         "paymentType": PaymentType.ONLINE,
+        "taxLevel": tax_level.pk,
         "canApplyForDiscount": True,
     }
     if pk is not None:
@@ -48,9 +54,13 @@ def own_pricing_input(*, begins: datetime.date, amount: str, pk: int | None = No
 def test_reservation_unit__own_pricings__create(graphql):
     today = local_date()
 
+    tax_level = TaxLevelFactory.create()
+
     graphql.login_with_superuser()
 
-    input_data = get_create_draft_input_data(ownPricings=[own_pricing_input(begins=today, amount="10.00")])
+    input_data = get_create_draft_input_data(
+        ownPricings=[own_pricing_input(begins=today, amount="10.00", tax_level=tax_level)],
+    )
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response
@@ -68,6 +78,7 @@ def test_reservation_unit__own_pricings__create(graphql):
     assert components[0].valid_until is None
     assert components[0].amount == Decimal(10)
     assert components[0].can_apply_for_discount is True
+    assert components[0].tax_level == tax_level
 
 
 # ── Update ──
@@ -79,7 +90,10 @@ def test_reservation_unit__own_pricings__first_pricing_can_begin_in_the_past(gra
 
     graphql.login_with_superuser()
 
-    input_data = {"pk": reservation_unit.pk, "ownPricings": [own_pricing_input(begins=begins, amount="10.00")]}
+    input_data = {
+        "pk": reservation_unit.pk,
+        "ownPricings": [own_pricing_input(begins=begins, amount="10.00", tax_level=TaxLevelFactory.create())],
+    }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response
@@ -113,8 +127,8 @@ def test_reservation_unit__own_pricings__add_future_pricing(graphql):
     input_data = {
         "pk": reservation_unit.pk,
         "ownPricings": [
-            own_pricing_input(begins=active.valid_from, amount="10.00", pk=active.pk),
-            own_pricing_input(begins=future_date, amount="20.00"),
+            own_pricing_input(begins=active.valid_from, amount="10.00", tax_level=active.tax_level, pk=active.pk),
+            own_pricing_input(begins=future_date, amount="20.00", tax_level=TaxLevelFactory.create()),
         ],
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
@@ -155,7 +169,9 @@ def test_reservation_unit__own_pricings__remove_future_pricing(graphql):
 
     input_data = {
         "pk": reservation_unit.pk,
-        "ownPricings": [own_pricing_input(begins=active.valid_from, amount="10.00", pk=active.pk)],
+        "ownPricings": [
+            own_pricing_input(begins=active.valid_from, amount="10.00", tax_level=active.tax_level, pk=active.pk)
+        ],
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
@@ -183,7 +199,10 @@ def test_reservation_unit__own_pricings__shared_group_is_rejected(graphql):
     graphql.login_with_superuser()
 
     future_date = today + datetime.timedelta(days=10)
-    input_data = {"pk": reservation_unit.pk, "ownPricings": [own_pricing_input(begins=future_date, amount="20.00")]}
+    input_data = {
+        "pk": reservation_unit.pk,
+        "ownPricings": [own_pricing_input(begins=future_date, amount="20.00", tax_level=TaxLevelFactory.create())],
+    }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     assert response.has_errors is True, response
@@ -208,7 +227,10 @@ def test_reservation_unit__own_pricings__own_group_used_by_another_reservation_u
     graphql.login_with_superuser()
 
     future_date = today + datetime.timedelta(days=10)
-    input_data = {"pk": reservation_unit.pk, "ownPricings": [own_pricing_input(begins=future_date, amount="20.00")]}
+    input_data = {
+        "pk": reservation_unit.pk,
+        "ownPricings": [own_pricing_input(begins=future_date, amount="20.00", tax_level=TaxLevelFactory.create())],
+    }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     assert response.has_errors is True, response

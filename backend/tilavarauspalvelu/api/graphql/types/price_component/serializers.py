@@ -31,13 +31,14 @@ class PriceComponentInputSerializer(NestingModelSerializer):
             "can_apply_for_discount",
             "material_price_description",
             "payment_type",
+            "tax_level",
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         if data.get("pk") is not None:
             return data
 
-        missing_fields = [field for field in ("valid_from", "amount", "price_unit") if field not in data]
+        missing_fields = [field for field in ("valid_from", "amount", "price_unit", "tax_level") if field not in data]
         if missing_fields:
             msg = f"New price component is missing required fields: {', '.join(missing_fields)}."
             raise ValidationError(msg, code=error_codes.REQUIRED_FIELD_MISSING)

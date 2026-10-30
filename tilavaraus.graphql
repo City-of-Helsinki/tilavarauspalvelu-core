@@ -2432,6 +2432,7 @@ type PriceComponentNode implements Node {
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
   paymentType: PaymentType
+  taxLevel: TaxLevelNode!
 
   """The ID of the object"""
   id: ID!
@@ -2456,6 +2457,17 @@ type PriceOptionNode implements Node {
 
   """The ID of the object"""
   id: ID!
+  pk: Int
+}
+
+type TaxLevelNode implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+
+  """The ID of the object"""
+  id: ID!
+  currentPercentage: Decimal
   pk: Int
 }
 
@@ -2853,17 +2865,6 @@ type TaxLevelNodeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
-}
-
-type TaxLevelNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object"""
-  id: ID!
-  currentPercentage: Decimal
-  pk: Int
 }
 
 """Ordering fields for the 'TaxLevel' model."""
@@ -4084,6 +4085,7 @@ input OwnPricingInputSerializerInput {
   amount: Decimal!
   priceUnit: PriceUnit!
   paymentType: PaymentType
+  taxLevel: Int!
   canApplyForDiscount: Boolean
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
@@ -4328,6 +4330,7 @@ input UpdatePriceComponentInputSerializerInput {
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
   paymentType: PaymentType
+  taxLevel: Int
 }
 
 type IntendedUseCreateMutationPayload {

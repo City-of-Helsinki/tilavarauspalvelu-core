@@ -25,7 +25,14 @@ from tilavarauspalvelu.enums import AccessType, PaymentType, PriceUnit, Reservat
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing, Resource, Space
+from tilavarauspalvelu.models import (
+    ReservationUnit,
+    ReservationUnitAccessType,
+    ReservationUnitPricing,
+    Resource,
+    Space,
+    TaxLevel,
+)
 from tilavarauspalvelu.services.pricing.own_pricing import OwnPricing, save_own_pricings
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime
@@ -59,6 +66,7 @@ class OwnPricingInputSerializer(serializers.Serializer):
         required=False,
         allow_null=True,
     )
+    tax_level = serializers.PrimaryKeyRelatedField(queryset=TaxLevel.objects.all())
     can_apply_for_discount = serializers.BooleanField(required=False)
     material_price_description_fi = serializers.CharField(required=False, allow_blank=True)
     material_price_description_en = serializers.CharField(required=False, allow_blank=True)
@@ -495,6 +503,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 amount=pricing["amount"],
                 price_unit=pricing["price_unit"],
                 payment_type=pricing.get("payment_type"),
+                tax_level=pricing["tax_level"],
                 can_apply_for_discount=pricing.get("can_apply_for_discount", False),
                 material_price_description_fi=pricing.get("material_price_description_fi", ""),
                 material_price_description_en=pricing.get("material_price_description_en", ""),

@@ -15,6 +15,7 @@ from tests.factories import (
     PricingGroupFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
+    TaxLevelFactory,
     UnitGroupFactory,
     UserFactory,
 )
@@ -42,6 +43,7 @@ def component_input(component: PriceComponent, **overrides) -> dict:
         "materialPriceDescriptionFi": component.material_price_description_fi or "",
         "materialPriceDescriptionEn": component.material_price_description_en or "",
         "materialPriceDescriptionSv": component.material_price_description_sv or "",
+        "taxLevel": component.tax_level.pk,
     }
     data.update(overrides)
     return data
@@ -53,6 +55,7 @@ def new_component_input() -> dict:
         "amount": "10.00",
         "priceUnit": PriceUnit.PER_HOUR,
         "paymentType": PaymentType.ONLINE,
+        "taxLevel": TaxLevelFactory.create().pk,
     }
 
 
@@ -81,6 +84,7 @@ def test_pricing_group__update_components__price_change_from_a_future_date(graph
                 "amount": "20.00",
                 "priceUnit": PriceUnit.PER_HOUR,
                 "paymentType": PaymentType.ONLINE,
+                "taxLevel": active.tax_level.pk,
             },
         ],
     }
@@ -96,6 +100,7 @@ def test_pricing_group__update_components__price_change_from_a_future_date(graph
     assert components[1].valid_until is None
     assert components[1].amount == Decimal(20)
     assert components[1].payment_type == PaymentType.ONLINE
+    assert components[1].tax_level == active.tax_level
 
 
 def test_pricing_group__update_components__delete_future_component(graphql):
@@ -150,6 +155,7 @@ def test_pricing_group__update_components__left_out_fields_keep_saved_values(gra
                 "amount": "20.00",
                 "priceUnit": PriceUnit.PER_HOUR,
                 "paymentType": PaymentType.ON_SITE,
+                "taxLevel": active.tax_level.pk,
             },
         ],
     }
@@ -258,6 +264,7 @@ def test_pricing_group__update_components__constraint_errors_have_codes(graphql)
                 "amount": "10.00",
                 "priceUnit": PriceUnit.PER_HOUR,
                 "paymentType": None,
+                "taxLevel": TaxLevelFactory.create().pk,
             },
         ],
     }
@@ -287,7 +294,7 @@ def test_pricing_group__update_components__required_fields(graphql):
     assert response.field_errors == [
         {
             "field": "components.0.nonFieldErrors",
-            "message": "New price component is missing required fields: valid_from, amount, price_unit.",
+            "message": "New price component is missing required fields: valid_from, amount, price_unit, tax_level.",
             "code": error_codes.REQUIRED_FIELD_MISSING,
         },
     ]
