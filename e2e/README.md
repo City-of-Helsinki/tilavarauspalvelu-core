@@ -134,6 +134,9 @@ the runtime offline.
 - **My bookings tabs:** `mybookings.Navigate To Cancelled/Past/Upcoming Bookings` focus the tab before clicking it
   and check that it got selected. The HDS tab list slides when a tab gets focus, and on mobile WebKit the slide could
   make a plain click miss.
+- **Mobile menu:** the app opens a page from the HDS mobile menu without a reload, so the menu stays open, and while
+  it is open HDS uses the next click outside it only to close the menu. `topnav.Navigate To My Bookings Mobile` and
+  `Navigate To Single Booking Page Mobile` close it with Escape.
 - **Browsers:** each project's browser and device are in its `use` options in `playwright.config.ts`: Chromium at
   1440×900 on desktop, Pixel 5 and iPhone 14 on mobile. Playwright starts one browser per worker and gives each test
   a new context and page, which the "Set Up … And Open Url" keywords in `devices` open. A second one in a test opens
@@ -168,12 +171,13 @@ in the HTML report's `index.html`, so it works on a report downloaded from CI to
 passed tests, and `--extract DIR` writes the report's JSON files. Each failure also has an `error-context.md`
 with the page's accessibility snapshot, next to its screenshot.
 
-**Backend errors:** while a test runs, `lib/backend-errors.ts` watches its page loads and API calls to the test
-environment's services (`*.test.hel.ninja`, except Sentry). It adds a "backend error" annotation to the attempt,
-with the time, for each 5xx response, failed request, request that took 10 s or more, GraphQL response with errors,
-error page of the apps ("503: Palaamme pian!" comes with status 200) and uncaught error in a page. When the test
-fails, it also adds each request that has had no answer for 5 s, and each open page that shows an error page (the
-customer app can render one in the browser). The HTML report shows them at the top of the attempt, and
+**Backend errors:** while a test runs, `lib/backend-errors.ts` watches its page loads, scripts and API calls to the
+test environment's services (`*.test.hel.ninja`, except Sentry). It adds a "backend error" annotation to the
+attempt, with the time, for each 5xx response, script that didn't load (a 4xx too), failed request, request that
+took 10 s or more, GraphQL response with errors, error page of the apps ("503: Palaamme pian!" comes with status 200)
+and uncaught error in a page. When the test fails, it also adds each request that has had no answer for 5 s, and
+each open page that shows an error page (the customer app can render one in the browser) or no text at all (a page
+whose scripts didn't load or run). The HTML report shows them at the top of the attempt, and
 `report_summary.py` under it. They show whether a flaky test met a backend failure, and when. URLs are shown without
 their query strings, and no headers or request bodies are recorded. Cancelled requests are left out, as are the
 access control errors that WebKit reports for fetches a navigation cancels. A request that a page load or reload

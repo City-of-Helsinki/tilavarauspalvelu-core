@@ -1,14 +1,15 @@
 /**
  * Records what went wrong between the browser and the test environment while a test runs, as "backend error"
- * annotations of the test attempt: 5xx responses, failed requests, requests that took 10 s or more, GraphQL errors,
- * the apps' error pages ("503: Palaamme pian!" is served with status 200), and uncaught errors in the pages. When a
- * test fails, also the requests still unanswered and the open pages that show an error page (the customer app can
- * render one in the browser). A flaky test's report then shows whether the backend failed, and when.
+ * annotations of the test attempt: 5xx responses, scripts that didn't load (a 4xx too), failed requests, requests
+ * that took 10 s or more, GraphQL errors, the apps' error pages ("503: Palaamme pian!" is served with status 200), and
+ * uncaught errors in the pages. When a test fails, also the requests still unanswered and the open pages that show an
+ * error page (the customer app can render one in the browser) or nothing at all (a page whose scripts didn't load or
+ * run). A flaky test's report then shows whether the backend failed, and when.
  *
- * Only page loads and API calls (document, fetch, xhr) to the test environment's services are watched: the pages
- * also call production and city APIs (the service map, Linked Events) and Sentry, which the browser often can't reach
- * from the test environment. URLs are shown without their query strings, and no headers or request bodies are
- * recorded.
+ * Only page loads, scripts and API calls (document, script, fetch, xhr) to the test environment's services are
+ * watched: the pages also call production and city APIs (the service map, Linked Events) and Sentry, which the browser
+ * often can't reach from the test environment. URLs are shown without their query strings, and no headers or request
+ * bodies are recorded.
  */
 import { setTimeout as delay } from "node:timers/promises";
 import type { BrowserContext, Frame, Page, Request, Response, TestInfo, WebError } from "@playwright/test";
@@ -25,7 +26,7 @@ const SLOW_MS = 10_000;
 /** How long a response body is read for, and how long the end of the test waits for the reads still going on */
 const BODY_MS = 5000;
 
-const WATCHED_TYPES = new Set(["document", "fetch", "xhr"]);
+const WATCHED_TYPES = new Set(["document", "script", "fetch", "xhr"]);
 /** A request that the page or Playwright cancelled, e.g. by navigating away or redirecting, isn't an error */
 const ABORTED = /ERR_ABORTED|NS_BINDING_ABORTED|NS_ERROR_ABORT|cancell?ed|Frame load interrupted/i;
 /** WebKit reports a fetch that a navigation cancels as an uncaught access control error */
@@ -108,7 +109,7 @@ export class BackendErrors {
   /** The reads of response bodies, which the end of the test waits for */
   private readonly reads: Array<Promise<void>> = [];
   private readonly contexts: BrowserContext[] = [];
-  /** The pages whose error page has been recorded */
+  /** The pages already recorded as showing an error page or nothing */
   private readonly errorPages = new Set<Page>();
 
   private readonly watched: (url: URL) => boolean;
@@ -196,8 +197,9 @@ export class BackendErrors {
   }
 
   /**
-   * Records the open pages that show one of the apps' error pages, if the test has failed. The customer app can render
-   * its error page in the browser, without an error response. Called before contexts close.
+   * Records the open pages that show one of the apps' error pages or no text at all, if the test has failed. The
+   * customer app can render its error page in the browser, without an error response, and a page whose scripts didn't
+   * load or run stays blank. Called before contexts close.
    */
   async noteErrorPages(): Promise<void> {
     if (this.info.status === this.info.expectedStatus) {
@@ -208,18 +210,25 @@ export class BackendErrors {
         continue;
       }
       try {
+        const url = new URL(page.url());
         const heading = page.locator(ERROR_PAGE_HEADING).first();
         // oxlint-disable-next-line no-await-in-loop -- one page at a time
         if ((await heading.count()) > 0) {
           // oxlint-disable-next-line no-await-in-loop -- one page at a time
           const testId = (await heading.getAttribute("data-testid")) ?? "";
           const code = /^error__(.*)--title$/.exec(testId)?.[1] ?? testId;
-          const url = new URL(page.url());
           this.errorPages.add(page);
           this.add(Date.now(), `the page shows the error page "${code}": ${url.host}${url.pathname}`);
+        } else if (url.protocol.startsWith("http") && this.watched(url)) {
+          // oxlint-disable-next-line no-await-in-loop -- one page at a time
+          const text = await page.evaluate(() => document.body.innerText.trim());
+          if (text === "") {
+            this.errorPages.add(page);
+            this.add(Date.now(), `the page is blank: ${url.host}${url.pathname}`);
+          }
         }
       } catch {
-        // The page closed
+        // The page closed, or has no body
       }
     }
   }
@@ -296,7 +305,8 @@ export class BackendErrors {
       return;
     }
     const at = Date.now();
-    if (response.status() >= 500) {
+    // A script that didn't load leaves its page broken or blank, so its 4xx counts too
+    if (response.status() >= 500 || (response.status() >= 400 && request.resourceType() === "script")) {
       // The gateway's 502 comes without a status text
       const status = `${response.status()} ${response.statusText()}`.trim();
       this.add(at, `${status}: ${describe(request)}`);
