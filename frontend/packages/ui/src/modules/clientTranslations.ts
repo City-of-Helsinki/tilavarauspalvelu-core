@@ -5,11 +5,12 @@ import type { SSRConfig, UserConfig } from "next-i18next/pages";
 /// For example _error after a client side render error.
 /// appWithTranslation drops the i18n provider if pageProps has no _nextI18Next,
 /// so reuse the translations the browser already loaded for the previous page.
-export function getClientTranslations(userConfig: UserConfig): SSRConfig {
+/// Pass the router locale if the caller has it. Else the current i18n language is used.
+export function getClientTranslations(userConfig: UserConfig, locale?: string): SSRConfig {
   if (typeof window === "undefined" || i18n == null) {
     return {};
   }
-  const lang = i18n.language;
+  const lang = locale ?? i18n.language;
   return {
     _nextI18Next: {
       initialI18nStore: i18n.store.data,

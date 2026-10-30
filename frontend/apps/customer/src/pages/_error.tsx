@@ -14,7 +14,7 @@ const CustomErrorComponent: NextPage<ErrorProps> = (props) => {
 CustomErrorComponent.getInitialProps = async (contextData) => {
   await Sentry.captureUnderscoreErrorException(contextData);
   const errorProps = await Error.getInitialProps(contextData);
-  return { ...errorProps, ...getClientTranslations(i18nConfig) };
+  return { ...errorProps, ...getClientTranslations(i18nConfig, contextData.locale) };
 };
 
 export default CustomErrorComponent;
