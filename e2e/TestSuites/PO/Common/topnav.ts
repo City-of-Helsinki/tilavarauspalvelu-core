@@ -1,5 +1,5 @@
 /** A resource file with top navigation keywords. */
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import {
@@ -14,14 +14,14 @@ import {
  * Clicks a logout button and waits until the logout is done: signOut (packages/ui) ends on the app's /auth/logout/,
  * which redirects back to the app after the session is destroyed.
  */
-async function clickAndWaitForLogout(page: Page, logout_button: string): Promise<void> {
+async function clickAndWaitForLogout(page: Page, logout_button: Locator): Promise<void> {
   const app_host = new URL(page.url()).host;
   // Waiting together, so a failed click doesn't leave the response wait unhandled
   await Promise.all([
     page.waitForResponse((response) => new URL(response.url()).pathname.endsWith("/auth/logout/"), {
       timeout: 30_000,
     }),
-    page.locator(logout_button).click(),
+    logout_button.click(),
   ]);
   await page.waitForURL((url) => url.host === app_host && !url.pathname.endsWith("/auth/logout/"));
 }
@@ -35,17 +35,18 @@ export class Topnav extends PageObject {
   @step("topnav.Click Login Admin Side")
   async clickLoginAdminSide() {
     await this.page.locator("h1").waitFor({ state: "visible" });
-    await this.page.locator(`button >> span:text-is("${LOGIN_TEXT_ADMIN}") >> nth=-1`).click();
+    // The landing page's button: the header has a login button of the same name before it
+    await this.page.getByRole("button", { name: LOGIN_TEXT_ADMIN, exact: true }).last().click();
   }
 
   @step("topnav.Click Logout")
   async clickLogout() {
-    await clickAndWaitForLogout(this.page, '[aria-label="Kirjaudu ulos"]');
+    await clickAndWaitForLogout(this.page, this.page.getByRole("button", { name: "Kirjaudu ulos", exact: true }));
   }
 
   @step("topnav.Click Logout Admin Side")
   async clickLogoutAdminSide() {
-    await clickAndWaitForLogout(this.page, '[aria-label="signout"]');
+    await clickAndWaitForLogout(this.page, this.page.locator('[aria-label="signout"]'));
   }
 
   @step("topnav.Click User Menu")
@@ -67,14 +68,14 @@ export class Topnav extends PageObject {
   @step("topnav.Navigate To Single Booking Page")
   async navigateToSingleBookingPage() {
     await this.pages.customKeywords.clickAndWaitForPage(
-      `header >> [href="/search"]:text-is("${SINGLEBOOKING_FI}")`,
+      this.page.locator("header").getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
       "/search"
     );
   }
 
   @step("topnav.Navigate To My Bookings")
   async navigateToMyBookings() {
-    await this.page.locator(`header >> [href="/reservations"]:text-is("${MYBOOKINGS_FI}")`).click();
+    await this.page.locator("header").getByRole("link", { name: MYBOOKINGS_FI, exact: true }).click();
 
     // Confirms page is loaded
     await this.pages.mybookings.checkMyBookingsH1(MYBOOKINGS_FI);
@@ -83,13 +84,13 @@ export class Topnav extends PageObject {
 
   @step("topnav.Navigate To Recurring Booking Page")
   async navigateToRecurringBookingPage() {
-    await this.page.locator(`header >> [href="/recurring"]:text-is("${RECURRING_BOOKINGS_FI}")`).click();
+    await this.page.locator("header").getByRole("link", { name: RECURRING_BOOKINGS_FI, exact: true }).click();
     await this.page.waitForURL((url) => url.pathname === "/recurring");
   }
 
   @step("topnav.Navigate To My Applications")
   async navigateToMyApplications() {
-    await this.page.locator(`header >> [href="/applications"]:text-is("${MYAPPLICATIONS_FI}")`).click();
+    await this.page.locator("header").getByRole("link", { name: MYAPPLICATIONS_FI, exact: true }).click();
     await this.page.waitForURL((url) => url.pathname === "/applications");
   }
 
@@ -112,7 +113,7 @@ export class Topnav extends PageObject {
 
   @step("topnav.Click Logout Mobile")
   async clickLogoutMobile() {
-    await clickAndWaitForLogout(this.page, '[aria-label="Kirjaudu ulos"]');
+    await clickAndWaitForLogout(this.page, this.page.getByRole("button", { name: "Kirjaudu ulos", exact: true }));
   }
 
   @step("topnav.Click Tablist Scroll Button To Right Mobile")
@@ -140,7 +141,7 @@ export class Topnav extends PageObject {
   async navigateToSingleBookingPageMobile() {
     await this.page.locator("#Menu").click();
     await this.pages.customKeywords.clickAndWaitForPage(
-      `header >> [href="/search"]:text-is("${SINGLEBOOKING_FI}")`,
+      this.page.locator("header").getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
       "/search"
     );
   }

@@ -27,11 +27,12 @@ export class ReservationUnitReserverInfo extends PageObject {
   @step("reservation_unit_reserver_info.Select Home City")
   async selectHomeCity(homecity: string) {
     const main_button = "#reservation-form-field__municipality-main-button";
-    const selected_city = this.page.locator(main_button).locator(`text="${homecity}"`);
+    // The button shows the selected city in an element of its own
+    const selected_city = this.page.locator(main_button).getByText(homecity, { exact: true });
     // Clicking the selected city would unselect it
     if ((await selected_city.count()) === 0) {
       await this.page.locator(main_button).click();
-      await this.pages.customKeywords.findAndClickElementWithText("li", homecity);
+      await this.page.getByRole("option", { name: homecity, exact: true }).click();
     }
     await selected_city.first().waitFor({ state: "visible", timeout: 5000 });
     await this.pages.customKeywords.closeSelectListIfOpen(main_button);

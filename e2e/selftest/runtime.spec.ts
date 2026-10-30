@@ -492,6 +492,51 @@ test.describe("Runtime self-test", () => {
     expect(recorded.join("\n")).not.toContain("selftest-query");
   });
 
+  testWithBrowser("Requests that a page load ends count only if they had waited", async ({ context, page }) => {
+    // The page sends a request that never answers, another one 600 ms later, and then loads the next page, which ends
+    // both. The browser doesn't always report such requests as failed, so they count by how long they had waited.
+    const server = createServer((request, response) => {
+      if (request.url === "/") {
+        response.writeHead(200, { "content-type": "text/html" });
+        response.end(`<script>
+          fetch("/waited");
+          setTimeout(() => {
+            fetch("/just-sent");
+            location.href = "/next";
+          }, 600);
+        </script>`);
+      } else if (request.url === "/next") {
+        response.writeHead(200, { "content-type": "text/html" });
+        response.end("<p>next</p>");
+      } else if (request.url !== "/waited" && request.url !== "/just-sent") {
+        response.writeHead(404).end();
+      }
+    });
+    await once(server.listen(0, "127.0.0.1"), "listening");
+    const { port } = server.address() as AddressInfo;
+    // A failed test's info, so that unanswered requests are recorded
+    const info = {
+      status: "failed" as const,
+      expectedStatus: "passed" as const,
+      annotations: [] as Array<{ type: string; description?: string }>,
+    };
+    const backendErrors = new BackendErrors(info, { watched: () => true, pendingMs: 300 });
+    backendErrors.watch(context);
+    try {
+      const justSent = page.waitForRequest((request) => request.url().endsWith("/just-sent"));
+      await page.goto(`http://127.0.0.1:${port}/`);
+      await justSent;
+      await expect(page.locator("p")).toHaveText("next");
+      await backendErrors.finish();
+    } finally {
+      server.closeAllConnections();
+      server.close();
+    }
+    const recorded = info.annotations.map((annotation) => annotation.description ?? "").join("\n");
+    expect(recorded).toContain(`then the page was reloaded or left: GET 127.0.0.1:${port}/waited`);
+    expect(recorded).not.toContain("/just-sent");
+  });
+
   testWithBrowser(
     "The session opens the test's own page first, then contexts of their own",
     async ({ browser, context, page }, info) => {

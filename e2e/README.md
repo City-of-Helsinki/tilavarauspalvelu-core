@@ -176,4 +176,6 @@ fails, it also adds each request that has had no answer for 5 s, and each open p
 customer app can render one in the browser). The HTML report shows them at the top of the attempt, and
 `report_summary.py` under it. They show whether a flaky test met a backend failure, and when. URLs are shown without
 their query strings, and no headers or request bodies are recorded. Cancelled requests are left out, as are the
-access control errors that WebKit reports for fetches a navigation cancels.
+access control errors that WebKit reports for fetches a navigation cancels. A request that a page load or reload
+ended counts as unanswered only if it had waited 5 s by then, because the browser doesn't always report such requests
+as cancelled.
