@@ -268,6 +268,43 @@ def test_reservation_unit__create__pricing__creating_future_pricing_without_acti
     assert ReservationUnit.objects.count() == 0
 
 
+def test_reservation_unit__create__pricing__first_pricing_can_begin_in_past(graphql):
+    graphql.login_with_superuser()
+    last_year = local_date() - datetime.timedelta(days=365)
+    tomorrow = local_date() + datetime.timedelta(days=1)
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(begins=last_year.isoformat()),
+            get_pricing_data(begins=tomorrow.isoformat()),
+        ],
+    )
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert sorted(reservation_unit.pricings.values_list("begins", flat=True)) == [last_year, tomorrow]
+
+
+def test_reservation_unit__create__pricing__second_pricing_cannot_begin_in_past(graphql):
+    graphql.login_with_superuser()
+    last_year = local_date() - datetime.timedelta(days=365)
+    yesterday = local_date() - datetime.timedelta(days=1)
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(begins=last_year.isoformat()),
+            get_pricing_data(begins=yesterday.isoformat()),
+        ],
+    )
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_BEGINS_IN_PAST
+    assert ReservationUnit.objects.count() == 0
+
+
 def test_reservation_unit__create__pricing__cannot_use_disabled_tax_percentage(graphql):
     tax_percentage = TaxPercentageFactory.create(is_enabled=False, value=Decimal("11.0"))
 
@@ -382,7 +419,33 @@ def test_reservation_unit__update__pricing__future_pricing_can_be_created_on_upd
     assert reservation_unit.pricings.count() == 2
 
 
-def test_reservation_unit__update__pricing__add_another_active_pricing(graphql):
+def test_reservation_unit__update__pricing__new_pricing_can_begin_today(graphql):
+    graphql.login_with_superuser()
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(begins="2022-09-01"),
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 1
+
+    today = local_date()
+    data["pk"] = reservation_unit.pk
+    data["pricings"][0]["pk"] = reservation_unit.pricings.first().pk
+    data["pricings"].append(get_pricing_data(begins=today.isoformat()))
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert sorted(reservation_unit.pricings.values_list("begins", flat=True)) == [datetime.date(2022, 9, 1), today]
+
+
+def test_reservation_unit__update__pricing__new_pricing_cannot_begin_in_past(graphql):
     graphql.login_with_superuser()
     data = get_create_draft_input_data(
         pricings=[
@@ -398,13 +461,45 @@ def test_reservation_unit__update__pricing__add_another_active_pricing(graphql):
 
     data["pk"] = reservation_unit.pk
     data["pricings"][0]["pk"] = reservation_unit.pricings.first().pk
-    data["pricings"].append(get_pricing_data(begins="2022-09-02"))  # Becomes the new active pricing
+    data["pricings"].append(get_pricing_data(begins="2022-09-02"))
     response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_BEGINS_IN_PAST
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.pricings.count() == 1
+
+
+def test_reservation_unit__update__pricing__saved_pricing_cannot_move_to_past(graphql):
+    graphql.login_with_superuser()
+    tomorrow = local_date() + datetime.timedelta(days=1)
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(begins="2022-09-01"),
+            get_pricing_data(begins=tomorrow.isoformat()),
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
-    reservation_unit.refresh_from_db()
-    assert reservation_unit.pricings.count() == 2
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    past_pricing = reservation_unit.pricings.get(begins=datetime.date(2022, 9, 1))
+    future_pricing = reservation_unit.pricings.get(begins=tomorrow)
+
+    yesterday = local_date() - datetime.timedelta(days=1)
+    data["pk"] = reservation_unit.pk
+    data["pricings"][0]["pk"] = past_pricing.pk
+    data["pricings"][1]["pk"] = future_pricing.pk
+    data["pricings"][1]["begins"] = yesterday.isoformat()
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_BEGINS_IN_PAST
+
+    future_pricing.refresh_from_db()
+    assert future_pricing.begins == tomorrow
 
 
 def test_reservation_unit__update__pricing__add_another_future_pricing(graphql):
