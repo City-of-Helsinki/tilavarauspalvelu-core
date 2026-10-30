@@ -512,7 +512,12 @@ def test_save_price_component_changes__own_group_in_inconsistent_application_rou
     )
 
     own_component.valid_until = MAR_1
-    new = PriceComponentFactory.build(pricing_group=own_group, valid_from=MAR_1, amount=Decimal(20))
+    new = PriceComponentFactory.build(
+        pricing_group=own_group,
+        valid_from=MAR_1,
+        amount=Decimal(20),
+        tax_level=own_component.tax_level,
+    )
 
     save_price_component_changes(pricing_group=own_group, components=[own_component, new], deleted_component_pks=[])
 
