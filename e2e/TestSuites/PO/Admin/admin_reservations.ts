@@ -25,10 +25,7 @@ export class AdminReservations extends PageObject {
     await this.pages.customKeywords.checkElementsText(this.page.getByTestId("pk-0"), booking_number, {
       message: "ERROR: Check from screenshot that the search worked and there is only one match in the list.",
     });
-    await this.pages.customKeywords.findAndClickElementWithText(
-      this.page.getByTestId("reservee_name-0").locator("a"),
-      user_fullname
-    );
+    await this.page.getByTestId("reservee_name-0").getByRole("link", { name: user_fullname, exact: true }).click();
     // The reservation's page opens
     await this.page.waitForURL((url) => url.pathname.endsWith(`/reservations/${booking_number}`), {
       timeout: 15_000,
@@ -406,12 +403,11 @@ export class AdminReservations extends PageObject {
     await this.page
       .locator("#controlled-date-input__date")
       .pressSequentially(this.state.modifiedDateSubventedReservation);
-    await expect(
-      this.page.locator('button[type="submit"]'),
-      " Check that the modified time is available?"
-    ).toBeEnabled();
-    await this.page.locator('button[type="submit"]').focus();
-    await this.page.locator('button[type="submit"]').click();
+    // The edit time dialog's own submit button
+    const submit = this.page.locator("#info-dialog").locator('button[type="submit"]');
+    await expect(submit, " Check that the modified time is available?").toBeEnabled();
+    await submit.focus();
+    await submit.click();
     // Saving the new time closes the dialog
     await expect(this.page.locator("#info-dialog")).toBeHidden({ timeout: 15_000 });
 

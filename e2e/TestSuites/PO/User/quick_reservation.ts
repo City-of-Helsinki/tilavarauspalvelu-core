@@ -161,11 +161,12 @@ export class QuickReservation extends PageObject {
   async selectDuration(duration: string) {
     // Click  id=quick-reservation >> css=.Select-module_selectAndListContainer__vSJEv
     const main_button = "#quick-reservation__duration-main-button";
-    const selected_duration = this.page.locator(main_button).locator(`text="${duration}"`);
+    // The button shows the selected duration in an element of its own
+    const selected_duration = this.page.locator(main_button).getByText(duration, { exact: true });
     // Clicking the selected duration would unselect it
     if ((await selected_duration.count()) === 0) {
       await this.page.locator("#quick-reservation").locator(main_button).click();
-      await this.page.locator('[role="option"]').locator(`text="${duration}"`).click();
+      await this.page.getByRole("option", { name: duration, exact: true }).click();
     }
     await selected_duration.first().waitFor({ state: "visible", timeout: 5000 });
     await this.pages.customKeywords.closeSelectListIfOpen(main_button);
@@ -273,7 +274,7 @@ export class QuickReservation extends PageObject {
     // Set to 1h
     await this.page.locator("#mobile-quick-reservation-duration-toggle-button").click();
     // The clicks wait until the list's animation has ended
-    await this.page.locator('[role="option"]').locator(`text="${duration}"`).click();
+    await this.page.getByRole("option", { name: duration, exact: true }).click();
   }
 
   /** Verifies that the specified time slot is not available in the list of free slots. */
