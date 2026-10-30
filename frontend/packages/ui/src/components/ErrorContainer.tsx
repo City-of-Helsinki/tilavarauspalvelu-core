@@ -100,7 +100,7 @@ function statusCodeText({
   return (
     <>
       <H1 data-testid={`error__${statusCode}--title`}>
-        {statusCode !== 500 ? `${statusCode}: ` : ""}
+        {statusCode != null && statusCode !== 500 ? `${statusCode}: ` : ""}
         {title ?? t(`${statusCodeString}.heading`)}
       </H1>
       <Body data-testid={`error__${statusCode}--body`}>{body ?? t(`${statusCodeString}.body`)}</Body>
