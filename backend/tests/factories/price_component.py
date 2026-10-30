@@ -32,6 +32,8 @@ class PriceComponentFactory(GenericDjangoModelFactory[PriceComponent]):
     material_price_description = ""
     payment_type = PaymentType.ONLINE
 
+    tax_level = ForeignKeyFactory("tests.factories.TaxLevelFactory", required=True)
+
     @classmethod
     def create_free(cls, **kwargs) -> PriceComponent:
         kwargs.setdefault("amount", Decimal(0))
