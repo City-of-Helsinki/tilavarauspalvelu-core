@@ -4599,8 +4599,14 @@ type ReservationApproveMutationPayload {
 
 input ReservationApproveMutationInput {
   pk: Int!
-  price: Decimal!
+  price: Decimal
+  priceLines: [ReservationPriceLineOverrideSerializerInput]
   handlingDetails: String!
+}
+
+input ReservationPriceLineOverrideSerializerInput {
+  pk: Int!
+  overrideAmount: Decimal
 }
 
 type ReservationRefundMutationPayload {

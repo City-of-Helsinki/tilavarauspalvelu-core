@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
@@ -14,7 +17,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.models import Reservation, ReservationPriceLine
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_datetime
 from utils.external_service.errors import ExternalServiceError
@@ -27,12 +30,27 @@ __all__ = [
 ]
 
 
+class ReservationPriceLineOverrideSerializer(serializers.Serializer):
+    """The final amount of one price line of the reservation. A null override amount clears the override."""
+
+    pk = serializers.IntegerField()
+    override_amount = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        min_value=Decimal(0),
+        allow_null=True,
+        default=None,
+    )
+
+
 class ReservationApproveSerializer(NestingModelSerializer):
     """Approve a reservation during handling."""
 
     instance: Reservation
 
     pk = IntegerField(required=True)
+
+    price_lines = ReservationPriceLineOverrideSerializer(many=True, required=False, write_only=True)
 
     state = EnumFriendlyChoiceField(
         choices=ReservationStateChoice.choices,
@@ -45,12 +63,13 @@ class ReservationApproveSerializer(NestingModelSerializer):
         fields = [
             "pk",
             "price",
+            "price_lines",
             "handling_details",
             "handled_at",
             "state",
         ]
         extra_kwargs = {
-            "price": {"required": True},
+            "price": {"required": False},
             "handling_details": {"required": True},
             "handled_at": {"read_only": True},
         }
@@ -60,9 +79,45 @@ class ReservationApproveSerializer(NestingModelSerializer):
         data["state"] = ReservationStateChoice.CONFIRMED
         data["handled_at"] = local_datetime()
 
+        has_price = "price" in data
+        has_price_lines = "price_lines" in data
+
+        if not has_price and not has_price_lines:
+            msg = "Either price or price lines must be given."
+            raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_REQUIRED)
+
+        if has_price and has_price_lines:
+            msg = "Price and price lines cannot both be given."
+            raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_AND_PRICE_LINES_GIVEN)
+
+        if has_price_lines:
+            data = self.validate_price_line_overrides(data)
+
         if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
             return self.validate_payment_order(data)
 
+        return data
+
+    def validate_price_line_overrides(self, data: ReservationApproveData) -> ReservationApproveData:
+        price_lines: list[ReservationPriceLine] = list(self.instance.price_lines.all())
+        overrides = data.pop("price_lines")
+
+        line_pks = sorted(line.pk for line in price_lines)
+        override_pks = sorted(override["pk"] for override in overrides)
+
+        if not price_lines or line_pks != override_pks:
+            msg = "Price lines must contain each price line of the reservation exactly once."
+            raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_LINES_MISMATCH)
+
+        price_line_overrides = {override["pk"]: override["override_amount"] for override in overrides}
+
+        price = Decimal(0)
+        for line in price_lines:
+            override_amount = price_line_overrides[line.pk]
+            price += line.amount if override_amount is None else override_amount
+
+        data["price"] = price
+        data["price_line_overrides"] = price_line_overrides
         return data
 
     def validate_payment_order(self, data: ReservationApproveData) -> ReservationApproveData:
@@ -121,10 +176,16 @@ class ReservationApproveSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:
-        if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
-            self.create_payment_order_if_required(validated_data)
+        price_line_overrides = validated_data.pop("price_line_overrides", None)
 
-        instance = super().update(instance=instance, validated_data=validated_data)
+        with transaction.atomic():
+            if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
+                self.create_payment_order_if_required(validated_data)
+
+            if price_line_overrides is not None:
+                self.save_price_line_overrides(price_line_overrides)
+
+            instance = super().update(instance=instance, validated_data=validated_data)
 
         if instance.access_type == AccessType.ACCESS_CODE:
             # Allow activation in Pindora to fail, will be handled by a background task.
@@ -151,6 +212,13 @@ class ReservationApproveSerializer(NestingModelSerializer):
         EmailService.send_reservation_created_staff_notification_email(reservation=instance)
 
         return instance
+
+    def save_price_line_overrides(self, price_line_overrides: dict[int, Decimal | None]) -> None:
+        price_lines: list[ReservationPriceLine] = list(self.instance.price_lines.all())
+        for line in price_lines:
+            line.override_amount = price_line_overrides[line.pk]
+
+        ReservationPriceLine.objects.bulk_update(price_lines, fields=["override_amount"])
 
     def create_payment_order_if_required(self, validated_data: ReservationApproveData) -> None:
         # Delete any non-paid/refunded payment order
