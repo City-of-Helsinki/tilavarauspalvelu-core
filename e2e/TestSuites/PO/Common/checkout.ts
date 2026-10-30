@@ -48,7 +48,7 @@ export class Checkout extends PageObject {
   @step("checkout.Check User Details In Checkout")
   async checkUserDetailsInCheckout() {
     await this.pages.customKeywords.findTextFromElementsOrFail(
-      ".customer-details-information >> td",
+      this.page.locator(".customer-details-information").locator("td"),
       this.testData.user.email
     );
   }
@@ -56,7 +56,7 @@ export class Checkout extends PageObject {
   @step("checkout.Check Product List Has All The Info")
   async checkProductListHasAllTheInfo() {
     await this.pages.customKeywords.checkElementsText(
-      ".product-summary >> span.cart-total.padded",
+      this.page.locator(".product-summary").locator("span.cart-total.padded"),
       SINGLEBOOKING_PAID_PRICE_CHECKOUT
     );
   }
@@ -74,13 +74,9 @@ export class Checkout extends PageObject {
     // Extract the text of the next sibling element
     const reservation_number = await element_next_to_varausnumero.innerText();
 
-    // Log the reservation number
+    // Save and log the reservation number
+    this.state.bookingNumOnly = reservation_number;
     await log(`Reservation number: ${reservation_number}`);
-
-    let BOOKING_NUM_ONLY = reservation_number;
-    this.state.bookingNumOnly = BOOKING_NUM_ONLY;
-    BOOKING_NUM_ONLY = this.state.bookingNumOnly;
-    await log(BOOKING_NUM_ONLY);
   }
 
   @step("checkout.Check The Info In Checkout")

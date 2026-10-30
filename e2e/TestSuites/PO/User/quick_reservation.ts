@@ -21,7 +21,7 @@ export class QuickReservation extends PageObject {
 
     const slots = this.page.locator('[class*="slide-visible"]').getByTestId("quick-reservation__slot");
     // The carousel can move when its slots change, wait until it shows slots and has stopped
-    await expect(slots.first(), "No free available slots in quick reservation slots").toBeVisible({ timeout: 10_000 });
+    await expect(slots.first(), "No free available slots in quick reservation slots").toBeVisible();
     // Locators can't wait for an element to stop moving, its element handle can
     const first_slot = await slots.first().elementHandle({ timeout: 5000 });
     await first_slot?.waitForElementState("stable", { timeout: 5000 });
@@ -84,7 +84,7 @@ export class QuickReservation extends PageObject {
     await expect(
       submit,
       "Expected exactly 1 submit button inside quick-reservation. Button may have disappeared."
-    ).toHaveCount(1, { timeout: 10_000 });
+    ).toHaveCount(1);
     await submit.scrollIntoViewIfNeeded();
 
     // Alternative: Basic Browser library click (commented out - less reliable with React re-renders)
@@ -93,7 +93,7 @@ export class QuickReservation extends PageObject {
 
     // The button's mouse events, dispatched to the button itself once it is enabled: a click at its position was
     // less reliable while React re-renders the form
-    await expect(submit, "Button still disabled after 10s").toBeEnabled({ timeout: 10_000 });
+    await expect(submit, "Button still disabled after 10s").toBeEnabled();
     await this.page.waitForTimeout(300);
     for (const type of ["mousedown", "mouseup", "click"]) {
       // oxlint-disable-next-line no-await-in-loop -- the events in order
@@ -159,7 +159,6 @@ export class QuickReservation extends PageObject {
 
   @step("quick_reservation.Select Duration")
   async selectDuration(duration: string) {
-    await log(duration);
     // Click  id=quick-reservation >> css=.Select-module_selectAndListContainer__vSJEv
     const main_button = "#quick-reservation__duration-main-button";
     const selected_duration = this.page.locator(main_button).locator(`text="${duration}"`);
@@ -174,7 +173,7 @@ export class QuickReservation extends PageObject {
 
   @step("quick_reservation.Click More Available Slots")
   async clickMoreAvailableSlots() {
-    await this.page.getByTestId("quick-reservation-next-available-time").click();
+    await this.page.getByTestId("quick-reservation__next-available-time").click();
   }
 
   /**
@@ -183,9 +182,6 @@ export class QuickReservation extends PageObject {
    */
   @step("quick_reservation.Check The Quick Reservation Time")
   async checkTheQuickReservationTime(time_of_quick_reservation_slot: string) {
-    await log(this.state.timeOfQuickReservationFreeSlot);
-    await log(this.state.timeOfQuickReservation);
-    await log(time_of_quick_reservation_slot);
     const reservationtime = this.page.getByTestId("reservation__reservation-info-card__duration");
     await expect(reservationtime).toHaveText(time_of_quick_reservation_slot, { useInnerText: true });
   }
@@ -197,7 +193,6 @@ export class QuickReservation extends PageObject {
    */
   @step("quick_reservation.Check The Price Of Quick Reservation")
   async checkThePriceOfQuickReservation(price_with_text: string) {
-    await log(`expected price string ${price_with_text}`);
     await expect(async () => {
       await this.infoCardPriceShouldBe(price_with_text);
     }).toPass({ intervals: [250], timeout: CONTENT_WAIT_TIMEOUT });
@@ -215,16 +210,12 @@ export class QuickReservation extends PageObject {
     // The number is shown once the reservation has loaded
     const number_element = this.page.getByTestId("reservation__reservation-info-card__reservationNumber");
     await expect(number_element).toHaveText(/^\d+$/, { useInnerText: true });
-    const reservation_number = await number_element.innerText();
-    let BOOKING_NUM_ONLY = reservation_number;
-    this.state.bookingNumOnly = BOOKING_NUM_ONLY;
-    BOOKING_NUM_ONLY = this.state.bookingNumOnly;
-    await log(BOOKING_NUM_ONLY);
+    this.state.bookingNumOnly = await number_element.innerText();
+    await log(this.state.bookingNumOnly);
   }
 
   @step("quick_reservation.Check Booking Number")
   async checkBookingNumber(booking_number: string) {
-    await log(`booking_number: ${booking_number}`);
     await expect(this.page.getByTestId("reservation__reservation-info-card__reservationNumber")).toHaveText(
       booking_number,
       { useInnerText: true }
@@ -288,8 +279,6 @@ export class QuickReservation extends PageObject {
   /** Verifies that the specified time slot is not available in the list of free slots. */
   @step("quick_reservation.Verify Time Slot Not Available")
   async verifyTimeSlotNotAvailable(time_to_check: string) {
-    await log(`Verifying time slot not available: ${time_to_check}`);
-
     await this.page.locator("#quick-reservation__duration-main-button").waitFor({ state: "visible" });
     // The free slots are rendered after the reservation form
     await expect(
@@ -320,6 +309,5 @@ export class QuickReservation extends PageObject {
 
     // 4 Final assertion
     expect(slot_texts, `Slot '${time_to_check}' is still available`).not.toContain(time_to_check);
-    await log(`Slot '${time_to_check}' is not available, as expected.`);
   }
 }

@@ -1,5 +1,5 @@
 /** A resource file with top navigation keywords. */
-import { step, log } from "../../../lib/runtime";
+import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class RecurringApplicationsPage2 extends PageObject {
@@ -29,7 +29,7 @@ export class RecurringApplicationsPage2 extends PageObject {
 
   @step("recurring_applications_page2.User Clicks Continue Button")
   async userClicksContinueButton() {
-    await log("this is the same in the page 3");
+    // This is the same in page 3
     await this.pages.customKeywords.clickAndWaitForPage("#button__application--next");
   }
 }

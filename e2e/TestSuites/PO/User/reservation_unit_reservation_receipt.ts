@@ -1,5 +1,5 @@
 /** Port of PO/User/reservation_unit_reservation_receipt.robot */
-import { expect, step, log } from "../../../lib/runtime";
+import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import {
   JUSTIFICATION_FOR_FREE_OF_CHARGE,
@@ -95,7 +95,6 @@ export class ReservationUnitReservationReceipt extends PageObject {
         timeout: 15_000,
       }
     );
-    await log(expected_reservation_message);
   }
 
   // TERMS AND CONDITIONS

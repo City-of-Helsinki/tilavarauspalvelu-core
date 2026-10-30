@@ -1,6 +1,6 @@
 /** A resource file with top navigation keywords. */
 import type { Page } from "@playwright/test";
-import { expect, step, log } from "../../../lib/runtime";
+import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import {
   LOGIN_TEXT_ADMIN,
@@ -61,7 +61,6 @@ export class Topnav extends PageObject {
   @step("topnav.Check Dropdown Menu Has User Info")
   async checkDropdownMenuHasUserInfo(name: string) {
     // DEVNOTE Enable this when the profile bug no longer empties the name info
-    await log(name);
     await expect(this.page.locator("#user-menu")).toHaveText(name, { useInnerText: true });
   }
 

@@ -231,9 +231,6 @@ export class Mybookings extends PageObject {
 
     // Loop through each reservation element
     for (const reservation_text of reservations) {
-      // Log the reservation details for debugging purposes
-      await log(`Processing reservation: ${reservation_text}`);
-
       // Extract the date portion before the word "klo"
       // Remove any leading or trailing whitespace from the extracted date
       const date_part = (reservation_text.split("klo")[0] ?? "").trim();
@@ -243,9 +240,6 @@ export class Mybookings extends PageObject {
 
       // Convert the cleaned date into the format YYYYMMDD
       const converted_date_part = python_keywords.format_date_to_ics(date_without_weekday);
-
-      // Log the converted date for debugging
-      await log(`Converted date: ${converted_date_part}`);
 
       // Check if the reservation date is today or later
       if (Number(converted_date_part) >= Number(today)) {
@@ -319,14 +313,6 @@ export class Mybookings extends PageObject {
    */
   @step("mybookings.Check Unitname And Reservation Time And Click Show")
   async checkUnitnameAndReservationTimeAndClickShow(unitname: string, reservation_time: string) {
-    await log(
-      `Starting validation for reservation card with unit name: ${unitname} and reservation time: ${reservation_time}`
-    );
-
-    // Log the time we got in
-    await log(this.state.timeOfQuickReservationMinusT);
-    await log(reservation_time);
-
     // Retrieve all reservation card containers and log their count
     await this.waitForReservationCards();
     const containers = await elementsOf(this.page.getByTestId("reservation-card__container"));
@@ -361,7 +347,6 @@ export class Mybookings extends PageObject {
 
   @step("mybookings.Click Show Button")
   async clickShowButton(container: Locator) {
-    await log("Attempting to click the show button inside the container");
     const button_element = container.getByTestId("reservation-card__button--goto-reservation");
     await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
       button_element,
@@ -369,7 +354,6 @@ export class Mybookings extends PageObject {
       /* max_attempts= */ 2,
       /* nav_timeout= */ 20_000
     );
-    await log("Successfully clicked the show button");
   }
 
   /**
@@ -378,12 +362,6 @@ export class Mybookings extends PageObject {
    */
   @step("mybookings.Check Unitname And Reservation Time And Verify No Cancel Button")
   async checkUnitnameAndReservationTimeAndVerifyNoCancelButton(unitname: string, reservation_time: string) {
-    await log(
-      `Starting validation for reservation card with unit name: ${unitname} and reservation time: ${reservation_time}`
-    );
-    await log(this.state.timeOfQuickReservationMinusT);
-    await log(reservation_time);
-
     // DEVNOTE for testing
     // ${unitname}=  Set Variable  Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju
     // ${reservation_time}=  Set Variable  Ke 24.7.2024 klo 09:30–09:45
@@ -421,9 +399,6 @@ export class Mybookings extends PageObject {
   @step("mybookings.Check Unitname And Reservation Are Found")
   async checkUnitnameAndReservationAreFound(unitname: string, reservation_time: string) {
     await log(
-      `Starting validation for reservation card with unit name: ${unitname} and reservation time: ${reservation_time}`
-    );
-    await log(
       'This keyword uses selectors: [data-testid="reservation-card__name"] and [data-testid="reservation-card__time"]'
     );
 
@@ -443,8 +418,6 @@ export class Mybookings extends PageObject {
 
       // Compare the fetched name and the expected unit name
       if (name_text === unitname) {
-        await log(`Name matches for unit name: ${unitname}`);
-
         // If name matches, check the time match
         if (time_text === reservation_time) {
           await log(`Match found at index ${index}: ${unitname} at ${reservation_time}`);
@@ -465,20 +438,11 @@ export class Mybookings extends PageObject {
       // Fail the keyword if no match was found, indicating an error or unexpected condition
       throw new Error(`No match found for unit name: ${unitname} and reservation time: ${reservation_time}`);
     }
-    await log(`Successfully validated reservation for ${unitname} at ${reservation_time}`);
     await log("Completed validation for reservation card.");
   }
 
   @step("mybookings.Check Unitname And Reservation Are Not Found")
   async checkUnitnameAndReservationAreNotFound(unitname: string, reservation_time: string) {
-    // Log the start of the validation process for ensuring the absence of specific reservation details
-    await log(
-      `Starting validation for reservation card absence with unit name: ${unitname} and reservation time: ${reservation_time}`
-    );
-
-    // Log additional debugging information if required
-    await log(`Current reservation time being validated: ${this.state.timeOfQuickReservationMinusT}`);
-
     // Retrieve all reservation card containers by their test IDs and count them
     // A shorter timeout avoids long waits when no elements are found
     const containers = await elementsOf(this.page.getByTestId("reservation-card__container"), 1500);

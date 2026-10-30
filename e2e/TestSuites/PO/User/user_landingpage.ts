@@ -11,7 +11,6 @@ export class UserLandingpage extends PageObject {
     await expect(this.page.locator("h1")).toContainText(expected_h1_text, {
       timeout: BROWSER_TIMEOUT_GLOBAL,
     });
-    await log(expected_h1_text);
   }
 
   @step("user_landingpage.Check The Name In The Login Button")
