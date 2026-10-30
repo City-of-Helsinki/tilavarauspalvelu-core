@@ -249,7 +249,6 @@ export class AppCommon extends PageObject {
   @step("app_common.Open Django Admin In Firefox And App Admin In Chromium")
   async openDjangoAdminInFirefoxAndAppAdminInChromium(django_url: string, app_url: string) {
     // Set up Firefox browser for Django admin
-    await log("🦊 Setting up Firefox browser for Django admin...");
     await this.pages.devices.setUpFirefoxDesktopBrowserAndOpenUrl(django_url, DOWNLOAD_DIR);
 
     // Save the Firefox page
@@ -257,14 +256,11 @@ export class AppCommon extends PageObject {
     await log(`Django admin (Firefox) page is ${this.page.url()}`);
 
     // Set up Chromium browser for app admin
-    await log("🌐 Setting up Chromium browser for app admin...");
     await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(app_url, DOWNLOAD_DIR);
 
     // Save the Chromium page
     this.state.browserUserSide = this.page;
     await log(`App admin (Chromium) page is ${this.page.url()}`);
-
-    await log("✅ Both browsers set up successfully");
   }
 
   @step("app_common.Reload Page")

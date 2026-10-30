@@ -113,7 +113,7 @@ export class AdminReservations extends PageObject {
     // Check price if provided
     if (singlebooking_price !== "None") {
       await this.pages.customKeywords.checkElementsTextWithRemoveNonBreakingSpace(
-        '[data-testid="reservation__summary--Hinta"]',
+        this.page.getByTestId("reservation__summary--Hinta"),
         singlebooking_price
       );
     }
@@ -179,7 +179,7 @@ export class AdminReservations extends PageObject {
     // Check price if provided
     if (singlebooking_price !== "None") {
       await this.pages.customKeywords.checkElementsTextWithRemoveNonBreakingSpace(
-        '[data-testid="reservation__summary--Hinta"]',
+        this.page.getByTestId("reservation__summary--Hinta"),
         singlebooking_price
       );
     }
@@ -227,7 +227,6 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Checks Reservation Status")
   async adminChecksReservationStatus(status: string) {
-    await log(status);
     // Check Elements Text waits until the page shows the status
     await this.pages.customKeywords.checkElementsText(
       this.page.getByTestId("reservation_title_section__reservation_state"),

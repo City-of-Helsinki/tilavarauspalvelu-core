@@ -9,8 +9,6 @@ export class Mail extends PageObject {
   /** Verify confirmation email contains all required terms */
   @step("mail.Verify Reservation Confirmation Email")
   async verifyReservationConfirmationEmail(reservation_number: string) {
-    await log(`Verifying confirmation email for reservation: ${reservation_number}`);
-
     // Build list of expected terms
     const expected_terms = [
       ALWAYS_PAID_UNIT,
@@ -30,8 +28,6 @@ export class Mail extends PageObject {
   /** Verify cancellation email contains all required terms */
   @step("mail.Verify Reservation Cancellation Email")
   async verifyReservationCancellationEmail(reservation_number: string) {
-    await log(`Verifying cancellation email for reservation: ${reservation_number}`);
-
     const expected_terms = [
       ALWAYS_PAID_UNIT,
       CANCELLATION_TEXT_IN_MAIL,

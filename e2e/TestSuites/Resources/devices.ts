@@ -56,7 +56,6 @@ export class Devices extends PageObject {
       browserName: BROWSER_FOR_MAIL,
       contextOptions: context_config,
     });
-    await log(`🌐 Navigating to: ${input_URL}`);
     // Go To waits for the page to load
     await this.page.goto(input_URL);
     await log("✅ Page loaded successfully");
@@ -73,7 +72,6 @@ export class Devices extends PageObject {
     const context_config: BrowserContextOptions = {};
     await this.applyGlobalHeaderToContextConfig(context_config);
     await this.session.openPage({ contextOptions: context_config });
-    await log(`🌐 Navigating to: ${input_URL}`);
     // Go To waits for the page to load
     await this.page.goto(input_URL);
 
@@ -89,7 +87,6 @@ export class Devices extends PageObject {
     const context_config: BrowserContextOptions = {};
     await this.applyGlobalHeaderToContextConfig(context_config);
     await this.session.openPage({ contextOptions: context_config });
-    await log(`🌐 Navigating to: ${input_URL}`);
     // Go To waits for the page to load
     await this.page.goto(input_URL);
 
@@ -106,9 +103,8 @@ export class Devices extends PageObject {
 
   @step("devices.Log Current Cookies")
   async logCurrentCookies() {
-    const fresh_cookies = (await this.page.context().cookies())
-      .map((cookie) => `${cookie.name}=${cookie.value}`)
-      .join("; ");
-    await log(`"🔍 cookies: ${fresh_cookies}"`);
+    // The names only: the values would put the session into the report
+    const fresh_cookies = (await this.page.context().cookies()).map((cookie) => cookie.name).join(", ");
+    await log(`🔍 cookies: ${fresh_cookies}`);
   }
 }

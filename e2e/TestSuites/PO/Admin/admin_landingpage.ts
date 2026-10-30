@@ -1,5 +1,5 @@
 /** Port of PO/Admin/admin_landingpage.robot */
-import { expect, step, log } from "../../../lib/runtime";
+import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { BROWSER_TIMEOUT_GLOBAL } from "../../Resources/variables";
 
@@ -12,7 +12,6 @@ export class AdminLandingpage extends PageObject {
     });
     // The top navigation renders a moment after the heading, when the user's data has loaded
     await this.page.waitForLoadState("networkidle", { timeout: 40_000 });
-    await log(expected_H1_text);
   }
 
   @step("admin_landingpage.Approve Cookies")
