@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from auditlog.models import LogEntry
@@ -8,6 +9,8 @@ from django.db import transaction
 from graphene.utils.str_converters import to_camel_case
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.errors import GQLCodeError
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers import (
@@ -18,11 +21,19 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializer
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, Weekday
+from tilavarauspalvelu.enums import AccessType, PaymentType, PriceUnit, ReservationStartInterval, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing, Resource, Space
+from tilavarauspalvelu.models import (
+    ReservationUnit,
+    ReservationUnitAccessType,
+    ReservationUnitPricing,
+    Resource,
+    Space,
+    TaxLevel,
+)
+from tilavarauspalvelu.services.pricing.own_pricing import OwnPricing, save_own_pricings
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
@@ -33,9 +44,33 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Unit
 
 __all__ = [
+    "OwnPricingInputSerializer",
     "ReservationUnitArchiveSerializer",
     "ReservationUnitSerializer",
 ]
+
+
+class OwnPricingInputSerializer(serializers.Serializer):
+    """
+    One pricing of a reservation unit's own pricing group. It lasts until the next pricing begins.
+    The pricings must include the active pricing and all future pricings.
+    """
+
+    pk = serializers.IntegerField(required=False, allow_null=True)
+    begins = serializers.DateField()
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal(0))
+    price_unit = EnumFriendlyChoiceField(choices=PriceUnit.choices, enum=PriceUnit)
+    payment_type = EnumFriendlyChoiceField(
+        choices=PaymentType.choices,
+        enum=PaymentType,
+        required=False,
+        allow_null=True,
+    )
+    tax_level = serializers.PrimaryKeyRelatedField(queryset=TaxLevel.objects.all())
+    can_apply_for_discount = serializers.BooleanField(required=False)
+    material_price_description_fi = serializers.CharField(required=False, allow_blank=True)
+    material_price_description_en = serializers.CharField(required=False, allow_blank=True)
+    material_price_description_sv = serializers.CharField(required=False, allow_blank=True)
 
 
 class ReservationUnitSerializer(NestingModelSerializer):
@@ -43,6 +78,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
     images = ReservationUnitImageFieldSerializer(many=True, required=False)
     pricings = ReservationUnitPricingSerializer(many=True, required=False)
+    own_pricings = OwnPricingInputSerializer(many=True, required=False, write_only=True)
     application_round_time_slots = ApplicationRoundTimeSlotSerializer(many=True, required=False)
     access_types = ReservationUnitAccessTypeSerializer(many=True, required=False)
 
@@ -118,6 +154,9 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "pricings",
             "access_types",
             "application_round_time_slots",
+            #
+            # Input only
+            "own_pricings",
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
@@ -399,17 +438,21 @@ class ReservationUnitSerializer(NestingModelSerializer):
     @transaction.atomic
     def create(self, validated_data: dict[str, Any]) -> ReservationUnit:
         pricings = validated_data.pop("pricings", [])
+        own_pricings = validated_data.pop("own_pricings", [])
         access_types = validated_data.pop("access_types", [])
         reservation_unit = super().create(validated_data)
         self.handle_pricings(pricings, reservation_unit)
+        self.handle_own_pricings(own_pricings, reservation_unit)
         self.handle_access_types(access_types, reservation_unit)
         return reservation_unit
 
     @transaction.atomic
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
         pricings = validated_data.pop("pricings", [])
+        own_pricings = validated_data.pop("own_pricings", [])
         access_types = validated_data.pop("access_types", [])
         self.handle_pricings(pricings, instance)
+        self.handle_own_pricings(own_pricings, instance)
         self.handle_access_types(access_types, instance)
         # Reservation Unit needs to be updated last, due to post_save signals.
         # Verkkokauppa payment product update is triggered by the post_save signal of the ReservationUnit,
@@ -450,6 +493,25 @@ class ReservationUnitSerializer(NestingModelSerializer):
                     ReservationUnitPricing.objects.update_or_create(pk=pricing["pk"], defaults=pricing)
                 else:  # Create new pricings
                     ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
+
+    @staticmethod
+    def handle_own_pricings(own_pricings: list[dict[str, Any]], reservation_unit: ReservationUnit) -> None:
+        pricings = [
+            OwnPricing(
+                pk=pricing.get("pk"),
+                begins=pricing["begins"],
+                amount=pricing["amount"],
+                price_unit=pricing["price_unit"],
+                payment_type=pricing.get("payment_type"),
+                tax_level=pricing["tax_level"],
+                can_apply_for_discount=pricing.get("can_apply_for_discount", False),
+                material_price_description_fi=pricing.get("material_price_description_fi", ""),
+                material_price_description_en=pricing.get("material_price_description_en", ""),
+                material_price_description_sv=pricing.get("material_price_description_sv", ""),
+            )
+            for pricing in own_pricings
+        ]
+        save_own_pricings(reservation_unit=reservation_unit, pricings=pricings)
 
     @staticmethod
     def handle_access_types(access_types: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:

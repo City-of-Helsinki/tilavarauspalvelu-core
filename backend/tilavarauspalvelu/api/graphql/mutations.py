@@ -48,6 +48,7 @@ from .types.equipment_category.mutations import (
     EquipmentCategoryUpdateMutation,
 )
 from .types.intended_use.mutations import IntendedUseCreateMutation, IntendedUseUpdateMutation
+from .types.pricing_group.mutations import PricingGroupComponentsUpdateMutation
 from .types.reservation.mutations import (
     ReservationAdjustTimeMutation,
     ReservationApproveMutation,
@@ -115,6 +116,7 @@ __all__ = [
     "EquipmentUpdateMutation",
     "IntendedUseCreateMutation",
     "IntendedUseUpdateMutation",
+    "PricingGroupComponentsUpdateMutation",
     "RejectAllApplicationOptionsMutation",
     "RejectAllSectionOptionsMutation",
     "ReservationAdjustTimeMutation",
