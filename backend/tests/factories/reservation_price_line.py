@@ -30,6 +30,7 @@ class ReservationPriceLineFactory(GenericDjangoModelFactory[ReservationPriceLine
     amount = Decimal(10)
     override_amount = None
 
+    tax_level = ForeignKeyFactory("tests.factories.TaxLevelFactory", required=True)
     tax_percentage = Decimal(0)
     vat_code = ""
 

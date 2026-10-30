@@ -185,6 +185,7 @@ class ReservationPriceLineInline(admin.TabularInline):
         "unit_amount",
         "amount",
         "override_amount",
+        "tax_level",
         "tax_percentage",
         "vat_code",
         "price_component",

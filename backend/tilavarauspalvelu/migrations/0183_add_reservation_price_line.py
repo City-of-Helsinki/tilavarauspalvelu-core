@@ -35,6 +35,7 @@ class Migration(migrations.Migration):
                 ('payment_product', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='reservation_price_lines', to='tilavarauspalvelu.paymentproduct')),
                 ('price_component', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='price_lines', to='tilavarauspalvelu.pricecomponent')),
                 ('reservation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='price_lines', to='tilavarauspalvelu.reservation')),
+                ('tax_level', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='reservation_price_lines', to='tilavarauspalvelu.taxlevel')),
             ],
             options={
                 'verbose_name': 'reservation price line',

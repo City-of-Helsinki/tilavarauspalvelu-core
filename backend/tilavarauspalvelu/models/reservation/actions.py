@@ -29,9 +29,10 @@ from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation
+from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -351,6 +352,9 @@ class ReservationActions:
         )
 
     def create_order_in_verkkokauppa(self) -> Order:
+        # The tax of the sale is the rate on the order date.
+        set_price_line_taxes(reservation=self.reservation, on_date=local_date())
+
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             return create_mock_verkkokauppa_order(self.reservation)
 

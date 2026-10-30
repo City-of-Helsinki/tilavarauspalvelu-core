@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from django.db import transaction
 
 from tilavarauspalvelu.models import ReservationPriceLine
+from utils.date_utils import local_date
 from utils.decimal_utils import round_decimal
 
 from .price_calculation import calculate_price
@@ -21,6 +22,7 @@ if TYPE_CHECKING:
 __all__ = [
     "PriceLines",
     "build_price_lines",
+    "set_price_line_taxes",
     "set_reservation_price_lines",
 ]
 
@@ -50,9 +52,12 @@ def build_price_lines(
         end=end,
     )
 
+    today = local_date()
+
     lines: list[ReservationPriceLine] = []
     for calculation_line in calculation.lines:
         component = calculation_line.component
+        tax_level = component.tax_level
 
         # The calculation keeps only components with no option or with the selected option.
         line_option = price_option if component.price_option_id is not None else None
@@ -69,7 +74,8 @@ def build_price_lines(
             adjustment_percentage=Decimal(0),
             amount=calculation_line.amount,
             override_amount=None,
-            tax_percentage=Decimal(0),
+            tax_level=tax_level,
+            tax_percentage=tax_level.actions.get_percentage(on_date=today),
             vat_code="",
             payment_product=None,
         )
@@ -107,3 +113,20 @@ def set_reservation_price_lines(*, reservation: Reservation, price_option: Price
         reservation.price_lines.all().delete()
         ReservationPriceLine.objects.bulk_create(price_lines.lines)
         reservation.save(update_fields=["price", "non_subsidised_price"])
+
+
+def set_price_line_taxes(*, reservation: Reservation, on_date: datetime.date) -> None:
+    """
+    Set the tax percentage of each price line of the reservation from the rate of its tax level on the given date.
+    The amounts do not change. A reservation without price lines does not change.
+
+    :raises TaxLevelHasNoRateError: If a tax level has no rate on the given date.
+    """
+    price_lines: list[ReservationPriceLine] = list(reservation.price_lines.select_related("tax_level"))
+    if not price_lines:
+        return
+
+    for line in price_lines:
+        line.tax_percentage = line.tax_level.actions.get_percentage(on_date=on_date)
+
+    ReservationPriceLine.objects.bulk_update(price_lines, fields=["tax_percentage"])
