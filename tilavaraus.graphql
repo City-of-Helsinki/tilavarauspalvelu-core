@@ -483,6 +483,11 @@ type Query {
     """Ordering"""
     orderBy: [ReservationOrderingChoices]
   ): [ReservationNode!]
+
+  """
+  Calculate the price lines that a reservation with the given input would get.
+  """
+  reservationPrice(reservationUnit: Int!, priceOption: Int, beginsAt: DateTime!, endsAt: DateTime!): ReservationPriceType
   reservationSeries(
     """The ID of the object"""
     id: ID!
@@ -916,6 +921,11 @@ type ReservationUnitNode implements Node {
   firstReservableDatetime: DateTime
   effectiveAccessType: AccessType
   haukiUrl: String
+
+  """
+  Summary of the base prices of the pricing group that the reservation unit uses today.
+  """
+  priceSummary: PriceSummaryType
   reservableTimeSpans(startDate: Date!, endDate: Date!): [ReservableTimeSpanType!]
   numActiveUserReservations: Int!
   calculatedSurfaceArea: Int!
@@ -1513,6 +1523,7 @@ type ReservationNode implements Node {
   purpose: ReservationPurposeNode
   ageGroup: AgeGroupNode
   paymentOrder: PaymentOrderNode
+  priceLines: [ReservationPriceLineNode!]
 
   """The ID of the object"""
   id: ID!
@@ -2281,6 +2292,48 @@ enum OrderStatus {
   REFUNDED
 }
 
+type ReservationPriceLineNode implements Node {
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  quantity: Decimal!
+  priceUnit: PriceUnit!
+  unitAmount: Decimal!
+  amountBeforeAdjustment: Decimal!
+  adjustmentPercentage: Decimal!
+  amount: Decimal!
+  overrideAmount: Decimal
+  taxPercentage: Decimal!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+"""An enumeration."""
+enum PriceUnit {
+  """per 15 minutes"""
+  PER_15_MINS
+
+  """per 30 minutes"""
+  PER_30_MINS
+
+  """per hour"""
+  PER_HOUR
+
+  """per half a day"""
+  PER_HALF_DAY
+
+  """per day"""
+  PER_DAY
+
+  """per week"""
+  PER_WEEK
+
+  """fixed"""
+  FIXED
+}
+
 type AppliedPricingInfo {
   """
   This is a 'Date', but graphene doesn't know how to serialize it from string...
@@ -2305,17 +2358,6 @@ type AppliedPricingInfo {
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
-}
-
-"""An enumeration."""
-enum PriceUnit {
-  PER_15_MINS
-  PER_30_MINS
-  PER_HOUR
-  PER_HALF_DAY
-  PER_DAY
-  PER_WEEK
-  FIXED
 }
 
 type PindoraReservationInfoType {
@@ -2469,6 +2511,13 @@ type TaxLevelNode implements Node {
   id: ID!
   currentPercentage: Decimal
   pk: Int
+}
+
+type PriceSummaryType {
+  isFree: Boolean!
+  lowestAmount: Decimal!
+  priceUnit: PriceUnit!
+  varies: Boolean!
 }
 
 type ReservableTimeSpanType {
@@ -2907,6 +2956,27 @@ type ReservationNodeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+type ReservationPriceType {
+  lines: [ReservationPriceCalculationLineType!]!
+  total: Decimal!
+  canApplyForDiscount: Boolean!
+  paymentType: PaymentType
+}
+
+type ReservationPriceCalculationLineType {
+  descriptionFi: String!
+  descriptionEn: String!
+  descriptionSv: String!
+  quantity: Decimal!
+  priceUnit: PriceUnit!
+  unitAmount: Decimal!
+  amount: Decimal!
+  taxPercentage: Decimal!
+  materialPriceDescriptionFi: String!
+  materialPriceDescriptionEn: String!
+  materialPriceDescriptionSv: String!
 }
 
 type ReservationSeriesNodeConnection {

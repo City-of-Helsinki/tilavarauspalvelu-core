@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any, NamedTuple
 
 import graphene
 from django.contrib.postgres.expressions import ArraySubquery
 from django.db import models
 from django.db.models import Sum
-from django.db.models.functions import JSONObject
+from django.db.models.functions import Cast, JSONObject
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.errors import GQLCodeError
 from lookup_property import L
@@ -15,24 +16,34 @@ from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedFi
 from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
-from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
+from tilavarauspalvelu.enums import (
+    AccessType,
+    PriceComponentKind,
+    PriceUnit,
+    ReservationUnitPublishingState,
+    ReservationUnitReservationState,
+)
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import (
     OriginHaukiResource,
     PaymentMerchant,
+    PriceComponent,
     ReservableTimeSpan,
     Reservation,
     ReservationUnit,
+    ReservationUnitPricingGroup,
     Unit,
 )
+from tilavarauspalvelu.services.pricing.price_summary import BasePrice, summarize_base_prices
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_date
 from utils.db import SubqueryCount
 
 from .filtersets import ReservationUnitAllFilterSet, ReservationUnitFilterSet
 from .permissions import ReservationUnitAllPermission, ReservationUnitPermission
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.services.pricing.price_summary import PriceSummary
     from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
@@ -49,6 +60,16 @@ class ReservableTimeSpanItem(NamedTuple):
 class ReservableTimeSpanType(graphene.ObjectType):
     start_datetime = graphene.DateTime(required=True)
     end_datetime = graphene.DateTime(required=True)
+
+
+class PriceSummaryType(graphene.ObjectType):
+    is_free = graphene.Boolean(required=True)
+    lowest_amount = graphene.Decimal(required=True)
+    price_unit = graphene.Field(graphene.Enum.from_enum(PriceUnit), required=True)
+    varies = graphene.Boolean(required=True)
+
+    def resolve_price_unit(root: PriceSummary, info: GQLInfo) -> str:
+        return root.price_unit.value
 
 
 class ReservationUnitNode(DjangoNode):
@@ -68,6 +89,11 @@ class ReservationUnitNode(DjangoNode):
     effective_access_type = graphene.Field(graphene.Enum.from_enum(AccessType))
 
     hauki_url = ManuallyOptimizedField(graphene.String)
+
+    price_summary = ManuallyOptimizedField(
+        PriceSummaryType,
+        description="Summary of the base prices of the pricing group that the reservation unit uses today.",
+    )
 
     reservable_time_spans = ManuallyOptimizedField(
         graphene.List(graphene.NonNull(ReservableTimeSpanType)),
@@ -175,6 +201,7 @@ class ReservationUnitNode(DjangoNode):
             "first_reservable_datetime",
             "effective_access_type",
             "num_active_user_reservations",
+            "price_summary",
         ]
         restricted_fields = {
             "cancellation_rule": lambda user: user.is_authenticated,
@@ -367,6 +394,20 @@ class ReservationUnitNode(DjangoNode):
         return items
 
     @staticmethod
+    def optimize_price_summary(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        # A queryset annotation is lost when the reservation unit comes through a foreign key. This one is not.
+        optimizer.annotations["price_summary_components"] = _active_base_component_data()
+        return queryset
+
+    def resolve_price_summary(root: ReservationUnit, info: GQLInfo) -> PriceSummary | None:
+        components: list[dict[str, str]] = root.price_summary_components
+        base_prices = [
+            BasePrice(amount=Decimal(component["amount"]), price_unit=PriceUnit(component["price_unit"]))
+            for component in components
+        ]
+        return summarize_base_prices(base_prices)
+
+    @staticmethod
     def optimize_num_active_user_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
         if optimizer.info.context.user.is_anonymous:
             optimizer.annotations["num_active_user_reservations"] = models.Value(0)
@@ -405,3 +446,35 @@ class ReservationUnitAllNode(DjangoNode):
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         # Always hide archived reservation units
         return queryset.filter(is_archived=False)
+
+
+# Internals
+
+
+def _active_base_component_data() -> ArraySubquery:
+    """Amounts and price units of the base components that the reservation unit in the outer query has today."""
+    today = local_date()
+
+    active_pricing_group = (
+        ReservationUnitPricingGroup.objects
+        .filter(reservation_unit=models.OuterRef(models.OuterRef("pk")), begins__lte=today)
+        .order_by("-begins")
+        .values("pricing_group")[:1]
+    )
+    active_base_components = (
+        PriceComponent.objects
+        .filter(
+            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+            models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
+            pricing_group=models.Subquery(active_pricing_group),
+            kind=PriceComponentKind.BASE,
+            valid_from__lte=today,
+        )
+        .order_by("amount", "pk")
+        .annotate(
+            # Amount as text, so that it does not go through a float in JSON.
+            data=JSONObject(amount=Cast("amount", models.CharField()), price_unit="price_unit"),
+        )
+        .values("data")
+    )
+    return ArraySubquery(active_base_components)
