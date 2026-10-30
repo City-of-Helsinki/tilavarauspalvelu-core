@@ -19,6 +19,7 @@ from tests.factories import (
     ReservationFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
+    TaxLevelFactory,
     UnitGroupFactory,
 )
 
@@ -62,6 +63,7 @@ def test_reservation_price__hourly_price(graphql):
         material_price_description_fi="Materiaalit",
         material_price_description_en="Materials",
         material_price_description_sv="Material",
+        tax_level=TaxLevelFactory.create(rates__percentage=Decimal(24)),
     )
 
     query = build_query(
@@ -84,7 +86,7 @@ def test_reservation_price__hourly_price(graphql):
                 "priceUnit": PriceUnit.PER_HOUR.value,
                 "unitAmount": "10.00",
                 "amount": "20.00",
-                "taxPercentage": "0",
+                "taxPercentage": "24.00",
                 "materialPriceDescriptionFi": "Materiaalit",
                 "materialPriceDescriptionEn": "Materials",
                 "materialPriceDescriptionSv": "Material",
