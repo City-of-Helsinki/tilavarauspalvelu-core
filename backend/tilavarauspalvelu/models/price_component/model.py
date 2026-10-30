@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PriceOption, PricingGroup
+    from tilavarauspalvelu.models import PriceOption, PricingGroup, TaxLevel
 
     from .actions import PriceComponentActions
     from .queryset import PriceComponentManager
@@ -66,6 +66,12 @@ class PriceComponent(models.Model):
     )
 
     payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
+
+    tax_level: TaxLevel = models.ForeignKey(
+        "tilavarauspalvelu.TaxLevel",
+        related_name="price_components",
+        on_delete=models.PROTECT,
+    )
 
     # Translated field hints
     material_price_description_fi: str | None
