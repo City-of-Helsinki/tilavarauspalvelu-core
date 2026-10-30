@@ -40,8 +40,9 @@ class ReservationUnitImageNode(DjangoNode):
         if not image_name:
             return None
 
-        # Build the name into the absolute URL for the image.
-        url = root.image.storage.url(image_name)
+        # Use the storage of the model field, because reading `root.image` loads the deferred field with a query.
+        storage = ReservationUnitImage.image.field.storage
+        url = storage.url(image_name)
         return info.context.build_absolute_uri(url)
 
     def resolve_large_url(root: ReservationUnitImage, info: GQLInfo) -> str | None:
