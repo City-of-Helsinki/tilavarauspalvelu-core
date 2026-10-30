@@ -10,7 +10,7 @@ export function isPageRequest(url: URL, basePath = ""): boolean {
     url.pathname.startsWith(`${basePath}/healthcheck`) ||
     url.pathname.startsWith(`${basePath}/api/healthcheck`) ||
     url.pathname.startsWith(`${basePath}/_next`) ||
-    url.pathname.match(/\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/) ||
+    /\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/.test(url.pathname) ||
     url.pathname.startsWith(`${basePath}/503`) ||
     url.pathname.startsWith(`${basePath}/en/503`) ||
     url.pathname.startsWith(`${basePath}/sv/503`)
