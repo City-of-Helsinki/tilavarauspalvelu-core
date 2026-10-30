@@ -32,6 +32,7 @@ class TaxLevelFactory(GenericDjangoModelFactory[TaxLevel]):
     name_sv = FakerSV("word", unique=True)
 
     reservation_unit_pricings = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingFactory")
+    price_components = ReverseForeignKeyFactory("tests.factories.PriceComponentFactory")
 
     @factory.post_generation
     def rates(self: TaxLevel, create: bool, rates: Iterable[TaxLevelRate] | None, **kwargs: Any) -> None:

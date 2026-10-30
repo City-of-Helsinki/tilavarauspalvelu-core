@@ -19,6 +19,9 @@ from .payment_merchant.model import PaymentMerchant
 from .payment_order.model import PaymentOrder
 from .payment_product.model import PaymentProduct
 from .personal_info_view_log.model import PersonalInfoViewLog
+from .price_component.model import PriceComponent
+from .price_option.model import PriceOption
+from .pricing_group.model import PricingGroup
 from .rejected_occurrence.model import RejectedOccurrence
 from .reservable_time_span.model import ReservableTimeSpan
 from .reservation.model import Reservation
@@ -33,6 +36,7 @@ from .reservation_unit_hierarchy.model import ReservationUnitHierarchy
 from .reservation_unit_image.model import ReservationUnitImage
 from .reservation_unit_option.model import ReservationUnitOption
 from .reservation_unit_pricing.model import ReservationUnitPricing
+from .reservation_unit_pricing_group.model import ReservationUnitPricingGroup
 from .reservation_unit_type.model import ReservationUnitType
 from .resource.model import Resource
 from .space.model import Space
@@ -66,6 +70,9 @@ __all__ = [
     "PaymentOrder",
     "PaymentProduct",
     "PersonalInfoViewLog",
+    "PriceComponent",
+    "PriceOption",
+    "PricingGroup",
     "ProfileUser",
     "RejectedOccurrence",
     "ReservableTimeSpan",
@@ -81,6 +88,7 @@ __all__ = [
     "ReservationUnitImage",
     "ReservationUnitOption",
     "ReservationUnitPricing",
+    "ReservationUnitPricingGroup",
     "ReservationUnitType",
     "Resource",
     "Space",
