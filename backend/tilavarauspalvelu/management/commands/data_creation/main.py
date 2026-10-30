@@ -77,7 +77,7 @@ def create_test_data(*, flush: bool = True, number_of_days_that_have_reservation
 
     _create_caisa(tax_levels=tax_levels)
 
-    _create_pricing_groups()
+    _create_pricing_groups(tax_levels=tax_levels)
 
 
 @with_logs
