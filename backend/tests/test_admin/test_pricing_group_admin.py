@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
@@ -10,7 +11,17 @@ from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
 from tilavarauspalvelu.typing import error_codes
 
-from tests.factories import PriceOptionFactory, ReservationUnitFactory, TaxLevelFactory, UnitGroupFactory, UserFactory
+from tests.factories import (
+    ApplicationRoundFactory,
+    PriceComponentFactory,
+    PriceOptionFactory,
+    PricingGroupFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingGroupFactory,
+    TaxLevelFactory,
+    UnitGroupFactory,
+    UserFactory,
+)
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
 
 if TYPE_CHECKING:
@@ -206,3 +217,56 @@ def test_pricing_group_admin__inactive_option_is_rejected(api_client):
         },
     ]
     assert not PricingGroup.objects.exists()
+
+
+def test_pricing_group_admin__reservation_unit_in_application_round_cannot_lose_price_option(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
+    shared_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=shared_group, price_option=adults, valid_from=datetime.date(2027, 1, 1))
+    row = ReservationUnitPricingGroupFactory.create(pricing_group=shared_group, begins=datetime.date(2027, 1, 1))
+    application_round = ApplicationRoundFactory.create(
+        name="Kesä",
+        reservation_units=[row.reservation_unit],
+        application_period_begins_at=datetime.datetime(2027, 1, 1, tzinfo=datetime.UTC),
+        application_period_ends_at=datetime.datetime(2027, 2, 1, tzinfo=datetime.UTC),
+        reservation_period_begin_date=datetime.date(2027, 5, 1),
+        reservation_period_end_date=datetime.date(2027, 8, 31),
+    )
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_add")
+    data = {
+        **group_form_data(),
+        **component_form_data(0, valid_from="2027-01-01"),
+        "reservation_unit_pricing_groups-0-reservation_unit": row.reservation_unit.pk,
+        "reservation_unit_pricing_groups-0-begins": "2027-06-01",
+        **management_form_data("components", total_forms=1),
+        **management_form_data("reservation_unit_pricing_groups", total_forms=1),
+    }
+
+    errors: list[dict[str, Any]] = []
+    with collect_admin_form_errors(errors):
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 200
+    assert errors == [
+        {
+            "code": "",
+            "message": (
+                f"Application round '{application_round.name}': "
+                f"Reservation unit {row.reservation_unit.pk} has price options (none) on 2027-06-01, "
+                f"but reservation unit {row.reservation_unit.pk} has 'Adults' on 2027-05-01. "
+                "All reservation units must have the same price options for the whole reservation period."
+            ),
+        },
+        {
+            "code": "",
+            "message": (
+                f"Application round '{application_round.name}': "
+                "The change removes price options 'Adults' from the application round. "
+                "Applicants can select them until the reservations of the round are made."
+            ),
+        },
+    ]
+    assert not PricingGroup.objects.filter(name_fi="Hinnasto").exists()

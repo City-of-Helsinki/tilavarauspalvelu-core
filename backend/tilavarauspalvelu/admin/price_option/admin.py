@@ -7,6 +7,8 @@ from modeltranslation.admin import TabbedTranslationAdmin
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import PriceOption
 
+from .form import PriceOptionAdminForm
+
 __all__ = [
     "PriceOptionAdmin",
 ]
@@ -30,6 +32,7 @@ class PriceOptionAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslationAdmin):
     ordering = ["name"]
 
     # Form
+    form = PriceOptionAdminForm
     fields = [
         "name",
         "description",
