@@ -7,7 +7,7 @@ from django.core.management import call_command
 from .create_caisa import _create_caisa
 from .create_misc import _create_banner_notifications, _create_general_terms_of_use, _create_periodic_tasks
 from .create_permissions import _create_unit_groups, _set_user_group_permissions, _set_user_roles
-from .create_pricing_groups import _create_pricing_groups
+from .create_pricing_groups import _create_pricing_groups, _create_reservation_price_lines
 from .create_reservation_related_things import (
     _create_age_groups,
     _create_cancellation_rules,
@@ -79,6 +79,7 @@ def create_test_data(*, flush: bool = True) -> None:
     _create_caisa()
 
     _create_pricing_groups(tax_levels=tax_levels)
+    _create_reservation_price_lines()
 
 
 @with_logs
