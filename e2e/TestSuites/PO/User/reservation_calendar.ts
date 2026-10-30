@@ -11,7 +11,7 @@ export class ReservationCalendar extends PageObject {
       .getByTestId("calendar-controls__duration")
       .locator("#calendar-controls__duration-main-button")
       .click();
-    await this.page.locator('[role="option"]').locator(`text="${duration}"`).click();
+    await this.page.getByRole("option", { name: duration, exact: true }).click();
     // An option picked within 200 ms of opening leaves the HDS Select list open
     await this.pages.customKeywords.closeSelectListIfOpen("#calendar-controls__duration-main-button");
   }
@@ -41,7 +41,7 @@ export class ReservationCalendar extends PageObject {
     // Clicking the current time would unselect it and keep the continue button disabled
     const selected_time = this.page
       .locator("#calendar-controls__time-main-button")
-      .locator(`text="${this.state.calendarControlTimeOfFreeSlot}"`);
+      .getByText(this.state.calendarControlTimeOfFreeSlot, { exact: true });
     const is_current_time = await selected_time.count();
     if (is_current_time > 0) {
       await log(`${this.state.calendarControlTimeOfFreeSlot} is the current time, changing to a different time`);
@@ -52,7 +52,7 @@ export class ReservationCalendar extends PageObject {
     }
     await this.page
       .locator("#calendar-controls__time-main-button")
-      .locator(`text="${this.state.calendarControlTimeOfFreeSlot}"`)
+      .getByText(this.state.calendarControlTimeOfFreeSlot, { exact: true })
       .first()
       .waitFor({ state: "visible", timeout: 5000 });
     await this.pages.customKeywords.closeSelectListIfOpen("#calendar-controls__time-main-button");

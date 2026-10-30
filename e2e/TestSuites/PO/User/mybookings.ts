@@ -33,7 +33,7 @@ export class Mybookings extends PageObject {
   @step("mybookings.Select Reason For Cancellation")
   async selectReasonForCancellation(reason: string) {
     // Wait For Elements State  id=reason-item-0  visible
-    await this.pages.customKeywords.findAndClickElementWithText("li", reason);
+    await this.page.getByRole("option", { name: reason, exact: true }).click();
     // An option picked within 200 ms of opening leaves the HDS Select list open over the cancel button
     await this.pages.customKeywords.closeSelectListIfOpen("#reservation-cancel__reason-main-button");
   }

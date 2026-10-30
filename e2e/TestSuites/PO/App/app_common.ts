@@ -92,9 +92,13 @@ export class AppCommon extends PageObject {
 
   @step("app_common.Verify Notification Banner Message")
   async verifyNotificationBannerMessage(notification_banner_message: string, notification_type: string) {
-    await this.page.locator(`section${notification_type}`).waitFor({ state: "visible", timeout: 10_000 });
+    // A banner of this type: toasts and form errors are HDS notifications with the same type classes
+    const banner = this.page
+      .getByTestId("BannerNotificationList__Notification")
+      .and(this.page.locator(notification_type));
+    await banner.waitFor({ state: "visible", timeout: 10_000 });
 
-    await this.pages.customKeywords.checkElementsText(`section${notification_type}`, notification_banner_message);
+    await this.pages.customKeywords.checkElementsText(banner, notification_banner_message);
   }
 
   /** Fails if a notification banner is shown. Use after the banners have loaded. */

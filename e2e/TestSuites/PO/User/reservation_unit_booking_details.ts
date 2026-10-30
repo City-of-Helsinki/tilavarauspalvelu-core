@@ -12,7 +12,7 @@ export class ReservationUnitBookingDetails extends PageObject {
   @step("reservation_unit_booking_details.Select The Purpose Of The Booking")
   async selectThePurposeOfTheBooking(purpose: string) {
     await this.page.locator("#reservation-form-field__purpose-main-button").click();
-    await this.pages.customKeywords.findAndClickElementWithText("li", purpose);
+    await this.page.getByRole("option", { name: purpose, exact: true }).click();
     // An option picked within 200 ms of opening leaves the HDS Select list open
     await this.pages.customKeywords.closeSelectListIfOpen("#reservation-form-field__purpose-main-button");
   }
@@ -40,7 +40,7 @@ export class ReservationUnitBookingDetails extends PageObject {
   @step("reservation_unit_booking_details.Click And Select AgeGroup Button")
   async clickAndSelectAgeGroupButton(age_group: string) {
     await this.page.locator("#reservation-form-field__ageGroup-main-button").click();
-    await this.pages.customKeywords.findAndClickElementWithText("li", age_group);
+    await this.page.getByRole("option", { name: age_group, exact: true }).click();
     await this.pages.customKeywords.closeSelectListIfOpen("#reservation-form-field__ageGroup-main-button");
   }
 }

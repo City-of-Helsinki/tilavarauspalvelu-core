@@ -111,10 +111,12 @@ export class AppUser extends PageObject {
       return;
     }
 
-    await this.pages.customKeywords.findAndClickElementWithText(
-      this.page.getByTestId("list-with-pagination__list--container").getByTestId("card__heading"),
-      nameoftheunit
-    );
+    // The first result card with this name: a card's heading has only the unit's name
+    await this.page
+      .getByTestId("list-with-pagination__list--container")
+      .getByRole("heading", { name: nameoftheunit, exact: true })
+      .first()
+      .click();
     await this.pages.customKeywords.waitForUrlToContain("/reservation-unit/", /* timeout= */ 8000);
   }
 

@@ -5,21 +5,19 @@ import { PageObject } from "../../page-object";
 export class RecurringApplicationsPage2 extends PageObject {
   @step("recurring_applications_page2.User Selects Type Of The Booking Request")
   async userSelectsTypeOfTheBookingRequest(type_of_booking_request_txt: string) {
-    await this.page.locator('[aria-label*="Aikatoiveen tyyppi. "]').click();
-    await this.pages.customKeywords.findAndClickElementWithText("ul >> span", type_of_booking_request_txt);
+    const main_button = this.page.getByRole("combobox", { name: "Aikatoiveen tyyppi." });
+    await main_button.click();
+    await this.page.getByRole("option", { name: type_of_booking_request_txt, exact: true }).click();
     // An option picked within 200 ms of opening leaves the HDS Select list open
-    await this.pages.customKeywords.closeSelectListIfOpen(
-      '[aria-haspopup="listbox"][aria-label*="Aikatoiveen tyyppi. "]'
-    );
+    await this.pages.customKeywords.closeSelectListIfOpen(main_button);
   }
 
   @step("recurring_applications_page2.User Clicks Available Seasonal Booking Times For")
   async userClicksAvailableSeasonalBookingTimesFor(name_of_the_unit: string) {
-    await this.page.locator('[aria-label*="Näytä kausivarattavat "]').click();
-    await this.pages.customKeywords.findAndClickElementWithText("ul >> span", name_of_the_unit);
-    await this.pages.customKeywords.closeSelectListIfOpen(
-      '[aria-haspopup="listbox"][aria-label*="Näytä kausivarattavat "]'
-    );
+    const main_button = this.page.getByRole("combobox", { name: "Näytä kausivarattavat" });
+    await main_button.click();
+    await this.page.getByRole("option", { name: name_of_the_unit, exact: true }).click();
+    await this.pages.customKeywords.closeSelectListIfOpen(main_button);
   }
 
   @step("recurring_applications_page2.User Selects The Times For Recurring Application")

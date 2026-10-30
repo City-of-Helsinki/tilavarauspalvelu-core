@@ -11,16 +11,14 @@ export class Popups extends PageObject {
    */
   @step("popups.User Accepts Cookies If Dialog Is Visible")
   async userAcceptsCookiesIfDialogIsVisible(cookie_text: string) {
+    // The cookie banner's button (HDS cookie consent); the name is matched as a substring, like :has-text was
+    const accept = this.page.locator(".hds-cc__buttons").getByRole("button", { name: cookie_text });
     // The click below waits for the button to stop moving (the Robot suite waited for "stable" here)
-    const dialog_visible = await reachesState(
-      this.page.locator(`button:has-text("${cookie_text}")`),
-      "visible",
-      10_000
-    );
+    const dialog_visible = await reachesState(accept, "visible", 10_000);
 
     if (dialog_visible) {
       await log(`Dialog is visible. Checking for the button with text "${cookie_text}".`);
-      await this.page.locator(`.hds-cc__buttons >> button:has-text("${cookie_text}")`).click();
+      await accept.click();
       await log(`Clicked the "${cookie_text}" button.`);
       await this.page.locator(".hds-cc__buttons").waitFor({ state: "hidden", timeout: 5000 });
     } else {

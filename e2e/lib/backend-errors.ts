@@ -11,7 +11,7 @@
  * recorded.
  */
 import { setTimeout as delay } from "node:timers/promises";
-import type { BrowserContext, Page, Request, Response, TestInfo, WebError } from "@playwright/test";
+import type { BrowserContext, Frame, Page, Request, Response, TestInfo, WebError } from "@playwright/test";
 import { redact } from "./runtime";
 
 export const BACKEND_ERROR = "backend error";
@@ -67,6 +67,25 @@ function describe(request: Request): string {
   return `${request.method()} ${url.host}${url.pathname}${operation}`;
 }
 
+/** The frame that sent a request, or null when it has none (a service worker's request) */
+function frameOf(request: Request): Frame | null {
+  try {
+    return request.frame();
+  } catch {
+    return null;
+  }
+}
+
+/** Whether a frame is `ancestor` or inside it */
+function isWithin(frame: Frame, ancestor: Frame): boolean {
+  for (let current: Frame | null = frame; current != null; current = current.parentFrame()) {
+    if (current === ancestor) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /** The messages of a GraphQL response's errors, or null when it has none or the body isn't GraphQL JSON. */
 function graphqlErrors(body: string): string[] | null {
   try {
@@ -84,6 +103,8 @@ export class BackendErrors {
   private readonly entries: Entry[] = [];
   /** The watched requests that have no answer yet, with the time they were sent */
   private readonly inFlight = new Map<Request, number>();
+  /** The watched requests that a new document ended after they had waited `pendingMs`, with when that happened */
+  private readonly ended: Array<{ request: Request; sent: number; endedAt: number }> = [];
   /** The reads of response bodies, which the end of the test waits for */
   private readonly reads: Array<Promise<void>> = [];
   private readonly contexts: BrowserContext[] = [];
@@ -141,6 +162,7 @@ export class BackendErrors {
       }
     });
     context.on("response", (response) => {
+      this.forgetReplacedRequests(response);
       this.checkResponse(response);
     });
     context.on("weberror", (error: WebError) => {
@@ -164,6 +186,12 @@ export class BackendErrors {
         this.add(sent, `no answer in ${((now - sent) / 1000).toFixed(1)} s: ${describe(request)}`);
         this.inFlight.delete(request);
       }
+    }
+    for (const { request, sent, endedAt } of this.ended.splice(0)) {
+      this.add(
+        sent,
+        `no answer in ${((endedAt - sent) / 1000).toFixed(1)} s, then the page was reloaded or left: ${describe(request)}`
+      );
     }
   }
 
@@ -225,6 +253,41 @@ export class BackendErrors {
 
   private add(at: number, text: string): void {
     this.entries.push({ at, text: text.replaceAll(URL_QUERY, "$1") });
+  }
+
+  /**
+   * A frame's new document ends the requests that its old document sent, and the browser doesn't always report them as
+   * failed, so they would look unanswered (Playwright's own network idle wait forgets them too). They are forgotten
+   * when the new document's response comes, and the ones that had already waited `pendingMs` are kept for the report.
+   */
+  private forgetReplacedRequests(response: Response): void {
+    const navigation = response.request();
+    const status = response.status();
+    // Redirects, empty answers and downloads don't replace the document
+    if (
+      !navigation.isNavigationRequest() ||
+      (status >= 300 && status < 400) ||
+      status === 204 ||
+      status === 205 ||
+      /^attachment/i.test(response.headers()["content-disposition"] ?? "")
+    ) {
+      return;
+    }
+    const frame = frameOf(navigation);
+    if (frame == null) {
+      return;
+    }
+    const now = Date.now();
+    for (const [request, sent] of this.inFlight) {
+      const sender = frameOf(request);
+      if (request === navigation || sender == null || !isWithin(sender, frame)) {
+        continue;
+      }
+      this.inFlight.delete(request);
+      if (now - sent >= this.pendingMs) {
+        this.ended.push({ request, sent, endedAt: now });
+      }
+    }
   }
 
   private checkResponse(response: Response): void {
