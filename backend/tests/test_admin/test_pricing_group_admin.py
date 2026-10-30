@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
@@ -10,8 +10,11 @@ from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
 from tilavarauspalvelu.typing import error_codes
 
-from tests.factories import PriceOptionFactory, ReservationUnitFactory, UnitGroupFactory, UserFactory
+from tests.factories import PriceOptionFactory, ReservationUnitFactory, TaxLevelFactory, UnitGroupFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import TaxLevel
 
 # Applied to all tests
 pytestmark = [
@@ -22,7 +25,14 @@ pytestmark = [
 # ── Helpers ──
 
 
-def component_form_data(index: int, *, valid_from: str, valid_until: str = "") -> dict[str, Any]:
+def component_form_data(
+    index: int,
+    *,
+    valid_from: str,
+    valid_until: str = "",
+    tax_level: TaxLevel | None = None,
+) -> dict[str, Any]:
+    tax_level = tax_level or TaxLevelFactory.create()
     return {
         f"components-{index}-kind": PriceComponentKind.BASE.value,
         f"components-{index}-valid_from": valid_from,
@@ -30,6 +40,7 @@ def component_form_data(index: int, *, valid_from: str, valid_until: str = "") -
         f"components-{index}-amount": "10.00",
         f"components-{index}-price_unit": PriceUnit.PER_HOUR.value,
         f"components-{index}-payment_type": PaymentType.ONLINE.value,
+        f"components-{index}-tax_level": tax_level.pk,
         f"components-{index}-material_price_description_fi": "",
         f"components-{index}-material_price_description_en": "",
         f"components-{index}-material_price_description_sv": "",
@@ -50,11 +61,12 @@ def group_form_data() -> dict[str, Any]:
 def test_pricing_group_admin__create_with_component_and_reservation_unit(api_client):
     api_client.force_login(UserFactory.create_superuser())
     reservation_unit = ReservationUnitFactory.create()
+    tax_level = TaxLevelFactory.create()
 
     url = reverse("admin:tilavarauspalvelu_pricinggroup_add")
     data = {
         **group_form_data(),
-        **component_form_data(0, valid_from="2026-01-01"),
+        **component_form_data(0, valid_from="2026-01-01", tax_level=tax_level),
         "reservation_unit_pricing_groups-0-reservation_unit": reservation_unit.pk,
         "reservation_unit_pricing_groups-0-begins": "2026-01-01",
         **management_form_data("components", total_forms=1),
@@ -68,6 +80,7 @@ def test_pricing_group_admin__create_with_component_and_reservation_unit(api_cli
     components = list(PriceComponent.objects.filter(pricing_group=pricing_group))
     assert len(components) == 1
     assert components[0].amount == Decimal(10)
+    assert components[0].tax_level == tax_level
     rows = list(ReservationUnitPricingGroup.objects.filter(pricing_group=pricing_group))
     assert len(rows) == 1
     assert rows[0].reservation_unit == reservation_unit

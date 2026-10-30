@@ -20,12 +20,15 @@ from .utils import with_logs
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from tilavarauspalvelu.models import ReservationUnitPricing
+    from tilavarauspalvelu.models import ReservationUnitPricing, TaxLevel
+
+    from .utils import TaxLevelKey
 
 
 @with_logs
-def _create_pricing_groups() -> None:
-    shared_reservation_units = _create_shared_pricing_group()
+def _create_pricing_groups(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
+    tax_level = tax_levels["general"]
+    shared_reservation_units = _create_shared_pricing_group(tax_level=tax_level)
 
     reservation_units = (
         ReservationUnit.objects
@@ -33,10 +36,10 @@ def _create_pricing_groups() -> None:
         .exclude(pk__in=[reservation_unit.pk for reservation_unit in shared_reservation_units])
         .distinct()
     )
-    create_own_pricing_groups(reservation_units)
+    create_own_pricing_groups(reservation_units, tax_level=tax_level)
 
 
-def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit]) -> None:
+def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit], *, tax_level: TaxLevel) -> None:
     """Make an own pricing group for each reservation unit, with one base component for each of its pricings."""
     for reservation_unit in reservation_units:
         pricings: list[ReservationUnitPricing] = list(reservation_unit.pricings.order_by("begins"))
@@ -71,6 +74,7 @@ def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit]) -> N
                 material_price_description_en=pricing.material_price_description_en or "",
                 material_price_description_sv=pricing.material_price_description_sv or "",
                 payment_type=(pricing.payment_type or PaymentType.ON_SITE) if pricing.highest_price > 0 else None,
+                tax_level=tax_level,
             )
             for pricing, valid_until in zip(pricings, valid_until_dates, strict=True)
         ]
@@ -80,7 +84,7 @@ def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit]) -> N
 # Internals
 
 
-def _create_shared_pricing_group() -> list[ReservationUnit]:
+def _create_shared_pricing_group(*, tax_level: TaxLevel) -> list[ReservationUnit]:
     """
     Make a shared pricing group with two price options and a price change in the future,
     and move two reservation units of the first unit group to it.
@@ -138,6 +142,7 @@ def _create_shared_pricing_group() -> list[ReservationUnit]:
             amount=Decimal(20),
             price_unit=PriceUnit.PER_HOUR,
             payment_type=PaymentType.ONLINE,
+            tax_level=tax_level,
         ),
         PriceComponent(
             pricing_group=pricing_group,
@@ -148,6 +153,7 @@ def _create_shared_pricing_group() -> list[ReservationUnit]:
             amount=Decimal(25),
             price_unit=PriceUnit.PER_HOUR,
             payment_type=PaymentType.ONLINE,
+            tax_level=tax_level,
         ),
         PriceComponent(
             pricing_group=pricing_group,
@@ -158,6 +164,7 @@ def _create_shared_pricing_group() -> list[ReservationUnit]:
             amount=Decimal(10),
             price_unit=PriceUnit.PER_HOUR,
             payment_type=PaymentType.ONLINE,
+            tax_level=tax_level,
             can_apply_for_discount=True,
         ),
     ])

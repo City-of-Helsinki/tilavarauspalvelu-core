@@ -37,7 +37,7 @@ def create_test_data(*, flush: bool = True) -> None:
     terms_of_use = _create_specific_terms_of_use()
     cancellation_rules = _create_cancellation_rules()
     tax_percentages = _create_tax_percentages()
-    _create_tax_levels()
+    tax_levels = _create_tax_levels()
 
     _create_reservation_units(
         terms_of_use=terms_of_use,
@@ -78,7 +78,7 @@ def create_test_data(*, flush: bool = True) -> None:
 
     _create_caisa()
 
-    _create_pricing_groups()
+    _create_pricing_groups(tax_levels=tax_levels)
 
 
 @with_logs
