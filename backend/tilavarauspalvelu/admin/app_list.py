@@ -41,6 +41,8 @@ ADMIN_APP_GROUPS: list[AdminAppGroup] = [
         models=[
             "tilavarauspalvelu.ReservationUnit",
             "tilavarauspalvelu.ReservationUnitPricing",
+            "tilavarauspalvelu.PricingGroup",
+            "tilavarauspalvelu.PriceOption",
             "tilavarauspalvelu.ReservationUnitAccessType",
             "tilavarauspalvelu.ReservationUnitImage",
             "tilavarauspalvelu.ReservationUnitCancellationRule",

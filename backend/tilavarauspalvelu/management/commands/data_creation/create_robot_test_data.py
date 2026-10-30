@@ -32,6 +32,7 @@ from tilavarauspalvelu.enums import (
     UserRoleChoice,
     Weekday,
 )
+from tilavarauspalvelu.management.commands.data_creation.create_pricing_groups import create_own_pricing_groups
 from tilavarauspalvelu.management.commands.data_creation.utils import (
     defer_reservation_unit_create_operations,
     get_image_path,
@@ -49,6 +50,7 @@ from tilavarauspalvelu.models import (
     PaymentAccounting,
     PaymentMerchant,
     PaymentProduct,
+    PricingGroup,
     Reservation,
     ReservationPurpose,
     ReservationSeries,
@@ -60,6 +62,8 @@ from tilavarauspalvelu.models import (
     ReservationUnitPricing,
     ReservationUnitType,
     Space,
+    TaxLevel,
+    TaxLevelRate,
     TaxPercentage,
     TermsOfUse,
     Unit,
@@ -99,9 +103,35 @@ def create_robot_test_data() -> None:
     remove_existing_data()
     create_users()
     create_reservation_units()
+    create_own_pricing_groups(
+        ReservationUnit.objects.filter(unit__tprek_id="71677"),
+        tax_level=create_general_tax_level(),
+    )
     create_application_rounds()
     create_past_reservations()
     create_permissions()
+
+
+def create_general_tax_level() -> TaxLevel:
+    general_tax_level, _ = TaxLevel.objects.get_or_create(
+        name="Yleinen",
+        defaults={
+            "name_fi": "Yleinen",
+            "name_en": "General",
+            "name_sv": "Allmän",
+        },
+    )
+    TaxLevelRate.objects.get_or_create(
+        tax_level=general_tax_level,
+        begins=local_date(2000, 1, 1),
+        defaults={"percentage": Decimal("24.0")},
+    )
+    TaxLevelRate.objects.get_or_create(
+        tax_level=general_tax_level,
+        begins=local_date(2024, 9, 1),
+        defaults={"percentage": Decimal("25.5")},
+    )
+    return general_tax_level
 
 
 def remove_existing_data() -> None:
@@ -127,6 +157,12 @@ def remove_existing_data() -> None:
         | models.Q(application_round__name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)")
     )
 
+    own_pricing_groups = PricingGroup.objects.filter(
+        unit_group__isnull=True,
+        reservation_unit_pricing_groups__reservation_unit__in=sq,
+    )
+    own_pricing_group_ids = list(own_pricing_groups.values_list("id", flat=True))
+
     spaces.delete()
     reservations.delete()
     series.delete()
@@ -135,6 +171,7 @@ def remove_existing_data() -> None:
     applications.delete()
     application_round.delete()
     reservation_units.delete()
+    PricingGroup.objects.filter(id__in=own_pricing_group_ids).delete()
     harakka.delete()
 
     UnitGroup.objects.filter(name_fi="Automaatiotestit (Älä poista)").delete()
