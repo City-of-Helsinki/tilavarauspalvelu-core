@@ -8,6 +8,7 @@ from graphql_relay import to_global_id
 from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReservationUnitImageType,
     ReservationUnitPublishingState,
     TermsOfUseTypeChoices,
     Weekday,
@@ -386,8 +387,16 @@ def test_reservation_unit__query__images__image_url(graphql):
     """
 
     reservation_unit_1 = ReservationUnitFactory.create()
-    ReservationUnitImageFactory.create(reservation_unit=reservation_unit_1, image="reservation_unit_images/1.jpg")
-    ReservationUnitImageFactory.create(reservation_unit=reservation_unit_1, image="reservation_unit_images/2.jpg")
+    ReservationUnitImageFactory.create(
+        reservation_unit=reservation_unit_1,
+        image="reservation_unit_images/1.jpg",
+        image_type=ReservationUnitImageType.MAIN,
+    )
+    ReservationUnitImageFactory.create(
+        reservation_unit=reservation_unit_1,
+        image="reservation_unit_images/2.jpg",
+        image_type=ReservationUnitImageType.OTHER,
+    )
 
     reservation_unit_2 = ReservationUnitFactory.create()
     ReservationUnitImageFactory.create(reservation_unit=reservation_unit_2, image="reservation_unit_images/3.jpg")
