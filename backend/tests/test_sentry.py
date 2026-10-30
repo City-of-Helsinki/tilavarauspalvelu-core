@@ -3,6 +3,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
+from django.db.models.signals import post_init
 from django.test import override_settings
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -96,6 +97,7 @@ def test_sentry_post_setup_initializes_sdk_with_configured_options(environment: 
     assert options["profile_lifecycle"] == "trace"
     assert len(options["integrations"]) == 1
     assert isinstance(options["integrations"][0], DjangoIntegration)
+    assert options["integrations"][0].signals_denylist == [post_init]
 
 
 @pytest.mark.parametrize("environment", [Docker, Platta])

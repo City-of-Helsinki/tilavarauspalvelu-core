@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import sentry_sdk
+from django.db.models.signals import post_init
 from sentry_sdk.integrations.django import DjangoIntegration
 
 if TYPE_CHECKING:
@@ -20,7 +21,11 @@ def init_sentry(
         dsn=dsn,
         environment=environment,
         release=release,
-        integrations=[DjangoIntegration()],
+        integrations=[
+            # modeltranslation connects 'delete_mt_init' to 'post_init', which fires for every loaded
+            # model instance. Each call becomes a span, and these spans fill the trace.
+            DjangoIntegration(signals_denylist=[post_init]),
+        ],
         traces_sampler=sentry_traces_sampler,
         before_send_transaction=sentry_before_send_transaction,
         profile_session_sample_rate=profile_session_sample_rate,
