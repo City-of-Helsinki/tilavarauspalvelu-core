@@ -72,6 +72,7 @@ class Migration(migrations.Migration):
                 ('payment_type', utils.fields.model.TextChoicesField(blank=True, choices=[('ON_SITE', 'On site'), ('ONLINE', 'Online'), ('ONLINE_OR_INVOICE', 'Online or invoice')], enum=tilavarauspalvelu.enums.PaymentType, max_length=17, null=True)),
                 ('price_option', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='price_components', to='tilavarauspalvelu.priceoption')),
                 ('pricing_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='components', to='tilavarauspalvelu.pricinggroup')),
+                ('tax_level', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='price_components', to='tilavarauspalvelu.taxlevel')),
             ],
             options={
                 'verbose_name': 'price component',
