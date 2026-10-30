@@ -60,7 +60,8 @@ from tilavarauspalvelu.models import (
     ReservationUnitPricing,
     ReservationUnitType,
     Space,
-    TaxPercentage,
+    TaxLevel,
+    TaxLevelRate,
     TermsOfUse,
     Unit,
     UnitGroup,
@@ -841,8 +842,62 @@ def create_reservation_units() -> None:
         },
     )
 
-    nolla_veroprosentti, _ = TaxPercentage.objects.get_or_create(value=Decimal("0.0"))
-    uusi_veroprosentti, _ = TaxPercentage.objects.get_or_create(value=Decimal("25.5"))
+    yleinen_verotaso, _ = TaxLevel.objects.get_or_create(
+        name="Yleinen",
+        defaults={
+            "name_fi": "Yleinen",
+            "name_en": "General",
+            "name_sv": "Allmän",
+        },
+    )
+    TaxLevelRate.objects.get_or_create(
+        tax_level=yleinen_verotaso,
+        begins=local_date(2000, 1, 1),
+        defaults={"percentage": Decimal("24.0")},
+    )
+    TaxLevelRate.objects.get_or_create(
+        tax_level=yleinen_verotaso,
+        begins=local_date(2024, 9, 1),
+        defaults={"percentage": Decimal("25.5")},
+    )
+
+    alennettu_verotaso, _ = TaxLevel.objects.get_or_create(
+        name="Alennettu",
+        defaults={
+            "name_fi": "Alennettu",
+            "name_en": "Reduced",
+            "name_sv": "Reducerad",
+        },
+    )
+    TaxLevelRate.objects.get_or_create(
+        tax_level=alennettu_verotaso,
+        begins=local_date(2000, 1, 1),
+        defaults={"percentage": Decimal("10.0")},
+    )
+    TaxLevelRate.objects.get_or_create(
+        tax_level=alennettu_verotaso,
+        begins=local_date(2025, 1, 1),
+        defaults={"percentage": Decimal("14.0")},
+    )
+    TaxLevelRate.objects.get_or_create(
+        tax_level=alennettu_verotaso,
+        begins=local_date(2026, 1, 1),
+        defaults={"percentage": Decimal("13.5")},
+    )
+
+    veroton_verotaso, _ = TaxLevel.objects.get_or_create(
+        name="Veroton",
+        defaults={
+            "name_fi": "Veroton",
+            "name_en": "Tax free",
+            "name_sv": "Skattefri",
+        },
+    )
+    TaxLevelRate.objects.get_or_create(
+        tax_level=veroton_verotaso,
+        begins=local_date(2000, 1, 1),
+        defaults={"percentage": Decimal("0.0")},
+    )
 
     harakka_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2952865")
     mankeli_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2956668")
@@ -1107,10 +1162,9 @@ def create_reservation_units() -> None:
         begins=local_date(2023, 9, 25),
         price_unit=PriceUnit.PER_15_MINS,
         payment_type=None,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=0,
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _maksuton_mankeli_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_maksuton_mankeli,
@@ -1297,10 +1351,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 9, 1),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=PaymentType.ONLINE,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=40,
-        tax_percentage=uusi_veroprosentti,
+        tax_level=yleinen_verotaso,
     )
     _aina_maksullinen_aitio_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_aina_maksullinen_aitio,
@@ -1483,10 +1536,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 8, 23),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=PaymentType.ONLINE_OR_INVOICE,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=40,
-        tax_percentage=uusi_veroprosentti,
+        tax_level=yleinen_verotaso,
     )
     _aina_kasiteltava_kellarikerros_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_aina_kasiteltava_kellarikerros,
@@ -1664,10 +1716,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 9, 1),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=PaymentType.ONLINE,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=30,
-        tax_percentage=uusi_veroprosentti,
+        tax_level=yleinen_verotaso,
     )
     _alennuskelpoinen_aula_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_alennuskelpoinen_aula,
@@ -1769,10 +1820,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 3, 1),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=None,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=0,
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _perumiskelvoton_parveke_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_perumiskelvoton_parveke,
@@ -1876,10 +1926,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 3, 1),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=PaymentType.ONLINE,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=0,
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _aina_varattu_yksikko_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_aina_varattu_yksikko,
@@ -2097,10 +2146,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 3, 1),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=PaymentType.ONLINE,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=0,
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _ovikoodi_maksuton_kasiteltava_yksikko_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_ovikoodi_maksuton_kasiteltava_yksikko,
@@ -2204,10 +2252,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 3, 1),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=PaymentType.ONLINE,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=0,
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _tuplabuukattu_tupla_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_tuplabuukattu_tupla,
@@ -2319,10 +2366,9 @@ def create_reservation_units() -> None:
         begins=local_date(2025, 6, 12),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=None,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=0,
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _kausivarausyksikko_malmi_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_malmi,
@@ -2438,10 +2484,9 @@ def create_reservation_units() -> None:
         begins=local_date(2025, 6, 12),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=None,
-        is_activated_on_begins=False,
         lowest_price=0,
         highest_price=0,
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _kausivarausyksikko_keskusta_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_keskusta,
@@ -2557,10 +2602,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 8, 27),
         price_unit=PriceUnit.FIXED,
         payment_type=PaymentType.ONLINE,
-        is_activated_on_begins=False,
         lowest_price=Decimal("12.40"),
         highest_price=Decimal("50.00"),
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _kausivarausyksikko_yrjo_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
@@ -2716,10 +2760,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 8, 27),
         price_unit=PriceUnit.PER_15_MINS,
         payment_type=PaymentType.ONLINE,
-        is_activated_on_begins=False,
         lowest_price=Decimal("24.80"),
         highest_price=Decimal("60.00"),
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _kausivarausyksikko_kalevi_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
@@ -2871,10 +2914,9 @@ def create_reservation_units() -> None:
         begins=local_date(2024, 2, 23),
         price_unit=PriceUnit.PER_HOUR,
         payment_type=PaymentType.ONLINE,
-        is_activated_on_begins=False,
         lowest_price=Decimal("30.00"),
         highest_price=Decimal("80.00"),
-        tax_percentage=nolla_veroprosentti,
+        tax_level=veroton_verotaso,
     )
     _kausivarausyksikko_piitu_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,

@@ -37,6 +37,8 @@ from .reservation_unit_type.model import ReservationUnitType
 from .resource.model import Resource
 from .space.model import Space
 from .suitable_time_range.model import SuitableTimeRange
+from .tax_level.model import TaxLevel
+from .tax_level_rate.model import TaxLevelRate
 from .tax_percentage.model import TaxPercentage
 from .terms_of_use.model import TermsOfUse
 from .unit.model import Unit
@@ -83,6 +85,8 @@ __all__ = [
     "Resource",
     "Space",
     "SuitableTimeRange",
+    "TaxLevel",
+    "TaxLevelRate",
     "TaxPercentage",
     "TermsOfUse",
     "Unit",

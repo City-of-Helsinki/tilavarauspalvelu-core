@@ -43,17 +43,15 @@ class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslatio
         "begins",
         "lowest_price",
         "highest_price",
-        "tax_percentage",
+        "tax_level",
         "price_unit",
-        "is_activated_on_begins",
     ]
     list_filter = [
         ("begins", DateRangeFilterBuilder()),
-        "tax_percentage",
-        "is_activated_on_begins",
+        "tax_level",
         ("reservation_unit", ReservationUnitFilter),
     ]
-    list_select_related = ["reservation_unit__unit", "tax_percentage"]
+    list_select_related = ["reservation_unit__unit", "tax_level"]
     autocomplete_fields = ["reservation_unit"]
     ordering = ["-begins"]
 
@@ -62,12 +60,11 @@ class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslatio
     fields = [
         "reservation_unit",
         "begins",
-        "is_activated_on_begins",
         ("lowest_price", "lowest_price_net"),
         ("highest_price", "highest_price_net"),
         "price_unit",
         "payment_type",
-        "tax_percentage",
+        "tax_level",
         "material_price_description",
     ]
     readonly_fields = [
@@ -76,7 +73,13 @@ class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslatio
     ]
 
     def lowest_price_net(self, obj: ReservationUnitPricing) -> str:
-        return f"{round_decimal(obj.lowest_price_net, 2)} €"
+        lowest_price_net = obj.lowest_price_net
+        if lowest_price_net is None:
+            return "-"
+        return f"{round_decimal(lowest_price_net, 2)} €"
 
     def highest_price_net(self, obj: ReservationUnitPricing) -> str:
-        return f"{round_decimal(obj.highest_price_net, 2)} €"
+        highest_price_net = obj.highest_price_net
+        if highest_price_net is None:
+            return "-"
+        return f"{round_decimal(highest_price_net, 2)} €"

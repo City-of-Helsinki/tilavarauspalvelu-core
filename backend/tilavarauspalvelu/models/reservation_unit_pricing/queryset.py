@@ -12,8 +12,6 @@ from utils.date_utils import local_date
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import TaxPercentage
-
 __all__ = [
     "ReservationUnitPricingManager",
     "ReservationUnitPricingQuerySet",
@@ -39,14 +37,10 @@ class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
 
     def past_or_active(self, from_date: datetime.date | models.F | None = None) -> Self:
         """Get only past or active pricings, ordered from most recent to oldest."""
-        today = local_date()
         if from_date is None:
-            from_date = today
+            from_date = local_date()
 
-        return self.filter(
-            models.Q(begins__lte=today)  # Is active regardless of `is_activated_on_begins` value
-            | models.Q(begins__lte=from_date, is_activated_on_begins=False)
-        ).order_by("-begins")
+        return self.filter(begins__lte=from_date).order_by("-begins")
 
     def active(self, from_date: datetime.date | models.F | None = None) -> Self:
         """Get only active pricings for each reservation unit."""
@@ -61,32 +55,6 @@ class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
                 ),
             )
             .filter(row_number=1)
-        )
-
-    def latest_pricings_for_tax_update(self, change_date: datetime.date, ignored_company_codes: list[str]) -> Self:
-        """Get last pricing for each reservation unit before the change date"""
-        return (
-            self
-            .filter(
-                models.Q(begins__lte=change_date, highest_price=0)  # Ignore FREE pricings after the change date
-                | models.Q(highest_price__gt=0)
-            )
-            .exclude(reservation_unit__payment_accounting__company_code__in=ignored_company_codes)
-            .exclude(
-                # Use Unit's Payment Accounting, only if Reservation Unit's Payment Accounting is not set
-                reservation_unit__unit__payment_accounting__company_code__in=ignored_company_codes,
-                reservation_unit__payment_accounting__isnull=True,
-            )
-            .order_by("reservation_unit_id", "-begins")
-            .distinct("reservation_unit_id")
-        )
-
-    def pricings_with_tax_percentage(self, after_date: datetime.date, tax_percentage: TaxPercentage) -> Self:
-        """Get pricings for the given tax percentage from the given date."""
-        return self.filter(
-            begins__gte=after_date,
-            tax_percentage=tax_percentage,
-            highest_price__gt=0,
         )
 
 

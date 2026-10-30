@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
+from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from utils.auditlog_util import AuditLogger
@@ -14,11 +16,10 @@ from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
     import datetime
-    from decimal import Decimal
 
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ReservationUnit, TaxPercentage
+    from tilavarauspalvelu.models import ReservationUnit, TaxLevel, TaxPercentage
 
     from .actions import ReservationUnitPricingActions
     from .queryset import ReservationUnitPricingManager
@@ -36,8 +37,7 @@ class ReservationUnitPricing(models.Model):
 
     payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
 
-    # True: This pricing is used for reservations that are created after the begins date
-    # False: This pricing is used for reservations that start after the begins date
+    # Not used. Kept so that migrations can be reversed. Removed in TILA-4558.
     is_activated_on_begins = models.BooleanField(default=False)
 
     lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -51,11 +51,19 @@ class ReservationUnitPricing(models.Model):
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
-    tax_percentage: TaxPercentage = models.ForeignKey(
+    tax_level: TaxLevel = models.ForeignKey(
+        "tilavarauspalvelu.TaxLevel",
+        related_name="reservation_unit_pricings",
+        on_delete=models.PROTECT,
+    )
+
+    # Not used. Kept so that migrations can be reversed. Removed in TILA-4558.
+    tax_percentage: TaxPercentage | None = models.ForeignKey(
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
-        limit_choices_to=models.Q(is_enabled=True),
+        null=True,
+        blank=True,
     )
 
     reservation_unit: ReservationUnit = models.ForeignKey(
@@ -93,22 +101,40 @@ class ReservationUnitPricing(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"
+        return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_level})"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.pk} ({self!s})>"
 
-    @property
-    def lowest_price_net(self) -> Decimal:
-        if self.tax_percentage == 0:
-            return self.lowest_price
-        return self.lowest_price / self.tax_percentage.multiplier
+    @lookup_property
+    def lowest_price_net() -> Decimal | None:
+        """The lowest price without the tax of the rate that is in effect today."""
+        return models.ExpressionWrapper(  # type: ignore[return-value]
+            models.F("lowest_price") / (Decimal(1) + L("tax_level__current_percentage") / Decimal(100)),
+            output_field=models.DecimalField(),
+        )
 
-    @property
-    def highest_price_net(self) -> Decimal:
-        if self.tax_percentage == 0:
-            return self.highest_price
-        return self.highest_price / self.tax_percentage.multiplier
+    @lowest_price_net.override
+    def _(self) -> Decimal | None:
+        tax_percentage = self.tax_level.current_percentage
+        if tax_percentage is None:
+            return None
+        return self.lowest_price / (1 + tax_percentage / Decimal(100))
+
+    @lookup_property
+    def highest_price_net() -> Decimal | None:
+        """The highest price without the tax of the rate that is in effect today."""
+        return models.ExpressionWrapper(  # type: ignore[return-value]
+            models.F("highest_price") / (Decimal(1) + L("tax_level__current_percentage") / Decimal(100)),
+            output_field=models.DecimalField(),
+        )
+
+    @highest_price_net.override
+    def _(self) -> Decimal | None:
+        tax_percentage = self.tax_level.current_percentage
+        if tax_percentage is None:
+            return None
+        return self.highest_price / (1 + tax_percentage / Decimal(100))
 
 
 AuditLogger.register(ReservationUnitPricing)

@@ -5,6 +5,8 @@ import itertools
 from decimal import Decimal
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import (
@@ -102,7 +104,7 @@ def test_reservation_unit_export__multiple():
     assert row_2[next(index)] == reservation_unit_1.pricings.first().price_unit
     assert row_2[next(index)] == reservation_unit_1.pricings.first().lowest_price
     assert row_2[next(index)] == reservation_unit_1.pricings.first().highest_price
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().tax_percentage
+    assert row_2[next(index)] == "25.50%"
     assert row_2[next(index)] == reservation_unit_1.pricings.first().material_price_description
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)
@@ -264,3 +266,24 @@ def test_reservation_unit_export__subset():
     # - the writes contain only 3 rows (+header)
     writes = mock_writer.get_writes()
     assert len(writes) == 4, writes
+
+
+def test_reservation_unit_export__query_count_does_not_grow_with_reservation_units():
+    ReservationUnitFactory.create(
+        pricings__highest_price=Decimal(20),
+        access_types__access_type=AccessType.UNRESTRICTED,
+    )
+
+    with CaptureQueriesContext(connection) as one_reservation_unit, mock_csv_writer():
+        ReservationUnitExporter().write_csv()
+
+    ReservationUnitFactory.create_batch(
+        3,
+        pricings__highest_price=Decimal(20),
+        access_types__access_type=AccessType.UNRESTRICTED,
+    )
+
+    with CaptureQueriesContext(connection) as four_reservation_units, mock_csv_writer():
+        ReservationUnitExporter().write_csv()
+
+    assert len(four_reservation_units.captured_queries) == len(one_reservation_unit.captured_queries)

@@ -6,11 +6,12 @@ from decimal import Decimal
 
 import pytest
 from django.urls import reverse
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.date_utils import next_hour
+from utils.date_utils import local_date, local_datetime, next_hour
 from utils.utils import get_query_params, update_query_params
 
 from tests.factories import OrderFactory, ReservationFactory, ReservationUnitFactory
@@ -39,9 +40,31 @@ def test_redirect_to_verkkokauppa__success(api_client, settings):
     assert response.status_code == 302
     assert response.url == "https://checkout.url/paymentmethod?lang=en"
 
-    # Tax percentage value should be updated
+
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_redirect_to_verkkokauppa__uses_tax_rate_of_payment_date(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
+    order = OrderFactory.create()
+    VerkkokauppaAPIClient.create_order.return_value = order
+
+    reservation = ReservationFactory.create_with_pending_payment(tax_percentage_value=Decimal(24))
+
+    url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
+    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi", lang="en")
+
+    api_client.force_login(reservation.user)
+    response = api_client.get(url)
+
+    assert response.status_code == 302
+
     reservation.refresh_from_db()
     assert reservation.tax_percentage_value == Decimal("25.5")
+
+    payment_order = reservation.payment_order
+    assert payment_order.price_net == Decimal("9.88")
+    assert payment_order.price_vat == Decimal("2.52")
+    assert payment_order.price_total == Decimal("12.4")
 
 
 def test_redirect_to_verkkokauppa__no_redirect_on_error(api_client, settings):
@@ -336,6 +359,33 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_cl
     }
 
 
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
+    reservation = ReservationFactory.create_with_pending_payment(tax_percentage_value=Decimal("25.5"))
+
+    tax_level = reservation.reservation_unit.pricings.first().tax_level
+    tax_level.rates.update(begins=local_date(2024, 1, 2))
+
+    url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
+    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
+
+    api_client.force_login(reservation.user)
+    response = api_client.get(url)
+
+    query_params = get_query_params(response.url)
+
+    assert response.status_code == 302
+    assert query_params == {
+        "error_message": "Reservation unit pricing has no tax rate in effect today",
+        "error_code": "TAX_LEVEL_HAS_NO_RATE",
+    }
+
+    reservation.refresh_from_db()
+    assert reservation.tax_percentage_value == Decimal("25.5")
+
+
 @patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Error"))
 def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client, settings):
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
@@ -355,3 +405,26 @@ def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client
         "error_message": "Payment for reservation could not be created in verkkokauppa",
         "error_code": "RESERVATION_PAYMENT_CREATION_FAILED",
     }
+
+
+@patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Error"))
+def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed__tax_amounts_match(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
+    reservation = ReservationFactory.create_with_pending_payment(tax_percentage_value=Decimal(24))
+
+    url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
+    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
+
+    api_client.force_login(reservation.user)
+    response = api_client.get(url)
+
+    assert response.status_code == 302
+
+    reservation.refresh_from_db()
+    assert reservation.tax_percentage_value == Decimal("25.5")
+
+    payment_order = reservation.payment_order
+    assert payment_order.price_net == Decimal("9.88")
+    assert payment_order.price_vat == Decimal("2.52")
+    assert payment_order.price_total == Decimal("12.4")

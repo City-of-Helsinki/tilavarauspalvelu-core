@@ -31,7 +31,7 @@ from .reservation_unit_pricing.admin import ReservationUnitPricingAdmin
 from .reservation_unit_type.admin import ReservationUnitTypeAdmin
 from .resource.admin import ResourceAdmin
 from .space.admin import SpaceAdmin
-from .tax_percentage.admin import TaxPercentageAdmin
+from .tax_level.admin import TaxLevelAdmin
 from .terms_of_use.admin import TermsOfUseAdmin
 from .unit.admin import UnitAdmin
 from .unit_group.admin import UnitGroupAdmin
@@ -70,7 +70,7 @@ __all__ = [
     "ReservationUnitTypeAdmin",
     "ResourceAdmin",
     "SpaceAdmin",
-    "TaxPercentageAdmin",
+    "TaxLevelAdmin",
     "TermsOfUseAdmin",
     "UnitAdmin",
     "UnitGroupAdmin",

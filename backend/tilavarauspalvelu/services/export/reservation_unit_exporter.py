@@ -13,7 +13,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStartInterval,
 )
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing, TaxLevel
 from utils.date_utils import local_date
 
 from ._base_exporter import BaseCSVExporter, BaseExportRow
@@ -114,6 +114,9 @@ class ReservationUnitExporter(BaseCSVExporter):
 
     @property
     def queryset(self) -> models.QuerySet:
+        tax_levels = TaxLevel.objects.annotate(current_percentage=L("current_percentage"))
+        pricings = ReservationUnitPricing.objects.active().prefetch_related(models.Prefetch("tax_level", tax_levels))
+
         return (
             self._queryset
             .select_related(
@@ -134,11 +137,12 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "resources",
                 "intended_uses",
                 "equipments",
-                models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
+                models.Prefetch("pricings", pricings),
             )
             .annotate(
                 publishing_state=L("publishing_state"),
                 reservation_state=L("reservation_state"),
+                current_access_type=L("current_access_type"),
             )
         )
 
@@ -245,6 +249,7 @@ class ReservationUnitExporter(BaseCSVExporter):
         pricing: ReservationUnitPricing = next(iter(instance.pricings.all()), None)
         start_interval = ReservationStartInterval(instance.reservation_start_interval)
         payment_type = getattr(pricing, "payment_type", None)
+        tax_percentage = pricing.tax_level.current_percentage if pricing is not None else None
         access_type = instance.current_access_type
         return [
             ReservationUnitExportRow(
@@ -278,7 +283,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 price_unit=getattr(pricing, "price_unit", ""),
                 lowest_price=getattr(pricing, "lowest_price", ""),
                 highest_price=getattr(pricing, "highest_price", ""),
-                tax_percentage=getattr(pricing, "tax_percentage", ""),
+                tax_percentage=f"{tax_percentage}%" if tax_percentage is not None else "",
                 material_price_description=getattr(pricing, "material_price_description", ""),  # Includes any HTML tags
                 reservation_begins_at=self.format_datetime(instance.reservation_begins_at),
                 reservation_ends_at=self.format_datetime(instance.reservation_ends_at),

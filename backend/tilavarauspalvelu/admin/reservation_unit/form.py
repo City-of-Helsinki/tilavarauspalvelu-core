@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import json
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django import forms
 from django.contrib import admin
@@ -22,6 +22,9 @@ from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType,
 from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import TaxLevel
 
 # Access type
 
@@ -138,6 +141,17 @@ class ReservationUnitPricingForm(forms.ModelForm):
             "material_price_description": TinyMCE(mce_attrs={"height": "250px"}),
         }
 
+    def clean_tax_level(self) -> TaxLevel:
+        tax_level: TaxLevel = self.cleaned_data["tax_level"]
+
+        today = local_date()
+        has_rate = tax_level.rates.effective_on(on_date=today).exists()
+        if not has_rate:
+            msg = _("This tax level has no rate in effect today.")
+            raise ValidationError(msg)
+
+        return tax_level
+
 
 class ReservationUnitPricingFormSet(BaseInlineFormSet):
     form = ReservationUnitPricingForm
@@ -172,12 +186,11 @@ class ReservationUnitPricingInline(TranslationStackedInline):
     model = ReservationUnitPricing
     fields = [
         "begins",
-        "is_activated_on_begins",
         "lowest_price",
         "highest_price",
         "price_unit",
         "payment_type",
-        "tax_percentage",
+        "tax_level",
         "material_price_description",
     ]
     form = ReservationUnitPricingForm

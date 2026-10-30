@@ -23,6 +23,7 @@ from .models import (
     ReservationUnitType,
     Resource,
     Space,
+    TaxLevel,
     TermsOfUse,
     Unit,
     UnitGroup,
@@ -124,6 +125,11 @@ class ResourceTranslationOptions(TranslationOptions):
 
 @register_lazy(Space)
 class SpaceTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register_lazy(TaxLevel)
+class TaxLevelTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 

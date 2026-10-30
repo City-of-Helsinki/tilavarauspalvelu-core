@@ -8,11 +8,11 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
-    "TaxPercentagePermission",
+    "TaxLevelPermission",
 ]
 
 
-class TaxPercentagePermission(BasePermission):
+class TaxLevelPermission(BasePermission):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True

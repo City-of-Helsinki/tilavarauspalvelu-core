@@ -3,23 +3,19 @@ from __future__ import annotations
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from tilavarauspalvelu.models import TaxPercentage
+from tilavarauspalvelu.models import TaxLevel
 
 __all__ = [
-    "TaxPercentageFilterSet",
+    "TaxLevelFilterSet",
 ]
 
 
-class TaxPercentageFilterSet(ModelFilterSet):
+class TaxLevelFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
 
     class Meta:
-        model = TaxPercentage
-        fields = [
-            "value",
-            "is_enabled",
-        ]
+        model = TaxLevel
+        fields = []
         order_by = [
             "pk",
-            "is_enabled",
         ]

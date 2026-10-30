@@ -214,6 +214,7 @@ class ReservationConfirmData(TypedDict):
     confirmed_at: NotRequired[datetime.datetime]
     payment_type: NotRequired[PaymentType | None]
     state: NotRequired[ReservationStateChoice]
+    tax_percentage_value: NotRequired[Decimal]
 
 
 class ReservationAdjustTimeData(TypedDict):
@@ -604,9 +605,10 @@ class error_codes(StrEnum):  # noqa: N801
     RESERVATION_UNIT_PRICINGS_INVALID_PRICES = auto()
     RESERVATION_UNIT_PRICINGS_MISSING = auto()
     RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING = auto()
-    RESERVATION_UNIT_PRICINGS_TAX_PERCENTAGE_DISABLED = auto()
+    RESERVATION_UNIT_PRICINGS_TAX_LEVEL_HAS_NO_RATE = auto()
     RESERVATION_UNIT_PRICING_NO_PAYMENT_TYPE = auto()
     RESERVATION_WRONG_ACCESS_TYPE = auto()
+    TAX_LEVEL_HAS_NO_RATE = auto()
     UPSTREAM_CALL_FAILED = auto()
     USER_NOT_INTERNAL_USER = auto()
     USER_NOT_OF_AGE = auto()

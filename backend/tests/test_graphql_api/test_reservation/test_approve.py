@@ -13,9 +13,15 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraS
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import PaymentOrder, Reservation
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
-from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory
+from tests.factories import (
+    PaymentOrderFactory,
+    ReservationFactory,
+    ReservationSeriesFactory,
+    ReservationUnitFactory,
+    TaxLevelRateFactory,
+)
 from tests.helpers import ResponseMock, patch_method
 
 from .helpers import APPROVE_MUTATION, get_approve_data
@@ -56,6 +62,7 @@ def test_reservation__approve__paid__on_site(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservation_unit=reservation_unit,
+        tax_percentage_value=Decimal("24.0"),
     )
 
     graphql.login_with_superuser()
@@ -67,6 +74,7 @@ def test_reservation__approve__paid__on_site(graphql):
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.tax_percentage_value == Decimal("24.0")
 
     assert EmailService.send_reservation_confirmed_email.called is True
     assert EmailService.send_reservation_created_staff_notification_email.called is True
@@ -100,9 +108,6 @@ def test_reservation__approve__paid__in_webshop(graphql):
     # Reservation is confirmed, even though payment is not completed
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    # Tax percentage is taken from the latest pricing
-    assert reservation.tax_percentage_value == Decimal("25.5")
-
     assert hasattr(reservation, "payment_order")
 
     payment_order = reservation.payment_order
@@ -124,6 +129,37 @@ def test_reservation__approve__paid__in_webshop(graphql):
     # Handled payment due by is set 3 days from now
     handled_payment_due_by = payment_order.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE)
     assert handled_payment_due_by == local_datetime(2024, 1, 4, 12)
+
+
+@patch_method(EmailService.send_reservation_requires_payment_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__paid__in_webshop__uses_tax_rate_of_approval_date(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    tax_level = reservation_unit.pricings.first().tax_level
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2024, 1, 10), percentage=Decimal(27))
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
+        tax_percentage_value=Decimal("24.0"),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="10.59")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.tax_percentage_value == Decimal("25.5")
+
+    payment_order = reservation.payment_order
+    assert payment_order.price_net == Decimal("8.44")
+    assert payment_order.price_vat == Decimal("2.15")
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
@@ -190,6 +226,7 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2024, 1, 1, 13),
         ends_at=local_datetime(2024, 1, 1, 14),
+        tax_percentage_value=Decimal("24.0"),
     )
 
     graphql.login_with_superuser()
@@ -208,8 +245,12 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
 
     payment_order = reservation.payment_order
 
+    assert reservation.tax_percentage_value == Decimal("24.0")
+
     assert payment_order.payment_type == PaymentType.ON_SITE
     assert payment_order.status == OrderStatus.PAID_MANUALLY
+    assert payment_order.price_net == Decimal("8.54")
+    assert payment_order.price_vat == Decimal("2.05")
 
 
 @patch_method(EmailService.send_reservation_confirmed_email)
@@ -520,7 +561,7 @@ def test_reservation__approve__no_payment_product_if_paid_online(graphql):
     reservation_unit = ReservationUnitFactory.create(
         pricings__lowest_price=Decimal("10.00"),
         pricings__highest_price=Decimal("20.00"),
-        pricings__tax_percentage__value=Decimal("25.50"),
+        pricings__tax_level__rates__percentage=Decimal("25.50"),
         pricings__payment_type=PaymentType.ONLINE,
     )
 

@@ -4,13 +4,17 @@ import datetime
 from decimal import Decimal
 
 import pytest
-from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import PriceUnit
 from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, ReservationUnitPricingFactory
+from tests.factories import (
+    ReservationFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingFactory,
+    TaxLevelRateFactory,
+)
 from tests.helpers import exact
 
 # Applied to all tests
@@ -124,7 +128,26 @@ def test_calculate_full_price__no_active_pricing():
         reservation.actions.calculate_full_price(begin_datetime=begin, end_datetime=end)
 
 
-def test_get_active_pricing__future_has_same_tax_percentage():
+def test_pricing_net_prices__use_current_tax_rate():
+    today = local_date()
+
+    pricing = ReservationUnitPricingFactory.create(
+        begins=today + datetime.timedelta(days=1),
+        lowest_price=Decimal("12.55"),
+        highest_price=Decimal("25.10"),
+        tax_level__rates__percentage=Decimal("25.5"),
+    )
+    TaxLevelRateFactory.create(
+        tax_level=pricing.tax_level,
+        begins=today + datetime.timedelta(days=1),
+        percentage=Decimal(27),
+    )
+
+    assert pricing.lowest_price_net == Decimal(10)
+    assert pricing.highest_price_net == Decimal(20)
+
+
+def test_get_active_pricing__future_pricing():
     day_1 = local_datetime()
     day_2 = day_1 + datetime.timedelta(days=1)
 
@@ -132,13 +155,11 @@ def test_get_active_pricing__future_has_same_tax_percentage():
     pricing_1 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_1,
-        tax_percentage__value=Decimal(24),
         price_unit=PriceUnit.FIXED,
     )
     pricing_2 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
-        tax_percentage__value=Decimal(24),
         price_unit=PriceUnit.FIXED,
         highest_price=Decimal("100.0"),
     )
@@ -150,40 +171,32 @@ def test_get_active_pricing__future_has_same_tax_percentage():
     assert pricing.pk == pricing_2.pk
 
 
-def test_get_active_pricing__is_activated_on_begins():
-    day_1 = local_datetime()
-    day_2 = day_1 + datetime.timedelta(days=1)
+def test_get_active_pricing__past_date():
+    today = local_date()
+    last_week = today - datetime.timedelta(days=7)
+    yesterday = today - datetime.timedelta(days=1)
 
     reservation_unit = ReservationUnitFactory.create()
     pricing_1 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
-        begins=day_1,
-        tax_percentage__value=Decimal(24),
+        begins=last_week,
         price_unit=PriceUnit.FIXED,
     )
     pricing_2 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
-        begins=day_2,
-        tax_percentage__value=Decimal("25.5"),
+        begins=yesterday,
         price_unit=PriceUnit.FIXED,
-        is_activated_on_begins=True,
+        highest_price=Decimal("100.0"),
     )
 
-    # Price for day 1 is used as expected
-    pricing = reservation_unit.actions.get_active_pricing(by_date=day_1.date())
-    assert pricing.tax_percentage.value == pricing_1.tax_percentage.value
+    pricing = reservation_unit.actions.get_active_pricing(by_date=last_week)
+    assert pricing.pk == pricing_1.pk
 
-    # Price for day 2 still uses the price from day 1, as the price for day 2 has different tax % and isn't ACTIVE yet
-    pricing = reservation_unit.actions.get_active_pricing(by_date=day_2.date())
-    assert pricing.tax_percentage.value == pricing_1.tax_percentage.value
-
-    with freeze_time(day_2):
-        # Price for day 2 is now used as expected
-        pricing = reservation_unit.actions.get_active_pricing(by_date=day_2.date())
-        assert pricing.tax_percentage.value == pricing_2.tax_percentage.value
+    pricing = reservation_unit.actions.get_active_pricing(by_date=yesterday)
+    assert pricing.pk == pricing_2.pk
 
 
-def test_get_active_pricing__active_is_free_future_is_paid_and_different_tax_percentage():
+def test_get_active_pricing__active_is_free_future_is_paid():
     day_1 = local_datetime()
     day_2 = day_1 + datetime.timedelta(days=1)
 
@@ -196,18 +209,17 @@ def test_get_active_pricing__active_is_free_future_is_paid_and_different_tax_per
     ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
-        tax_percentage__value=Decimal("25.5"),
         price_unit=PriceUnit.FIXED,
     )
 
     pricing = reservation_unit.actions.get_active_pricing(by_date=day_1.date())
-    assert pricing.tax_percentage.value == Decimal(0)
+    assert pricing.highest_price == Decimal(0)
 
     pricing = reservation_unit.actions.get_active_pricing(by_date=day_2.date())
-    assert pricing.tax_percentage.value == Decimal("25.5")
+    assert pricing.highest_price == Decimal(10)
 
 
-def test_get_active_pricing__active_is_paid_future_is_free_and_different_tax_percentage():
+def test_get_active_pricing__active_is_paid_future_is_free():
     day_1 = local_datetime()
     day_2 = day_1 + datetime.timedelta(days=1)
 
@@ -215,7 +227,6 @@ def test_get_active_pricing__active_is_paid_future_is_free_and_different_tax_per
     ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_1,
-        tax_percentage__value=Decimal("25.5"),
         price_unit=PriceUnit.FIXED,
     )
     ReservationUnitPricingFactory.create_free(
@@ -225,7 +236,7 @@ def test_get_active_pricing__active_is_paid_future_is_free_and_different_tax_per
     )
 
     pricing = reservation_unit.actions.get_active_pricing(by_date=day_1.date())
-    assert pricing.tax_percentage.value == Decimal("25.5")
+    assert pricing.highest_price == Decimal(10)
 
     pricing = reservation_unit.actions.get_active_pricing(by_date=day_2.date())
-    assert pricing.tax_percentage.value == Decimal(0)
+    assert pricing.highest_price == Decimal(0)
