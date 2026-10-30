@@ -117,7 +117,7 @@ def _create_reservation_price_lines() -> None:
 
     components_by_pricing_group: dict[int, list[PriceComponent]] = defaultdict(list)
     price_options_by_pricing_group: dict[int, PriceOption] = {}
-    for component in PriceComponent.objects.select_related("price_option").order_by("valid_from"):
+    for component in PriceComponent.objects.select_related("price_option", "tax_level").order_by("valid_from"):
         components_by_pricing_group[component.pricing_group_id].append(component)
 
         option = component.price_option
@@ -129,6 +129,9 @@ def _create_reservation_price_lines() -> None:
             price_options_by_pricing_group[component.pricing_group_id] = option
 
     reservations = Reservation.objects.filter(reservation_unit__in=list(reservation_unit_pricing_groups))
+
+    today = local_date()
+    tax_percentages: dict[int, Decimal] = {}
 
     price_lines: list[ReservationPriceLine] = []
     priced_reservations: list[Reservation] = []
@@ -179,6 +182,10 @@ def _create_reservation_price_lines() -> None:
 
         line_option = component.price_option
 
+        tax_level = component.tax_level
+        if tax_level.pk not in tax_percentages:
+            tax_percentages[tax_level.pk] = tax_level.actions.get_percentage(on_date=today)
+
         line = ReservationPriceLine(
             reservation=reservation,
             price_component=component,
@@ -192,7 +199,8 @@ def _create_reservation_price_lines() -> None:
             adjustment_percentage=Decimal(0),
             amount=amount,
             override_amount=None,
-            tax_percentage=Decimal(0),
+            tax_level=tax_level,
+            tax_percentage=tax_percentages[tax_level.pk],
             vat_code="",
             payment_product=None,
         )
