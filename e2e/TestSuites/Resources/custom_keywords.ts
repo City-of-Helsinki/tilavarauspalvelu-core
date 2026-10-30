@@ -35,7 +35,6 @@ export class CustomKeywords extends PageObject {
     // Port: Click waits for the element to be visible and enabled (Playwright's auto-waiting), so there's no
     // separate Wait For Elements State
     await target.click();
-    await log(`Element with text "${wanted_text}" clicked.`);
   }
 
   /**
@@ -161,7 +160,6 @@ export class CustomKeywords extends PageObject {
   /** This keyword verifies that an element containing the specified text is NOT found within a list of elements identified by the given selector. */
   @step("custom_keywords.Verify Element With Text Is Not Found")
   async verifyElementWithTextIsNotFound(element_with_text: string | Locator, wanted_text: string) {
-    await log(`Verifying that ${formatValue(element_with_text)} with text: ${wanted_text} is NOT found`);
     // Port: expect.poll reads the elements' texts (stripped, for webkit) again until none of them is the text,
     // instead of reading them once in a loop
     await expect
@@ -174,34 +172,25 @@ export class CustomKeywords extends PageObject {
   /** This keyword verifies that an element identified by the given selector is NOT found on the page. */
   @step("custom_keywords.Verify Element Is Not Found")
   async verifyElementIsNotFound(element_selector: string) {
-    await log(`Verifying that element ${element_selector} is NOT found`);
-
     // Port: waits until the element is gone (expect's timeout) instead of counting the elements once
     await expect(
       this.page.locator(element_selector),
       `Element "${element_selector}" was found but should not be present`
     ).toHaveCount(0);
-
-    await log(`Element "${element_selector}" is correctly not present on the page`);
   }
 
   /** This keyword verifies that an element identified by the given selector IS found on the page. */
   @step("custom_keywords.Verify Element Is Found")
   async verifyElementIsFound(element_selector: string) {
-    await log(`Verifying that element ${element_selector} IS found`);
-
     // Port: waits until the element is there (expect's timeout) instead of counting the elements once
     await expect(
       this.page.locator(element_selector),
       `Element "${element_selector}" was not found but should be present`
     ).not.toHaveCount(0);
-
-    await log(`Element "${element_selector}" is correctly present on the page`);
   }
 
   @step("custom_keywords.Find And Click Element With Exact Text Using JS")
   async findAndClickElementWithExactTextUsingJs(element_with_text: string | Locator, wanted_text: string) {
-    await log(`Searching for element with text: ${wanted_text}`);
     const elements_with_text = await elementsOf(this.locate(element_with_text));
 
     for (const element of elements_with_text) {
@@ -212,7 +201,6 @@ export class CustomKeywords extends PageObject {
       if (el_text === wanted_text) {
         // A click event, like the DOM's click(): the element needn't be visible or in view
         await element.dispatchEvent("click");
-        await log(`Element with text "${wanted_text}" clicked using JavaScript.`);
         return;
       }
     }
@@ -262,7 +250,6 @@ export class CustomKeywords extends PageObject {
     text: string,
     element_to_click: string
   ) {
-    await log(`Searching for cards: ${card_element}`);
     const cards = await elementsOf(this.page.locator(card_element));
     await log(`Found ${cards.length} card containers.`);
 
@@ -278,7 +265,6 @@ export class CustomKeywords extends PageObject {
           await log(`Found matching text '${text}' in card at index ${index}`);
           // Found the card with the desired text, now click the target element inside this card
           await card.locator(element_to_click).click();
-          await log(`Clicked element '${element_to_click}' in card containing text '${text}'`);
           return;
         }
       }
@@ -303,8 +289,6 @@ export class CustomKeywords extends PageObject {
     tags_text: string,
     button_text: string
   ) {
-    await log(`Searching for group wrapper containing "${group_text}"`);
-
     // Find all group wrappers
     const group_wrappers = await elementsOf(this.page.locator(group_wrapper_selector));
     await log(`Found ${group_wrappers.length} group wrappers.`);
@@ -317,7 +301,6 @@ export class CustomKeywords extends PageObject {
 
       if (wrapper_text.includes(group_text)) {
         target_group_wrapper = wrapper;
-        await log(`Found target group wrapper containing "${group_text}"`);
         break;
       }
     }
@@ -382,7 +365,6 @@ export class CustomKeywords extends PageObject {
     for (const button of buttons) {
       if (await this.checkElementsText(button, button_text, { return_status: true })) {
         await button.click();
-        await log(`Clicked "${button_text}" button successfully`);
         return;
       }
     }
@@ -400,7 +382,6 @@ export class CustomKeywords extends PageObject {
    */
   @step("custom_keywords.Verify Card Not Found In Group With Matching Conditions")
   async verifyCardNotFoundInGroupWithMatchingConditions(empty_state_message: string) {
-    await log(`Starting verification for empty state message: "${empty_state_message}"`);
     await log("Context: Test creates 1 application, cancels it, then verifies no applications remain");
 
     // Get all elements that could contain the message
@@ -418,7 +399,6 @@ export class CustomKeywords extends PageObject {
     for (const element_text of (await this.page.locator(message_selector).allInnerTexts()).map((text) => text.trim())) {
       // Check for exact match
       if (element_text === empty_state_message) {
-        await log(`SUCCESS: Found expected empty state message: "${empty_state_message}"`);
         return;
       }
     }
@@ -431,7 +411,6 @@ export class CustomKeywords extends PageObject {
 
   @step("custom_keywords.Find Text From Elements Or Fail")
   async findTextFromElementsOrFail(element_with_text: string | Locator, wanted_text: string) {
-    await log(`Searching for text: ${wanted_text}`);
     // Port: expect.poll reads the elements' texts again until one of them is the wanted text (both stripped),
     // instead of reading them once in a loop
     await expect
@@ -444,7 +423,6 @@ export class CustomKeywords extends PageObject {
 
   @step("custom_keywords.Find Text Element From Elements")
   async findTextElementFromElements(element_with_text: string | Locator, wanted_text: string): Promise<Locator | null> {
-    await log(`Searching for text: ${wanted_text}`);
     const elements_with_text = await elementsOf(this.locate(element_with_text));
     const wanted = wanted_text.trim();
 
@@ -463,18 +441,14 @@ export class CustomKeywords extends PageObject {
   }
 
   @step("custom_keywords.Remove Non-breaking Space")
+  // oxlint-disable-next-line eslint/require-await -- keywords are async, each call is a report step
   async removeNonBreakingSpace(string: string) {
-    await log(`Original string: '${string}'`);
-    const normalized = string.replaceAll(/\u00A0|\u200B|\u200C|\u200D|\u202F/g, " ").trim();
-
-    await log(`Normalized string: '${normalized}'`);
-    return normalized;
+    return string.replaceAll(/\u00A0|\u200B|\u200C|\u200D|\u202F/g, " ").trim();
   }
 
   /** Verifies if a number extracted from the specified text element matches the expected value. */
   @step("custom_keywords.Check Number From Text Is Equal To")
   async checkNumberFromTextIsEqualTo(text_element: string | Locator, number_equalTo: string) {
-    await log(number_equalTo);
     const number_element = this.locate(text_element);
     // Reads the element's digits again until they are the expected number
     await expect
@@ -482,16 +456,11 @@ export class CustomKeywords extends PageObject {
         message: `The number in ${formatValue(text_element)} is not ${number_equalTo}`,
       })
       .toBe(number_equalTo);
-    const number_element_string = await number_element.innerText();
-    await log(number_element_string);
-    const NUM_FROM_TXT = number_element_string.replaceAll(/[^0-9]/g, "");
-    await log(NUM_FROM_TXT);
   }
 
   /** Verifies if a number extracted from the specified text element does NOT match the expected value. */
   @step("custom_keywords.Check Number From Text Is Not Equal To")
   async checkNumberFromTextIsNotEqualTo(text_element: string | Locator, number_notEqualTo: string) {
-    await log(`Expected number should NOT be: ${number_notEqualTo}`);
     await this.locate(text_element).waitFor({ state: "visible" });
     const number_element_string = await this.locate(text_element).innerText();
     await log(`Original text from element: ${number_element_string}`);
@@ -516,12 +485,9 @@ export class CustomKeywords extends PageObject {
   }
 
   @step("custom_keywords.Check Elements Text With Remove Non-breaking Space")
-  async checkElementsTextWithRemoveNonBreakingSpace(Element: string, Expected_text: string) {
-    await log(`Element: ${Element}`);
-    await log(`Expected text: ${Expected_text}`);
-
+  async checkElementsTextWithRemoveNonBreakingSpace(Element: string | Locator, Expected_text: string) {
     // Port: expect waits until the text matches. It normalizes whitespace, non-breaking spaces included.
-    await expect(this.page.locator(Element)).toHaveText(Expected_text, { useInnerText: true, timeout: 20_000 });
+    await expect(this.locate(Element)).toHaveText(Expected_text, { useInnerText: true, timeout: 20_000 });
   }
 
   /**
@@ -530,9 +496,6 @@ export class CustomKeywords extends PageObject {
    */
   @step("custom_keywords.Check Text Of Element With Normalization And Logging To File")
   async checkTextOfElementWithNormalizationAndLoggingToFile(Element: string | Locator, Expected_text: string) {
-    await log(`Element: ${formatValue(Element)}`);
-    await log(`Expected text: ${Expected_text}`);
-
     // Wait until the element is visible on the page
     await this.locate(Element).waitFor({ state: "visible" });
 
@@ -615,9 +578,6 @@ Differences:
     Expected_text: string,
     { strip_spaces = true, ignore_case = false, return_status = false, message = null }: CheckTextOptions = {}
   ): Promise<boolean> {
-    await log(`Element: ${formatValue(Element)}`);
-    await log(`Expected text: ${Expected_text}`);
-
     // Determine the error message to use
     const final_msg = message ?? `Element text does not match. Element: ${formatValue(Element)}`;
 
@@ -670,9 +630,6 @@ Differences:
     Expected_text: string,
     { strip_spaces = true, ignore_case = false, return_status = false }: Omit<CheckTextOptions, "message"> = {}
   ): Promise<boolean> {
-    await log(`Element: ${formatValue(Element)}`);
-    await log(`Expected text: ${Expected_text}`);
-
     // Return status boolean for loops vs fail test for assertions
     if (return_status) {
       // Wait until the element is visible on the page
@@ -698,7 +655,7 @@ Differences:
     await expect(
       this.locate(Element),
       `Element text does not contain expected text. Element: ${formatValue(Element)}`
-    ).toContainText(Expected_text, { ignoreCase: ignore_case, useInnerText: true, timeout: 10_000 });
+    ).toContainText(Expected_text, { ignoreCase: ignore_case, useInnerText: true });
     return true;
   }
 
@@ -711,7 +668,6 @@ Differences:
       .formatToParts(new Date())
       .find((part) => part.type === "timeZoneName")?.value;
     await log(`Current system time zone is: ${timezone}`);
-    await log(`This is the timeslot ${time_string}`);
 
     // Convert booking time to ICS format using the Python function
     const [ics_start, ics_end] = python_keywords.convert_booking_time_to_ics(time_string);
@@ -723,9 +679,6 @@ Differences:
 
   @step("custom_keywords.Extract Start And End Time From ICS File")
   async extractStartAndEndTimeFromIcsFile(text_from_ics_file: string) {
-    // Log the ICS text for debugging
-    await log(`ICS Text: ${text_from_ics_file}`);
-
     // For testing
     // ${text_from_ics_file}=  Set Variable  asdfasfasdf_DTSTART;TZID=America/New_York:20241003T083000..werwer_DTEND;TZID=America/New_York:20241003T093000
 
@@ -750,10 +703,6 @@ Differences:
     // Save the extracted matches for the next keywords (state)
     this.state.startTimeFromIcs = start_match;
     this.state.endTimeFromIcs = end_match;
-
-    // Log the variables for confirmation
-    await log(`Start datetime: ${this.state.startTimeFromIcs}`);
-    await log(`End datetime: ${this.state.endTimeFromIcs}`);
   }
 
   /**

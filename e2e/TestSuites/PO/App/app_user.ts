@@ -135,8 +135,6 @@ export class AppUser extends PageObject {
     // This sets ${TIME_OF_QUICK_RESERVATION_FREE_SLOT}
     await this.pages.quickReservation.selectTheFreeSlotFromQuickReservation();
 
-    await log(this.state.timeOfQuickReservationFreeSlot);
-
     const [formatted_date, formatted_date_minus_t] = await this.pages.dataModification.setInfoCardDurationTimeInfo(
       this.state.timeOfQuickReservationFreeSlot,
       quick_reservation_current_date_value
@@ -173,7 +171,6 @@ export class AppUser extends PageObject {
 
   @step("app_user.User Checks That Quick Reservation Does Not Have Reserved Time")
   async userChecksThatQuickReservationDoesNotHaveReservedTime(reservationtime: string) {
-    await log(reservationtime);
     await this.pages.quickReservation.verifyTimeSlotNotAvailable(reservationtime);
   }
 
@@ -183,10 +180,8 @@ export class AppUser extends PageObject {
    */
   @step("app_user.User Checks That Reservation Calendar Does Not Have Reserved Time Slot Available")
   async userChecksThatReservationCalendarDoesNotHaveReservedTimeSlotAvailable() {
-    await log(`This keyword sets the variable '${this.state.englishDay}'`);
     await this.pages.dataModification.convertFinnishShortDayToEnglish(this.state.timeOfQuickReservation);
 
-    await log(`This keyword sets the variable '${this.state.calendarTimeslot}'`);
     await this.pages.dataModification.computeReservationTimeSlot(
       this.state.timeOfQuickReservationFreeSlot,
       QUICK_RESERVATION_DURATION
@@ -201,7 +196,7 @@ export class AppUser extends PageObject {
     await expect(
       this.page.getByTestId("reservation__button--continue"),
       "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible();
     await this.pages.reservationUnitReserverInfo.checkApplicationCannotBeMadeWithoutInfo();
     await this.pages.reservationUnitReserverInfo.enterFirstName(this.testData.user.firstName);
     await this.pages.reservationUnitReserverInfo.enterLastName(this.testData.user.lastName);
@@ -218,7 +213,7 @@ export class AppUser extends PageObject {
     await expect(
       this.page.getByTestId("reservation__button--continue"),
       "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -239,7 +234,7 @@ export class AppUser extends PageObject {
     await expect(
       this.page.getByTestId("reservation__button--continue"),
       "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -263,7 +258,7 @@ export class AppUser extends PageObject {
     await expect(
       this.page.getByTestId("reservation__button--continue"),
       "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.reservationUnitBookingDetails.typeTheDescriptionOfTheBooking(SINGLEBOOKING_DESCRIPTION);
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
@@ -281,7 +276,7 @@ export class AppUser extends PageObject {
     await expect(
       this.page.getByTestId("reservation__button--continue"),
       "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -301,7 +296,7 @@ export class AppUser extends PageObject {
     await expect(
       this.page.getByTestId("reservation__button--continue"),
       "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -457,7 +452,6 @@ export class AppUser extends PageObject {
   async userChecksTheModifiedReservationInfoIsRightAndClicksContinue() {
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxAcceptedTerms();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxGenericTerms();
-    await log(this.state.timeOfQuickReservationModified);
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservationModified);
     // TODO: Separate the submit and the next page check into their own keywords
     await this.pages.reservationLownav.clickSubmitButtonContinue();
@@ -505,7 +499,7 @@ export class AppUser extends PageObject {
     await log(this.state.timeOfQuickReservationMinusTModified);
 
     await log("If the continue button is not enabled, verify that the reservation time was actually modified");
-    await expect(this.page.getByTestId("reservation__button--continue")).toBeEnabled({ timeout: 10_000 });
+    await expect(this.page.getByTestId("reservation__button--continue")).toBeEnabled();
     await this.pages.reservationCalendar.clickContinueButton();
   }
 
@@ -528,8 +522,6 @@ export class AppUser extends PageObject {
 
   @step("app_user.User Can See Upcoming Booking In List And Clicks It")
   async userCanSeeUpcomingBookingInListAndClicksIt(unitname: string, reservationtime: string) {
-    await log(unitname);
-    await log(reservationtime);
     // The list is fetched once when the page opens, so open it again if the booking is not in it. A slow "Näytä" can
     // leave the browser on the reservation page, so the list page is opened rather than the current page reloaded.
     await this.pages.customKeywords.retryWithRecovery(
@@ -542,8 +534,6 @@ export class AppUser extends PageObject {
 
   @step("app_user.User Can See Upcoming Noncancelable Booking In List And Clicks It")
   async userCanSeeUpcomingNoncancelableBookingInListAndClicksIt(unitname: string, reservationtime: string) {
-    await log(unitname);
-    await log(reservationtime);
     await this.pages.mybookings.checkMyBookingsH1(MYBOOKINGS_FI);
     // Opens the list page again if the booking is not in it, see User Can See Upcoming Booking In List And Clicks It
     await this.pages.customKeywords.retryWithRecovery(
@@ -771,23 +761,12 @@ export class AppUser extends PageObject {
     await log(`Extracted End Time: ${this.state.endTimeFromIcs}`);
 
     // Comparisons
+    // Additional info: Check custom_keywords.Convert booking time to ICS format if the times don't match
     // Assert Start Times
-    const start_times_equal = this.state.startTimeFromIcs === this.state.formattedStartToIcs;
-    if (!start_times_equal) {
-      // Additional info: Check custom_keywords.Convert booking time to ICS format if variables don't match
-      throw new Error(
-        `The start times do not match: Expected ${this.state.startTimeFromIcs}, but got ${this.state.formattedStartToIcs}.`
-      );
-    }
+    expect(this.state.startTimeFromIcs, "The start time in the calendar file").toBe(this.state.formattedStartToIcs);
 
     // Assert End Times
-    const end_times_equal = this.state.endTimeFromIcs === this.state.formattedEndToIcs;
-    if (!end_times_equal) {
-      // Additional info: Check custom_keywords.Convert booking time to ICS format if variables don't match
-      throw new Error(
-        `The end times do not match: Expected ${this.state.endTimeFromIcs}, but got ${this.state.formattedEndToIcs}.`
-      );
-    }
+    expect(this.state.endTimeFromIcs, "The end time in the calendar file").toBe(this.state.formattedEndToIcs);
   }
 
   // Recurring

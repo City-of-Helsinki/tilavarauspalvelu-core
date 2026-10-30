@@ -152,7 +152,7 @@ export class AppAdmin extends PageObject {
     await this.pages.adminReservations.adminChangesAccessCode();
     await this.pages.adminReservations.adminClicksConfirmAccessCodeButton();
     // Admin Checks Access Code Does Not Match waits until the access code has changed
-    await expect(this.page.getByTestId("reservation__info--Ovikoodi")).toBeVisible({ timeout: 10_000 });
+    await expect(this.page.getByTestId("reservation__info--Ovikoodi")).toBeVisible();
   }
 
   /** Verifies that the access code matches the expected value (extracts numbers only). */
@@ -377,7 +377,7 @@ export class AppAdmin extends PageObject {
     await expect(
       this.page.locator("#info-dialog"),
       "Info dialog should be visible after clicking make reservation button"
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible();
   }
 
   @step("app_admin.Admin Rejects Reservation And Checks The Status")

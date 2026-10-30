@@ -92,9 +92,9 @@ export class Login extends PageObject {
       /* nav_timeout= */ 15_000
     );
 
-    // Click fakevetuma2 (mobile uses nav >> prefix) and wait for HETU input page
+    // Click fakevetuma2 (on mobile, the one in the nav) and wait for HETU input page
     await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
-      "nav >> #li_fakevetuma2",
+      this.page.locator("nav").locator("#li_fakevetuma2"),
       "#hetu_input",
       /* max_attempts= */ 3,
       /* nav_timeout= */ 15_000

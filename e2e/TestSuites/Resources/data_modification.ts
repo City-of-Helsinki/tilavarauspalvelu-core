@@ -33,10 +33,6 @@ export class DataModification extends PageObject {
   /** Formats the given information as "Ma 25.11.2024 22:30–23:30, 1 t | Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA), Harakka, piilokoju" */
   @step("data_modification.Formats Tagline For Admin Side")
   async formatsTaglineForAdminSide(info_card_time_of_reservation: string, name_of_reservationunit: string) {
-    // Log the original time of reservation string
-    await log(info_card_time_of_reservation);
-    await log(name_of_reservationunit);
-
     // DEVNOTE: Remove 'klo' and any following whitespace using a regular expression
     // This was used when the app didn't include 'klo' in the time format
     // Uncomment the lines below if the app changes back to not including 'klo'
@@ -50,9 +46,6 @@ export class DataModification extends PageObject {
 
     // Use the original time string directly (keeping 'klo' as the app now includes it)
     const RESERVATION_TAG_TIME = info_card_time_of_reservation.trim();
-
-    // Log the result after stripping whitespace
-    await log(RESERVATION_TAG_TIME);
 
     // Build tagline by default with location
     let RESERVATION_TAG = `${RESERVATION_TAG_TIME} | ${name_of_reservationunit}`;
@@ -82,8 +75,6 @@ export class DataModification extends PageObject {
   /** Converts Finnish short weekday (e.g. "Su") from a datetime string into full English name. */
   @step("data_modification.Convert Finnish Short Day To English")
   async convertFinnishShortDayToEnglish(finnish_datetime: string) {
-    await log(`Finnish datetime: ${finnish_datetime}`);
-
     // 1: Extract the Finnish short day (first token before the first space)
     // e.g. ['Su','4.5.2025','klo','02:15–02:45,','30','min']
     const parts = finnish_datetime.split(" ");
@@ -93,8 +84,6 @@ export class DataModification extends PageObject {
 
     // 3: Lowercase the short day e.g. 'Su' --> 'su'
     const cleaned_shortday = short_day.toLowerCase();
-
-    await log(`Normalized key ➔ ${cleaned_shortday}`);
 
     // 4: Define parallel lists of Finnish abbreviations and English full names
     const fi_days = ["ma", "ti", "ke", "to", "pe", "la", "su"];
@@ -106,6 +95,7 @@ export class DataModification extends PageObject {
 
     // 6: Use the same index to fetch the English full name
     const english_day = en_days[idx] ?? "";
+    await log(`English day ➔ ${english_day}`);
 
     this.state.englishDay = english_day;
   }
@@ -116,9 +106,6 @@ export class DataModification extends PageObject {
    */
   @step("data_modification.Compute Reservation Time Slot")
   async computeReservationTimeSlot(reservation_start_time: string, duration: string) {
-    await log(`Reservation start time: ${reservation_start_time}`);
-    await log(`Duration: ${duration}`);
-
     // 1: Validate start time (H:MM or HH:MM with optional leading zeros, minutes 00–59)
     expect(
       reservation_start_time,
@@ -136,29 +123,19 @@ export class DataModification extends PageObject {
 
     // 3a: Remove leading zero from start hour
     const start_hour = Number.parseInt(start_hour_raw, 10);
-    await log(`Parsed start: ${start_hour}h ${start_min}m (leading zero removed if present)`);
 
-    // 4: Build a time interval string for the start (e.g. "17 hours 30 minutes")
-    const start_interval = `${start_hour} hours ${start_min} minutes`;
-    await log(`Start interval ➔ ${start_interval}`);
-
-    // 5: Normalize duration to full words (e.g. "60 min" → "60 minutes")
+    // 4–5: The duration's minutes (e.g. "60 min" → "60")
     const num_str = (duration.split("min")[0] ?? "").replaceAll(" ", "");
-    const duration_str = `${num_str} minutes`;
-    await log(`Normalized duration ➔ ${duration_str}`);
 
-    // 6: Add start interval and duration to get raw end time "HH:MM:SS"
+    // 6: Add the duration to the start time to get raw end time "HH:MM:SS"
     const end_minutes = start_hour * 60 + Number(start_min) + Number(num_str);
     const end_timer = `${pad2(Math.floor(end_minutes / 60))}:${pad2(end_minutes % 60)}:00`;
-    await log(`Raw timer end ➔ ${end_timer}`);
 
     // 7: Extract hour and minute from timer string
     const [end_hour_raw = "", end_min = ""] = end_timer.split(":"); // e.g. "18", and "30"
-    await log(`Computed end: ${end_hour_raw}h ${end_min}m`);
 
     // 8: Remove leading zero from end_hour
     const end_hour = Number.parseInt(end_hour_raw, 10);
-    await log(`End hour without leading zero ➔ ${end_hour}`);
 
     // 9: Ensure end time didn’t wrap past midnight
     // a) Must not exceed 23
@@ -187,20 +164,16 @@ export class DataModification extends PageObject {
 
     // Generate random number for days to add (1-15 days)
     const number_day = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
-    await log(number_day);
 
     // Generate random number for the start hour subtraction (1-5 hours)
     const start_hour_subtraction = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
-    await log(`Start hour subtraction: ${start_hour_subtraction}`);
 
     // Calculate the modified date and times
     const date_plus_x_days = ddmmyyyy(addToDate(current_date, { days: number_day }));
     const start_hour = pad2(addToDate(current_date, { hours: -start_hour_subtraction }).getHours());
     const end_hour = pad2(addToDate(current_date, { hours: -(start_hour_subtraction - 1) }).getHours());
 
-    await log(date_plus_x_days);
-    await log(start_hour);
-    await log(end_hour);
+    await log(`Modified date and hours: ${date_plus_x_days}, ${start_hour}–${end_hour}`);
 
     return [date_plus_x_days, start_hour, end_hour];
   }
@@ -212,8 +185,6 @@ export class DataModification extends PageObject {
    */
   @step("data_modification.Formats Reservation Time To Start And End Time")
   async formatsReservationTimeToStartAndEndTime(time_of_the_reservation: string) {
-    await log("This sets the FORMATTED_STARTTIME and FORMATTED_ENDTIME");
-
     // DEVNOTE For testing
     // ${time_of_the_reservation}=  Set variable  Pe 13.9.2024 klo 11:45–12:45
     // This uses en dash (–)
@@ -251,10 +222,8 @@ export class DataModification extends PageObject {
    * this keyword uses hard coded formatting to assume that reservation duration is 60min
    */
   @step("data_modification.Set Info Card Duration Time Info")
+  // oxlint-disable-next-line eslint/require-await -- keywords are async, each call is a report step
   async setInfoCardDurationTimeInfo(Timeslot_to_format: string, Date_to_format: string): Promise<[string, string]> {
-    await log(`Timeslot to format: ${Timeslot_to_format}`);
-    await log(`Date to format: ${Date_to_format}`);
-
     // DEVNOTE For testing keyword
     // ${Timeslot_to_format}=  Set Variable  12.15
 
@@ -267,7 +236,6 @@ export class DataModification extends PageObject {
     // Combine date and time into a single datetime string
     // Strip any extra whitespace or hidden characters from the datetime string
     const date_time_string = `${formatted_date} ${formatted_time}`.trim();
-    await log(`Formatted datetime string: ${date_time_string}`);
 
     // Convert string to datetime object (dd-mm-yyyy hh:mm)
     const parsed = /^(?<d>\d{1,2})-(?<m>\d{1,2})-(?<y>\d{4}) (?<H>\d{1,2}):(?<M>\d{1,2})$/.exec(

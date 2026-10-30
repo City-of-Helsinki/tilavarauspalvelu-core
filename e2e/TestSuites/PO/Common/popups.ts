@@ -37,11 +37,9 @@ export class Popups extends PageObject {
     let attempt = 1;
     let success = false;
     while (true) {
-      // Check if notification exists
-      const notifications_visible = await this.page
-        .locator('[data-sentry-component="BannerNotificationsList"]')
-        .getByTestId("BannerNotificationList__Notification")
-        .count();
+      // Check if notification exists. The banners are found by their test id: the list's data-sentry-component
+      // attribute isn't rendered in the test environment, so a count inside it always gave 0.
+      const notifications_visible = await this.page.getByTestId("BannerNotificationList__Notification").count();
       await log(`Attempt ${attempt}: Found ${notifications_visible} notifications`);
 
       // Exit if no notifications
@@ -60,7 +58,7 @@ export class Popups extends PageObject {
       // Close notification and refresh
       await this.page
         .getByTestId("BannerNotificationList__Notification")
-        .locator('button[title="Sulje"]')
+        .getByRole("button", { name: "Sulje", exact: true })
         .first()
         .click();
       await log("Clicked close button on notification");
