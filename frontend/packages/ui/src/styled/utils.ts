@@ -48,6 +48,7 @@ export type SpacingSize = "none" | "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-x
 
 export const Flex = styled.div<{
   $direction?: "row" | "column" | "row-reverse" | "column-reverse";
+  $grow?: boolean;
   $gap?: SpacingSize;
   $marginTop?: SpacingSize;
   $marginBottom?: SpacingSize;
@@ -60,6 +61,7 @@ export const Flex = styled.div<{
   flex-wrap: ${({ $wrap }) => $wrap ?? "nowrap"};
   gap: ${({ $gap }) => ($gap != null ? `var(--spacing-${$gap})` : "var(--spacing-m)")};
   flex-direction: ${({ $direction }) => $direction ?? "column"};
+  flex-grow: ${({ $grow }) => ($grow ? "1" : undefined)};
   justify-content: ${({ $justifyContent }) => $justifyContent ?? "initial"};
   align-items: ${({ $alignItems }) => $alignItems ?? "initial"};
   margin-top: ${({ $marginTop }) => ($marginTop ? `var(--spacing-${$marginTop})` : "0")};
