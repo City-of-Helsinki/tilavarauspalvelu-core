@@ -43,6 +43,7 @@ def test_pricing_group__query__components_and_options(graphql):
             amount
             priceUnit
             priceOption { pk nameFi }
+            taxLevel { pk currentPercentage }
         }
     """
     query = pricing_group_query(fields=fields, id=to_global_id("PricingGroupNode", pricing_group.pk))
@@ -60,6 +61,7 @@ def test_pricing_group__query__components_and_options(graphql):
                 "amount": "12.50",
                 "priceUnit": PriceUnit.PER_HOUR,
                 "priceOption": {"pk": option.pk, "nameFi": "Adults"},
+                "taxLevel": {"pk": component.tax_level.pk, "currentPercentage": "25.50"},
             },
         ],
     }
