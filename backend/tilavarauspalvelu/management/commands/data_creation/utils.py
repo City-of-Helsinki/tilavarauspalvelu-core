@@ -44,6 +44,7 @@ if TYPE_CHECKING:
 
 
 type Percentage = Literal["0", "10", "14", "24", "25.5"]
+type TaxLevelKey = Literal["general", "reduced", "tax_free"]
 TQuerySet = TypeVar("TQuerySet", bound=models.QuerySet)
 
 

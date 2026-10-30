@@ -13,6 +13,7 @@ from .create_reservation_related_things import (
     _create_hauki_resources,
     _create_reservation_purposes,
     _create_specific_terms_of_use,
+    _create_tax_levels,
     _create_tax_percentages,
 )
 from .create_reservation_units import _create_reservation_units
@@ -35,6 +36,7 @@ def create_test_data(*, flush: bool = True) -> None:
     terms_of_use = _create_specific_terms_of_use()
     cancellation_rules = _create_cancellation_rules()
     tax_percentages = _create_tax_percentages()
+    _create_tax_levels()
 
     _create_reservation_units(
         terms_of_use=terms_of_use,
