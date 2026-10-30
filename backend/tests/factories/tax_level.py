@@ -33,6 +33,7 @@ class TaxLevelFactory(GenericDjangoModelFactory[TaxLevel]):
 
     reservation_unit_pricings = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingFactory")
     price_components = ReverseForeignKeyFactory("tests.factories.PriceComponentFactory")
+    reservation_price_lines = ReverseForeignKeyFactory("tests.factories.ReservationPriceLineFactory")
 
     @factory.post_generation
     def rates(self: TaxLevel, create: bool, rates: Iterable[TaxLevelRate] | None, **kwargs: Any) -> None:
