@@ -357,19 +357,6 @@ type Query {
     """Ordering"""
     orderBy: [ReservationUnitCancellationRuleOrderingChoices]
   ): ReservationUnitCancellationRuleNodeConnection
-  taxPercentages(
-    first: Int
-    last: Int
-    offset: Int
-    after: String
-    before: String
-    value: Decimal
-    isEnabled: Boolean
-    pk: [Int]
-
-    """Ordering"""
-    orderBy: [TaxPercentageOrderingChoices]
-  ): TaxPercentageNodeConnection
   taxLevels(
     first: Int
     last: Int
@@ -2363,13 +2350,12 @@ type ReservationUnitPricingNode implements Node {
   begins: Date!
   priceUnit: PriceUnit!
   paymentType: PaymentType
-  isActivatedOnBegins: Boolean!
   lowestPrice: Decimal!
   highestPrice: Decimal!
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
-  taxPercentage: TaxPercentageNode!
+  taxLevel: TaxLevelNode!
 
   """The ID of the object"""
   id: ID!
@@ -2378,12 +2364,14 @@ type ReservationUnitPricingNode implements Node {
   pk: Int
 }
 
-type TaxPercentageNode implements Node {
-  value: Decimal!
-  isEnabled: Boolean!
+type TaxLevelNode implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """The ID of the object"""
   id: ID!
+  currentPercentage: Decimal
   pk: Int
 }
 
@@ -2739,32 +2727,6 @@ enum ReservationUnitCancellationRuleOrderingChoices {
   pkDesc
 }
 
-type TaxPercentageNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [TaxPercentageNodeEdge]!
-  totalCount: Int
-}
-
-"""A Relay edge containing a `TaxPercentageNode` and its cursor."""
-type TaxPercentageNodeEdge {
-  """The item at the end of the edge"""
-  node: TaxPercentageNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-"""Ordering fields for the 'TaxPercentage' model."""
-enum TaxPercentageOrderingChoices {
-  pkAsc
-  pkDesc
-  isEnabledAsc
-  isEnabledDesc
-}
-
 type TaxLevelNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
@@ -2781,17 +2743,6 @@ type TaxLevelNodeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
-}
-
-type TaxLevelNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object"""
-  id: ID!
-  currentPercentage: Decimal
-  pk: Int
 }
 
 """Ordering fields for the 'TaxLevel' model."""
@@ -3974,14 +3925,11 @@ scalar Upload
 input ReservationUnitPricingSerializerInput {
   pk: Int
   begins: Date!
-  isActivatedOnBegins: Boolean
   paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
-  lowestPriceNet: String
   highestPrice: Decimal
-  highestPriceNet: String
-  taxPercentage: Int!
+  taxLevel: Int!
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
@@ -4153,14 +4101,11 @@ input UpdateReservationUnitImageFieldSerializerInput {
 input UpdateReservationUnitPricingSerializerInput {
   pk: Int
   begins: Date
-  isActivatedOnBegins: Boolean
   paymentType: PaymentType
   priceUnit: PriceUnit
   lowestPrice: Decimal
-  lowestPriceNet: String
   highestPrice: Decimal
-  highestPriceNet: String
-  taxPercentage: Int
+  taxLevel: Int
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String

@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 import graphene
 from graphene_django_extensions import DjangoNode
+from lookup_property import L
+from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import ReservationUnitPricing
@@ -17,22 +19,21 @@ if TYPE_CHECKING:
 
 class ReservationUnitPricingNode(DjangoNode):
     payment_type = graphene.Field(graphene.Enum.from_enum(PaymentType), required=False)
-    lowest_price_net = graphene.Decimal(required=True)
-    highest_price_net = graphene.Decimal(required=True)
+    lowest_price_net = AnnotatedField(graphene.Decimal, expression=L("lowest_price_net"), required=True)
+    highest_price_net = AnnotatedField(graphene.Decimal, expression=L("highest_price_net"), required=True)
 
     class Meta:
         model = ReservationUnitPricing
         fields = [
             "pk",
             "begins",
-            "is_activated_on_begins",
             "price_unit",
             "payment_type",
             "lowest_price",
             "lowest_price_net",
             "highest_price",
             "highest_price_net",
-            "tax_percentage",
+            "tax_level",
             "material_price_description_fi",
             "material_price_description_en",
             "material_price_description_sv",

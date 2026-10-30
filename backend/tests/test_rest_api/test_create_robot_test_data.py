@@ -29,7 +29,8 @@ from tilavarauspalvelu.models import (
     ReservationUnitCancellationRule,
     ReservationUnitPricing,
     Space,
-    TaxPercentage,
+    TaxLevel,
+    TaxLevelRate,
     TermsOfUse,
     Unit,
     UnitGroup,
@@ -286,7 +287,8 @@ def test_remove_existing_data():
     assert IntendedUse.objects.count() == 8
     assert EquipmentCategory.objects.count() == 6
     assert Equipment.objects.count() == 29
-    assert TaxPercentage.objects.count() == 2
+    assert TaxLevel.objects.count() == 3
+    assert TaxLevelRate.objects.count() == 6
     assert OriginHaukiResource.objects.count() == 14
     assert PaymentProduct.objects.count() == 5
     assert PaymentAccounting.objects.count() == 1

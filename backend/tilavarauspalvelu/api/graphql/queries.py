@@ -41,7 +41,6 @@ from .types.resource.types import ResourceNode
 from .types.space.types import SpaceNode
 from .types.suitable_time_range.types import SuitableTimeRangeNode
 from .types.tax_level.types import TaxLevelNode
-from .types.tax_percentage.types import TaxPercentageNode
 from .types.terms_of_use.types import TermsOfUseNode
 from .types.unit.types import UnitAllNode, UnitNode
 from .types.unit_group.types import UnitGroupNode
@@ -84,7 +83,6 @@ __all__ = [
     "SpaceNode",
     "SuitableTimeRangeNode",
     "TaxLevelNode",
-    "TaxPercentageNode",
     "TermsOfUseNode",
     "UnitAllNode",
     "UnitGroupNode",

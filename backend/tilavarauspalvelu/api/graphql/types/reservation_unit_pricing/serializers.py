@@ -11,19 +11,12 @@ class ReservationUnitPricingSerializer(NestingModelSerializer):
         fields = [
             "pk",
             "begins",
-            "is_activated_on_begins",
             "payment_type",
             "price_unit",
             "lowest_price",
-            "lowest_price_net",
             "highest_price",
-            "highest_price_net",
-            "tax_percentage",
+            "tax_level",
             "material_price_description_fi",
             "material_price_description_en",
             "material_price_description_sv",
         ]
-        extra_kwargs = {
-            "lowest_price_net": {"read_only": True},
-            "highest_price_net": {"read_only": True},
-        }

@@ -353,7 +353,7 @@ def test_reservation__adjust_time__reservation_unit_in_open_application_round(gr
         unit=space.unit,
         pricings__lowest_price=0,
         pricings__highest_price=0,
-        pricings__tax_percentage__value=0,
+        pricings__tax_level__rates__percentage=0,
         cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
 

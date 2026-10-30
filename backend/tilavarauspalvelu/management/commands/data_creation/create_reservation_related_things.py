@@ -23,7 +23,6 @@ from tilavarauspalvelu.models import (
     ReservationPurpose,
     ReservationUnitCancellationRule,
     TaxLevelRate,
-    TaxPercentage,
     TermsOfUse,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
@@ -43,7 +42,6 @@ from tests.factories import (
     ReservationUnitImageFactory,
     TaxLevelFactory,
     TaxLevelRateFactory,
-    TaxPercentageFactory,
     TermsOfUseFactory,
 )
 
@@ -52,7 +50,7 @@ from .utils import IntendedUseData, fetch_image, get_image_path, with_logs
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit, ReservationUnitImage, TaxLevel
 
-    from .utils import Percentage, TaxLevelKey
+    from .utils import TaxLevelKey
 
 
 @with_logs
@@ -202,16 +200,6 @@ def _create_intended_uses() -> list[IntendedUse]:
         intended_uses.append(intended_use)
 
     return IntendedUse.objects.bulk_create(intended_uses)
-
-
-@with_logs
-def _create_tax_percentages() -> dict[Percentage, TaxPercentage]:
-    tax_percentages: list[TaxPercentage] = [
-        TaxPercentageFactory.build(value=Decimal(percentage))  #
-        for percentage in ("0", "10", "14", "24", "25.5")
-    ]
-    tax_percentages = TaxPercentage.objects.bulk_create(tax_percentages)
-    return {str(tax.value): tax for tax in tax_percentages}  # type: ignore[return-value]
 
 
 @with_logs

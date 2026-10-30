@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -29,7 +30,6 @@ from tests.factories import (
     ReservationUnitPricingFactory,
     ReservationUnitTypeFactory,
     SpaceFactory,
-    TaxPercentageFactory,
     TermsOfUseFactory,
     UnitFactory,
 )
@@ -37,9 +37,14 @@ from tests.factories import (
 from .create_reservation_related_things import _fetch_and_build_reservation_unit_image
 from .utils import SetName, with_logs
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import TaxLevel
+
+    from .utils import TaxLevelKey
+
 
 @with_logs
-def _create_caisa() -> None:
+def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
     """Create the caisa unit from testing server"""
     caisa = UnitFactory.create(
         tprek_id="7256",
@@ -56,13 +61,6 @@ def _create_caisa() -> None:
         web_page="http://www.caisa.fi/",  # NOSONAR
         phone="+358 9 310 37500",
     )
-
-    ###########################################################################################################
-    # Create tax percentages and payment types
-    ###########################################################################################################
-
-    tax_percentage_0 = TaxPercentageFactory.create(value=0.0)
-    tax_percentage_255 = TaxPercentageFactory.create(value=25.5)
 
     ###########################################################################################################
     # Create payment terms
@@ -733,7 +731,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=40.0,
-        tax_percentage=tax_percentage_255,
+        tax_level=tax_levels["general"],
         payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
@@ -828,7 +826,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_levels["tax_free"],
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=maksuton_mankeli,
@@ -955,7 +953,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=40.0,
         highest_price=40.0,
-        tax_percentage=tax_percentage_255,
+        tax_level=tax_levels["general"],
         payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
@@ -1066,7 +1064,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
-        tax_percentage=tax_percentage_255,
+        tax_level=tax_levels["general"],
         payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
@@ -1154,7 +1152,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_levels["tax_free"],
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=perumiskelvoton_parveke,
@@ -1251,7 +1249,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
-        tax_percentage=tax_percentage_255,
+        tax_level=tax_levels["general"],
         payment_type=PaymentType.ONLINE,
     )
     ReservationUnitAccessTypeFactory.create(
@@ -1356,7 +1354,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_levels["tax_free"],
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=toistuvien_varausten_toimisto,
@@ -1447,7 +1445,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_levels["tax_free"],
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=tauotettu_takkahuone,
@@ -1549,7 +1547,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
-        tax_percentage=tax_percentage_0,
+        tax_level=tax_levels["tax_free"],
     )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_kasiteltava_kammio,
