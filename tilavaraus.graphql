@@ -370,6 +370,17 @@ type Query {
     """Ordering"""
     orderBy: [TaxPercentageOrderingChoices]
   ): TaxPercentageNodeConnection
+  taxLevels(
+    first: Int
+    last: Int
+    offset: Int
+    after: String
+    before: String
+    pk: [Int]
+
+    """Ordering"""
+    orderBy: [TaxLevelOrderingChoices]
+  ): TaxLevelNodeConnection
   intendedUses(
     first: Int
     last: Int
@@ -2752,6 +2763,41 @@ enum TaxPercentageOrderingChoices {
   pkDesc
   isEnabledAsc
   isEnabledDesc
+}
+
+type TaxLevelNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [TaxLevelNodeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `TaxLevelNode` and its cursor."""
+type TaxLevelNodeEdge {
+  """The item at the end of the edge"""
+  node: TaxLevelNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type TaxLevelNode implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+
+  """The ID of the object"""
+  id: ID!
+  currentPercentage: Decimal
+  pk: Int
+}
+
+"""Ordering fields for the 'TaxLevel' model."""
+enum TaxLevelOrderingChoices {
+  pkAsc
+  pkDesc
 }
 
 type IntendedUseNodeConnection {
