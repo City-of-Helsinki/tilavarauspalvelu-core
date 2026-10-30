@@ -7,7 +7,7 @@ type Props = {
 };
 // NOTE for now this is just the header for now
 // should include html layout but it's all client routed so can't include in next page
-export default function Layout({ children, version }: Props) {
+export function Layout({ children, version }: Props) {
   return (
     <>
       <Head>
