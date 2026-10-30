@@ -414,11 +414,13 @@ test.describe("Runtime self-test", () => {
 
   testWithBrowser("Backend errors are recorded for the report", async ({ context, page }) => {
     // The server answers like a failing backend: a 500, GraphQL errors, a slow answer, the apps' 503 page (served
-    // with status 200) and a request that never answers, and the page throws an uncaught error
+    // with status 200), a missing script, a blank page and a request that never answers, and the page throws an
+    // uncaught error. A missing API path (404) isn't a backend error.
     const server = createServer((request, response) => {
       if (request.url === "/") {
         response.writeHead(200, { "content-type": "text/html" });
-        response.end(`<script>
+        response.end(`<script src="/missing.js"></script><script>
+          fetch("/not-found");
           fetch("/boom?token=selftest-query");
           fetch("/graphql/", {
             method: "POST",
@@ -437,6 +439,9 @@ test.describe("Runtime self-test", () => {
       } else if (request.url === "/error-page") {
         response.writeHead(200, { "content-type": "text/html" });
         response.end('<h1 data-testid="error__503--title">503: Palaamme pian!</h1>');
+      } else if (request.url === "/blank") {
+        response.writeHead(200, { "content-type": "text/html" });
+        response.end("<html><body></body></html>");
       } else if (request.url === "/slow") {
         setTimeout(() => response.writeHead(200).end("slow"), 300);
       } else if (request.url !== "/hangs") {
@@ -456,6 +461,7 @@ test.describe("Runtime self-test", () => {
     try {
       const uncaught = page.waitForEvent("pageerror");
       await Promise.all([
+        page.waitForResponse((response) => response.url().endsWith("/not-found")),
         page.waitForResponse((response) => response.url().includes("/boom")),
         page.waitForResponse((response) => response.url().endsWith("/graphql/")),
         page.waitForRequest((request) => request.url().endsWith("/hangs")),
@@ -466,7 +472,9 @@ test.describe("Runtime self-test", () => {
       // Before the next page load cancels the request that has no answer
       backendErrors.notePending();
       await page.goto(`http://127.0.0.1:${port}/error-page`);
-      // The failed test's open page that shows an error page
+      // The failed test's open pages: one shows an error page, the other one nothing
+      const blank_page = await context.newPage();
+      await blank_page.goto(`http://127.0.0.1:${port}/blank`);
       await backendErrors.finish();
     } finally {
       server.closeAllConnections();
@@ -477,11 +485,13 @@ test.describe("Runtime self-test", () => {
     const host = `127.0.0.1:${port}`;
     for (const expected of [
       `500 Internal Server Error: GET ${host}/boom`,
+      `404 Not Found: GET ${host}/missing.js`,
       `GraphQL errors: POST ${host}/graphql/ (SelftestQuery): selftest error`,
       `GET ${host}/hangs`,
       `GET ${host}/slow`,
       `error page "503" (status 200): GET ${host}/error-page`,
       `the page shows the error page "503": ${host}/error-page`,
+      `the page is blank: ${host}/blank`,
       "uncaught error in the page at /: selftest uncaught https://example.com/x",
     ]) {
       expect(
@@ -490,6 +500,7 @@ test.describe("Runtime self-test", () => {
       ).toBe(true);
     }
     expect(recorded.join("\n")).not.toContain("selftest-query");
+    expect(recorded.join("\n")).not.toContain("/not-found");
   });
 
   testWithBrowser("Requests that a page load ends count only if they had waited", async ({ context, page }) => {

@@ -1,6 +1,5 @@
 import type { Response } from "@playwright/test";
 /** Port of PO/User/quick_reservation.robot */
-import { elementsOf } from "../../../lib/locators";
 import { graphqlErrorsIn } from "../../../lib/responses";
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
@@ -26,17 +25,9 @@ export class QuickReservation extends PageObject {
     const first_slot = await slots.first().elementHandle({ timeout: 5000 });
     await first_slot?.waitForElementState("stable", { timeout: 5000 });
 
-    // Get all available slots
-    const all_free_quick_timeslots = await elementsOf(slots);
-
-    // Get the total number of slots
-    const total_slots = all_free_quick_timeslots.length;
+    // Get the total number of slots (the check above fails if there are none)
+    const total_slots = await slots.count();
     await log(`Total available slots: ${total_slots}`);
-
-    // Check if there are any available slots
-    if (total_slots === 0) {
-      throw new Error("No free available slots in quick reservation slots");
-    }
 
     // Port: picks from the slots that start in 30 minutes or later, if there are any. A test can take minutes from
     // booking to cancelling, and a reservation that has started can't be cancelled (the Robot keyword can pick them).
@@ -50,7 +41,7 @@ export class QuickReservation extends PageObject {
       }
     }
     if (later_slots.length === 0) {
-      later_slots = [...all_free_quick_timeslots.keys()];
+      later_slots = Array.from({ length: total_slots }, (_, index) => index);
     }
 
     // Pick one of them at random
@@ -119,14 +110,19 @@ export class QuickReservation extends PageObject {
 
   /**
    * Reloads and waits for the unit's existing reservations (AffectingReservations query),
-   * so that the free slots shown are up to date.
+   * so that the free slots shown are up to date. If the browser has left the unit page (a submit that went through
+   * opens the booking details page), opens the unit page again instead.
    */
   @step("quick_reservation.Reload Reservation Unit Page And Wait For Reservations")
-  async reloadReservationUnitPageAndWaitForReservations() {
+  async reloadReservationUnitPageAndWaitForReservations(unit_page_url: string) {
     // Port: starts waiting once the reload has replaced the page, not before it. The page being replaced can start
     // the same query just before the reload, and that response (whose body never finishes) was taken for the new one.
     // The new page can't send its query before its scripts have loaded.
-    await this.page.reload({ waitUntil: "commit" });
+    if (new URL(this.page.url()).pathname === new URL(unit_page_url).pathname) {
+      await this.page.reload({ waitUntil: "commit" });
+    } else {
+      await this.page.goto(unit_page_url, { waitUntil: "commit" });
+    }
     const reservations_loaded: PendingResponse = await this.startWaitingForReservationsQuery();
     await this.waitForReservationsQuery(reservations_loaded);
     await this.page.waitForLoadState("load");
@@ -194,9 +190,11 @@ export class QuickReservation extends PageObject {
    */
   @step("quick_reservation.Check The Price Of Quick Reservation")
   async checkThePriceOfQuickReservation(price_with_text: string) {
-    await expect(async () => {
-      await this.infoCardPriceShouldBe(price_with_text);
-    }).toPass({ intervals: [250], timeout: CONTENT_WAIT_TIMEOUT });
+    // expect retries until the price matches. It normalizes whitespace, non-breaking spaces included.
+    await expect(this.page.getByTestId("reservation__reservation-info-card__price")).toHaveText(price_with_text, {
+      useInnerText: true,
+      timeout: CONTENT_WAIT_TIMEOUT,
+    });
   }
 
   @step("quick_reservation.Info Card Price Should Be")
@@ -281,34 +279,22 @@ export class QuickReservation extends PageObject {
   @step("quick_reservation.Verify Time Slot Not Available")
   async verifyTimeSlotNotAvailable(time_to_check: string) {
     await this.page.locator("#quick-reservation__duration-main-button").waitFor({ state: "visible" });
+    const slots = this.page.locator('[class*="slider-list"]').getByTestId("quick-reservation__slot");
     // The free slots are rendered after the reservation form
-    await expect(
-      this.page.locator('[class*="slider-list"]').getByTestId("quick-reservation__slot").first()
-    ).toBeVisible();
+    await expect(slots.first()).toBeVisible();
     // Port: instead of Robot's Sleep 2s. The page shows the free slots before its AffectingReservations query returns
-    // and removes the booked ones, so wait until the slot is gone (the query can take over 10 s on the test env).
+    // and removes the booked ones, so wait until the slot is gone (the query can take over 10 s on the test env). A
+    // slot button's only text is its time.
     await expect(
-      this.page.locator(
-        `[class*="slider-list"] >> [data-testid="quick-reservation__slot"]:text-is("${time_to_check}")`
-      ),
+      slots.and(this.page.getByText(time_to_check, { exact: true })),
       `Slot '${time_to_check}' is still available`
     ).toHaveCount(0, { timeout: 20_000 });
 
-    // 1 Collect all time slots
-    const slots = this.page.locator('[class*="slider-list"]').getByTestId("quick-reservation__slot");
-    const elements = await elementsOf(slots);
+    // Fail the test if no slots are shown at all: then the check above had nothing to compare with
+    await expect(slots.first(), `No slots found at all. Cannot verify exclusion of ${time_to_check}`).toBeAttached();
 
-    // 2 Fail test if no slots are found
-    const count = elements.length;
-    if (count === 0) {
-      throw new Error(`No slots found at all. Cannot verify exclusion of ${time_to_check}`);
-    }
-
-    // 3 The texts of the slots shown now, skipping blanks
+    // The texts of the slots shown now, skipping blanks
     const slot_texts: string[] = (await slots.allInnerTexts()).filter((text) => text !== "");
     await log(`Collected slots: ${slot_texts.join(", ")}`);
-
-    // 4 Final assertion
-    expect(slot_texts, `Slot '${time_to_check}' is still available`).not.toContain(time_to_check);
   }
 }

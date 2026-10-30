@@ -6,12 +6,15 @@ export class Recurring extends PageObject {
   @step("recurring.User Selects A Recurring Booking Round")
   async userSelectsARecurringBookingRound(name_of_the_recurring_reservation: string) {
     const url_before = this.page.url();
-    await this.pages.customKeywords.findAndClickElementInCardElementByText(
-      '[data-testid="recurring-lander__application-round-container--active"] >> .card--default',
-      '[data-testid="card__heading"]',
-      name_of_the_recurring_reservation,
-      'a[href*="/recurring/"]:not([href*="/criteria"])'
-    );
+    // The first active round's card with this name, and its link to the round (the card's other link is to the
+    // round's criteria)
+    await this.page
+      .getByTestId("recurring-lander__application-round-container--active")
+      .locator(".card--default")
+      .filter({ has: this.page.getByRole("heading", { name: name_of_the_recurring_reservation, exact: true }) })
+      .first()
+      .locator('a[href*="/recurring/"]:not([href*="/criteria"])')
+      .click();
     // The round's page opens, its units are waited for when they are selected
     // Port: expect retries until the URL has changed, instead of Wait Until Keyword Succeeds with Url Should Have
     // Changed
@@ -20,19 +23,13 @@ export class Recurring extends PageObject {
 
   @step("recurring.User Selects The Units For Recurring Reservation")
   async userSelectsTheUnitsForRecurringReservation(name_of_the_recurring_unit: string) {
-    // The units are loaded after the page opens
+    // The units are loaded after the page opens, so the click waits up to 20 s for the unit's card
     await this.page
-      .locator('[class*="Card__CardContent"]')
-      .getByTestId("card__heading")
-      .locator(`text="${name_of_the_recurring_unit}"`)
+      .locator(".card--default")
+      .filter({ has: this.page.getByRole("heading", { name: name_of_the_recurring_unit, exact: true }) })
       .first()
-      .waitFor({ state: "visible", timeout: 20_000 });
-    await this.pages.customKeywords.findAndClickElementInCardElementByText(
-      '[class*="Card__CardContent"]',
-      '[data-testid="card__heading"]',
-      name_of_the_recurring_unit,
-      '[data-testid="recurring-card__button--toggle"]'
-    );
+      .getByTestId("recurring-card__button--toggle")
+      .click({ timeout: 20_000 });
   }
 
   @step("recurring.User Checks The Count Of Selected Units")

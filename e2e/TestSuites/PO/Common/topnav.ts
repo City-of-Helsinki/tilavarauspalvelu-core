@@ -26,6 +26,19 @@ async function clickAndWaitForLogout(page: Page, logout_button: Locator): Promis
   await page.waitForURL((url) => url.host === app_host && !url.pathname.endsWith("/auth/logout/"));
 }
 
+/**
+ * Closes the HDS mobile menu after a link in it has opened a page. The app opens the page without a reload, so the
+ * menu stays open, and while it is open HDS swallows the next click outside it to close the menu. Escape closes the
+ * menu only if it is open.
+ */
+async function closeMobileMenu(page: Page): Promise<void> {
+  await page.keyboard.press("Escape");
+  await expect(page.locator('[aria-controls="hds-mobile-menu"]'), "The mobile menu did not close").toHaveAttribute(
+    "aria-expanded",
+    "false"
+  );
+}
+
 export class Topnav extends PageObject {
   @step("topnav.Click Login")
   async clickLogin() {
@@ -144,6 +157,7 @@ export class Topnav extends PageObject {
       this.page.locator("header").getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
       "/search"
     );
+    await closeMobileMenu(this.page);
   }
 
   @step("topnav.Navigate To My Bookings Mobile")
@@ -151,5 +165,6 @@ export class Topnav extends PageObject {
     await this.clickNavigationMenuMobile();
     await this.navigateToMyBookings();
     await this.page.locator("h1").waitFor({ state: "visible" });
+    await closeMobileMenu(this.page);
   }
 }

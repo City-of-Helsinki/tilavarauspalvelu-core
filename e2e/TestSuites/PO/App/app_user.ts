@@ -156,17 +156,19 @@ export class AppUser extends PageObject {
   @step("app_user.User Reserves A Free Quick Reservation Slot")
   async userReservesAFreeQuickReservationSlot() {
     const lock_name = await this.pages.quickReservation.getUnitLockName();
+    // The unit page the slot is booked on: a submit that went through before a retry has left it
+    const unit_page_url = this.page.url();
     await acquireLock(lock_name);
     try {
-      await retry(3, 2000, () => this.userSelectsAndSubmitsQuickReservationOnFreshPage());
+      await retry(3, 2000, () => this.userSelectsAndSubmitsQuickReservationOnFreshPage(unit_page_url));
     } finally {
       await releaseLock(lock_name);
     }
   }
 
   @step("app_user.User Selects And Submits Quick Reservation On Fresh Page")
-  async userSelectsAndSubmitsQuickReservationOnFreshPage() {
-    await this.pages.quickReservation.reloadReservationUnitPageAndWaitForReservations();
+  async userSelectsAndSubmitsQuickReservationOnFreshPage(unit_page_url: string) {
+    await this.pages.quickReservation.reloadReservationUnitPageAndWaitForReservations(unit_page_url);
     await this.userSelectsTheTimeWithQuickReservationAndSetsTimeVariables();
     await this.pages.quickReservation.userClicksSubmitButtonInQuickReservation();
   }
@@ -855,19 +857,19 @@ export class AppUser extends PageObject {
    */
   @step("app_user.User Checks The Recurring Reservation Is Sent State And Cancels It")
   async userChecksTheRecurringReservationIsSentStateAndCancelsIt() {
-    await this.pages.customKeywords.findAndClickButtonInGroupWithMatchingConditions(
-      '[data-testid="applications__group--wrapper"]',
-      "Vastaanotettu",
-      '[class*="Card__CardContent"]',
-      '[data-testid="card__heading"]',
-      "Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)",
-      '[data-testid="card__tags"]',
-      "Lähetetty",
-      "Peru"
-    );
+    // In the received applications ("Vastaanotettu", the group's heading), the last card of the round that is sent
+    // ("Lähetetty", its status tag)
+    const application_card = this.page
+      .getByTestId("applications__group--wrapper")
+      .filter({ has: this.page.getByRole("heading", { level: 2, name: "Vastaanotettu", exact: true }) })
+      .locator(".card--default")
+      .filter({ has: this.page.getByRole("heading", { name: "Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)" }) })
+      .filter({ has: this.page.getByTestId("card__tags").filter({ hasText: "Lähetetty" }) })
+      .last();
+    await application_card.getByRole("button", { name: "Peru", exact: true }).click();
 
     // The click waits until the modal's animation has ended
-    await this.pages.customKeywords.findAndClickElementWithText("#application-card-modal >> span", "Kyllä");
+    await this.page.locator("#application-card-modal").getByRole("button", { name: "Kyllä", exact: true }).click();
   }
 
   /**
@@ -905,31 +907,32 @@ export class AppUser extends PageObject {
   @step("app_user.User Checks That Reservation Unit Picture Is Loaded")
   async userChecksThatReservationUnitPictureIsLoaded(unit_name: string) {
     // Target the image by its alt text - this is the most reliable selector
-    const img_selector: string = `img[alt*="${unit_name}"]`;
-
-    const image = this.page.locator(img_selector).first();
+    const image = this.page.locator(`img[alt*="${unit_name}"]`).first();
 
     // Wait for the image element to be attached
     await expect(image, `Reservation unit picture for ${unit_name} is not present`).toBeAttached({ timeout: 5000 });
 
     // Verify the src attribute is present
-    const src = await image.getAttribute("src");
-    expect(src, "Image src attribute is empty").toBeTruthy();
+    await expect(image, "Image src attribute is empty").toHaveAttribute("src", /.+/);
 
-    // Verify the image has actually loaded (not broken)
-    // Check that image.complete is true, naturalWidth > 0, and naturalHeight > 0
-    const complete = await image.evaluate((element) => (element as HTMLImageElement).complete);
-    expect(complete, "Image is not fully loaded (complete property is false)").toBe(true);
-
-    const natural_width = await image.evaluate((element) => (element as HTMLImageElement).naturalWidth);
-    expect(natural_width, "Image naturalWidth is 0 - image failed to load").toBeGreaterThan(0);
-
-    const natural_height = await image.evaluate((element) => (element as HTMLImageElement).naturalHeight);
-    expect(natural_height, "Image naturalHeight is 0 - image failed to load").toBeGreaterThan(0);
+    // Verify the image has actually loaded (not broken): complete is true, naturalWidth > 0 and naturalHeight > 0.
+    // Port: expect.poll waits for the image to load, instead of checking once.
+    await expect
+      .poll(
+        () =>
+          image.evaluate((element) => {
+            const img = element as HTMLImageElement;
+            return img.complete && img.naturalWidth > 0 && img.naturalHeight > 0;
+          }),
+        { message: "Image is not loaded: complete is false, or naturalWidth or naturalHeight is 0" }
+      )
+      .toBe(true);
 
     // Get and log the image dimensions for debugging
-    const width = await image.evaluate((element) => (element as HTMLImageElement).naturalWidth);
-    const height = await image.evaluate((element) => (element as HTMLImageElement).naturalHeight);
+    const { width, height } = await image.evaluate((element) => ({
+      width: (element as HTMLImageElement).naturalWidth,
+      height: (element as HTMLImageElement).naturalHeight,
+    }));
     await log(`Image loaded successfully with dimensions: ${width}x${height}`);
   }
 }

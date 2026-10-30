@@ -384,29 +384,12 @@ export class CustomKeywords extends PageObject {
   async verifyCardNotFoundInGroupWithMatchingConditions(empty_state_message: string) {
     await log("Context: Test creates 1 application, cancels it, then verifies no applications remain");
 
-    // Get all elements that could contain the message
-    const message_selector = "#main >> span";
-    const message_elements = await elementsOf(this.page.locator(message_selector));
-    const element_count = message_elements.length;
-
-    if (element_count === 0) {
-      throw new Error(`No message elements found using selector: ${message_selector}`);
-    }
-
-    await log(`Found ${element_count} potential message element(s) to check`);
-
-    // Check if any element contains the expected message
-    for (const element_text of (await this.page.locator(message_selector).allInnerTexts()).map((text) => text.trim())) {
-      // Check for exact match
-      if (element_text === empty_state_message) {
-        return;
-      }
-    }
-
-    // If message not found, raise error (message should exist after cancellation)
-    throw new Error(
+    // The empty state is a span with only the message. Port: expect retries until the message shows, instead of
+    // reading the spans once.
+    await expect(
+      this.page.locator("#main").getByText(empty_state_message, { exact: true }),
       `Expected empty state message "${empty_state_message}" not found. This indicates applications still exist after cancellation, but none should remain.`
-    );
+    ).toBeVisible();
   }
 
   @step("custom_keywords.Find Text From Elements Or Fail")
@@ -724,26 +707,18 @@ Differences:
     const day_labels = this.page.locator(
       `.rbc-time-column:nth-child(${dayIdx + 2}) .rbc-events-container .rbc-event-label`
     );
-    const labels = await elementsOf(day_labels);
-    await log(`Found ${labels.length} label(s) on ${DAY_TO_CHECK}`);
-    expect(labels.length, `No reservation labels found. There should be at least one ${DAY_TO_CHECK}`).toBeGreaterThan(
-      0
-    );
+    // The calendar's events are loaded after the page, so the first label is waited for as long as an action waits
+    await expect(
+      day_labels.first(),
+      `No reservation labels found. There should be at least one ${DAY_TO_CHECK}`
+    ).toBeAttached({ timeout: BROWSER_TIMEOUT_GLOBAL });
 
-    // Port: a local flag, Set Test Variable in the Robot suite (nothing else reads it)
-    let found = false;
-
-    for (const txt of (await day_labels.allInnerTexts()).map((label) => normalizeTimeLabel(label))) {
-      await log(`Normalized label ➔ ${txt}`);
-      if (txt === normTime) {
-        found = true;
-        await log("Match found!");
-        break;
-      }
-    }
-
-    await log(`Final result: ${found}`);
-    expect(found, `Reservation not found for ${DAY_TO_CHECK} at ${TIME_TO_CHECK}`).toBe(true);
+    // Port: expect.poll reads the labels again until one of them is the time, instead of reading them once in a loop
+    await expect
+      .poll(async () => (await day_labels.allInnerTexts()).map((label) => normalizeTimeLabel(label)), {
+        message: `Reservation not found for ${DAY_TO_CHECK} at ${TIME_TO_CHECK}`,
+      })
+      .toContain(normTime);
 
     // Calendar extraction
   }
