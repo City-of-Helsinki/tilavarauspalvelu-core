@@ -122,7 +122,7 @@ def test_tax_level_admin__rates__delete_only_rate_in_effect_today(api_client):
     api_client.force_login(UserFactory.create_superuser())
     tomorrow = local_date() + datetime.timedelta(days=1)
 
-    tax_level = TaxLevelFactory.create(rates__percentage=Decimal(24))
+    tax_level = TaxLevelFactory.create(rates__begins=local_date(), rates__percentage=Decimal(24))
     rate = tax_level.rates.get()
 
     url = reverse("admin:tilavarauspalvelu_taxlevel_change", args=[tax_level.pk])
@@ -204,6 +204,98 @@ def test_tax_level_admin__rates__change_view_shows_no_empty_rates(api_client):
     formset = response.context["inline_admin_formsets"][0].formset
     assert formset.total_form_count() == 1
     assert formset.initial_form_count() == 1
+
+
+# ── Locked rates ──
+
+
+def test_tax_level_admin__locked_rates__show_rate_that_began_yesterday_as_text(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    yesterday = local_date() - datetime.timedelta(days=1)
+
+    tax_level = TaxLevelFactory.create(rates__begins=yesterday, rates__percentage=Decimal(24))
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_change", args=[tax_level.pk])
+    response = api_client.get(path=url)
+
+    assert response.status_code == 200
+
+    form = response.context["inline_admin_formsets"][0].formset.forms[0]
+    assert str(form["begins"]) == f"<p>{yesterday.strftime('%d.%m.%Y')}</p>"
+    assert str(form["percentage"]) == "<p>24.00</p>"
+    assert str(form["DELETE"]) == '<input type="hidden" name="rates-0-DELETE" disabled id="id_rates-0-DELETE">'
+
+
+def test_tax_level_admin__locked_rates__change_rate_that_began_yesterday(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    yesterday = local_date() - datetime.timedelta(days=1)
+    two_days_ago = local_date() - datetime.timedelta(days=2)
+
+    tax_level = TaxLevelFactory.create(rates__begins=yesterday, rates__percentage=Decimal(24))
+    rate = tax_level.rates.get()
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_change", args=[tax_level.pk])
+    data = {
+        **tax_level_form_data(tax_level),
+        **existing_rate_form_data(0, rate),
+        "rates-0-begins": two_days_ago.isoformat(),
+        "rates-0-percentage": "30",
+        **management_form_data("rates", total_forms=1, initial_forms=1),
+    }
+    response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 302, response.content
+
+    rates = list(TaxLevelRate.objects.filter(tax_level=tax_level).values_list("begins", "percentage"))
+    assert rates == [(yesterday, Decimal(24))]
+
+
+def test_tax_level_admin__locked_rates__delete_rate_that_began_yesterday(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    yesterday = local_date() - datetime.timedelta(days=1)
+
+    tax_level = TaxLevelFactory.create(rates__begins=yesterday, rates__percentage=Decimal(24))
+    rate = tax_level.rates.get()
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_change", args=[tax_level.pk])
+    data = {
+        **tax_level_form_data(tax_level),
+        **existing_rate_form_data(0, rate, delete=True),
+        "rates-1-tax_level": tax_level.pk,
+        "rates-1-begins": local_date().isoformat(),
+        "rates-1-percentage": "25.5",
+        **management_form_data("rates", total_forms=2, initial_forms=1),
+    }
+    response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 302, response.content
+
+    rates = list(TaxLevelRate.objects.filter(tax_level=tax_level).values_list("begins", "percentage"))
+    assert rates == [
+        (yesterday, Decimal(24)),
+        (local_date(), Decimal("25.5")),
+    ]
+
+
+def test_tax_level_admin__locked_rates__change_rate_that_begins_today(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+
+    tax_level = TaxLevelFactory.create(rates__begins=local_date(), rates__percentage=Decimal(24))
+    rate = tax_level.rates.get()
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_change", args=[tax_level.pk])
+    data = {
+        **tax_level_form_data(tax_level),
+        **existing_rate_form_data(0, rate),
+        "rates-0-percentage": "25.5",
+        **management_form_data("rates", total_forms=1, initial_forms=1),
+    }
+    response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 302, response.content
+
+    rates = list(TaxLevelRate.objects.filter(tax_level=tax_level).values_list("begins", "percentage"))
+    assert rates == [(local_date(), Decimal("25.5"))]
 
 
 # ── Pricings ──
