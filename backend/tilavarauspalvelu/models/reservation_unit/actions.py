@@ -537,7 +537,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         params = CreateOrUpdateAccountingParams(
             vat_code=accounting.vat_code,
             internal_order=accounting.internal_order,
-            profit_center=accounting.profit_center,
             project=accounting.project,
             operation_area=accounting.operation_area,
             company_code=accounting.company_code,

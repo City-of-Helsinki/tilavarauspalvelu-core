@@ -67,7 +67,6 @@ def test_verkkokauppa__product_types__create_or_update_accounting_params__to_jso
     params = CreateOrUpdateAccountingParams(
         vat_code="vat-code",
         internal_order="internal-order",
-        profit_center="profit-center",
         project="project",
         operation_area="operation-area",
         company_code="company-code",
@@ -84,7 +83,6 @@ def test_verkkokauppa__product_types__create_or_update_accounting_params__to_jso
     expected = {
         "vatCode": params.vat_code,
         "internalOrder": params.internal_order,
-        "profitCenter": params.profit_center,
         "project": params.project,
         "operationArea": params.operation_area,
         "companyCode": params.company_code,
@@ -104,7 +102,6 @@ def test_verkkokauppa__product_types__create_or_update_accounting_params__to_jso
     params = CreateOrUpdateAccountingParams(
         vat_code="vat-code",
         internal_order="",
-        profit_center="",
         project="",
         operation_area="",
         company_code="company-code",
@@ -132,7 +129,6 @@ def test_verkkokauppa__product_types__accounting_params__from_json():
         "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
         "vatCode": "vat-code",
         "internalOrder": "internal-order",
-        "profitCenter": "profit-center",
         "project": "project",
         "operationArea": "operation-area",
         "companyCode": "CODE",
@@ -144,7 +140,6 @@ def test_verkkokauppa__product_types__accounting_params__from_json():
         product_id=json["productId"],
         vat_code=json["vatCode"],
         internal_order=json["internalOrder"],
-        profit_center=json["profitCenter"],
         project=json["project"],
         operation_area=json["operationArea"],
         company_code=json["companyCode"],
@@ -160,7 +155,6 @@ def test_verkkokauppa__product_types__accounting_params__from_json__raises_excep
             "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
             "vatCode": "vat-code",
             "internalOrder": "internal-order",
-            "profitCenter": "profit-center",
             "project": "project",
             "operationArea": "operation-area",
             "companyCode": "CODE",

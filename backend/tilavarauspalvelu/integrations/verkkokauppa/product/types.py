@@ -65,7 +65,6 @@ class ProductInvoicingParams:
 class CreateOrUpdateAccountingParams:
     vat_code: str
     internal_order: str
-    profit_center: str
     project: str
     operation_area: str
     company_code: str
@@ -86,9 +85,6 @@ class CreateOrUpdateAccountingParams:
         if self.internal_order:
             json["internalOrder"] = self.internal_order
 
-        if self.profit_center:
-            json["profitCenter"] = self.profit_center
-
         if self.project:
             json["project"] = self.project
 
@@ -106,7 +102,6 @@ class Accounting:
     product_id: str
     vat_code: str
     internal_order: str
-    profit_center: str
     project: str
     operation_area: str
     company_code: str
@@ -120,7 +115,6 @@ class Accounting:
                 product_id=json["productId"],
                 vat_code=json["vatCode"],
                 internal_order=json["internalOrder"],
-                profit_center=json["profitCenter"],
                 project=json["project"],
                 operation_area=json["operationArea"],
                 company_code=json["companyCode"],

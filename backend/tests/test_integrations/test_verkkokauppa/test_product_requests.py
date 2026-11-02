@@ -32,7 +32,6 @@ create_product_params = CreateProductParams(
 create_or_update_account_params = CreateOrUpdateAccountingParams(
     vat_code="AB",
     internal_order="1234567890",
-    profit_center="1111111",
     project="2222222",
     operation_area="333333",
     company_code="4444",
@@ -59,7 +58,6 @@ create_or_update_accounting_response = {
     "productId": "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
     "vatCode": "AB",
     "internalOrder": "1234567890",
-    "profitCenter": "1111111",
     "project": "2222222",
     "operationArea": "333333",
     "companyCode": "4444",
