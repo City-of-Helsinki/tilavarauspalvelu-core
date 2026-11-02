@@ -373,6 +373,17 @@ type Query {
     """Ordering"""
     orderBy: [TaxLevelOrderingChoices]
   ): TaxLevelNodeConnection
+  salesItems(
+    first: Int
+    last: Int
+    offset: Int
+    after: String
+    before: String
+    pk: [Int]
+
+    """Ordering"""
+    orderBy: [SalesItemOrderingChoices]
+  ): SalesItemNodeConnection
   pricingGroup(
     """The ID of the object"""
     id: ID!
@@ -2878,6 +2889,41 @@ type TaxLevelNodeEdge {
 enum TaxLevelOrderingChoices {
   pkAsc
   pkDesc
+}
+
+type SalesItemNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [SalesItemNodeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `SalesItemNode` and its cursor."""
+type SalesItemNodeEdge {
+  """The item at the end of the edge"""
+  node: SalesItemNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type SalesItemNode implements Node {
+  name: String!
+  taxLevel: TaxLevelNode!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+"""Ordering fields for the 'SalesItem' model."""
+enum SalesItemOrderingChoices {
+  pkAsc
+  pkDesc
+  nameAsc
+  nameDesc
 }
 
 type IntendedUseNodeConnection {

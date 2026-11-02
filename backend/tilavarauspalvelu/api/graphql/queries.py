@@ -43,6 +43,7 @@ from .types.reservation_unit_pricing.types import ReservationUnitPricingNode
 from .types.reservation_unit_pricing_group.types import ReservationUnitPricingGroupNode
 from .types.reservation_unit_type.types import ReservationUnitTypeNode
 from .types.resource.types import ResourceNode
+from .types.sales_item.types import SalesItemNode
 from .types.space.types import SpaceNode
 from .types.suitable_time_range.types import SuitableTimeRangeNode
 from .types.tax_level.types import TaxLevelNode
@@ -91,6 +92,7 @@ __all__ = [
     "ReservationUnitPricingNode",
     "ReservationUnitTypeNode",
     "ResourceNode",
+    "SalesItemNode",
     "SpaceNode",
     "SuitableTimeRangeNode",
     "TaxLevelNode",
