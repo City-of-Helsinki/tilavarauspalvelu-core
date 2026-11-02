@@ -61,7 +61,6 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
         params=CreateOrUpdateAccountingParams(
             vat_code=reservation_unit.payment_accounting.vat_code,
             internal_order=reservation_unit.payment_accounting.internal_order,
-            profit_center=reservation_unit.payment_accounting.profit_center,
             project=reservation_unit.payment_accounting.project,
             operation_area=reservation_unit.payment_accounting.operation_area,
             company_code=reservation_unit.payment_accounting.company_code,

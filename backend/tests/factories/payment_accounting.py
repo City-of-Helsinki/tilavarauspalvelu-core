@@ -19,7 +19,6 @@ class PaymentAccountingFactory(GenericDjangoModelFactory[PaymentAccounting]):
     main_ledger_account = "123456"
     vat_code = "AB"
     internal_order = "1234567890"
-    profit_center = ""
     project = ""
     operation_area = "123456"
     balance_profit_center = "2983300"

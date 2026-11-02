@@ -37,7 +37,6 @@ class PaymentAccounting(models.Model):
     vat_code: str = models.CharField(max_length=2, validators=[MinLengthValidator(2)])
 
     internal_order: str = models.CharField(blank=True, default="", max_length=10, validators=[is_numeric])
-    profit_center: str = models.CharField(blank=True, default="", max_length=7, validators=[is_numeric])
     project: str = models.CharField(
         blank=True,
         default="",
@@ -107,16 +106,9 @@ class PaymentAccounting(models.Model):
                 violation_error_message="Must fill all product invoicing fields or none of them",
             ),
             models.CheckConstraint(
-                condition=~models.Q(project="") | ~models.Q(profit_center="") | ~models.Q(internal_order=""),
-                name="internal_order_profit_center_or_project_required",
-                violation_error_message=(
-                    "At least one of the following fields must be filled: 'internal_order', 'profit_center', 'project'"
-                ),
-            ),
-            models.CheckConstraint(
-                condition=models.Q(profit_center="") | models.Q(internal_order=""),
-                name="either_internal_order_or_profit_center",
-                violation_error_message="Can fill either 'internal_order' or 'profit_center'",
+                condition=~models.Q(project="") | ~models.Q(internal_order=""),
+                name="internal_order_or_project_required",
+                violation_error_message="At least one of the fields 'internal_order' and 'project' must be filled",
             ),
         ]
 

@@ -22,7 +22,6 @@ class PaymentAccountingForm(forms.ModelForm):
             "main_ledger_account": "Main ledger account",
             "vat_code": "VAT code",
             "internal_order": "Internal order",
-            "profit_center": "Profit center",
             "project": "Project",
             "operation_area": "Operation area",
             "balance_profit_center": "Balance profit center",
@@ -42,21 +41,16 @@ class PaymentAccountingForm(forms.ModelForm):
                 "Ask the Talpa team for the correct code."
             ),
             "internal_order": (
-                "Accounting identifier that assigns the income to the correct profit center. "
+                "Accounting identifier that assigns the income to the correct service. "
                 "Each service has its own internal order. "
                 "10 digits that start with the division code, for example 29. "
-                "Fill this, profit center or project. Cannot be used together with profit center."
-            ),
-            "profit_center": (
-                "Profit center (tulosyksikkö) that the income is assigned to. "
-                "Internal accounting field. The division's financial administration decides how it is used. "
-                "Fill this, internal order or project. Cannot be used together with internal order."
+                "Fill this, project or both."
             ),
             "project": (
                 "SAP project number. A project is either real or statistical. "
                 "A real project is used without an internal order. A statistical project needs an internal order. "
                 "Varaamo rarely uses projects. "
-                "Fill this, internal order or profit center. 7, 10, 12, 14 or 16 digits."
+                "Fill this, internal order or both. 7, 10, 12, 14 or 16 digits."
             ),
             "operation_area": (
                 "Type of activity that the income comes from within the unit. "
@@ -91,7 +85,6 @@ class PaymentAccountingAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "main_ledger_account",
                     "vat_code",
                     "internal_order",
-                    "profit_center",
                     "project",
                     "operation_area",
                     "balance_profit_center",

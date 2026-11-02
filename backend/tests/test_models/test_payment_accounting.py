@@ -101,11 +101,10 @@ def test_payment_accounting__one_of_the_fields_is_required(settings):
     with pytest.raises(IntegrityError) as error:
         PaymentAccountingFactory.create(
             internal_order="",
-            profit_center="",
             project="",
         )
 
-    constraint = "internal_order_profit_center_or_project_required"
+    constraint = "internal_order_or_project_required"
     assert constraint in str(error.value)
 
 

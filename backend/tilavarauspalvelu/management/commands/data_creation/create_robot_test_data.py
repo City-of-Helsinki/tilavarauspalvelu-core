@@ -981,7 +981,6 @@ def create_reservation_units() -> None:
             "main_ledger_account": "340025",
             "vat_code": "44",
             "internal_order": "2941505900",
-            "profit_center": "",
             "project": "",
             "operation_area": "290017",
             "balance_profit_center": "2983300",
