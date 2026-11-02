@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { convertReservationUnit } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
-import { PricingSection } from "./PricingSection";
+import { formatNetPrice, PricingSection } from "./PricingSection";
 import type { TaxLevelOption } from "./PricingSection";
 
 const TAX_LEVEL_OPTIONS: TaxLevelOption[] = [
@@ -68,7 +68,7 @@ describe("PricingSection", () => {
     expect(screen.getByRole("checkbox", { name: "label.canApplyFreeOfCharge" })).toBeEnabled();
   });
 
-  it("shows the net price as read-only, computed with today's rate of the selected tax level", async () => {
+  it("shows the net price in the helper text once the price and the tax level are set", async () => {
     render(<Harness />);
     const user = await openAccordion();
     await switchToPaid(user);
@@ -76,27 +76,21 @@ describe("PricingSection", () => {
     const lowestPrice = screen.getByRole("spinbutton", { name: nameLike("label.lowestPrice") });
     await user.clear(lowestPrice);
     await user.type(lowestPrice, "100");
-
-    const lowestPriceNet = screen.getByRole("textbox", { name: "label.lowestPriceNet" });
-    expect(lowestPriceNet).toHaveAttribute("readonly");
     // No tax level is selected yet
-    expect(lowestPriceNet).toHaveValue("");
+    expect(lowestPrice).not.toHaveAccessibleDescription("label.netPrice");
 
     await selectComboOption(user, /^label\.taxLevel/, "Yleinen (25,5 %)");
-    expect((lowestPriceNet as HTMLInputElement).value).toMatch(/^79,68\s€$/);
+    expect(lowestPrice).toHaveAccessibleDescription("label.netPrice");
   }, 10_000);
 
-  it("updates the net price when the price changes", async () => {
+  it("shows no net price when the price is empty", async () => {
     render(<Harness taxLevel={2} />);
     const user = await openAccordion();
     await switchToPaid(user);
 
     const highestPrice = screen.getByRole("spinbutton", { name: nameLike("label.highestPrice") });
     await user.clear(highestPrice);
-    await user.type(highestPrice, "57");
-
-    const highestPriceNet = screen.getByRole("textbox", { name: "label.highestPriceNet" });
-    expect((highestPriceNet as HTMLInputElement).value).toMatch(/^50,00\s€$/);
+    expect(highestPrice).not.toHaveAccessibleDescription("label.netPrice");
   });
 
   it("has no input for the net price or the activation flag", async () => {
@@ -104,8 +98,7 @@ describe("PricingSection", () => {
     const user = await openAccordion();
     await switchToPaid(user);
 
-    expect(screen.queryByRole("spinbutton", { name: nameLike("label.lowestPriceNet") })).not.toBeInTheDocument();
-    expect(screen.queryByRole("spinbutton", { name: nameLike("label.highestPriceNet") })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("spinbutton")).toHaveLength(2);
     expect(screen.queryByRole("checkbox", { name: "label.isActivatedOnBegins" })).not.toBeInTheDocument();
   });
 
@@ -154,5 +147,18 @@ describe("PricingSection", () => {
 
     expect(screen.getByRole("textbox", { name: nameLike("reservationUnitEditor:label.begins") })).toBeInTheDocument();
     expect(screen.getAllByRole("radio", { name: "reservationUnitEditor:label.pricingTypes.free" })).toHaveLength(2);
+  });
+});
+
+describe("formatNetPrice", () => {
+  it("removes the tax from the price", () => {
+    expect(formatNetPrice(100, 25.5)).toMatch(/^79,68\s€$/);
+    expect(formatNetPrice(57, 14)).toMatch(/^50,00\s€$/);
+  });
+
+  it("returns an empty string without a price or a tax percentage", () => {
+    expect(formatNetPrice(null, 25.5)).toBe("");
+    expect(formatNetPrice(Number.NaN, 25.5)).toBe("");
+    expect(formatNetPrice(100, undefined)).toBe("");
   });
 });
