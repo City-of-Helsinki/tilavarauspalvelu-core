@@ -270,6 +270,8 @@ export class AppCommon extends PageObject {
   @step("app_common.Reload Page")
   async reloadPage() {
     await this.page.reload();
+    // Network idle on purpose: the pages load more data after the load event, like the admin menu's own units link,
+    // and the checks after a reload need all of it
     await this.page.waitForLoadState("networkidle", { timeout: 30_000 });
   }
 

@@ -10,7 +10,8 @@ export class AdminLandingpage extends PageObject {
     await expect(this.page.locator("H1")).toContainText(expected_H1_text, {
       timeout: BROWSER_TIMEOUT_GLOBAL,
     });
-    // The top navigation renders a moment after the heading, when the user's data has loaded
+    // Network idle on purpose: the menu renders after the heading, and its first link (own units) comes from a later
+    // query that moves the other links
     await this.page.waitForLoadState("networkidle", { timeout: 40_000 });
   }
 

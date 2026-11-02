@@ -31,7 +31,19 @@ export class UserLandingpage extends PageObject {
   @step("user_landingpage.Approve Interrupted Payment")
   async approveInterruptedPayment() {
     await log("Clicking on the first button if previous test runs have failed and there are multiple banners/buttons");
+    const checkout_button = this.page.getByTestId("reservation-notification__button--checkout").first();
+    // The banner's query runs once per page load, so when the backend fails it (a 502), the page is reloaded
+    await this.pages.customKeywords.retryWithRecovery(
+      async () => {
+        await expect(checkout_button, 'No "Varauksesi on keskeneräinen" banner with a payment button').toBeVisible({
+          timeout: 5000,
+        });
+      },
+      async () => {
+        await this.page.reload();
+      }
+    );
     // The checkout's first step waits for the payment page
-    await this.page.getByTestId("reservation-notification__button--checkout").first().click();
+    await checkout_button.click();
   }
 }

@@ -41,16 +41,10 @@ test.describe(
       await appCommon.userOpensDesktopBrowserToLandingPage();
     });
 
-    test.afterEach(async ({ commonSetupsTeardowns }) => {
-      await commonSetupsTeardowns.completeTestTeardown();
-    });
-
     test(
       "User logs in and out with suomi_fi",
       { tag: ["@desktop-test-data-set-0", "@smoke"] },
-      async ({ appCommon, commonSetupsTeardowns }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
-
+      async ({ appCommon }) => {
         await log("User logs in with Suomi.fi");
         await appCommon.userLogsInWithSuomiFi();
 
@@ -63,8 +57,7 @@ test.describe(
     test(
       "User can make free single booking and modifies it",
       { tag: ["@desktop-test-data-set-1"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, reservationLownav, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User navigates to reservation unit page");
@@ -108,18 +101,7 @@ test.describe(
     test(
       "User can create non-cancelable booking",
       { tag: ["@desktop-test-data-set-2"] },
-      async ({
-        appUser,
-        commonSetupsTeardowns,
-        login,
-        popups,
-        reservationLownav,
-        state,
-        testData,
-        topnav,
-        userLandingpage,
-      }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appUser, login, popups, reservationLownav, state, testData, topnav, userLandingpage }) => {
         await topnav.clickLogin();
         await login.loginSuomiFi(testData.user.hetu);
         await userLandingpage.checkTheUserLandingPageH1(USER_LANDING_PAGE_H1_TEXT);
@@ -147,8 +129,7 @@ test.describe(
     test(
       "User can make paid single booking with interrupted checkout",
       { tag: ["@desktop-test-data-set-3"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates reservation");
@@ -193,8 +174,7 @@ test.describe(
     test(
       "User can make paid single booking",
       { tag: ["@desktop-test-data-set-4"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, mybookings, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, mybookings, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates paid reservation");
@@ -245,8 +225,7 @@ test.describe(
     test(
       "User can make subvented single booking that requires handling",
       { tag: ["@desktop-test-data-set-5"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates subvented reservation");
@@ -273,8 +252,7 @@ test.describe(
     test(
       "User checks that reserved time is not available anymore",
       { tag: ["@desktop-test-data-set-7"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, state, testData }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, reservationLownav, state, testData }) => {
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates reservation");
@@ -297,8 +275,7 @@ test.describe(
     test(
       "User checks that there are not current dates in the past bookings",
       { tag: ["@desktop-test-data-set-8"] },
-      async ({ appCommon, commonSetupsTeardowns, mybookings, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, mybookings, topnav }) => {
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User verifies past bookings contain only past dates");
@@ -311,8 +288,7 @@ test.describe(
     test(
       "User can make free single booking and check info from downloaded calendar file",
       { tag: ["@desktop-test-data-set-9"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, testData }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, reservationLownav, testData }) => {
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates reservation");
@@ -340,8 +316,7 @@ test.describe(
             "Makes a paid booking, pays it and cancels it, then verifies the reservation confirmation and cancellation\nemails of that booking.",
         },
       },
-      async ({ appCommon, appUser, commonSetupsTeardowns, mail, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, mail, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates paid reservation");
@@ -374,9 +349,9 @@ test.describe(
     test(
       "User makes recurring reservation",
       { tag: ["@desktop-test-data-set-11"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, recurring, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, recurring, topnav }) => {
         await appCommon.userLogsInWithSuomiFi();
+        await appUser.userCancelsLeftoverApplications();
 
         await appUser.userNavigatesToRecurringBookingPage();
 

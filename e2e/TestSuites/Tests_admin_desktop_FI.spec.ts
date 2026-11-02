@@ -28,15 +28,10 @@ test.describe(
       await appCommon.adminOpensDesktopBrowserToLandingPage();
     });
 
-    test.afterEach(async ({ commonSetupsTeardowns }) => {
-      await commonSetupsTeardowns.completeTestTeardown();
-    });
-
     test(
       "Admin logs in with suomi_fi",
       { tag: ["@admin-test-data-set-0", "@admin-suite", "@smoke"] },
-      async ({ appCommon, commonSetupsTeardowns }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon }) => {
         await appCommon.adminLogsInWithSuomiFi();
         await appCommon.adminLogsOut();
       }
@@ -45,8 +40,7 @@ test.describe(
     test(
       "Admin verifies all reservation types and verifies no unavailable reservations exist",
       { tag: ["@admin-test-data-set-1", "@admin-suite"] },
-      async ({ appAdmin, appCommon, commonSetupsTeardowns, testData }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appAdmin, appCommon, testData }) => {
         await appCommon.adminLogsInWithSuomiFi();
         await appAdmin.adminNavigatesToOwnUnitsAndSelectsUnitGroup(UNIT_LOCATION);
         await appAdmin.adminOpensMakeReservationModalAndSelectsUnit(testData.units.unavailableUnit);
@@ -68,18 +62,7 @@ test.describe(
     test(
       "Admin checks permissions",
       { tag: ["@admin-test-data-set-2", "@admin-suite", "@general-permissions-test"] },
-      async ({
-        adminReservations,
-        appAdmin,
-        appCommon,
-        commonSetupsTeardowns,
-        djangoAdmin,
-        login,
-        session,
-        state,
-        testData,
-      }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ adminReservations, appAdmin, appCommon, djangoAdmin, login, session, state, testData }) => {
         await appCommon.openDjangoAdminInFirefoxAndAppAdminInChromium(URL_DJANGO_ADMIN, URL_ADMIN);
         // Now in Chromium, so switch to Firefox for Django admin operations
         await session.switchTo(state.browserAdminSide);
@@ -161,18 +144,7 @@ test.describe(
     test(
       "Admin checks unit permissions",
       { tag: ["@admin-test-data-set-3", "@admin-suite", "@unit-permissions-test"] },
-      async ({
-        adminReservations,
-        appAdmin,
-        appCommon,
-        commonSetupsTeardowns,
-        djangoAdmin,
-        login,
-        session,
-        state,
-        testData,
-      }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ adminReservations, appAdmin, appCommon, djangoAdmin, login, session, state, testData }) => {
         await appCommon.openDjangoAdminInFirefoxAndAppAdminInChromium(URL_DJANGO_ADMIN, URL_ADMIN);
 
         // Now in Chromium, so switch to Firefox for Django admin operations
@@ -246,18 +218,7 @@ test.describe(
     test(
       "Admin checks group unit permissions",
       { tag: ["@admin-test-data-set-4", "@admin-suite", "@unit-group-permissions-test"] },
-      async ({
-        adminReservations,
-        appAdmin,
-        appCommon,
-        commonSetupsTeardowns,
-        djangoAdmin,
-        login,
-        session,
-        state,
-        testData,
-      }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ adminReservations, appAdmin, appCommon, djangoAdmin, login, session, state, testData }) => {
         await appCommon.openDjangoAdminInFirefoxAndAppAdminInChromium(URL_DJANGO_ADMIN, URL_ADMIN);
 
         // Now in Chromium, so switch to Firefox for Django admin operations

@@ -563,7 +563,6 @@ export class AppUser extends PageObject {
     time_in_quickreservations: string,
     reservation_number: string
   ) {
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
     await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
     await this.pages.mybookings.checkReservationStatus(booking_status);
@@ -584,7 +583,6 @@ export class AppUser extends PageObject {
     booking_price: string,
     time_in_quickreservations: string
   ) {
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
     await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
     await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
@@ -626,7 +624,6 @@ export class AppUser extends PageObject {
     time_in_quickreservations: string,
     access_code: string
   ) {
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
     await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
     await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
@@ -646,7 +643,6 @@ export class AppUser extends PageObject {
     booking_price: string,
     time_in_quickreservations: string
   ) {
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
     await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
     await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
@@ -666,8 +662,6 @@ export class AppUser extends PageObject {
 
   @step("app_user.User Checks Booking Info In Reservations For Noncancelable Booking")
   async userChecksBookingInfoInReservationsForNoncancelableBooking() {
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
-
     await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
     await this.pages.mybookings.checkReservationStatus(MYBOOKINGS_STATUS_CONFIRMED);
     await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
@@ -682,7 +676,6 @@ export class AppUser extends PageObject {
 
   @step("app_user.User Verifies Details Of Subvented Reservation After Admin Approval Without Payment")
   async userVerifiesDetailsOfSubventedReservationAfterAdminApprovalWithoutPayment() {
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
     await log(
       "If the booking number comparison fails, verify that there are no duplicate times in the upcoming bookings list."
     );
@@ -704,7 +697,6 @@ export class AppUser extends PageObject {
 
   @step("app_user.User Checks The Rejected Reservation Info Is Right After Admin Handling")
   async userChecksTheRejectedReservationInfoIsRightAfterAdminHandling() {
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
     await log(
       "If the booking number comparison fails, verify that there are no duplicate times in the upcoming bookings list."
     );
@@ -870,6 +862,33 @@ export class AppUser extends PageObject {
 
     // The click waits until the modal's animation has ended
     await this.page.locator("#application-card-modal").getByRole("button", { name: "Kyllä", exact: true }).click();
+  }
+
+  /**
+   * Cancels the applications that an earlier attempt of the test left, like a draft whose send failed, because the test
+   * checks at the end that the user has no applications. Does nothing when there are none.
+   */
+  @step("app_user.User Cancels Leftover Applications")
+  async userCancelsLeftoverApplications() {
+    await this.pages.topnav.navigateToMyApplications();
+    const cancel_buttons = this.page
+      .getByTestId("applications__group--wrapper")
+      .getByRole("button", { name: "Peru", exact: true, disabled: false });
+    // The list of applications, or the empty state
+    await expect(
+      cancel_buttons
+        .first()
+        .or(this.page.locator("#main").getByText(EMPTY_STATE_MESSAGE_RECURRING_APPLICATIONS, { exact: true })),
+      "The applications page shows neither applications that can be cancelled nor its empty state"
+    ).toBeVisible();
+    for (let left = await cancel_buttons.count(); left > 0; left = await cancel_buttons.count()) {
+      await log(`Cancelling a leftover application, ${left} left`);
+      await cancel_buttons.first().click();
+      // The click waits until the modal's animation has ended
+      await this.page.locator("#application-card-modal").getByRole("button", { name: "Kyllä", exact: true }).click();
+      // The list is fetched again after the cancellation
+      await expect(cancel_buttons).toHaveCount(left - 1);
+    }
   }
 
   /**

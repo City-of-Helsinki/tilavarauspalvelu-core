@@ -245,17 +245,19 @@ export class QuickReservation extends PageObject {
 
   @step("quick_reservation.Confirms Date Picker Opens From Quick Reservation")
   async confirmsDatePickerOpensFromQuickReservation() {
-    await this.page.locator("#quick-reservation__date").waitFor({ state: "visible" });
-    await this.page.locator("#quick-reservation").locator('[aria-label="Valitse päivämäärä"]').click();
+    // The click waits for the date input's button, which renders with the input
+    const quick_reservation = this.page.locator("#quick-reservation");
+    await quick_reservation.getByRole("button", { name: "Valitse päivämäärä", exact: true }).click();
 
-    // Ensures cancel button is visible
-    await this.page.locator("button").locator('span:text-is("Sulje")').waitFor({ state: "visible" });
+    // Ensures cancel button is visible: the date picker's own, in the HDS dialog (hidden from roles while closed)
+    const date_picker = quick_reservation.getByRole("dialog");
+    await expect(date_picker.getByTestId("closeButton")).toBeVisible();
 
     // Confirms the select button exists and closes the datepicker dialog window
-    await this.page.locator("#quick-reservation").getByTestId("selectButton").click();
+    await date_picker.getByTestId("selectButton").click();
 
     // Verify the datepicker dialog is closed
-    await this.page.locator("#hds-date-picker").getByTestId("selectButton").waitFor({ state: "hidden", timeout: 5000 });
+    await expect(date_picker).toBeHidden({ timeout: 5000 });
   }
 
   /** Gets the current date value from the quick reservation date input field */

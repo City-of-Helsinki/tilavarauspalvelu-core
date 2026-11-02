@@ -33,6 +33,8 @@ export const JUSTIFICATION_FOR_SUBVENTION = "Haluan alennusta -20";
 export const HOME_CITY = "Helsinki";
 export const SINGLEBOOKING_NUMBER_OF_PERSONS = "1";
 export const AGEGROUP_OF_PERSONS = "18 - 24";
+// The heading of the booking form's list of missing fields
+export const FORM_ERRORS_TITLE_FI = "Täytä puuttuvat tiedot";
 export const SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL = "Hinta: 40,00 € (sis. alv 25,5%)";
 export const SINGLEBOOKING_PAID_PRICE_VAT_INCL = "Hinta: 40,00 € (sis. alv 25,5%)";
 export const SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL = "Hinta: 0 - 30,00 € (sis. alv 25,5%)";
