@@ -152,5 +152,6 @@
     "delete": "Poista",
     "back": "Takaisin",
     "backTo": "Takaisin {{destination}}"
-  }
+  },
+  "unsavedChangesConfirm": "Sivulla on tallentamattomia muutoksia. Jos poistut sivulta, muutokset katoavat. Haluatko poistua?"
 }

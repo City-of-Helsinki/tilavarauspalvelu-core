@@ -9,6 +9,8 @@ import type { ApplicationPage2Query } from "@gql/gql-types";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelectorForm } from "@/components/application/funnel/TimeSelector";
 import { getApplicationPath } from "@/modules/urls";
+import { ApplicationSectionSummary } from "./ApplicationSectionSummary";
+import { convertApplicationSectionPage1 } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;
@@ -102,6 +104,10 @@ function ApplicationSectionTimePicker({
       heading={aes.name}
       theme="thin"
     >
+      {/* Show the page 1 answers so the user does not need to go back to check them */}
+      {section != null && (
+        <ApplicationSectionSummary applicationSection={convertApplicationSectionPage1(section)} name={section.name} />
+      )}
       <TimeSelectorForm
         index={sectionIndex}
         reservationUnitOptions={reservationUnitOptions}

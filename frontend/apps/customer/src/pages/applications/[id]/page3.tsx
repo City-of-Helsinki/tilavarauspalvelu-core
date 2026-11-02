@@ -25,6 +25,7 @@ import {
   transformPage3Application,
 } from "@/components/application/funnel/form";
 import type { ApplicationPage3FormValues } from "@/components/application/funnel/form";
+import { useUnsavedChangesWarning } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
@@ -85,7 +86,9 @@ export default function Page3({ application }: Pick<PropsNarrowed, "application"
   });
 
   const { handleSubmit } = form;
-  const { isSubmitting } = form.formState;
+  const { isDirty, isSubmitting } = form.formState;
+  // Submit saves and then navigates. Do not ask during it.
+  useUnsavedChangesWarning(isDirty && !isSubmitting);
 
   const { t } = useTranslation();
   const [mutate, { loading: isSaving }] = useUpdateApplicationMutation();
