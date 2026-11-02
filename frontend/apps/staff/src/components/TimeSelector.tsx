@@ -27,7 +27,7 @@ type TimeSelectorProps = {
  * A cell is open when at least one of the requested reservation units can be booked then.
  */
 export function TimeSelector({ applicationSection, alternativeId }: TimeSelectorProps): React.ReactElement {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const availability = toAvailability(
     filterNonNullable(applicationSection.reservationUnitOptions).flatMap((option) =>
@@ -44,7 +44,6 @@ export function TimeSelector({ applicationSection, alternativeId }: TimeSelector
         step={SUITABLE_TIME_STEP_MINUTES}
         availability={availability}
         visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
-        locale={i18n.language}
         getStateLabel={(cell) =>
           t(
             `application:TimeSelector.legend.${

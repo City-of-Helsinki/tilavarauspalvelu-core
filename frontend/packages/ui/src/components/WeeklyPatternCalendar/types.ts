@@ -90,8 +90,6 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
   /** Return a reason to refuse a paint. The reason is announced to screen readers. */
   isValidSelection?: (span: WeeklyPatternSpan<TData>) => string | null;
 
-  /** BCP 47 tag used for weekday names. */
-  locale: string;
   /** Translated state word for a cell, e.g. "Closed", "Free", "Primary". */
   getStateLabel: (cell: WeeklyPatternCellInfo<TData>) => string;
   getCellAppearance?: (data: TData) => CellAppearance | undefined;

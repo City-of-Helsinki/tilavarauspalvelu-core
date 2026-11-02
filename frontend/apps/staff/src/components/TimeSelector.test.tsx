@@ -45,31 +45,35 @@ describe("staff TimeSelector", () => {
       "aria-readonly",
       "true"
     );
-    expect(cell(/^keskiviikko, 10:00–12:00, application:TimeSelector.legend.primary$/)).toHaveAttribute(
-      "aria-selected",
-      "true"
-    );
+    expect(
+      cell(/^common:weekdayLongEnum.WEDNESDAY, 10:00–12:00, application:TimeSelector.legend.primary$/)
+    ).toHaveAttribute("aria-selected", "true");
   });
 
   test("a cell is open when any requested reservation unit can be booked then", () => {
     render(<TimeSelector applicationSection={createSection()} alternativeId="times" />);
 
-    expect(cell(/^keskiviikko, 08:00–08:15, application:TimeSelector.legend.open$/)).toBeInTheDocument();
-    expect(cell(/^torstai, 09:00–09:15, application:TimeSelector.legend.open$/)).toBeInTheDocument();
-    expect(cell(/^torstai, 13:00–13:15, application:TimeSelector.legend.unavailable$/)).toBeInTheDocument();
+    expect(
+      cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:15, application:TimeSelector.legend.open$/)
+    ).toBeInTheDocument();
+    expect(
+      cell(/^common:weekdayLongEnum.THURSDAY, 09:00–09:15, application:TimeSelector.legend.open$/)
+    ).toBeInTheDocument();
+    expect(
+      cell(/^common:weekdayLongEnum.THURSDAY, 13:00–13:15, application:TimeSelector.legend.unavailable$/)
+    ).toBeInTheDocument();
   });
 
   test("times cannot be changed", async () => {
     const user = userEvent.setup();
     render(<TimeSelector applicationSection={createSection()} alternativeId="times" />);
 
-    cell(/^torstai, 09:00–09:15/).focus();
+    cell(/^common:weekdayLongEnum.THURSDAY, 09:00–09:15/).focus();
     await user.keyboard("{Enter}");
 
-    expect(cell(/^torstai, 09:00–09:15, application:TimeSelector.legend.open$/)).toHaveAttribute(
-      "aria-selected",
-      "false"
-    );
+    expect(
+      cell(/^common:weekdayLongEnum.THURSDAY, 09:00–09:15, application:TimeSelector.legend.open$/)
+    ).toHaveAttribute("aria-selected", "false");
   });
 
   test("links to the text list of the same times and has a legend", () => {
