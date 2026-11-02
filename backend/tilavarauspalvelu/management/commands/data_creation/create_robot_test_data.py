@@ -2963,6 +2963,12 @@ def copy_reservation_unit(original: ReservationUnit, *, kind: Literal["android",
         space._state.adding = True  # noqa: SLF001
         space.id = None
 
+        # MPTT keeps the tree fields of a new node if they are set. Clear them so that the copy gets its own tree.
+        space.tree_id = None  # type: ignore[assignment]
+        space.lft = None  # type: ignore[assignment]
+        space.rght = None  # type: ignore[assignment]
+        space.level = None  # type: ignore[assignment]
+
         space.name += f" ({kind})"
         space.name_en += f" ({kind})"
         space.name_sv += f" ({kind})"
