@@ -2,7 +2,7 @@ import React from "react";
 import { Controller, useWatch } from "react-hook-form";
 import type { Control, UseFormReturn } from "react-hook-form";
 import { addDays, startOfDay } from "date-fns";
-import { IconAlertCircleFill, RadioButton, TextInput } from "hds-react";
+import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { capitalize } from "lodash-es";
 import { useTranslation } from "next-i18next/pages";
 import dynamic from "next/dynamic";
@@ -14,7 +14,7 @@ import {
   ControlledCheckbox,
 } from "ui/src/components/form";
 import { formatters as getFormatters } from "ui/src/modules/number-formatters";
-import { AutoGrid, Flex, HR } from "ui/src/styled";
+import { AutoGrid, Flex, FullRow, HR } from "ui/src/styled";
 import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { getTranslatedError } from "@/modules/helpers";
 import { FieldGroup } from "./FieldGroup";
@@ -57,7 +57,7 @@ export type TaxLevelOption = {
 };
 
 // The number input sets the price to null when it is empty
-function formatNetPrice(price: number | null, taxPercentage: number | undefined): string {
+export function formatNetPrice(price: number | null, taxPercentage: number | undefined): string {
   if (price == null || taxPercentage == null || Number.isNaN(price)) {
     return "";
   }
@@ -92,73 +92,68 @@ function PaidPricingPart({
   // The net price changes when the rate of the tax level changes, so it is only shown with today's rate
   const taxPercentage = taxLevelOptions.find((x) => x.pk === pricing.taxLevel)?.percentage;
 
+  const netPriceHelperText = (price: number | null) => {
+    const net = formatNetPrice(price, taxPercentage);
+    return net !== "" ? t("label.netPrice", { price: net }) : undefined;
+  };
+
   return (
-    <>
-      <ControlledSelect
-        name={`pricings.${index}.priceUnit`}
-        control={control}
-        label={t("label.priceUnit")}
-        style={{ gridColumnStart: "1" }}
-        required
-        options={unitPriceOptions}
-        tooltip={t("tooltip.priceUnit")}
-        error={getTranslatedError(t, errors.pricings?.[index]?.priceUnit?.message)}
-      />
-      <ControlledSelect
-        name={`pricings.${index}.taxLevel`}
-        control={control}
-        required
-        label={t("label.taxLevel")}
-        tooltip={t("tooltip.taxLevel")}
-        options={taxLevelOptions.map((x) => ({
-          label: x.label,
-          value: x.pk,
-        }))}
-        error={getTranslatedError(t, errors.pricings?.[index]?.taxLevel?.message)}
-      />
-      <ControlledNumberInput
-        required
-        name={`pricings.${index}.lowestPrice`}
-        control={control}
-        label={t("label.lowestPrice")}
-        tooltipText={t("tooltip.lowestPrice")}
-        min={0}
-        errorText={getTranslatedError(t, errors.pricings?.[index]?.lowestPrice?.message)}
-      />
-      <TextInput
-        id={`pricings.${index}.lowestPriceNet`}
-        label={t("label.lowestPriceNet")}
-        helperText={t("label.netPriceHelperText")}
-        value={formatNetPrice(pricing.lowestPrice, taxPercentage)}
-        readOnly
-      />
-      <ControlledNumberInput
-        name={`pricings.${index}.highestPrice`}
-        required
-        control={control}
-        label={t("label.highestPrice")}
-        tooltipText={t("tooltip.highestPrice")}
-        min={0}
-        errorText={getTranslatedError(t, errors.pricings?.[index]?.highestPrice?.message)}
-      />
-      <TextInput
-        id={`pricings.${index}.highestPriceNet`}
-        label={t("label.highestPriceNet")}
-        helperText={t("label.netPriceHelperText")}
-        value={formatNetPrice(pricing.highestPrice, taxPercentage)}
-        readOnly
-      />
-      <ControlledSelect
-        // This is not pricing type specific
-        name={`pricings.${index}.paymentType`}
-        control={control}
-        required
-        options={paymentTypeOptions}
-        label={t("label.paymentType")}
-        tooltip={t("tooltip.paymentType")}
-        error={getTranslatedError(t, errors.pricings?.[index]?.paymentType?.message)}
-      />
-    </>
+    <FullRow>
+      <AutoGrid $gap="xs">
+        <ControlledSelect
+          name={`pricings.${index}.priceUnit`}
+          control={control}
+          label={t("label.priceUnit")}
+          required
+          options={unitPriceOptions}
+          tooltip={t("tooltip.priceUnit")}
+          error={getTranslatedError(t, errors.pricings?.[index]?.priceUnit?.message)}
+        />
+        <ControlledSelect
+          name={`pricings.${index}.taxLevel`}
+          control={control}
+          required
+          label={t("label.taxLevel")}
+          tooltip={t("tooltip.taxLevel")}
+          options={taxLevelOptions.map((x) => ({
+            label: x.label,
+            value: x.pk,
+          }))}
+          error={getTranslatedError(t, errors.pricings?.[index]?.taxLevel?.message)}
+        />
+        <ControlledSelect
+          // This is not pricing type specific
+          name={`pricings.${index}.paymentType`}
+          control={control}
+          required
+          options={paymentTypeOptions}
+          label={t("label.paymentType")}
+          tooltip={t("tooltip.paymentType")}
+          error={getTranslatedError(t, errors.pricings?.[index]?.paymentType?.message)}
+        />
+        <ControlledNumberInput
+          required
+          name={`pricings.${index}.lowestPrice`}
+          control={control}
+          label={t("label.lowestPrice")}
+          tooltipText={t("tooltip.lowestPrice")}
+          helperText={netPriceHelperText(pricing.lowestPrice)}
+          min={0}
+          style={{ gridColumnStart: "1" }}
+          errorText={getTranslatedError(t, errors.pricings?.[index]?.lowestPrice?.message)}
+        />
+        <ControlledNumberInput
+          name={`pricings.${index}.highestPrice`}
+          required
+          control={control}
+          label={t("label.highestPrice")}
+          tooltipText={t("tooltip.highestPrice")}
+          helperText={netPriceHelperText(pricing.highestPrice)}
+          min={0}
+          errorText={getTranslatedError(t, errors.pricings?.[index]?.highestPrice?.message)}
+        />
+      </AutoGrid>
+    </FullRow>
   );
 }
 
