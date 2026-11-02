@@ -17,11 +17,18 @@ if TYPE_CHECKING:
 
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PriceComponent, ReservationPriceLine, ReservationUnitPricing, TaxLevelRate
+    from tilavarauspalvelu.models import (
+        PriceComponent,
+        ReservationPriceLine,
+        ReservationUnitPricing,
+        SalesItem,
+        TaxLevelRate,
+    )
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.price_component.queryset import PriceComponentQuerySet
     from tilavarauspalvelu.models.reservation_price_line.queryset import ReservationPriceLineQuerySet
     from tilavarauspalvelu.models.reservation_unit_pricing.queryset import ReservationUnitPricingQuerySet
+    from tilavarauspalvelu.models.sales_item.queryset import SalesItemQuerySet
     from tilavarauspalvelu.models.tax_level_rate.queryset import TaxLevelRateQuerySet
 
     from .actions import TaxLevelActions
@@ -49,6 +56,7 @@ class TaxLevel(models.Model):
     reservation_unit_pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
     price_components: OneToManyRelatedManager[PriceComponent, PriceComponentQuerySet]
     reservation_price_lines: OneToManyRelatedManager[ReservationPriceLine, ReservationPriceLineQuerySet]
+    sales_items: OneToManyRelatedManager[SalesItem, SalesItemQuerySet]
 
     class Meta:
         db_table = "tax_level"

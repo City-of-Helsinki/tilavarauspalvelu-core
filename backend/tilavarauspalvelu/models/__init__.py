@@ -40,6 +40,7 @@ from .reservation_unit_pricing.model import ReservationUnitPricing
 from .reservation_unit_pricing_group.model import ReservationUnitPricingGroup
 from .reservation_unit_type.model import ReservationUnitType
 from .resource.model import Resource
+from .sales_item.model import SalesItem
 from .space.model import Space
 from .suitable_time_range.model import SuitableTimeRange
 from .tax_level.model import TaxLevel
@@ -93,6 +94,7 @@ __all__ = [
     "ReservationUnitPricingGroup",
     "ReservationUnitType",
     "Resource",
+    "SalesItem",
     "Space",
     "SuitableTimeRange",
     "TaxLevel",

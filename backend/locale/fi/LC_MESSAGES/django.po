@@ -4348,6 +4348,14 @@ msgstr "resurssi"
 msgid "resources"
 msgstr "resurssit"
 
+#: tilavarauspalvelu/models/sales_item/model.py
+msgid "sales item"
+msgstr "myyntituote"
+
+#: tilavarauspalvelu/models/sales_item/model.py
+msgid "sales items"
+msgstr "myyntituotteet"
+
 #: tilavarauspalvelu/models/space/model.py
 msgid "space"
 msgstr "tila"

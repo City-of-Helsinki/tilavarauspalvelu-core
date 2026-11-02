@@ -37,6 +37,7 @@ from .reservation_unit_pricing import ReservationUnitPricingFactory
 from .reservation_unit_pricing_group import ReservationUnitPricingGroupFactory
 from .reservation_unit_type import ReservationUnitTypeFactory
 from .resource import ResourceFactory
+from .sales_item import SalesItemFactory
 from .space import SpaceFactory
 from .suitable_time_range import SuitableTimeRangeFactory
 from .tax_level import TaxLevelFactory
@@ -93,6 +94,7 @@ __all__ = [
     "ReservationUnitPricingGroupFactory",
     "ReservationUnitTypeFactory",
     "ResourceFactory",
+    "SalesItemFactory",
     "SpaceFactory",
     "SuitableTimeRangeFactory",
     "TaxLevelFactory",
