@@ -113,11 +113,11 @@ importers:
         specifier: ^16.14.1
         version: 16.14.1
       hds-core:
-        specifier: ^6.0.6
-        version: 6.0.6
+        specifier: ^6.0.7
+        version: 6.0.7
       hds-react:
-        specifier: ^6.0.6
-        version: 6.0.6(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^6.0.7
+        version: 6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18next:
         specifier: ^26.5.6
         version: 26.5.6(typescript@7.0.2)
@@ -264,11 +264,11 @@ importers:
         specifier: ^16.14.1
         version: 16.14.1
       hds-core:
-        specifier: ^6.0.6
-        version: 6.0.6
+        specifier: ^6.0.7
+        version: 6.0.7
       hds-react:
-        specifier: ^6.0.6
-        version: 6.0.6(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^6.0.7
+        version: 6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0
@@ -421,8 +421,8 @@ importers:
         specifier: ^16.14.1
         version: 16.14.1
       hds-react:
-        specifier: ^6.0.6
-        version: 6.0.6(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^6.0.7
+        version: 6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18next:
         specifier: ^26.5.6
         version: 26.5.6(typescript@7.0.2)
@@ -697,8 +697,8 @@ packages:
     resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/runtime@8.0.7':
-    resolution: {integrity: sha512-k0hagDDq/6w4v+0Sp4wFvIz/yswH5O7Va6aRTnD7N62Tnborp4X+YB+H3XUcWVSR4aE47WPEXiIIZchBs0GmYg==}
+  '@babel/runtime@8.0.8':
+    resolution: {integrity: sha512-dEu8nGlRqjsJsvviUUoSMfcRHpwomCiRlXsc2mPfJ79+ffTpDm+JtfUtTMzUrqCApHQnCsVPD3gT1ZT8RgBRCQ==}
 
   '@babel/template@7.29.7':
     resolution: {integrity: sha512-puq+Gf35oI24FeN11LkoUQFqv9uwNeWpxXZi/Ji3rRIoKAzKnxRaZ+Gkj0vKS9ZCiTESfng1N9LyOyXvo+m+Gg==}
@@ -4034,17 +4034,17 @@ packages:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
 
-  hds-core@6.0.6:
-    resolution: {integrity: sha512-RUPuBHlyAkGloFYbqzudn5+5AI3CzmpGQ5xvD/0gO1UXcj1p0z+Svh/5jnnZamhAU+Ib8wM3cmD3x6gZcUD+Ew==}
-    engines: {node: ^24.18.0}
+  hds-core@6.0.7:
+    resolution: {integrity: sha512-RTBTGWgq2nxnbf07UmMR9pDWCqaBJZ6jrV2ZDzn6ya5mH1+cYWa1N2JV4PBfHQWOPivDj0yEIHpQzWq3EwI+dg==}
+    engines: {node: ^24}
 
-  hds-design-tokens@6.0.6:
-    resolution: {integrity: sha512-vKjrlqZxEb1fpFhxB32L9IrsVqjcLoLK1kmkSS81nRLWrTdsGFnZeVkB6qg0MHQbZy4gTlXuqpQLTw/A9ZhyHw==}
-    engines: {node: ^24.18.0}
+  hds-design-tokens@6.0.7:
+    resolution: {integrity: sha512-yYEoNitAJGjZa0AfCUjzytKygorAsqNJwSlb+y6T6KjkJxvoW1yva9SxAQptWpEADE7BlKwn6/MYgkWS2LGf5Q==}
+    engines: {node: ^24}
 
-  hds-react@6.0.6:
-    resolution: {integrity: sha512-j19+5c/9VYY3JG12w0aF5wnIcVNQ5rSQggeTAinqogAONgrv2NWBVXY3rcfo3E/5Klfo2mRckC1GDixQM9H3VQ==}
-    engines: {node: ^24.18.0}
+  hds-react@6.0.7:
+    resolution: {integrity: sha512-jlINoju5VhTsfWzQA8kOcilrtvx2agVAETTdj7BSKClxpYL8HzNrZRLch9XDpIZxziZ9oh7ZMWlM/iX1u0e6hA==}
+    engines: {node: ^24}
     peerDependencies:
       postcss: ^8.5.28
       react: ^19.0.0
@@ -4722,6 +4722,10 @@ packages:
 
   postcss-selector-parser@7.1.6:
     resolution: {integrity: sha512-7qASPzhKF2l2KLboRZux8CCTRMdGiV08vWmyKzPz22qZ7ZjQBOeY7rNzNoCLSUiftJ7HUq0GERHmxw/t0dCdMw==}
+    engines: {node: '>=4'}
+
+  postcss-selector-parser@7.1.7:
+    resolution: {integrity: sha512-wWBro/7hJ40ye6TPiXkUQoXKCw23xSsjriUvqd7Uls9Sso3oLiON1flc18cCdnjgCRXw4fBVqUJJeOdDTh3P3g==}
     engines: {node: '>=4'}
 
   postcss-styled-syntax@0.7.3:
@@ -5755,7 +5759,7 @@ snapshots:
 
   '@ardatan/relay-compiler@13.0.2(graphql@16.14.2)':
     dependencies:
-      '@babel/runtime': 8.0.7
+      '@babel/runtime': 8.0.8
       graphql: 16.14.2
       immutable: 5.1.9
       invariant: 2.2.4
@@ -5913,7 +5917,7 @@ snapshots:
 
   '@babel/runtime@7.29.7': {}
 
-  '@babel/runtime@8.0.7': {}
+  '@babel/runtime@8.0.8': {}
 
   '@babel/template@7.29.7':
     dependencies:
@@ -5999,9 +6003,9 @@ snapshots:
     dependencies:
       postcss-selector-parser: 7.1.6
 
-  '@csstools/selector-specificity@2.2.0(postcss-selector-parser@7.1.6)':
+  '@csstools/selector-specificity@2.2.0(postcss-selector-parser@7.1.7)':
     dependencies:
-      postcss-selector-parser: 7.1.6
+      postcss-selector-parser: 7.1.7
 
   '@csstools/selector-specificity@6.0.1(postcss-selector-parser@7.1.6)':
     dependencies:
@@ -8970,11 +8974,11 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hds-core@6.0.6: {}
+  hds-core@6.0.7: {}
 
-  hds-design-tokens@6.0.6: {}
+  hds-design-tokens@6.0.7: {}
 
-  hds-react@6.0.6(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  hds-react@6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@apollo/client': 3.14.1(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(graphql@16.14.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@babel/runtime': 7.29.10
@@ -8989,8 +8993,8 @@ snapshots:
       crc-32: 1.2.2
       date-fns: 2.30.0
       graphql: 16.14.2
-      hds-core: 6.0.6
-      hds-design-tokens: 6.0.6
+      hds-core: 6.0.7
+      hds-design-tokens: 6.0.7
       jwt-decode: 3.1.2
       kashe: 1.2.0
       lodash: 4.18.1
@@ -9635,15 +9639,20 @@ snapshots:
 
   postcss-nesting@10.2.0(postcss@8.5.29):
     dependencies:
-      '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@7.1.6)
+      '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@7.1.7)
       postcss: 8.5.29
-      postcss-selector-parser: 7.1.6
+      postcss-selector-parser: 7.1.7
 
   postcss-safe-parser@7.1.0(postcss@8.5.29):
     dependencies:
       postcss: 8.5.29
 
   postcss-selector-parser@7.1.6:
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
+
+  postcss-selector-parser@7.1.7:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
