@@ -593,7 +593,8 @@ def _create_application_round_time_slots(reservation_units: list[ReservationUnit
                 reservable_times.append(
                     TimeSlotDB(
                         begin=datetime.time(hour=random.randint(7, 12)).isoformat(timespec="seconds"),
-                        end=datetime.time(hour=random.randint(12, 19)).isoformat(timespec="seconds"),
+                        # Ends before the second reservable time begins, since the admin UI rejects touching times.
+                        end=datetime.time(hour=random.randint(13, 18)).isoformat(timespec="seconds"),
                     )
                 )
                 # 1/3 chance of having a second reservable time
