@@ -20,6 +20,7 @@ def _set_user_group_permissions() -> None:
 
 @with_logs
 def _set_user_roles() -> None:
+    admin = User.objects.get(username="tvp")
     users = User.objects.exclude(username="tvp").all()
     units = list(Unit.objects.all())
     unit_groups = list(UnitGroup.objects.all())
@@ -32,7 +33,7 @@ def _set_user_roles() -> None:
             UnitRoleFactory.create(
                 user=user,
                 role=user_role,
-                assigner=users[0],
+                assigner=admin,
                 units=units,
                 unit_groups=unit_groups,
             )
@@ -41,7 +42,7 @@ def _set_user_roles() -> None:
             GeneralRoleFactory.create(
                 user=user,
                 role=user_role,
-                assigner=users[0],
+                assigner=admin,
             )
 
         else:
