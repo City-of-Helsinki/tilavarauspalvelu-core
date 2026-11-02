@@ -936,7 +936,7 @@ def _create_reservations_for_series(
     if reject_random > 0:
         rejected_count: int = 0
 
-        while rejected_count <= reject_random:
+        while rejected_count < reject_random:
             # Replace the reservation with a rejected occurrence.
             index = random.randint(0, len(reservations) - 1)
             reservation = reservations.pop(index)
