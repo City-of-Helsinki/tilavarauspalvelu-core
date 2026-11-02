@@ -18,3 +18,5 @@ class SalesItemFactory(GenericDjangoModelFactory[SalesItem]):
     main_ledger_account = "340025"
 
     tax_level = ForeignKeyFactory("tests.factories.TaxLevelFactory", required=True)
+
+    reservation_price_lines = ReverseForeignKeyFactory("tests.factories.ReservationPriceLineFactory")

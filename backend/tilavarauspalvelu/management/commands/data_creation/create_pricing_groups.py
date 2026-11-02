@@ -210,6 +210,7 @@ def _create_reservation_price_lines() -> None:
             adjustment_percentage=Decimal(0),
             amount=amount,
             override_amount=None,
+            sales_item=None,
             tax_level=tax_level,
             tax_percentage=tax_percentages[tax_level.pk],
             vat_code="",
