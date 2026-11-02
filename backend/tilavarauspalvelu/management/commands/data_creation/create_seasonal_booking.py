@@ -235,6 +235,10 @@ def _create_handled_application_rounds(
         allocated_time_slots.extend(results.allocated_time_slots)
 
     Application.objects.bulk_create(applications)
+    Application.objects.filter(application_round=handled_round).update(
+        created_at=handled_round.application_period_begins_at,
+        updated_at=now,
+    )
     ApplicationSection.objects.bulk_create(application_sections)
     SuitableTimeRange.objects.bulk_create(suitable_time_ranges)
     ReservationUnitOption.objects.bulk_create(reservation_unit_options)
@@ -408,6 +412,10 @@ def _create_application_round_in_allocations(
     reservation_unit_options.extend(results.reservation_unit_options)
 
     Application.objects.bulk_create(applications)
+    Application.objects.filter(application_round=in_allocation_round).update(
+        created_at=in_allocation_round.application_period_begins_at,
+        updated_at=now,
+    )
     ApplicationSection.objects.bulk_create(application_sections)
     SuitableTimeRange.objects.bulk_create(suitable_time_ranges)
     ReservationUnitOption.objects.bulk_create(reservation_unit_options)
@@ -554,6 +562,10 @@ def _create_open_application_rounds(
         application.cancelled_at = now
 
     Application.objects.bulk_create(applications)
+    Application.objects.filter(application_round=open_round).update(
+        created_at=open_round.application_period_begins_at,
+        updated_at=now,
+    )
     ApplicationSection.objects.bulk_create(application_sections)
     SuitableTimeRange.objects.bulk_create(suitable_time_ranges)
     ReservationUnitOption.objects.bulk_create(reservation_unit_options)
