@@ -166,7 +166,7 @@ export const ApplicationPage2Schema = z.object({
 
 export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
 
-function convertApplicationSectionPage1(section: SectionType): ApplicationSectionPage1FormValues {
+export function convertApplicationSectionPage1(section: SectionType): ApplicationSectionPage1FormValues {
   const reservationUnits = filterNonNullable(
     section.reservationUnitOptions?.map(({ reservationUnit, preferredOrder }) => ({
       pk: reservationUnit.pk,

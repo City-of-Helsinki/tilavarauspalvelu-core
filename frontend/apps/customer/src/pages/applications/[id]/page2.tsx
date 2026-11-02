@@ -17,6 +17,7 @@ import {
   ApplicationPage2Schema,
 } from "@/components/application/funnel/form";
 import type { ApplicationPage2FormValues } from "@/components/application/funnel/form";
+import { useUnsavedChangesWarning } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
@@ -57,6 +58,9 @@ function Page2({ application }: Pick<PropsNarrowed, "application">): React.React
     defaultValues: convertApplicationPage2(application),
     resolver: zodResolver(ApplicationPage2Schema),
   });
+  // Submit saves and then navigates. Do not ask during it.
+  const { isDirty, isSubmitting } = form.formState;
+  useUnsavedChangesWarning(isDirty && !isSubmitting);
 
   useEffect(() => {
     const isInvalidPk = (application.applicationSections ?? []).some((section) => typeof section.pk !== "number");
