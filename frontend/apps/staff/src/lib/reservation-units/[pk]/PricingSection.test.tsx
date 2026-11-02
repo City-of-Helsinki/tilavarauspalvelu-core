@@ -20,10 +20,12 @@ function nameLike(base: string): RegExp {
   return new RegExp(`^${escaped}(\\s\\*)?$`);
 }
 
-function Harness() {
-  const form = useForm<ReservationUnitEditFormValues>({
-    defaultValues: convertReservationUnit(undefined),
-  });
+function Harness({ taxLevel }: { taxLevel?: number }) {
+  const defaultValues = convertReservationUnit(undefined);
+  if (taxLevel != null) {
+    defaultValues.pricings = defaultValues.pricings.map((p) => ({ ...p, taxLevel }));
+  }
+  const form = useForm<ReservationUnitEditFormValues>({ defaultValues });
   return <PricingSection form={form} taxLevelOptions={TAX_LEVEL_OPTIONS} pricingTermsOptions={PRICING_TERMS_OPTIONS} />;
 }
 
@@ -66,7 +68,7 @@ describe("PricingSection", () => {
     expect(screen.getByRole("checkbox", { name: "label.canApplyFreeOfCharge" })).toBeEnabled();
   });
 
-  it("computes the net price from the gross price and selected tax level", async () => {
+  it("shows the net price as read-only, computed with today's rate of the selected tax level", async () => {
     render(<Harness />);
     const user = await openAccordion();
     await switchToPaid(user);
@@ -75,11 +77,37 @@ describe("PricingSection", () => {
     await user.clear(lowestPrice);
     await user.type(lowestPrice, "100");
 
-    await selectComboOption(user, /^label\.taxLevel/, "Yleinen (25,5 %)");
+    const lowestPriceNet = screen.getByRole("textbox", { name: "label.lowestPriceNet" });
+    expect(lowestPriceNet).toHaveAttribute("readonly");
+    // No tax level is selected yet
+    expect(lowestPriceNet).toHaveValue("");
 
-    const lowestPriceNet = screen.getByRole("spinbutton", { name: nameLike("label.lowestPriceNet") });
-    expect(lowestPriceNet).toHaveValue(79.68);
+    await selectComboOption(user, /^label\.taxLevel/, "Yleinen (25,5 %)");
+    expect((lowestPriceNet as HTMLInputElement).value).toMatch(/^79,68\s€$/);
   }, 10_000);
+
+  it("updates the net price when the price changes", async () => {
+    render(<Harness taxLevel={2} />);
+    const user = await openAccordion();
+    await switchToPaid(user);
+
+    const highestPrice = screen.getByRole("spinbutton", { name: nameLike("label.highestPrice") });
+    await user.clear(highestPrice);
+    await user.type(highestPrice, "57");
+
+    const highestPriceNet = screen.getByRole("textbox", { name: "label.highestPriceNet" });
+    expect((highestPriceNet as HTMLInputElement).value).toMatch(/^50,00\s€$/);
+  });
+
+  it("has no input for the net price or the activation flag", async () => {
+    render(<Harness />);
+    const user = await openAccordion();
+    await switchToPaid(user);
+
+    expect(screen.queryByRole("spinbutton", { name: nameLike("label.lowestPriceNet") })).not.toBeInTheDocument();
+    expect(screen.queryByRole("spinbutton", { name: nameLike("label.highestPriceNet") })).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "label.isActivatedOnBegins" })).not.toBeInTheDocument();
+  });
 
   it("shows the material price description fields when hasMaterialPrice is checked", async () => {
     render(<Harness />);
