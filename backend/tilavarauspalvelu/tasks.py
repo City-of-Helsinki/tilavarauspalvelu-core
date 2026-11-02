@@ -650,7 +650,9 @@ def create_robot_test_data_task() -> None:
     This is a task due to the amount of data created and time it takes when run on the test server.
     """
     try:
-        cache.set(key=settings.ROBOT_TEST_DATA_LOCK_KEY, value=True, timeout=None)
+        # The worker kills the task at the time limit, and then 'finally' does not run.
+        # The timeout makes sure that the lock does not stay after that.
+        cache.set(key=settings.ROBOT_TEST_DATA_LOCK_KEY, value=True, timeout=settings.CELERY_TASK_TIME_LIMIT)
 
         create_robot_test_data()
     finally:
