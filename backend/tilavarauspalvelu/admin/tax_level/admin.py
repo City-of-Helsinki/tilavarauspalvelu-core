@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
@@ -27,7 +27,12 @@ class TaxLevelRateInline(admin.TabularInline):
     form = TaxLevelRateForm
     formset = TaxLevelRateFormSet
     ordering = ["-begins"]
-    extra = 0
+
+    def get_extra(self, request: WSGIRequest, obj: TaxLevel | None = None, **kwargs: Any) -> int:
+        # A new tax level needs a rate in effect today.
+        if obj is None:
+            return 1
+        return 0
 
 
 @admin.register(TaxLevel)
