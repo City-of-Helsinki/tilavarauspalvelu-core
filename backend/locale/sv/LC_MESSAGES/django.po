@@ -2237,6 +2237,14 @@ msgstr ""
 msgid "current percentage"
 msgstr "nuvarande skattesats"
 
+#: tilavarauspalvelu/admin/tax_level/admin.py
+msgid "next percentage"
+msgstr "nästa skattesats"
+
+#: tilavarauspalvelu/admin/tax_level/admin.py
+msgid "next percentage begins"
+msgstr "startdatum för nästa skattesats"
+
 #: tilavarauspalvelu/admin/tax_level/form.py
 msgid "Tax percentage"
 msgstr "Skattesats"
