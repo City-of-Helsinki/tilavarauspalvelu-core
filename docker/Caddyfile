@@ -13,7 +13,8 @@
 	# The customer UI uses "/monitoring" without a slash for the Sentry tunnel, so only "/monitoring/*" goes to the backend.
 	@backend path /graphql/* /admin/* /v1/* /helauth/* /pysocial/* /gdpr/* /tinymce/* /csrf/* /monitoring/* /mock_verkkokauppa/* /static/* /media/*
 	handle @backend {
-		reverse_proxy backend:8000
+		# docker-compose.yml sets GATEWAY_BACKEND. The error testing setup changes it.
+		reverse_proxy {$GATEWAY_BACKEND}
 	}
 
 	# The frontends share the network namespace of the "frontend-net" service.
