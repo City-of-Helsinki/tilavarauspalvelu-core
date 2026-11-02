@@ -75,7 +75,6 @@ const PricingFormSchema = z.object({
   // frontend only value, this is used to control if we should show price section
   isPaid: z.boolean(),
   hasMaterialPrice: z.boolean(),
-  isActivatedOnBegins: z.boolean(),
   materialPriceDescriptionFi: z
     .string()
     .transform(cleanHtmlWhitespace)
@@ -797,7 +796,6 @@ function convertPricing(p?: PricingNode): PricingFormValues {
     materialPriceDescriptionFi: p?.materialPriceDescriptionFi ?? "",
     materialPriceDescriptionEn: p?.materialPriceDescriptionEn ?? "",
     materialPriceDescriptionSv: p?.materialPriceDescriptionSv ?? "",
-    isActivatedOnBegins: p?.isActivatedOnBegins ?? false,
   };
 }
 
@@ -835,7 +833,6 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
       materialPriceDescriptionFi: "",
       materialPriceDescriptionEn: "",
       materialPriceDescriptionSv: "",
-      isActivatedOnBegins: false,
     });
   }
   return prices;
@@ -1086,6 +1083,5 @@ function transformPricing(
     materialPriceDescriptionFi: values.hasMaterialPrice ? values.materialPriceDescriptionFi : "",
     materialPriceDescriptionEn: values.hasMaterialPrice ? values.materialPriceDescriptionEn : "",
     materialPriceDescriptionSv: values.hasMaterialPrice ? values.materialPriceDescriptionSv : "",
-    isActivatedOnBegins: values.isActivatedOnBegins ?? false,
   };
 }
