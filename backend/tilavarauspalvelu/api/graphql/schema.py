@@ -126,6 +126,7 @@ from .queries import (
     ReservationUnitNode,
     ReservationUnitTypeNode,
     ResourceNode,
+    SalesItemNode,
     SpaceNode,
     TaxLevelNode,
     TermsOfUseNode,
@@ -194,6 +195,7 @@ class Query(graphene.ObjectType):
     reservation_unit_types = ReservationUnitTypeNode.Connection()
     reservation_unit_cancellation_rules = ReservationUnitCancellationRuleNode.Connection()
     tax_levels = TaxLevelNode.Connection()
+    sales_items = SalesItemNode.Connection()
     pricing_group = PricingGroupNode.Node()
     price_option = PriceOptionNode.Node()
     intended_uses = IntendedUseNode.Connection()
