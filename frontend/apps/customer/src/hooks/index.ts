@@ -7,3 +7,4 @@ export { useAvailableTimes } from "./useAvailableTimes";
 export { useRemoveStoredReservation } from "./useRemoveStoredReservation";
 export { useBlockingReservations } from "./useBlockingReservations";
 export { useSession } from "./useSession";
+export { useUnsavedChangesWarning } from "./useUnsavedChangesWarning";

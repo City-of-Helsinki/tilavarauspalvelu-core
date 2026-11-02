@@ -1,4 +1,5 @@
 {
+  "title": "Summary",
   "message": "You are making a booking <bold>{{name}}</bold> for the period <bold>{{startDate}}–{{endDate}}</bold>.",
   "time_summary": "The total duration of the bookings is at least <bold>{{hours}} h</bold>.",
   "numPersons": "Group size is {{count}} persons",
