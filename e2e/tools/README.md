@@ -42,8 +42,8 @@ has replaced. The tests, tags and keywords have the same names as there.
 - **Browsers:** the browser and device of each suite are the project's `use` options in `playwright.config.ts`. The
   "Set Up … And Open Url" keywords open Playwright's page instead of New Browser, New Context and New Page, without
   the Chrome arguments (`devices`). Switch Browser and Switch Page are `session.switchTo(page)`. The staggered startup
-  is the `staggeredStart` fixture (`TestSuites/fixtures.ts`): the run's first test in each parallel slot waits 3 s
-  times the slot's number.
+  is the `staggeredStart` fixture (`TestSuites/fixtures.ts`): the run's first test in each parallel slot waits 10 s
+  times the slot's number (Robot waited 3 s per slot, plus a random 1–2 s).
 - **Waiting:** Playwright waits for elements, texts and URLs (actions' auto-waiting, `expect`, `waitForURL`) instead
   of `Sleep`, checks that read the page once, and Wait Until Keyword Succeeds loops.
 - **Suite Setup** `Run Only Once    create_data.Create Robot Test Data` is the `create_data` project. It waits until

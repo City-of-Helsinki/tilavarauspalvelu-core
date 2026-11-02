@@ -48,23 +48,34 @@ async function freeUnitPk(api: APIRequestContext): Promise<number | null> {
 }
 
 /**
- * Whether the site answers normally: the customer landing page renders (it isn't the error page that the customer app
- * shows when its server side rendering fails), and GraphQL answers the unit query. Logs what failed.
+ * Whether a page of the customer app renders: it isn't the error page that the app shows when its server side
+ * rendering fails. Logs what failed.
  */
-async function siteAnswers(api: APIRequestContext): Promise<boolean> {
+async function pageAnswers(api: APIRequestContext, path: string, name: string): Promise<boolean> {
   try {
-    // The landing page goes through the app's /csrf/ redirect, which needs the cookie that the API context keeps
-    const landing = await api.get("/", { failOnStatusCode: false, timeout: 30_000 });
-    if (landing.status() !== 200) {
-      await log(`The landing page answered ${landing.status()}`);
+    // The page goes through the app's /csrf/ redirect, which needs the cookie that the API context keeps
+    const response = await api.get(path, { failOnStatusCode: false, timeout: 30_000 });
+    if (response.status() !== 200) {
+      await log(`${name} answered ${response.status()}`);
       return false;
     }
-    if (/data-testid="error__[^"]*--title"/.test(await landing.text())) {
-      await log("The landing page is the error page");
+    if (/data-testid="error__[^"]*--title"/.test(await response.text())) {
+      await log(`${name} is the error page`);
       return false;
     }
   } catch (err) {
-    await log(`The landing page didn't answer: ${errorMessage(err)}`);
+    await log(`${name} didn't answer: ${errorMessage(err)}`);
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Whether the site answers normally: the customer landing page and the search page (which runs a search on the
+ * server) render, and GraphQL answers the unit query. Logs what failed.
+ */
+async function siteAnswers(api: APIRequestContext): Promise<boolean> {
+  if (!(await pageAnswers(api, "/", "The landing page")) || !(await pageAnswers(api, "/search", "The search page"))) {
     return false;
   }
   if ((await freeUnitPk(api)) == null) {
@@ -75,9 +86,9 @@ async function siteAnswers(api: APIRequestContext): Promise<boolean> {
 }
 
 /**
- * Waits until the site has answered normally three times in a row, 5 s apart, for at most 2 minutes. Right after the
- * test data has been saved, the backend can still fail for a while (a 502, the customer app's error page), and the
- * first tests failed on that. After 2 minutes the tests start anyway, with a warning.
+ * Waits until the site has answered normally three times in a row, 5 s apart, for at most 2 minutes, so that the tests
+ * don't start while the backend still fails after the data creation (a 502, the customer app's error page). After
+ * 2 minutes the tests start anyway, with a warning.
  */
 async function waitUntilTheSiteAnswers(api: APIRequestContext): Promise<void> {
   await runStep("Wait until the site answers normally", async () => {

@@ -27,10 +27,6 @@ test.describe(
       await appCommon.userOpensDesktopBrowserToLandingPage();
     });
 
-    test.afterEach(async ({ commonSetupsTeardowns }) => {
-      await commonSetupsTeardowns.completeTestTeardown();
-    });
-
     test(
       "User creates and Admin accepts single booking that requires handling",
       { tag: ["@combined-test-data-set-0", "@accept-booking"] },
@@ -40,13 +36,11 @@ test.describe(
         appAdmin,
         appCommon,
         appUser,
-        commonSetupsTeardowns,
         dataModification,
         state,
         testData,
         topnav,
       }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates subvented reservation");
@@ -108,14 +102,12 @@ test.describe(
         appAdmin,
         appCommon,
         appUser,
-        commonSetupsTeardowns,
         dataModification,
         reservationLownav,
         state,
         testData,
         topnav,
       }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates reservation that requires handling");
@@ -179,13 +171,11 @@ test.describe(
         appAdmin,
         appCommon,
         appUser,
-        commonSetupsTeardowns,
         reservationLownav,
         state,
         testData,
         topnav,
       }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
         await appCommon.userLogsInWithSuomiFi();
 
         await log("User creates reservation");

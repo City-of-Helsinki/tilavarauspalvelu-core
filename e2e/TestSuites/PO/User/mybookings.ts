@@ -11,7 +11,6 @@ import type { PendingResponse } from "./quick_reservation";
 export class Mybookings extends PageObject {
   @step("mybookings.Check My Bookings H1")
   async checkMyBookingsH1(bookingstatus: string) {
-    await this.page.locator("h1").waitFor({ state: "visible", timeout: 15_000 });
     await this.pages.customKeywords.checkElementsText("h1", bookingstatus);
   }
 
@@ -65,6 +64,7 @@ export class Mybookings extends PageObject {
   // Reservations page
   @step("mybookings.Check Reservation Status")
   async checkReservationStatus(reservation_status: string) {
+    // Kept on purpose: after a cancellation the page loads again, and the status check alone waits only 20 s
     await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
     await this.pages.customKeywords.checkElementsText(this.page.getByTestId("reservation__status"), reservation_status);
   }
@@ -181,9 +181,9 @@ export class Mybookings extends PageObject {
       await this.page.locator("#tab-2-button").focus();
       await this.page.locator("#tab-2-button").click();
       await expect(
-        this.page.locator('#tab-2-button[aria-selected="true"]'),
+        this.page.locator("#tab-2-button"),
         "The cancelled bookings tab is not selected after the click"
-      ).toBeVisible({ timeout: 2000 });
+      ).toHaveAttribute("aria-selected", "true", { timeout: 2000 });
     });
   }
 
@@ -194,9 +194,9 @@ export class Mybookings extends PageObject {
       await this.page.locator("#tab-1-button").focus();
       await this.page.locator("#tab-1-button").click();
       await expect(
-        this.page.locator('#tab-1-button[aria-selected="true"]'),
+        this.page.locator("#tab-1-button"),
         "The past bookings tab is not selected after the click"
-      ).toBeVisible({ timeout: 2000 });
+      ).toHaveAttribute("aria-selected", "true", { timeout: 2000 });
     });
   }
 
@@ -207,9 +207,9 @@ export class Mybookings extends PageObject {
       await this.page.locator("#tab-0-button").focus();
       await this.page.locator("#tab-0-button").click();
       await expect(
-        this.page.locator('#tab-0-button[aria-selected="true"]'),
+        this.page.locator("#tab-0-button"),
         "The upcoming bookings tab is not selected after the click"
-      ).toBeVisible({ timeout: 2000 });
+      ).toHaveAttribute("aria-selected", "true", { timeout: 2000 });
     });
   }
 

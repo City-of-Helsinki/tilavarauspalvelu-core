@@ -1,7 +1,7 @@
 /** Port of PO/User/reservation_unit_reserver_info.robot */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
-import { NOTIFICATION_TYPE_ERROR } from "../../Resources/variables";
+import { FORM_ERRORS_TITLE_FI } from "../../Resources/texts_FI";
 
 export class ReservationUnitReserverInfo extends PageObject {
   @step("reservation_unit_reserver_info.Enter First Name")
@@ -50,8 +50,8 @@ export class ReservationUnitReserverInfo extends PageObject {
     await this.page.waitForTimeout(1000);
 
     // Check that error notification banner is displayed
-    // The form's own notification, in the page's main content: an error toast (like a 502 from the backend) has the
-    // same style
-    await expect(this.page.getByRole("main").locator(NOTIFICATION_TYPE_ERROR)).toBeVisible();
+    // The form's own error box, by its heading in the page's main content: an error toast (like a 502 from the
+    // backend) has the same style but no heading
+    await expect(this.page.getByRole("main").getByRole("heading", { name: FORM_ERRORS_TITLE_FI })).toBeVisible();
   }
 }

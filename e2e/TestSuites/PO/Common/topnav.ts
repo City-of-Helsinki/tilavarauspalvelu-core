@@ -164,7 +164,6 @@ export class Topnav extends PageObject {
   async navigateToMyBookingsMobile() {
     await this.clickNavigationMenuMobile();
     await this.navigateToMyBookings();
-    await this.page.locator("h1").waitFor({ state: "visible" });
     await closeMobileMenu(this.page);
   }
 }

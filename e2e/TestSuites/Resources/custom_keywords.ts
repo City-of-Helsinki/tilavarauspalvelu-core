@@ -3,6 +3,7 @@ import { test } from "@playwright/test";
 import { appendFile } from "node:fs/promises";
 import type { Locator } from "@playwright/test";
 import { elementsOf } from "../../lib/locators";
+import { retry } from "../../lib/retry";
 import { errorMessage, expect, formatValue, rethrowSkip, step, log } from "../../lib/runtime";
 import { PageObject } from "../page-object";
 import { python_keywords } from "../Resources/python_keywords";
@@ -51,8 +52,11 @@ export class CustomKeywords extends PageObject {
   ) {
     // Get URL before click to detect if navigation happened
     const url_before = this.page.url();
+    let attempt = 0;
 
-    for (let attempt = 1; attempt <= max_attempts; attempt++) {
+    // A click whose target element doesn't show is repeated after 2 s, at most max_attempts clicks in all
+    await retry(max_attempts, 2000, async () => {
+      attempt++;
       await log(`Attempt ${attempt} of ${max_attempts}: Clicking ${formatValue(click_selector)}`);
 
       // Port: the click scrolls the element into view and waits until it's stable and enabled (Playwright's
@@ -61,37 +65,26 @@ export class CustomKeywords extends PageObject {
       await this.locate(click_selector).click();
 
       // Wait for target element to appear (indicates successful navigation)
-      // Port: expect waits for it, instead of Run Keyword And Return Status around Wait For Elements State
-      const target_exists = await expect(this.locate(target_element_selector))
-        .toBeVisible({ timeout: nav_timeout })
-        .then(
-          () => true,
-          () => false
+      try {
+        await expect(
+          this.locate(target_element_selector),
+          `ERROR: Failed to navigate. Target element '${formatValue(target_element_selector)}' not found. Check screenshot.`
+        ).toBeVisible({ timeout: nav_timeout });
+      } catch (err) {
+        // Target element not found: log whether the page changed, then retry if there are attempts left
+        const url_after = this.page.url();
+        await log(
+          url_after === url_before
+            ? `⚠️ Navigation did not occur on attempt ${attempt}, URL unchanged`
+            : `⚠️ URL changed to ${url_after} but target element not found`
         );
-
-      if (target_exists) {
-        await log(`✅ Successfully navigated on attempt ${attempt}`);
-        return;
+        if (attempt < max_attempts) {
+          await log("Waiting before retry...");
+        }
+        throw err;
       }
-
-      // Target element not found - check if we should retry
-      const url_after = this.page.url();
-      if (url_after === url_before) {
-        await log(`⚠️ Navigation did not occur on attempt ${attempt}, URL unchanged`);
-      } else {
-        await log(`⚠️ URL changed to ${url_after} but target element not found`);
-      }
-
-      // Retry if we have more attempts
-      if (attempt < max_attempts) {
-        await log("Waiting before retry...");
-        await this.page.waitForTimeout(2000);
-      }
-    }
-
-    throw new Error(
-      `ERROR: Failed to navigate after ${max_attempts} attempts. Target element '${formatValue(target_element_selector)}' not found. Check screenshot.`
-    );
+      await log(`✅ Successfully navigated on attempt ${attempt}`);
+    });
   }
 
   /**
@@ -459,7 +452,6 @@ export class CustomKeywords extends PageObject {
    */
   @step("custom_keywords.Get Number From Element Text")
   async getNumberFromElementText(text_element: string | Locator) {
-    await this.locate(text_element).waitFor({ state: "visible" });
     const element_text = await this.locate(text_element).innerText();
     await log(`Original text: ${element_text}`);
     const numbers_only = element_text.replaceAll(/[^0-9]/g, "");

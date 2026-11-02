@@ -1,5 +1,6 @@
 /** A resource file with top navigation keywords. */
-import { step } from "../../../lib/runtime";
+import { retry } from "../../../lib/retry";
+import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class RecurringApplicationsPagePreview extends PageObject {
@@ -15,7 +16,17 @@ export class RecurringApplicationsPagePreview extends PageObject {
 
   @step("recurring_applications_page_preview.User Clicks The Submit Button")
   async userClicksTheSubmitButton() {
-    await this.page.locator("#button__application--submit").click();
+    // After a 5xx the app keeps the application a draft and enables the button again, so the send is repeated
+    await retry(3, 5000, async () => {
+      // Waiting together, so a failed click doesn't leave the response wait unhandled
+      const [response] = await Promise.all([
+        this.page.waitForResponse((candidate) => (candidate.request().postData() ?? "").includes("SendApplication"), {
+          timeout: 30_000,
+        }),
+        this.page.locator("#button__application--submit").click(),
+      ]);
+      expect(response.status(), "The backend failed to send the application").toBeLessThan(500);
+    });
     // Sending the application opens its sent page
     await this.page.waitForURL((url) => url.pathname.endsWith("/sent"));
   }

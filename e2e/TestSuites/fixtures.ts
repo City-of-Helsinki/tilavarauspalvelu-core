@@ -15,12 +15,15 @@ import { mkdir } from "node:fs/promises";
 import { setTimeout } from "node:timers/promises";
 import { BackendErrors } from "../lib/backend-errors";
 import { acquireLock, releaseLock, sharedDir } from "../lib/locks";
-import { isSequential, runStep, test as base } from "../lib/runtime";
+import { errorMessage, isSequential, log, runStep, test as base } from "../lib/runtime";
 import { Session } from "../lib/session";
 import { Pages } from "./pages";
 import type { TestState } from "./state";
 import { resolveTestData } from "./test-data";
 import type { TestData } from "./test-data";
+
+/** The run's first test in parallel slot n waits n times this before it starts */
+const STAGGER_MS = 10_000;
 
 /** True for the run's first test in this parallel slot: that test creates the slot's folder in the run's folder. */
 async function firstInSlot(slot: number): Promise<boolean> {
@@ -45,14 +48,13 @@ type PageObjectFixtures = { [Name in keyof Pages]: Pages[Name] };
 export const test = base.extend<
   { staggeredStart: void; testData: TestData; session: Session; pages: Pages; state: TestState } & PageObjectFixtures
 >({
-  // Like Apply Staggered Startup Strategy in devices.robot, the run's first test in each parallel slot waits 3 s times
-  // the slot's number, so the first tests don't all log in at once. Suomi.fi logins that ended at the same moment were
-  // refused (access_denied) or sent to Helsinki Profiili's email page. Later tests start at different times anyway.
+  // The run's first test in each slot waits 10 s times the slot's number: when all first tests started together, the
+  // test environment answered with 502s and error pages, and simultaneous Suomi.fi logins failed.
   staggeredStart: [
     async ({ testRuntime: _testRuntime }, use, info) => {
       if (info.parallelIndex > 0 && (await firstInSlot(info.parallelIndex))) {
-        await runStep(`Staggered start: waits ${info.parallelIndex * 3} s`, () =>
-          setTimeout(info.parallelIndex * 3000)
+        await runStep(`Staggered start: waits ${(info.parallelIndex * STAGGER_MS) / 1000} s`, () =>
+          setTimeout(info.parallelIndex * STAGGER_MS)
         );
       }
       await use();
@@ -69,6 +71,16 @@ export const test = base.extend<
       if (data.dataSet != null) {
         await acquireLock(`DATA_SET_${data.dataSet}`);
       }
+      // The report shows the users that the tags chose (in Before Hooks)
+      await log(`🚀 Test data for: ${info.title}`);
+      await log(`🏷️ Tags: ${info.tags.join(", ")}`);
+      const { user, admin, djangoAdmin, permissionTarget } = data;
+      for (const [kind, person] of Object.entries({ user, admin, djangoAdmin, permissionTarget })) {
+        if (person.fullName !== "") {
+          // oxlint-disable-next-line no-await-in-loop -- log lines in order
+          await log(`👤 ${kind}: ${person.fullName}`);
+        }
+      }
       await use(data);
       if (data.dataSet != null) {
         await releaseLock(`DATA_SET_${data.dataSet}`);
@@ -82,7 +94,12 @@ export const test = base.extend<
     const session = new Session({ browser, context, page }, info, backendErrors);
     await use(session);
     await backendErrors.finish();
-    await session.close();
+    // A failure to close what the test opened isn't the test's result, so it is a warning
+    try {
+      await session.close();
+    } catch (err) {
+      await log(`Closing the test's pages failed: ${errorMessage(err)}`, { level: "WARN" });
+    }
   },
   pages: async ({ session, testData }, use) => {
     await use(new Pages(session, testData));

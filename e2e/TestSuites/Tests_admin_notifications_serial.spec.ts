@@ -20,23 +20,17 @@ test.describe(
       await appCommon.userOpensDesktopBrowserToLandingPage();
     });
 
-    test.afterEach(async ({ commonSetupsTeardowns }) => {
-      await commonSetupsTeardowns.completeTestTeardown();
-    });
-
     test("Admin creates normal notifications for both sides", async ({
       adminNavigationMenu,
       adminNotifications,
       adminNotificationsCreatePage,
       appAdmin,
       appCommon,
-      commonSetupsTeardowns,
       graphqlCommands,
       popups,
       session,
       state,
     }) => {
-      await commonSetupsTeardowns.completeTestSetupFromTags();
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
       await popups.closeNotificationBannerIfVisible();
@@ -94,13 +88,11 @@ test.describe(
       adminNotificationsCreatePage,
       appAdmin,
       appCommon,
-      commonSetupsTeardowns,
       graphqlCommands,
       popups,
       session,
       state,
     }) => {
-      await commonSetupsTeardowns.completeTestSetupFromTags();
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
       await popups.closeNotificationBannerIfVisible();
@@ -158,13 +150,11 @@ test.describe(
       adminNotificationsCreatePage,
       appAdmin,
       appCommon,
-      commonSetupsTeardowns,
       graphqlCommands,
       popups,
       session,
       state,
     }) => {
-      await commonSetupsTeardowns.completeTestSetupFromTags();
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
       await popups.closeNotificationBannerIfVisible();
@@ -231,14 +221,11 @@ test.describe(
         adminNotificationsCreatePage,
         appAdmin,
         appCommon,
-        commonSetupsTeardowns,
         graphqlCommands,
         popups,
         session,
         state,
       }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
-
         await log("Test cleanup");
         // This is for test cleanup if the last run failed
         await popups.closeNotificationBannerIfVisible();

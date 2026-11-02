@@ -39,8 +39,8 @@ time**. The endpoint also rejects a second call within 60 seconds. The backend c
 and pages fail or hang until it has been saved, so the project waits (up to 5 minutes) until the always free unit
 has a new id. If the id can't be read before the call, it waits 3 minutes like the Robot suite. The backend can
 still fail for a while after that (a 502, the customer app's error page), so the project then waits until the
-customer landing page and GraphQL answer normally three times in a row, 5 seconds apart. After 2 minutes the tests
-start anyway, with a warning in the report.
+customer landing page, the search page and GraphQL answer normally three times in a row, 5 seconds apart. After
+2 minutes the tests start anyway, with a warning in the report.
 
 Runs need `TZ=Europe/Helsinki`: the config sets it when it is unset.
 
@@ -115,8 +115,8 @@ the runtime offline.
   from the section with the same tag in `pabot_users.dat`, and only one test at a time uses a data set. A data set
   tag that `pabot_users.dat` doesn't have fails the test. A suite tag (`@desktop-suite`, `@admin-suite`,
   `@combined-suite`, `@android-suite`, `@iphone-suite`) picks the units. In sequential mode, and in tests without a
-  data set tag, the tests use the shared users in `serial_users.ts`. `Complete Test Setup From Tags` logs the users
-  it chose.
+  data set tag, the tests use the shared users in `serial_users.ts`. The `testData` fixture logs the users it chose,
+  under the report's "Before Hooks".
 
 ## How it works
 
@@ -125,8 +125,9 @@ the runtime offline.
   set's users and a unit's free times to one test at a time. Folders of runs started over a day ago are removed when
   a run starts. A worker can take a lock it already holds, and releasing a lock it doesn't hold fails. Locks a test
   still holds are released when it ends, and a lock left by a worker that stopped is taken over. The first tests
-  start 3 seconds apart (the `staggeredStart` fixture, which marks each slot's first test in the same folder),
-  because Suomi.fi logins that end at the same moment can fail.
+  start 10 seconds apart (the `staggeredStart` fixture, which marks each slot's first test in the same folder):
+  when they started together, the test environment answered with 502s and error pages, and simultaneous Suomi.fi
+  logins failed.
 - **Retries:** a failed test is retried once. A skipped test fails the run (`lib/skips-fail-run-reporter.ts`).
 - **Emails:** "Check emails from reservations" makes, pays and cancels a paid booking of its own, then checks the
   confirmation and cancellation emails of that booking in the backend's robot email cache. The backend sends emails
@@ -137,6 +138,10 @@ the runtime offline.
 - **Mobile menu:** the app opens a page from the HDS mobile menu without a reload, so the menu stays open, and while
   it is open HDS uses the next click outside it only to close the menu. `topnav.Navigate To My Bookings Mobile` and
   `Navigate To Single Booking Page Mobile` close it with Escape.
+- **Interrupted payment:** if the "Varauksesi on keskeneräinen" banner doesn't show in 5 seconds, the page is
+  reloaded (at most 3 tries). The banner's query runs only once per page load.
+- **Recurring application:** the test first cancels applications that an earlier attempt left, and sends the
+  application again if the send fails with a 5xx (at most 3 sends).
 - **Browsers:** each project's browser and device are in its `use` options in `playwright.config.ts`: Chromium at
   1440×900 on desktop, Pixel 5 and iPhone 14 on mobile. Playwright starts one browser per worker and gives each test
   a new context and page, which the "Set Up … And Open Url" keywords in `devices` open. A second one in a test opens
@@ -147,10 +152,11 @@ the runtime offline.
 - **Waiting:** keywords wait for what they need: actions wait for their element, checks use Playwright's `expect`,
   and navigations wait for the new URL (`waitForURL`). A logout waits for the app's `/auth/logout/` redirect, which
   comes after the session is destroyed. After a pick from an HDS Select, `Close Select List If Open` closes a list
-  that stayed open (HDS ignores a close within 200 ms of opening). Fixed sleeps are left only where nothing on the
-  page tells when to go on: the pause between login click retries, a second after the empty booking form's submit,
-  and a second for banners before a "no banner" check. The config's `baseURL` is the test environment, so Playwright
-  code can open pages with `page.goto("/…")`.
+  that stayed open (HDS ignores a close within 200 ms of opening). The two Reload Page keywords and the admin landing
+  page check wait for network idle on purpose: the pages load data after the load event. Fixed sleeps are left only
+  where nothing on the page tells when to go on: the pause between login click retries, a second after the empty
+  booking form's submit, and a second for banners before a "no banner" check. The config's `baseURL` is the test
+  environment, so Playwright code can open pages with `page.goto("/…")`.
 - **Reports:** the HTML report shows the keyword steps of each test, with the arguments (a locator as Playwright
   describes it, like `getByTestId('reservation__status')`), and `test-results/junit.xml` is for CI summaries. A
   failed test has a full-page screenshot of each open page and a video of its own page. Backend errors are

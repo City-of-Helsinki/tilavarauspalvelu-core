@@ -32,30 +32,19 @@ test.describe(
       await appCommon.userOpensIphoneWebkitToLandingPage();
     });
 
-    test.afterEach(async ({ commonSetupsTeardowns }) => {
-      await commonSetupsTeardowns.completeTestTeardown();
+    test("User logs in and out with suomi_fi", { tag: ["@mobile-iphone-data-set-0"] }, async ({ appCommon }) => {
+      await log("User logs in with Suomi.fi");
+      await appCommon.userLogsInWithSuomiFiMobile();
+
+      await log("User logs out");
+      await appCommon.userLogsOutMobile();
+      await appCommon.userConfirmsLogOutMobile();
     });
-
-    test(
-      "User logs in and out with suomi_fi",
-      { tag: ["@mobile-iphone-data-set-0"] },
-      async ({ appCommon, commonSetupsTeardowns }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
-
-        await log("User logs in with Suomi.fi");
-        await appCommon.userLogsInWithSuomiFiMobile();
-
-        await log("User logs out");
-        await appCommon.userLogsOutMobile();
-        await appCommon.userConfirmsLogOutMobile();
-      }
-    );
 
     test(
       "User can make free single booking and modifies it",
       { tag: ["@mobile-iphone-data-set-1"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, reservationLownav, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
         await log("User creates reservation");
@@ -94,8 +83,7 @@ test.describe(
     test(
       "User can make paid single booking",
       { tag: ["@mobile-iphone-data-set-2"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
         await log("User creates paid reservation");
@@ -145,8 +133,7 @@ test.describe(
     test(
       "User can make paid single booking with interrupted checkout",
       { tag: ["@mobile-iphone-data-set-3"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
         await log("User creates reservation");
@@ -191,8 +178,7 @@ test.describe(
     test(
       "User can make booking that requires handling",
       { tag: ["@mobile-iphone-data-set-4"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, reservationLownav, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, reservationLownav, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
         await log("User creates reservation that requires handling");
@@ -221,8 +207,7 @@ test.describe(
     test(
       "User can make subvented single booking that requires handling",
       { tag: ["@mobile-iphone-data-set-5"] },
-      async ({ appCommon, appUser, commonSetupsTeardowns, state, testData, topnav }) => {
-        await commonSetupsTeardowns.completeTestSetupFromTags();
+      async ({ appCommon, appUser, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
         await log("User creates subvented reservation");
