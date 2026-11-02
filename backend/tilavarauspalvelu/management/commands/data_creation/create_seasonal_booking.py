@@ -117,7 +117,7 @@ def _create_handled_application_rounds(
         name="Käsitelty kausivarauskierros",
         name_fi="Käsitelty kausivarauskierros",
         name_en="Handled application round",
-        name_sv="Hanterade ansökningsrunda",
+        name_sv="Hanterad ansökningsomgång",
         #
         application_period_begins_at=now - datetime.timedelta(days=30),
         application_period_ends_at=now - datetime.timedelta(days=1),
