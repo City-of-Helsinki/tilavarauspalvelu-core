@@ -512,9 +512,11 @@ def _create_open_application_rounds(
     ):
         sent_at: datetime.datetime | None = None
         if random.choice([True, False]):
-            period = open_round.application_period_ends_at - open_round.application_period_begins_at
-            offset_days = random.randint(0, period.days + 1)
-            sent_at = open_round.application_period_begins_at + datetime.timedelta(days=offset_days)
+            # Applications in an open round can only be sent between the start of the period and now.
+            time_since_period_began = now - open_round.application_period_begins_at
+            seconds_since_period_began = int(time_since_period_began.total_seconds())
+            offset_seconds = random.randint(0, seconds_since_period_began)
+            sent_at = open_round.application_period_begins_at + datetime.timedelta(seconds=offset_seconds)
 
         results = _create_application_for_round(
             application_round=open_round,
