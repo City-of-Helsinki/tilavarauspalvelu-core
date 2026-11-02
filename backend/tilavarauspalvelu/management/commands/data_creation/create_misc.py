@@ -100,7 +100,7 @@ def _create_periodic_tasks() -> None:
         timezone=DEFAULT_TIMEZONE,
     )
     every_other_minute = CrontabSchedule.objects.create(
-        minute="2",
+        minute="*/2",
         timezone=DEFAULT_TIMEZONE,
     )
 
