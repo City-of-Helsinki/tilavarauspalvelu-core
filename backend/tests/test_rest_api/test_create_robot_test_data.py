@@ -286,6 +286,20 @@ def test_create_robot_test_data__users_can_exist_before_run():
 
 @pytest.mark.slow
 @pytest.mark.django_db
+def test_create_robot_test_data__users_have_the_robot_password(settings):
+    create_robot_test_data_task.delay()
+
+    users = list(User.objects.all())
+    users_without_robot_password = [
+        user.username for user in users if not user.check_password(settings.ROBOT_TEST_DATA_USER_PASSWORD)
+    ]
+
+    assert len(users) == 39
+    assert users_without_robot_password == []
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
 def test_remove_existing_data():
     create_robot_test_data_task.delay()
     remove_existing_data()
