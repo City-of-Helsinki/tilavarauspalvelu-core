@@ -11,6 +11,7 @@ export type LegendItem = { state: LegendState; label: string; current?: boolean 
 export const arrow = css`
   content: "";
   position: absolute;
+  z-index: 1;
   left: 8px;
   top: 3px;
   width: 0;
@@ -35,14 +36,14 @@ const secondaryFill = css`
 const primaryIndicator = css`
   &::after {
     ${arrow};
-    border-bottom: 10px solid var(--color-white);
+    border-bottom: 8px solid var(--color-white);
   }
 `;
 
 const secondaryIndicator = css`
   &::after {
     ${arrow};
-    border-top: 10px solid var(--color-black);
+    border-top: 8px solid var(--color-black);
   }
 `;
 
@@ -61,35 +62,46 @@ const secondaryFragment = css`
 // The cell stays in the table's flow (the shared styles make it `position: relative`, the box `::before` fills).
 // An absolute cell would leave its row, and the cells after it would slide one column to the left.
 const eventBackground = (appearance: CellAppearance) => css`
+  background: transparent;
   padding-right: 4px;
   &::before {
     display: block;
     content: "";
     position: absolute;
-    inset: 0 var(--event-gap);
-    width: calc(100% - 18px);
-    padding: 2px 4px 0;
-    border-inline: 1px solid ${appearance === "primary" ? "transparent" : "var(--border-color)"};
+    z-index: 1;
+    inset: 0 var(--event-gap) -1px; /* The event should be drawn on top of eventual cell bottom-border. */
+    padding-inline: 4px;
+    ${appearance === "secondary" && "border-inline: 1px solid var(--border-color)"};
+    font-size: var(--fontsize-body-s);
+    text-align: right;
     color: ${appearance === "primary" ? "var(--color-white)" : "var(--color-black)"};
     background-color: ${appearance === "primary" ? "var(--color-bus)" : "var(--color-engel)"};
   }
 
   &[data-run-start] {
-    z-index: 1;
+    z-index: 2;
     &::before {
-      top: 1px;
       padding-top: 2px;
       content: attr(data-runtime-start) "–" attr(data-runtime-end);
-      border-top-left-radius: var(--spacing-2-xs);
-      border-top-right-radius: var(--spacing-2-xs);
+      border-top-left-radius: var(--event-border-radius);
+      border-top-right-radius: var(--event-border-radius);
+    }
+    &[data-run-end] {
+      &::before {
+        padding-top: 0;
+        margin-top: -1px /* Make the time text fit inside the box */;
+      }
+      &::after {
+        top: 1px;
+      }
     }
   }
 
   &[data-run-end] {
     &::before {
       bottom: 0;
-      border-bottom-left-radius: var(--spacing-2-xs);
-      border-bottom-right-radius: var(--spacing-2-xs);
+      border-bottom-left-radius: var(--event-border-radius);
+      border-bottom-right-radius: var(--event-border-radius);
     }
   }
 `;
@@ -100,7 +112,7 @@ export const WeeklyPatternRoot = styled.div`
 
   position: relative;
   overflow-x: auto;
-  height: auto;
+  height: var(--weekly-pattern-height, auto);
 
   /* 
     The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
@@ -113,10 +125,9 @@ export const WeeklyPatternRoot = styled.div`
     touch-action: manipulation;
 
     --step-height: 12px;
-
-    /* Just wide enough for a time label like "14". The other columns split the rest evenly. */
-    --time-column-width: 30px;
+    --time-column-width: 30px; /* Just wide enough for a time label like "14". The other columns split the rest evenly. */
     --event-gap: 4px;
+    --event-border-radius: 4px;
   }
 
   thead th,
@@ -135,17 +146,17 @@ export const WeeklyPatternRoot = styled.div`
     ${fontBold};
     font-size: var(--fontsize-body-m);
     text-align: center;
-    vertical-align: middle;
+    vertical-align: top;
     white-space: nowrap;
     z-index: 2;
     border-top: 1px solid var(--color-black-20);
   }
 
   tbody td {
-    padding: 0 var(--spacing-2-xs) 0 0;
+    padding-right: var(--spacing-2-xs);
     width: calc((100% - 30px) / 7);
     cursor: pointer;
-    text-align: right;
+    text-align: center;
     font-size: 12px;
     line-height: 0.9;
     color: transparent;
@@ -153,18 +164,14 @@ export const WeeklyPatternRoot = styled.div`
       color 0.1s ease-in-out,
       background 0.1s ease-in-out,
       box-shadow 0.1s ease-in-out;
+    border-top: 1px solid var(--color-black-10);
 
-    &:not([data-appearance="primary"], [data-appearance="secondary"]) {
-      border-top: 1px solid var(--color-black-10);
-      &[data-hour-start] {
-        border-top: 1px solid var(--border-color);
-      }
+    &[data-hour-start] {
+      border-top: 1px solid var(--border-color);
     }
 
     &[data-appearance="primary"] {
       ${eventBackground("primary")};
-      text-align: right;
-      border-top: 1px solid rgb(var(--color-white), 0.1);
     }
 
     &[data-appearance="secondary"] {
@@ -196,23 +203,28 @@ export const WeeklyPatternRoot = styled.div`
       &[data-appearance="primary"],
       &[data-appearance="secondary"] {
         cursor: pointer;
+        background-image: ${unavailableBackgroundSVG};
+        background-size: auto calc(var(--step-height) / 2);
       }
 
       /* Due to the opacity being lower, a darker background can be used. It also makes a clearer distinction between
          the parts of the run which are on closed cells. */
       &[data-appearance="primary"]::before {
-        background-color: rgba(from var(--color-bus-dark) r g b / 0.75);
+        background-color: rgb(from var(--color-bus-dark) r g b / 0.6);
       }
 
       &[data-appearance="secondary"]::before {
-        background-color: rgba(from var(--color-engel-dark) r g b / 0.75);
+        background-color: rgb(from var(--color-engel-dark) r g b / 0.75);
       }
     }
 
     /* None of the reservation units can be booked here, so nothing can be painted either. */
     &[data-availability="unavailable"] {
-      border-top-color: var(--color-black-30);
+      border-top-color: rgb(from var(--color-black) r g b / 0.1);
       background: var(--color-black-30);
+      &[data-hour-start] {
+        border-top-color: rgb(from var(--color-black) r g b / 0.5);
+      }
     }
 
     /* The arrow only marks where a run begins, not every cell in it. */
@@ -242,7 +254,6 @@ export const WeeklyPatternRoot = styled.div`
 
 const LegendList = styled.ul`
   display: flex;
-  flex-wrap: wrap;
   gap: var(--spacing-xs);
   margin: 0;
   padding: 0;
@@ -254,7 +265,6 @@ const LegendItemRow = styled.li`
   align-items: center;
   gap: var(--spacing-2-xs);
   white-space: nowrap;
-
   &[aria-current="true"] {
     font-family: var(--font-bold), sans-serif;
   }
@@ -273,7 +283,7 @@ const LegendBox = styled.div<{ $state: LegendState }>`
         ? "var(--color-black-5)"
         : "var(--color-white)"};
   ${({ $state }) => ($state === "primary" ? primaryFragment : $state === "secondary" ? secondaryFragment : "")}
-  ${({ $state }) => $state === "closed" && `background-image: ${unavailableBackgroundSVG}; background-size: auto 10px; background-repeat: repeat;`}
+  ${({ $state }) => $state === "closed" && `background-color: var(--color-black-10); background-image: ${unavailableBackgroundSVG}; background-size: auto 10px; background-repeat: repeat;`}
   [aria-current="true"] > & {
     box-shadow: 0 0 0 2px var(--color-focus-outline);
   }
