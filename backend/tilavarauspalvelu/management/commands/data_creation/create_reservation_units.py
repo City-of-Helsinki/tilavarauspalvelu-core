@@ -1315,8 +1315,8 @@ def _create_reservation_units_in_space_hierarchies(
         parent=penthouse,
         name="EXP Karaoke huone",
         name_fi="EXP Karaoke huone",
-        name_en="EXP Karaokerum",
-        name_sv="EXP Karaoke Room",
+        name_en="EXP Karaoke Room",
+        name_sv="EXP Karaokerum",
         unit=unit,
     )
     rooftop_terrace = SpaceFactory.create(
