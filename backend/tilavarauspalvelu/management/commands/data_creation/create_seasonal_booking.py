@@ -537,7 +537,7 @@ def _create_open_application_rounds(
 
     # Cancel 3 random applications
     for application in random.sample(applications, k=3):
-        application.cancelled_at = open_round.application_period_ends_at - datetime.timedelta(days=1)
+        application.cancelled_at = now
 
     Application.objects.bulk_create(applications)
     ApplicationSection.objects.bulk_create(application_sections)
