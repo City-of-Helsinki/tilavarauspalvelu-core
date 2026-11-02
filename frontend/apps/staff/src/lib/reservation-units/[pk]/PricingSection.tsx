@@ -2,7 +2,7 @@ import React from "react";
 import { Controller, useWatch } from "react-hook-form";
 import type { Control, UseFormReturn } from "react-hook-form";
 import { addDays, startOfDay } from "date-fns";
-import { IconAlertCircleFill, RadioButton } from "hds-react";
+import { IconAlertCircleFill, RadioButton, TextInput } from "hds-react";
 import { capitalize } from "lodash-es";
 import { useTranslation } from "next-i18next/pages";
 import dynamic from "next/dynamic";
@@ -13,6 +13,7 @@ import {
   ControlledSelect,
   ControlledCheckbox,
 } from "ui/src/components/form";
+import { formatters as getFormatters } from "ui/src/modules/number-formatters";
 import { AutoGrid, Flex, HR } from "ui/src/styled";
 import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { getTranslatedError } from "@/modules/helpers";
@@ -48,22 +49,21 @@ type Props = {
   taxLevelOptions: TaxLevelOption[];
 };
 
-function removeTax(price: number, taxPercentage: number) {
-  const tmp = (price * 100) / (100 + taxPercentage);
-  return Math.floor(tmp * 100) / 100;
-}
-
-function addTax(price: number, taxPercentage: number) {
-  const tmp = price * ((100 + taxPercentage) / 100);
-  return Math.floor(tmp * 100) / 100;
-}
-
 export type TaxLevelOption = {
   label: string;
   pk: number;
   // The rate of the tax level today
   percentage: number;
 };
+
+// The number input sets the price to null when it is empty
+function formatNetPrice(price: number | null, taxPercentage: number | undefined): string {
+  if (price == null || taxPercentage == null || Number.isNaN(price)) {
+    return "";
+  }
+  const net = (price * 100) / (100 + taxPercentage);
+  return getFormatters("fi").currencyWithDecimals?.format(net) ?? "";
+}
 
 function PaidPricingPart({
   form,
@@ -75,7 +75,7 @@ function PaidPricingPart({
   taxLevelOptions: TaxLevelOption[];
 }) {
   const { t } = useTranslation("reservationUnitEditor");
-  const { control, setValue, formState, watch } = form;
+  const { control, formState, watch } = form;
   const { errors } = formState;
 
   const unitPriceOptions = Object.values(PriceUnit).map((choice) => ({
@@ -89,7 +89,8 @@ function PaidPricingPart({
   }));
 
   const pricing = watch(`pricings.${index}`);
-  const taxPercentage = taxLevelOptions.find((x) => x.pk === pricing.taxLevel)?.percentage ?? 0;
+  // The net price changes when the rate of the tax level changes, so it is only shown with today's rate
+  const taxPercentage = taxLevelOptions.find((x) => x.pk === pricing.taxLevel)?.percentage;
 
   return (
     <>
@@ -113,74 +114,39 @@ function PaidPricingPart({
           label: x.label,
           value: x.pk,
         }))}
-        afterChange={(val) => {
-          const low = pricing.lowestPrice;
-          const high = pricing.highestPrice;
-          const tax = taxLevelOptions.find((x) => x.pk === val)?.percentage ?? 0;
-          if (!Number.isNaN(low)) {
-            const lowNet = removeTax(low, tax);
-            setValue(`pricings.${index}.lowestPriceNet`, lowNet);
-          }
-          if (!Number.isNaN(high)) {
-            const highNet = removeTax(high, tax);
-            setValue(`pricings.${index}.highestPriceNet`, highNet);
-          }
-        }}
         error={getTranslatedError(t, errors.pricings?.[index]?.taxLevel?.message)}
-      />
-      <ControlledNumberInput
-        name={`pricings.${index}.lowestPriceNet`}
-        required
-        control={control}
-        afterChange={(value) => {
-          if (value != null) {
-            setValue(`pricings.${index}.lowestPrice`, addTax(value, taxPercentage));
-          }
-        }}
-        label={t("label.lowestPriceNet")}
-        min={0}
-        errorText={getTranslatedError(t, errors.pricings?.[index]?.lowestPriceNet?.message)}
       />
       <ControlledNumberInput
         required
         name={`pricings.${index}.lowestPrice`}
         control={control}
-        afterChange={(value) => {
-          if (value != null) {
-            setValue(`pricings.${index}.lowestPriceNet`, removeTax(value, taxPercentage));
-          }
-        }}
         label={t("label.lowestPrice")}
         tooltipText={t("tooltip.lowestPrice")}
         min={0}
         errorText={getTranslatedError(t, errors.pricings?.[index]?.lowestPrice?.message)}
       />
-      <ControlledNumberInput
-        name={`pricings.${index}.highestPriceNet`}
-        required
-        control={control}
-        afterChange={(value) => {
-          if (value != null) {
-            setValue(`pricings.${index}.highestPrice`, addTax(value, taxPercentage));
-          }
-        }}
-        label={t("label.highestPriceNet")}
-        min={0}
-        errorText={getTranslatedError(t, errors.pricings?.[index]?.highestPriceNet?.message)}
+      <TextInput
+        id={`pricings.${index}.lowestPriceNet`}
+        label={t("label.lowestPriceNet")}
+        helperText={t("label.netPriceHelperText")}
+        value={formatNetPrice(pricing.lowestPrice, taxPercentage)}
+        readOnly
       />
       <ControlledNumberInput
         name={`pricings.${index}.highestPrice`}
         required
         control={control}
-        afterChange={(value) => {
-          if (value != null) {
-            setValue(`pricings.${index}.highestPriceNet`, removeTax(value, taxPercentage));
-          }
-        }}
         label={t("label.highestPrice")}
         tooltipText={t("tooltip.highestPrice")}
         min={0}
         errorText={getTranslatedError(t, errors.pricings?.[index]?.highestPrice?.message)}
+      />
+      <TextInput
+        id={`pricings.${index}.highestPriceNet`}
+        label={t("label.highestPriceNet")}
+        helperText={t("label.netPriceHelperText")}
+        value={formatNetPrice(pricing.highestPrice, taxPercentage)}
+        readOnly
       />
       <ControlledSelect
         // This is not pricing type specific
