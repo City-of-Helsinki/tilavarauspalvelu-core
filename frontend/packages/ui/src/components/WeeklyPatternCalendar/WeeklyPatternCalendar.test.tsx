@@ -31,7 +31,6 @@ function Harness({ initial = [], onChange, ...overrides }: Overrides) {
         step={30}
         availability={availability}
         brush={primary}
-        locale="en"
         getStateLabel={(cell) => (cell.data ? cell.data.priority : cell.availability === "open" ? "free" : "closed")}
         getCellAppearance={(data) => (data.priority === "primary" ? "primary" : "secondary")}
         announcements={{ painted: "Added", erased: "Removed" }}
@@ -51,15 +50,15 @@ describe("WeeklyPatternCalendar", () => {
     render(<Harness />);
     expect(screen.getByRole("grid", { name: "Suitable times" })).toBeInTheDocument();
     expect(screen.getAllByRole("columnheader")).toHaveLength(7);
-    expect(cell(/^Monday, 08:00–08:30, free$/)).toBeInTheDocument();
-    expect(cell(/^Wednesday, 08:00–08:30, closed$/)).toHaveAttribute("aria-disabled", "true");
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30, free$/)).toBeInTheDocument();
+    expect(cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30, closed$/)).toHaveAttribute("aria-disabled", "true");
   });
 
   test("only one cell is in the tab order", () => {
     render(<Harness />);
     const tabbable = screen.getAllByRole("gridcell").filter((element) => element.getAttribute("tabindex") === "0");
     expect(tabbable).toHaveLength(1);
-    expect(tabbable[0]).toHaveAccessibleName(/^Monday, 08:00–08:30/);
+    expect(tabbable[0]).toHaveAccessibleName(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
   });
 
   test("Enter paints the cell, announces it, and Enter again erases it", async () => {
@@ -67,16 +66,16 @@ describe("WeeklyPatternCalendar", () => {
     const user = userEvent.setup();
     render(<Harness onChange={onChange} />);
 
-    cell(/^Monday, 08:00–08:30/).focus();
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
     await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenLastCalledWith([
       { weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 510, data: primary },
     ]);
-    expect(screen.getByRole("status")).toHaveTextContent("Added: Monday, 08:00–08:30");
+    expect(screen.getByRole("status")).toHaveTextContent("Added: common:weekdayLongEnum.MONDAY, 08:00–08:30");
 
     await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenLastCalledWith([]);
-    expect(screen.getByRole("status")).toHaveTextContent("Removed: Monday, 08:00–08:30");
+    expect(screen.getByRole("status")).toHaveTextContent("Removed: common:weekdayLongEnum.MONDAY, 08:00–08:30");
   });
 
   test("Shift+ArrowDown extends a run, announcing the whole span", async () => {
@@ -84,30 +83,30 @@ describe("WeeklyPatternCalendar", () => {
     const user = userEvent.setup();
     render(<Harness onChange={onChange} />);
 
-    cell(/^Monday, 08:00–08:30/).focus();
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
     await user.keyboard("{Shift>}{ArrowDown}{ArrowDown}{/Shift}");
     expect(onChange).toHaveBeenLastCalledWith([
       { weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 570, data: primary },
     ]);
-    expect(screen.getByRole("status")).toHaveTextContent("Added: Monday, 08:00–09:30");
+    expect(screen.getByRole("status")).toHaveTextContent("Added: common:weekdayLongEnum.MONDAY, 08:00–09:30");
   });
 
   test("the first cell of a run is named after the whole run", () => {
     render(<Harness initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 540, data: primary }]} />);
-    expect(cell(/^Monday, 08:00–09:00, primary$/)).toHaveAttribute("aria-selected", "true");
-    expect(cell(/^Monday, 08:30–09:00, primary$/)).toHaveAttribute("aria-selected", "true");
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–09:00, primary$/)).toHaveAttribute("aria-selected", "true");
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00, primary$/)).toHaveAttribute("aria-selected", "true");
   });
 
   test("every cell of a long run has its own accessible name", () => {
     render(<Harness initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 600, data: primary }]} />);
     const names = screen
-      .getAllByRole("gridcell", { name: /^Monday, .*primary$/ })
+      .getAllByRole("gridcell", { name: /^common:weekdayLongEnum.MONDAY, .*primary$/ })
       .map((element) => element.getAttribute("aria-label"));
     expect(names).toEqual([
-      "Monday, 08:00–10:00, primary",
-      "Monday, 08:30–09:00, primary",
-      "Monday, 09:00–09:30, primary",
-      "Monday, 09:30–10:00, primary",
+      "common:weekdayLongEnum.MONDAY, 08:00–10:00, primary",
+      "common:weekdayLongEnum.MONDAY, 08:30–09:00, primary",
+      "common:weekdayLongEnum.MONDAY, 09:00–09:30, primary",
+      "common:weekdayLongEnum.MONDAY, 09:30–10:00, primary",
     ]);
   });
 
@@ -121,7 +120,7 @@ describe("WeeklyPatternCalendar", () => {
         onChange={onChange}
       />
     );
-    cell(/^Monday, 08:00–08:30/).focus();
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
     await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenLastCalledWith([
       { weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 510, data: secondary },
@@ -133,7 +132,7 @@ describe("WeeklyPatternCalendar", () => {
     const user = userEvent.setup();
     render(<Harness onChange={onChange} isValidSelection={() => "Too short"} />);
 
-    cell(/^Monday, 08:00–08:30/).focus();
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
     await user.keyboard("{Enter}");
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.getByRole("status")).toHaveTextContent("Too short");
@@ -148,7 +147,7 @@ describe("WeeklyPatternCalendar", () => {
         onChange={onChange}
       />
     );
-    const stale = cell(/^Wednesday, 08:00–08:30, primary$/);
+    const stale = cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30, primary$/);
     expect(stale).toHaveAttribute("aria-disabled", "true");
 
     stale.focus();
@@ -158,14 +157,14 @@ describe("WeeklyPatternCalendar", () => {
 
   test("painted times outside the opening hours extend the grid", () => {
     render(<Harness initial={[{ weekday: Weekday.Monday, beginMinutes: 360, endMinutes: 390, data: primary }]} />);
-    expect(cell(/^Monday, 06:00–06:30, primary$/)).toBeInTheDocument();
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 06:00–06:30, primary$/)).toBeInTheDocument();
   });
 
   test("read-only grids cannot be edited", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
     render(<Harness readOnly onChange={onChange} />);
-    cell(/^Monday, 08:00–08:30/).focus();
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
     await user.keyboard("{Enter}");
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.getByRole("grid")).toHaveAttribute("aria-readonly", "true");
@@ -175,7 +174,7 @@ describe("WeeklyPatternCalendar", () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
     render(<Harness onChange={onChange} />);
-    cell(/^Wednesday, 08:00–08:30/).focus();
+    cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30/).focus();
     await user.keyboard("{Enter}");
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -187,16 +186,19 @@ describe("WeeklyPatternCalendar", () => {
 
     test("cells are open, closed or unavailable, and only unavailable cells are disabled", () => {
       render(<Harness paintable={paintable} getStateLabel={label} />);
-      expect(cell(/^Monday, 08:00–08:30, open$/)).not.toHaveAttribute("aria-disabled");
-      expect(cell(/^Wednesday, 08:00–08:30, closed$/)).not.toHaveAttribute("aria-disabled");
-      expect(cell(/^Wednesday, 09:00–09:30, unavailable$/)).toHaveAttribute("aria-disabled", "true");
+      expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30, open$/)).not.toHaveAttribute("aria-disabled");
+      expect(cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30, closed$/)).not.toHaveAttribute("aria-disabled");
+      expect(cell(/^common:weekdayLongEnum.WEDNESDAY, 09:00–09:30, unavailable$/)).toHaveAttribute(
+        "aria-disabled",
+        "true"
+      );
     });
 
     test("closed cells inside them can be painted", async () => {
       const onChange = vi.fn();
       const user = userEvent.setup();
       render(<Harness paintable={paintable} getStateLabel={label} onChange={onChange} />);
-      cell(/^Wednesday, 08:00–08:30/).focus();
+      cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30/).focus();
       await user.keyboard("{Enter}");
       expect(onChange).toHaveBeenLastCalledWith([
         { weekday: Weekday.Wednesday, beginMinutes: 480, endMinutes: 510, data: primary },
@@ -207,11 +209,11 @@ describe("WeeklyPatternCalendar", () => {
       const onChange = vi.fn();
       const user = userEvent.setup();
       render(<Harness paintable={paintable} getStateLabel={label} onChange={onChange} />);
-      cell(/^Wednesday, 09:00–09:30/).focus();
+      cell(/^common:weekdayLongEnum.WEDNESDAY, 09:00–09:30/).focus();
       await user.keyboard("{Enter}");
       expect(onChange).not.toHaveBeenCalled();
 
-      cell(/^Wednesday, 08:30–09:00/).focus();
+      cell(/^common:weekdayLongEnum.WEDNESDAY, 08:30–09:00/).focus();
       await user.keyboard("{Shift>}{ArrowDown}{/Shift}");
       expect(onChange).toHaveBeenLastCalledWith([
         { weekday: Weekday.Wednesday, beginMinutes: 510, endMinutes: 540, data: primary },

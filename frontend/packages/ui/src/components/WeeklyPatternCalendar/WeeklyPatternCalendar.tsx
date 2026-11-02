@@ -7,6 +7,8 @@
 
 import React, { forwardRef, useImperativeHandle, useMemo } from "react";
 import type { ForwardedRef, ReactElement, Ref } from "react";
+import { useTranslation } from "next-i18next/pages";
+import type { TFunction } from "i18next";
 import { WEEKDAYS_SORTED } from "@ui/modules/const";
 import { formatTimeRange, minutesToHoursString } from "@ui/modules/date-utils";
 import type { Weekday } from "../../../gql/gql-types";
@@ -35,11 +37,12 @@ function formatRange(beginMinutes: number, endMinutes: number): string {
   return `${formatClock(beginMinutes)}–${formatClock(endMinutes)}`;
 }
 
-// Monday 1 January 2024, so WEEKDAYS_SORTED's index is the day offset.
-function weekdayNames(locale: string, style: "long" | "short"): Record<Weekday, string> {
-  const formatter = new Intl.DateTimeFormat(locale, { weekday: style, timeZone: "UTC" });
+function weekdayNames(style: "long" | "short", t: TFunction): Record<Weekday, string> {
   return Object.fromEntries(
-    WEEKDAYS_SORTED.map((weekday, offset) => [weekday, formatter.format(new Date(Date.UTC(2024, 0, 1 + offset)))])
+    WEEKDAYS_SORTED.map((weekday) => [
+      weekday,
+      t(`common:weekday${style === "long" ? "Long" : "Short"}Enum.${weekday}`),
+    ])
   ) as Record<Weekday, string>;
 }
 
@@ -47,6 +50,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
   props: WeeklyPatternCalendarProps<TData>,
   ref: ForwardedRef<WeeklyPatternHandle>
 ): ReactElement {
+  const { t } = useTranslation("application");
   const {
     value,
     onChange = NOOP,
@@ -62,7 +66,6 @@ function WeeklyPatternTable<TData extends CalendarData>(
     brush,
     isDataEqual,
     isValidSelection,
-    locale,
     getStateLabel,
     getCellAppearance,
     getCellProps,
@@ -72,7 +75,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     ...tableAttributes
   } = props;
 
-  const longNames = useMemo(() => weekdayNames(locale, "long"), [locale]);
+  const longNames = useMemo(() => weekdayNames("long", t), [t]);
 
   const grid = useWeeklyPatternCalendar({
     value,

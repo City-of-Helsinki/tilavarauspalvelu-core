@@ -111,13 +111,9 @@ function createMockSubmitValues(
   };
 }
 
-// The mocked language is Finnish and the mocked t() returns the key, so the labels are predictable.
+// The mocked t() returns the key, so the weekday name is its translation key.
 function weekdayLabel(day: Weekday): string {
-  const monday = Date.UTC(2024, 0, 1);
-  const offset = WEEKDAYS_SORTED.indexOf(day);
-  return new Intl.DateTimeFormat("fi", { weekday: "long", timeZone: "UTC" }).format(
-    new Date(monday + offset * 86_400_000)
-  );
+  return `common:weekdayLongEnum.${day}`;
 }
 
 // The first cell of a painted run is named after the whole run, so pass its end.
