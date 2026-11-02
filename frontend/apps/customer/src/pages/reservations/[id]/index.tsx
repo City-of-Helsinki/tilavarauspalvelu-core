@@ -211,7 +211,9 @@ function Reservation({
       params.get("error_code") === "RESERVATION_PAYMENT_ORDER_PAST_DUE_BY" ||
       params.get("error_code") === "RESERVATION_PAYMENT_NOT_PENDING"
         ? t("reservation:reservationNoLongerPayable")
-        : params.get("error_message") || t("error:genericError"),
+        : params.get("error_code") === "TAX_LEVEL_HAS_NO_RATE"
+          ? t("errors:api.validation.TAX_LEVEL_HAS_NO_RATE")
+          : params.get("error_message") || t("error:genericError"),
     type: "error",
   });
 
