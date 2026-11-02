@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import math
 import random
 import uuid
 from typing import TYPE_CHECKING
@@ -161,8 +162,9 @@ def _create_normal_reservations(
         # Space out reservations such that no reservation's buffers overlap with its
         # next or previous reservation's reservable time (buffers may still overlap).
         max_buffer = max(reservation_unit.buffer_time_before, reservation_unit.buffer_time_after)
-        min_interval_hours = max(int(max_buffer.total_seconds() / 3600), 1 if busy else 5)
-        max_interval_hours = max(min_interval_hours + 1, 3 if busy else 10)
+        max_buffer_hours = math.ceil(max_buffer.total_seconds() / 3600)
+        min_gap_hours = max(max_buffer_hours, 0 if busy else 2)
+        max_gap_hours = max(min_gap_hours + 1, 2 if busy else 5)
 
         pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
@@ -237,7 +239,9 @@ def _create_normal_reservations(
                     payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
                     payment_orders.append(payment_order)
 
-                begin_datetime += datetime.timedelta(hours=random.randint(min_interval_hours, max_interval_hours))
+                gap_hours = random.randint(min_gap_hours, max_gap_hours)
+                gap = datetime.timedelta(hours=gap_hours)
+                begin_datetime = reservation.ends_at + gap
 
     ReservationUnit.objects.bulk_update(reservation_units, fields=["name", "name_fi", "name_en", "name_sv"])
     Reservation.objects.bulk_create(reservations)
