@@ -196,6 +196,7 @@ def _create_normal_reservations(
 
                 if can_apply_for_discount:
                     applying_for_free_of_charge = random.choice([True, False])
+                    free_of_charge_reason = None
                     if applying_for_free_of_charge:
                         free_of_charge_reason = "Reason for applying for free of charge"
 
