@@ -191,6 +191,27 @@ def test_create_robot_test_data():
     assert GeneralRole.objects.count() == 1
 
 
+@pytest.mark.usefixtures("clear_robot_test_data_flags")
+def test_create_robot_test_data__lock_expires_after_task_time_limit(settings):
+    settings.CELERY_TASK_TIME_LIMIT = 300
+
+    lock_exists: list[bool] = []
+
+    with freeze_time(local_datetime(2025, 1, 1, 12)) as frozen_time:
+
+        def create_data() -> None:
+            frozen_time.tick(299)
+            lock_exists.append(cache.get(key=settings.ROBOT_TEST_DATA_LOCK_KEY) is not None)
+
+            frozen_time.tick(2)
+            lock_exists.append(cache.get(key=settings.ROBOT_TEST_DATA_LOCK_KEY) is not None)
+
+        with patch("tilavarauspalvelu.tasks.create_robot_test_data", side_effect=create_data):
+            create_robot_test_data_task.delay()
+
+    assert lock_exists == [True, False]
+
+
 @pytest.mark.slow
 @pytest.mark.django_db
 @freeze_time(local_datetime(2030, 1, 1, 12))
