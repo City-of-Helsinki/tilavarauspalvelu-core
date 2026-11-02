@@ -833,7 +833,6 @@ def _create_allocated_time_slots_for_section(
     - Check previous allocations for the same application section, and don't allow overlapping ones
     - Allocate only once per weekday, or twice if the applicant applied for morning and evening
     - Allocate at least the minimum duration of the reservation unit, but not more than the section allows
-    - If enough allocations cannot be made, mark all reservation unit options as locked
 
     Note that in actual allocation process there are more rules regarding the order
     in which allocations are made, which is not implemented here.
