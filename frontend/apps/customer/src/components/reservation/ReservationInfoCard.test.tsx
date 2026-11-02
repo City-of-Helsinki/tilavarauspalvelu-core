@@ -116,10 +116,10 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
           lowestPrice: "0.0",
           priceUnit: PriceUnit.PerHour,
           paymentType: PaymentType.OnlineOrInvoice,
-          taxPercentage: {
+          taxLevel: {
             id: "123",
             pk: 123,
-            value: "25.5",
+            currentPercentage: "25.5",
           },
           materialPriceDescriptionFi: "Testimateriaali",
           materialPriceDescriptionEn: "Test material",

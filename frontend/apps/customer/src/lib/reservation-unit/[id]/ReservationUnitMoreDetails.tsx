@@ -154,7 +154,8 @@ function PriceChangeNotice({ futurePricing }: Readonly<{ futurePricing: PricingF
   const { t, i18n } = useTranslation();
 
   const isPaid = !isPriceFree(futurePricing);
-  const taxPercentage = toNumber(futurePricing.taxPercentage.value) ?? 0;
+  // The VAT of a reservation is the rate on the day of sale, so this is the rate for a reservation made today
+  const taxPercentage = toNumber(futurePricing.taxLevel.currentPercentage) ?? 0;
   const begins = parseApiDate(futurePricing.begins);
   const priceString = getPriceString({
     t,
