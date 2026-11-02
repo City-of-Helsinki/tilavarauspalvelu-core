@@ -7,6 +7,7 @@ import functools
 import itertools
 import operator
 import random
+from contextlib import contextmanager
 from enum import StrEnum
 from functools import wraps
 from pathlib import Path
@@ -94,6 +95,22 @@ def with_logs[**P, T](func: Callable[P, T]) -> Callable[P, T]:
     return wrapper
 
 
+@contextmanager
+def turn_off_signal_updates() -> Generator[None]:
+    """
+    Turn off the updates that signals run after data changes.
+    The caller must run the necessary updates once after the data creation.
+    """
+    with override_settings(
+        UPDATE_AFFECTING_TIME_SPANS=False,
+        UPDATE_RESERVATION_UNIT_HIERARCHY=False,
+        SAVE_RESERVATION_STATISTICS=False,
+        UPDATE_SEARCH_VECTORS=False,
+        REBUILD_SPACE_HIERARCHY=False,
+    ):
+        yield
+
+
 def defer_reservation_unit_create_operations[**P](func: Callable[P, None]) -> Callable[P, None]:
     """
     Defer some operations that would trigger from reservation unit and space creation through signals.
@@ -102,13 +119,7 @@ def defer_reservation_unit_create_operations[**P](func: Callable[P, None]) -> Ca
 
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
-        with override_settings(
-            UPDATE_AFFECTING_TIME_SPANS=False,
-            UPDATE_RESERVATION_UNIT_HIERARCHY=False,
-            SAVE_RESERVATION_STATISTICS=False,
-            UPDATE_SEARCH_VECTORS=False,
-            REBUILD_SPACE_HIERARCHY=False,
-        ):
+        with turn_off_signal_updates():
             func(*args, **kwargs)
             print("Rebuilding space hierarchy...")  # noqa: T201
             Space.objects.rebuild()
