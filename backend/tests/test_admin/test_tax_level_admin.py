@@ -11,7 +11,7 @@ from tilavarauspalvelu.enums import AccessType, PaymentType, PriceUnit, TermsOfU
 from tilavarauspalvelu.models import ReservationUnitPricing, TaxLevel, TaxLevelRate
 from utils.date_utils import local_date
 
-from tests.factories import ReservationUnitFactory, TaxLevelFactory, TermsOfUseFactory, UserFactory
+from tests.factories import ReservationUnitFactory, TaxLevelFactory, TaxLevelRateFactory, TermsOfUseFactory, UserFactory
 from tests.test_admin.helpers import (
     collect_admin_form_errors,
     management_form_data,
@@ -296,6 +296,57 @@ def test_tax_level_admin__locked_rates__change_rate_that_begins_today(api_client
 
     rates = list(TaxLevelRate.objects.filter(tax_level=tax_level).values_list("begins", "percentage"))
     assert rates == [(local_date(), Decimal("25.5"))]
+
+
+# ── List ──
+
+
+def test_tax_level_admin__list__current_and_next_percentage(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    tomorrow = local_date() + datetime.timedelta(days=1)
+    next_week = local_date() + datetime.timedelta(days=7)
+
+    tax_level = TaxLevelFactory.create(rates__percentage=Decimal(24))
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=next_week, percentage=Decimal(30))
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=tomorrow, percentage=Decimal("25.5"))
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_changelist")
+    response = api_client.get(path=url)
+
+    assert response.status_code == 200
+
+    model_admin = response.context["cl"].model_admin
+    rows = [
+        [
+            model_admin.current_percentage(tax_level),
+            model_admin.next_percentage(tax_level),
+            model_admin.next_percentage_begins(tax_level),
+        ]
+        for tax_level in response.context["cl"].result_list
+    ]
+    assert rows == [["24.00%", "25.50%", tomorrow]]
+
+
+def test_tax_level_admin__list__no_next_percentage(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+
+    TaxLevelFactory.create(rates__percentage=Decimal(24))
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_changelist")
+    response = api_client.get(path=url)
+
+    assert response.status_code == 200
+
+    model_admin = response.context["cl"].model_admin
+    rows = [
+        [
+            model_admin.current_percentage(tax_level),
+            model_admin.next_percentage(tax_level),
+            model_admin.next_percentage_begins(tax_level),
+        ]
+        for tax_level in response.context["cl"].result_list
+    ]
+    assert rows == [["24.00%", "-", None]]
 
 
 # ── Pricings ──
