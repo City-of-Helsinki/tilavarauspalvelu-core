@@ -300,6 +300,18 @@ def test_create_robot_test_data__users_have_the_robot_password(settings):
 
 @pytest.mark.slow
 @pytest.mark.django_db
+def test_create_robot_test_data__each_space_is_its_own_tree():
+    create_robot_test_data_task.delay()
+
+    tree_fields = list(Space.objects.values_list("parent", "lft", "rght", "level"))
+    tree_ids = set(Space.objects.values_list("tree_id", flat=True))
+
+    assert tree_fields == [(None, 1, 2, 0)] * 23
+    assert len(tree_ids) == 23
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
 def test_remove_existing_data():
     create_robot_test_data_task.delay()
     remove_existing_data()
