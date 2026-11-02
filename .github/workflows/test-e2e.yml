@@ -1,0 +1,73 @@
+name: "E2E checks"
+
+# Checks the e2e suite without the test environment: lint, format, that all tests load, and the self-test
+on:
+  push:
+    paths:
+      - e2e/**
+      - .github/workflows/test-e2e.yml
+    branches:
+      - main
+  pull_request:
+    paths:
+      - e2e/**
+      - .github/workflows/test-e2e.yml
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 24
+  PNPM_VERSION: 11.3.0
+
+jobs:
+  check-e2e:
+    name: E2E lint and self-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: e2e
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: e2e/pnpm-lock.yaml
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Lint
+        run: |
+          pnpm lint
+          pnpm format:check
+
+      - name: Check that all tests load
+        run: pnpm run list
+
+      - name: Install browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Self-test
+        run: pnpm selftest
+
+      - name: Upload self-test report
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-selftest-report-${{ github.run_number }}
+          path: e2e/playwright-report/
+          retention-days: 7

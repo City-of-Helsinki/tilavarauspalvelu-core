@@ -1,0 +1,131 @@
+name: "E2E tests"
+run-name: "E2E tests: ${{ inputs.test_suite }}, ${{ inputs.execution_mode }}"
+
+# Runs the e2e suite against the test environment (https://varaamo.test.hel.ninja/), only when started by hand
+on:
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: "Test suite to run"
+        required: true
+        default: "All Tests"
+        type: choice
+        options:
+          - All Tests
+          - Smoke
+          - Tests_user_desktop_FI
+          - Tests_user_mobile_iphone_FI
+          - Tests_user_mobile_android_FI
+          - Tests_users_with_admin_desktop
+          - Tests_admin_desktop_FI
+          - Tests_admin_notifications_serial
+      execution_mode:
+        description: "Parallel workers, or one worker with shared users"
+        required: true
+        default: "parallel"
+        type: choice
+        options:
+          - parallel
+          - sequential
+
+# One run at a time: each run deletes and creates the shared test data again
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 24
+  PNPM_VERSION: 11.3.0
+
+jobs:
+  run-e2e:
+    name: E2E tests
+    runs-on: ubuntu-latest
+    # A sequential run of all tests takes the longest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: e2e
+    env:
+      # The reservation times and the summary's times in Helsinki time
+      TZ: Europe/Helsinki
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: e2e/pnpm-lock.yaml
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Install browsers
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Run tests
+        env:
+          SUITE: ${{ inputs.test_suite }}
+          MODE: ${{ inputs.execution_mode }}
+          # The Robot suite's CI ran 3 processes; a GitHub runner has 4 CPUs
+          WORKERS: 3
+          WAF_BYPASS_SECRET: ${{ secrets.WAF_BYPASS_SECRET }}
+          ROBOT_API_TOKEN: ${{ secrets.ROBOT_API_TOKEN }}
+          DJANGO_ADMIN_PASSWORD: ${{ secrets.DJANGO_ADMIN_PASSWORD }}
+        run: |
+          missing=""
+          for name in WAF_BYPASS_SECRET ROBOT_API_TOKEN DJANGO_ADMIN_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              missing="$missing $name"
+            fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing"
+            exit 1
+          fi
+
+          if [ "$MODE" = "sequential" ]; then
+            export FORCE_SINGLE_USER=True WORKERS=1
+          fi
+
+          case "$SUITE" in
+            "All Tests") pnpm test:all ;;
+            Smoke) pnpm test:smoke ;;
+            Tests_admin_notifications_serial) pnpm test:notifications ;;
+            *) pnpm exec playwright test --project "$SUITE" ;;
+          esac
+
+      - name: Write summary
+        if: ${{ !cancelled() }}
+        run: |
+          for report in playwright-report playwright-report/notifications; do
+            if [ -f "$report/index.html" ]; then
+              {
+                echo '```'
+                python3 tools/report_summary.py "$report"
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      # HAR files and traces are for local debugging only (see e2e/README.md)
+      - name: Upload reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-reports-${{ github.run_number }}
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+            !e2e/test-results/**/*.har
+            !e2e/test-results/**/trace.zip
+          retention-days: 30

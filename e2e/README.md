@@ -169,6 +169,19 @@ pnpm lint      # oxlint with type checking, with the frontend's rules
 pnpm selftest  # the runtime and the keywords that need no test environment, against local pages
 ```
 
+The "E2E checks" workflow (`.github/workflows/test-e2e.yml`) runs these, `pnpm format:check` and `pnpm run list`
+for pull requests and pushes to `main` that change `e2e/`.
+
+## GitHub Actions
+
+The "E2E tests" workflow (`.github/workflows/run-e2e.yml`) runs the suite against the test environment. Start it in
+the Actions tab and pick the suite ("All Tests" is `pnpm test:all`) and the mode (sequential is one worker with
+shared users).
+
+- It runs 3 workers, and one run at a time, because each run creates the test data again.
+- The run's summary shows the `report_summary.py` output. The reports are in its `e2e-reports-<run number>`
+  artifact for 30 days.
+
 ## Reading a run's results
 
 `python3 tools/report_summary.py [playwright-report]` prints the run's totals and warnings, and each failed or
