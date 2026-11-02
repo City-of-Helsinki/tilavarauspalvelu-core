@@ -563,7 +563,6 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         ...PricingFields
         lowestPriceNet
         highestPriceNet
-        isActivatedOnBegins
       }
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlots
