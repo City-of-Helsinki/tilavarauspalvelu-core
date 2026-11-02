@@ -61,11 +61,6 @@ def create_test_data(*, flush: bool = True, number_of_days_that_have_reservation
         age_groups=age_groups,
     )
 
-    _create_unit_groups()
-
-    _set_user_group_permissions()
-    _set_user_roles()
-
     _create_application_rounds(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
@@ -75,6 +70,12 @@ def create_test_data(*, flush: bool = True, number_of_days_that_have_reservation
     _create_periodic_tasks()
 
     _create_caisa()
+
+    # Create these last, so that they include every unit.
+    _create_unit_groups()
+
+    _set_user_group_permissions()
+    _set_user_roles()
 
 
 @with_logs
