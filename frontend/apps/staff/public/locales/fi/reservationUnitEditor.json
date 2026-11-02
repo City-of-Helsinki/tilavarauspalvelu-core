@@ -48,6 +48,7 @@
     "paymentType": "Maksutapa",
     "priceUnit": "Hinnan yksikkö",
     "taxLevel": "Verotaso",
+    "netPriceHelperText": "Laskettu verotason tämän päivän alv-prosentilla",
     "reservationPendingInstructionsEn": "Varausvahvistuksen lisäohjeteksti englanniksi",
     "reservationPendingInstructionsFi": "Varausvahvistuksen lisäohjeteksti suomeksi",
     "reservationPendingInstructionsSv": "Varausvahvistuksen lisäohjeteksti ruotsiksi",

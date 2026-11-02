@@ -61,11 +61,8 @@ const PricingFormSchema = z.object({
   // on the frontend pk <= 0 is a new pricing
   pk: z.number(),
   taxLevel: z.number(),
-  // net price is never sent to backend (but we want to keep it in the UI)
   lowestPrice: z.number({ error: "Required" }),
-  lowestPriceNet: z.number({ error: "Required" }),
   highestPrice: z.number({ error: "Required" }),
-  highestPriceNet: z.number({ error: "Required" }),
   priceUnit: z.enum(PriceUnit).nullable(),
   paymentType: z.enum(PaymentType).nullable(),
   // NOTE this has to be a string because of HDS date input in ui format: "d.M.yyyy"
@@ -120,7 +117,7 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
   }
 
   if (data.isPaid) {
-    const { lowestPrice, highestPrice, lowestPriceNet, highestPriceNet } = data;
+    const { lowestPrice, highestPrice } = data;
 
     if (Number.isNaN(lowestPrice)) {
       ctx.addIssue({
@@ -133,20 +130,6 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
       ctx.addIssue({
         message: "must be a number",
         path: [`${path}.highestPrice`],
-        code: "custom",
-      });
-    }
-    if (Number.isNaN(lowestPriceNet)) {
-      ctx.addIssue({
-        message: "must be a number",
-        path: [`${path}.lowestPriceNet`],
-        code: "custom",
-      });
-    }
-    if (Number.isNaN(highestPriceNet)) {
-      ctx.addIssue({
-        message: "must be a number",
-        path: [`${path}.highestPriceNet`],
         code: "custom",
       });
     }
@@ -778,15 +761,11 @@ function convertBegins(begins?: string) {
 type PricingNode = NonNullable<Node["pricings"]>[0];
 
 function convertPricing(p?: PricingNode): PricingFormValues {
-  const lowestPriceNet = Math.floor(100 * (toNumber(p?.lowestPriceNet) ?? 0)) / 100;
-  const highestPriceNet = Math.floor(100 * (toNumber(p?.highestPriceNet) ?? 0)) / 100;
   return {
     pk: p?.pk ?? 0,
     taxLevel: p?.taxLevel?.pk ?? 0,
     lowestPrice: toNumber(p?.lowestPrice) ?? 0,
     highestPrice: toNumber(p?.highestPrice) ?? 0,
-    lowestPriceNet,
-    highestPriceNet,
     isPaid: (toNumber(p?.highestPrice) ?? 0) > 0,
     isFuture: new Date(p?.begins ?? "") > new Date(),
     priceUnit: p?.priceUnit ?? null,
@@ -821,9 +800,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
       pk: rollingIndex--,
       taxLevel: 0,
       lowestPrice: 0,
-      lowestPriceNet: 0,
       highestPrice: 0,
-      highestPriceNet: 0,
       isFuture,
       isPaid: false,
       priceUnit: null,
