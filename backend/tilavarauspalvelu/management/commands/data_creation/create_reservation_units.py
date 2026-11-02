@@ -1624,7 +1624,7 @@ def _create_reservation_units_in_resource_hierarchies(
     kitchen = SpaceFactory.build_for_bulk_create(
         name="Konttorin keittiö",
         name_fi="Konttorin keittiö",
-        name_en="Office kichen",
+        name_en="Office kitchen",
         name_sv="Kontors kök",
         unit=unit,
     )
