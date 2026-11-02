@@ -23,15 +23,15 @@ import type {
   ShowNotificationsListQuery,
   ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
+import { Layout } from "@/components/Layout";
 import { PageWrapper } from "@/components/PageWrapper";
 import { EnvContextProvider } from "@/context/EnvContext";
 import { ModalContextProvider } from "@/context/ModalContext";
 import { getHandlingDataVariables } from "@/hooks/useHandling";
 import { createClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import type { StaffEnvConfig } from "@/modules/serverUtils";
 import "../styles/global.scss";
-import Layout from "./layout";
+import type { StaffEnvConfig } from "@/modules/serverUtils";
 
 // suppress useLayoutEffect warnings on SSR till it's fixed upstream in HDS
 if (typeof window === "undefined") React.useLayoutEffect = () => {};
@@ -54,12 +54,14 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   // -> render the component without currentUser
   // -> run useEffect
   // -> redraw component with currentUser
-  apolloClient.writeQuery({
-    query: CurrentUserDocument,
-    data: {
-      currentUser,
-    },
-  });
+  if (currentUser !== undefined) {
+    apolloClient.writeQuery({
+      query: CurrentUserDocument,
+      data: {
+        currentUser,
+      },
+    });
+  }
   if (handlingData) {
     apolloClient.writeQuery({
       query: HandlingDataDocument,
@@ -98,7 +100,8 @@ function formatUrlPath(router: Router): string {
 }
 
 type AppOwnProps = {
-  currentUser: CurrentUserQuery["currentUser"];
+  // undefined when getInitialProps runs in the browser, so the cached user is kept
+  currentUser: CurrentUserQuery["currentUser"] | undefined;
   handlingData: HandlingDataQuery | null;
   handlingVariables: HandlingDataQueryVariables | null;
   notificationsData: ShowNotificationsListQuery | null;
@@ -112,8 +115,35 @@ type AppOwnProps = {
 MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppInitialProps> => {
   const ctx = await App.getInitialProps(context);
 
+  // Next.js runs this in the browser on client navigation to a page without getServerSideProps.
+  // Server env is empty in the browser, so reuse the env of the first server render.
+  // The Apollo cache already has the user and navigation data, so do not query them again.
+  if (typeof window !== "undefined") {
+    return {
+      ...ctx,
+      envConfig: window.__NEXT_DATA__.props.envConfig,
+      currentUser: undefined,
+      handlingData: null,
+      handlingVariables: null,
+      notificationsData: null,
+    };
+  }
+
   const commonProps = await getCommonServerSideProps();
   triggerServerError(commonProps.isErrorTriggerEnabled, context.ctx);
+
+  // The proxy shows 503 when the backend is down, so do not query it
+  if (context.router.pathname === "/503") {
+    return {
+      ...ctx,
+      envConfig: commonProps,
+      currentUser: null,
+      handlingData: null,
+      handlingVariables: null,
+      notificationsData: null,
+    };
+  }
+
   const client = createClient(commonProps.apiBaseUrl, context.ctx.req);
 
   try {

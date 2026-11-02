@@ -50,8 +50,8 @@ importers:
         specifier: ^6.1.2
         version: 6.1.2(graphql@16.14.2)
       '@graphql-codegen/typescript-operations':
-        specifier: ^6.1.10
-        version: 6.1.10(graphql@16.14.2)
+        specifier: ^6.2.0
+        version: 6.2.0(graphql@16.14.2)
       '@graphql-codegen/typescript-react-apollo':
         specifier: ^5.0.0
         version: 5.0.0(graphql@16.14.2)
@@ -96,7 +96,7 @@ importers:
         version: 3.14.1(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(graphql@16.14.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@hookform/resolvers':
         specifier: 6.0.0
-        version: 6.0.0(@sinclair/typebox@0.34.52)(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.7)
+        version: 6.0.0(@sinclair/typebox@0.34.52)(ajv@8.20.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.7)
       '@sentry/core':
         specifier: ^10.76.2
         version: 10.76.2
@@ -113,14 +113,14 @@ importers:
         specifier: ^16.14.1
         version: 16.14.1
       hds-core:
-        specifier: ^6.0.6
-        version: 6.0.6
+        specifier: ^6.0.7
+        version: 6.0.7
       hds-react:
-        specifier: ^6.0.6
-        version: 6.0.6(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^6.0.7
+        version: 6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18next:
-        specifier: ^26.5.6
-        version: 26.5.6(typescript@7.0.2)
+        specifier: ^26.5.11
+        version: 26.5.11(typescript@7.0.2)
       import-in-the-middle:
         specifier: ^3.5.2
         version: 3.5.2
@@ -134,8 +134,8 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
       next-i18next:
-        specifier: ^16.4.1
-        version: 16.4.1(@types/react@19.3.0)(i18next@26.5.6(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.3(i18next@26.5.6(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
+        specifier: ^16.4.3
+        version: 16.4.3(@types/react@19.3.0)(i18next@26.5.11(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.9(i18next@26.5.11(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
       nuka-carousel:
         specifier: ^7.0.0
         version: 7.0.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -146,8 +146,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
       react-hook-form:
-        specifier: 7.90.0
-        version: 7.90.0(@types/react@19.3.0)(react@19.3.0)
+        specifier: 7.91.0
+        version: 7.91.0(@types/react@19.3.0)(react@19.3.0)
       react-transition-group:
         specifier: ^4.4.5
         version: 4.4.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -244,7 +244,7 @@ importers:
         version: 3.14.1(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(graphql@16.14.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@hookform/resolvers':
         specifier: 6.0.0
-        version: 6.0.0(@sinclair/typebox@0.34.52)(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.7)
+        version: 6.0.0(@sinclair/typebox@0.34.52)(ajv@8.20.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.7)
       '@sentry/core':
         specifier: ^10.76.2
         version: 10.76.2
@@ -264,17 +264,17 @@ importers:
         specifier: ^16.14.1
         version: 16.14.1
       hds-core:
-        specifier: ^6.0.6
-        version: 6.0.6
+        specifier: ^6.0.7
+        version: 6.0.7
       hds-react:
-        specifier: ^6.0.6
-        version: 6.0.6(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^6.0.7
+        version: 6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0
       i18next:
-        specifier: ^26.5.6
-        version: 26.5.6(typescript@7.0.2)
+        specifier: ^26.5.11
+        version: 26.5.11(typescript@7.0.2)
       import-in-the-middle:
         specifier: ^3.5.2
         version: 3.5.2
@@ -285,8 +285,8 @@ importers:
         specifier: ^16.4.2
         version: 16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0)
       next-i18next:
-        specifier: ^16.4.1
-        version: 16.4.1(@types/react@19.3.0)(i18next@26.5.6(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.3(i18next@26.5.6(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
+        specifier: ^16.4.3
+        version: 16.4.3(@types/react@19.3.0)(i18next@26.5.11(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.9(i18next@26.5.11(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
       quill:
         specifier: ^2.0.3
         version: 2.0.3
@@ -300,11 +300,11 @@ importers:
         specifier: ^6.1.6
         version: 6.1.6(@types/react@19.3.0)(react@19.3.0)
       react-hook-form:
-        specifier: 7.90.0
-        version: 7.90.0(@types/react@19.3.0)(react@19.3.0)
+        specifier: 7.91.0
+        version: 7.91.0(@types/react@19.3.0)(react@19.3.0)
       react-i18next:
-        specifier: ^17.1.3
-        version: 17.1.3(i18next@26.5.6(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
+        specifier: ^17.1.9
+        version: 17.1.9(i18next@26.5.11(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
       react-use:
         specifier: ^17.6.1
         version: 17.6.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -421,11 +421,11 @@ importers:
         specifier: ^16.14.1
         version: 16.14.1
       hds-react:
-        specifier: ^6.0.6
-        version: 6.0.6(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^6.0.7
+        version: 6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18next:
-        specifier: ^26.5.6
-        version: 26.5.6(typescript@7.0.2)
+        specifier: ^26.5.11
+        version: 26.5.11(typescript@7.0.2)
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
@@ -439,8 +439,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
       react-hook-form:
-        specifier: 7.90.0
-        version: 7.90.0(@types/react@19.3.0)(react@19.3.0)
+        specifier: 7.91.0
+        version: 7.91.0(@types/react@19.3.0)(react@19.3.0)
       react-toastify:
         specifier: ^11.1.0
         version: 11.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -515,8 +515,8 @@ importers:
         specifier: ^16.4.2
         version: 16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0)
       next-i18next:
-        specifier: ^16.4.1
-        version: 16.4.1(@types/react@19.3.0)(i18next@26.5.6(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.3(i18next@26.5.6(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
+        specifier: ^16.4.3
+        version: 16.4.3(@types/react@19.3.0)(i18next@26.5.11(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.9(i18next@26.5.11(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
       postcss-styled-syntax:
         specifier: ^0.7.3
         version: 0.7.3(postcss@8.5.29)
@@ -697,8 +697,8 @@ packages:
     resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/runtime@8.0.7':
-    resolution: {integrity: sha512-k0hagDDq/6w4v+0Sp4wFvIz/yswH5O7Va6aRTnD7N62Tnborp4X+YB+H3XUcWVSR4aE47WPEXiIIZchBs0GmYg==}
+  '@babel/runtime@8.0.8':
+    resolution: {integrity: sha512-dEu8nGlRqjsJsvviUUoSMfcRHpwomCiRlXsc2mPfJ79+ffTpDm+JtfUtTMzUrqCApHQnCsVPD3gT1ZT8RgBRCQ==}
 
   '@babel/template@7.29.7':
     resolution: {integrity: sha512-puq+Gf35oI24FeN11LkoUQFqv9uwNeWpxXZi/Ji3rRIoKAzKnxRaZ+Gkj0vKS9ZCiTESfng1N9LyOyXvo+m+Gg==}
@@ -1012,12 +1012,6 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
 
-  '@graphql-codegen/plugin-helpers@7.4.1':
-    resolution: {integrity: sha512-T9BZKoz3bRqvPJHDxJo2/QFy/AeTqw/z+7aiL1viky0Wolu+z2VVJ6MZv+Dh7pGHzjtqn6f/vOC0Au9Ll/rF6A==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
-
   '@graphql-codegen/plugin-helpers@7.4.2':
     resolution: {integrity: sha512-5SmkQvoNg3orbCNWBIv6lD1Zk1/mJbgdqv5oUy2Pw8Q70sO1Y3CGOkdwnPUp5l/pm0GKApQUyqPJkqFaJKewpQ==}
     engines: {node: '>=16'}
@@ -1036,8 +1030,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@graphql-codegen/typescript-operations@6.1.10':
-    resolution: {integrity: sha512-hTnwAwQI+/lV0mAlWV0Jg7jBo2XCC++8+njr0meDHQbeAJSH6Pew1ZIcmLVvQUsQNSQwNoR4SKftHbDvq6KoNA==}
+  '@graphql-codegen/typescript-operations@6.2.0':
+    resolution: {integrity: sha512-TOMrl34UbfrHJ67WkoWoY5V6bHxCZrvwTtUfuaaos6ZIAOK9d2fIJnouwjPgMRU8JzACYWV3XG+qqOsoDaB25g==}
     engines: {node: '>=16'}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
@@ -1070,8 +1064,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@graphql-codegen/visitor-plugin-common@7.2.8':
-    resolution: {integrity: sha512-LBBHgc9QgNCQ2RiuLnIVXsG+EaX55oJPjMyd0doXeOmOHZfB+RnxHuOf+305VHn9XhZg3DcUmSB2ZrWlOcqUwQ==}
+  '@graphql-codegen/visitor-plugin-common@7.5.0':
+    resolution: {integrity: sha512-/7h13H2PnjWMKVD0wYvxh9MWmG9HX6vHCoUL3Hyf2dOUI9soU/uTvBK6gJUs58RILKu4V36QxY/tIaeGOuRRRw==}
     engines: {node: '>=16'}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
@@ -1244,6 +1238,12 @@ packages:
 
   '@graphql-tools/relay-operation-optimizer@7.1.12':
     resolution: {integrity: sha512-Mhdc6lHutQXP2Wikcrdl5HW83aH/UO8pUqAA0P/bGYrOUT8X7prfJWRRtU+ZiHVskcni7ZZEhDD0sj7vk1UeMQ==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+
+  '@graphql-tools/relay-operation-optimizer@7.1.14':
+    resolution: {integrity: sha512-dpU5rev9s7rl1tj2xXLunp/bjGr57fgw4FxlIj7uA397ka93tLJsXANlH/Paix5I0qbtsqyrgt3xtapJBgmJ4w==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
@@ -4034,17 +4034,17 @@ packages:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
 
-  hds-core@6.0.6:
-    resolution: {integrity: sha512-RUPuBHlyAkGloFYbqzudn5+5AI3CzmpGQ5xvD/0gO1UXcj1p0z+Svh/5jnnZamhAU+Ib8wM3cmD3x6gZcUD+Ew==}
-    engines: {node: ^24.18.0}
+  hds-core@6.0.7:
+    resolution: {integrity: sha512-RTBTGWgq2nxnbf07UmMR9pDWCqaBJZ6jrV2ZDzn6ya5mH1+cYWa1N2JV4PBfHQWOPivDj0yEIHpQzWq3EwI+dg==}
+    engines: {node: ^24}
 
-  hds-design-tokens@6.0.6:
-    resolution: {integrity: sha512-vKjrlqZxEb1fpFhxB32L9IrsVqjcLoLK1kmkSS81nRLWrTdsGFnZeVkB6qg0MHQbZy4gTlXuqpQLTw/A9ZhyHw==}
-    engines: {node: ^24.18.0}
+  hds-design-tokens@6.0.7:
+    resolution: {integrity: sha512-yYEoNitAJGjZa0AfCUjzytKygorAsqNJwSlb+y6T6KjkJxvoW1yva9SxAQptWpEADE7BlKwn6/MYgkWS2LGf5Q==}
+    engines: {node: ^24}
 
-  hds-react@6.0.6:
-    resolution: {integrity: sha512-j19+5c/9VYY3JG12w0aF5wnIcVNQ5rSQggeTAinqogAONgrv2NWBVXY3rcfo3E/5Klfo2mRckC1GDixQM9H3VQ==}
-    engines: {node: ^24.18.0}
+  hds-react@6.0.7:
+    resolution: {integrity: sha512-jlINoju5VhTsfWzQA8kOcilrtvx2agVAETTdj7BSKClxpYL8HzNrZRLch9XDpIZxziZ9oh7ZMWlM/iX1u0e6hA==}
+    engines: {node: ^24}
     peerDependencies:
       postcss: ^8.5.28
       react: ^19.0.0
@@ -4092,8 +4092,8 @@ packages:
   i18next-resources-to-backend@1.2.3:
     resolution: {integrity: sha512-8Y/LLAm5fqZc2ckQxtTWbu75ndjNLzF7mcYl6rhc4g+WBopIsG3YhdYqF5qhJy64tlYhlU2KSSnEgW3gGHLqwg==}
 
-  i18next@26.5.6:
-    resolution: {integrity: sha512-GFWrDwGmYhOQS3bKvjA2Ir2ob9ScEdyY1UbeQJ10jyVACGQ6XxmDYqC/lxEj/IPEJlPQYNRnYffDET6TM8mnFg==}
+  i18next@26.5.11:
+    resolution: {integrity: sha512-Wc0klBPKxqZ2tL2qdAnF8xvvnWgr1IMGSY2ikTiAvaFVbz7xiFARtkoU4RidBDw1SyziGROp0qxu6qnJ7l2Wug==}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
     peerDependenciesMeta:
@@ -4486,8 +4486,8 @@ packages:
   next-compose-plugins@2.2.1:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
 
-  next-i18next@16.4.1:
-    resolution: {integrity: sha512-SEFE1aL10DXBI2CNYLRxDRio+el2YmiKELEwhAGj3JA7cJxiliK6YKBMWTsOC7hJWRTeWFpiHrAe3pFyqweBEw==}
+  next-i18next@16.4.3:
+    resolution: {integrity: sha512-eYSjAw25ndsKuvfc5Cyjs/Nb9ZrYG6Hm6g9YGm+pm3C0sBVFUwpCqZv87MrWPG8PW/tpopmUM5o8M3KpbaMIrw==}
     engines: {node: '>=20'}
     peerDependencies:
       i18next: '>= 23.7.13'
@@ -4724,6 +4724,10 @@ packages:
     resolution: {integrity: sha512-7qASPzhKF2l2KLboRZux8CCTRMdGiV08vWmyKzPz22qZ7ZjQBOeY7rNzNoCLSUiftJ7HUq0GERHmxw/t0dCdMw==}
     engines: {node: '>=4'}
 
+  postcss-selector-parser@7.1.7:
+    resolution: {integrity: sha512-wWBro/7hJ40ye6TPiXkUQoXKCw23xSsjriUvqd7Uls9Sso3oLiON1flc18cCdnjgCRXw4fBVqUJJeOdDTh3P3g==}
+    engines: {node: '>=4'}
+
   postcss-styled-syntax@0.7.3:
     resolution: {integrity: sha512-F6PSmNJKnOk1E5BWNqp6lEg3qlVYexKPf9C5eoBflPxNyS29goTATFVU7vUi0WWMmpAK+Pf2yHuUdjKXL2bOTg==}
     engines: {node: '>=14.17'}
@@ -4810,8 +4814,8 @@ packages:
   react-fast-compare@3.2.2:
     resolution: {integrity: sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==}
 
-  react-hook-form@7.90.0:
-    resolution: {integrity: sha512-+NdG0FLzCPhFOp2NNxaUYLF9fyZhNjx9FTBBSYWF71/l6BBlmIc/j6xlp3DbaHWLJbIG7Zd8oznA19xJClU97w==}
+  react-hook-form@7.91.0:
+    resolution: {integrity: sha512-5BEBUnCBwa28AFXYTYmOaB/+CSpJ/+CWVASHEvIGUzFdHyUiPHeRhG7r5hOZ8nZi0yP7pbHdFNXO/p31EKTJFQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@types/react': '*'
@@ -4820,8 +4824,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-i18next@17.1.3:
-    resolution: {integrity: sha512-XfaTqU09NPuBDuADQ8TEPbE0Goc2Gh6FHu0qvdFWfOWCdGQWRxRY2Uo5tDPtGBdzu4COXp0LQCkQIYa0IhJXlA==}
+  react-i18next@17.1.9:
+    resolution: {integrity: sha512-OgYqIH13XHPlWTaaI795Dz+k2AdKnXcOxNQVnf750T8Ij0TYWp1nYvXRpoJBulPqlyk2OAbn1PM4tFKiIj/byA==}
     peerDependencies:
       i18next: '>= 26.2.0'
       react: '>= 16.8.0'
@@ -5755,7 +5759,7 @@ snapshots:
 
   '@ardatan/relay-compiler@13.0.2(graphql@16.14.2)':
     dependencies:
-      '@babel/runtime': 8.0.7
+      '@babel/runtime': 8.0.8
       graphql: 16.14.2
       immutable: 5.1.9
       invariant: 2.2.4
@@ -5913,7 +5917,7 @@ snapshots:
 
   '@babel/runtime@7.29.7': {}
 
-  '@babel/runtime@8.0.7': {}
+  '@babel/runtime@8.0.8': {}
 
   '@babel/template@7.29.7':
     dependencies:
@@ -5999,9 +6003,9 @@ snapshots:
     dependencies:
       postcss-selector-parser: 7.1.6
 
-  '@csstools/selector-specificity@2.2.0(postcss-selector-parser@7.1.6)':
+  '@csstools/selector-specificity@2.2.0(postcss-selector-parser@7.1.7)':
     dependencies:
-      postcss-selector-parser: 7.1.6
+      postcss-selector-parser: 7.1.7
 
   '@csstools/selector-specificity@6.0.1(postcss-selector-parser@7.1.6)':
     dependencies:
@@ -6183,8 +6187,8 @@ snapshots:
       '@graphql-codegen/plugin-helpers': 7.4.2(graphql@16.14.2)
       '@graphql-codegen/typed-document-node': 7.1.1(graphql@16.14.2)
       '@graphql-codegen/typescript': 6.1.2(graphql@16.14.2)
-      '@graphql-codegen/typescript-operations': 6.1.10(graphql@16.14.2)
-      '@graphql-codegen/visitor-plugin-common': 7.2.10(graphql@16.14.2)
+      '@graphql-codegen/typescript-operations': 6.2.0(graphql@16.14.2)
+      '@graphql-codegen/visitor-plugin-common': 7.5.0(graphql@16.14.2)
       '@graphql-tools/documents': 1.0.2(graphql@16.14.2)
       '@graphql-tools/utils': 12.1.0(graphql@16.14.2)
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.14.2)
@@ -6202,7 +6206,7 @@ snapshots:
   '@graphql-codegen/gql-tag-operations@6.1.1(graphql@16.14.2)':
     dependencies:
       '@graphql-codegen/plugin-helpers': 7.4.2(graphql@16.14.2)
-      '@graphql-codegen/visitor-plugin-common': 7.2.10(graphql@16.14.2)
+      '@graphql-codegen/visitor-plugin-common': 7.5.0(graphql@16.14.2)
       '@graphql-tools/utils': 12.1.0(graphql@16.14.2)
       auto-bind: 5.0.1
       graphql: 16.14.2
@@ -6212,15 +6216,6 @@ snapshots:
     dependencies:
       '@graphql-tools/utils': 11.2.2(graphql@16.14.2)
       change-case-all: 1.0.15
-      common-tags: 1.8.2
-      graphql: 16.14.2
-      import-from: 4.0.0
-      tslib: 2.8.1
-
-  '@graphql-codegen/plugin-helpers@7.4.1(graphql@16.14.2)':
-    dependencies:
-      '@graphql-tools/utils': 11.2.2(graphql@16.14.2)
-      change-case-all: 2.1.0
       common-tags: 1.8.2
       graphql: 16.14.2
       import-from: 4.0.0
@@ -6245,17 +6240,17 @@ snapshots:
   '@graphql-codegen/typed-document-node@7.1.1(graphql@16.14.2)':
     dependencies:
       '@graphql-codegen/plugin-helpers': 7.4.2(graphql@16.14.2)
-      '@graphql-codegen/visitor-plugin-common': 7.2.10(graphql@16.14.2)
+      '@graphql-codegen/visitor-plugin-common': 7.5.0(graphql@16.14.2)
       auto-bind: 5.0.1
       change-case-all: 2.1.0
       graphql: 16.14.2
       tslib: 2.8.1
 
-  '@graphql-codegen/typescript-operations@6.1.10(graphql@16.14.2)':
+  '@graphql-codegen/typescript-operations@6.2.0(graphql@16.14.2)':
     dependencies:
-      '@graphql-codegen/plugin-helpers': 7.4.1(graphql@16.14.2)
+      '@graphql-codegen/plugin-helpers': 7.4.2(graphql@16.14.2)
       '@graphql-codegen/schema-ast': 6.1.1(graphql@16.14.2)
-      '@graphql-codegen/visitor-plugin-common': 7.2.8(graphql@16.14.2)
+      '@graphql-codegen/visitor-plugin-common': 7.5.0(graphql@16.14.2)
       auto-bind: 5.0.1
       graphql: 16.14.2
       tslib: 2.8.1
@@ -6306,12 +6301,12 @@ snapshots:
       parse-filepath: 1.0.2
       tslib: 2.8.1
 
-  '@graphql-codegen/visitor-plugin-common@7.2.8(graphql@16.14.2)':
+  '@graphql-codegen/visitor-plugin-common@7.5.0(graphql@16.14.2)':
     dependencies:
-      '@graphql-codegen/plugin-helpers': 7.4.1(graphql@16.14.2)
+      '@graphql-codegen/plugin-helpers': 7.4.2(graphql@16.14.2)
       '@graphql-tools/optimize': 2.0.1(graphql@16.14.2)
-      '@graphql-tools/relay-operation-optimizer': 7.1.12(graphql@16.14.2)
-      '@graphql-tools/utils': 11.2.2(graphql@16.14.2)
+      '@graphql-tools/relay-operation-optimizer': 7.1.14(graphql@16.14.2)
+      '@graphql-tools/utils': 12.1.0(graphql@16.14.2)
       auto-bind: 5.0.1
       change-case-all: 2.1.0
       dependency-graph: 1.0.0
@@ -6585,6 +6580,13 @@ snapshots:
       graphql: 16.14.2
       tslib: 2.8.1
 
+  '@graphql-tools/relay-operation-optimizer@7.1.14(graphql@16.14.2)':
+    dependencies:
+      '@ardatan/relay-compiler': 13.0.2(graphql@16.14.2)
+      '@graphql-tools/utils': 12.1.0(graphql@16.14.2)
+      graphql: 16.14.2
+      tslib: 2.8.1
+
   '@graphql-tools/schema@10.1.3(graphql@16.14.2)':
     dependencies:
       '@graphql-tools/merge': 9.2.6(graphql@16.14.2)
@@ -6711,14 +6713,14 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@hookform/resolvers@2.9.11(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.0))':
+  '@hookform/resolvers@2.9.11(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.0))':
     dependencies:
-      react-hook-form: 7.90.0(@types/react@19.3.0)(react@19.3.0)
+      react-hook-form: 7.91.0(@types/react@19.3.0)(react@19.3.0)
 
-  '@hookform/resolvers@6.0.0(@sinclair/typebox@0.34.52)(ajv@8.20.0)(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.7)':
+  '@hookform/resolvers@6.0.0(@sinclair/typebox@0.34.52)(ajv@8.20.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.7)':
     dependencies:
       '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.90.0(@types/react@19.3.0)(react@19.3.0)
+      react-hook-form: 7.91.0(@types/react@19.3.0)(react@19.3.0)
     optionalDependencies:
       '@sinclair/typebox': 0.34.52
       ajv: 8.20.0
@@ -8970,15 +8972,15 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hds-core@6.0.6: {}
+  hds-core@6.0.7: {}
 
-  hds-design-tokens@6.0.6: {}
+  hds-design-tokens@6.0.7: {}
 
-  hds-react@6.0.6(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  hds-react@6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@apollo/client': 3.14.1(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(graphql@16.14.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@babel/runtime': 7.29.10
-      '@hookform/resolvers': 2.9.11(react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.0))
+      '@hookform/resolvers': 2.9.11(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.0))
       '@juggle/resize-observer': 3.4.0
       '@popperjs/core': 2.11.8
       '@react-aria/visually-hidden': 3.9.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -8989,8 +8991,8 @@ snapshots:
       crc-32: 1.2.2
       date-fns: 2.30.0
       graphql: 16.14.2
-      hds-core: 6.0.6
-      hds-design-tokens: 6.0.6
+      hds-core: 6.0.7
+      hds-design-tokens: 6.0.7
       jwt-decode: 3.1.2
       kashe: 1.2.0
       lodash: 4.18.1
@@ -8999,7 +9001,7 @@ snapshots:
       postcss-nesting: 10.2.0(postcss@8.5.29)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
-      react-hook-form: 7.90.0(@types/react@19.3.0)(react@19.3.0)
+      react-hook-form: 7.91.0(@types/react@19.3.0)(react@19.3.0)
       react-merge-refs: 1.1.0
       react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react-use-measure: 2.1.7(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -9053,7 +9055,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.29.10
 
-  i18next@26.5.6(typescript@7.0.2):
+  i18next@26.5.11(typescript@7.0.2):
     optionalDependencies:
       typescript: 7.0.2
 
@@ -9397,15 +9399,15 @@ snapshots:
 
   next-compose-plugins@2.2.1: {}
 
-  next-i18next@16.4.1(@types/react@19.3.0)(i18next@26.5.6(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.3(i18next@26.5.6(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0):
+  next-i18next@16.4.3(@types/react@19.3.0)(i18next@26.5.11(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.9(i18next@26.5.11(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0):
     dependencies:
       '@types/hoist-non-react-statics': 3.3.7(@types/react@19.3.0)
       hoist-non-react-statics: 3.3.2
-      i18next: 26.5.6(typescript@7.0.2)
+      i18next: 26.5.11(typescript@7.0.2)
       i18next-resources-to-backend: 1.2.3
       next: 16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0)
       react: 19.3.0
-      react-i18next: 17.1.3(i18next@26.5.6(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
+      react-i18next: 17.1.9(i18next@26.5.11(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
     transitivePeerDependencies:
       - '@types/react'
 
@@ -9635,15 +9637,20 @@ snapshots:
 
   postcss-nesting@10.2.0(postcss@8.5.29):
     dependencies:
-      '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@7.1.6)
+      '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@7.1.7)
       postcss: 8.5.29
-      postcss-selector-parser: 7.1.6
+      postcss-selector-parser: 7.1.7
 
   postcss-safe-parser@7.1.0(postcss@8.5.29):
     dependencies:
       postcss: 8.5.29
 
   postcss-selector-parser@7.1.6:
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
+
+  postcss-selector-parser@7.1.7:
     dependencies:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
@@ -9765,17 +9772,17 @@ snapshots:
 
   react-fast-compare@3.2.2: {}
 
-  react-hook-form@7.90.0(@types/react@19.3.0)(react@19.3.0):
+  react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.0):
     dependencies:
       react: 19.3.0
     optionalDependencies:
       '@types/react': 19.3.0
 
-  react-i18next@17.1.3(i18next@26.5.6(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2):
+  react-i18next@17.1.9(i18next@26.5.11(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2):
     dependencies:
       '@babel/runtime': 7.29.10
       html-parse-stringify: 4.0.1
-      i18next: 26.5.6(typescript@7.0.2)
+      i18next: 26.5.11(typescript@7.0.2)
       react: 19.3.0
       use-sync-external-store: 1.7.0(react@19.3.0)
     optionalDependencies:
