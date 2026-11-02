@@ -13,7 +13,9 @@ from utils.auditlog_util import AuditLogger
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import TaxLevel
+    from tilavarauspalvelu.models import ReservationPriceLine, TaxLevel
+    from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.reservation_price_line.queryset import ReservationPriceLineQuerySet
 
     from .actions import SalesItemActions
     from .queryset import SalesItemManager
@@ -50,6 +52,8 @@ class SalesItem(models.Model):
     objects: ClassVar[SalesItemManager] = LazyModelManager.new()
     actions: LazyAttribute[SalesItemActions] = LazyModelAttribute.new()
     validators: LazyAttribute[SalesItemValidator] = LazyModelAttribute.new()
+
+    reservation_price_lines: OneToManyRelatedManager[ReservationPriceLine, ReservationPriceLineQuerySet]
 
     class Meta:
         db_table = "sales_item"

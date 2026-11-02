@@ -96,6 +96,7 @@ def test_build_price_lines__hourly_price():
     assert line.adjustment_percentage == Decimal(0)
     assert line.amount == Decimal("15.00")
     assert line.override_amount is None
+    assert line.sales_item is None
     assert line.tax_level == tax_level
     assert line.tax_percentage == Decimal(24)
     assert line.vat_code == ""

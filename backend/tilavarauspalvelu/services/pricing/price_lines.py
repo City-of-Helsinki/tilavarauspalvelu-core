@@ -74,6 +74,7 @@ def build_price_lines(
             adjustment_percentage=Decimal(0),
             amount=calculation_line.amount,
             override_amount=None,
+            sales_item=None,
             tax_level=tax_level,
             tax_percentage=tax_level.actions.get_percentage(on_date=today),
             vat_code="",
