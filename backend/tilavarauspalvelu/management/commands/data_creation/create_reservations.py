@@ -179,8 +179,7 @@ def _create_normal_reservations(
         for reservation_date in get_date_range(start_date, number=number_of_days_that_have_reservations):
             if reservation_unit.require_reservation_handling:
                 reservation_state = weighted_choice(handling_state_choices, weights=[2, 1])
-                if reservation_state == ReservationStateChoice.CONFIRMED:
-                    handled_at = local_datetime()
+                handled_at = local_datetime() if reservation_state == ReservationStateChoice.CONFIRMED else None
 
             begin_time = datetime.time(hour=random.randint(6, 10))
             begin_datetime = datetime.datetime.combine(reservation_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
@@ -188,6 +187,7 @@ def _create_normal_reservations(
             while reservation_date == begin_datetime.date():
                 customer_type = weighted_choice(reservee_type_choice, weights=[5, 1, 1])
                 reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
+                handled_payment_due_by = None
 
                 if pricing.highest_price != pricing.lowest_price:
                     applying_for_free_of_charge = random.choice([True, False])
