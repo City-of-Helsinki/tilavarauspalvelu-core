@@ -188,7 +188,9 @@ def _create_intended_uses() -> list[IntendedUse]:
             if not path.exists():
                 fetch_image(data.image_url, path)
 
-            image = f"{settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT}/{data.image_filename}{data.extension}"
+            # Skip the image if the download failed.
+            if path.exists():
+                image = f"{settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT}/{data.image_filename}{data.extension}"
 
         intended_use = IntendedUseFactory.build(
             name=data.name_fi,
