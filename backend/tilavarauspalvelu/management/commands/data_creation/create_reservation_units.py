@@ -1489,7 +1489,7 @@ def _create_reservation_units_in_space_hierarchies(
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=rooftop_terrace_unit,
         image_url="https://images.unsplash.com/photo-1657639753220-8d59b05958d1",
-        filename="messukeskus_karaoke",
+        filename="messukeskus_kattoterassi",
     )
     if image is not None:
         images.append(image)
