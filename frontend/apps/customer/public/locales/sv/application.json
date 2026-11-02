@@ -87,7 +87,7 @@
       "removeTime": "Ta bort {{time}}",
       "errors": {
         "endAfterStart": "Sluttiden måste vara efter starttiden.",
-        "outsideReservable": "Tiden är utanför de tider då utrymmet kan bokas."
+        "outsideReservable": "Tiden kan inte bokas i någon av ansökningens lokaler."
       }
     }
   },
@@ -97,11 +97,11 @@
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
     "summary": "Sammanfattning",
-    "prioritySelectLabel": "Typ av tidsönskemål",
+    "prioritySelectLabel": "Välj typ av tidsönskemål",
     "reservationUnitSelectLabel": "Visa säsongbokningstider för lokalen",
     "priorityLabels": {
-      "primary": "Välj prioriterade tidsönskemål",
-      "secondary": "Välj alternativa tidsönskemål"
+      "primary": "Prioriterade tidsönskemål",
+      "secondary": "Alternativa tidsönskemål"
     },
     "notification": {
       "copyCells": "Önskade tider kopierades till alla bokningar"

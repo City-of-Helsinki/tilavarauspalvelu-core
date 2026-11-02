@@ -21,7 +21,7 @@ import {
   toPattern,
 } from "ui/src/modules/suitableTimes";
 import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
-import { Flex } from "ui/src/styled";
+import { Flex, fontBold } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
 import { TimePreview } from "@/components/application/funnel/TimePreview";
@@ -168,9 +168,10 @@ const PriorityRadioButton = styled(RadioButton)`
     margin-top: 0;
   }
   &:before {
+    box-sizing: border-box;
     position: absolute;
-    top: 0;
-    right: 0;
+    top: -3px;
+    left: 35px;
     display: block;
     content: "";
     width: 30px;
@@ -180,11 +181,14 @@ const PriorityRadioButton = styled(RadioButton)`
   }
   &:after {
     ${arrow};
-    left: auto;
-    right: 11px;
-    top: 3px;
+    left: 45px;
+    right: auto;
+    top: 0;
     border-bottom: 10px solid var(--color-white);
   }
+  &:not(:first-of-type) {
+    margin-top: 0;
+  } /* override hds-react default margin-top */
   &:last-of-type {
     &:before {
       background-color: var(--color-engel);
@@ -195,24 +199,34 @@ const PriorityRadioButton = styled(RadioButton)`
       border-top: 10px solid var(--color-black);
     }
   }
+  [checked] + [class*="hds-radio-button__label"] {
+    ${fontBold};
+  }
+  [class*="radio-button_hds-radio-button__label"] {
+    margin-left: 40px;
+    &::before,
+    &::after {
+      left: -40px;
+    }
+  }
 `;
 
 function PrioritySelector({ index, control }: { index: number; control: Control<ApplicationPage2FormValues> }) {
   const { t } = useTranslation();
-  const name = `applicationSections.${index}.priority` as const;
-  const { field } = useController({ name, control });
+  const { field } = useController({ name: `applicationSections.${index}.priority`, control });
   const priorityOptions = [Priority.Primary, Priority.Secondary].map((n) => ({
     label: t(`application:Page2.priorityLabels.${priorityKey(n)}`),
     value: n,
   }));
   return (
     <RadioGroup>
+      <legend style={{ marginBottom: "var(--spacing-2-xs)" }}>{t("application:Page2.prioritySelectLabel")}</legend>
       {priorityOptions.map((opt) => {
         const checked = field.value === opt.value;
         return (
           <PriorityRadioButton
-            id={`${name}.${opt.label}`}
-            name={name}
+            id={`applicationSections.${index}.priority.${opt.value}`}
+            name={`applicationSections.${index}.priority`}
             key={opt.label + checked}
             label={opt.label}
             onChange={() => field.onChange(opt.value)}

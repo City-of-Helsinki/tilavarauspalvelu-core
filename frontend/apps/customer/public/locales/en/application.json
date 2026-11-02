@@ -87,7 +87,7 @@
       "removeTime": "Remove {{time}}",
       "errors": {
         "endAfterStart": "The end time must be after the start time.",
-        "outsideReservable": "The time is outside the times when the space can be booked."
+        "outsideReservable": "The time is not available in any space on this application."
       }
     }
   },
@@ -97,11 +97,11 @@
     "copyTimes": "Copy times for all booking requests",
     "resetTimes": "Clear calendar",
     "summary": "Summary",
-    "prioritySelectLabel": "Type of booking request",
+    "prioritySelectLabel": "Select type of booking request",
     "reservationUnitSelectLabel": "Available seasonal booking times for",
     "priorityLabels": {
-      "primary": "Select preferred time slots",
-      "secondary": "Select other suitable time slots"
+      "primary": "Preferred time slots",
+      "secondary": "Other suitable time slots"
     },
     "notification": {
       "copyCells": "Times copied to all booking requests"
