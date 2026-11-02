@@ -380,7 +380,9 @@ class AllocationTime:
 
 @dataclasses.dataclass(slots=True)
 class AllocationInfo:
-    allocations: dict[Annotated[int, "Res Unit PK"], list[AllocationTime]] = dataclasses.field(default_factory=dict)
+    allocations: dict[tuple[Annotated[int, "Res Unit PK"], Weekday], list[AllocationTime]] = dataclasses.field(
+        default_factory=dict,
+    )
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

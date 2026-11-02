@@ -841,10 +841,10 @@ def _create_allocated_time_slots_for_section(
     reservation_unit_options = sorted(reservation_unit_options, key=lambda o: o.preferred_order)
 
     for option in reservation_unit_options:
-        allocations = allocation_info.allocations.setdefault(option.reservation_unit.pk, [])
-
         for suitable in suitable_time_ranges:
-            day_allocations = section_allocations.setdefault(Weekday(suitable.day_of_the_week), [])
+            weekday = Weekday(suitable.day_of_the_week)
+            allocations = allocation_info.allocations.setdefault((option.reservation_unit.pk, weekday), [])
+            day_allocations = section_allocations.setdefault(weekday, [])
             if len(day_allocations) >= allocations_per_weekday:
                 continue
 
