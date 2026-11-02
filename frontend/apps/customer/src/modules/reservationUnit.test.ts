@@ -811,12 +811,14 @@ describe("getReservationUnitPrice", () => {
     ];
   }
 
+  // The VAT is the rate of the tax level on the day of sale, so a different rate does not keep the active pricing
   test.for([
-    { isFreeNow: false, expected: "20,00 € / tunti" },
-    { isFreeNow: true, expected: "25,00 € / tunti" },
-  ])("change in tax is only active in the future", ({ isFreeNow, expected }) => {
+    { isFreeNow: false, days: 15, expected: "25,00 € / tunti" },
+    { isFreeNow: true, days: 15, expected: "25,00 € / tunti" },
+    { isFreeNow: false, days: 5, expected: "20,00 € / tunti" },
+  ])("uses the pricing of the reservation date when the tax rate differs", ({ isFreeNow, days, expected }) => {
     const input = connstructInput({
-      date: addDays(new Date(), 15),
+      date: addDays(new Date(), days),
       pricings: constructTaxChangePricings(isFreeNow),
     });
     expect(getReservationUnitPrice(input)).toBe(expected);

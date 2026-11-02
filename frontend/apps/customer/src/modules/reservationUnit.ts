@@ -284,19 +284,8 @@ export function getReservationUnitPrice(props: GetReservationUnitPriceProps): st
     return null;
   }
 
-  const futurePricing = getFuturePricing(ru, [], pricingDate);
-  const activePricing = getActivePricing(ru);
-  let pricing = futurePricing ?? activePricing;
-  // tax percentage change is based on the day of buying
-  if (
-    futurePricing &&
-    activePricing &&
-    futurePricing.taxPercentage.value !== activePricing.taxPercentage.value &&
-    isReservationUnitPaid([activePricing])
-  ) {
-    pricing = activePricing;
-  }
-
+  // The price comes from the pricing on the reservation date. A VAT change does not change the pricing.
+  const pricing = getFuturePricing(ru, [], pricingDate) ?? getActivePricing(ru);
   if (pricing == null) {
     return null;
   }
