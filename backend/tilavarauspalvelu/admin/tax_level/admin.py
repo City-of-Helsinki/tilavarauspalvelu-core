@@ -8,7 +8,7 @@ from lookup_property import L
 from modeltranslation.admin import TranslationAdmin
 
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
-from tilavarauspalvelu.admin.tax_level.form import TaxLevelRateFormSet
+from tilavarauspalvelu.admin.tax_level.form import TaxLevelRateForm, TaxLevelRateFormSet
 from tilavarauspalvelu.models import TaxLevel, TaxLevelRate
 
 if TYPE_CHECKING:
@@ -17,14 +17,16 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
 
 
+__all__ = [
+    "TaxLevelAdmin",
+]
+
+
 class TaxLevelRateInline(admin.TabularInline):
     model = TaxLevelRate
-    fields = [
-        "begins",
-        "percentage",
-    ]
-    ordering = ["-begins"]
+    form = TaxLevelRateForm
     formset = TaxLevelRateFormSet
+    ordering = ["-begins"]
     extra = 0
 
 
