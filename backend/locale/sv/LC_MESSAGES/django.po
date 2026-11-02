@@ -4277,6 +4277,14 @@ msgstr ""
 msgid "resources"
 msgstr ""
 
+#: tilavarauspalvelu/models/sales_item/model.py
+msgid "sales item"
+msgstr "försäljningsartikel"
+
+#: tilavarauspalvelu/models/sales_item/model.py
+msgid "sales items"
+msgstr "försäljningsartiklar"
+
 #: tilavarauspalvelu/models/space/model.py
 msgid "space"
 msgstr ""
