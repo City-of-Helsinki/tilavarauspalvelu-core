@@ -440,7 +440,6 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         reservation_unit: ReservationUnit,
         *,
         allow_overnight: bool = False,
-        subsidised: bool = False,
         pricing: ReservationUnitPricing | None = None,
     ) -> Self:
         """Add begin datetime and end datetime based on given reservation unit's allowed durations."""
@@ -471,7 +470,7 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
             self.set(
                 price=price,
                 non_subsidised_price=price,
-                unit_price=pricing.lowest_price if subsidised else pricing.highest_price,
+                unit_price=pricing.highest_price,
                 tax_percentage_value=pricing.tax_percentage.value,
             )
 
