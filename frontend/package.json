@@ -29,7 +29,7 @@
     "@graphql-codegen/cli": "^7.4.6",
     "@graphql-codegen/schema-ast": "^6.1.1",
     "@graphql-codegen/typescript": "^6.1.2",
-    "@graphql-codegen/typescript-operations": "^6.1.10",
+    "@graphql-codegen/typescript-operations": "^6.2.0",
     "@graphql-codegen/typescript-react-apollo": "^5.0.0",
     "@graphql-tools/graphql-tag-pluck": "^9.0.7",
     "@parcel/watcher": "^2.6.0",
