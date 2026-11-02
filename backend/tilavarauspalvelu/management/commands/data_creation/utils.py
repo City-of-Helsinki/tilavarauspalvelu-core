@@ -415,6 +415,10 @@ def get_image_path(image_url: str, filename: str, extension: str = ".jpg") -> st
     if not path.exists():
         fetch_image(image_url, path)
 
+    # The download failed.
+    if not path.exists():
+        return None
+
     return f"{settings.RESERVATION_UNIT_IMAGES_ROOT}/{filename}{extension}"
 
 
