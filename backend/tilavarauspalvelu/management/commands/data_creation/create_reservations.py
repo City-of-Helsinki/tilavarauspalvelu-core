@@ -894,7 +894,7 @@ def _create_reservations_for_series(
                     created_at=local_datetime(),
                     #
                     price=price,
-                    non_subsidised_price=pricing.highest_price,
+                    non_subsidised_price=price,
                     unit_price=pricing.highest_price,
                     tax_percentage_value=pricing.tax_percentage.value,
                     #

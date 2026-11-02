@@ -467,9 +467,10 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
 
         if pricing is not None:
             duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
+            price = round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2)
             self.set(
-                price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
-                non_subsidised_price=pricing.highest_price,
+                price=price,
+                non_subsidised_price=price,
                 unit_price=pricing.lowest_price if subsidised else pricing.highest_price,
                 tax_percentage_value=pricing.tax_percentage.value,
             )
@@ -495,9 +496,10 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
             raise ValueError(msg)
 
         duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
+        price = round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2)
         self.set(
-            price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
-            non_subsidised_price=pricing.highest_price,
+            price=price,
+            non_subsidised_price=price,
             unit_price=pricing.lowest_price,
             tax_percentage_value=pricing.tax_percentage.value,
         )
