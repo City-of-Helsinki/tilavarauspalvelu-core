@@ -687,6 +687,7 @@ def _create_paid_reservation_units(
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     create_own_prices(pricings)
+    ReservationUnitAccessType.objects.bulk_create(reservation_unit_access_types)
     ReservationUnitImage.objects.bulk_create(images)
 
 
