@@ -128,7 +128,7 @@ def _create_handled_application_rounds(
         handled_at=None,  # Don't set this to allow ending handling and generating reservations
         sent_at=None,
         #
-        public_display_begins_at=now - datetime.timedelta(days=1),
+        public_display_begins_at=now - datetime.timedelta(days=31),
         public_display_ends_at=now + datetime.timedelta(days=720),
         #
         terms_of_use=terms_of_use,
@@ -265,7 +265,7 @@ def _create_application_round_in_allocations(
         handled_at=None,
         sent_at=None,
         #
-        public_display_begins_at=now - datetime.timedelta(days=1),
+        public_display_begins_at=now - datetime.timedelta(days=31),
         public_display_ends_at=now + datetime.timedelta(days=720),
         #
         terms_of_use=terms_of_use,
