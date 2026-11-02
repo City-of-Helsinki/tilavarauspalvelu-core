@@ -73,6 +73,7 @@
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Du har det maximala antalet bokningar för detta objekt.",
       "RESERVATION_MODIFICATION_NOT_ALLOWED": "Tyvärr går det inte att ändra bokningen.",
+      "TAX_LEVEL_HAS_NO_RATE": "Objektets pris kan inte beräknas just nu. Försök igen senare eller kontakta objektets administratör.",
       "USER_NOT_INTERNAL_USER": "Det är inte tillåtet att göra en bokning.",
       "generic_validation_error": "Ett fel uppstod.",
       "invalid": "Ogiltigt värde."
