@@ -482,7 +482,7 @@ def _create_open_application_rounds(
             primary_applied_weekdays=[Weekday.MONDAY, Weekday.WEDNESDAY, Weekday.SUNDAY],
         ),
         SuitableTimeInfo(
-            name="Multiple weekdays, secondarily priority also",
+            name="Multiple weekdays, secondary priority also",
             primary_applied_weekdays=[Weekday.MONDAY, Weekday.WEDNESDAY],
             secondary_applied_weekdays=[Weekday.MONDAY, Weekday.FRIDAY],
         ),
