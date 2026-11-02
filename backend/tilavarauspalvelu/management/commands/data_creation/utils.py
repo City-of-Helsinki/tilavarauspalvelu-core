@@ -410,17 +410,21 @@ def get_image_path(image_url: str, filename: str, extension: str = ".jpg") -> st
     path = Path(settings.MEDIA_ROOT) / settings.RESERVATION_UNIT_IMAGES_ROOT / filename
     path = path.with_suffix(extension)
 
-    if not path.exists():
-        fetch_image(image_url, path)
+    image_saved = path.exists()
+    if not image_saved:
+        image_saved = fetch_image(image_url, path)
+
+    if not image_saved:
+        return None
 
     return f"{settings.RESERVATION_UNIT_IMAGES_ROOT}/{filename}{extension}"
 
 
-def fetch_image(image_url: str, path: Path) -> None:
+def fetch_image(image_url: str, path: Path) -> bool:
     """
     Fetch image from the internet and save it to the given path (including filename).
     Validate that the downloaded image is a known image format, and that it matches file extension
-    in the given path.
+    in the given path. Return whether the image was saved.
     """
     if not path.suffix:
         msg = "Path must be a path to a file, not a directory."
@@ -432,7 +436,7 @@ def fetch_image(image_url: str, path: Path) -> None:
     except Exception as e:  # noqa: BLE001
         msg = f"Could not download image from '{image_url}': {e}"
         print(msg)  # noqa: T201
-        return
+        return False
 
     content_type = response.headers.get("Content-Type")
     if content_type == "image/jpeg":
@@ -444,8 +448,10 @@ def fetch_image(image_url: str, path: Path) -> None:
     else:
         msg = f"Unknown content type: {content_type}"
         print(msg)  # noqa: T201
-        return
+        return False
 
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open(mode="wb") as handler:
         handler.write(response.content)
+
+    return True
