@@ -194,10 +194,12 @@ def _create_intended_uses() -> list[IntendedUse]:
         if add_images:
             path = Path(settings.MEDIA_ROOT) / settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT / data.image_filename
             path = path.with_suffix(data.extension)
-            if not path.exists():
-                fetch_image(data.image_url, path)
+            image_saved = path.exists()
+            if not image_saved:
+                image_saved = fetch_image(data.image_url, path)
 
-            image = f"{settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT}/{data.image_filename}{data.extension}"
+            if image_saved:
+                image = f"{settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT}/{data.image_filename}{data.extension}"
 
         intended_use = IntendedUseFactory.build(
             name=data.name_fi,
