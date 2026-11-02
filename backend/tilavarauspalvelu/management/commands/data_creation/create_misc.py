@@ -186,8 +186,8 @@ def _create_general_terms_of_use() -> list[TermsOfUse]:
             id=term_id,
             name=term_name["fi"],
             name_fi=term_name["fi"],
-            name_sv=term_name["en"],
-            name_en=term_name["sv"],
+            name_sv=term_name["sv"],
+            name_en=term_name["en"],
             terms_type=TermsOfUseTypeChoices.GENERIC,
         )
         terms_of_use.append(terms)
