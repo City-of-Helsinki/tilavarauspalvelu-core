@@ -795,13 +795,16 @@ def _create_reservation_unit_options_for_section(
     option_info: OptionInfo,
     reservation_units: list[ReservationUnit],
 ) -> Generator[ReservationUnitOption]:
-    for i in range(option_info.number):
+    number_of_options = min(option_info.number, len(reservation_units))
+    selected_reservation_units = random.sample(reservation_units, k=number_of_options)
+
+    for i, reservation_unit in enumerate(selected_reservation_units):
         yield (
             ReservationUnitOptionBuilder()
             .in_application_section(section)
             .build(
                 preferred_order=i,
-                reservation_unit=random.choice(reservation_units),
+                reservation_unit=reservation_unit,
             )
         )
 
