@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
-import { fontBold } from "@ui/styled";
+import { fontMedium } from "@ui/styled";
 
 export const visuallyHidden = css`
   position: absolute;
@@ -60,7 +60,7 @@ export const gridTableStyles = css`
     z-index: 2;
     padding: var(--spacing-2-xs) var(--spacing-xs);
     background: var(--color-white);
-    ${fontBold};
+    ${fontMedium};
     text-align: center;
     user-select: none;
   }
@@ -81,9 +81,10 @@ export const gridTableStyles = css`
     background: var(--color-white);
 
     &[data-availability="closed"] {
-      background-color: var(--color-black-5);
+      background-color: var(--color-black-10);
       background-image: ${unavailableBackgroundSVG};
       background-size: auto var(--closed-pattern-height, var(--step-height));
+      border-top: 1px solid var(--color-black-20);
     }
 
     &:focus-visible {

@@ -87,7 +87,7 @@
       "removeTime": "Poista {{time}}",
       "errors": {
         "endAfterStart": "Päättymisajan täytyy olla alkamisajan jälkeen.",
-        "outsideReservable": "Aika on varattavissa olevien aikojen ulkopuolella."
+        "outsideReservable": "Aika ei ole varattavissa missään hakemukselle valitussa tilassa."
       }
     }
   },
@@ -97,11 +97,11 @@
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",
-    "prioritySelectLabel": "Aikatoiveen tyyppi",
+    "prioritySelectLabel": "Valitse aikatoiveen tyyppi",
     "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
     "priorityLabels": {
-      "primary": "Valitse ensisijaiset aikatoiveet",
-      "secondary": "Valitse vaihtoehtoiset aikatoiveet"
+      "primary": "Ensisijaiset aikatoiveet",
+      "secondary": "Vaihtoehtoiset aikatoiveet"
     },
     "notification": {
       "copyCells": "Ajat kopioitu kaikille varaustoiveille"

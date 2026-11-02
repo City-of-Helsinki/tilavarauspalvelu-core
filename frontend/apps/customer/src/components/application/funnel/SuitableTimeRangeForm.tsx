@@ -59,6 +59,15 @@ const TimeList = styled.ul`
   }
 `;
 
+const TimeListItem = styled.li<{ $priority?: "primary" | "secondary" }>`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-s);
+  ${({ $priority }) => $priority === "primary" && `background-color: var(--color-bus); color: var(--color-white);`}
+`;
+
 const pad = (value: number) => value.toString().padStart(2, "0");
 const formatClock = (minutes: number) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
 
@@ -178,7 +187,7 @@ export function SuitableTimeRangeForm({ id, index, openingHours }: Props): React
         ) : (
           <TimeList aria-labelledby={`${id}-list-label`}>
             {listed.map(({ weekday: day, beginMinutes, endMinutes, data }, position) => (
-              <li key={`${day}-${beginMinutes}`}>
+              <TimeListItem key={`${day}-${beginMinutes}`} $priority={priorityKey(data.priority)}>
                 <span>
                   {describe(day, beginMinutes, endMinutes)},{" "}
                   {t(`application:TimeSelector.legend.${priorityKey(data.priority)}`)}
@@ -194,7 +203,7 @@ export function SuitableTimeRangeForm({ id, index, openingHours }: Props): React
                 >
                   {t("application:TimeSelector.form.remove")}
                 </Button>
-              </li>
+              </TimeListItem>
             ))}
           </TimeList>
         )}
