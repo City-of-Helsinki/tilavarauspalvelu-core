@@ -45,7 +45,7 @@ export function TimeSelectorForm({
   reservationUnitOpeningHours,
   sectionOpeningHours,
 }: TimeSelectorProps): React.ReactElement | null {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { control, getValues, setValue } = useFormContext<ApplicationPage2FormValues>();
   const applicationSections = useWatch({ name: "applicationSections", control });
   const priority = useWatch({ name: `applicationSections.${index}.priority`, control }) as Priority;
@@ -109,7 +109,6 @@ export function TimeSelectorForm({
             paintable={paintable}
             visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
             brush={{ priority }}
-            locale={i18n.language}
             getStateLabel={(cell) => getStateLabel(cell)}
             getCellAppearance={({ priority: cellPriority }) =>
               cellPriority === Priority.Primary ? "primary" : "secondary"

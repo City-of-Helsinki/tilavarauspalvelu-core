@@ -133,8 +133,8 @@ describe("Application Page2", () => {
   });
 });
 
-// Tuesday in the mocked language (Finnish)
-const TUESDAY = "tiistai";
+// Tuesday as the mocked t returns it: the translation key
+const TUESDAY = "common:weekdayLongEnum.TUESDAY";
 
 function tuesdayCell(view: ReturnType<typeof render>, begin: string) {
   return view.getByLabelText(new RegExp(`^${TUESDAY}, ${begin}–`));
