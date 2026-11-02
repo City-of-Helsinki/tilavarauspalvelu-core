@@ -167,8 +167,6 @@ def _create_normal_reservations(
         pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
-        payment_type = PaymentType(pricing.payment_type)
-
         reservation_state: ReservationStateChoice = ReservationStateChoice.CONFIRMED
         handled_at: datetime.datetime | None = None
         applying_for_free_of_charge: bool = False
@@ -235,6 +233,7 @@ def _create_normal_reservations(
                 reservations.append(reservation)
 
                 if pricing.highest_price > 0:
+                    payment_type = PaymentType(pricing.payment_type)
                     payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
                     payment_orders.append(payment_order)
 
