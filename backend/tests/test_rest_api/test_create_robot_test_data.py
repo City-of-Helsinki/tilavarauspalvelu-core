@@ -312,6 +312,26 @@ def test_create_robot_test_data__each_space_is_its_own_tree():
 
 @pytest.mark.slow
 @pytest.mark.django_db
+def test_create_robot_test_data__reservation_units_have_search_vectors():
+    create_robot_test_data_task.delay()
+
+    reservation_units = list(ReservationUnit.objects.all())
+    reservation_units_without_search_vectors = [
+        reservation_unit.name
+        for reservation_unit in reservation_units
+        if not (
+            reservation_unit.search_vector_fi
+            and reservation_unit.search_vector_en
+            and reservation_unit.search_vector_sv
+        )
+    ]
+
+    assert len(reservation_units) == 23
+    assert reservation_units_without_search_vectors == []
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
 def test_remove_existing_data():
     create_robot_test_data_task.delay()
     remove_existing_data()
