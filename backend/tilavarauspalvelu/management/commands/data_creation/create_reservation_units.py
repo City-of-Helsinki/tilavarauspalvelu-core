@@ -234,7 +234,7 @@ def _create_free_reservation_units(
         BufferInfo(name="(-15, +60)", before=datetime.timedelta(minutes=15), after=datetime.timedelta(minutes=60)),
     ]
     reservation_time_choices: list[DurationInfo] = [
-        DurationInfo(name="short", minimum=datetime.timedelta(minutes=15), maximum=datetime.timedelta(minutes=60)),
+        DurationInfo(name="short", minimum=datetime.timedelta(minutes=30), maximum=datetime.timedelta(minutes=60)),
         DurationInfo(name="long", minimum=datetime.timedelta(hours=2), maximum=datetime.timedelta(hours=5)),
     ]
     min_max_days_before_choices: list[ReservableWindowInfo] = [
@@ -472,7 +472,7 @@ def _create_paid_reservation_units(
     Every other reservation unit has a material price, so that it is shown together with a paid price.
     """
     reservation_time_choices: list[DurationInfo] = [
-        DurationInfo(name="short", minimum=datetime.timedelta(minutes=15), maximum=datetime.timedelta(minutes=60)),
+        DurationInfo(name="short", minimum=datetime.timedelta(minutes=30), maximum=datetime.timedelta(minutes=60)),
         DurationInfo(name="long", minimum=datetime.timedelta(hours=2), maximum=datetime.timedelta(hours=5)),
     ]
     cancellation_rule_choices: list[CancelInfo] = [
@@ -709,7 +709,7 @@ def _create_seasonal_bookable_reservation_units(
      - Seasonal and direct / seasonal only
     """
     reservation_time_choices: list[DurationInfo] = [
-        DurationInfo(name="short", minimum=datetime.timedelta(minutes=15), maximum=datetime.timedelta(minutes=60)),
+        DurationInfo(name="short", minimum=datetime.timedelta(minutes=30), maximum=datetime.timedelta(minutes=60)),
         DurationInfo(name="long", minimum=datetime.timedelta(hours=2), maximum=datetime.timedelta(hours=5)),
     ]
     cancellation_rule_choices: list[CancelInfo] = [
