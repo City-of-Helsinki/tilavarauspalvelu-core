@@ -62,7 +62,7 @@ const pricing = {
   materialPriceDescriptionFi: "",
   materialPriceDescriptionEn: "",
   materialPriceDescriptionSv: "",
-  taxPercentage: { id: "tax-1", pk: 1, value: "24" },
+  taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
 };
 
 function createReservationUnit(
@@ -157,7 +157,10 @@ describe("ReservationUnitMoreDetails", () => {
   });
 
   test("shows a future price-change notice with a tax notice when the tax rate is above zero", () => {
-    vi.mocked(getFuturePricing).mockReturnValue({ ...pricing, taxPercentage: { id: "tax-1", pk: 1, value: "24" } });
+    vi.mocked(getFuturePricing).mockReturnValue({
+      ...pricing,
+      taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
+    });
 
     render(
       <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
@@ -169,8 +172,26 @@ describe("ReservationUnitMoreDetails", () => {
   });
 
   test("omits the tax notice when the future pricing is free", () => {
-    vi.mocked(getFuturePricing).mockReturnValue({ ...pricing, taxPercentage: { id: "tax-1", pk: 1, value: "0" } });
+    vi.mocked(getFuturePricing).mockReturnValue({
+      ...pricing,
+      taxLevel: { id: "tax-1", pk: 1, currentPercentage: "0" },
+    });
     vi.mocked(getPriceString).mockReturnValue("Free");
+
+    render(
+      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
+    );
+
+    const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
+    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
+    expect(noticeAccordion).not.toHaveTextContent("reservationUnit:futurePriceNoticeTax");
+  });
+
+  test("omits the tax notice when the tax level of the future pricing has no rate today", () => {
+    vi.mocked(getFuturePricing).mockReturnValue({
+      ...pricing,
+      taxLevel: { id: "tax-1", pk: 1, currentPercentage: null },
+    });
 
     render(
       <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />

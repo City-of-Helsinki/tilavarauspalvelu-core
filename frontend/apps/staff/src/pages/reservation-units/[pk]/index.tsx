@@ -13,6 +13,7 @@ import { errorToast, successToast } from "ui/src/components/toast";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { formatters as getFormatters } from "ui/src/modules/number-formatters";
 import { Flex } from "ui/src/styled";
 import {
   EquipmentOrderingChoices,
@@ -58,7 +59,7 @@ import {
   PricingSection,
   ErrorInfo,
 } from "@lib/reservation-units/[pk]/";
-import type { ImageFormType, ReservationUnitEditFormValues } from "@lib/reservation-units/[pk]/";
+import type { ImageFormType, ReservationUnitEditFormValues, TaxLevelOption } from "@lib/reservation-units/[pk]/";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -91,6 +92,24 @@ function makeTermsOptions(
         label: tou?.nameFi ?? "no-name",
       };
     });
+}
+
+// The pricing mutation rejects a tax level that has no rate in effect today, so it is not an option
+function makeTaxLevelOptions(parameters: ReservationUnitEditorParametersQuery | undefined): TaxLevelOption[] {
+  const formatters = getFormatters("fi");
+  return filterNonNullable(parameters?.taxLevels?.edges.map((e) => e?.node)).flatMap((n) => {
+    const percentage = toNumber(n.currentPercentage);
+    if (n.pk == null || percentage == null) {
+      return [];
+    }
+    return [
+      {
+        pk: n.pk,
+        percentage,
+        label: `${n.nameFi ?? "no-name"} (${formatters.strippedDecimal?.format(percentage)} %)`,
+      },
+    ];
+  });
 }
 
 function useImageMutations() {
@@ -225,13 +244,7 @@ function ReservationUnitEditor({
 
   // ----------------------------- Constants ---------------------------------
 
-  const taxPercentageOptions = filterNonNullable(parametersData?.taxPercentages?.edges.map((e) => e?.node)).map(
-    (n) => ({
-      value: Number(n.value),
-      pk: n.pk ?? -1,
-      label: n.value,
-    })
-  );
+  const taxLevelOptions = makeTaxLevelOptions(parametersData);
   const pricingTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Pricing);
 
   const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Service);
@@ -254,7 +267,7 @@ function ReservationUnitEditor({
 
   // unsafe because the handleSubmit doesn't pass return value (so throw is the only way to manipulate control flow)
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
-    const { pk, ...input } = transformReservationUnit(formValues, taxPercentageOptions);
+    const { pk, ...input } = transformReservationUnit(formValues, taxLevelOptions);
     const promise =
       pk != null
         ? updateMutation({ variables: { input: { ...input, pk } } })
@@ -317,11 +330,7 @@ function ReservationUnitEditor({
           reservationUnitTypes={parametersData?.reservationUnitTypes}
         />
         <ReservationUnitSettingsSection form={form} cancellationRuleOptions={cancellationRuleOptions} />
-        <PricingSection
-          form={form}
-          taxPercentageOptions={taxPercentageOptions}
-          pricingTermsOptions={pricingTermsOptions}
-        />
+        <PricingSection form={form} taxLevelOptions={taxLevelOptions} pricingTermsOptions={pricingTermsOptions} />
         {isDirect && (
           <TermsSection
             form={form}
@@ -624,12 +633,13 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
       nameFi
       pk
     }
-    taxPercentages(isEnabled: true) {
+    taxLevels {
       edges {
         node {
           id
           pk
-          value
+          nameFi
+          currentPercentage
         }
       }
     }

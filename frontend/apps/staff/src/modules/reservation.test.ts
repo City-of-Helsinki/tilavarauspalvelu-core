@@ -35,10 +35,10 @@ function constructPricing({
     priceUnit: PriceUnit.PerHour,
     lowestPrice: lowestPrice.toString(),
     highestPrice: highestPrice.toString(),
-    taxPercentage: {
+    taxLevel: {
       id: "1",
       pk: 1,
-      value: "24",
+      currentPercentage: "24",
     },
     paymentType: PaymentType.Online,
     materialPriceDescriptionFi: "",

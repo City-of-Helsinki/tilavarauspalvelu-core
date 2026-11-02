@@ -35,10 +35,10 @@ export const PRICING_FRAGMENT = gql`
     paymentType
     lowestPrice
     highestPrice
-    taxPercentage {
+    taxLevel {
       id
       pk
-      value
+      currentPercentage
     }
     materialPriceDescriptionFi
     materialPriceDescriptionEn

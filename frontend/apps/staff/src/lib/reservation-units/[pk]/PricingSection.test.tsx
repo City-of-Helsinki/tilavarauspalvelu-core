@@ -6,9 +6,12 @@ import { describe, expect, it } from "vitest";
 import { convertReservationUnit } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { PricingSection } from "./PricingSection";
-import type { TaxOption } from "./PricingSection";
+import type { TaxLevelOption } from "./PricingSection";
 
-const TAX_OPTIONS: TaxOption[] = [{ label: "25.5 %", pk: 1, value: 25.5 }];
+const TAX_LEVEL_OPTIONS: TaxLevelOption[] = [
+  { label: "Yleinen (25,5 %)", pk: 1, percentage: 25.5 },
+  { label: "Alennettu (14 %)", pk: 2, percentage: 14 },
+];
 const PRICING_TERMS_OPTIONS = [{ value: "terms-1", label: "Terms 1" }];
 
 // HDS appends a trailing " *" to the accessible name of required fields.
@@ -21,7 +24,7 @@ function Harness() {
   const form = useForm<ReservationUnitEditFormValues>({
     defaultValues: convertReservationUnit(undefined),
   });
-  return <PricingSection form={form} taxPercentageOptions={TAX_OPTIONS} pricingTermsOptions={PRICING_TERMS_OPTIONS} />;
+  return <PricingSection form={form} taxLevelOptions={TAX_LEVEL_OPTIONS} pricingTermsOptions={PRICING_TERMS_OPTIONS} />;
 }
 
 async function openAccordion() {
@@ -63,7 +66,7 @@ describe("PricingSection", () => {
     expect(screen.getByRole("checkbox", { name: "label.canApplyFreeOfCharge" })).toBeEnabled();
   });
 
-  it("computes the net price from the gross price and selected tax percentage", async () => {
+  it("computes the net price from the gross price and selected tax level", async () => {
     render(<Harness />);
     const user = await openAccordion();
     await switchToPaid(user);
@@ -72,7 +75,7 @@ describe("PricingSection", () => {
     await user.clear(lowestPrice);
     await user.type(lowestPrice, "100");
 
-    await selectComboOption(user, /^label\.taxPercentage/, "25.5 %");
+    await selectComboOption(user, /^label\.taxLevel/, "Yleinen (25,5 %)");
 
     const lowestPriceNet = screen.getByRole("spinbutton", { name: nameLike("label.lowestPriceNet") });
     expect(lowestPriceNet).toHaveValue(79.68);

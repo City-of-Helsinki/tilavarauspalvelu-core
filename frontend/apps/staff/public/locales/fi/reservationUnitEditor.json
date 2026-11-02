@@ -47,7 +47,7 @@
     "paymentTerms": "Maksuehdot",
     "paymentType": "Maksutapa",
     "priceUnit": "Hinnan yksikkö",
-    "taxPercentage": "Hinnan alv%",
+    "taxLevel": "Verotaso",
     "reservationPendingInstructionsEn": "Varausvahvistuksen lisäohjeteksti englanniksi",
     "reservationPendingInstructionsFi": "Varausvahvistuksen lisäohjeteksti suomeksi",
     "reservationPendingInstructionsSv": "Varausvahvistuksen lisäohjeteksti ruotsiksi",
@@ -124,7 +124,8 @@
     "reservationPendingInstructionsFi": "Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on lähetetty  käsittelyyn.\nVoit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.",
     "reservationConfirmedInstructionsFi": "Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on hyväksytty.\nVoit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.",
     "reservationCancelledInstructionsFi": "Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on hylätty tai peruutettu.\nVoit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.",
-    "contactInformation": "Lisää nimesi ja yhteystietosi, jotta palvelusi tuoteomistaja tai Varaamon ylläpito tietää kehen tarvittaessa yhteyttä."
+    "contactInformation": "Lisää nimesi ja yhteystietosi, jotta palvelusi tuoteomistaja tai Varaamon ylläpito tietää kehen tarvittaessa yhteyttä.",
+    "taxLevel": "Verotason alv-prosentti voi muuttua. Hinnoittelua ei tarvitse muuttaa, kun alv-prosentti muuttuu."
   },
   "closed": "Suljettu",
   "seasonalTimesTitle": "Kausivarattavat ajat",
