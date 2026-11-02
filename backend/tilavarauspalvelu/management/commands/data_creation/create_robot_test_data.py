@@ -16,7 +16,6 @@ from django.contrib.gis.geos import Point
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, ValidationError
 from django.db import models, transaction
 from django.db.models import Subquery
-from django.test import override_settings
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -33,7 +32,7 @@ from tilavarauspalvelu.enums import (
     UserRoleChoice,
     Weekday,
 )
-from tilavarauspalvelu.management.commands.data_creation.utils import get_image_path
+from tilavarauspalvelu.management.commands.data_creation.utils import get_image_path, turn_off_signal_updates
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     AllocatedTimeSlot,
@@ -95,14 +94,7 @@ def create_robot_test_data() -> None:
         msg = "Hey! This is the production environment! Don't just try to generate test data! >:("
         raise ValidationError(msg, code="production_environment")
 
-    # Turn off the updates that the signals run after each save. The necessary ones run once at the end.
-    with override_settings(
-        UPDATE_AFFECTING_TIME_SPANS=False,
-        UPDATE_RESERVATION_UNIT_HIERARCHY=False,
-        SAVE_RESERVATION_STATISTICS=False,
-        UPDATE_SEARCH_VECTORS=False,
-        REBUILD_SPACE_HIERARCHY=False,
-    ):
+    with turn_off_signal_updates():
         remove_existing_data()
         create_users()
         create_reservation_units()
