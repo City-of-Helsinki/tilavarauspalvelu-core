@@ -179,6 +179,33 @@ def test_tax_level_admin__rates__create_tax_level_with_future_rate_only(api_clie
     assert TaxLevel.objects.count() == 0
 
 
+def test_tax_level_admin__rates__add_view_shows_one_empty_rate(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_add")
+    response = api_client.get(path=url)
+
+    assert response.status_code == 200
+
+    formset = response.context["inline_admin_formsets"][0].formset
+    assert formset.total_form_count() == 1
+
+
+def test_tax_level_admin__rates__change_view_shows_no_empty_rates(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+
+    tax_level = TaxLevelFactory.create()
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_change", args=[tax_level.pk])
+    response = api_client.get(path=url)
+
+    assert response.status_code == 200
+
+    formset = response.context["inline_admin_formsets"][0].formset
+    assert formset.total_form_count() == 1
+    assert formset.initial_form_count() == 1
+
+
 # ── Pricings ──
 
 
