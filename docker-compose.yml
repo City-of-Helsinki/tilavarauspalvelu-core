@@ -176,6 +176,8 @@ services:
     profiles: [frontend, frontend-release]
     depends_on:
       - frontend-net
+    environment:
+      GATEWAY_BACKEND: backend:8000
     ports:
       - "127.0.0.1:8080:8080"
     volumes:
