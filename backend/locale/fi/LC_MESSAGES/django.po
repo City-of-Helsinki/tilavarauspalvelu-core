@@ -2298,6 +2298,14 @@ msgstr "Etsi nimellä tai toimipisteen nimellä"
 msgid "current percentage"
 msgstr "nykyinen veroprosentti"
 
+#: tilavarauspalvelu/admin/tax_level/admin.py
+msgid "next percentage"
+msgstr "seuraava veroprosentti"
+
+#: tilavarauspalvelu/admin/tax_level/admin.py
+msgid "next percentage begins"
+msgstr "seuraavan veroprosentin aloituspäivä"
+
 #: tilavarauspalvelu/admin/tax_level/form.py
 msgid "Tax percentage"
 msgstr "Veroprosentti"
