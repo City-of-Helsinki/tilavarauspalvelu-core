@@ -1699,6 +1699,7 @@ msgstr "Viikonpäivät, joina tässä toistuvassa varauksessa on varauksia"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
 #: tilavarauspalvelu/admin/reservation_unit_access_type/admin.py
+#: tilavarauspalvelu/admin/tax_level/form.py
 msgid "Begin date"
 msgstr "Aloituspäivä"
 
@@ -2296,6 +2297,10 @@ msgstr "Etsi nimellä tai toimipisteen nimellä"
 #: tilavarauspalvelu/admin/tax_level/admin.py
 msgid "current percentage"
 msgstr "nykyinen veroprosentti"
+
+#: tilavarauspalvelu/admin/tax_level/form.py
+msgid "Tax percentage"
+msgstr "Veroprosentti"
 
 #: tilavarauspalvelu/admin/tax_level/form.py
 msgid "At least one rate in effect today is required."

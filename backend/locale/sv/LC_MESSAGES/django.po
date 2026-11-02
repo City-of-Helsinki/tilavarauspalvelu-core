@@ -1662,8 +1662,9 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
 #: tilavarauspalvelu/admin/reservation_unit_access_type/admin.py
+#: tilavarauspalvelu/admin/tax_level/form.py
 msgid "Begin date"
-msgstr ""
+msgstr "Startdatum"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "End date"
@@ -2235,6 +2236,10 @@ msgstr ""
 #: tilavarauspalvelu/admin/tax_level/admin.py
 msgid "current percentage"
 msgstr "nuvarande skattesats"
+
+#: tilavarauspalvelu/admin/tax_level/form.py
+msgid "Tax percentage"
+msgstr "Skattesats"
 
 #: tilavarauspalvelu/admin/tax_level/form.py
 msgid "At least one rate in effect today is required."
