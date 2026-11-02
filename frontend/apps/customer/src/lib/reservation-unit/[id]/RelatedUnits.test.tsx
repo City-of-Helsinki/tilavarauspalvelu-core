@@ -115,7 +115,7 @@ describe("RelatedUnits", () => {
               materialPriceDescriptionFi: "",
               materialPriceDescriptionEn: "",
               materialPriceDescriptionSv: "",
-              taxPercentage: { id: "tax-1", pk: 1, value: "24" },
+              taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
             },
           ],
         }),

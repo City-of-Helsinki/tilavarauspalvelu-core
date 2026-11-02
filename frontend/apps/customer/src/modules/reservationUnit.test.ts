@@ -642,10 +642,10 @@ function constructPricing({
     priceUnit: priceUnit ?? PriceUnit.PerHour,
     lowestPrice: lowestPrice?.toString() ?? p.toString(),
     highestPrice: highestPrice?.toString() ?? p.toString(),
-    taxPercentage: {
+    taxLevel: {
       id: "1",
       pk: 1,
-      value: (taxPercentage ?? 24).toString(),
+      currentPercentage: (taxPercentage ?? 24).toString(),
     },
     materialPriceDescriptionFi: "",
     materialPriceDescriptionEn: "",

@@ -21,7 +21,7 @@ import type { ReservationUnitEditFormValues } from "./form";
 
 type QueryData = NonNullable<ReservationUnitEditQuery["reservationUnit"]>;
 
-const TAX_OPTIONS = [{ label: "25.5 %", pk: 1, value: 25.5 }];
+const TAX_OPTIONS = [{ label: "Yleinen (25,5 %)", pk: 1, percentage: 25.5 }];
 
 // Non-null array access helper: avoids `!` (banned by lint) while still failing loudly
 // (instead of silently continuing with `undefined`) if the index doesn't exist.
@@ -117,7 +117,7 @@ describe("convertReservationUnit", () => {
           lowestPrice: "0",
           highestPriceNet: "0",
           lowestPriceNet: "0",
-          taxPercentage: { pk: 1 },
+          taxLevel: { pk: 1 },
         },
         {
           pk: 2,
@@ -126,13 +126,14 @@ describe("convertReservationUnit", () => {
           lowestPrice: "5",
           highestPriceNet: "12.4",
           lowestPriceNet: "6.2",
-          taxPercentage: { pk: 1 },
+          taxLevel: { pk: 3 },
         },
       ],
     } as unknown as QueryData);
     // only the most recent active pricing (pk 2) is kept, a future one is synthesized
     expect(values.pricings.filter((p) => !p.isFuture)).toHaveLength(1);
     expect(values.pricings.find((p) => !p.isFuture)?.pk).toBe(2);
+    expect(values.pricings.find((p) => !p.isFuture)?.taxLevel).toBe(3);
     expect(values.pricings.some((p) => p.isFuture)).toBe(true);
   });
 
@@ -281,7 +282,7 @@ describe("transformReservationUnit", () => {
       pricings: [
         {
           pk: 1,
-          taxPercentage: 0,
+          taxLevel: 0,
           lowestPrice: 0,
           lowestPriceNet: 0,
           highestPrice: 10,
@@ -298,7 +299,7 @@ describe("transformReservationUnit", () => {
         },
         {
           pk: -1,
-          taxPercentage: 0,
+          taxLevel: 0,
           lowestPrice: 0,
           lowestPriceNet: 0,
           highestPrice: 0,
@@ -320,7 +321,7 @@ describe("transformReservationUnit", () => {
     expect(result.pricings).toHaveLength(1);
     expect(result.pricings?.[0]).toMatchObject({
       pk: 1,
-      taxPercentage: 1,
+      taxLevel: 1,
       highestPrice: "10",
       lowestPrice: "0",
       priceUnit: PriceUnit.PerHour,
@@ -328,12 +329,20 @@ describe("transformReservationUnit", () => {
     });
   });
 
-  it("throws when a paid pricing has no valid tax percentage available", () => {
+  it("sends the selected tax level of a pricing", () => {
+    const values = createValidFormValues();
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, taxLevel: 2, highestPrice: 10 };
+    const result = transformReservationUnit(values, TAX_OPTIONS);
+    expect(result.pricings?.[0]).toMatchObject({ taxLevel: 2, highestPrice: "10" });
+    expect(result.pricings?.[0]).not.toHaveProperty("isActivatedOnBegins");
+  });
+
+  it("throws when a paid pricing has no valid tax level available", () => {
     const values = createValidFormValues({
       pricings: [
         {
           pk: 1,
-          taxPercentage: 0,
+          taxLevel: 0,
           lowestPrice: 5,
           lowestPriceNet: 6,
           highestPrice: 10,
@@ -350,7 +359,7 @@ describe("transformReservationUnit", () => {
         },
       ],
     });
-    expect(() => transformReservationUnit(values, [])).toThrow("Tax percentage is required for pricing");
+    expect(() => transformReservationUnit(values, [])).toThrow("Tax level is required for pricing");
   });
 });
 
@@ -410,7 +419,7 @@ describe("ReservationUnitEditSchema", () => {
     values.pricings[0] = {
       ...at(values.pricings, 0),
       isPaid: true,
-      taxPercentage: 0,
+      taxLevel: 0,
       paymentType: null,
       lowestPrice: 20,
       highestPrice: 10,
@@ -419,7 +428,7 @@ describe("ReservationUnitEditSchema", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       const paths = result.error.issues.map((i) => i.path.join("."));
-      expect(paths).toContain("pricings.0.taxPercentage");
+      expect(paths).toContain("pricings.0.taxLevel");
       expect(paths).toContain("pricings.0.paymentType");
       expect(paths).toContain("pricings.0.lowestPrice");
     }
@@ -430,7 +439,7 @@ describe("ReservationUnitEditSchema", () => {
     values.pricings[0] = {
       ...at(values.pricings, 0),
       isPaid: true,
-      taxPercentage: 1,
+      taxLevel: 1,
       paymentType: PaymentType.Online,
       lowestPrice: 5,
       highestPrice: 10,

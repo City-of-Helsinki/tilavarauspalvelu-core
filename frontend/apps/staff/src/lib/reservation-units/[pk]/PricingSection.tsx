@@ -45,7 +45,7 @@ const ErrorText = styled.div`
 type Props = {
   pk: number;
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  taxPercentageOptions: TaxOption[];
+  taxLevelOptions: TaxLevelOption[];
 };
 
 function removeTax(price: number, taxPercentage: number) {
@@ -58,20 +58,21 @@ function addTax(price: number, taxPercentage: number) {
   return Math.floor(tmp * 100) / 100;
 }
 
-export type TaxOption = {
+export type TaxLevelOption = {
   label: string;
   pk: number;
-  value: number;
+  // The rate of the tax level today
+  percentage: number;
 };
 
 function PaidPricingPart({
   form,
   index,
-  taxPercentageOptions,
+  taxLevelOptions,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
   index: number;
-  taxPercentageOptions: TaxOption[];
+  taxLevelOptions: TaxLevelOption[];
 }) {
   const { t } = useTranslation("reservationUnitEditor");
   const { control, setValue, formState, watch } = form;
@@ -88,8 +89,7 @@ function PaidPricingPart({
   }));
 
   const pricing = watch(`pricings.${index}`);
-  const taxPercentagePk = watch(`pricings.${index}.taxPercentage`);
-  const taxPercentage = taxPercentageOptions.find((x) => x.pk === taxPercentagePk)?.value ?? 0;
+  const taxPercentage = taxLevelOptions.find((x) => x.pk === pricing.taxLevel)?.percentage ?? 0;
 
   return (
     <>
@@ -104,18 +104,19 @@ function PaidPricingPart({
         error={getTranslatedError(t, errors.pricings?.[index]?.priceUnit?.message)}
       />
       <ControlledSelect
-        name={`pricings.${index}.taxPercentage`}
+        name={`pricings.${index}.taxLevel`}
         control={control}
         required
-        label={t(`label.taxPercentage`)}
-        options={taxPercentageOptions.map((x) => ({
+        label={t("label.taxLevel")}
+        tooltip={t("tooltip.taxLevel")}
+        options={taxLevelOptions.map((x) => ({
           label: x.label,
           value: x.pk,
         }))}
         afterChange={(val) => {
           const low = pricing.lowestPrice;
           const high = pricing.highestPrice;
-          const tax = taxPercentageOptions.find((x) => x.pk === val)?.value ?? 0;
+          const tax = taxLevelOptions.find((x) => x.pk === val)?.percentage ?? 0;
           if (!Number.isNaN(low)) {
             const lowNet = removeTax(low, tax);
             setValue(`pricings.${index}.lowestPriceNet`, lowNet);
@@ -125,7 +126,7 @@ function PaidPricingPart({
             setValue(`pricings.${index}.highestPriceNet`, highNet);
           }
         }}
-        error={getTranslatedError(t, errors.pricings?.[index]?.taxPercentage?.message)}
+        error={getTranslatedError(t, errors.pricings?.[index]?.taxLevel?.message)}
       />
       <ControlledNumberInput
         name={`pricings.${index}.lowestPriceNet`}
@@ -195,7 +196,7 @@ function PaidPricingPart({
   );
 }
 
-export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): React.ReactElement | null {
+export function PricingTypeView({ pk, form, taxLevelOptions }: Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   const { control, formState, watch } = form;
@@ -253,7 +254,7 @@ export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): Reac
           <span>{getTranslatedError(t, errors.pricings.message)}</span>
         </ErrorText>
       )}
-      {isPaid && <PaidPricingPart form={form} index={index} taxPercentageOptions={taxPercentageOptions} />}
+      {isPaid && <PaidPricingPart form={form} index={index} taxLevelOptions={taxLevelOptions} />}
     </AutoGrid>
   );
 }
@@ -261,11 +262,11 @@ export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): Reac
 function PricingControl({
   pricing,
   form,
-  taxPercentageOptions,
+  taxLevelOptions,
 }: {
   pricing: ReservationUnitEditFormValues["pricings"][0];
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  taxPercentageOptions: TaxOption[];
+  taxLevelOptions: TaxLevelOption[];
 }) {
   const { t } = useTranslation("reservationUnitEditor");
   const { watch, control } = form;
@@ -280,7 +281,7 @@ function PricingControl({
         required
         tooltip={t("tooltip.pricingType")}
       >
-        <PricingTypeView pk={pricing.pk} form={form} taxPercentageOptions={taxPercentageOptions} />
+        <PricingTypeView pk={pricing.pk} form={form} taxLevelOptions={taxLevelOptions} />
       </FieldGroup>
       <ControlledCheckbox name={toggleFieldName} control={control} label={t("label.hasMaterialPrice")} />
       {showMaterialDescriptions && (
@@ -331,11 +332,11 @@ function MaterialPricingDescription({ control, language, index, helperText }: De
 
 export function PricingSection({
   form,
-  taxPercentageOptions,
+  taxLevelOptions,
   pricingTermsOptions,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  taxPercentageOptions: TaxOption[];
+  taxLevelOptions: TaxLevelOption[];
   pricingTermsOptions: Array<{ value: string; label: string }>;
 }) {
   const { t } = useTranslation("reservationUnitEditor");
@@ -376,12 +377,7 @@ export function PricingSection({
         {pricings
           .filter((p) => !p.isFuture)
           .map((pricing) => (
-            <PricingControl
-              key={pricing.pk}
-              form={form}
-              pricing={pricing}
-              taxPercentageOptions={taxPercentageOptions}
-            />
+            <PricingControl key={pricing.pk} form={form} pricing={pricing} taxLevelOptions={taxLevelOptions} />
           ))}
         <FuturePricingContainer $gap="s" $toggled={hasFuturePricing}>
           <ControlledCheckbox control={control} name="hasFuturePricing" label={t("label.hasFuturePrice")} />
@@ -389,12 +385,7 @@ export function PricingSection({
             pricings
               .filter((p) => p.isFuture)
               .map((pricing) => (
-                <PricingControl
-                  key={pricing.pk}
-                  form={form}
-                  pricing={pricing}
-                  taxPercentageOptions={taxPercentageOptions}
-                />
+                <PricingControl key={pricing.pk} form={form} pricing={pricing} taxLevelOptions={taxLevelOptions} />
               ))}
         </FuturePricingContainer>
       </Flex>

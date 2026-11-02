@@ -37,7 +37,7 @@ import type {
   UpdateApplicationRoundTimeSlotSerializerInput,
   ReservationUnitAccessTypeSerializerInput,
 } from "@gql/gql-types";
-import type { TaxOption } from "./PricingSection";
+import type { TaxLevelOption } from "./PricingSection";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -60,7 +60,7 @@ const PricingFormSchema = z.object({
   // pk === 0 fails silently on the backend, but undefined creates a new pricing
   // on the frontend pk <= 0 is a new pricing
   pk: z.number(),
-  taxPercentage: z.number(),
+  taxLevel: z.number(),
   // net price is never sent to backend (but we want to keep it in the UI)
   lowestPrice: z.number({ error: "Required" }),
   lowestPriceNet: z.number({ error: "Required" }),
@@ -150,10 +150,10 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
         code: "custom",
       });
     }
-    if (data.taxPercentage <= 0) {
+    if (data.taxLevel <= 0) {
       ctx.addIssue({
-        message: "taxPercentage must be selected",
-        path: [`${path}.taxPercentage`],
+        message: "taxLevel must be selected",
+        path: [`${path}.taxLevel`],
         code: "custom",
       });
     }
@@ -782,7 +782,7 @@ function convertPricing(p?: PricingNode): PricingFormValues {
   const highestPriceNet = Math.floor(100 * (toNumber(p?.highestPriceNet) ?? 0)) / 100;
   return {
     pk: p?.pk ?? 0,
-    taxPercentage: p?.taxPercentage?.pk ?? 0,
+    taxLevel: p?.taxLevel?.pk ?? 0,
     lowestPrice: toNumber(p?.lowestPrice) ?? 0,
     highestPrice: toNumber(p?.highestPrice) ?? 0,
     lowestPriceNet,
@@ -819,7 +819,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
 
     prices.push({
       pk: rollingIndex--,
-      taxPercentage: 0,
+      taxLevel: 0,
       lowestPrice: 0,
       lowestPriceNet: 0,
       highestPrice: 0,
@@ -969,7 +969,7 @@ function maybeToApiDateTime(date: string, time: string): string | null {
 }
 
 // Too hard to type this because of two separate mutations that have optional fields in them
-export function transformReservationUnit(values: ReservationUnitEditFormValues, taxPercentageOptions: TaxOption[]) {
+export function transformReservationUnit(values: ReservationUnitEditFormValues, taxLevelOptions: TaxLevelOption[]) {
   // Convert from form values to API data
   const {
     pk,
@@ -1050,7 +1050,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     reservationKind,
     isDraft,
     cancellationRule: hasCancellationRule ? cancellationRule : null,
-    pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing, taxPercentageOptions))),
+    pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing, taxLevelOptions))),
     accessTypes,
     applicationRoundTimeSlots,
   };
@@ -1059,21 +1059,21 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
 function transformPricing(
   values: PricingFormValues,
   hasFuturePricing: boolean,
-  taxPercentageOptions: TaxOption[]
+  taxLevelOptions: TaxLevelOption[]
 ): ReservationUnitPricingSerializerInput | null {
   if (!hasFuturePricing && isAfterToday(values.begins)) {
     return null;
   }
-  // without a valid taxPrecentage mutation fails even if it's free pricing
-  // but we don't have a valid taxPercentage for free pricings (user has made no selection)
-  const taxPercentage = values.taxPercentage > 0 ? values.taxPercentage : (taxPercentageOptions[0]?.pk ?? 0);
-  if (taxPercentage === 0) {
-    throw new Error("Tax percentage is required for pricing");
+  // without a valid taxLevel mutation fails even if it's free pricing
+  // but we don't have a valid taxLevel for free pricings (user has made no selection)
+  const taxLevel = values.taxLevel > 0 ? values.taxLevel : (taxLevelOptions[0]?.pk ?? 0);
+  if (taxLevel === 0) {
+    throw new Error("Tax level is required for pricing");
   }
 
   const begins = parseUIDate(values.begins) ?? new Date();
   return {
-    taxPercentage,
+    taxLevel,
     begins: formatApiDate(begins) ?? "",
     highestPrice: values.isPaid ? values.highestPrice.toString() : "0",
     lowestPrice: values.isPaid ? values.lowestPrice.toString() : "0",

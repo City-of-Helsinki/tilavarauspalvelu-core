@@ -32,7 +32,7 @@
     "Too big. expected string to have <=4000 characters": "Viesti ei saa olla yli 4000 merkkiä",
     "must be a number": "Pitää olla numero",
     "lowestPrice must be lower than highestPrice": "Alin hinta pitää olla pienempi kuin ylin hinta",
-    "taxPercentage must be selected": "Vero prosentti pitää valita",
+    "taxLevel must be selected": "Verotaso pitää valita",
     "Begin needs to be in the future": "Alkamisajan tulee olla tulevaisuudessa",
     "Number must be greater than or equal to 1": "Pitää olla vähintään 1",
     "Expected number, received null": "Pakollinen",

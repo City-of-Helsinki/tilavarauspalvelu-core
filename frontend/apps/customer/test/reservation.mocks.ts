@@ -231,10 +231,10 @@ export function createMockReservation(
           paymentType: PaymentType.Online,
           highestPrice: price,
           lowestPrice: "0.0",
-          taxPercentage: {
-            id: createNodeId("TaxPercentageNode", 1),
+          taxLevel: {
+            id: createNodeId("TaxLevelNode", 1),
             pk: 1,
-            value: "24.5",
+            currentPercentage: "24.5",
           },
           materialPriceDescriptionFi: "Testimateriaali FI",
           materialPriceDescriptionEn: "Test material EN",

@@ -15,5 +15,5 @@ export { OpeningHoursSection } from "./OpeningHoursSection";
 export { CommunicationSection } from "./CommunicationSection";
 export { AccessTypeSection } from "./AccessTypeSection";
 export { ReservationUnitSettingsSection } from "./ReservationUnitSettingsSection";
-export { PricingSection } from "./PricingSection";
+export { PricingSection, type TaxLevelOption } from "./PricingSection";
 export { ErrorInfo } from "./ErrorInfo";
