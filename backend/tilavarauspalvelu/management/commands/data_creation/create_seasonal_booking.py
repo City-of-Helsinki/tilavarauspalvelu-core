@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import math
 import random
 from typing import TYPE_CHECKING
 
@@ -725,7 +726,8 @@ def _create_application_sections_for_application(
                 _create_allocated_time_slots_for_section(
                     reservation_unit_options=options,
                     suitable_time_ranges=suitable_times,
-                    duration=section.reservation_min_duration,
+                    min_duration=section.reservation_min_duration,
+                    max_duration=section.reservation_max_duration,
                     suitable_time_info=suitable_time_info,
                     allocation_info=allocation_info,
                 )
@@ -810,9 +812,11 @@ def _create_reservation_unit_options_for_section(
 
 
 def _create_allocated_time_slots_for_section(
+    *,
     reservation_unit_options: list[ReservationUnitOption],
     suitable_time_ranges: list[SuitableTimeRange],
-    duration: datetime.timedelta,
+    min_duration: datetime.timedelta,
+    max_duration: datetime.timedelta,
     suitable_time_info: SuitableTimeInfo,
     allocation_info: AllocationInfo,
 ) -> Generator[AllocatedTimeSlot]:
@@ -828,6 +832,7 @@ def _create_allocated_time_slots_for_section(
     - Check previous allocations for the same reservation unit, and don't allow overlapping ones
     - Check previous allocations for the same application section, and don't allow overlapping ones
     - Allocate only once per weekday, or twice if the applicant applied for morning and evening
+    - Allocate at least the minimum duration of the reservation unit, but not more than the section allows
     - If enough allocations cannot be made, mark all reservation unit options as locked
 
     Note that in actual allocation process there are more rules regarding the order
@@ -835,7 +840,6 @@ def _create_allocated_time_slots_for_section(
     """
     section_allocations: dict[Weekday, list[AllocationTime]] = {}
     allocations_per_weekday = 2 if suitable_time_info.applied_morning_and_evening else 1
-    duration_hours = int(duration.total_seconds() // 3600)
 
     # Sort suitable time ranges by priority so that primary ones are used first
     suitable_time_ranges = sorted(suitable_time_ranges, key=lambda s: 0 if s.priority == Priority.PRIMARY else 1)
@@ -844,6 +848,13 @@ def _create_allocated_time_slots_for_section(
     reservation_unit_options = sorted(reservation_unit_options, key=lambda o: o.preferred_order)
 
     for option in reservation_unit_options:
+        reservation_unit_min_duration = option.reservation_unit.min_reservation_duration or datetime.timedelta()
+        duration = max(min_duration, reservation_unit_min_duration)
+        duration_hours = math.ceil(duration.total_seconds() / 3600)
+        rounded_duration = datetime.timedelta(hours=duration_hours)
+        if rounded_duration > max_duration:
+            continue
+
         for suitable in suitable_time_ranges:
             weekday = Weekday(suitable.day_of_the_week)
             allocations = allocation_info.allocations.setdefault((option.reservation_unit.pk, weekday), [])
@@ -853,6 +864,9 @@ def _create_allocated_time_slots_for_section(
 
             # For simplicity, allocate on even hours only.
             for begin_time in get_time_range(suitable.begin_time, suitable.end_time):
+                if begin_time.hour + duration_hours > suitable.end_time.hour:
+                    break
+
                 end_time = begin_time.replace(hour=begin_time.hour + duration_hours)
 
                 first_overlapping_allocation = next(
