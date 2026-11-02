@@ -116,8 +116,8 @@ def _create_intended_uses() -> list[IntendedUse]:
         ),
         IntendedUseData(
             name_fi="Pelaa digitaalisesti",
-            name_en="Exercise and relax",
-            name_sv="Motionera och koppla av",
+            name_en="Play digitally",
+            name_sv="Spela digitalt",
             image_url=(
                 "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Pelaa_digitaalisesti_Maija_Astikainen_FmzBTxt.jpg"
