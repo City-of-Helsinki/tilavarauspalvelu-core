@@ -32,8 +32,19 @@ up-release *args: env
 up-backend *args: env
     COMPOSE_PROFILES=backend docker compose up --build --watch {{ args }}
 
-# The error testing setup. See "Error testing" in README.md.
-chaos_files := "-f docker-compose.yml -f docker-compose.chaos.yml"
+# The single address setup puts the gateway on "localhost:8000". See "Single address setup" in README.md.
+gateway_files := "-f docker-compose.yml -f docker-compose.gateway.yml"
+
+# Start the development setup with the gateway on localhost:8000. Set COMPOSE_PROFILES for the release frontends.
+up-gateway *args: env
+    COMPOSE_PROFILES={{ up_profiles }} docker compose {{ gateway_files }} up --build --watch {{ args }}
+
+# Remove the containers of the single address setup. Run it before you go back to "just stack up".
+down-gateway *args:
+    docker compose {{ gateway_files }} down {{ args }}
+
+# The error testing setup builds on the single address setup. See "Error testing" in README.md.
+chaos_files := gateway_files + " -f docker-compose.chaos.yml"
 chaos_url := "http://127.0.0.1:8099"
 
 # Start the development setup with the chaos proxy in front of the backend. Set COMPOSE_PROFILES for the release frontends.
