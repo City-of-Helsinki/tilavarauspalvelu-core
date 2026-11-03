@@ -8,11 +8,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path, reverse
-from graphene_django_extensions import FileUploadGraphQLView
 from health_check.views import HealthCheckView
 
 from tilavarauspalvelu.admin.app_list import group_admin_app_list
 from tilavarauspalvelu.api.gdpr.views import TilavarauspalveluGDPRAPIView
+from tilavarauspalvelu.api.graphql.views import SentryGraphQLView
 from tilavarauspalvelu.api.rest.views import (
     csrf_view,
     liveness_check,
@@ -73,7 +73,7 @@ admin.site.get_app_list = lambda request, app_label=None: (
     "connect-src": [SELF, "https://cdn.jsdelivr.net;"],
 })
 def graphql_view_with_csp_decorator(request: HttpRequest) -> HttpResponseBase:
-    return FileUploadGraphQLView.as_view(graphiql=settings.GRAPHIQL_ENABLED)(request)
+    return SentryGraphQLView.as_view(graphiql=settings.GRAPHIQL_ENABLED)(request)
 
 
 # --- URL Patterns ---------------------------------------------------------------------------------------------------
