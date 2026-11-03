@@ -4,8 +4,11 @@ import { randomBytes } from "node:crypto";
  * This is used for creating the necessary test data for test execution.
  */
 import { request } from "@playwright/test";
+import { print } from "graphql";
+import { gql } from "graphql-tag";
 import { setTimeout } from "node:timers/promises";
 import type { APIRequestContext } from "@playwright/test";
+import type { RobotUnitQuery, RobotUnitQueryVariables } from "../../gql/gql-types";
 import { errorMessage, expect, log, runStep, step } from "../../lib/runtime";
 import { PageObject } from "../page-object";
 import { ROBOT_API_ENDPOINT, ROBOT_API_TOKEN } from "./env_loader";
@@ -17,9 +20,18 @@ export const MAX_RETRIES = 2;
 export const RETRY_DELAY = 60;
 export const DEFAULT_ENDPOINT = "/v1/create_robot_test_data/";
 
-interface UnitQueryResult {
-  data?: { reservationUnits?: { edges?: Array<{ node: { pk: number; nameFi: string } }> } };
-}
+const ROBOT_UNIT_QUERY = gql`
+  query RobotUnit($name: String) {
+    reservationUnits(nameFi: $name) {
+      edges {
+        node {
+          pk
+          nameFi
+        }
+      }
+    }
+  }
+`;
 
 /**
  * Port: the pk of the always free unit, or null when it can't be read. The backend deletes the test data and creates
@@ -29,19 +41,19 @@ async function freeUnitPk(api: APIRequestContext): Promise<number | null> {
   // Django accepts any CSRF token that is the same in the cookie and the header
   const csrf_token = randomBytes(16).toString("hex");
   try {
+    const variables: RobotUnitQueryVariables = { name: ALWAYS_FREE_UNIT };
     const response = await api.post("/graphql/", {
-      data: {
-        query: "query RobotUnit($name: String) { reservationUnits(nameFi: $name) { edges { node { pk nameFi } } } }",
-        variables: { name: ALWAYS_FREE_UNIT },
-      },
+      data: { query: print(ROBOT_UNIT_QUERY), variables },
       headers: { Cookie: `csrftoken=${csrf_token}`, "X-CSRFToken": csrf_token, Referer: `${BASE_URL}/` },
       failOnStatusCode: false,
     });
     if (response.status() !== 200) {
       return null;
     }
-    const result = (await response.json()) as UnitQueryResult;
-    return result.data?.reservationUnits?.edges?.find((edge) => edge.node.nameFi === ALWAYS_FREE_UNIT)?.node.pk ?? null;
+    const result = (await response.json()) as { data?: RobotUnitQuery };
+    return (
+      result.data?.reservationUnits?.edges.find((edge) => edge?.node?.nameFi === ALWAYS_FREE_UNIT)?.node?.pk ?? null
+    );
   } catch {
     return null;
   }

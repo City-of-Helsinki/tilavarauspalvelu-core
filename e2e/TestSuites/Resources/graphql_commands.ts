@@ -1,30 +1,64 @@
 /** GraphQL API commands for interacting with Varaamo backend */
+import { print } from "graphql";
+import { gql } from "graphql-tag";
+import type {
+  BannerNotificationState,
+  BannerNotificationsQuery,
+  DeleteBannerNotificationMutation,
+  DeleteBannerNotificationMutationVariables,
+  UpdateBannerNotificationMutation,
+  UpdateBannerNotificationMutationVariables,
+} from "../../gql/gql-types";
 import { step, expect, log } from "../../lib/runtime";
 import { PageObject } from "../page-object";
 import { URL_TEST } from "./variables";
 
-/** The fields of a banner notification that the queries below read */
-interface BannerNotificationNode {
-  pk: number;
-  name: string;
-  state: string;
-  draft: boolean;
-  activeFrom: string | null;
-  activeUntil: string | null;
-  target: string;
-  level: string;
-  messageFi: string | null;
-  messageEn: string | null;
-  messageSv: string | null;
+/** A GraphQL response: a request that fails on the server answers 200 with errors */
+interface GraphQLResult<T> {
+  data: T;
+  errors?: unknown[];
 }
 
-interface BannerNotificationEdge {
-  node: BannerNotificationNode;
-}
+// Query all notifications without filter
+// Include message fields for pattern matching
+const BANNER_NOTIFICATIONS_QUERY = gql`
+  query BannerNotifications {
+    bannerNotifications {
+      edges {
+        node {
+          pk
+          name
+          state
+          draft
+          activeFrom
+          activeUntil
+          target
+          level
+          messageFi
+          messageEn
+          messageSv
+        }
+      }
+    }
+  }
+`;
 
-interface BannerNotificationsResult {
-  data: { bannerNotifications: { edges: BannerNotificationEdge[] } };
-}
+const UPDATE_BANNER_NOTIFICATION_MUTATION = gql`
+  mutation UpdateBannerNotification($input: BannerNotificationUpdateMutationInput!) {
+    updateBannerNotification(input: $input) {
+      pk
+      name
+    }
+  }
+`;
+
+const DELETE_BANNER_NOTIFICATION_MUTATION = gql`
+  mutation DeleteBannerNotification($input: BannerNotificationDeleteMutationInput!) {
+    deleteBannerNotification(input: $input) {
+      deleted
+    }
+  }
+`;
 
 export class GraphqlCommands extends PageObject {
   /** Requires user to be logged in (uses existing cookies from Browser) */
@@ -58,13 +92,11 @@ export class GraphqlCommands extends PageObject {
    */
   @step("graphql_commands.Get All Banner Notifications")
   async getAllBannerNotifications() {
-    // Query all notifications without filter
-    // Include message fields for pattern matching
-    const query =
-      "query { bannerNotifications { edges { node { pk name state draft activeFrom activeUntil target level messageFi messageEn messageSv } } } }";
-    const response = await this.makeGraphQLRequest(query);
+    const response = await this.makeGraphQLRequest(print(BANNER_NOTIFICATIONS_QUERY));
     expect(response.status).toBe(200);
-    return (await response.json()) as BannerNotificationsResult;
+    const response_json = (await response.json()) as GraphQLResult<BannerNotificationsQuery>;
+    expect(response_json.errors ?? [], "The banner notifications query returned errors").toEqual([]);
+    return response_json;
   }
 
   /**
@@ -72,12 +104,14 @@ export class GraphqlCommands extends PageObject {
    * Queries all notifications and filters them here
    */
   @step("graphql_commands.Get Filtered Banner Notifications")
-  async getFilteredBannerNotifications(...states: string[]) {
+  async getFilteredBannerNotifications(...states: BannerNotificationState[]) {
     const response_json = await this.getAllBannerNotifications();
-    const all_notifications = response_json.data.bannerNotifications.edges;
+    const all_notifications = (response_json.data.bannerNotifications?.edges ?? [])
+      .map((edge) => edge?.node)
+      .filter((node) => node != null);
 
     // Filter notifications by state
-    return all_notifications.filter((edge) => states.includes(edge.node.state));
+    return all_notifications.filter((node) => states.includes(node.state));
   }
 
   /**
@@ -94,19 +128,21 @@ export class GraphqlCommands extends PageObject {
     let drafted_count = 0;
 
     // Loop through each notification and set to draft
-    for (const { node } of notifications) {
+    for (const node of notifications) {
       const { pk, name, state: current_state } = node;
 
       await log(`Processing notification ${pk}: "${name}" (${current_state})`, { level: "DEBUG" });
 
-      // Only update if not already in draft
-      if (current_state !== "DRAFT") {
+      // Only update if not already in draft (pk is nullable in the schema)
+      if (current_state !== "DRAFT" && pk != null) {
         // Make the GraphQL mutation to set draft=true
-        const mutation =
-          "mutation UpdateBannerNotification($input: BannerNotificationUpdateMutationInput!) { updateBannerNotification(input: $input) { pk name } }";
-        const variables = { input: { pk: pk, draft: true } };
+        const variables: UpdateBannerNotificationMutationVariables = { input: { pk: pk, draft: true } };
         // oxlint-disable-next-line no-await-in-loop -- one notification at a time
-        await this.makeGraphQLRequest(mutation, variables);
+        const response = await this.makeGraphQLRequest(print(UPDATE_BANNER_NOTIFICATION_MUTATION), variables);
+        expect(response.status, `Drafting notification ${pk} failed`).toBe(200);
+        // oxlint-disable-next-line no-await-in-loop -- one notification at a time
+        const response_json = (await response.json()) as GraphQLResult<UpdateBannerNotificationMutation>;
+        expect(response_json.errors ?? [], `Drafting notification ${pk} returned errors`).toEqual([]);
         drafted_count++;
         // oxlint-disable-next-line no-await-in-loop -- log lines in order
         await log(`Drafted notification ${pk}`, { level: "DEBUG" });
@@ -132,7 +168,7 @@ export class GraphqlCommands extends PageObject {
     let deleted_count = 0;
 
     // Loop through each notification and delete if name or message matches pattern
-    for (const { node } of notifications) {
+    for (const node of notifications) {
       const { pk, name } = node;
 
       // Check if pattern appears in name or any message field (case-insensitive)
@@ -141,16 +177,18 @@ export class GraphqlCommands extends PageObject {
         (text ?? "").toUpperCase().includes(pattern_upper)
       );
 
-      if (contains) {
+      if (contains && pk != null) {
         // oxlint-disable-next-line no-await-in-loop -- log lines in order
         await log(`Deleting: ${pk} - "${name}"`, { level: "DEBUG" });
 
         // Make the GraphQL mutation to delete the notification
-        const mutation =
-          "mutation DeleteBannerNotification($input: BannerNotificationDeleteMutationInput!) { deleteBannerNotification(input: $input) { deleted } }";
-        const variables = { input: { pk: pk } };
+        const variables: DeleteBannerNotificationMutationVariables = { input: { pk: pk } };
         // oxlint-disable-next-line no-await-in-loop -- one notification at a time
-        await this.makeGraphQLRequest(mutation, variables);
+        const response = await this.makeGraphQLRequest(print(DELETE_BANNER_NOTIFICATION_MUTATION), variables);
+        expect(response.status, `Deleting notification ${pk} failed`).toBe(200);
+        // oxlint-disable-next-line no-await-in-loop -- one notification at a time
+        const response_json = (await response.json()) as GraphQLResult<DeleteBannerNotificationMutation>;
+        expect(response_json.errors ?? [], `Deleting notification ${pk} returned errors`).toEqual([]);
 
         deleted_count++;
       } else {

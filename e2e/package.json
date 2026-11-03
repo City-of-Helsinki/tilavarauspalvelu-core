@@ -13,14 +13,21 @@
     "selftest": "playwright test --project selftest",
     "list": "playwright test --list",
     "report": "playwright show-report",
+    "codegen": "graphql-codegen",
     "lint": "oxlint --type-aware --type-check",
     "lint:fix": "oxlint --type-aware --type-check --fix",
     "format": "oxfmt",
     "format:check": "oxfmt --check"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^7.4.6",
+    "@graphql-codegen/typescript": "^6.1.2",
+    "@graphql-codegen/typescript-operations": "^6.2.0",
     "@playwright/test": "1.64.0",
     "@types/node": "^24.19.2",
+    "graphql": "^16.14.2",
+    "graphql-config": "^5.1.8",
+    "graphql-tag": "^2.12.7",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
     "oxlint-tsgolint": "^7.0.2004"

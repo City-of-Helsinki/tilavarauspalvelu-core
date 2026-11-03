@@ -202,8 +202,9 @@ onTestEnd(async () => {
 export async function resetSharedState(): Promise<void> {
   await mkdir(SHARED_BASE, { recursive: true });
   for (const entry of await readdir(SHARED_BASE)) {
-    const started = Number(RUN_DIR.exec(entry)?.[1] ?? 0);
-    if (Date.now() - started > OLD_RUN_MS) {
+    // Only run folders are removed, as PABOT_SHARED_DIR can point to a folder that has other files too
+    const started = RUN_DIR.exec(entry)?.[1];
+    if (started != null && Date.now() - Number(started) > OLD_RUN_MS) {
       // oxlint-disable-next-line no-await-in-loop -- small directory
       await rm(join(SHARED_BASE, entry), { recursive: true, force: true });
     }

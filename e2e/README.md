@@ -91,6 +91,8 @@ the runtime offline.
   `session.ts` keeps a test's pages, `backend-errors.ts` records their backend errors into the report, `locks.ts`
   has the locks between the workers, and `locators.ts`, `responses.ts` and `retry.ts` are small helpers for the
   keywords.
+- `graphql.config.ts`: the codegen settings for the GraphQL queries, which are written with `gql`. `pnpm codegen`
+  writes their types from `../tilavaraus.graphql` to `gql/gql-types.ts`, which isn't committed.
 - `tools/`: the report reader described below. `tools/README.md` lists how the suite differs from the Robot suite it
   was converted from.
 
@@ -165,12 +167,13 @@ the runtime offline.
 ## Checks without the test environment
 
 ```bash
+pnpm codegen   # the types of the GraphQL queries, which pnpm lint needs
 pnpm lint      # oxlint with type checking, with the frontend's rules
 pnpm selftest  # the runtime and the keywords that need no test environment, against local pages
 ```
 
 The "E2E checks" workflow (`.github/workflows/test-e2e.yml`) runs these, `pnpm format:check` and `pnpm run list`
-for pull requests and pushes to `main` that change `e2e/`.
+for pull requests and pushes to `main` that change `e2e/` or the GraphQL schema.
 
 ## GitHub Actions
 

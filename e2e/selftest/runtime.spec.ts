@@ -266,15 +266,20 @@ test.describe("Runtime self-test", () => {
     expect(dirname(runDir)).toBe(SHARED_BASE);
     expect(basename(runDir)).toMatch(/^run-\d+-\d+$/);
     expect(sharedDir()).toBe(runDir);
-    // The global setup of another run (like pnpm selftest during a run) keeps this run's folder, removing old ones
+    // The global setup of another run (like pnpm selftest during a run) keeps this run's folder, removing old ones.
+    // What isn't a run folder is kept.
     const old = join(SHARED_BASE, `run-${Date.now() - 2 * 24 * 60 * 60_000}-1`);
+    const other = join(SHARED_BASE, "selftest-not-a-run");
     await mkdir(old);
+    await mkdir(other, { recursive: true });
     try {
       await resetSharedState();
       expect(existsSync(runDir)).toBe(true);
       expect(existsSync(old)).toBe(false);
+      expect(existsSync(other)).toBe(true);
       expect(process.env.PABOT_SHARED_RUN_DIR).not.toBe(runDir);
     } finally {
+      await rm(other, { recursive: true, force: true });
       const made = process.env.PABOT_SHARED_RUN_DIR;
       if (made != null && made !== runDir && dirname(made) === SHARED_BASE) {
         await rm(made, { recursive: true, force: true });
