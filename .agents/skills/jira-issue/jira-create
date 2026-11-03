@@ -61,7 +61,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --description-file)
       [[ -z "$description_file" ]] || { echo "Give --description-file only once." >&2; usage; }
-      check_description_file "$value"
+      check_text_file "$value" description
       description_file="$value"
       ;;
     --label)

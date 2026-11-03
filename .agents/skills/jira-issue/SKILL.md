@@ -72,6 +72,7 @@ Give the issue first, then one or more options. Each run changes only the parts 
 |-----------------------------|--------|--------------------------------------------------------|
 | `--summary <text>`          | no     | Replace the summary (the title). One line.             |
 | `--description-file <path>` | no     | Replace the description with the contents of the file. |
+| `--comment-file <path>`     | no     | Add a comment with the contents of the file.           |
 | `--add-label <label>`       | yes    | Add a label. The other labels stay.                    |
 | `--remove-label <label>`    | yes    | Remove a label. The other labels stay.                 |
 | `--blocks <key>`            | yes    | Add a link: this issue blocks `<key>`.                 |

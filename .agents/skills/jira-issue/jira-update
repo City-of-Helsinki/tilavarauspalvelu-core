@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Update the summary, description, labels or links of a Jira issue through the Jira Cloud REST API.
+# Update the summary, description, labels or links of a Jira issue, or add a comment, through the Jira Cloud REST API.
 # Usage: jira-update <key or URL> <options>, e.g. jira-update TILA-123 --add-label backend
 set -euo pipefail
 
@@ -11,6 +11,7 @@ Usage: jira-update <key or URL> <options>, e.g. jira-update TILA-123 --add-label
 Give at least one change. Options marked with * can be repeated.
   --summary <text>            Replace the summary (the title). One line.
   --description-file <path>   Replace the description with the file contents (Jira wiki markup).
+  --comment-file <path>       Add a comment with the file contents (Jira wiki markup).
   --add-label <label>       * Add a label: backend, frontend, operations, infra or design.
   --remove-label <label>    * Remove a label.
   --blocks <key>            * Add a link: this issue blocks <key>.
@@ -28,6 +29,7 @@ shift
 
 new_summary=""
 description_file=""
+comment_file=""
 add_labels=()
 remove_labels=()
 blocks=()
@@ -55,8 +57,13 @@ while [[ $# -gt 0 ]]; do
       ;;
     --description-file)
       [[ -z "$description_file" ]] || { echo "Give --description-file only once." >&2; usage; }
-      check_description_file "$value"
+      check_text_file "$value" description
       description_file="$value"
+      ;;
+    --comment-file)
+      [[ -z "$comment_file" ]] || { echo "Give --comment-file only once." >&2; usage; }
+      check_text_file "$value" comment
+      comment_file="$value"
       ;;
     --add-label | --remove-label)
       check_label "$value"
@@ -88,7 +95,7 @@ for other in ${remove_links[@]+"${remove_links[@]}"}; do
     || { echo "Link to $other is both added and removed." >&2; exit 2; }
 done
 
-if [[ -z "$new_summary" && -z "$description_file" ]] \
+if [[ -z "$new_summary" && -z "$description_file" && -z "$comment_file" ]] \
   && (( ${#add_labels[@]} + ${#remove_labels[@]} + ${#blocks[@]} + ${#blocked_by[@]} + ${#relates[@]} + ${#remove_links[@]} == 0 )); then
   echo "Nothing to change." >&2
   usage
@@ -148,6 +155,11 @@ if (( ${#edit_summary[@]} > 0 )); then
   )"
   summary="$(printf '%s ' ${edit_summary[@]+"${edit_summary[@]}"})"
   requests+=("PUT${sep}rest/api/2/issue/$key$sep$body$sep${summary% }")
+fi
+
+if [[ -n "$comment_file" ]]; then
+  body="$(jq --null-input --compact-output --rawfile comment "$comment_file" '{body: $comment}')"
+  requests+=("POST${sep}rest/api/2/issue/$key/comment$sep$body${sep}Added a comment.")
 fi
 
 # Remove links before adding new ones.
