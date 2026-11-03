@@ -102,6 +102,7 @@ function DatedWeekTable<TData extends CalendarData>(
     draftId,
     onMoveDraft,
     isDraftAllowed,
+    getDraftTitle,
     isLoading,
     alternative,
     toolbarExtra,
@@ -133,8 +134,14 @@ function DatedWeekTable<TData extends CalendarData>(
   };
   const shownEvents = useMemo(
     () =>
-      moving && draftId != null ? events.map((item) => (item.id === draftId ? { ...item, ...moving } : item)) : events,
-    [events, draftId, moving]
+      moving && draftId != null
+        ? events.map((item) =>
+            item.id === draftId
+              ? { ...item, ...moving, title: getDraftTitle ? getDraftTitle(moving) : item.title }
+              : item
+          )
+        : events,
+    [events, draftId, moving, getDraftTitle]
   );
   const segmentsByDay = useMemo(() => segmentEvents(shownEvents, days), [shownEvents, days]);
   const open = useMemo(() => openRangesByDay(openRanges, days), [openRanges, days]);

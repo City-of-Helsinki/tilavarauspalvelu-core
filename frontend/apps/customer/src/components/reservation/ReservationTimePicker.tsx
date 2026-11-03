@@ -5,6 +5,7 @@ import { gql } from "@apollo/client";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import type { CalendarEvent, CalendarEventBuffer } from "@ui/components/calendar/types";
 import { getEventBuffers } from "@ui/components/calendar/utils";
 import { DatedWeekCalendar } from "@ui/components/DatedWeekCalendar/DatedWeekCalendar";
@@ -46,6 +47,12 @@ const stateOf = ({ source }: PickerData) => source.event?.state as string | unde
 // Buffers are built from reservations so they carry a pk, but they are typed as only a state.
 const reservationOf = ({ source }: PickerData): ReservationNode | null =>
   source.event != null && "pk" in source.event ? source.event : null;
+
+// The draft's time and length, e.g. "12:00–13:00 (1 h)". Also follows the draft while it is being dragged.
+function formatDraftTitle(t: TFunction, { start, end }: DatedRange): string {
+  const timeRange = formatTimeRange(dateToMinutes(start), dateToMinutes(end), true);
+  return `${timeRange} (${formatDuration(t, { minutes: differenceInMinutes(end, start) })})`;
+}
 
 function toDatedEvent(source: PickerData["source"], index: number): DatedEvent<PickerData> {
   const state = source.event?.state as string | undefined;
@@ -125,13 +132,12 @@ function useCalendarEventChange({
 
     let focusEvent = null;
     if (shouldDisplayFocusSlot) {
-      const { durationMinutes: diff, start, end } = focusSlot;
-      const timeRange = formatTimeRange(dateToMinutes(start), dateToMinutes(end), true);
+      const { start, end } = focusSlot;
       focusEvent = {
         beginsAt: start,
         endsAt: end,
         state: "INITIAL",
-        durationString: `${timeRange} (${formatDuration(t, { minutes: diff })})`,
+        durationString: formatDraftTitle(t, { start, end }),
       };
     }
 
@@ -417,6 +423,7 @@ export function ReservationTimePicker({
         onSelectSlot={isReservationQuotaReached ? undefined : (range) => refuseUnless(handleSlotClick(range))}
         onMoveDraft={isReservationQuotaReached ? undefined : (range) => refuseUnless(handleCalendarEventChange(range))}
         isDraftAllowed={(range) => toReservableRange(range) != null}
+        getDraftTitle={(range) => formatDraftTitle(t, range)}
         alternative={{ id: CONTROLS_ID, label: t("reservationCalendar:skipToForm") }}
         getEventLabel={getEventLabel}
         getEventProps={({ data: { source } }) => ({

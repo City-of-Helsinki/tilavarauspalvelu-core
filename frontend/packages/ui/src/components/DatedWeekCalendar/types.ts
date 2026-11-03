@@ -129,6 +129,11 @@ export type DatedWeekCalendarProps<TData extends CalendarData> = {
    * A drag, a keyboard move and the hover preview of a click only go where every cell is open and this agrees.
    */
   isDraftAllowed?: (range: DatedRange) => boolean;
+  /**
+   * The draft's title at a range, for a title that tells its time, e.g. "12:00–13:00 (1 h)". Lets the title follow
+   * a drag or keyboard move before it is confirmed. Without it the draft keeps its own title until then.
+   */
+  getDraftTitle?: (range: DatedRange) => string;
   /** Marks the grid busy while its events are being fetched. */
   isLoading?: boolean;
   /** The equal form for the same task. A skip link to it is shown before the grid. */
