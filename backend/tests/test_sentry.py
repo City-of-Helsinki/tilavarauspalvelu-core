@@ -203,7 +203,22 @@ def test_sentry_graphql_view_names_transaction_and_span_with_operation_name(
     assert spans == [("graphql.execute", "FrontPage", "FrontPage")]
 
 
-def test_sentry_graphql_view_uses_placeholder_without_operation_name(sentry_transport: EnvelopeCollector) -> None:
+def test_sentry_graphql_view_reads_operation_name_from_query_without_operation_name(
+    sentry_transport: EnvelopeCollector,
+) -> None:
+    post_graphql_in_transaction(body={"query": "query FrontPage { __typename }"})
+
+    transactions = sentry_transport.sent_transactions()
+    assert len(transactions) == 1
+    assert transactions[0]["transaction"] == "/graphql/ FrontPage"
+
+    spans = [
+        (span["op"], span["description"], span["data"]["graphql.operation.name"]) for span in transactions[0]["spans"]
+    ]
+    assert spans == [("graphql.execute", "FrontPage", "FrontPage")]
+
+
+def test_sentry_graphql_view_uses_placeholder_for_anonymous_operation(sentry_transport: EnvelopeCollector) -> None:
     post_graphql_in_transaction(body={"query": "{ __typename }"})
 
     transactions = sentry_transport.sent_transactions()
