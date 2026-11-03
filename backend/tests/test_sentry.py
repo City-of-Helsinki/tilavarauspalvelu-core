@@ -227,3 +227,32 @@ def test_sentry_graphql_view_uses_placeholder_for_anonymous_operation(sentry_tra
 
     spans = [(span["op"], span["description"]) for span in transactions[0]["spans"]]
     assert spans == [("graphql.execute", "<unknown operation>")]
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        ["{ __typename }"],
+        {"query": "{ __typename }"},
+        1,
+        "{" + "field {" * 3000 + "leaf" + "}" * 3001,
+    ],
+    ids=["list", "object", "number", "deeply-nested"],
+)
+def test_sentry_graphql_view_returns_graphql_error_when_query_cannot_be_parsed(
+    sentry_transport: EnvelopeCollector,
+    query: Any,
+) -> None:
+    client = Client()
+    with sentry_sdk.start_transaction(name="/graphql/", op="http.server"):
+        response = client.post("/graphql/", data={"query": query}, content_type="application/json")
+
+    assert response.status_code == 400
+
+    response_body = response.json()
+    assert list(response_body) == ["errors"]
+    assert len(response_body["errors"]) == 1
+
+    transactions = sentry_transport.sent_transactions()
+    assert len(transactions) == 1
+    assert transactions[0]["transaction"] == "/graphql/ <unknown operation>"

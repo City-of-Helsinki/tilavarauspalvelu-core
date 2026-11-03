@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 import sentry_sdk
 from graphene_django_extensions import FileUploadGraphQLView
-from graphql import GraphQLError, get_operation_ast, parse
+from graphql import get_operation_ast, parse
 from sentry_sdk.tracing import TransactionSource
 
 if TYPE_CHECKING:
@@ -50,9 +50,11 @@ class SentryGraphQLView(FileUploadGraphQLView):
 
 
 def _operation_name_from_query(query: str) -> str | None:
+    # The parent view parses the query again and turns any parse error into its GraphQL error response.
+    # A query that is not a string can raise errors such as AttributeError, so catch them all like the parent does.
     try:
         document = parse(query)
-    except GraphQLError:
+    except Exception:  # noqa: BLE001
         return None
 
     # Without an operation name, graphql-core executes the only operation in the document.
