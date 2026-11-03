@@ -38,10 +38,10 @@ check_label() {
     || { echo "Not an allowed label: $1. Use one of: ${allowed_labels[*]}" >&2; exit 2; }
 }
 
-# Exit if the description file cannot be read or is empty.
-check_description_file() {
-  [[ -f "$1" && -r "$1" ]] || { echo "Cannot read the description file: $1" >&2; exit 2; }
-  [[ -s "$1" ]] || { echo "The description file is empty: $1" >&2; exit 2; }
+# Exit if the text file cannot be read or is empty. The second argument names the file in the error, e.g. description.
+check_text_file() {
+  [[ -f "$1" && -r "$1" ]] || { echo "Cannot read the $2 file: $1" >&2; exit 2; }
+  [[ -s "$1" ]] || { echo "The $2 file is empty: $1" >&2; exit 2; }
 }
 
 # Set link_type, link_text and link_body for a link option between issue `key` and issue `other`.
