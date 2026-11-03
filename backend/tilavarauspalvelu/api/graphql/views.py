@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 import sentry_sdk
 from graphene_django_extensions import FileUploadGraphQLView
+from graphql import GraphQLError, get_operation_ast, parse
 from sentry_sdk.tracing import TransactionSource
 
 if TYPE_CHECKING:
@@ -35,7 +36,7 @@ class SentryGraphQLView(FileUploadGraphQLView):
         if not query:
             return super().execute_graphql_request(request, data, query, variables, operation_name, show_graphiql)
 
-        span_name = operation_name or "<unknown operation>"
+        span_name = operation_name or _operation_name_from_query(query) or "<unknown operation>"
 
         scope = sentry_sdk.get_current_scope()
         scope.set_transaction_name(f"/graphql/ {span_name}", source=TransactionSource.CUSTOM)
@@ -43,3 +44,20 @@ class SentryGraphQLView(FileUploadGraphQLView):
         with sentry_sdk.start_span(op="graphql.execute", name=span_name) as span:
             span.set_data("graphql.operation.name", span_name)
             return super().execute_graphql_request(request, data, query, variables, operation_name, show_graphiql)
+
+
+# --- Internals ------------------------------------------------------------------------------------------------------
+
+
+def _operation_name_from_query(query: str) -> str | None:
+    try:
+        document = parse(query)
+    except GraphQLError:
+        return None
+
+    # Without an operation name, graphql-core executes the only operation in the document.
+    operation = get_operation_ast(document)
+    if operation is None or operation.name is None:
+        return None
+
+    return operation.name.value
