@@ -496,6 +496,12 @@ class Common(Environment):
     AUTO_CREATE_CELERY_TASKS = values.BooleanValue(default=False)
 
     @classproperty
+    def CELERY_TASK_SOFT_TIME_LIMIT(cls) -> int:
+        # Raises 'SoftTimeLimitExceeded' in the task, so it can clean up and Sentry gets its traceback.
+        # It must come before the hard limit, which kills the task without cleanup.
+        return cls.CELERY_TASK_TIME_LIMIT * 9 // 10
+
+    @classproperty
     def CELERY_BROKER_URL(cls) -> str:
         return "filesystem://"
 

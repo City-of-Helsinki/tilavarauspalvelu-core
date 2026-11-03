@@ -21,6 +21,14 @@ class SentryLogger:
             capture_message(message, level=level)
 
     @staticmethod
+    def log_killed_celery_task(*, task_name: str, task_id: str, reason: str) -> None:
+        with new_scope() as scope:
+            scope.set_tag("celery_task_name", task_name)
+            scope.set_extra("celery_task_id", task_id)
+            scope.fingerprint = ["celery", "killed", task_name, reason]
+            capture_message(f"Celery task '{task_name}' was killed: {reason}", level="error")
+
+    @staticmethod
     def log_exception(err: Exception, details: str, **extra: Any) -> None:
         with new_scope() as scope:
             scope.set_extra("details", details)
