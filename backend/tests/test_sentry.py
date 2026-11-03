@@ -1,14 +1,69 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import pytest
+import sentry_sdk
 from django.db.models.signals import post_init
-from django.test import override_settings
+from django.test import Client, override_settings
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.transport import Transport
 
 from config.sentry import sentry_before_send_transaction, sentry_traces_sampler
 from config.settings import Common, Docker, Platta
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from sentry_sdk.envelope import Envelope
+
+# ── Helpers ──
+
+
+class EnvelopeCollector(Transport):
+    def __init__(self) -> None:
+        super().__init__()
+        self.envelopes: list[Envelope] = []
+
+    def capture_envelope(self, envelope: Envelope) -> None:
+        self.envelopes.append(envelope)
+
+    def sent_transactions(self) -> list[dict[str, Any]]:
+        return [
+            item.payload.json
+            for envelope in self.envelopes
+            for item in envelope.items
+            if item.type == "transaction" and item.payload.json is not None
+        ]
+
+
+@pytest.fixture
+def sentry_transport() -> Iterator[EnvelopeCollector]:
+    previous_client = sentry_sdk.get_client()
+    transport = EnvelopeCollector()
+    sentry_sdk.init(
+        dsn="https://public@example.ingest.sentry.io/1",
+        transport=transport,
+        traces_sample_rate=1.0,
+        default_integrations=False,
+        auto_enabling_integrations=False,
+    )
+    try:
+        yield transport
+    finally:
+        sentry_sdk.get_global_scope().set_client(previous_client)
+
+
+def post_graphql_in_transaction(*, body: dict[str, Any]) -> None:
+    client = Client()
+    with sentry_sdk.start_transaction(name="/graphql/", op="http.server"):
+        response = client.post("/graphql/", data=body, content_type="application/json")
+
+    assert response.status_code == 200
+
+
+# ── Sampling and transaction data ──
 
 
 def test_sentry_traces_sampler_respects_parent_sampling_decision() -> None:
@@ -127,3 +182,33 @@ def test_sentry_post_setup_skips_sdk_initialization_when_disabled(environment: t
 def test_sentry_is_enabled_by_default_only_in_platta_environments() -> None:
     assert Common.SENTRY_ENABLED is False
     assert Platta.SENTRY_ENABLED is True
+
+
+# ── GraphQL view ──
+
+
+def test_sentry_graphql_view_names_transaction_and_span_with_operation_name(
+    sentry_transport: EnvelopeCollector,
+) -> None:
+    post_graphql_in_transaction(body={"query": "query FrontPage { __typename }", "operationName": "FrontPage"})
+
+    transactions = sentry_transport.sent_transactions()
+    assert len(transactions) == 1
+    assert transactions[0]["transaction"] == "/graphql/ FrontPage"
+    assert transactions[0]["transaction_info"] == {"source": "custom"}
+
+    spans = [
+        (span["op"], span["description"], span["data"]["graphql.operation.name"]) for span in transactions[0]["spans"]
+    ]
+    assert spans == [("graphql.execute", "FrontPage", "FrontPage")]
+
+
+def test_sentry_graphql_view_uses_placeholder_without_operation_name(sentry_transport: EnvelopeCollector) -> None:
+    post_graphql_in_transaction(body={"query": "{ __typename }"})
+
+    transactions = sentry_transport.sent_transactions()
+    assert len(transactions) == 1
+    assert transactions[0]["transaction"] == "/graphql/ <unknown operation>"
+
+    spans = [(span["op"], span["description"]) for span in transactions[0]["spans"]]
+    assert spans == [("graphql.execute", "<unknown operation>")]
