@@ -269,18 +269,35 @@ When you add a backend path to `backend/config/urls.py`, add it to the Caddyfile
 The backend must allow `http://localhost:8080` in `CORS_ALLOWED_ORIGINS` and `CSRF_TRUSTED_ORIGINS`.
 `backend/.env.example` has it. If you made `backend/.env.docker` before, add it there.
 
+#### Single address setup
+
+`just stack up-gateway` moves the gateway to `localhost:8000` and stops publishing the backend there.
+The browser then reaches the frontends and the backend through one address, as on the server.
+Login works, because the Tunnistamo test client allows the `localhost:8000` callback.
+The setup adds [`docker-compose.gateway.yml`](docker-compose.gateway.yml) to the development setup.
+It needs Docker Compose 2.24.4 or later. The env files need no changes.
+
+| Service | Address |
+|---------|---------|
+| Customer UI | http://localhost:8000 |
+| Staff UI | http://localhost:8000/kasittely |
+| Django admin | http://localhost:8000/admin/ |
+
+The frontend ports 3000 and 3001 stay open, so links from other settings, for example `MOCK_VERKKOKAUPPA_FRONTEND_URL`, still work.
+Run `just stack down-gateway` before you go back to `just stack up`. Otherwise the gateway keeps port 8000 and the backend cannot start.
+
 #### Error testing
 
 The error testing setup puts a chaos proxy in front of the backend. The proxy can add delays, drop connections
-and return errors. It adds [`docker-compose.chaos.yml`](docker-compose.chaos.yml) to the development setup.
-The proxy is [`docker/chaos-proxy.mjs`](docker/chaos-proxy.mjs). It needs Docker Compose 2.24.4 or later.
+and return errors. It builds on the [single address setup](#single-address-setup), so open the frontends on `localhost:8000`.
+It adds [`docker-compose.chaos.yml`](docker-compose.chaos.yml). The proxy is [`docker/chaos-proxy.mjs`](docker/chaos-proxy.mjs).
 
 The proxy has two channels with their own faults:
 
 | Channel | Traffic |
 |---------|---------|
 | `ssr` | The server side rendering of the frontend containers |
-| `client` | The browser, on `localhost:8000` and through the gateway |
+| `client` | The browser, through the gateway on `localhost:8000` |
 
 ```sh
 just stack up-chaos                                          # Start the setup. Add COMPOSE_PROFILES=backend,frontend-release for the release frontends.
