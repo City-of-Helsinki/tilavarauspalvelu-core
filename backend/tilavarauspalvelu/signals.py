@@ -11,6 +11,8 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any, Unpack
 
+from celery.exceptions import TimeLimitExceeded, WorkerLostError
+from celery.signals import task_failure
 from django.conf import settings
 from django.contrib.auth import user_logged_in
 from django.core.signals import got_request_exception
@@ -54,6 +56,8 @@ from tilavarauspalvelu.tasks import (
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
+    from celery import Task
+
     from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import M2MChangedKwargs, PostDeleteKwargs, PostSaveKwargs, PreSaveKwargs, WSGIRequest
 
@@ -261,6 +265,20 @@ def _user_logged_in(user: User, **kwargs: Any) -> None:
             "sent_email_about_anonymization",
         ]
     )
+
+
+@receiver(task_failure, dispatch_uid="celery_task_failure")
+def _celery_task_failure(sender: Task, task_id: str, exception: BaseException, **kwargs: Any) -> None:
+    # The main worker process sends these failures after the task process is gone.
+    # Sentry's Celery integration reports only the exceptions raised inside the task process.
+    if isinstance(exception, TimeLimitExceeded):
+        reason = "hard time limit exceeded"
+    elif isinstance(exception, WorkerLostError):
+        reason = "worker process exited unexpectedly"
+    else:
+        return
+
+    SentryLogger.log_killed_celery_task(task_name=sender.name, task_id=task_id, reason=reason)
 
 
 sentry_disconnected = got_request_exception.disconnect(_got_request_exception)

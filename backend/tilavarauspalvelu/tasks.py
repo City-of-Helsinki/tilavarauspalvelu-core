@@ -266,7 +266,7 @@ def prune_reservation_statistics_task() -> None:
     tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="2", minute="0"),
 )
 def create_missing_reservation_statistics_task() -> None:
-    # Limited so that the task finishes within `CELERY_TASK_TIME_LIMIT`. Larger gaps are filled over several runs.
+    # Limited so that the task finishes within `CELERY_TASK_SOFT_TIME_LIMIT`. Larger gaps are filled over several runs.
     Reservation.objects.create_missing_statistics(limit=5_000, batch_size=500)
 
 
@@ -650,8 +650,8 @@ def create_robot_test_data_task() -> None:
     This is a task due to the amount of data created and time it takes when run on the test server.
     """
     try:
-        # The worker kills the task at the time limit, and then 'finally' does not run.
-        # The timeout makes sure that the lock does not stay after that.
+        # 'finally' releases the lock at the soft time limit. At the hard time limit the worker kills the task
+        # and 'finally' does not run. The timeout makes sure that the lock does not stay after that.
         cache.set(key=settings.ROBOT_TEST_DATA_LOCK_KEY, value=True, timeout=settings.CELERY_TASK_TIME_LIMIT)
 
         create_robot_test_data()

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import sentry_sdk
 from django.db.models.signals import post_init
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import ignore_logger
 
 if TYPE_CHECKING:
     from sentry_sdk.types import Event, Hint, SamplingContext
@@ -31,6 +32,10 @@ def init_sentry(
         profile_session_sample_rate=profile_session_sample_rate,
         profile_lifecycle="trace",
     )
+
+    # The worker logs hard time limits and lost worker processes here without the task scope,
+    # so Sentry groups them into one issue. 'tilavarauspalvelu.signals' reports them per task instead.
+    ignore_logger("celery.worker.request")
 
 
 def sentry_traces_sampler(sampling_context: SamplingContext) -> float:
