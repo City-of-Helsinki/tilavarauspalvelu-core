@@ -4,6 +4,7 @@ import { gql } from "graphql-tag";
 import type {
   BannerNotificationState,
   BannerNotificationsQuery,
+  BannerNotificationsQueryVariables,
   DeleteBannerNotificationMutation,
   DeleteBannerNotificationMutationVariables,
   UpdateBannerNotificationMutation,
@@ -19,11 +20,14 @@ interface GraphQLResult<T> {
   errors?: unknown[];
 }
 
-// Query all notifications without filter
+/** An edge of a page of the banner notifications query */
+type BannerNotificationEdge = NonNullable<BannerNotificationsQuery["bannerNotifications"]>["edges"][number];
+
+// Query all notifications without filter, a page at a time
 // Include message fields for pattern matching
 const BANNER_NOTIFICATIONS_QUERY = gql`
-  query BannerNotifications {
-    bannerNotifications {
+  query BannerNotifications($after: String) {
+    bannerNotifications(after: $after) {
       edges {
         node {
           pk
@@ -38,6 +42,10 @@ const BANNER_NOTIFICATIONS_QUERY = gql`
           messageEn
           messageSv
         }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
       }
     }
   }
@@ -92,11 +100,22 @@ export class GraphqlCommands extends PageObject {
    */
   @step("graphql_commands.Get All Banner Notifications")
   async getAllBannerNotifications() {
-    const response = await this.makeGraphQLRequest(print(BANNER_NOTIFICATIONS_QUERY));
-    expect(response.status).toBe(200);
-    const response_json = (await response.json()) as GraphQLResult<BannerNotificationsQuery>;
-    expect(response_json.errors ?? [], "The banner notifications query returned errors").toEqual([]);
-    return response_json;
+    // The backend answers at most 100 notifications at a time, so the pages are read until the last one
+    const edges: BannerNotificationEdge[] = [];
+    let after: string | null = null;
+    do {
+      const variables: BannerNotificationsQueryVariables = { after };
+      // oxlint-disable-next-line no-await-in-loop -- each page starts after the previous one
+      const response = await this.makeGraphQLRequest(print(BANNER_NOTIFICATIONS_QUERY), variables);
+      expect(response.status).toBe(200);
+      // oxlint-disable-next-line no-await-in-loop -- each page starts after the previous one
+      const response_json = (await response.json()) as GraphQLResult<BannerNotificationsQuery>;
+      expect(response_json.errors ?? [], "The banner notifications query returned errors").toEqual([]);
+      const page = response_json.data.bannerNotifications;
+      edges.push(...(page?.edges ?? []));
+      after = page?.pageInfo.hasNextPage === true ? page.pageInfo.endCursor : null;
+    } while (after != null);
+    return edges;
   }
 
   /**
@@ -105,8 +124,7 @@ export class GraphqlCommands extends PageObject {
    */
   @step("graphql_commands.Get Filtered Banner Notifications")
   async getFilteredBannerNotifications(...states: BannerNotificationState[]) {
-    const response_json = await this.getAllBannerNotifications();
-    const all_notifications = (response_json.data.bannerNotifications?.edges ?? [])
+    const all_notifications = (await this.getAllBannerNotifications())
       .map((edge) => edge?.node)
       .filter((node) => node != null);
 
