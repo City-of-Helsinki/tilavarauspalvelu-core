@@ -2495,6 +2495,7 @@ type PriceSummaryType {
   lowestAmount: Decimal!
   priceUnit: PriceUnit!
   varies: Boolean!
+  canApplyForDiscount: Boolean!
 }
 
 type ReservableTimeSpanType {

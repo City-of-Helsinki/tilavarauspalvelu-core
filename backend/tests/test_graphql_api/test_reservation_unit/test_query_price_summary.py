@@ -31,7 +31,7 @@ pytestmark = [
 # ── Helpers ──
 
 
-FIELDS = "priceSummary { isFree lowestAmount priceUnit varies }"
+FIELDS = "priceSummary { isFree lowestAmount priceUnit varies canApplyForDiscount }"
 
 
 # ── Price summary ──
@@ -63,6 +63,39 @@ def test_reservation_unit__query__price_summary__one_price(graphql):
             "lowestAmount": "12.50",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
+            "canApplyForDiscount": False,
+        },
+    }
+
+
+def test_reservation_unit__query__price_summary__can_apply_for_discount(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        amount=Decimal("12.50"),
+        price_unit=PriceUnit.PER_HOUR,
+        can_apply_for_discount=True,
+    )
+
+    query = reservation_unit_query(fields=FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "priceSummary": {
+            "isFree": False,
+            "lowestAmount": "12.50",
+            "priceUnit": PriceUnit.PER_HOUR.value,
+            "varies": False,
+            "canApplyForDiscount": True,
         },
     }
 
@@ -102,6 +135,7 @@ def test_reservation_unit__query__price_summary__options_with_different_prices(g
             "lowestAmount": "15.00",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": True,
+            "canApplyForDiscount": False,
         },
     }
 
@@ -141,6 +175,7 @@ def test_reservation_unit__query__price_summary__inactive_option_not_included(gr
             "lowestAmount": "30.00",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
+            "canApplyForDiscount": False,
         },
     }
 
@@ -170,6 +205,7 @@ def test_reservation_unit__query__price_summary__free(graphql):
             "lowestAmount": "0.00",
             "priceUnit": PriceUnit.FIXED.value,
             "varies": False,
+            "canApplyForDiscount": False,
         },
     }
 
@@ -211,6 +247,7 @@ def test_reservation_unit__query__price_summary__future_price_change_not_include
             "lowestAmount": "20.00",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
+            "canApplyForDiscount": False,
         },
     }
 
@@ -311,6 +348,7 @@ def test_reservation_unit__query__price_summary__through_foreign_key(graphql):
             "lowestAmount": "12.50",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
+            "canApplyForDiscount": False,
         },
     }
     assert [response.node(index)["reservationUnit"]["priceSummary"]["lowestAmount"] for index in range(3)] == [

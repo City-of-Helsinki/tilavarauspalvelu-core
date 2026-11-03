@@ -68,6 +68,7 @@ class PriceSummaryType(graphene.ObjectType):
     lowest_amount = graphene.Decimal(required=True)
     price_unit = graphene.Field(graphene.Enum.from_enum(PriceUnit), required=True)
     varies = graphene.Boolean(required=True)
+    can_apply_for_discount = graphene.Boolean(required=True)
 
     def resolve_price_unit(root: PriceSummary, info: GQLInfo) -> str:
         return root.price_unit.value
@@ -403,9 +404,13 @@ class ReservationUnitNode(DjangoNode):
         return queryset
 
     def resolve_price_summary(root: ReservationUnit, info: GQLInfo) -> PriceSummary | None:
-        components: list[dict[str, str]] = root.price_summary_components
+        components: list[dict[str, Any]] = root.price_summary_components
         base_prices = [
-            BasePrice(amount=Decimal(component["amount"]), price_unit=PriceUnit(component["price_unit"]))
+            BasePrice(
+                amount=Decimal(component["amount"]),
+                price_unit=PriceUnit(component["price_unit"]),
+                can_apply_for_discount=component["can_apply_for_discount"],
+            )
             for component in components
         ]
         return summarize_base_prices(base_prices)
@@ -455,7 +460,7 @@ class ReservationUnitAllNode(DjangoNode):
 
 
 def _active_base_component_data() -> ArraySubquery:
-    """Amounts and price units of the base components that the reservation unit in the outer query has today."""
+    """Base component data for the price summary of the reservation unit in the outer query, as it is today."""
     today = local_date()
 
     active_pricing_group = (
@@ -476,7 +481,11 @@ def _active_base_component_data() -> ArraySubquery:
         .order_by("amount", "pk")
         .annotate(
             # Amount as text, so that it does not go through a float in JSON.
-            data=JSONObject(amount=Cast("amount", models.CharField()), price_unit="price_unit"),
+            data=JSONObject(
+                amount=Cast("amount", models.CharField()),
+                price_unit="price_unit",
+                can_apply_for_discount="can_apply_for_discount",
+            ),
         )
         .values("data")
     )
