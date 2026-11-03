@@ -18,6 +18,8 @@ if (env.SENTRY_DSN) {
     // Session replay is forbidden in the City's Sentry organisation. Do not add replayIntegration.
     integrations: [
       Sentry.extraErrorDataIntegration({ depth: 3 }),
+      // Adds the operation name to the fetch spans and breadcrumbs of GraphQL requests.
+      Sentry.graphqlClientIntegration({ endpoints: [/\/graphql\/?$/] }),
       thirdPartyErrorFilterIntegration({
         filterKeys: [SENTRY_APPLICATION_KEY],
         behaviour: "drop-error-if-exclusively-contains-third-party-frames",
