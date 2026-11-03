@@ -73,8 +73,9 @@ def main() -> None:
         f"Run {started}, {summary.get('duration', 0) / 60_000:.0f} min: {stats['total']} tests, {stats['expected']} passed, "
         f"{stats['unexpected']} failed, {stats['flaky']} flaky, {stats['skipped']} skipped"
     )
+    # The run's errors are texts, unlike the errors of a test's results
     for error in summary.get("errors", []):
-        print(f"Run error: {first_line(error.get('message'))}")
+        print(f"Run error: {first_line(error)}")
 
     warnings: Counter[str] = Counter()
     tests = [test for name, content in files.items() if name != "report.json" for test in content["tests"]]

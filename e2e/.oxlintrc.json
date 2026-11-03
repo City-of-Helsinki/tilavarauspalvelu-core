@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "extends": ["../frontend/.oxlintrc.json"],
-  "ignorePatterns": ["node_modules/", "test-results/", "playwright-report/", "blob-report/"],
+  "ignorePatterns": ["node_modules/", "test-results/", "playwright-report/", "blob-report/", "**/gql-types.ts"],
   "rules": {
     "vitest/no-standalone-expect": "off",
     // The rule is for the DOM property. Playwright's locator.innerText() reads the text as the user sees it, like the

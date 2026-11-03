@@ -1,16 +1,19 @@
 name: "E2E checks"
 
-# Checks the e2e suite without the test environment: lint, format, that all tests load, and the self-test
+# Checks the e2e suite without the test environment: its GraphQL queries against the schema, lint, format, that all
+# tests load, and the self-test
 on:
   push:
     paths:
       - e2e/**
+      - tilavaraus.graphql
       - .github/workflows/test-e2e.yml
     branches:
       - main
   pull_request:
     paths:
       - e2e/**
+      - tilavaraus.graphql
       - .github/workflows/test-e2e.yml
   workflow_dispatch:
 
@@ -35,13 +38,15 @@ jobs:
         working-directory: e2e
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           version: ${{ env.PNPM_VERSION }}
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache-dependency-path: e2e/pnpm-lock.yaml
@@ -49,6 +54,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Generate GraphQL types
+        run: pnpm codegen
 
       - name: Lint
         run: |
@@ -66,7 +74,7 @@ jobs:
 
       - name: Upload self-test report
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-selftest-report-${{ github.run_number }}
           path: e2e/playwright-report/

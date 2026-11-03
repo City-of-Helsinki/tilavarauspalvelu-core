@@ -535,11 +535,12 @@ Differences:
       )
       .join("\n");
 
-    // Write to file
-    await appendFile(`debug_${test_name}.txt`, `${header}${formatted_differences}`, "utf8");
+    // Write to a file in the test's output folder, named without the characters that a file name can't have
+    const differences_file = test.info().outputPath(`debug_${test_name.replaceAll(/[\\/:*?"<>|]/g, "_")}.txt`);
+    await appendFile(differences_file, `${header}${formatted_differences}`, "utf8");
 
     // Fail the test with a descriptive message
-    throw new Error(`Texts still do not match after normalization. Differences logged to debug_${test_name}.txt.`);
+    throw new Error(`Texts still do not match after normalization. Differences logged to ${differences_file}.`);
   }
 
   /**
