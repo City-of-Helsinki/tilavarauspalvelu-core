@@ -25,6 +25,8 @@ from html import escape
 from pathlib import Path
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
+# The labels of an assertion's values: "Expected:", "Received:", "Expected pattern:", "Received string:" and so on
+ASSERTION_VALUE = re.compile(r"(Expected|Received)( [a-z]+)*:")
 BACKEND_ERROR = "backend error"
 # Failed tests first, then flaky, skipped and passed ones
 ORDER = {"unexpected": 0, "flaky": 1, "skipped": 2, "expected": 3}
@@ -60,9 +62,9 @@ def first_line(text: str | None) -> str:
 
 
 def error_lines(text: str | None) -> list[str]:
-    """The first line of an error, and the Expected: and Received: lines of Playwright's assertions."""
+    """The first line of an error, and the lines with the values of Playwright's assertions."""
     lines = [line.strip() for line in ANSI.sub("", text or "").splitlines() if line.strip()]
-    return lines[:1] + [line for line in lines[1:] if line.startswith(("Expected:", "Received:"))]
+    return lines[:1] + [line for line in lines[1:] if ASSERTION_VALUE.match(line)]
 
 
 def code(text: str) -> str:
@@ -147,7 +149,8 @@ def print_text(report: Path, summary: dict, tests: list[dict], show_all: bool) -
 
 def print_markdown(report: Path, summary: dict, tests: list[dict], show_all: bool) -> None:  # type: ignore[type-arg]
     stats = summary["stats"]
-    passed = stats["unexpected"] == 0 and not summary.get("errors")
+    # A skipped test fails the run too (lib/skips-fail-run-reporter.ts)
+    passed = stats["unexpected"] == 0 and stats["skipped"] == 0 and not summary.get("errors")
     print(f"### {'✅' if passed else '❌'} Run {started(summary)}, {summary.get('duration', 0) / 60_000:.0f} min\n")
     print("| Project | ✅ Passed | ❌ Failed | ⚠️ Flaky | ⏭️ Skipped |")
     print("| --- | ---: | ---: | ---: | ---: |")
