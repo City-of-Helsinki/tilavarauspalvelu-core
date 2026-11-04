@@ -172,6 +172,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     notesWhenApplyingSv: null, // Maybe<Scalars["String"]["output"]>;
     extUuid: "dummy-uuid", // Scalars["UUID"]["output"];
     reservationForm: ReservationFormType.ReserveeInfoForm,
+    paymentType: null,
   };
 }
 
