@@ -28,15 +28,6 @@ class PriceComponentValidator:
             msg = "Amount cannot be negative."
             raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE)
 
-    def validate_payment_type_matches_amount(self) -> None:
-        amount = self.price_component.amount
-        payment_type = self.price_component.payment_type
-        is_paid_with_payment_type = amount > 0 and payment_type is not None
-        is_free_without_payment_type = amount == 0 and payment_type is None
-        if not is_paid_with_payment_type and not is_free_without_payment_type:
-            msg = "Payment type is required for a paid component and not allowed for a free one."
-            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID)
-
     def validate_valid_from_before_valid_until(self) -> None:
         valid_until = self.price_component.valid_until
         if valid_until is not None and self.price_component.valid_from >= valid_until:

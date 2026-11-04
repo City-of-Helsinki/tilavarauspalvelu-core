@@ -99,7 +99,6 @@ def _validate_changed_component(
     saved_component.validators.validate_change(component)
 
     component.validators.validate_amount_not_negative()
-    component.validators.validate_payment_type_matches_amount()
     component.validators.validate_valid_from_before_valid_until()
 
     component.validators.validate_option_belongs_to_pricing_group_unit_group()
@@ -120,7 +119,6 @@ def _validate_new_component(
 
     component.pricing_group = pricing_group
     component.validators.validate_amount_not_negative()
-    component.validators.validate_payment_type_matches_amount()
     component.validators.validate_valid_from_before_valid_until()
 
     component.validators.validate_option_belongs_to_pricing_group_unit_group()

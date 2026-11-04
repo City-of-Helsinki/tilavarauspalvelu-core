@@ -162,18 +162,6 @@ def _check_date_range(
             )
             errors.append(error)
 
-    paid_components = [component for component in active_components if component.amount > 0]
-    payment_types = {component.payment_type for component in paid_components}
-    if len(payment_types) > 1:
-        error = CoverageError(
-            code=error_codes.PRICING_GROUP_PAYMENT_TYPE_CONFLICT,
-            message=f"All paid prices must have the same payment type {range_text}. {_describe(paid_components)}",
-            components=paid_components,
-            begin=begin,
-            end=end,
-        )
-        errors.append(error)
-
     return errors
 
 
