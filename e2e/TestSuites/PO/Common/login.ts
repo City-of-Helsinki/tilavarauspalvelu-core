@@ -1,7 +1,7 @@
 /** Port of PO/Common/login.robot */
+import { readEnv } from "../../../lib/env";
 import { step, expect, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
-import { DJANGO_ADMIN_PASSWORD } from "../../Resources/env_loader";
 
 export class Login extends PageObject {
   @step("login.Login Suomi Fi")
@@ -56,7 +56,8 @@ export class Login extends PageObject {
     const typed_username = await this.page.locator("#id_username").inputValue();
     expect(typed_username).toEqual(input_username);
 
-    // The password comes from the environment or the .env file (env_loader)
+    // The password comes from the environment or the .env file (lib/env.ts)
+    const { DJANGO_ADMIN_PASSWORD } = readEnv();
     await this.page.locator("#id_password").clear();
     // Typing would show the password in the report's steps, so the value is set in the page instead
     await this.page.locator("#id_password").evaluate((input, value) => {

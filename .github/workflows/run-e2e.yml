@@ -50,7 +50,7 @@ jobs:
       run:
         working-directory: e2e
     env:
-      # The reservation times and the summary's times in Helsinki time
+      # report_summary.py prints times in Helsinki time, like the suite
       TZ: Europe/Helsinki
     steps:
       - name: Checkout code
@@ -72,7 +72,7 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Install browsers
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
+        run: pnpm e2e:install-deps
 
       - name: Run tests
         env:

@@ -8,11 +8,13 @@
     "test": "playwright test --grep-invert @serialonly --project 'Tests_*' --project create_data",
     "test:smoke": "playwright test --grep @smoke",
     "test:notifications": "playwright test --project Tests_admin_notifications_serial --workers 1",
-    "test:all": "playwright test --grep-invert @serialonly --project 'Tests_*' --project create_data; parallel=$?; PLAYWRIGHT_HTML_OUTPUT_DIR=playwright-report/notifications PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/notifications/junit.xml playwright test --project Tests_admin_notifications_serial --workers 1 --output test-results/notifications; notifications=$?; exit $((parallel || notifications))",
+    "test:all": "pnpm test; suites=$?; pnpm test:all:notifications; notifications=$?; exit $((suites || notifications))",
+    "test:all:notifications": "PLAYWRIGHT_HTML_OUTPUT_DIR=playwright-report/notifications PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/notifications/junit.xml pnpm test:notifications --output test-results/notifications",
     "test:sequential": "FORCE_SINGLE_USER=True playwright test --grep-invert @serialonly --project 'Tests_*' --project create_data --workers 1",
-    "selftest": "playwright test --project selftest",
+    "test:unit": "playwright test --project unit",
     "list": "playwright test --list",
     "report": "playwright show-report",
+    "e2e:install-deps": "playwright install --with-deps chromium firefox webkit",
     "codegen": "graphql-codegen",
     "lint": "oxlint --type-aware --type-check",
     "lint:fix": "oxlint --type-aware --type-check --fix",
@@ -29,7 +31,8 @@
     "graphql-tag": "^2.12.7",
     "oxfmt": "^0.73.0",
     "oxlint": "^1.88.0",
-    "oxlint-tsgolint": "^7.0.2004"
+    "oxlint-tsgolint": "^7.0.2004",
+    "zod": "^4.6.5"
   },
   "engines": {
     "npm": "pnpm"

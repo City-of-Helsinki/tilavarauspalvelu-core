@@ -46,7 +46,7 @@ import type { TestData } from "./test-data";
 export class Pages {
   /**
    * `session` is the test's pages and `testData` the users and units its tags chose; tests without a browser
-   * (create_data, selftest) have neither. `state` keeps the values that keywords save while the test runs.
+   * (create_data, unit) have neither. `state` keeps the values that keywords save while the test runs.
    */
   constructor(
     readonly session: Session | null = null,

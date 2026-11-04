@@ -10,8 +10,6 @@
 #   - in sequential mode: FORCE_SINGLE_USER=True or one worker (pnpm test:sequential)
 #   - in tests without a data set tag, like the notification tests
 #
-# The file keeps its name and format from the Robot suite's pabot value sets.
-#
 # =============================================================================
 # DESKTOP USER TESTS - Tests_user_desktop_FI.robot (11 tests)
 # =============================================================================

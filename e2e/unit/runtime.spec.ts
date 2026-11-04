@@ -1,6 +1,6 @@
 /**
- * Offline self-test of the suite's runtime: the keyword steps, the helpers in lib/, the test pages (Session) and the
- * keywords that don't need the test environment. Runs against local pages, so it needs no secrets or network.
+ * Offline unit tests of the suite's runtime: the keyword steps, the helpers in lib/, the test pages (Session) and the
+ * keywords that don't need the test environment. They run against local pages, so they need no secrets or network.
  */
 import { once } from "node:events";
 import { existsSync } from "node:fs";
@@ -11,6 +11,7 @@ import { errors } from "@playwright/test";
 import { mkdir, readdir, readFile, rm, utimes, writeFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
 import { BackendErrors } from "../lib/backend-errors";
+import { readEnv } from "../lib/env";
 import { elementsOf, reachesState } from "../lib/locators";
 import { SHARED_BASE, acquireLock, releaseLock, resetSharedState, sharedDir } from "../lib/locks";
 import { graphqlErrorsIn } from "../lib/responses";
@@ -35,7 +36,7 @@ const dataPage = (html: string) => `data:text/html;charset=utf-8,${encodeURIComp
 
 /** A keyword that fails, to see what `@step` does with the error. */
 class FailingKeywords {
-  @step("selftest.Fail With")
+  @step("unittest.Fail With")
   failWith(error: Error): Promise<never> {
     return Promise.reject(error);
   }
@@ -65,7 +66,7 @@ async function failureOf(promise: Promise<unknown>): Promise<unknown> {
   return null;
 }
 
-test.describe("Runtime self-test", () => {
+test.describe("Runtime", () => {
   test("Values are printed in step titles, with secrets hidden", () => {
     expect(formatValue({ page_id: "page=3", video_path: null, list: ["a", "it's", 1.5, false] })).toBe(
       `{"page_id":"page=3","video_path":null,"list":["a","it's",1.5,false]}`
@@ -87,6 +88,34 @@ test.describe("Runtime self-test", () => {
     expect(BASIC_PERMISSION_TARGET_ADMIN.fullName).toBe("Marika Salminen");
   });
 
+  test("Environment variables are read and checked in one place", () => {
+    const previous = {
+      FORCE_SINGLE_USER: process.env.FORCE_SINGLE_USER,
+      WORKERS: process.env.WORKERS,
+      LOG_LEVEL: process.env.LOG_LEVEL,
+    };
+    try {
+      // Booleans like the frontend's coerceBoolean, in any case, so True works too
+      process.env.FORCE_SINGLE_USER = "True";
+      process.env.WORKERS = "3";
+      expect(readEnv()).toMatchObject({ FORCE_SINGLE_USER: true, WORKERS: 3 });
+      process.env.FORCE_SINGLE_USER = "0";
+      expect(readEnv().FORCE_SINGLE_USER).toBe(false);
+      // An invalid value fails with the variable's name, without the value
+      process.env.LOG_LEVEL = "LOUD";
+      let failure: unknown = null;
+      try {
+        readEnv();
+      } catch (err) {
+        failure = err;
+      }
+      expect(errorMessage(failure)).toContain("LOG_LEVEL");
+      expect(errorMessage(failure)).not.toContain("LOUD");
+    } finally {
+      restoreEnv(previous);
+    }
+  });
+
   test("Errors and retries", async () => {
     // Playwright's timeouts keep their name in the message
     const timeout = new errors.TimeoutError("locator.waitFor: Timeout 20000ms exceeded.");
@@ -106,17 +135,17 @@ test.describe("Runtime self-test", () => {
 
   test("Secrets are hidden in the errors keywords fail with", async () => {
     const previous = { ROBOT_API_TOKEN: process.env.ROBOT_API_TOKEN };
-    process.env.ROBOT_API_TOKEN = "selftest-secret";
+    process.env.ROBOT_API_TOKEN = "unittest-secret";
     try {
       const keywords = new FailingKeywords();
-      const failed = await failureOf(keywords.failWith(new Error("Token selftest-secret was rejected")));
+      const failed = await failureOf(keywords.failWith(new Error("Token unittest-secret was rejected")));
       expect(failed).toBeInstanceOf(Error);
       expect((failed as Error).message).toBe("Token *** was rejected");
-      expect((failed as Error).stack).not.toContain("selftest-secret");
+      expect((failed as Error).stack).not.toContain("unittest-secret");
       // Also in the errors it was caused by, and in errors whose message is read-only
       const caused = await failureOf(
         keywords.failWith(
-          new Error("Request failed", { cause: new DOMException("Header selftest-secret", "AbortError") })
+          new Error("Request failed", { cause: new DOMException("Header unittest-secret", "AbortError") })
         )
       );
       expect(((caused as Error).cause as Error).message).toBe("Header ***");
@@ -203,73 +232,73 @@ test.describe("Runtime self-test", () => {
     expect(unitPermissions.permissionTarget.fullName).toBe("Niko Selänne");
     expect(resolveTestData([], parallel)).toMatchObject({ dataSet: null, suite: "desktop-suite" });
 
-    // A data set that pabot_users.dat doesn't have fails the test instead of falling back to the shared users
+    // A data set that parallel_users.dat doesn't have fails the test instead of falling back to the shared users
     expect(() => resolveTestData(["desktop-test-data-set-99"], parallel)).toThrow(
-      "No section with tags=desktop-test-data-set-99 in pabot_users.dat"
+      "No section with tags=desktop-test-data-set-99 in parallel_users.dat"
     );
   });
 
   test("Locks", async () => {
-    await acquireLock("SELFTEST_LOCK");
-    await releaseLock("SELFTEST_LOCK");
+    await acquireLock("UNITTEST_LOCK");
+    await releaseLock("UNITTEST_LOCK");
   });
 
   test("Locks can be taken again by their worker, and are taken over from a stopped one", async () => {
-    await acquireLock("SELFTEST_REENTRANT");
-    await acquireLock("SELFTEST_REENTRANT");
-    await releaseLock("SELFTEST_REENTRANT");
-    expect(existsSync(lockPath("SELFTEST_REENTRANT"))).toBe(true);
-    await releaseLock("SELFTEST_REENTRANT");
-    expect(existsSync(lockPath("SELFTEST_REENTRANT"))).toBe(false);
-    await expect(releaseLock("SELFTEST_REENTRANT")).rejects.toThrow("Lock SELFTEST_REENTRANT isn't held by any worker");
+    await acquireLock("UNITTEST_REENTRANT");
+    await acquireLock("UNITTEST_REENTRANT");
+    await releaseLock("UNITTEST_REENTRANT");
+    expect(existsSync(lockPath("UNITTEST_REENTRANT"))).toBe(true);
+    await releaseLock("UNITTEST_REENTRANT");
+    expect(existsSync(lockPath("UNITTEST_REENTRANT"))).toBe(false);
+    await expect(releaseLock("UNITTEST_REENTRANT")).rejects.toThrow("Lock UNITTEST_REENTRANT isn't held by any worker");
 
     // A lock left by a stopped worker is taken over: its owner's process is gone, or it never got an owner file
     const noProcess = 2 ** 22 + 1; // above the largest process id of Linux and macOS
-    await mkdir(lockPath("SELFTEST_STOPPED_OWNER"), { recursive: true });
+    await mkdir(lockPath("UNITTEST_STOPPED_OWNER"), { recursive: true });
     await writeFile(
-      join(lockPath("SELFTEST_STOPPED_OWNER"), "owner.json"),
+      join(lockPath("UNITTEST_STOPPED_OWNER"), "owner.json"),
       JSON.stringify({ pid: noProcess, token: "x" })
     );
-    await acquireLock("SELFTEST_STOPPED_OWNER");
-    const owner = JSON.parse(await readFile(join(lockPath("SELFTEST_STOPPED_OWNER"), "owner.json"), "utf8")) as {
+    await acquireLock("UNITTEST_STOPPED_OWNER");
+    const owner = JSON.parse(await readFile(join(lockPath("UNITTEST_STOPPED_OWNER"), "owner.json"), "utf8")) as {
       pid: number;
     };
     expect(owner.pid).toBe(process.pid);
-    await releaseLock("SELFTEST_STOPPED_OWNER");
-    await mkdir(lockPath("SELFTEST_OWNERLESS"));
+    await releaseLock("UNITTEST_STOPPED_OWNER");
+    await mkdir(lockPath("UNITTEST_OWNERLESS"));
     const minuteAgo = new Date(Date.now() - 60_000);
-    await utimes(lockPath("SELFTEST_OWNERLESS"), minuteAgo, minuteAgo);
-    await acquireLock("SELFTEST_OWNERLESS");
-    await releaseLock("SELFTEST_OWNERLESS");
+    await utimes(lockPath("UNITTEST_OWNERLESS"), minuteAgo, minuteAgo);
+    await acquireLock("UNITTEST_OWNERLESS");
+    await releaseLock("UNITTEST_OWNERLESS");
 
     // A live worker's lock is waited for, and can't be released by another
-    await mkdir(lockPath("SELFTEST_LIVE_OWNER"));
+    await mkdir(lockPath("UNITTEST_LIVE_OWNER"));
     await writeFile(
-      join(lockPath("SELFTEST_LIVE_OWNER"), "owner.json"),
+      join(lockPath("UNITTEST_LIVE_OWNER"), "owner.json"),
       JSON.stringify({ pid: process.ppid, token: "x" })
     );
-    await expect(releaseLock("SELFTEST_LIVE_OWNER")).rejects.toThrow(
-      "Lock SELFTEST_LIVE_OWNER is held by another worker"
+    await expect(releaseLock("UNITTEST_LIVE_OWNER")).rejects.toThrow(
+      "Lock UNITTEST_LIVE_OWNER is held by another worker"
     );
     const waiting = (async () => {
-      await acquireLock("SELFTEST_LIVE_OWNER");
+      await acquireLock("UNITTEST_LIVE_OWNER");
       return "taken";
     })();
     expect(await Promise.race([waiting, delay(500, "waiting")])).toBe("waiting");
-    await rm(lockPath("SELFTEST_LIVE_OWNER"), { recursive: true });
+    await rm(lockPath("UNITTEST_LIVE_OWNER"), { recursive: true });
     expect(await waiting).toBe("taken");
-    await releaseLock("SELFTEST_LIVE_OWNER");
+    await releaseLock("UNITTEST_LIVE_OWNER");
   });
 
   test("Each run keeps its locks in a folder of its own", async () => {
-    const runDir = process.env.PABOT_SHARED_RUN_DIR ?? "";
+    const runDir = process.env.SHARED_STATE_RUN_DIR ?? "";
     expect(dirname(runDir)).toBe(SHARED_BASE);
     expect(basename(runDir)).toMatch(/^run-\d+-\d+$/);
     expect(sharedDir()).toBe(runDir);
-    // The global setup of another run (like pnpm selftest during a run) keeps this run's folder, removing old ones.
+    // The global setup of another run (like pnpm test:unit during a run) keeps this run's folder, removing old ones.
     // What isn't a run folder is kept.
     const old = join(SHARED_BASE, `run-${Date.now() - 2 * 24 * 60 * 60_000}-1`);
-    const other = join(SHARED_BASE, "selftest-not-a-run");
+    const other = join(SHARED_BASE, "unittest-not-a-run");
     await mkdir(old);
     await mkdir(other, { recursive: true });
     try {
@@ -277,14 +306,14 @@ test.describe("Runtime self-test", () => {
       expect(existsSync(runDir)).toBe(true);
       expect(existsSync(old)).toBe(false);
       expect(existsSync(other)).toBe(true);
-      expect(process.env.PABOT_SHARED_RUN_DIR).not.toBe(runDir);
+      expect(process.env.SHARED_STATE_RUN_DIR).not.toBe(runDir);
     } finally {
       await rm(other, { recursive: true, force: true });
-      const made = process.env.PABOT_SHARED_RUN_DIR;
+      const made = process.env.SHARED_STATE_RUN_DIR;
       if (made != null && made !== runDir && dirname(made) === SHARED_BASE) {
         await rm(made, { recursive: true, force: true });
       }
-      process.env.PABOT_SHARED_RUN_DIR = runDir;
+      process.env.SHARED_STATE_RUN_DIR = runDir;
     }
   });
 
@@ -426,21 +455,21 @@ test.describe("Runtime self-test", () => {
         response.writeHead(200, { "content-type": "text/html" });
         response.end(`<script src="/missing.js"></script><script>
           fetch("/not-found");
-          fetch("/boom?token=selftest-query");
+          fetch("/boom?token=unittest-query");
           fetch("/graphql/", {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({ operationName: "SelftestQuery", query: "{ x }" }),
+            body: JSON.stringify({ operationName: "UnittestQuery", query: "{ x }" }),
           });
           fetch("/hangs");
           fetch("/slow");
-          setTimeout(() => { throw new Error("selftest uncaught https://example.com/x?token=selftest-query"); }, 100);
+          setTimeout(() => { throw new Error("unittest uncaught https://example.com/x?token=unittest-query"); }, 100);
         </script>`);
       } else if (request.url?.startsWith("/boom") === true) {
         response.writeHead(500).end();
       } else if (request.url === "/graphql/") {
         response.writeHead(200, { "content-type": "application/json" });
-        response.end('{"errors":[{"message":"selftest error"}]}');
+        response.end('{"errors":[{"message":"unittest error"}]}');
       } else if (request.url === "/error-page") {
         response.writeHead(200, { "content-type": "text/html" });
         response.end('<h1 data-testid="error__503--title">503: Palaamme pian!</h1>');
@@ -491,20 +520,20 @@ test.describe("Runtime self-test", () => {
     for (const expected of [
       `500 Internal Server Error: GET ${host}/boom`,
       `404 Not Found: GET ${host}/missing.js`,
-      `GraphQL errors: POST ${host}/graphql/ (SelftestQuery): selftest error`,
+      `GraphQL errors: POST ${host}/graphql/ (UnittestQuery): unittest error`,
       `GET ${host}/hangs`,
       `GET ${host}/slow`,
       `error page "503" (status 200): GET ${host}/error-page`,
       `the page shows the error page "503": ${host}/error-page`,
       `the page is blank: ${host}/blank`,
-      "uncaught error in the page at /: selftest uncaught https://example.com/x",
+      "uncaught error in the page at /: unittest uncaught https://example.com/x",
     ]) {
       expect(
         recorded.some((description) => description.endsWith(expected)),
         expected
       ).toBe(true);
     }
-    expect(recorded.join("\n")).not.toContain("selftest-query");
+    expect(recorded.join("\n")).not.toContain("unittest-query");
     expect(recorded.join("\n")).not.toContain("/not-found");
   });
 
@@ -559,11 +588,11 @@ test.describe("Runtime self-test", () => {
       // The server echoes a header, like the WAF bypass header that devices.ts adds to every context
       const server = createServer((request, response) => {
         response.writeHead(200, { "content-type": "text/html" });
-        response.end(`<p>${String(request.headers["x-selftest-header"])}</p>`);
+        response.end(`<p>${String(request.headers["x-unittest-header"])}</p>`);
       });
       await once(server.listen(0, "127.0.0.1"), "listening");
       const { port } = server.address() as AddressInfo;
-      const headers = { extraHTTPHeaders: { "X-Selftest-Header": "header" } };
+      const headers = { extraHTTPHeaders: { "X-Unittest-Header": "header" } };
       const session = new Session({ browser, context, page }, info);
       try {
         // The first one is Playwright's page, made with the project's `use` options
@@ -606,7 +635,7 @@ test.describe("Runtime self-test", () => {
     const server = createServer((request, response) => {
       if (request.url === "/") {
         response.writeHead(200, { "content-type": "text/html" });
-        response.end(`<p>${String(request.headers["x-selftest-secret"])}</p>`);
+        response.end(`<p>${String(request.headers["x-unittest-secret"])}</p>`);
       } else {
         response.writeHead(404).end();
       }
@@ -617,17 +646,17 @@ test.describe("Runtime self-test", () => {
       WAF_BYPASS_SECRET: process.env.WAF_BYPASS_SECRET,
       ENABLE_HAR_RECORDING: process.env.ENABLE_HAR_RECORDING,
     };
-    process.env.WAF_BYPASS_SECRET = "selftest-har-secret";
+    process.env.WAF_BYPASS_SECRET = "unittest-har-secret";
     // With ENABLE_HAR_RECORDING=True every context the session opens records a HAR file into the test's results
     process.env.ENABLE_HAR_RECORDING = "True";
     const session = new Session({ browser, context, page }, info);
     try {
       await session.openPage();
       const recorded = await session.openPage({
-        contextOptions: { extraHTTPHeaders: { "X-Selftest-Secret": "selftest-har-secret" } },
+        contextOptions: { extraHTTPHeaders: { "X-Unittest-Secret": "unittest-har-secret" } },
       });
       await recorded.goto(`http://127.0.0.1:${port}/`);
-      await expect(recorded.locator("p")).toHaveText("selftest-har-secret");
+      await expect(recorded.locator("p")).toHaveText("unittest-har-secret");
       await session.close();
     } finally {
       await session.close();
@@ -638,12 +667,12 @@ test.describe("Runtime self-test", () => {
     const files = (await readdir(info.outputDir)).filter((name) => /^context-\d+\.har$/.test(name));
     expect(files).toHaveLength(1);
     const text = await readFile(info.outputPath(files[0] ?? ""), "utf8");
-    expect(text).not.toContain("selftest-har-secret");
+    expect(text).not.toContain("unittest-har-secret");
     const har = JSON.parse(text) as {
       log: { entries: Array<{ request: { url: string; headers: Array<{ name: string; value: string }> } }> };
     };
     const entry = har.log.entries.find((candidate) => candidate.request.url === `http://127.0.0.1:${port}/`);
-    const header = entry?.request.headers.find((candidate) => candidate.name.toLowerCase() === "x-selftest-secret");
+    const header = entry?.request.headers.find((candidate) => candidate.name.toLowerCase() === "x-unittest-secret");
     expect(header?.value).toBe("***");
     expect(text).toContain("<p>***</p>");
   });

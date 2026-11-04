@@ -8,15 +8,15 @@ import { existsSync } from "node:fs";
 import { test as base, errors } from "@playwright/test";
 import { readFile, writeFile } from "node:fs/promises";
 import type { Locator, TestInfo } from "@playwright/test";
-
-const SECRET_NAMES = ["WAF_BYPASS_SECRET", "ROBOT_API_TOKEN", "DJANGO_ADMIN_PASSWORD"];
+import { LOG_LEVELS, SECRET_NAMES, readEnv } from "./env";
 
 /** Hides secrets from step titles and logs. */
 export function redact(text: string): string {
+  const env = readEnv();
   let result = text;
   for (const name of SECRET_NAMES) {
-    const secret = process.env[name];
-    if (secret != null && secret.length > 0) {
+    const secret = env[name];
+    if (secret.length > 0) {
       // Also as it appears inside a printed object, where quotes and backslashes are escaped
       for (const form of new Set([secret, JSON.stringify(secret).slice(1, -1)])) {
         result = result.replaceAll(form, "***");
@@ -41,7 +41,7 @@ export async function redactHarFile(path: string): Promise<void> {
 
 /** ENABLE_HAR_RECORDING=True records a HAR file of every browser context. */
 export function harRecordingEnabled(): boolean {
-  return process.env.ENABLE_HAR_RECORDING === "True";
+  return readEnv().ENABLE_HAR_RECORDING;
 }
 
 /** A Playwright Locator, which prints as Playwright describes it: `getByTestId('reservation__status')` */
@@ -143,14 +143,16 @@ let currentTestInfo: TestInfo | null = null;
 
 /**
  * Logs a message as a report step titled `Log    message`, with secrets hidden. A WARN or ERROR message is also an
- * annotation of the test, which the report shows at the top. DEBUG messages are left out.
+ * annotation of the test, which the report shows at the top. Messages below LOG_LEVEL (default INFO) are left out.
+ * With `console`, the message is also printed: as text, or as a JSON line with LOG_FORMAT=json.
  */
 export async function log(
   message: unknown,
   options: { level?: "DEBUG" | "INFO" | "WARN" | "ERROR"; console?: boolean } = {}
 ): Promise<void> {
   const level = options.level ?? "INFO";
-  if (level === "DEBUG") {
+  const env = readEnv();
+  if (LOG_LEVELS.indexOf(level) < LOG_LEVELS.indexOf(env.LOG_LEVEL)) {
     return;
   }
   const text = redact(formatValue(message));
@@ -158,7 +160,11 @@ export async function log(
     testInfo().annotations.push({ type: level === "WARN" ? "warning" : "error", description: text });
   }
   if (options.console === true) {
-    process.stdout.write(`${text}\n`);
+    const line =
+      env.LOG_FORMAT === "json"
+        ? JSON.stringify({ time: new Date().toISOString(), level, test: currentTestInfo?.title, message: text })
+        : text;
+    process.stdout.write(`${line}\n`);
   }
   await runStep(`Log    ${text.length > 200 ? `${text.slice(0, 197)}...` : text}`, () => undefined);
 }
@@ -172,8 +178,7 @@ function testInfo(): TestInfo {
 
 /** Sequential mode: FORCE_SINGLE_USER=True or a single worker, where all tests share the same users. */
 export function isSequential(): boolean {
-  const force = process.env.FORCE_SINGLE_USER;
-  if (force != null && force.toLowerCase() === "true") {
+  if (readEnv().FORCE_SINGLE_USER) {
     return true;
   }
   return currentTestInfo != null && currentTestInfo.config.workers === 1;
@@ -187,7 +192,7 @@ export function onTestEnd(hook: TestEndHook): void {
   testEndHooks.push(hook);
 }
 
-/** The Playwright `test` of tests that open no pages (create_data, selftest). Keeps the running test's info. */
+/** The Playwright `test` of tests that open no pages (create_data, unit). Keeps the running test's info. */
 export const testWithoutBrowser = base.extend<{ testRuntime: undefined }>({
   testRuntime: [
     async ({ playwright: _playwright }, use, info) => {

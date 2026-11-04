@@ -9,9 +9,9 @@ import { gql } from "graphql-tag";
 import { setTimeout } from "node:timers/promises";
 import type { APIRequestContext } from "@playwright/test";
 import type { RobotUnitQuery, RobotUnitQueryVariables } from "../../gql/gql-types";
+import { readEnv } from "../../lib/env";
 import { errorMessage, expect, log, runStep, step } from "../../lib/runtime";
 import { PageObject } from "../page-object";
-import { ROBOT_API_ENDPOINT, ROBOT_API_TOKEN } from "./env_loader";
 import { ALWAYS_FREE_UNIT } from "./variables";
 
 export const BASE_URL = "https://varaamo.test.hel.ninja";
@@ -130,8 +130,8 @@ export class CreateData extends PageObject {
    */
   @step("create_data.Create Robot Test Data")
   async createRobotTestData() {
-    // ROBOT_API_TOKEN comes from the environment or the .env file (env_loader)
-    const token = ROBOT_API_TOKEN;
+    // ROBOT_API_TOKEN and ROBOT_API_ENDPOINT come from the environment or the .env file (lib/env.ts)
+    const { ROBOT_API_TOKEN: token, ROBOT_API_ENDPOINT } = readEnv();
     if (token === "") {
       throw new Error("ROBOT_API_TOKEN not provided in the environment nor .env file");
     }

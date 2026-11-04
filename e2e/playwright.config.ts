@@ -4,7 +4,7 @@
  * One project per Robot suite file, with the same name. The suites depend on the `create_data` project, which
  * replaces Robot's `Suite Setup    Run Only Once    create_data.Create Robot Test Data`. The notification suite
  * has no data setup (like in Robot) and runs separately with one worker:
- *   playwright test --grep-invert @serialonly                                     # pabot run
+ *   playwright test --grep-invert @serialonly                                     # parallel run
  *   playwright test --project Tests_admin_notifications_serial --workers 1        # serial run
  * Sequential mode with shared users (robot --variable FORCE_SINGLE_USER:True):
  *   FORCE_SINGLE_USER=True playwright test --workers 1
@@ -14,12 +14,17 @@
  */
 import { defineConfig, devices } from "@playwright/test";
 import type { PlaywrightTestOptions, PlaywrightWorkerOptions } from "@playwright/test";
+import { readEnv } from "./lib/env";
 
-// The suite formats reservation times in local time, like the Robot Docker image (TZ=Europe/Helsinki)
-process.env.TZ ??= "Europe/Helsinki";
+// The app shows times only in Helsinki time, so the suite runs in it: TZ for the reservation times that the suite
+// formats in Node's local time, and timezoneId below for the browsers
+const TIME_ZONE = "Europe/Helsinki";
+process.env.TZ = TIME_ZONE;
+
+const env = readEnv();
 
 // PW_TRACE=on (or another trace mode) records Playwright traces for local debugging. They aren't recorded in CI.
-const trace = process.env.CI == null ? ((process.env.PW_TRACE ?? "off") as PlaywrightWorkerOptions["trace"]) : "off";
+const trace = env.CI ? "off" : env.PW_TRACE;
 
 // The desktop browser of devices.robot (Set Up Chromium Desktop Browser And Open Url)
 const desktop: Partial<PlaywrightTestOptions & PlaywrightWorkerOptions> = {
@@ -45,14 +50,14 @@ const suite = (
 
 export default defineConfig({
   testDir: "./TestSuites",
-  // pabot --testlevelsplit: every test can run in its own worker
+  // Every test can run in its own worker
   fullyParallel: true,
-  forbidOnly: process.env.CI != null,
+  forbidOnly: env.CI,
   // Replaces the end-of-run rerun of failed tests
-  retries: Number(process.env.RETRIES ?? 1),
+  retries: env.RETRIES,
   // docker-config.json "all_suites": 5
-  workers: Number(process.env.WORKERS ?? 5),
-  // Robot has no test timeout; the longest test waits up to 7 minutes for another test's emails
+  workers: env.WORKERS,
+  // Only stops a test that hangs
   timeout: 15 * 60_000,
   expect: { timeout: 10_000 },
   globalSetup: "./lib/global-setup.ts",
@@ -69,7 +74,7 @@ export default defineConfig({
     baseURL: "https://varaamo.test.hel.ninja/",
     // The context options of devices.robot, for every browser of the suites
     locale: "en-US",
-    timezoneId: "Europe/Helsinki",
+    timezoneId: TIME_ZONE,
     ignoreHTTPSErrors: true,
     acceptDownloads: true,
     // Set Browser Timeout    ${BROWSER_TIMEOUT_GLOBAL}
@@ -81,13 +86,15 @@ export default defineConfig({
     trace,
   },
   projects: [
-    // Offline test of the port's runtime (library shims, pure keywords), no test environment needed
-    { name: "selftest", testDir: "./selftest", retries: 0 },
+    // Unit tests of the e2e suite's own code (lib/ and the keywords that need no test environment), not tests of the
+    // app: they run offline against local pages, without the test environment (pnpm test:unit, and the E2E checks)
+    { name: "unit", testDir: "./unit", retries: 0 },
     {
       name: "create_data",
       testMatch: "create_data.setup.ts",
-      // create_data.Create Robot Test Data waits up to 5 minutes for the data, like its [Timeout] in Robot, and then up
-      // to 2 minutes until the site answers normally
+      // 10 minutes (Playwright counts in milliseconds), and only an upper limit: the data setup polls until the new
+      // data has been saved (at most 5 minutes) and then until the site answers normally (at most 2 minutes), and
+      // goes on as soon as each is ready. The other 3 minutes leave room for requests still running when a wait ends.
       timeout: 10 * 60_000,
       retries: 0,
     },
