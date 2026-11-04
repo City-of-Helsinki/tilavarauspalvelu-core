@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import factory
+
 from tilavarauspalvelu.models import SalesItem
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory
@@ -14,7 +16,7 @@ class SalesItemFactory(GenericDjangoModelFactory[SalesItem]):
         model = SalesItem
 
     name = FakerFI("word", unique=True)
-    material = ""
+    material = factory.Sequence(lambda number: f"{10000000 + number}")
     main_ledger_account = "340025"
 
     tax_level = ForeignKeyFactory("tests.factories.TaxLevelFactory", required=True)
