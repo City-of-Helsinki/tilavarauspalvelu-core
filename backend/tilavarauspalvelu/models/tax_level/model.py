@@ -17,8 +17,9 @@ if TYPE_CHECKING:
 
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import TaxLevelRate
+    from tilavarauspalvelu.models import ReservationUnitPricing, TaxLevelRate
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
+    from tilavarauspalvelu.models.reservation_unit_pricing.queryset import ReservationUnitPricingQuerySet
     from tilavarauspalvelu.models.tax_level_rate.queryset import TaxLevelRateQuerySet
 
     from .actions import TaxLevelActions
@@ -43,6 +44,7 @@ class TaxLevel(models.Model):
     validators: LazyAttribute[TaxLevelValidator] = LazyModelAttribute.new()
 
     rates: OneToManyRelatedManager[TaxLevelRate, TaxLevelRateQuerySet]
+    reservation_unit_pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
 
     class Meta:
         db_table = "tax_level"
