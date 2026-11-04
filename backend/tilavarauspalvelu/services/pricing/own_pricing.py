@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
-    from tilavarauspalvelu.enums import PaymentType, PriceUnit
+    from tilavarauspalvelu.enums import PriceUnit
     from tilavarauspalvelu.models import TaxLevel
 
 __all__ = [
@@ -32,7 +32,6 @@ class OwnPricing:
     begins: datetime.date
     amount: Decimal
     price_unit: PriceUnit
-    payment_type: PaymentType | None
     tax_level: TaxLevel
     can_apply_for_discount: bool
     material_price_description_fi: str
@@ -90,7 +89,6 @@ def save_own_pricings(*, reservation_unit: ReservationUnit, pricings: list[OwnPr
                 material_price_description_fi=pricing.material_price_description_fi,
                 material_price_description_en=pricing.material_price_description_en,
                 material_price_description_sv=pricing.material_price_description_sv,
-                payment_type=pricing.payment_type,
                 tax_level=pricing.tax_level,
             )
             for pricing, valid_until in zip(sorted_pricings, valid_until_dates, strict=True)

@@ -15,7 +15,12 @@ from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedFi
 from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
-from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
+from tilavarauspalvelu.enums import (
+    AccessType,
+    PaymentType,
+    ReservationUnitPublishingState,
+    ReservationUnitReservationState,
+)
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import (
     OriginHaukiResource,
@@ -62,6 +67,7 @@ class ReservationUnitNode(DjangoNode):
         expression=L("reservation_state"),
         required=True,
     )
+    payment_type = graphene.Field(graphene.Enum.from_enum(PaymentType), required=False)
 
     is_closed = graphene.Boolean(required=True)
     first_reservable_datetime = graphene.DateTime()
@@ -133,6 +139,7 @@ class ReservationUnitNode(DjangoNode):
             "reservation_start_interval",
             "reservation_kind",
             "reservation_form",
+            "payment_type",
             "publishing_state",
             "reservation_state",
             "current_access_type",

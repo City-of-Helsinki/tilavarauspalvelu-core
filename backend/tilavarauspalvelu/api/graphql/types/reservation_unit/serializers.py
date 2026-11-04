@@ -21,7 +21,7 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializer
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import AccessType, PaymentType, PriceUnit, ReservationStartInterval, Weekday
+from tilavarauspalvelu.enums import AccessType, PriceUnit, ReservationStartInterval, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -60,12 +60,6 @@ class OwnPricingInputSerializer(serializers.Serializer):
     begins = serializers.DateField()
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal(0))
     price_unit = EnumFriendlyChoiceField(choices=PriceUnit.choices, enum=PriceUnit)
-    payment_type = EnumFriendlyChoiceField(
-        choices=PaymentType.choices,
-        enum=PaymentType,
-        required=False,
-        allow_null=True,
-    )
     tax_level = serializers.PrimaryKeyRelatedField(queryset=TaxLevel.objects.all())
     can_apply_for_discount = serializers.BooleanField(required=False)
     material_price_description_fi = serializers.CharField(required=False, allow_blank=True)
@@ -129,6 +123,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "reservation_start_interval",
             "reservation_kind",
             "reservation_form",
+            "payment_type",
             "publishing_state",
             #
             # List fields
@@ -502,7 +497,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 begins=pricing["begins"],
                 amount=pricing["amount"],
                 price_unit=pricing["price_unit"],
-                payment_type=pricing.get("payment_type"),
                 tax_level=pricing["tax_level"],
                 can_apply_for_discount=pricing.get("can_apply_for_discount", False),
                 material_price_description_fi=pricing.get("material_price_description_fi", ""),

@@ -39,7 +39,6 @@ def own_pricing_input(*, begins: datetime.date, amount: str, tax_level: TaxLevel
         "begins": begins.isoformat(),
         "amount": amount,
         "priceUnit": PriceUnit.PER_HOUR,
-        "paymentType": PaymentType.ONLINE,
         "taxLevel": tax_level.pk,
         "canApplyForDiscount": True,
     }
@@ -59,6 +58,7 @@ def test_reservation_unit__own_pricings__create(graphql):
     graphql.login_with_superuser()
 
     input_data = get_create_draft_input_data(
+        paymentType=PaymentType.ONLINE,
         ownPricings=[own_pricing_input(begins=today, amount="10.00", tax_level=tax_level)],
     )
     response = graphql(CREATE_MUTATION, input_data=input_data)
@@ -66,6 +66,8 @@ def test_reservation_unit__own_pricings__create(graphql):
     assert response.has_errors is False, response
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.payment_type == PaymentType.ONLINE
+
     rows = list(ReservationUnitPricingGroup.objects.filter(reservation_unit=reservation_unit))
     assert len(rows) == 1
     assert rows[0].begins == today
@@ -118,7 +120,6 @@ def test_reservation_unit__own_pricings__add_future_pricing(graphql):
         valid_from=today - datetime.timedelta(days=10),
         amount=Decimal(10),
         price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
         can_apply_for_discount=True,
     )
 
@@ -160,7 +161,6 @@ def test_reservation_unit__own_pricings__remove_future_pricing(graphql):
         valid_until=future_date,
         amount=Decimal(10),
         price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
         can_apply_for_discount=True,
     )
     PriceComponentFactory.create(pricing_group=pricing_group, valid_from=future_date)

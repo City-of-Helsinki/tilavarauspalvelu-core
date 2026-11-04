@@ -30,7 +30,6 @@ class PriceComponentInputSerializer(NestingModelSerializer):
             "price_unit",
             "can_apply_for_discount",
             "material_price_description",
-            "payment_type",
             "tax_level",
         ]
 
