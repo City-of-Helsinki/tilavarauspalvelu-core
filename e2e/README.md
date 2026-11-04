@@ -190,15 +190,16 @@ the Actions tab and pick the suite ("All Tests" is `pnpm test:all`) and the mode
 shared users).
 
 - It runs 3 workers, and one run at a time, because each run creates the test data again.
-- The run's summary shows the `report_summary.py` output. The reports are in its `e2e-reports-<run number>`
-  artifact for 30 days.
+- The run's summary lists the results of each project and the failed and flaky tests, from
+  `report_summary.py --markdown`. The reports are in its `e2e-reports-<run number>` artifact for 30 days.
 
 ## Reading a run's results
 
 `python3 tools/report_summary.py [playwright-report]` prints the run's totals and warnings, and each failed or
 flaky test with its error, the keyword path to the failing step and its screenshot. It reads the data embedded
 in the HTML report's `index.html`, so it works on a report downloaded from CI too. `--all` also lists the
-passed tests, and `--extract DIR` writes the report's JSON files. Each failure also has an `error-context.md`
+passed tests, `--markdown` prints Markdown for the job summary, and `--extract DIR` writes the report's
+JSON files. Each failure also has an `error-context.md`
 with the page's accessibility snapshot, next to its screenshot.
 
 **Backend errors:** while a test runs, `lib/backend-errors.ts` watches its page loads, scripts and API calls to the

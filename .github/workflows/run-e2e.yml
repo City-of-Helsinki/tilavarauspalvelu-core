@@ -108,16 +108,20 @@ jobs:
 
       - name: Write summary
         if: ${{ !cancelled() }}
+        env:
+          REPORTS_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
+          found=""
           for report in playwright-report playwright-report/notifications; do
             if [ -f "$report/index.html" ]; then
-              {
-                echo '```'
-                python3 tools/report_summary.py "$report"
-                echo '```'
-              } >> "$GITHUB_STEP_SUMMARY"
+              python3 tools/report_summary.py "$report" --markdown >> "$GITHUB_STEP_SUMMARY"
+              found=yes
             fi
           done
+          if [ -n "$found" ]; then
+            echo "Screenshots, videos and error contexts: [e2e-reports-$RUN_NUMBER]($REPORTS_URL)" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       # HAR files and traces are for local debugging only (see e2e/README.md)
       - name: Upload reports
