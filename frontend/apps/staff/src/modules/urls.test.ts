@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   getOpeningHoursUrl,
   getApplicationRoundUrl,
@@ -21,7 +21,12 @@ function getReservationUnits(url: string): string | null {
 }
 
 describe("getOpeningHoursUrl", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("builds the opening hours url for a single reservation unit", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
     const url = getOpeningHoursUrl(5);
     expect(url.startsWith("/v1/edit_opening_hours/?")).toBe(true);
     expect(getReservationUnits(url)).toBe("5");

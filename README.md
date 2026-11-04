@@ -267,8 +267,12 @@ To add test data, run `just stack manage create_test_data`.
 
 #### Network
 
-The frontends use one backend URL for the server side rendering and for the browser.
+The frontends use two backend URLs. See [Frontend settings](#frontend-settings).
+The server side rendering uses `TILAVARAUS_API_URL` in the frontend containers.
+The browser uses `NEXT_PUBLIC_LOCAL_API_URL` on the host.
+Both are `http://localhost:8000` in `apps/<app>/.env.local`, and the containers and the host use the same file.
 So `http://localhost:8000` must be the backend both on the host and in the frontend containers.
+On the host, the backend container publishes port 8000.
 The frontends share the network namespace of the `frontend-net` service. That service publishes the frontend ports
 and forwards `localhost:8000` to the backend container.
 

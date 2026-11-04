@@ -1,5 +1,5 @@
 import { addDays, addHours, addMinutes, format, setHours, startOfDay, startOfToday } from "date-fns";
-import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
+import { vi, describe, test, expect, beforeAll, afterAll, afterEach } from "vitest";
 import type { TFunction } from "i18next";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
@@ -596,13 +596,18 @@ describe("getPaymentUrl", () => {
     };
   }
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   test("returns webstore checkout url for direct payments", () => {
     expect(getPaymentUrl(createPaymentReservation(), "fi")).toBe(
       "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=fi"
     );
   });
 
-  test("returns handled payment redirect url when payment is pending", () => {
+  test("returns handled payment redirect url on the page origin when payment is pending", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
     const origin = window.location.origin;
     expect(
       getPaymentUrl(
