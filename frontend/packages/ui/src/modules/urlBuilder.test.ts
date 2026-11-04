@@ -1,15 +1,56 @@
-import { describe, expect, it } from "vitest";
-import { getClientOrigin, getSignInUrl } from "./urlBuilder";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { getBrowserApiBaseUrl, getClientOrigin, getSignInUrl, getSignOutUrl } from "./urlBuilder";
+
+beforeEach(() => {
+  vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
+describe("getBrowserApiBaseUrl", () => {
+  it("is empty without NEXT_PUBLIC_LOCAL_API_URL", () => {
+    expect(getBrowserApiBaseUrl()).toBe("");
+  });
+
+  it("returns NEXT_PUBLIC_LOCAL_API_URL without a trailing slash", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://localhost:8000/");
+    expect(getBrowserApiBaseUrl()).toBe("http://localhost:8000");
+  });
+});
+
+describe("getSignOutUrl", () => {
+  it("returns a path without NEXT_PUBLIC_LOCAL_API_URL", () => {
+    expect(getSignOutUrl()).toBe("/helauth/logout/");
+  });
+
+  it("uses NEXT_PUBLIC_LOCAL_API_URL", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://localhost:8000");
+    expect(getSignOutUrl()).toBe("http://localhost:8000/helauth/logout/");
+  });
+});
 
 describe("getSignInUrl", () => {
+  it("returns a path without NEXT_PUBLIC_LOCAL_API_URL", () => {
+    const url = getSignInUrl({ callBackUrl: "/reservations", language: "fi", client: "customer" });
+    expect(url.startsWith("/helauth/login/?")).toBe(true);
+  });
+
+  it("uses NEXT_PUBLIC_LOCAL_API_URL", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://localhost:8000");
+    const url = getSignInUrl({ callBackUrl: "http://localhost:3000/reservations", language: "fi", client: "customer" });
+    expect(url.startsWith("http://localhost:8000/helauth/login/?")).toBe(true);
+  });
+
   it("keeps the query string of the callback url in next", () => {
     const url = new URL(
       getSignInUrl({
-        apiBaseUrl: "https://api.example.com",
         callBackUrl: "/reservations?textSearch=sauna&units=1&units=2",
         language: "fi",
         client: "customer",
-      })
+      }),
+      "https://example.com"
     );
     expect(url.pathname).toBe("/helauth/login/");
     expect(url.searchParams.get("next")).toBe("/reservations?textSearch=sauna&units=1&units=2");
@@ -27,12 +68,12 @@ describe("getSignInUrl", () => {
   ])("joins origin %s and path %s with one slash", (originOverride, callBackUrl) => {
     const url = new URL(
       getSignInUrl({
-        apiBaseUrl: "https://api.example.com",
         callBackUrl,
         language: "fi",
         client: "customer",
         originOverride,
-      })
+      }),
+      "https://example.com"
     );
     expect(url.searchParams.get("next")).toBe("https://example.com/reservations?x=1");
   });

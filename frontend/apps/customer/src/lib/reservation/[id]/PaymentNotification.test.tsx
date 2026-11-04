@@ -12,12 +12,7 @@ function customRender() {
   const appliedPricing = createAppliedPricingMock();
   const reservation = createReservationPageMock({});
   return render(
-    <PaymentNotification
-      reservation={reservation}
-      paymentOrder={paymentOrder}
-      appliedPricing={appliedPricing}
-      apiBaseUrl="http://localhost:8000"
-    />
+    <PaymentNotification reservation={reservation} paymentOrder={paymentOrder} appliedPricing={appliedPricing} />
   );
 }
 

@@ -9,16 +9,18 @@ import type { ApolloLink, NormalizedCacheObject } from "@apollo/client";
 import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { keepLoadedPages, keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
-import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
+import { buildGraphQLUrl, getBrowserApiBaseUrl } from "@ui/modules/urlBuilder";
+import { env } from "@/env.mjs";
 
 if (process.env.NODE_ENV === "development") {
   loadDevMessages();
   loadErrorMessages();
 }
 
-export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClient<NormalizedCacheObject> {
+/// The server connects to the backend with TILAVARAUS_API_URL. The browser uses getBrowserApiBaseUrl.
+export function createClient(req?: IncomingMessage): ApolloClient<NormalizedCacheObject> {
   const isServer = typeof window === "undefined";
-  const uri = buildGraphQLUrl(hostUrl);
+  const uri = buildGraphQLUrl(isServer ? (env.TILAVARAUS_API_URL ?? "") : getBrowserApiBaseUrl());
   const uploadLinkOptions = {
     uri,
     credentials: "include",

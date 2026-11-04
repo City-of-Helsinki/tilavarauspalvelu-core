@@ -597,7 +597,7 @@ describe("getPaymentUrl", () => {
   }
 
   test("returns webstore checkout url for direct payments", () => {
-    expect(getPaymentUrl(createPaymentReservation(), "fi", "https://api.example")).toBe(
+    expect(getPaymentUrl(createPaymentReservation(), "fi")).toBe(
       "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=fi"
     );
   });
@@ -615,11 +615,10 @@ describe("getPaymentUrl", () => {
             checkoutUrl: null,
           },
         }),
-        "sv",
-        "https://api.example"
+        "sv"
       )
     ).toBe(
-      `https://api.example/v1/pay_pending_reservation/1/?lang=sv&redirect_on_error=${encodeURIComponent(
+      `${origin}/v1/pay_pending_reservation/1/?lang=sv&redirect_on_error=${encodeURIComponent(
         `${origin}/sv/reservations/1`
       )}`
     );
@@ -632,8 +631,7 @@ describe("getPaymentUrl", () => {
           state: ReservationStateChoice.Cancelled,
           cancelReason: ReservationCancelReasonChoice.NotPaid,
         }),
-        "fi",
-        "https://api.example"
+        "fi"
       )
     ).toBeUndefined();
   });

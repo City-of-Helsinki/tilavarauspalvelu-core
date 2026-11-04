@@ -23,10 +23,6 @@ import {
   getAccessibilityTermsUrl,
 } from "@/modules/urls";
 
-type Props = {
-  apiBaseUrl: string;
-};
-
 const BackgroundHeader = styled(Header)`
   && {
     --actionbar-background-color: var(--color-bus-dark);
@@ -258,7 +254,7 @@ function NavigationAnchor({
   );
 }
 
-export function Navigation({ apiBaseUrl }: Props) {
+export function Navigation() {
   const { t, i18n } = useTranslation();
   const { user } = useSession();
   const firstName = user?.firstName?.trim() ?? "";
@@ -304,7 +300,7 @@ export function Navigation({ apiBaseUrl }: Props) {
                   <IconSignout />
                 </ProfileMenuLink>
               }
-              onClick={() => signOut(apiBaseUrl, env.NEXT_PUBLIC_BASE_URL)}
+              onClick={() => signOut(env.NEXT_PUBLIC_BASE_URL)}
             />
           </Header.ActionBarItem>
         ) : (
@@ -312,7 +308,6 @@ export function Navigation({ apiBaseUrl }: Props) {
             label={t("navigation:login")}
             onClick={() =>
               signIn({
-                apiBaseUrl,
                 language: getLocalizationLang(i18n.language),
                 client: "admin",
               })

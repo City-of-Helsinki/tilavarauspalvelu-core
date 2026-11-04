@@ -207,6 +207,17 @@ In the development setup, the frontends read `apps/<app>/.env.local` from the so
 `just stack env` runs `just setup`, which makes these files from the examples if they do not exist.
 A variable in the container environment has priority over the same variable in a `.env` file.
 
+The frontends use two backend URLs:
+
+| Variable | Used by | Server environments | Local development |
+|----------|---------|---------------------|-------------------|
+| `TILAVARAUS_API_URL` | The server side rendering and the proxy, for their own requests to the backend | The backend URL | `http://localhost:8000` |
+| `NEXT_PUBLIC_LOCAL_API_URL` | The browser, and the redirects that the browser follows | Empty | `http://localhost:8000` |
+
+When `NEXT_PUBLIC_LOCAL_API_URL` is empty, the browser sends its backend requests to paths on its own origin, for example `/graphql/`.
+On the servers, the gateway sends these paths to the backend. Next.js writes the value into the build, so a change needs a restart of `next dev`.
+Do not set it in an image build. If your `.env.local` is older than this variable, add it from `.env.example`.
+
 ### Development setup
 
 The development setup has three profiles. Without a profile, only the database and Redis start.

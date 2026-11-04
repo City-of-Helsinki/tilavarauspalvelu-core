@@ -19,10 +19,9 @@ type CardType = "upcoming" | "past" | "cancelled";
 interface PropsT {
   reservation: ReservationCardFragment;
   type?: CardType;
-  apiBaseUrl: string;
 }
 
-export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<PropsT>): React.ReactElement | null {
+export function ReservationCard({ reservation, type }: Readonly<PropsT>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnit;
@@ -93,7 +92,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
     </ButtonLikeLink>
   );
 
-  const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
+  const paymentUrl = getPaymentUrl(reservation, lang);
   if (paymentUrl) {
     buttons.push(
       <ButtonLikeLink

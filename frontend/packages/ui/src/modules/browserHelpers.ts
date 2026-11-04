@@ -17,12 +17,10 @@ function cleanupUrlParam(url: unknown): string | undefined {
 // current url if none is provided) after sign in
 /// Throws if called on the server
 export function signIn({
-  apiBaseUrl,
   language,
   client,
   returnUrl,
 }: {
-  apiBaseUrl: string;
   language: LocalizationLanguages;
   client: UserTypeChoice;
   returnUrl?: unknown;
@@ -34,7 +32,6 @@ export function signIn({
   // encode otherwise backend will drop the query params
   const returnTo = returnUrlParam ?? window.location.href;
   window.location.href = getSignInUrl({
-    apiBaseUrl,
     language,
     callBackUrl: returnTo,
     client,
@@ -45,14 +42,13 @@ export const isTouchDevice = (): boolean => isBrowser && window?.matchMedia("(an
 
 /// Sign the user out and redirect to route /auth/logout/ after the session is destroyed
 /// Throws if called on the server
-/// @param apiBaseUrl - base url for api
 /// @param appUrlBasePath - base path for the app (only required if next app is not in host root)
-export function signOut(apiBaseUrl: string, appUrlBasePath = "") {
+export function signOut(appUrlBasePath = "") {
   if (!isBrowser) {
     throw new NotBrowserError("singOut requires window.location.href");
   }
   const url = new URL(window.location.href);
-  const logoutUrl = getSignOutUrl(apiBaseUrl);
+  const logoutUrl = getSignOutUrl();
   const csrfToken = getCookie("csrftoken");
   const logoutPath = "/auth/logout/";
   const origin = url.origin;

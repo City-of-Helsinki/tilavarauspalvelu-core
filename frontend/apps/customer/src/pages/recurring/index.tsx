@@ -18,15 +18,13 @@ import type {
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApplicationRoundCard } from "@/lib/recurring";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const now = new Date();
   const { locale } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const { data } = await apolloClient.query<ApplicationRoundsUiQuery, ApplicationRoundsUiQueryVariables>({
     query: ApplicationRoundsUiDocument,

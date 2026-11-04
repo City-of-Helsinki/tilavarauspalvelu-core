@@ -18,7 +18,6 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { useCurrentUser } from "@/hooks";
 import { ApplicationsGroup } from "@/lib/applications";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -125,8 +124,7 @@ export default ApplicationsPage;
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
 
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const client = createApolloClient(apiBaseUrl, ctx);
+  const client = createApolloClient(ctx);
 
   // NOTE have to be done with double query because applications returns everything the user has access to (not what he owns)
   const { data: userData } = await client.query<CurrentUserQuery>({
