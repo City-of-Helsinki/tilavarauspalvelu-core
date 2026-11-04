@@ -25,9 +25,8 @@ class SalesItemForm(forms.ModelForm):
         help_texts = {
             "name": "Name in Varaamo. Staff select the sales item by this name in pricings. It is not sent to SAP.",
             "material": (
-                "Identifies the product or service that is invoiced. It is bound to a VAT category. "
-                "It does not usually change when the VAT percentage changes. "
-                "Needed only when the reservation is paid by invoice. 8 digits."
+                "SAP material (nimike) of the product or service that is sold. "
+                "One material has one VAT percentage and one main ledger account. 8 digits."
             ),
             "main_ledger_account": (
                 "Revenue account where the income is booked. Varaamo usually uses 340025 (Tilojen muut vuokratuotot)."
@@ -46,7 +45,7 @@ class SalesItemAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "material",
     ]
     list_select_related = ["tax_level"]
-    search_fields = ["name"]
+    search_fields = ["name", "material"]
 
     # Form
     form = SalesItemForm

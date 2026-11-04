@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255, unique=True)),
-                ('material', models.CharField(blank=True, default='', max_length=8, validators=[django.core.validators.MinLengthValidator(8), tilavarauspalvelu.validators.is_numeric])),
+                ('material', models.CharField(max_length=8, unique=True, validators=[django.core.validators.MinLengthValidator(8), tilavarauspalvelu.validators.is_numeric])),
                 ('main_ledger_account', models.CharField(max_length=6, validators=[tilavarauspalvelu.validators.is_numeric])),
             ],
             options={

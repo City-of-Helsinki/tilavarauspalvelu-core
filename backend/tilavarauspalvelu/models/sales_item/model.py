@@ -28,7 +28,7 @@ __all__ = [
 
 class SalesItem(models.Model):
     """
-    The product that a price component sells, for accounting.
+    The SAP material that a price component sells online, for accounting.
     The accounting fields that depend on the place come from the payment accounting.
     """
 
@@ -37,8 +37,7 @@ class SalesItem(models.Model):
     # Custom validation comes from requirements in SAP
     material: str = models.CharField(
         max_length=8,
-        blank=True,
-        default="",
+        unique=True,
         validators=[MinLengthValidator(8), is_numeric],
     )
     main_ledger_account: str = models.CharField(max_length=6, validators=[is_numeric])
