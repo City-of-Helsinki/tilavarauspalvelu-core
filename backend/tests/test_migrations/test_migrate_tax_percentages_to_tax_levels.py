@@ -33,6 +33,10 @@ pytestmark = [
 
 def migrate_to(target: tuple[str, str]) -> StateApps:
     """Migrate the database to the given migration and return the models of that state."""
+    # A schema change fails while the test transaction has pending checks for foreign keys.
+    with connection.cursor() as cursor:
+        cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
+
     executor = MigrationExecutor(connection)
     executor.migrate([target])
     executor.loader.build_graph()
@@ -66,8 +70,9 @@ def create_pricing(
 
 
 def test_migrate_tax_percentages_to_tax_levels__creates_tax_levels_with_rate_history():
+    reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
-    create_pricing(apps, reservation_unit=ReservationUnitFactory.create(), percentage=Decimal("25.50"))
+    create_pricing(apps, reservation_unit=reservation_unit, percentage=Decimal("25.50"))
 
     apps = migrate_to(AFTER_MIGRATION)
 
@@ -113,8 +118,9 @@ def test_migrate_tax_percentages_to_tax_levels__no_pricings():
     ],
 )
 def test_migrate_tax_percentages_to_tax_levels__sets_tax_level_by_percentage(percentage, tax_level_name):
+    reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
-    pricing = create_pricing(apps, reservation_unit=ReservationUnitFactory.create(), percentage=percentage)
+    pricing = create_pricing(apps, reservation_unit=reservation_unit, percentage=percentage)
 
     apps = migrate_to(AFTER_MIGRATION)
 
@@ -124,8 +130,9 @@ def test_migrate_tax_percentages_to_tax_levels__sets_tax_level_by_percentage(per
 
 
 def test_migrate_tax_percentages_to_tax_levels__unknown_percentage():
+    reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
-    create_pricing(apps, reservation_unit=ReservationUnitFactory.create(), percentage=Decimal("23.00"))
+    create_pricing(apps, reservation_unit=reservation_unit, percentage=Decimal("23.00"))
 
     msg = "No tax level for the tax percentages: [Decimal('23.00')]"
     with pytest.raises(migration.TaxLevelMigrationError, match=exact(msg)):
@@ -136,8 +143,8 @@ def test_migrate_tax_percentages_to_tax_levels__unknown_percentage():
 
 
 def test_migrate_tax_percentages_to_tax_levels__deletes_vat_only_change():
-    apps = migrate_to(BEFORE_MIGRATION)
     reservation_unit = ReservationUnitFactory.create()
+    apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
         apps,
         reservation_unit=reservation_unit,
@@ -171,8 +178,8 @@ def test_migrate_tax_percentages_to_tax_levels__deletes_vat_only_change():
 
 
 def test_migrate_tax_percentages_to_tax_levels__keeps_vat_change_with_new_price():
-    apps = migrate_to(BEFORE_MIGRATION)
     reservation_unit = ReservationUnitFactory.create()
+    apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
         apps,
         reservation_unit=reservation_unit,
@@ -199,8 +206,8 @@ def test_migrate_tax_percentages_to_tax_levels__keeps_vat_change_with_new_price(
 
 
 def test_migrate_tax_percentages_to_tax_levels__keeps_change_to_another_tax_level():
-    apps = migrate_to(BEFORE_MIGRATION)
     reservation_unit = ReservationUnitFactory.create()
+    apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
         apps,
         reservation_unit=reservation_unit,
@@ -226,8 +233,8 @@ def test_migrate_tax_percentages_to_tax_levels__keeps_change_to_another_tax_leve
 
 
 def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_without_activation_flag():
-    apps = migrate_to(BEFORE_MIGRATION)
     reservation_unit = ReservationUnitFactory.create()
+    apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
         apps,
         reservation_unit=reservation_unit,
@@ -252,16 +259,18 @@ def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_without_activat
 
 
 def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_in_another_reservation_unit():
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
         apps,
-        reservation_unit=ReservationUnitFactory.create(),
+        reservation_unit=reservation_unit_1,
         begins=datetime.date(2024, 1, 1),
         percentage=Decimal("24.00"),
     )
     pricing = create_pricing(
         apps,
-        reservation_unit=ReservationUnitFactory.create(),
+        reservation_unit=reservation_unit_2,
         begins=datetime.date(2024, 9, 1),
         percentage=Decimal("25.50"),
         is_activated_on_begins=True,
@@ -277,6 +286,7 @@ def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_in_another_rese
 
 
 def test_fill_missing_tax_percentages():
+    reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(AFTER_MIGRATION)
 
     TaxLevel = apps.get_model("tilavarauspalvelu", "TaxLevel")
@@ -288,7 +298,6 @@ def test_fill_missing_tax_percentages():
     TaxLevelRate.objects.create(tax_level=tax_level, begins=datetime.date(2020, 1, 1), percentage=Decimal("24.00"))
     TaxLevelRate.objects.create(tax_level=tax_level, begins=datetime.date(2024, 9, 1), percentage=Decimal("25.50"))
 
-    reservation_unit = ReservationUnitFactory.create()
     for begins in (datetime.date(2019, 1, 1), datetime.date(2024, 8, 31), datetime.date(2024, 9, 1)):
         ReservationUnitPricing.objects.create(
             reservation_unit_id=reservation_unit.pk,
