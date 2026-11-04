@@ -2495,6 +2495,7 @@ type PriceComponentNode implements Node {
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
   taxLevel: TaxLevelNode!
+  salesItem: SalesItemNode
 
   """The ID of the object"""
   id: ID!
@@ -2505,6 +2506,15 @@ type PriceComponentNode implements Node {
 enum PriceComponentKind {
   """Base"""
   BASE
+}
+
+type SalesItemNode implements Node {
+  name: String!
+  taxLevel: TaxLevelNode!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
 }
 
 type PriceSummaryType {
@@ -2907,15 +2917,6 @@ type SalesItemNodeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
-}
-
-type SalesItemNode implements Node {
-  name: String!
-  taxLevel: TaxLevelNode!
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
 }
 
 """Ordering fields for the 'SalesItem' model."""
@@ -4164,6 +4165,7 @@ input OwnPricingInputSerializerInput {
   amount: Decimal!
   priceUnit: PriceUnit!
   taxLevel: Int!
+  salesItem: Int
   canApplyForDiscount: Boolean
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
@@ -4407,6 +4409,7 @@ input UpdatePriceComponentInputSerializerInput {
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
   taxLevel: Int
+  salesItem: Int
 }
 
 type IntendedUseCreateMutationPayload {

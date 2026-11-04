@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PriceOption, PricingGroup, TaxLevel
+    from tilavarauspalvelu.models import PriceOption, PricingGroup, SalesItem, TaxLevel
 
     from .actions import PriceComponentActions
     from .queryset import PriceComponentManager
@@ -69,6 +69,14 @@ class PriceComponent(models.Model):
         "tilavarauspalvelu.TaxLevel",
         related_name="price_components",
         on_delete=models.PROTECT,
+    )
+    # The SAP material of the price, when it is paid online. A price that is paid on site is not in SAP.
+    sales_item: SalesItem | None = models.ForeignKey(
+        "tilavarauspalvelu.SalesItem",
+        related_name="price_components",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
 
     # Translated field hints

@@ -24,4 +24,5 @@ class PriceComponentNode(DjangoNode):
             "can_apply_for_discount",
             "material_price_description",
             "tax_level",
+            "sales_item",
         ]

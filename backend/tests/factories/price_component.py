@@ -32,6 +32,7 @@ class PriceComponentFactory(GenericDjangoModelFactory[PriceComponent]):
     material_price_description = ""
 
     tax_level = ForeignKeyFactory("tests.factories.TaxLevelFactory", required=True)
+    sales_item = ForeignKeyFactory("tests.factories.SalesItemFactory")
 
     @classmethod
     def create_free(cls, **kwargs) -> PriceComponent:

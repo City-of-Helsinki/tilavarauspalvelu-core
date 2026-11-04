@@ -51,6 +51,11 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='sales_items', to='tilavarauspalvelu.taxlevel'),
         ),
         migrations.AddField(
+            model_name='pricecomponent',
+            name='sales_item',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='price_components', to='tilavarauspalvelu.salesitem'),
+        ),
+        migrations.AddField(
             model_name='reservationpriceline',
             name='sales_item',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='reservation_price_lines', to='tilavarauspalvelu.salesitem'),

@@ -19,6 +19,7 @@ from tinymce.widgets import TinyMCE
 from tilavarauspalvelu.enums import AccessType, ReservationKind
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
+from tilavarauspalvelu.services.pricing.sales_items import validate_sales_items_for_payment_type
 from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
@@ -411,6 +412,12 @@ class ReservationUnitAdminForm(forms.ModelForm):
         cleaned_data = super().clean()
         if not cleaned_data:
             return
+
+        if "payment_type" in self.changed_data:
+            validate_sales_items_for_payment_type(
+                reservation_unit=self.instance,
+                payment_type=cleaned_data.get("payment_type"),
+            )
 
         is_draft = cleaned_data.get("is_draft", False)
         reservation_kind = ReservationKind(cleaned_data["reservation_kind"])

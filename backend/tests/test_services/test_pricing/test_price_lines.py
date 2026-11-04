@@ -26,6 +26,7 @@ from tests.factories import (
     ReservationPriceLineFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
+    SalesItemFactory,
     TaxLevelFactory,
     TaxLevelRateFactory,
     UnitGroupFactory,
@@ -66,12 +67,14 @@ def test_build_price_lines__hourly_price():
         begins=JAN_1,
     )
     tax_level = create_tax_level_with_rate_change()
+    sales_item = SalesItemFactory.create(tax_level=tax_level)
     component = PriceComponentFactory.create(
         pricing_group=pricing_group,
         valid_from=JAN_1,
         amount=Decimal(10),
         price_unit=PriceUnit.PER_HOUR,
         tax_level=tax_level,
+        sales_item=sales_item,
     )
 
     # The reservation is after the rate change, but the line gets today's rate.
@@ -96,7 +99,7 @@ def test_build_price_lines__hourly_price():
     assert line.adjustment_percentage == Decimal(0)
     assert line.amount == Decimal("15.00")
     assert line.override_amount is None
-    assert line.sales_item is None
+    assert line.sales_item == sales_item
     assert line.tax_level == tax_level
     assert line.tax_percentage == Decimal(24)
     assert line.vat_code == ""

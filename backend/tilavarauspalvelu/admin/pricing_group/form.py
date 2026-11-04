@@ -9,9 +9,11 @@ from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from modeltranslation.admin import TranslationStackedInline
 from tinymce.widgets import TinyMCE
 
+from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
 from tilavarauspalvelu.services.pricing.application_round_options import check_pricing_change_keeps_round_options
 from tilavarauspalvelu.services.pricing.coverage import check_pricing_group_coverage
+from tilavarauspalvelu.services.pricing.sales_items import check_sales_items_for_online_payments
 from utils.utils import only_django_validation_errors
 
 __all__ = [
@@ -71,6 +73,7 @@ class PriceComponentFormSet(BaseInlineFormSet):
                     component.validators.validate_new_begins_in_future(has_saved_components=bool(saved_components))
                 else:
                     saved_component.validators.validate_change(_with_changes(saved_component, form))
+                component.validators.validate_sales_item_matches_tax_level()
                 component.validators.validate_option_belongs_to_pricing_group_unit_group()
                 if component.pk is None or "price_option" in form.changed_data:
                     component.validators.validate_option_is_active()
@@ -84,6 +87,17 @@ class PriceComponentFormSet(BaseInlineFormSet):
         )
         if errors:
             raise ValidationError([error.message for error in errors])
+
+        sales_item_errors = check_sales_items_for_online_payments(
+            components=components,
+            online_reservation_unit_names=[
+                row.reservation_unit.name
+                for row in reservation_unit_rows
+                if row.reservation_unit.payment_type in PaymentType.requires_verkkokauppa
+            ],
+        )
+        if sales_item_errors:
+            raise ValidationError([error.message for error in sales_item_errors])
 
         round_errors = check_pricing_change_keeps_round_options(
             pricing_group=self.instance,
@@ -133,6 +147,7 @@ class PriceComponentInline(TranslationStackedInline):
         "amount",
         "price_unit",
         "tax_level",
+        "sales_item",
         "can_apply_for_discount",
         "material_price_description",
     ]

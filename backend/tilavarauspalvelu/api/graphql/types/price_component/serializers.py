@@ -31,6 +31,7 @@ class PriceComponentInputSerializer(NestingModelSerializer):
             "can_apply_for_discount",
             "material_price_description",
             "tax_level",
+            "sales_item",
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:

@@ -23,6 +23,12 @@ class PriceComponentValidator:
 
     # These match the check constraints of the model, so that a batch save does not need a query for each one.
 
+    def validate_sales_item_matches_tax_level(self) -> None:
+        sales_item = self.price_component.sales_item
+        if sales_item is not None and sales_item.tax_level_id != self.price_component.tax_level_id:
+            msg = "The tax level of the sales item must be the same as the tax level of the price component."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_SALES_ITEM_TAX_LEVEL_MISMATCH)
+
     def validate_amount_not_negative(self) -> None:
         if self.price_component.amount < 0:
             msg = "Amount cannot be negative."

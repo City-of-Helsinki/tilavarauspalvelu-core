@@ -5,11 +5,13 @@ from typing import TYPE_CHECKING
 from django.db import transaction
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
+from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import PriceComponent, PricingGroup
 from tilavarauspalvelu.typing import error_codes
 
 from .application_round_options import check_pricing_change_keeps_round_options
 from .coverage import check_pricing_group_coverage
+from .sales_items import check_sales_items_for_online_payments
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -38,8 +40,8 @@ def save_price_component_changes(
     :param pricing_group: The pricing group to change.
     :param components: Changed components (with a pk) and new components (without a pk). Not saved yet.
     :param deleted_component_pks: Primary keys of the components to delete.
-    :raises ValidationError: If an edit rule, a constraint, the coverage check or the application round check fails.
-                             Nothing is saved then.
+    :raises ValidationError: If an edit rule, a constraint, the coverage check, the application round check,
+                             or the sales item check for online payments fails. Nothing is saved then.
     """
     with transaction.atomic():
         # Lock the group, so that two batches for the same group cannot both pass the coverage check.
@@ -103,6 +105,7 @@ def _validate_changed_component(
 
     component.validators.validate_amount_not_negative()
     component.validators.validate_valid_from_before_valid_until()
+    component.validators.validate_sales_item_matches_tax_level()
 
     component.validators.validate_option_belongs_to_pricing_group_unit_group()
     if component.price_option_id != saved_component.price_option_id:
@@ -120,6 +123,7 @@ def _validate_new_component(
     component.pricing_group = pricing_group
     component.validators.validate_amount_not_negative()
     component.validators.validate_valid_from_before_valid_until()
+    component.validators.validate_sales_item_matches_tax_level()
 
     component.validators.validate_option_belongs_to_pricing_group_unit_group()
     component.validators.validate_option_is_active()
@@ -150,10 +154,18 @@ def _merge_components(
 
 
 def _validate_pricing_group(*, pricing_group: PricingGroup, components: list[PriceComponent]) -> None:
-    reservation_unit_begin_dates = list(pricing_group.reservation_unit_pricing_groups.values_list("begins", flat=True))
+    reservation_unit_rows = list(pricing_group.reservation_unit_pricing_groups.select_related("reservation_unit"))
     coverage_errors = check_pricing_group_coverage(
         components=components,
-        reservation_unit_begin_dates=reservation_unit_begin_dates,
+        reservation_unit_begin_dates=[row.begins for row in reservation_unit_rows],
+    )
+    sales_item_errors = check_sales_items_for_online_payments(
+        components=components,
+        online_reservation_unit_names=[
+            row.reservation_unit.name
+            for row in reservation_unit_rows
+            if row.reservation_unit.payment_type in PaymentType.requires_verkkokauppa
+        ],
     )
     # An own pricing group offers no price options, and its reservation units do not change here.
     # So a change to its components cannot change the options of an application round.
@@ -165,7 +177,7 @@ def _validate_pricing_group(*, pricing_group: PricingGroup, components: list[Pri
             reservation_unit_rows=None,
         )
 
-    errors = [*coverage_errors, *round_errors]
+    errors = [*coverage_errors, *sales_item_errors, *round_errors]
     if errors:
         details = [ErrorDetail(error.message, code=error.code) for error in errors]
         raise ValidationError(details)

@@ -71,6 +71,7 @@ class PricingGroupComponentsSerializer(NestingModelSerializer):
                         saved_component.material_price_description_sv,
                     ),
                     tax_level=data.get("tax_level", saved_component.tax_level),
+                    sales_item=data.get("sales_item", saved_component.sales_item),
                 )
 
             else:
@@ -88,6 +89,7 @@ class PricingGroupComponentsSerializer(NestingModelSerializer):
                     material_price_description_en=data.get("material_price_description_en", ""),
                     material_price_description_sv=data.get("material_price_description_sv", ""),
                     tax_level=data.get("tax_level"),
+                    sales_item=data.get("sales_item"),
                 )
 
             components.append(component)
