@@ -148,6 +148,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
             _("Payment"),
             {
                 "fields": [
+                    "payment_type",
                     "payment_merchant",
                     "payment_accounting",
                     "payment_product",

@@ -40,11 +40,20 @@ def _create_pricing_groups(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
 
 
 def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit], *, tax_level: TaxLevel) -> None:
-    """Make an own pricing group for each reservation unit, with one base component for each of its pricings."""
+    """
+    Make an own pricing group for each reservation unit, with one base component for each of its pricings.
+    The reservation unit gets the payment type of its latest paid pricing.
+    """
+    paid_reservation_units: list[ReservationUnit] = []
     for reservation_unit in reservation_units:
         pricings: list[ReservationUnitPricing] = list(reservation_unit.pricings.order_by("begins"))
         if not pricings:
             continue
+
+        paid_pricings = [pricing for pricing in pricings if pricing.highest_price > 0]
+        if paid_pricings:
+            reservation_unit.payment_type = paid_pricings[-1].payment_type or PaymentType.ON_SITE
+            paid_reservation_units.append(reservation_unit)
 
         pricing_group = PricingGroup.objects.create(
             name=reservation_unit.name,
@@ -73,12 +82,13 @@ def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit], *, t
                 material_price_description_fi=pricing.material_price_description_fi or "",
                 material_price_description_en=pricing.material_price_description_en or "",
                 material_price_description_sv=pricing.material_price_description_sv or "",
-                payment_type=(pricing.payment_type or PaymentType.ON_SITE) if pricing.highest_price > 0 else None,
                 tax_level=tax_level,
             )
             for pricing, valid_until in zip(pricings, valid_until_dates, strict=True)
         ]
         PriceComponent.objects.bulk_create(components)
+
+    ReservationUnit.objects.bulk_update(paid_reservation_units, fields=["payment_type"])
 
 
 # Internals
@@ -96,6 +106,10 @@ def _create_shared_pricing_group(*, tax_level: TaxLevel) -> list[ReservationUnit
     reservation_units = list(ReservationUnit.objects.filter(unit__unit_groups=unit_group).order_by("pk")[:2])
     if not reservation_units:
         return []
+
+    for reservation_unit in reservation_units:
+        reservation_unit.payment_type = PaymentType.ONLINE
+    ReservationUnit.objects.bulk_update(reservation_units, fields=["payment_type"])
 
     today = local_date()
     begins = today - datetime.timedelta(days=365)
@@ -141,7 +155,6 @@ def _create_shared_pricing_group(*, tax_level: TaxLevel) -> list[ReservationUnit
             price_option=adults,
             amount=Decimal(20),
             price_unit=PriceUnit.PER_HOUR,
-            payment_type=PaymentType.ONLINE,
             tax_level=tax_level,
         ),
         PriceComponent(
@@ -152,7 +165,6 @@ def _create_shared_pricing_group(*, tax_level: TaxLevel) -> list[ReservationUnit
             price_option=adults,
             amount=Decimal(25),
             price_unit=PriceUnit.PER_HOUR,
-            payment_type=PaymentType.ONLINE,
             tax_level=tax_level,
         ),
         PriceComponent(
@@ -163,7 +175,6 @@ def _create_shared_pricing_group(*, tax_level: TaxLevel) -> list[ReservationUnit
             price_option=juniors,
             amount=Decimal(10),
             price_unit=PriceUnit.PER_HOUR,
-            payment_type=PaymentType.ONLINE,
             tax_level=tax_level,
             can_apply_for_discount=True,
         ),
