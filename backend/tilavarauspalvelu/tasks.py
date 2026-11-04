@@ -430,7 +430,7 @@ def purge_image_cache_task(image_path: str) -> None:
 
 @singleton_task
 @app.task(name="generate_reservation_series_from_allocations")
-@SentryLogger.log_if_raises("Failed to generate reservation series from allocations")
+@SentryLogger.log_if_raises("Failed to generate reservation series from allocations", re_raise=True)
 def generate_reservation_series_from_allocations_task(application_round_id: int) -> None:
     application_round: ApplicationRound | None = ApplicationRound.objects.filter(pk=application_round_id).first()
     if application_round is None:
