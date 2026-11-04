@@ -188,6 +188,8 @@ export async function releaseLock(name: string): Promise<void> {
   await rm(lockDir(name), { recursive: true, force: true });
 }
 
+// A lock that can't be removed fails the test on purpose: Playwright then replaces this worker, and the other workers
+// take over the stopped worker's lock instead of waiting for it until the test timeout
 onTestEnd(async () => {
   for (const name of heldLocks.keys()) {
     // oxlint-disable-next-line no-await-in-loop -- releasing one by one
