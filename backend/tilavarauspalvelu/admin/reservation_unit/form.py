@@ -296,6 +296,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "can_apply_free_of_charge": _("Can apply free of charge"),
             "is_archived": _("Is archived"),
             "rank": _("Order number"),
+            "payment_type": _("Payment type"),
             "payment_merchant": _("Payment merchant"),
             "payment_accounting": _("Payment accounting"),
             "payment_product": _("Payment product"),

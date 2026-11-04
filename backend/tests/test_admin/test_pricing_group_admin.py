@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from django.urls import reverse
 
-from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
+from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
 from tilavarauspalvelu.typing import error_codes
 
@@ -39,7 +39,6 @@ def component_form_data(
         f"components-{index}-valid_until": valid_until,
         f"components-{index}-amount": "10.00",
         f"components-{index}-price_unit": PriceUnit.PER_HOUR.value,
-        f"components-{index}-payment_type": PaymentType.ONLINE.value,
         f"components-{index}-tax_level": tax_level.pk,
         f"components-{index}-material_price_description_fi": "",
         f"components-{index}-material_price_description_en": "",
