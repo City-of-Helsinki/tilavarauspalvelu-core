@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { NextRequest } from "next/server";
 import { getClientUrl, redirectCsrfToken } from "./middlewareHelpers";
 
@@ -43,46 +43,66 @@ describe("getClientUrl", () => {
 });
 
 describe("redirectCsrfToken", () => {
-  it("returns undefined if csrftoken cookie exists", () => {
-    const req = createRequest("https://example.com/search", { csrftoken: "token" });
-    expect(redirectCsrfToken(req, "https://api.example.com")).toBeUndefined();
+  beforeEach(() => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
   });
 
-  it("redirects to the csrf endpoint with the path", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("redirects to NEXT_PUBLIC_LOCAL_API_URL with the full client url", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://localhost:8000");
+    const req = createRequest("http://0.0.0.0:3000/search?textSearch=sauna", {}, { host: "localhost:3000" });
+    const url = redirectCsrfToken(req);
+    expect(url?.origin).toBe("http://localhost:8000");
+    expect(url?.pathname).toBe("/csrf/");
+    expect(url?.searchParams.get("redirect_to")).toBe("http://localhost:3000/search?textSearch=sauna");
+  });
+
+  it("returns undefined if csrftoken cookie exists", () => {
+    const req = createRequest("https://example.com/search", { csrftoken: "token" });
+    expect(redirectCsrfToken(req)).toBeUndefined();
+  });
+
+  it("redirects to the csrf endpoint on the same origin with the path", () => {
     const req = createRequest("https://example.com/en/search");
-    const url = redirectCsrfToken(req, "https://api.example.com");
-    expect(url?.origin).toBe("https://api.example.com");
+    const url = redirectCsrfToken(req);
+    expect(url?.origin).toBe("https://example.com");
     expect(url?.pathname).toBe("/csrf/");
     expect(url?.searchParams.get("redirect_to")).toBe("/en/search");
   });
 
   it("keeps the query string in redirect_to", () => {
     const req = createRequest("https://example.com/search?textSearch=sauna&units=1&units=2");
-    const url = redirectCsrfToken(req, "https://api.example.com");
+    const url = redirectCsrfToken(req);
     expect(url?.searchParams.get("redirect_to")).toBe("/search?textSearch=sauna&units=1&units=2");
     // the original params must not leak into the csrf url itself
     expect(url?.searchParams.has("textSearch")).toBe(false);
   });
 
-  it("keeps the client host on localhost in a container", () => {
-    const req = createRequest("http://0.0.0.0:3000/search?textSearch=sauna", {}, { host: "localhost:3000" });
-    const url = redirectCsrfToken(req, "http://localhost:8000");
-    expect(url?.searchParams.get("redirect_to")).toBe("http://localhost:3000/search?textSearch=sauna");
+  it("uses the client origin in a container", () => {
+    const req = createRequest("http://0.0.0.0:3000/search?textSearch=sauna", {}, { host: "localhost:8080" });
+    const url = redirectCsrfToken(req);
+    expect(url?.origin).toBe("http://localhost:8080");
+    expect(url?.searchParams.get("redirect_to")).toBe("/search?textSearch=sauna");
   });
 
-  it("keeps only the path behind a gateway", () => {
+  it("uses the client origin behind a gateway", () => {
     const req = createRequest(
       "http://0.0.0.0:3000/search",
       {},
       { "x-forwarded-host": "varaamo.hel.fi", "x-forwarded-proto": "https" }
     );
-    const url = redirectCsrfToken(req, "https://varaamo.hel.fi");
+    const url = redirectCsrfToken(req);
+    expect(url?.origin).toBe("https://varaamo.hel.fi");
     expect(url?.searchParams.get("redirect_to")).toBe("/search");
   });
 
-  it("keeps the host on localhost", () => {
-    const req = createRequest("http://localhost:3000/search?textSearch=sauna");
-    const url = redirectCsrfToken(req, "http://localhost:8000");
-    expect(url?.searchParams.get("redirect_to")).toBe("http://localhost:3000/search?textSearch=sauna");
+  it("keeps the base path of the staff UI in redirect_to", () => {
+    const req = createRequest("http://localhost:8080/kasittely/reservations?x=1");
+    const url = redirectCsrfToken(req);
+    expect(url?.pathname).toBe("/csrf/");
+    expect(url?.searchParams.get("redirect_to")).toBe("/kasittely/reservations?x=1");
   });
 });

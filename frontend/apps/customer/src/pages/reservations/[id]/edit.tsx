@@ -19,7 +19,6 @@ import { queryOptions } from "@/modules/queryOptions";
 import { isReservationEditable, transformReservation } from "@/modules/reservation";
 import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
 import { StyledStepper } from "@/styled/utils";
@@ -123,8 +122,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
 
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const client = createApolloClient(apiBaseUrl, ctx);
+  const client = createApolloClient(ctx);
 
   const notFound = {
     notFound: true,

@@ -8,7 +8,6 @@ type OptionType = {
 export type OptionsRecord = Record<"purpose" | "ageGroup", Readonly<OptionType[]>>;
 
 export interface CommonEnvConfig {
-  apiBaseUrl: string;
   feedbackUrl: string;
   isConsoleLoggingEnabled: boolean;
   isErrorTriggerEnabled: boolean;

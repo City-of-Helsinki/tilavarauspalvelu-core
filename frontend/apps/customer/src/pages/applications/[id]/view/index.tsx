@@ -19,7 +19,7 @@ import { ApprovedReservations, BREAKPOINT } from "@/components/application/Appro
 import { ViewApplication } from "@/components/application/view/ViewApplication";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { getGenericTerms } from "@/modules/serverUtils";
 import { applicationsPrefix } from "@/modules/urls";
 
 const TabPanel = styled(Tabs.TabPanel)`
@@ -150,8 +150,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const { query } = ctx;
   const pk = toNumber(ignoreMaybeArray(query.id));

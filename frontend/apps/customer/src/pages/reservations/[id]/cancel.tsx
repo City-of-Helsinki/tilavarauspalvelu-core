@@ -11,7 +11,6 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { ReservationCancellation } from "@/lib/reservation/[id]/cancel";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isReservationCancellable } from "@/modules/reservation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -66,8 +65,7 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
 
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const client = createApolloClient(apiBaseUrl, ctx);
+  const client = createApolloClient(ctx);
 
   const pk = toNumber(ignoreMaybeArray(params?.id));
   if (Number.isFinite(Number(pk))) {

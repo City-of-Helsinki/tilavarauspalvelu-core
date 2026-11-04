@@ -54,7 +54,7 @@ import {
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
-import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { getGenericTerms } from "@/modules/serverUtils";
 import {
   getApplicationPath,
   getFeedbackUrl,
@@ -221,7 +221,7 @@ function Reservation({
   const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
-  const paymentUrl = getPaymentUrl(reservation, lang, env.apiBaseUrl);
+  const paymentUrl = getPaymentUrl(reservation, lang);
   const hasCheckoutUrl = paymentUrl != null;
   const isWaitingForPayment = reservation.state === ReservationStateChoice.WaitingForPayment;
 
@@ -355,7 +355,6 @@ function Reservation({
               reservation={reservation}
               paymentOrder={reservation.paymentOrder}
               appliedPricing={reservation.appliedPricing}
-              apiBaseUrl={env.apiBaseUrl}
             />
           )}
           <Instructions reservation={reservation} />
@@ -410,8 +409,7 @@ function AccessCodeInfo({ pindoraInfo, feedbackUrl }: Readonly<AccessCodeInfoPro
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const notFound = {
     notFound: true,

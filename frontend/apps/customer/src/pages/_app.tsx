@@ -62,7 +62,7 @@ function useHasUserAcceptedStatistics() {
 
 function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const { Component, envConfig, pageProps } = props;
-  const { isHotjarEnabled, isMatomoEnabled, isConsoleLoggingEnabled, apiBaseUrl } = envConfig;
+  const { isHotjarEnabled, isMatomoEnabled, isConsoleLoggingEnabled } = envConfig;
 
   if (isConsoleLoggingEnabled) {
     initialiseLogWrite();
@@ -72,7 +72,7 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const { hasUserAcceptedStatistics: statisticsAccepted, recheck } = useHasUserAcceptedStatistics();
 
   // Keep one client, otherwise every render drops the cache and fetches all active queries again
-  const [client] = useState(() => createApolloClient(apiBaseUrl ?? ""));
+  const [client] = useState(() => createApolloClient());
   const language = getLocalizationLang(i18n.language);
 
   const enableMatomo = isMatomoEnabled && statisticsAccepted;
@@ -90,7 +90,6 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
         <EnvContextProvider env={envConfig}>
           <ApolloProvider client={client}>
             <PageWrapper
-              apiBaseUrl={apiBaseUrl}
               profileLink={envConfig.profileLink}
               feedbackUrl={envConfig.feedbackUrl}
               version={envConfig.version}

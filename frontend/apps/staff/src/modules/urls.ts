@@ -1,4 +1,4 @@
-import { logError } from "@ui/modules/errors";
+import { getBrowserApiBaseUrl } from "@ui/modules/urlBuilder";
 import type { Maybe } from "@gql/gql-types";
 import { isBrowser, PUBLIC_URL } from "./const";
 
@@ -132,11 +132,8 @@ export function getAccessibilityTermsUrl(): string {
   return `${getCustomerUrl()}/terms/accessibility-admin`;
 }
 
-export function getOpeningHoursUrl(
-  apiBaseUrl: string,
-  reservationUnitPk: number | number[] | null,
-  errorUrl?: string
-): string {
+/// Returns the backend url that opens the opening hours editor. It starts with getBrowserApiBaseUrl.
+export function getOpeningHoursUrl(reservationUnitPk: number | number[] | null, errorUrl?: string): string {
   let reservationUnitsParam = "";
   if (Array.isArray(reservationUnitPk)) {
     const validPks = reservationUnitPk.filter((pk) => pk > 0);
@@ -149,16 +146,9 @@ export function getOpeningHoursUrl(
   } else {
     reservationUnitsParam = reservationUnitPk.toString();
   }
-  try {
-    const url = new URL(`/v1/edit_opening_hours/`, apiBaseUrl);
-    const { searchParams } = url;
-    searchParams.set("reservation_units", reservationUnitsParam);
-    if (errorUrl) {
-      searchParams.set("redirect_on_error", errorUrl);
-    }
-    return url.toString();
-  } catch (err) {
-    logError(err);
+  const searchParams = new URLSearchParams({ reservation_units: reservationUnitsParam });
+  if (errorUrl) {
+    searchParams.set("redirect_on_error", errorUrl);
   }
-  return "";
+  return `${getBrowserApiBaseUrl()}/v1/edit_opening_hours/?${searchParams.toString()}`;
 }

@@ -38,15 +38,14 @@ if (typeof window === "undefined") React.useLayoutEffect = () => {};
 
 function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const { Component, pageProps, currentUser, handlingData, notificationsData, envConfig } = props;
-  const { apiBaseUrl, isConsoleLoggingEnabled, version } = envConfig;
+  const { isConsoleLoggingEnabled, version } = envConfig;
 
   if (isConsoleLoggingEnabled) {
     initialiseLogWrite();
   }
 
-  // NOTE incorrectly typed (apiBaseUrl can be undefined during build)
   // Keep one client, otherwise every render drops the cache and fetches all active queries again
-  const [apolloClient] = useState(() => createClient(apiBaseUrl ?? ""));
+  const [apolloClient] = useState(() => createClient());
 
   // Manual rehydration of currentUser (otherwise we have flashes of unauthenticated state)
   // DO NOT use useEffect / async here
@@ -144,7 +143,7 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     };
   }
 
-  const client = createClient(commonProps.apiBaseUrl, context.ctx.req);
+  const client = createClient(context.ctx.req);
 
   try {
     const startTime = performance.now();

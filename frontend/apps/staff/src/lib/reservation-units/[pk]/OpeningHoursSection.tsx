@@ -14,11 +14,9 @@ type Node = NonNullable<QueryData>;
 export function OpeningHoursSection({
   reservationUnit,
   previewUrlPrefix,
-  apiBaseUrl,
 }: {
   reservationUnit: Node | undefined;
   previewUrlPrefix: string;
-  apiBaseUrl: string;
 }) {
   const { t } = useTranslation();
 
@@ -26,8 +24,8 @@ export function OpeningHoursSection({
   const previewDisabled = previewUrlPrefix === "" || !reservationUnit?.pk || !reservationUnit?.extUuid;
   const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
   const editUrl =
-    getOpeningHoursUrl(apiBaseUrl, reservationUnit?.pk ?? 0, redirectOnErrorUrl) !== ""
-      ? getOpeningHoursUrl(apiBaseUrl, reservationUnit?.pk ?? 0, redirectOnErrorUrl)
+    getOpeningHoursUrl(reservationUnit?.pk ?? 0, redirectOnErrorUrl) !== ""
+      ? getOpeningHoursUrl(reservationUnit?.pk ?? 0, redirectOnErrorUrl)
       : undefined;
 
   return (

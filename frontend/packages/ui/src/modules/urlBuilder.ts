@@ -39,48 +39,52 @@ export function getClientOrigin(headers: Headers | IncomingHttpHeaders, requestP
   return `${proto}://${host}`;
 }
 
-function buildAuthUrl(apiUrl: string) {
-  return `${apiUrl}${apiUrl.endsWith("/") ? "" : "/"}helauth/`;
+/// Returns the base url of the backend for the urls that the browser uses, for example "http://localhost:8000".
+/// It is empty on the server environments. There the gateway puts the backend on the same origin, so the urls are paths.
+/// Local development sets NEXT_PUBLIC_LOCAL_API_URL, because the backend runs on another port.
+/// Next.js writes the value into the build, also for the proxy and the server side rendering.
+/// The server side requests to the backend use TILAVARAUS_API_URL.
+export function getBrowserApiBaseUrl(): string {
+  return removeTrailingSlash(process.env.NEXT_PUBLIC_LOCAL_API_URL ?? "");
 }
 
+const AUTH_PATH = "/helauth/";
+
 /// Returns href url for sign in dialog when given redirect url as parameter
-/// @param apiBaseUrl - base url for api (hostname typically)
+/// The url starts with getBrowserApiBaseUrl, so it is a path on the server environments.
 /// @param callBackUrl - url to redirect after successful login
 /// @param originOverride - when behind a gateway on a server the url.origin is incorrect
 /// @returns url to sign in dialog
 export function getSignInUrl({
-  apiBaseUrl,
   callBackUrl,
   language,
   client,
   originOverride,
 }: {
-  apiBaseUrl: string;
   callBackUrl: string;
   language: LocalizationLanguages;
   client: UserTypeChoice;
   originOverride?: string;
 }): string {
-  const loginUrl = new URL(`${buildAuthUrl(apiBaseUrl)}login/`);
+  const loginUrl = `${getBrowserApiBaseUrl()}${AUTH_PATH}login/`;
+  const params = new URLSearchParams();
 
   if (callBackUrl.includes(`/logout`)) {
     // NOTE this is unsound if the callback url is not a full url but at least it redirects to an error page
-    loginUrl.searchParams.set("next", originOverride ?? new URL(callBackUrl).origin);
-    return loginUrl.toString();
+    params.set("next", originOverride ?? new URL(callBackUrl).origin);
+    return `${loginUrl}?${params.toString()}`;
   }
-  loginUrl.searchParams.set("ui", client);
+  params.set("ui", client);
   if (client === "customer") {
-    loginUrl.searchParams.set("lang", language);
+    params.set("lang", language);
   }
   const next =
     originOverride != null ? `${removeTrailingSlash(originOverride)}/${callBackUrl.replace(/^\/+/, "")}` : callBackUrl;
-  loginUrl.searchParams.set("next", next);
-  return loginUrl.toString();
+  params.set("next", next);
+  return `${loginUrl}?${params.toString()}`;
 }
 
-/// @param apiBaseUrl - base url for api (hostname typically)
-/// @return url for logging out with redirect url to /logout
-export function getSignOutUrl(apiBaseUrl: string): string {
-  const authUrl = buildAuthUrl(apiBaseUrl);
-  return `${authUrl}logout/`;
+/// @return url for logging out. It starts with getBrowserApiBaseUrl.
+export function getSignOutUrl(): string {
+  return `${getBrowserApiBaseUrl()}${AUTH_PATH}logout/`;
 }

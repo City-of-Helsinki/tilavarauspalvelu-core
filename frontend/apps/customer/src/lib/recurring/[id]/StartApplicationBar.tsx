@@ -54,10 +54,9 @@ type Props = {
   applicationRound: {
     reservationUnits: Readonly<NodeList>;
   };
-  apiBaseUrl: string;
 };
 
-export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<Props>): React.ReactElement {
+export function StartApplicationBar({ applicationRound }: Readonly<Props>): React.ReactElement {
   const { t } = useTranslation();
   const router = useRouter();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
@@ -129,7 +128,6 @@ export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<P
           </WhiteButton>
           <LoginFragment
             returnUrl={getPostLoginUrl()}
-            apiBaseUrl={apiBaseUrl}
             type="application"
             componentIfAuthenticated={
               <WhiteButton

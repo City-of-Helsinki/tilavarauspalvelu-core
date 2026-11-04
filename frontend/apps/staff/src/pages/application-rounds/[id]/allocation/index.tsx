@@ -37,7 +37,6 @@ import {
 } from "@/modules/const";
 import { truncate } from "@/modules/helpers";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AllocationPageContent } from "@lib/application-rounds/[id]/allocation";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
@@ -437,8 +436,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return NOT_FOUND_SSR_VALUE;
   }
 
-  const { apiBaseUrl } = await getCommonServerSideProps();
-  const client = createClient(apiBaseUrl, req);
+  const client = createClient(req);
   const { data } = await client.query<ApplicationRoundFilterQuery, ApplicationRoundFilterQueryVariables>({
     query: ApplicationRoundFilterDocument,
     variables: { id: createNodeId("ApplicationRoundNode", pk) },

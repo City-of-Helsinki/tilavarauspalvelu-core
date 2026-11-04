@@ -24,7 +24,6 @@ import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { formatAddress } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationSeriesUrl } from "@/modules/urls";
 import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
 
@@ -184,9 +183,8 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
     return NOT_FOUND_SSR_VALUE;
   }
   const start = performance.now();
-  const { apiBaseUrl } = await getCommonServerSideProps();
   try {
-    const apolloClient = createClient(apiBaseUrl, req);
+    const apolloClient = createClient(req);
     const unitQuery = apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
       query: UnitViewDocument,
       variables: { id: createNodeId("UnitNode", pk) },

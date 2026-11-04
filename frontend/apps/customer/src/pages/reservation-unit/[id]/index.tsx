@@ -48,7 +48,6 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { InfoDialog } from "@/components/InfoDialog";
 import { LoginFragment } from "@/components/LoginFragment";
 import { QuickReservation } from "@/components/QuickReservation";
-import { useEnvContext } from "@/context/EnvContext";
 import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useReservableTimes } from "@/hooks";
 import {
   EquipmentList,
@@ -67,7 +66,6 @@ import type { FocusTimeSlot } from "@/modules/reservation";
 import { getActivePricing, isReservationUnitPublished, isReservationUnitReservable } from "@/modules/reservationUnit";
 import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { JustForDesktop } from "@/modules/style/layout";
 import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
@@ -86,7 +84,6 @@ function SubmitFragment({
   buttonText: string;
   isQuotaReached: boolean;
 }>): React.ReactElement {
-  const { env } = useEnvContext();
   const returnToUrl = useMemo(() => {
     if (!focusSlot.isReservable) {
       return;
@@ -105,7 +102,6 @@ function SubmitFragment({
   return (
     <LoginFragment
       isActionDisabled={!isReservable}
-      apiBaseUrl={env.apiBaseUrl}
       type="reservation"
       componentIfAuthenticated={
         <SubmitButton
@@ -427,8 +423,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { params, query, locale, req } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
   const uuid = query.ru;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const notFound = {
     props: {

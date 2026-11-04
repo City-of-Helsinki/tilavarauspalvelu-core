@@ -15,25 +15,25 @@ describe("CancelledLinkSet", () => {
   });
 
   test("links back to the search page when no reservation unit home is given", () => {
-    render(<CancelledLinkSet apiBaseUrl="https://api.example.com" />);
+    render(<CancelledLinkSet />);
 
     expect(screen.getByText(/reservation:searchPage/)).toBeInTheDocument();
     expect(screen.getByText("common:gotoFrontpage")).toBeInTheDocument();
   });
 
-  test("calls signOut with the api base url when the logout button is clicked", async () => {
+  test("calls signOut when the logout button is clicked", async () => {
     const user = userEvent.setup();
-    render(<CancelledLinkSet apiBaseUrl="https://api.example.com" />);
+    render(<CancelledLinkSet />);
 
     await user.click(screen.getByText("common:logout"));
 
-    expect(mockedSignOut).toHaveBeenCalledWith("https://api.example.com");
+    expect(mockedSignOut).toHaveBeenCalledWith();
   });
 });
 
 describe("BackLinkList", () => {
   test("links back to the reservation unit page when a home url is given", () => {
-    render(<BackLinkList apiBaseUrl="https://api.example.com" reservationUnitHome="/reservation-unit/1" />);
+    render(<BackLinkList reservationUnitHome="/reservation-unit/1" />);
 
     expect(screen.getByText(/reservation:reservationUnitPage/)).toBeInTheDocument();
   });
