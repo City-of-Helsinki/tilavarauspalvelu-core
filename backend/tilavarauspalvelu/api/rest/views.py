@@ -29,6 +29,7 @@ from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from tilavarauspalvelu.tasks import create_robot_test_data_task
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, utc_datetime
+from utils.db import advisory_lock_is_held
 from utils.utils import comma_sep_str, ical_hmac_signature, update_query_params
 
 from .utils import (
@@ -571,8 +572,7 @@ def robot_test_data_create_view(request: WSGIRequest) -> HttpResponse:
 
     cache.set(key=rate_limit_key, value=now, timeout=None)
 
-    lock = bool(cache.get(key=settings.ROBOT_TEST_DATA_LOCK_KEY))
-    if lock:
+    if advisory_lock_is_held(settings.ROBOT_TEST_DATA_LOCK_ID):
         detail = {"detail": "Robot test data creation is already in progress", "code": "too_early"}
         return JsonResponse(detail, status=HTTPStatus.TOO_EARLY)
 

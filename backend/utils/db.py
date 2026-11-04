@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from contextlib import contextmanager
 from functools import cache
 from inspect import cleandoc
 from typing import TYPE_CHECKING, Any, Literal
@@ -8,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Literal
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db import migrations, models
+from django.db import migrations, models, transaction
 from django.db.models import Func, Value
 from django.db.models.functions import Coalesce, NullIf
 from django.db.models.functions import Now as NowDB  # noqa: TID251
@@ -18,7 +19,7 @@ from lookup_property.converters.expressions import expression_to_ast
 from lookup_property.converters.utils import ast_attribute, ast_function
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
+    from collections.abc import Collection, Generator
 
 __all__ = [
     "ArrayRemove",
@@ -28,6 +29,8 @@ __all__ = [
     "SubqueryArray",
     "SubqueryCount",
     "SubquerySum",
+    "advisory_lock_is_held",
+    "advisory_transaction_lock",
     "text_search",
 ]
 
@@ -331,3 +334,45 @@ def build_search(text: str, *, separator: Literal["|", "&", "<->"] = "|") -> str
     text = text.replace("'", " ").replace("-", " ").replace("\\", " ")
     search_terms: list[str] = [f"'{value}':*" for value in text.split(" ") if value]
     return f" {separator} ".join(search_terms)
+
+
+@contextmanager
+def advisory_transaction_lock(lock_id: int) -> Generator[bool]:
+    """
+    Open a transaction and try to take the Postgres advisory lock with the given id in it.
+    Yields whether the lock was taken. Postgres releases the lock when the transaction ends
+    or when the connection closes, so a killed process does not keep the lock.
+    Inside an outer transaction, the lock is held until the outer transaction ends.
+    """
+    with transaction.atomic():
+        with transaction.get_connection().cursor() as cursor:
+            cursor.execute("SELECT pg_try_advisory_xact_lock(%s)", [lock_id])
+            row = cursor.fetchone()
+
+        yield row[0]
+
+
+def advisory_lock_is_held(lock_id: int) -> bool:
+    """Check if any database session holds the Postgres advisory lock with the given id."""
+    # 'pg_locks' stores a 64-bit lock id in two 32-bit columns.
+    high_bits = (lock_id >> 32) & 0xFFFFFFFF
+    low_bits = lock_id & 0xFFFFFFFF
+
+    with transaction.get_connection().cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM pg_locks
+                WHERE locktype = 'advisory'
+                    AND database = (SELECT oid FROM pg_database WHERE datname = current_database())
+                    AND classid = %s
+                    AND objid = %s
+                    AND objsubid = 1
+                    AND granted
+            )
+            """,
+            [high_bits, low_bits],
+        )
+        row = cursor.fetchone()
+        return row[0]

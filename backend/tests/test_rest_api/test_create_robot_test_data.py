@@ -6,7 +6,9 @@ from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
+from celery.exceptions import SoftTimeLimitExceeded
 from django.core.cache import cache
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.urls import reverse
 from freezegun import freeze_time
 
@@ -38,6 +40,7 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.tasks import create_robot_test_data_task
 from utils.date_utils import local_date, local_datetime
+from utils.db import advisory_lock_is_held, advisory_transaction_lock
 
 from tests.factories import (
     ApplicationFactory,
@@ -56,17 +59,16 @@ if TYPE_CHECKING:
 @pytest.fixture
 def clear_robot_test_data_flags(settings) -> Generator[None]:
     cache.delete(key=settings.ROBOT_TEST_DATA_RATE_LIMIT_KEY)
-    cache.delete(key=settings.ROBOT_TEST_DATA_LOCK_KEY)
     try:
         yield
     finally:
         cache.delete(key=settings.ROBOT_TEST_DATA_RATE_LIMIT_KEY)
-        cache.delete(key=settings.ROBOT_TEST_DATA_LOCK_KEY)
 
 
 # View
 
 
+@pytest.mark.django_db
 @pytest.mark.usefixtures("clear_robot_test_data_flags")
 def test_robot_test_data_create_view(api_client, settings):
     path = reverse("robot_test_data")
@@ -148,17 +150,17 @@ def test_robot_test_data_create_view__rate_limit(api_client, settings):
     assert mock.called is False
 
 
+@pytest.mark.django_db
 @pytest.mark.usefixtures("clear_robot_test_data_flags")
 def test_robot_test_data_create_view__lock(api_client, settings):
     path = reverse("robot_test_data")
-
-    cache.set(key=settings.ROBOT_TEST_DATA_LOCK_KEY, value=True, timeout=None)
 
     headers = {
         "Authorization": settings.ROBOT_TEST_DATA_TOKEN,
     }
 
-    with mock_data_generation() as mock:
+    with advisory_transaction_lock(settings.ROBOT_TEST_DATA_LOCK_ID) as lock_taken, mock_data_generation() as mock:
+        assert lock_taken is True
         response = api_client.post(path, headers=headers)
 
     assert response.status_code == HTTPStatus.TOO_EARLY, response.status_code
@@ -191,25 +193,48 @@ def test_create_robot_test_data():
     assert GeneralRole.objects.count() == 1
 
 
-@pytest.mark.usefixtures("clear_robot_test_data_flags")
-def test_create_robot_test_data__lock_expires_after_task_time_limit(settings):
-    settings.CELERY_TASK_TIME_LIMIT = 300
+@pytest.mark.django_db(transaction=True)
+def test_create_robot_test_data__lock_is_held_only_during_creation(settings):
+    lock_held_during_creation: list[bool] = []
 
-    lock_exists: list[bool] = []
+    def create_data() -> None:
+        lock_held_during_creation.append(advisory_lock_is_held(settings.ROBOT_TEST_DATA_LOCK_ID))
 
-    with freeze_time(local_datetime(2025, 1, 1, 12)) as frozen_time:
+    with patch("tilavarauspalvelu.tasks.create_robot_test_data", side_effect=create_data):
+        create_robot_test_data_task.delay()
 
-        def create_data() -> None:
-            frozen_time.tick(299)
-            lock_exists.append(cache.get(key=settings.ROBOT_TEST_DATA_LOCK_KEY) is not None)
+    assert lock_held_during_creation == [True]
+    assert advisory_lock_is_held(settings.ROBOT_TEST_DATA_LOCK_ID) is False
 
-            frozen_time.tick(2)
-            lock_exists.append(cache.get(key=settings.ROBOT_TEST_DATA_LOCK_KEY) is not None)
 
-        with patch("tilavarauspalvelu.tasks.create_robot_test_data", side_effect=create_data):
+@pytest.mark.django_db(transaction=True)
+def test_create_robot_test_data__lock_is_released_when_creation_fails(settings):
+    with (
+        patch("tilavarauspalvelu.tasks.create_robot_test_data", side_effect=SoftTimeLimitExceeded()),
+        pytest.raises(SoftTimeLimitExceeded),
+    ):
+        create_robot_test_data_task()
+
+    assert advisory_lock_is_held(settings.ROBOT_TEST_DATA_LOCK_ID) is False
+
+
+@pytest.mark.django_db(transaction=True)
+def test_create_robot_test_data__skipped_when_another_session_holds_the_lock(settings):
+    other_connection = connections.create_connection(DEFAULT_DB_ALIAS)
+    try:
+        with other_connection.cursor() as cursor:
+            cursor.execute("SELECT pg_advisory_lock(%s)", [settings.ROBOT_TEST_DATA_LOCK_ID])
+
+        with patch("tilavarauspalvelu.tasks.create_robot_test_data") as create_data:
             create_robot_test_data_task.delay()
+    finally:
+        with other_connection.cursor() as cursor:
+            cursor.execute("SELECT pg_advisory_unlock(%s)", [settings.ROBOT_TEST_DATA_LOCK_ID])
 
-    assert lock_exists == [True, False]
+        other_connection.close()
+
+    assert create_data.called is False
+    assert advisory_lock_is_held(settings.ROBOT_TEST_DATA_LOCK_ID) is False
 
 
 @pytest.mark.slow
