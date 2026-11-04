@@ -53,7 +53,6 @@ describe("serverUtils", () => {
   test("re-exports getVersion and returns default props", () => {
     expect(getVersion()).toBe("mock-version");
     expect(getDefaultServerSideProps()).toEqual({
-      apiBaseUrl: "",
       isConsoleLoggingEnabled: true,
       isErrorTriggerEnabled: false,
       isHotjarEnabled: false,
@@ -76,7 +75,6 @@ describe("serverUtils", () => {
     });
 
     expect(getCommonServerSideProps()).toEqual({
-      apiBaseUrl: "https://api.example",
       isConsoleLoggingEnabled: true,
       isErrorTriggerEnabled: true,
       isHotjarEnabled: true,

@@ -27,7 +27,6 @@ import { useReservationEditData, useStaffReservationMutation } from "@/hooks";
 import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { createTagString } from "@/modules/reservation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { ReservationTitleSection } from "@lib/reservations/[id]";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
@@ -191,8 +190,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     return NOT_FOUND_SSR_VALUE;
   }
 
-  const { apiBaseUrl } = await getCommonServerSideProps();
-  const apolloClient = createClient(apiBaseUrl, req);
+  const apolloClient = createClient(req);
   const { data } = await apolloClient.query<ReservationPermissionsQuery, ReservationPermissionsQueryVariables>({
     query: ReservationPermissionsDocument,
     variables: { id: createNodeId("ReservationNode", pk) },

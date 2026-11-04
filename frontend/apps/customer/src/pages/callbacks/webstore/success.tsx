@@ -9,14 +9,13 @@ import { OrderStatus, ReservationStateChoice, useReservationStateQuery } from "@
 import type { ReservationStateQuery } from "@gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { WEBSTORE_SUCCESS_POLL_INTERVAL_MS, WEBSTORE_SUCCESS_POLL_TIMEOUT_MS } from "@/modules/const";
-import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
+import { getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
 
 // This is webstore callback page for successful payments
 // this can't be tied to a reservationPk because webstore doesn't have that information
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
 
   const orderId = ignoreMaybeArray(query.orderId);
   const notFoundValue = {
@@ -31,7 +30,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundValue;
   }
 
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
   // The reservation exists already if the orderUuid is valid
   const reservation = await getReservationByOrderUuid(apolloClient, orderId);
 

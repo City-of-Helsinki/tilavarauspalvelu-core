@@ -12,7 +12,6 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { LinkPrev } from "@/components/LinkPrev";
 import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationSeriesForm";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -44,8 +43,7 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
   if (unitPk <= 0) {
     return NOT_FOUND_SSR_VALUE;
   }
-  const { apiBaseUrl } = await getCommonServerSideProps();
-  const apolloClient = createClient(apiBaseUrl, req);
+  const apolloClient = createClient(req);
   const unitData = await apolloClient.query<SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables>({
     query: SeriesReservationUnitDocument,
     variables: { id: createNodeId("UnitNode", unitPk) },

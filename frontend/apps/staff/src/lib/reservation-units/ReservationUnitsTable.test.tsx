@@ -10,14 +10,6 @@ vi.mock("next-i18next/pages", () => ({
   }),
 }));
 
-vi.mock("@/context/EnvContext", () => ({
-  useEnvContext: () => ({
-    env: {
-      apiBaseUrl: "http://api.example.com",
-    },
-  }),
-}));
-
 vi.mock("ui/src/components/statuses", () => ({
   ReservationUnitPublishingStatusLabel: ({ state }: { state: string }) => <span>{state}</span>,
   ReservationUnitReservationStatusLabel: ({ state }: { state: string }) => <span>{state}</span>,

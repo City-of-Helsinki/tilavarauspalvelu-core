@@ -6,7 +6,8 @@ import type { FieldPolicy } from "@apollo/client";
 import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { keepLoadedPages, keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
-import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
+import { buildGraphQLUrl, getBrowserApiBaseUrl } from "@ui/modules/urlBuilder";
+import { env } from "@/env.mjs";
 
 /* The backend can't tell if a next page exists. It filters by reservability after paging,
  * so hasNextPage and totalCount are not reliable.
@@ -41,9 +42,10 @@ if (process.env.NODE_ENV === "development") {
   loadErrorMessages();
 }
 
-export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsContext) {
+/// The server connects to the backend with TILAVARAUS_API_URL. The browser uses getBrowserApiBaseUrl.
+export function createApolloClient(ctx?: GetServerSidePropsContext) {
   const isServer = typeof window === "undefined";
-  const uri = buildGraphQLUrl(hostUrl);
+  const uri = buildGraphQLUrl(isServer ? (env.TILAVARAUS_API_URL ?? "") : getBrowserApiBaseUrl());
   const httpLink = new HttpLink({
     uri,
     credentials: "include",

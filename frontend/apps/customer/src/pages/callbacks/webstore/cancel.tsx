@@ -8,16 +8,14 @@ import { H1 } from "ui/src/styled";
 import { DeleteReservationDocument, ReservationStateChoice } from "@gql/gql-types";
 import type { DeleteReservationMutation, DeleteReservationMutationVariables } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { useEnvContext } from "@/context/EnvContext";
 import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
+import { getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 
 // This is the callback page from webstore if user cancels the order
 function Cancel({ state }: NarrowedProps): React.ReactElement {
   const { t } = useTranslation();
-  const { env } = useEnvContext();
   const routes = [
     {
       slug: reservationsPrefix,
@@ -38,14 +36,13 @@ function Cancel({ state }: NarrowedProps): React.ReactElement {
             ? t("reservation:cancelReservationNotFoundTitle")
             : t("reservation:cancelReservationErrorTitle")}
       </H1>
-      <CancelledLinkSet apiBaseUrl={env.apiBaseUrl} />
+      <CancelledLinkSet />
     </>
   );
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
   const orderId = ignoreMaybeArray(query.orderId);
 
   const notFoundValue = {
@@ -59,7 +56,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundValue;
   }
 
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
   try {
     const reservation = await getReservationByOrderUuid(apolloClient, orderId);
 

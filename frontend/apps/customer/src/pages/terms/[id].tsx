@@ -8,15 +8,13 @@ import { H1 } from "ui/src/styled";
 import { TermsOfUseDocument, TermsOfUseTypeChoices } from "@gql/gql-types";
 import type { TermsOfUseQuery, TermsOfUseQueryVariables } from "@gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const genericTermsId = ignoreMaybeArray(params?.id);
   const { data } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({

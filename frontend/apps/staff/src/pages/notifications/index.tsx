@@ -25,7 +25,6 @@ import { More } from "@/components/More";
 import { CustomTable } from "@/components/Table";
 import { createClient } from "@/modules/apolloClient";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
 
@@ -218,8 +217,7 @@ export default function ApplicationRoundRouted(props: PageProps): React.ReactEle
 }
 
 export async function getServerSideProps({ locale, req }: GetServerSidePropsContext) {
-  const { apiBaseUrl } = await getCommonServerSideProps();
-  const apolloClient = createClient(apiBaseUrl, req);
+  const apolloClient = createClient(req);
   const notifications = await apolloClient.query<BannerNotificationsListQuery, BannerNotificationsListQueryVariables>({
     query: BannerNotificationsListDocument,
     variables: getListVariables(DEFAULT_SORT),

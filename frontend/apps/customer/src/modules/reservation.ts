@@ -4,6 +4,7 @@ import type { TFunction } from "i18next";
 import { logError, NotBrowserError } from "@ui/modules/errors";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
+import { getBrowserApiBaseUrl } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { ReservationStateChoice, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type {
@@ -438,8 +439,7 @@ export const RESERVATION_PAYMENT_URL_FRAGMENT = gql`
 /// undefined is safe to assign to html a link href and disables the link
 export function getPaymentUrl(
   reservation: ReservationPaymentUrlFragment,
-  lang: LocalizationLanguages,
-  apiBaseUrl: string
+  lang: LocalizationLanguages
 ): string | undefined {
   const isExpired =
     reservation.state === ReservationStateChoice.Cancelled &&
@@ -457,7 +457,7 @@ export function getPaymentUrl(
     reservation.paymentOrder.status === OrderStatus.Pending &&
     reservation.paymentOrder.handledPaymentDueBy
   ) {
-    return getCheckoutRedirectUrl(reservation.pk, lang, apiBaseUrl);
+    return getCheckoutRedirectUrl(reservation.pk, lang);
   }
 
   // webstore checkout url for direct payments
@@ -473,15 +473,15 @@ export function getPaymentUrl(
 }
 
 /// Get the pending payment url for a reservation (handled reservations)
-/// browser only
-function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBaseUrl: string): string {
+/// browser only. Without getBrowserApiBaseUrl, the backend is on the same origin.
+function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages): string {
   if (!isBrowser) {
     throw new NotBrowserError("getCheckoutRedirectUrlrequires window.location.origin");
   }
   const langPrefix = lang !== "fi" ? `/${lang}` : "";
   const errorUrl = new URL(`${langPrefix}/reservations/${pk}`, window.location.origin);
   try {
-    const url = new URL(`/v1/pay_pending_reservation/${pk}/`, apiBaseUrl);
+    const url = new URL(`/v1/pay_pending_reservation/${pk}/`, getBrowserApiBaseUrl() || window.location.origin);
     const { searchParams } = url;
     searchParams.set("lang", lang);
     searchParams.set("redirect_on_error", errorUrl.toString());

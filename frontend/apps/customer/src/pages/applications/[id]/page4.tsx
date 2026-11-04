@@ -17,7 +17,7 @@ import { ApplicationTerms } from "@/components/application";
 import { validateApplication, PAGES_WITH_STEPPER, ApplicationFunnelWrapper } from "@/components/application/funnel";
 import { ViewApplication } from "@/components/application/view";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { getGenericTerms } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 
 // User has to accept the terms of service then on submit we change the application status
@@ -120,8 +120,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const tos = await getGenericTerms(apolloClient);
 

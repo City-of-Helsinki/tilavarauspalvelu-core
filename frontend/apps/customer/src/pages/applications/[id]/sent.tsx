@@ -13,7 +13,6 @@ import type { ApplicationSentPageQuery } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isSent } from "@/modules/helpers";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
 
 const Paragraph = styled.p`
@@ -61,8 +60,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
   const pk = toNumber(ignoreMaybeArray(query.id));
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
   const notFound = {
     notFound: true,
     props: {

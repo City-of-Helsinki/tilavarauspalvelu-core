@@ -37,7 +37,6 @@ import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { isApplicationRoundInProgress } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import type { TagOptionsList } from "@/modules/search";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { TimeframeStatus } from "@lib/application-rounds";
 import {
@@ -220,8 +219,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     return NOT_FOUND_SSR_VALUE;
   }
 
-  const { apiBaseUrl } = await getCommonServerSideProps();
-  const client = createClient(apiBaseUrl, req);
+  const client = createClient(req);
   const { data } = await client.query<ApplicationRoundQuery, ApplicationRoundQueryVariables>({
     query: ApplicationRoundDocument,
     variables: { id: createNodeId("ApplicationRoundNode", pk) },

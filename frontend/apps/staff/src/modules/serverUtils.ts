@@ -4,7 +4,6 @@ import { getVersion } from "@/modules/baseUtils";
 // only used for context creation
 export function getDefaultServerSideProps(): StaffEnvConfig {
   return {
-    apiBaseUrl: "",
     feedbackUrl: "",
     isConsoleLoggingEnabled: true,
     isErrorTriggerEnabled: false,
@@ -16,7 +15,6 @@ export function getDefaultServerSideProps(): StaffEnvConfig {
 export async function getCommonServerSideProps(): Promise<StaffEnvConfig> {
   const { env } = await import("@/env.mjs");
   return {
-    apiBaseUrl: env.TILAVARAUS_API_URL ?? "",
     feedbackUrl: env.FEEDBACK_URL ?? "",
     isConsoleLoggingEnabled: env.ENABLE_CONSOLE_LOGGING ?? false,
     isErrorTriggerEnabled: env.ENABLE_ERROR_TRIGGER ?? false,

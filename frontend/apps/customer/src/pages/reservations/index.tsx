@@ -18,7 +18,6 @@ import {
   ReservationTypeChoice,
 } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { useEnvContext } from "@/context/EnvContext";
 import { useSession } from "@/hooks";
 import { ReservationCard } from "@/lib/reservation";
 
@@ -73,8 +72,6 @@ function Reservations(_props: InferGetServerSidePropsType<typeof getServerSidePr
     }
   }, [routerError, t]);
 
-  const { env } = useEnvContext();
-
   // NOTE should never happen since the middleware should redirect
   if (!isAuthenticated) {
     return <div>{t("common:error.notAuthenticated")}</div>;
@@ -107,12 +104,7 @@ function Reservations(_props: InferGetServerSidePropsType<typeof getServerSidePr
               <EmptyMessage>{t("reservation:noUpcomingReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard
-                  key={reservation.pk}
-                  reservation={reservation}
-                  type="upcoming"
-                  apiBaseUrl={env.apiBaseUrl}
-                />
+                <ReservationCard key={reservation.pk} reservation={reservation} type="upcoming" />
               ))
             )}
           </StyledTabPanel>
@@ -123,12 +115,7 @@ function Reservations(_props: InferGetServerSidePropsType<typeof getServerSidePr
               <EmptyMessage>{t("reservation:noPastReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard
-                  key={reservation.pk}
-                  reservation={reservation}
-                  type="past"
-                  apiBaseUrl={env.apiBaseUrl}
-                />
+                <ReservationCard key={reservation.pk} reservation={reservation} type="past" />
               ))
             )}
           </StyledTabPanel>
@@ -139,12 +126,7 @@ function Reservations(_props: InferGetServerSidePropsType<typeof getServerSidePr
               <EmptyMessage>{t("reservation:noCancelledReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
-                <ReservationCard
-                  key={reservation.pk}
-                  reservation={reservation}
-                  type="cancelled"
-                  apiBaseUrl={env.apiBaseUrl}
-                />
+                <ReservationCard key={reservation.pk} reservation={reservation} type="cancelled" />
               ))
             )}
           </StyledTabPanel>

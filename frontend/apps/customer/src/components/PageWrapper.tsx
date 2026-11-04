@@ -11,7 +11,6 @@ import { Navigation } from "./Navigation";
 interface PageProps {
   children: React.ReactNode;
   overrideBackgroundColor?: string;
-  apiBaseUrl: string;
   profileLink: string;
   feedbackUrl: string;
   version: string;
@@ -21,20 +20,14 @@ const Main = styled.main`
   ${mainStyles}
 `;
 
-export function PageWrapper({
-  apiBaseUrl,
-  profileLink,
-  feedbackUrl,
-  children,
-  version,
-}: PageProps): React.ReactElement {
+export function PageWrapper({ profileLink, feedbackUrl, children, version }: PageProps): React.ReactElement {
   return (
     <>
       <Head>
         <title>Tilavarauspalvelu</title>
         <meta name="version" content={version} />
       </Head>
-      <Navigation apiBaseUrl={apiBaseUrl} profileLink={profileLink} />
+      <Navigation profileLink={profileLink} />
       <BannerNotificationsList target={BannerNotificationTarget.User} />
       <InProgressReservationNotification />
       <Main id="main">{children}</Main>

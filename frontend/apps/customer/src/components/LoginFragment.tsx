@@ -6,7 +6,6 @@ import { getLocalizationLang } from "ui/src/modules/helpers";
 import { useSession } from "@/hooks";
 
 type Props = {
-  apiBaseUrl: string;
   componentIfAuthenticated: React.ReactElement;
   isActionDisabled?: boolean;
   returnUrl?: string;
@@ -14,7 +13,6 @@ type Props = {
 };
 
 export function LoginFragment({
-  apiBaseUrl,
   componentIfAuthenticated,
   isActionDisabled,
   returnUrl,
@@ -25,7 +23,6 @@ export function LoginFragment({
 
   const handleClick = () => {
     signIn({
-      apiBaseUrl,
       language: getLocalizationLang(i18n.language),
       client: "customer",
       returnUrl,

@@ -54,7 +54,6 @@ import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { generateReservations } from "@/modules/generateReservations";
 import { getBufferTime } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationUrl } from "@/modules/urls";
 import { getRescheduleReservationSeriesSchema } from "@/schemas";
 import type { RescheduleReservationSeriesForm } from "@/schemas";
@@ -102,8 +101,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     return NOT_FOUND_SSR_VALUE;
   }
 
-  const { apiBaseUrl } = await getCommonServerSideProps();
-  const apolloClient = createClient(apiBaseUrl, req);
+  const apolloClient = createClient(req);
   const { data } = await apolloClient.query<ReservationPermissionsQuery, ReservationPermissionsQueryVariables>({
     query: ReservationPermissionsDocument,
     variables: { id: createNodeId("ReservationNode", pk) },

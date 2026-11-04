@@ -19,7 +19,6 @@ import {
 import type { ApplicationPage2FormValues } from "@/components/application/funnel/form";
 import { useUnsavedChangesWarning } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 
 function Page2({ application }: Pick<PropsNarrowed, "application">): React.ReactElement {
@@ -102,8 +101,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const client = createApolloClient(apiBaseUrl, ctx);
+  const client = createApolloClient(ctx);
   const { data } = await client.query<ApplicationPage2Query, ApplicationPage2QueryVariables>({
     query: ApplicationPage2Document,
     variables: {
