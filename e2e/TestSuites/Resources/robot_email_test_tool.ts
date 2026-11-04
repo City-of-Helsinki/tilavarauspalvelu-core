@@ -77,9 +77,10 @@ export class RobotEmailTester {
       const text = email.text_content ?? "";
       const attachments = email.attachments ?? [];
       const missing = expected_terms.filter((term) => term !== "" && !text.toLowerCase().includes(term.toLowerCase()));
+      // A miss isn't a warning: a later email may still match, and the error below covers the case where none does
       if (require_attachment && attachments.length === 0) {
         // oxlint-disable-next-line no-await-in-loop -- log lines in order
-        await log(`Email [${index}] is missing required attachment`, { level: "WARN" });
+        await log(`Email [${index}] is missing required attachment`);
         continue;
       }
       if (missing.length === 0) {
@@ -90,7 +91,7 @@ export class RobotEmailTester {
         return true;
       }
       // oxlint-disable-next-line no-await-in-loop -- log lines in order
-      await log(`Email [${index}] is missing terms: ${missing.join(", ")}`, { level: "WARN" });
+      await log(`Email [${index}] is missing terms: ${missing.join(", ")}`);
     }
     const sample = (matching[0]?.text_content ?? "").slice(0, 300);
     await log(
