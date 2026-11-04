@@ -198,11 +198,14 @@ export const testWithoutBrowser = base.extend<{ testRuntime: undefined }>({
     async ({ playwright: _playwright }, use, info) => {
       currentTestInfo = info;
       await use(undefined);
-      for (const hook of testEndHooks) {
-        // oxlint-disable-next-line no-await-in-loop -- hooks must run one after another
-        await redactingErrors(() => hook(info));
+      try {
+        for (const hook of testEndHooks) {
+          // oxlint-disable-next-line no-await-in-loop -- hooks must run one after another
+          await redactingErrors(() => hook(info));
+        }
+      } finally {
+        currentTestInfo = null;
       }
-      currentTestInfo = null;
     },
     { auto: true },
   ],
