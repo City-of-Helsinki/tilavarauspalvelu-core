@@ -781,6 +781,7 @@ type ReservationUnitNode implements Node {
   reservationStartInterval: ReservationStartInterval!
   reservationKind: ReservationKind!
   reservationForm: ReservationFormType!
+  paymentType: PaymentType
   searchTerms: [String!]!
   unit: UnitNode!
   reservationUnitType: ReservationUnitTypeNode
@@ -974,6 +975,13 @@ enum ReservationFormType {
   RESERVEE_INFO_FORM
   PURPOSE_FORM
   AGE_GROUP_FORM
+}
+
+"""An enumeration."""
+enum PaymentType {
+  ON_SITE
+  ONLINE
+  ONLINE_OR_INVOICE
 }
 
 type UnitNode implements Node {
@@ -2250,13 +2258,6 @@ type PaymentOrderNode implements Node {
 }
 
 """An enumeration."""
-enum PaymentType {
-  ON_SITE
-  ONLINE
-  ONLINE_OR_INVOICE
-}
-
-"""An enumeration."""
 enum OrderStatus {
   DRAFT
   PENDING
@@ -2419,7 +2420,6 @@ type PriceComponentNode implements Node {
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
-  paymentType: PaymentType
   taxLevel: TaxLevelNode!
 
   """The ID of the object"""
@@ -2445,17 +2445,6 @@ type PriceOptionNode implements Node {
 
   """The ID of the object"""
   id: ID!
-  pk: Int
-}
-
-type TaxLevelNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object"""
-  id: ID!
-  currentPercentage: Decimal
   pk: Int
 }
 
@@ -3909,6 +3898,7 @@ type ReservationUnitCreateMutationPayload {
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
   reservationForm: ReservationFormType
+  paymentType: PaymentType
   publishingState: String
   searchTerms: [String]
   unit: Int
@@ -3978,6 +3968,7 @@ input ReservationUnitCreateMutationInput {
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
   reservationForm: ReservationFormType
+  paymentType: PaymentType
   searchTerms: [String]
   unit: Int!
   reservationUnitType: Int
@@ -4043,7 +4034,6 @@ input OwnPricingInputSerializerInput {
   begins: Date!
   amount: Decimal!
   priceUnit: PriceUnit!
-  paymentType: PaymentType
   taxLevel: Int!
   canApplyForDiscount: Boolean
   materialPriceDescriptionFi: String
@@ -4102,6 +4092,7 @@ type ReservationUnitUpdateMutationPayload {
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
   reservationForm: ReservationFormType
+  paymentType: PaymentType
   publishingState: String
   searchTerms: [String]
   unit: Int
@@ -4171,6 +4162,7 @@ input ReservationUnitUpdateMutationInput {
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
   reservationForm: ReservationFormType
+  paymentType: PaymentType
   searchTerms: [String]
   unit: Int
   reservationUnitType: Int
@@ -4285,7 +4277,6 @@ input UpdatePriceComponentInputSerializerInput {
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
-  paymentType: PaymentType
   taxLevel: Int
 }
 

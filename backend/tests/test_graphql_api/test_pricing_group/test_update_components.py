@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import pytest
 
-from tilavarauspalvelu.enums import PaymentType, PriceUnit, UserRoleChoice
+from tilavarauspalvelu.enums import PriceUnit, UserRoleChoice
 from tilavarauspalvelu.models import PriceComponent
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
@@ -38,7 +38,6 @@ def component_input(component: PriceComponent, **overrides) -> dict:
         "validUntil": component.valid_until.isoformat() if component.valid_until else None,
         "amount": str(component.amount),
         "priceUnit": component.price_unit,
-        "paymentType": component.payment_type,
         "canApplyForDiscount": component.can_apply_for_discount,
         "materialPriceDescriptionFi": component.material_price_description_fi or "",
         "materialPriceDescriptionEn": component.material_price_description_en or "",
@@ -54,7 +53,6 @@ def new_component_input() -> dict:
         "validFrom": local_date().isoformat(),
         "amount": "10.00",
         "priceUnit": PriceUnit.PER_HOUR,
-        "paymentType": PaymentType.ONLINE,
         "taxLevel": TaxLevelFactory.create().pk,
     }
 
@@ -83,7 +81,6 @@ def test_pricing_group__update_components__price_change_from_a_future_date(graph
                 "validFrom": change_date.isoformat(),
                 "amount": "20.00",
                 "priceUnit": PriceUnit.PER_HOUR,
-                "paymentType": PaymentType.ONLINE,
                 "taxLevel": active.tax_level.pk,
             },
         ],
@@ -99,7 +96,6 @@ def test_pricing_group__update_components__price_change_from_a_future_date(graph
     assert components[1].valid_from == change_date
     assert components[1].valid_until is None
     assert components[1].amount == Decimal(20)
-    assert components[1].payment_type == PaymentType.ONLINE
     assert components[1].tax_level == active.tax_level
 
 
@@ -140,7 +136,6 @@ def test_pricing_group__update_components__left_out_fields_keep_saved_values(gra
         pricing_group=pricing_group,
         valid_from=today - datetime.timedelta(days=10),
         amount=Decimal(10),
-        payment_type=PaymentType.ON_SITE,
         can_apply_for_discount=True,
     )
 
@@ -154,7 +149,6 @@ def test_pricing_group__update_components__left_out_fields_keep_saved_values(gra
                 "validFrom": change_date.isoformat(),
                 "amount": "20.00",
                 "priceUnit": PriceUnit.PER_HOUR,
-                "paymentType": PaymentType.ON_SITE,
                 "taxLevel": active.tax_level.pk,
             },
         ],
@@ -166,7 +160,6 @@ def test_pricing_group__update_components__left_out_fields_keep_saved_values(gra
     active = PriceComponent.objects.get(pk=active.pk)
     assert active.valid_until == change_date
     assert active.amount == Decimal(10)
-    assert active.payment_type == PaymentType.ON_SITE
     assert active.can_apply_for_discount is True
 
 
@@ -261,9 +254,8 @@ def test_pricing_group__update_components__constraint_errors_have_codes(graphql)
         "components": [
             {
                 "validFrom": local_date().isoformat(),
-                "amount": "10.00",
+                "amount": "-1.00",
                 "priceUnit": PriceUnit.PER_HOUR,
-                "paymentType": None,
                 "taxLevel": TaxLevelFactory.create().pk,
             },
         ],
@@ -271,10 +263,8 @@ def test_pricing_group__update_components__constraint_errors_have_codes(graphql)
     response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
 
     assert response.has_errors is True, response
-    assert response.field_error_messages() == [
-        "Payment type is required for a paid component and not allowed for a free one.",
-    ]
-    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID]
+    assert response.field_error_messages() == ["Amount cannot be negative."]
+    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE]
 
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
