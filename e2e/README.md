@@ -17,8 +17,8 @@ Secrets go in `TestSuites/Resources/.env` (see `.env.example`): `WAF_BYPASS_SECR
 
 ```bash
 pnpm install
-pnpm exec playwright install --with-deps chromium firefox webkit
-pnpm test:all               # all 35 tests: pnpm test, then pnpm test:notifications
+pnpm e2e:install-deps       # Chromium, Firefox and WebKit, with their system packages
+pnpm test:all               # all 35 tests: pnpm test, then pnpm test:all:notifications
 pnpm test                   # all suites in parallel, creates the test data first
 pnpm test:notifications     # the notification suite, serially (it has no data setup)
 pnpm test:smoke             # tests tagged smoke
@@ -26,9 +26,12 @@ pnpm test:sequential        # one worker, all tests share the same users
 pnpm report                 # opens the HTML report
 ```
 
-`pnpm test:all` runs the notifications after the parallel suites, because they change the banners of the shared
-environment. It keeps both reports: the parallel run in `playwright-report/` and `test-results/`, the notifications
-in `playwright-report/notifications/` and `test-results/notifications/`. It fails if either run fails.
+`pnpm test:all` runs `pnpm test` and then `pnpm test:all:notifications`. The notifications can't run in parallel with
+the other suites, because they change the banners of the shared environment, which show on the other tests' pages.
+It keeps both reports: the parallel run in `playwright-report/` and `test-results/`, the notifications in
+`playwright-report/notifications/` and `test-results/notifications/`. It runs both parts and fails if either one
+fails, which pnpm's own options can't do: `--sequential` stops at the first failure, and `--no-bail` exits with 0.
+It runs pnpm itself, so pnpm has to be on the `PATH` (`corepack enable` puts it there).
 
 One suite: `pnpm exec playwright test --project Tests_user_desktop_FI`. One test:
 `... --project Tests_user_desktop_FI -g "User logs in and out with suomi_fi"`.
@@ -42,11 +45,13 @@ still fail for a while after that (a 502, the customer app's error page), so the
 customer landing page, the search page and GraphQL answer normally three times in a row, 5 seconds apart. After
 2 minutes the tests start anyway, with a warning in the report.
 
-Runs need `TZ=Europe/Helsinki`: the config sets it when it is unset.
+The app shows times only in Helsinki time, so the config runs the suite in it: it sets `TZ` and the browsers' time
+zone to `Europe/Helsinki`.
 
 ### Settings
 
-Environment variables:
+Environment variables, which `lib/env.ts` reads and checks. They can also go in `TestSuites/Resources/.env`, and
+`.env.example` there lists them all:
 
 - `WORKERS` (default 5) and `RETRIES` (default 1).
 - `FORCE_SINGLE_USER=True`: all tests use the same shared users. Use it with one worker, like `pnpm test:sequential`.
@@ -54,8 +59,11 @@ Environment variables:
   (`test-results/<test>/context*.har`).
 - `PW_TRACE=on` (or another Playwright trace mode, like `retain-on-failure`): records Playwright traces, which the
   HTML report shows. It is ignored when `CI` is set.
+- `LOG_LEVEL` (default `INFO`): the lowest level of the `log()` messages in the report, so `DEBUG` adds the debug
+  messages. `LOG_FORMAT=json` prints the messages that go to the console as JSON lines.
 
-Use HAR files and traces for local debugging only, and don't upload them as CI artifacts. Other environment
+Booleans take `true` or `1` and `false` or `0`, in any case, and an invalid value fails the run with the variable's
+name. Use HAR files and traces for local debugging only, and don't upload them as CI artifacts. Other environment
 variables don't change the suite's constants, even with the same name (like `BROWSER`).
 
 Playwright's own options work too: `--headed` shows the browsers, `--ui` opens the UI mode and `--debug` the
@@ -72,8 +80,8 @@ inspector, e.g. `pnpm exec playwright test --project Tests_user_desktop_FI --hea
 | `Tests_users_with_admin_desktop`   | 3     | A customer books, an admin handles the booking, the customer checks the result        |
 | `Tests_admin_notifications_serial` | 4     | Banner notifications, run serially (tag `@serialonly`)                                |
 
-Two more projects: `create_data` (`TestSuites/create_data.setup.ts`) creates the test data, and `selftest` checks
-the runtime offline.
+Two more projects: `create_data` (`TestSuites/create_data.setup.ts`) creates the test data, and `unit` runs the unit
+tests in `unit/`, which need no test environment.
 
 ## Layout
 
@@ -86,15 +94,15 @@ the runtime offline.
 - `TestSuites/Resources/`: shared keywords (`custom_keywords`, `devices` for the browsers and devices,
   `common_setups_teardowns`, `create_data`, `graphql_commands`, `data_modification`, …), constants (`variables` for
   URLs, units and selectors, `texts_FI`, `suite_specific_units`, `serial_users`), the test users in
-  `pabot_users.dat`, and `env_loader.ts`, which loads the secrets.
+  `parallel_users.dat`, and `.env.example`, which lists the environment variables.
 - `lib/`: the runtime. `runtime.ts` has the `@step` decorator, `log()`, the secret redaction and the `test` fixture.
-  `session.ts` keeps a test's pages, `backend-errors.ts` records their backend errors into the report, `locks.ts`
-  has the locks between the workers, and `locators.ts`, `responses.ts` and `retry.ts` are small helpers for the
-  keywords.
+  `env.ts` reads and checks the environment variables. `session.ts` keeps a test's pages, `backend-errors.ts`
+  records their backend errors into the report, `locks.ts` has the locks between the workers, and `locators.ts`,
+  `responses.ts` and `retry.ts` are small helpers for the keywords.
 - `graphql.config.ts`: the codegen settings for the GraphQL queries, which are written with `gql`. `pnpm codegen`
   writes their types from `../tilavaraus.graphql` to `gql/gql-types.ts`, which isn't committed.
-- `tools/`: the report reader described below. `tools/README.md` lists how the suite differs from the Robot suite it
-  was converted from.
+- `unit/`: the unit tests of `lib/` and of the keywords that need no test environment, against local pages.
+- `tools/`: `report_summary.py`, the report reader described below.
 
 ### Keywords, test data and tags
 
@@ -114,8 +122,8 @@ the runtime offline.
   `state` (`TestSuites/state.ts`): `state.timeOfQuickReservationMinusT`, `this.state.bookingNumOnly` in a page
   object. Each test gets a new one. Each field says which keywords set it.
 - Tags choose the test data before the test starts. A data set tag like `@desktop-test-data-set-0` picks the users
-  from the section with the same tag in `pabot_users.dat`, and only one test at a time uses a data set. A data set
-  tag that `pabot_users.dat` doesn't have fails the test. A suite tag (`@desktop-suite`, `@admin-suite`,
+  from the section with the same tag in `parallel_users.dat`, and only one test at a time uses a data set. A data set
+  tag that `parallel_users.dat` doesn't have fails the test. A suite tag (`@desktop-suite`, `@admin-suite`,
   `@combined-suite`, `@android-suite`, `@iphone-suite`) picks the units. In sequential mode, and in tests without a
   data set tag, the tests use the shared users in `serial_users.ts`. The `testData` fixture logs the users it chose,
   under the report's "Before Hooks".
@@ -123,7 +131,7 @@ the runtime offline.
 ## How it works
 
 - **Parallel runs:** the tests don't depend on each other, and they share only locks: files in a folder of each run's
-  own under `.pabot-shared/`, so a run (or `pnpm selftest`) never touches another run's state. The locks keep a data
+  own under `.shared-state/`, so a run (or `pnpm test:unit`) never touches another run's state. The locks keep a data
   set's users and a unit's free times to one test at a time. Folders of runs started over a day ago are removed when
   a run starts. A worker can take a lock it already holds, and releasing a lock it doesn't hold fails. Locks a test
   still holds are released when it ends, and a lock left by a worker that stopped is taken over. The first tests
@@ -169,7 +177,7 @@ the runtime offline.
 ```bash
 pnpm codegen   # the types of the GraphQL queries, which pnpm lint needs
 pnpm lint      # oxlint with type checking, with the frontend's rules
-pnpm selftest  # the runtime and the keywords that need no test environment, against local pages
+pnpm test:unit # the unit tests of lib/ and of the keywords that need no test environment
 ```
 
 The "E2E checks" workflow (`.github/workflows/test-e2e.yml`) runs these, `pnpm format:check` and `pnpm run list`
@@ -205,3 +213,22 @@ their query strings, and no headers or request bodies are recorded. Cancelled re
 access control errors that WebKit reports for fetches a navigation cancels. A request that a page load or reload
 ended counts as unanswered only if it had waited 5 s by then, because the browser doesn't always report such requests
 as cancelled.
+
+## Differences from the Robot suite
+
+Converted from [tilavarauspalvelu-robot](https://github.com/City-of-Helsinki/tilavarauspalvelu-robot) (commit
+`dc72ec3`), which it replaced. The tests, tags and keywords keep their Robot names, and the tests call the same
+keywords in the same order.
+
+- **Keywords** are page object methods titled with the Robot keyword's name (`@step`). Library keywords are
+  Playwright's locators, actions and `expect`, or plain TypeScript.
+- **Variables** are constants, the users and units come from `testData`, and Set Test Variable values are fields of
+  `state`. Robot's `--variable` settings are environment variables.
+- **Parallel runs:** pabot processes are Playwright workers, and PabotLib's locks are files under `.shared-state/`.
+  A failed test is retried once instead of rerun at the end.
+- **Waiting:** Playwright's auto-waiting, `expect` and `waitForURL` replace most sleeps. The `create_data` project
+  (Robot's Suite Setup) waits for the new data instead of sleeping 3 minutes.
+- **Independent tests:** "Check emails from reservations" makes its own paid booking instead of using another test's.
+- **Fixed in the port:** the quick reservation slot pick and booked-slot check, and the My bookings tab clicks.
+- **Reports:** the HTML report's keyword steps match Robot's log, and Playwright takes the failure screenshots and
+  videos.

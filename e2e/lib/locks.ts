@@ -2,7 +2,7 @@
  * Locks between the Playwright workers, which keep a data set's users and a unit's free times to one test at a time.
  *
  * The workers are separate processes, so a lock is a directory created atomically with an owner file. Each run has a
- * folder of its own under PABOT_SHARED_DIR, so a run never sees another run's state. Locks a test still holds are
+ * folder of its own under SHARED_STATE_DIR, so a run never sees another run's state. Locks a test still holds are
  * released when it ends.
  */
 import { randomUUID } from "node:crypto";
@@ -10,11 +10,12 @@ import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { setTimeout } from "node:timers/promises";
+import { readEnv } from "./env";
 import { onTestEnd } from "./runtime";
 
 const E2E_ROOT = resolve(import.meta.dirname, "..");
 /** The folder of the runs' shared state, one folder per run. */
-export const SHARED_BASE = process.env.PABOT_SHARED_DIR ?? join(E2E_ROOT, ".pabot-shared");
+export const SHARED_BASE = readEnv().SHARED_STATE_DIR ?? join(E2E_ROOT, ".shared-state");
 const RUN_DIR = /^run-(\d+)-\d+$/;
 /** Run folders older than this are removed at the start of a run. A newer one may belong to a run still going on. */
 const OLD_RUN_MS = 24 * 60 * 60_000;
@@ -34,7 +35,7 @@ const safeName = (name: string) => encodeURIComponent(name).replaceAll("%", "_")
 
 /** This run's folder, made by the global setup. Outside a run (no global setup) the base folder is used. */
 export function sharedDir(): string {
-  return process.env.PABOT_SHARED_RUN_DIR ?? SHARED_BASE;
+  return readEnv().SHARED_STATE_RUN_DIR ?? SHARED_BASE;
 }
 
 function lockDir(name: string): string {
@@ -196,13 +197,13 @@ onTestEnd(async () => {
 });
 
 /**
- * Makes this run's folder for the shared state, for the workers to find in PABOT_SHARED_RUN_DIR, and removes the
+ * Makes this run's folder for the shared state, for the workers to find in SHARED_STATE_RUN_DIR, and removes the
  * folders of old runs. Called from the global setup.
  */
 export async function resetSharedState(): Promise<void> {
   await mkdir(SHARED_BASE, { recursive: true });
   for (const entry of await readdir(SHARED_BASE)) {
-    // Only run folders are removed, as PABOT_SHARED_DIR can point to a folder that has other files too
+    // Only run folders are removed, as SHARED_STATE_DIR can point to a folder that has other files too
     const started = RUN_DIR.exec(entry)?.[1];
     if (started != null && Date.now() - Number(started) > OLD_RUN_MS) {
       // oxlint-disable-next-line no-await-in-loop -- small directory
@@ -211,5 +212,5 @@ export async function resetSharedState(): Promise<void> {
   }
   const runDir = join(SHARED_BASE, `run-${Date.now()}-${process.pid}`);
   await mkdir(runDir);
-  process.env.PABOT_SHARED_RUN_DIR = runDir;
+  process.env.SHARED_STATE_RUN_DIR = runDir;
 }

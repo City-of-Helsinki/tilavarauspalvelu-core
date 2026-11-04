@@ -1,9 +1,9 @@
 /** Port of Resources/devices.robot */
 import type { BrowserContextOptions } from "@playwright/test";
+import { readEnv } from "../../lib/env";
 import { step, log } from "../../lib/runtime";
 import type { BrowserName } from "../../lib/session";
 import { PageObject } from "../page-object";
-import { WAF_BYPASS_SECRET } from "./env_loader";
 
 export const BROWSER: BrowserName = "chromium";
 export const BROWSER_FOR_MAIL: BrowserName = "firefox";
@@ -16,6 +16,7 @@ export class Devices extends PageObject {
   @step("devices.Apply Global Header To Context Config")
   async applyGlobalHeaderToContextConfig(context_config: BrowserContextOptions) {
     if (ENABLE_WAF_BYPASS_HEADER) {
+      const { WAF_BYPASS_SECRET } = readEnv();
       if (WAF_BYPASS_SECRET !== "") {
         context_config.extraHTTPHeaders = { [WAF_BYPASS_HEADER_NAME]: WAF_BYPASS_SECRET };
         await log("🛡️ Added global WAF bypass header to browser context config");

@@ -118,7 +118,7 @@ export class BackendErrors {
 
   /**
    * `watched` picks the hosts to watch, `pendingMs` how long a request can go unanswered, and `slowMs` how long a
-   * request can take (the selftest's own).
+   * request can take (the unit tests' own).
    */
   constructor(
     private readonly info: Pick<TestInfo, "status" | "expectedStatus" | "annotations">,

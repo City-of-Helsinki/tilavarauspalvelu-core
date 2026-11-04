@@ -3,7 +3,7 @@
  * test and its page objects (`this.testData`):
  *
  * - A data set tag (e.g. `@desktop-test-data-set-0`) picks the test's users from the section with the same tag in
- *   `Resources/pabot_users.dat`. Only one test at a time uses a data set.
+ *   `Resources/parallel_users.dat`. Only one test at a time uses a data set.
  * - A suite tag (`@desktop-suite`, `@admin-suite`, `@combined-suite`, `@android-suite`, `@iphone-suite`) picks the
  *   test's units from `Resources/suite_specific_units`.
  * - In sequential mode (FORCE_SINGLE_USER=True or one worker), and in tests without a data set tag, the tests use the
@@ -19,7 +19,7 @@ import {
 } from "./Resources/serial_users";
 import { ANDROID_UNITS, COMBINED_UNITS, DESKTOP_UNITS, IPHONE_UNITS } from "./Resources/suite_specific_units";
 
-const PABOT_USERS = join(import.meta.dirname, "Resources/pabot_users.dat");
+const PARALLEL_USERS = join(import.meta.dirname, "Resources/parallel_users.dat");
 
 const DATA_SET_TAG =
   /^(desktop-test-data|admin-test-data|mobile-android-data|mobile-iphone-data|combined-test-data)-set-\d+$/;
@@ -76,7 +76,7 @@ export interface TestData {
   units: Units;
 }
 
-// The keys of each kind of user in the sections of pabot_users.dat
+// The keys of each kind of user in the sections of parallel_users.dat
 const USER_KEYS: Record<keyof User, string> = {
   email: "CURRENT_USER_EMAIL",
   firstName: "CURRENT_USER_FIRST_NAME",
@@ -191,10 +191,9 @@ const PERMISSION_TARGETS: Record<string, Person> = {
 };
 
 /**
- * The sections of pabot_users.dat by their `tags` value. The keys are uppercase, as the variables of the Robot suite
- * were named (pabot's configparser lowercased them).
+ * The sections of parallel_users.dat by their `tags` value, with the keys in uppercase.
  */
-function readDataSets(file = PABOT_USERS): Map<string, Record<string, string>> {
+function readDataSets(file = PARALLEL_USERS): Map<string, Record<string, string>> {
   const sets = new Map<string, Record<string, string>>();
   let current: Record<string, string> | null = null;
   for (const raw of readFileSync(file, "utf8").split(/\r?\n/)) {
@@ -230,7 +229,7 @@ function personOf<Field extends string>(
   for (const field of Object.keys(keys) as Field[]) {
     const value = values[keys[field]];
     if (value == null) {
-      throw new Error(`The section with tags=${dataSet} in pabot_users.dat has no ${keys[field]}`);
+      throw new Error(`The section with tags=${dataSet} in parallel_users.dat has no ${keys[field]}`);
     }
     person[field] = value;
   }
@@ -238,7 +237,7 @@ function personOf<Field extends string>(
 }
 
 /** The test data that the tags (without "@") choose. */
-export function resolveTestData(tags: string[], options: { sequential: boolean }, file = PABOT_USERS): TestData {
+export function resolveTestData(tags: string[], options: { sequential: boolean }, file = PARALLEL_USERS): TestData {
   const tagged = tags.find((tag) => DATA_SET_TAG.test(tag)) ?? null;
   const combined = tagged?.startsWith("combined-test-data") ?? false;
   const admin = (tagged?.startsWith("admin-test-data") ?? false) || combined;
@@ -261,7 +260,7 @@ export function resolveTestData(tags: string[], options: { sequential: boolean }
   if (dataSet != null) {
     const values = readDataSets(file).get(dataSet);
     if (values == null) {
-      throw new Error(`No section with tags=${dataSet} in pabot_users.dat`);
+      throw new Error(`No section with tags=${dataSet} in parallel_users.dat`);
     }
     data.dataSet = dataSet;
     if (user) {
