@@ -46,7 +46,7 @@ FIELDS = f"lines {{ {LINE_FIELDS} }} total canApplyForDiscount paymentType"
 
 
 def test_reservation_price__hourly_price(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(payment_type=PaymentType.ONLINE)
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
         reservation_unit=reservation_unit,
@@ -58,7 +58,6 @@ def test_reservation_price__hourly_price(graphql):
         valid_from=JAN_1,
         amount=Decimal(10),
         price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
         can_apply_for_discount=True,
         material_price_description_fi="Materiaalit",
         material_price_description_en="Materials",
