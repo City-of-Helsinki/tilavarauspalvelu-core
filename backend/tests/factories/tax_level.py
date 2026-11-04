@@ -9,7 +9,7 @@ from factory import LazyAttribute
 
 from tilavarauspalvelu.models import TaxLevel
 
-from ._base import FakerEN, FakerFI, FakerSV, GenericDjangoModelFactory, ReverseForeignKeyFactory
+from ._base import FakerEN, FakerFI, FakerSV, GenericDjangoModelFactory
 from .tax_level_rate import TaxLevelRateFactory
 
 if TYPE_CHECKING:
@@ -30,8 +30,6 @@ class TaxLevelFactory(GenericDjangoModelFactory[TaxLevel]):
     name_fi = LazyAttribute(lambda i: i.name)
     name_en = FakerEN("word", unique=True)
     name_sv = FakerSV("word", unique=True)
-
-    reservation_unit_pricings = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingFactory")
 
     @factory.post_generation
     def rates(self: TaxLevel, create: bool, rates: Iterable[TaxLevelRate] | None, **kwargs: Any) -> None:
