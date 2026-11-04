@@ -95,26 +95,27 @@ oc-status env: (oc-select env)
             | @tsv' \
         | column -t -s $'\t'
 
-# Follow the logs of an app (core, worker, scheduler, customer-ui, staff-ui) for an env
-oc-logs app env: (oc-select env)
+# Print the deploymentconfig name of an app (core, worker, scheduler, customer-ui, staff-ui)
+[private]
+_oc-deploymentconfig app:
     #!/usr/bin/env bash
     set -euo pipefail
 
     case "{{ app }}" in
         core)
-            deploymentconfig="tilavarauspalvelu-core"
+            echo "tilavarauspalvelu-core"
             ;;
         worker)
-            deploymentconfig="tilavarauspalvelu-core-worker"
+            echo "tilavarauspalvelu-core-worker"
             ;;
         scheduler)
-            deploymentconfig="tilavarauspalvelu-core-scheduler"
+            echo "tilavarauspalvelu-core-scheduler"
             ;;
         customer-ui)
-            deploymentconfig="tilavarauspalvelu-customer-ui"
+            echo "tilavarauspalvelu-customer-ui"
             ;;
         staff-ui)
-            deploymentconfig="tilavarauspalvelu-staff-ui"
+            echo "tilavarauspalvelu-staff-ui"
             ;;
         *)
             echo "Unknown app '{{ app }}'. Use core, worker, scheduler, customer-ui or staff-ui." >&2
@@ -122,7 +123,29 @@ oc-logs app env: (oc-select env)
             ;;
     esac
 
+# Follow the logs of an app (core, worker, scheduler, customer-ui, staff-ui) for an env
+oc-logs app env: (oc-select env)
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    deploymentconfig=$(just --justfile "{{ source_file() }}" _oc-deploymentconfig "{{ app }}")
+
     oc logs -l deploymentconfig="${deploymentconfig}" --prefix --tail=100 -f
+
+# Copy a directory from a running pod of an app to a local directory for an env
+oc-copy-from app env path dest=".": (oc-select env)
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    deploymentconfig=$(just --justfile "{{ source_file() }}" _oc-deploymentconfig "{{ app }}")
+
+    pod=$(oc get pods -l deploymentconfig="${deploymentconfig}" --field-selector=status.phase=Running -o name | head -n 1)
+    if [ -z "${pod}" ]; then
+        echo "No running pod for '{{ app }}' in '{{ env }}'." >&2
+        exit 1
+    fi
+
+    oc rsync "${pod#pod/}:{{ path }}" "{{ dest }}"
 
 # Log in to Azure DevOps in the City of Helsinki tenant
 az-login:
