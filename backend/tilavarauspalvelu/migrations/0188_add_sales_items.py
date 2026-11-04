@@ -2,6 +2,7 @@
 
 import django.core.validators
 import django.db.models.deletion
+import tilavarauspalvelu.typing
 import tilavarauspalvelu.validators
 from django.db import migrations, models
 
@@ -59,5 +60,9 @@ class Migration(migrations.Migration):
             model_name='reservationpriceline',
             name='sales_item',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='reservation_price_lines', to='tilavarauspalvelu.salesitem'),
+        ),
+        migrations.AddConstraint(
+            model_name='pricecomponent',
+            constraint=models.CheckConstraint(condition=models.Q(models.Q(('kind', 'BASE'), _negated=True), ('can_apply_for_discount', False), ('amount__gt', 0), _connector='OR'), name='price_component_base_discount_only_when_paid', violation_error_code=tilavarauspalvelu.typing.error_codes['PRICE_COMPONENT_DISCOUNT_WHEN_FREE'], violation_error_message='A free base component cannot allow applying for a discount.'),
         ),
     ]

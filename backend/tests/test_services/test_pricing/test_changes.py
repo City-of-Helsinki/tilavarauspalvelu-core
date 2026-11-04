@@ -299,6 +299,28 @@ def test_save_price_component_changes__model_constraints_are_checked(component_f
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
+def test_save_price_component_changes__free_component_cannot_allow_discount():
+    pricing_group = PricingGroupFactory.create()
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group,
+        tax_level=TaxLevelFactory.create(),
+        amount=Decimal(0),
+        can_apply_for_discount=True,
+        valid_from=JAN_1,
+    )
+
+    with pytest.raises(ValidationError) as error:
+        save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
+
+    assert error_details(error.value) == [
+        ErrorDetail(
+            "A free base component cannot allow applying for a discount.",
+            code=error_codes.PRICE_COMPONENT_DISCOUNT_WHEN_FREE,
+        ),
+    ]
+    assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
+
+
 def test_save_price_component_changes__model_constraints_are_checked_for_changed_components():
     pricing_group = PricingGroupFactory.create()
     future = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=MAR_1)
