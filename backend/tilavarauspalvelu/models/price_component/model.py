@@ -107,6 +107,18 @@ class PriceComponent(models.Model):
                 violation_error_message="Valid from must be before valid until.",
                 violation_error_code=error_codes.PRICE_COMPONENT_VALID_UNTIL_NOT_AFTER_VALID_FROM,
             ),
+            # Staff can raise the price of a reservation only when the customer has applied for a discount.
+            # A free price has no sales item, so it cannot be paid online if its price is raised.
+            models.CheckConstraint(
+                name="price_component_base_discount_only_when_paid",
+                condition=(
+                    ~models.Q(kind=PriceComponentKind.BASE)
+                    | models.Q(can_apply_for_discount=False)
+                    | models.Q(amount__gt=0)
+                ),
+                violation_error_message="A free base component cannot allow applying for a discount.",
+                violation_error_code=error_codes.PRICE_COMPONENT_DISCOUNT_WHEN_FREE,
+            ),
         ]
 
     def __str__(self) -> str:

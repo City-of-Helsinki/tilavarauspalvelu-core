@@ -26,6 +26,23 @@ def test_price_component__amount_cannot_be_negative():
     assert "price_component_amount_not_negative" in str(error.value)
 
 
+# ── Discount ──
+
+
+def test_price_component__free_component_cannot_allow_discount():
+    with pytest.raises(IntegrityError) as error:
+        PriceComponentFactory.create_free(can_apply_for_discount=True)
+
+    assert "price_component_base_discount_only_when_paid" in str(error.value)
+
+
+def test_price_component__paid_component_can_allow_discount():
+    component = PriceComponentFactory.create(amount=Decimal(10), can_apply_for_discount=True)
+
+    component = PriceComponent.objects.get(pk=component.pk)
+    assert component.can_apply_for_discount is True
+
+
 # ── Validity ──
 
 

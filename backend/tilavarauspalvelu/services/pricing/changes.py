@@ -105,6 +105,7 @@ def _validate_changed_component(
 
     component.validators.validate_amount_not_negative()
     component.validators.validate_valid_from_before_valid_until()
+    component.validators.validate_discount_only_when_paid()
     component.validators.validate_sales_item_matches_tax_level()
 
     component.validators.validate_option_belongs_to_pricing_group_unit_group()
@@ -123,6 +124,7 @@ def _validate_new_component(
     component.pricing_group = pricing_group
     component.validators.validate_amount_not_negative()
     component.validators.validate_valid_from_before_valid_until()
+    component.validators.validate_discount_only_when_paid()
     component.validators.validate_sales_item_matches_tax_level()
 
     component.validators.validate_option_belongs_to_pricing_group_unit_group()

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from rest_framework.exceptions import ValidationError
 
+from tilavarauspalvelu.enums import PriceComponentKind
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 
@@ -33,6 +34,12 @@ class PriceComponentValidator:
         if self.price_component.amount < 0:
             msg = "Amount cannot be negative."
             raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE)
+
+    def validate_discount_only_when_paid(self) -> None:
+        component = self.price_component
+        if component.kind == PriceComponentKind.BASE and component.can_apply_for_discount and component.amount <= 0:
+            msg = "A free base component cannot allow applying for a discount."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_DISCOUNT_WHEN_FREE)
 
     def validate_valid_from_before_valid_until(self) -> None:
         valid_until = self.price_component.valid_until
