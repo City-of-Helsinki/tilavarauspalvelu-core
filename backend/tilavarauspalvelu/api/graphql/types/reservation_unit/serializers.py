@@ -30,10 +30,12 @@ from tilavarauspalvelu.models import (
     ReservationUnitAccessType,
     ReservationUnitPricing,
     Resource,
+    SalesItem,
     Space,
     TaxLevel,
 )
 from tilavarauspalvelu.services.pricing.own_pricing import OwnPricing, save_own_pricings
+from tilavarauspalvelu.services.pricing.sales_items import validate_sales_items_for_payment_type
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
@@ -61,6 +63,7 @@ class OwnPricingInputSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal(0))
     price_unit = EnumFriendlyChoiceField(choices=PriceUnit.choices, enum=PriceUnit)
     tax_level = serializers.PrimaryKeyRelatedField(queryset=TaxLevel.objects.all())
+    sales_item = serializers.PrimaryKeyRelatedField(queryset=SalesItem.objects.all(), required=False, allow_null=True)
     can_apply_for_discount = serializers.BooleanField(required=False)
     material_price_description_fi = serializers.CharField(required=False, allow_blank=True)
     material_price_description_en = serializers.CharField(required=False, allow_blank=True)
@@ -161,6 +164,9 @@ class ReservationUnitSerializer(NestingModelSerializer):
         self._validate_reservation_duration_fields(data)
         self._validate_pricings(data)
         self._validate_access_types(access_types=data.get("access_types", []), is_draft=is_draft)
+
+        if self.instance is not None and "payment_type" in data:
+            validate_sales_items_for_payment_type(reservation_unit=self.instance, payment_type=data["payment_type"])
 
         if not is_draft:
             self._validate_for_publish(data)
@@ -498,6 +504,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 amount=pricing["amount"],
                 price_unit=pricing["price_unit"],
                 tax_level=pricing["tax_level"],
+                sales_item=pricing.get("sales_item"),
                 can_apply_for_discount=pricing.get("can_apply_for_discount", False),
                 material_price_description_fi=pricing.get("material_price_description_fi", ""),
                 material_price_description_en=pricing.get("material_price_description_en", ""),

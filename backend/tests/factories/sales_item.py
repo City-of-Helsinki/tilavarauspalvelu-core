@@ -4,7 +4,7 @@ import factory
 
 from tilavarauspalvelu.models import SalesItem
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory
+from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
 
 __all__ = [
     "SalesItemFactory",
@@ -21,4 +21,5 @@ class SalesItemFactory(GenericDjangoModelFactory[SalesItem]):
 
     tax_level = ForeignKeyFactory("tests.factories.TaxLevelFactory", required=True)
 
+    price_components = ReverseForeignKeyFactory("tests.factories.PriceComponentFactory")
     reservation_price_lines = ReverseForeignKeyFactory("tests.factories.ReservationPriceLineFactory")

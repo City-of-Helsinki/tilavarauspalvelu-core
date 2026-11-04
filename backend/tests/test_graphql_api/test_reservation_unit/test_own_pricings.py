@@ -16,6 +16,7 @@ from tests.factories import (
     PricingGroupFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
+    SalesItemFactory,
     TaxLevelFactory,
     UnitGroupFactory,
 )
@@ -23,7 +24,7 @@ from tests.factories import (
 from .helpers import CREATE_MUTATION, UPDATE_MUTATION, get_create_draft_input_data
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import TaxLevel
+    from tilavarauspalvelu.models import SalesItem, TaxLevel
 
 # Applied to all tests
 pytestmark = [
@@ -34,12 +35,20 @@ pytestmark = [
 # ── Helpers ──
 
 
-def own_pricing_input(*, begins: datetime.date, amount: str, tax_level: TaxLevel, pk: int | None = None) -> dict:
+def own_pricing_input(
+    *,
+    begins: datetime.date,
+    amount: str,
+    tax_level: TaxLevel,
+    sales_item: SalesItem | None = None,
+    pk: int | None = None,
+) -> dict:
     data = {
         "begins": begins.isoformat(),
         "amount": amount,
         "priceUnit": PriceUnit.PER_HOUR,
         "taxLevel": tax_level.pk,
+        "salesItem": sales_item.pk if sales_item is not None else None,
         "canApplyForDiscount": True,
     }
     if pk is not None:
@@ -54,12 +63,13 @@ def test_reservation_unit__own_pricings__create(graphql):
     today = local_date()
 
     tax_level = TaxLevelFactory.create()
+    sales_item = SalesItemFactory.create(tax_level=tax_level)
 
     graphql.login_with_superuser()
 
     input_data = get_create_draft_input_data(
         paymentType=PaymentType.ONLINE,
-        ownPricings=[own_pricing_input(begins=today, amount="10.00", tax_level=tax_level)],
+        ownPricings=[own_pricing_input(begins=today, amount="10.00", tax_level=tax_level, sales_item=sales_item)],
     )
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
@@ -81,6 +91,63 @@ def test_reservation_unit__own_pricings__create(graphql):
     assert components[0].amount == Decimal(10)
     assert components[0].can_apply_for_discount is True
     assert components[0].tax_level == tax_level
+    assert components[0].sales_item == sales_item
+
+
+def test_reservation_unit__own_pricings__paid_online_needs_sales_item(graphql):
+    today = local_date()
+
+    graphql.login_with_superuser()
+
+    input_data = get_create_draft_input_data(
+        paymentType=PaymentType.ONLINE,
+        ownPricings=[own_pricing_input(begins=today, amount="10.00", tax_level=TaxLevelFactory.create())],
+    )
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_SALES_ITEM_MISSING]
+    assert not ReservationUnit.objects.exists()
+
+
+def test_reservation_unit__own_pricings__paid_on_site_needs_no_sales_item(graphql):
+    today = local_date()
+
+    graphql.login_with_superuser()
+
+    input_data = get_create_draft_input_data(
+        paymentType=PaymentType.ON_SITE,
+        ownPricings=[own_pricing_input(begins=today, amount="10.00", tax_level=TaxLevelFactory.create())],
+    )
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+    component = PriceComponent.objects.get()
+    assert component.sales_item is None
+
+
+def test_reservation_unit__own_pricings__payment_type_cannot_change_to_online_without_sales_items(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create(is_draft=True, payment_type=PaymentType.ON_SITE)
+    pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=today - datetime.timedelta(days=10))
+
+    graphql.login_with_superuser()
+
+    input_data = {"pk": reservation_unit.pk, "paymentType": PaymentType.ONLINE}
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_SALES_ITEM_MISSING]
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.payment_type == PaymentType.ON_SITE
 
 
 # ── Update ──

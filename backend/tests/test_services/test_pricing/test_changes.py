@@ -7,6 +7,7 @@ import pytest
 from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
+from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import PriceComponent
 from tilavarauspalvelu.services.pricing.changes import save_price_component_changes
 from tilavarauspalvelu.typing import error_codes
@@ -17,6 +18,7 @@ from tests.factories import (
     PriceOptionFactory,
     PricingGroupFactory,
     ReservationUnitPricingGroupFactory,
+    SalesItemFactory,
     TaxLevelFactory,
     UnitGroupFactory,
 )
@@ -425,6 +427,68 @@ def test_save_price_component_changes__coverage_includes_reservation_units():
             code=error_codes.PRICING_GROUP_BEGINS_BEFORE_COMPONENTS,
         ),
     ]
+
+
+# ── Sales items ──
+
+
+def test_save_price_component_changes__sales_item_must_have_the_tax_level_of_the_component():
+    pricing_group = PricingGroupFactory.create()
+    new = PriceComponentFactory.build(
+        pricing_group=pricing_group,
+        tax_level=TaxLevelFactory.create(),
+        sales_item=SalesItemFactory.create(),
+        valid_from=JAN_1,
+    )
+
+    with pytest.raises(ValidationError) as error:
+        save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
+
+    assert error_details(error.value) == [
+        ErrorDetail(
+            "The tax level of the sales item must be the same as the tax level of the price component.",
+            code=error_codes.PRICE_COMPONENT_SALES_ITEM_TAX_LEVEL_MISMATCH,
+        ),
+    ]
+    assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
+
+
+def test_save_price_component_changes__paid_online_needs_sales_item():
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        pricing_group=pricing_group,
+        begins=JAN_1,
+        reservation_unit__name="Sali",
+        reservation_unit__payment_type=PaymentType.ONLINE,
+    )
+    new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=JAN_1)
+
+    with pytest.raises(ValidationError) as error:
+        save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
+
+    assert error_details(error.value) == [
+        ErrorDetail(
+            "Paid prices need a sales item, because these reservation units are paid online: Sali. "
+            "Price components: new from 2026-01-01.",
+            code=error_codes.PRICE_COMPONENT_SALES_ITEM_MISSING,
+        ),
+    ]
+    assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
+
+
+def test_save_price_component_changes__paid_on_site_needs_no_sales_item():
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        pricing_group=pricing_group,
+        begins=JAN_1,
+        reservation_unit__payment_type=PaymentType.ON_SITE,
+    )
+    new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=JAN_1)
+
+    save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
+
+    component = PriceComponent.objects.get(pricing_group=pricing_group)
+    assert component.sales_item is None
 
 
 # ── Application rounds ──
