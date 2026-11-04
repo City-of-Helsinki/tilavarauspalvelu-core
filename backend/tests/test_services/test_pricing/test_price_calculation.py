@@ -38,9 +38,13 @@ MAR_2 = datetime.date(2026, 3, 2)
 # ── Helpers ──
 
 
-def create_pricing_group_row(*, unit_group: UnitGroup | None = None) -> ReservationUnitPricingGroup:
+def create_pricing_group_row(
+    *,
+    unit_group: UnitGroup | None = None,
+    payment_type: PaymentType | None = PaymentType.ONLINE,
+) -> ReservationUnitPricingGroup:
     """A reservation unit that uses a new pricing group from January 1st onward."""
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(payment_type=payment_type)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     return ReservationUnitPricingGroupFactory.create(
         reservation_unit=reservation_unit,
@@ -53,7 +57,7 @@ def create_pricing_group_row(*, unit_group: UnitGroup | None = None) -> Reservat
 
 
 def test_calculate_price__hourly_price():
-    row = create_pricing_group_row()
+    row = create_pricing_group_row(payment_type=PaymentType.ON_SITE)
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
     component = PriceComponentFactory.create(
@@ -61,7 +65,6 @@ def test_calculate_price__hourly_price():
         valid_from=JAN_1,
         amount=Decimal(10),
         price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ON_SITE,
     )
 
     result = calculate_price(
@@ -270,14 +273,12 @@ def test_calculate_price__reservation_over_the_date_of_a_price_change():
         valid_until=MAR_2,
         amount=Decimal(10),
         price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
     )
     new = PriceComponentFactory.create(
         pricing_group=pricing_group,
         valid_from=MAR_2,
         amount=Decimal(20),
         price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
         can_apply_for_discount=True,
     )
 
@@ -295,7 +296,7 @@ def test_calculate_price__reservation_over_the_date_of_a_price_change():
     assert result.can_apply_for_discount is True
 
 
-def test_calculate_price__payment_type_from_paid_date_after_free_date():
+def test_calculate_price__payment_type_of_reservation_unit_when_a_part_is_paid():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
@@ -310,7 +311,6 @@ def test_calculate_price__payment_type_from_paid_date_after_free_date():
         valid_from=MAR_2,
         amount=Decimal(20),
         price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
     )
 
     result = calculate_price(

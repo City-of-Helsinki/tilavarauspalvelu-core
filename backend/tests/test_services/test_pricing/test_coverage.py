@@ -5,7 +5,6 @@ from decimal import Decimal
 
 import pytest
 
-from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.services.pricing.coverage import CoverageError, check_pricing_group_coverage
 from tilavarauspalvelu.typing import error_codes
 
@@ -92,14 +91,12 @@ def test_coverage__free_and_paid_components_on_the_same_date():
             pricing_group=pricing_group,
             price_option=adults,
             valid_from=JAN_1,
-            payment_type=PaymentType.ONLINE,
         ),
         PriceComponentFactory.build(
             pricing_group=pricing_group,
             price_option=juniors,
             valid_from=JAN_1,
             amount=Decimal(0),
-            payment_type=None,
         ),
     ]
 
@@ -220,44 +217,6 @@ def test_coverage__component_for_all_options_overlaps_an_option():
                 "Price components: new from 2026-01-01, new from 2026-01-01."
             ),
             components=[for_adults, for_all],
-            begin=JAN_1,
-            end=None,
-        ),
-    ]
-
-
-# ── Payment type ──
-
-
-def test_coverage__paid_components_with_different_payment_types():
-    unit_group = UnitGroupFactory.create()
-    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
-    adults = PriceOptionFactory.create(unit_group=unit_group)
-    juniors = PriceOptionFactory.create(unit_group=unit_group)
-
-    online = PriceComponentFactory.build(
-        pricing_group=pricing_group,
-        price_option=adults,
-        valid_from=JAN_1,
-        payment_type=PaymentType.ONLINE,
-    )
-    on_site = PriceComponentFactory.build(
-        pricing_group=pricing_group,
-        price_option=juniors,
-        valid_from=JAN_1,
-        payment_type=PaymentType.ON_SITE,
-    )
-
-    errors = check_pricing_group_coverage(components=[online, on_site], reservation_unit_begin_dates=[])
-
-    assert errors == [
-        CoverageError(
-            code=error_codes.PRICING_GROUP_PAYMENT_TYPE_CONFLICT,
-            message=(
-                "All paid prices must have the same payment type from 2026-01-01 onward. "
-                "Price components: new from 2026-01-01, new from 2026-01-01."
-            ),
-            components=[online, on_site],
             begin=JAN_1,
             end=None,
         ),

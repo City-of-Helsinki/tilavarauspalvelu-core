@@ -277,16 +277,6 @@ def test_save_price_component_changes__component_of_another_group():
             error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE,
         ),
         (
-            {"payment_type": None},
-            "Payment type is required for a paid component and not allowed for a free one.",
-            error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID,
-        ),
-        (
-            {"amount": Decimal(0)},
-            "Payment type is required for a paid component and not allowed for a free one.",
-            error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID,
-        ),
-        (
             {"valid_until": JAN_1},
             "Valid from must be before valid until.",
             error_codes.PRICE_COMPONENT_VALID_UNTIL_NOT_AFTER_VALID_FROM,
