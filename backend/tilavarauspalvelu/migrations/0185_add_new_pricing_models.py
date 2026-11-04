@@ -3,6 +3,7 @@
 import django.db.models.deletion
 import django_nh3.models
 import tilavarauspalvelu.enums
+import tilavarauspalvelu.typing
 import utils.fields.model
 from django.db import migrations, models
 
@@ -14,6 +15,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='reservationunit',
+            name='payment_type',
+            field=utils.fields.model.TextChoicesField(blank=True, choices=[('ON_SITE', 'On site'), ('ONLINE', 'Online'), ('ONLINE_OR_INVOICE', 'Online or invoice')], enum=tilavarauspalvelu.enums.PaymentType, max_length=17, null=True),
+        ),
         migrations.CreateModel(
             name='PriceOption',
             fields=[
@@ -69,10 +75,9 @@ class Migration(migrations.Migration):
                 ('material_price_description_fi', django_nh3.models.Nh3CharField(blank=True, default='', max_length=1000, null=True)),
                 ('material_price_description_en', django_nh3.models.Nh3CharField(blank=True, default='', max_length=1000, null=True)),
                 ('material_price_description_sv', django_nh3.models.Nh3CharField(blank=True, default='', max_length=1000, null=True)),
-                ('payment_type', utils.fields.model.TextChoicesField(blank=True, choices=[('ON_SITE', 'On site'), ('ONLINE', 'Online'), ('ONLINE_OR_INVOICE', 'Online or invoice')], enum=tilavarauspalvelu.enums.PaymentType, max_length=17, null=True)),
+                ('tax_level', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='price_components', to='tilavarauspalvelu.taxlevel')),
                 ('price_option', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='price_components', to='tilavarauspalvelu.priceoption')),
                 ('pricing_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='components', to='tilavarauspalvelu.pricinggroup')),
-                ('tax_level', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='price_components', to='tilavarauspalvelu.taxlevel')),
             ],
             options={
                 'verbose_name': 'price component',
@@ -80,7 +85,7 @@ class Migration(migrations.Migration):
                 'db_table': 'price_component',
                 'ordering': ['pricing_group', 'valid_from', 'pk'],
                 'base_manager_name': 'objects',
-                'constraints': [models.CheckConstraint(condition=models.Q(('amount__gte', 0)), name='price_component_amount_not_negative', violation_error_code='PRICE_COMPONENT_AMOUNT_NEGATIVE', violation_error_message='Amount cannot be negative.'), models.CheckConstraint(condition=models.Q(models.Q(('amount__gt', 0), ('payment_type__isnull', False)), models.Q(('amount', 0), ('payment_type__isnull', True)), _connector='OR'), name='price_component_payment_type_only_when_paid', violation_error_code='PRICE_COMPONENT_PAYMENT_TYPE_INVALID', violation_error_message='Payment type is required for a paid component and not allowed for a free one.'), models.CheckConstraint(condition=models.Q(('valid_until__isnull', True), ('valid_from__lt', models.F('valid_until')), _connector='OR'), name='price_component_valid_from_before_valid_until', violation_error_code='PRICE_COMPONENT_VALID_UNTIL_NOT_AFTER_VALID_FROM', violation_error_message='Valid from must be before valid until.')],
+                'constraints': [models.CheckConstraint(condition=models.Q(('amount__gte', 0)), name='price_component_amount_not_negative', violation_error_code=tilavarauspalvelu.typing.error_codes['PRICE_COMPONENT_AMOUNT_NEGATIVE'], violation_error_message='Amount cannot be negative.'), models.CheckConstraint(condition=models.Q(('valid_until__isnull', True), ('valid_from__lt', models.F('valid_until')), _connector='OR'), name='price_component_valid_from_before_valid_until', violation_error_code=tilavarauspalvelu.typing.error_codes['PRICE_COMPONENT_VALID_UNTIL_NOT_AFTER_VALID_FROM'], violation_error_message='Valid from must be before valid until.')],
             },
         ),
         migrations.CreateModel(

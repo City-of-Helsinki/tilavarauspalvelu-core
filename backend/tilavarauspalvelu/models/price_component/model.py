@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
-from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
+from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from tilavarauspalvelu.typing import error_codes
 from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
@@ -65,8 +65,6 @@ class PriceComponent(models.Model):
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
-    payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
-
     tax_level: TaxLevel = models.ForeignKey(
         "tilavarauspalvelu.TaxLevel",
         related_name="price_components",
@@ -94,14 +92,6 @@ class PriceComponent(models.Model):
                 condition=models.Q(amount__gte=0),
                 violation_error_message="Amount cannot be negative.",
                 violation_error_code=error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE,
-            ),
-            models.CheckConstraint(
-                name="price_component_payment_type_only_when_paid",
-                condition=(
-                    models.Q(amount__gt=0, payment_type__isnull=False) | models.Q(amount=0, payment_type__isnull=True)
-                ),
-                violation_error_message="Payment type is required for a paid component and not allowed for a free one.",
-                violation_error_code=error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID,
             ),
             models.CheckConstraint(
                 name="price_component_valid_from_before_valid_until",

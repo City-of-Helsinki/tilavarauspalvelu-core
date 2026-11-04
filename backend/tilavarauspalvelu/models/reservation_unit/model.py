@@ -17,6 +17,7 @@ from lookup_property import L, lookup_property
 from tilavarauspalvelu.enums import (
     AccessType,
     AuthenticationType,
+    PaymentType,
     ReservationFormType,
     ReservationKind,
     ReservationStartInterval,
@@ -187,6 +188,8 @@ class ReservationUnit(models.Model):
         default=ReservationFormType.CONTACT_INFO_FORM,
         db_index=True,
     )
+    # The payment type is separate from the pricing, because prices and payment types change independently.
+    payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
 
     # List fields
 
