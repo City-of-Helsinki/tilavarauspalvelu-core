@@ -2,15 +2,26 @@ import type { NextRequest } from "next/server";
 import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
 import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 
+// The regexes below work on a path with or without a query string and with any base path.
+// Only the part before the query string can match.
+const FILE_EXTENSIONS = "webmanifest|js|css|png|jpe?g|svg|gif|ico|json|woff2?|ttf|eot|otf|pdf|txt";
+
+/// Matches the paths of requests that are not pages: Next.js files, API routes and public files.
+/// The proxy skips these requests. The Sentry server configs drop the proxy transactions for them.
+export const NON_PAGE_PATH = new RegExp(`^[^?]*(/(_next|api)/|\\.(${FILE_EXTENSIONS})(\\?|$))`);
+
+/// Matches the paths of public files, such as /favicon.svg. Paths under /_next/ do not match.
+/// The Sentry server configs drop the transactions for these files.
+/// NOTE Do not include /_next/ here. Requests to /_next/data/ run getServerSideProps on client navigation.
+export const PUBLIC_FILE_PATH = new RegExp(`^(?![^?]*/_next/)[^?]*\\.(${FILE_EXTENSIONS})(\\?|$)`);
+
 /// Check if the request is a page request
 /// @param url - URL
 export function isPageRequest(url: URL, basePath = ""): boolean {
   if (
     // ignore healthcheck because it's for automated test suite that can't do redirects
     url.pathname.startsWith(`${basePath}/healthcheck`) ||
-    url.pathname.startsWith(`${basePath}/api/healthcheck`) ||
-    url.pathname.startsWith(`${basePath}/_next`) ||
-    /\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/.test(url.pathname) ||
+    NON_PAGE_PATH.test(url.pathname) ||
     url.pathname.startsWith(`${basePath}/503`) ||
     url.pathname.startsWith(`${basePath}/en/503`) ||
     url.pathname.startsWith(`${basePath}/sv/503`)
