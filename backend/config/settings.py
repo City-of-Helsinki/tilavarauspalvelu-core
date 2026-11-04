@@ -617,7 +617,8 @@ class Common(Environment):
     ROBOT_TEST_DATA_TOKEN = values.StringValue()
     ROBOT_TEST_DATA_CREATION_RATE_LIMIT_SECONDS = values.IntegerValue(default=60)
     ROBOT_TEST_DATA_RATE_LIMIT_KEY = "robot-test-data-create-view-rate-limit"
-    ROBOT_TEST_DATA_LOCK_KEY = "robot-test-data-create-view-lock"
+    # Id of the Postgres advisory lock. Must differ from the ids of other advisory locks in the project.
+    ROBOT_TEST_DATA_LOCK_ID = 1001
     ROBOT_TEST_DATA_USER_PASSWORD = values.StringValue(default="robot-test-password")
     # Emails to these addresses will be cached, so that robot tests can verify the email contents.
     ROBOT_EMAIL_ADDRESSES = values.ListValue(default=[])

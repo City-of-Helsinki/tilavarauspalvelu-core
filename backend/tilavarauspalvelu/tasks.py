@@ -38,6 +38,7 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.typing import CeleryAutoCreateTaskSchedule
 from utils.date_utils import local_datetime
+from utils.db import advisory_transaction_lock
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -649,11 +650,9 @@ def create_robot_test_data_task() -> None:
     Creates test data for robotframework tests.
     This is a task due to the amount of data created and time it takes when run on the test server.
     """
-    try:
-        # 'finally' releases the lock at the soft time limit. At the hard time limit the worker kills the task
-        # and 'finally' does not run. The timeout makes sure that the lock does not stay after that.
-        cache.set(key=settings.ROBOT_TEST_DATA_LOCK_KEY, value=True, timeout=settings.CELERY_TASK_TIME_LIMIT)
+    with advisory_transaction_lock(settings.ROBOT_TEST_DATA_LOCK_ID) as lock_taken:
+        if not lock_taken:
+            SentryLogger.log_message(message="Robot test data creation skipped since another run is in progress.")
+            return
 
         create_robot_test_data()
-    finally:
-        cache.delete(settings.ROBOT_TEST_DATA_LOCK_KEY)
