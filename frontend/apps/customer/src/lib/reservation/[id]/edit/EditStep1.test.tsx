@@ -180,4 +180,50 @@ describe("EditStep1", () => {
     await waitFor(() => expect(mockedDisplayError).toHaveBeenCalled());
     expect(mockedRouterPush).not.toHaveBeenCalled();
   });
+
+  it("stays on the step when the mutation fails with another error", async () => {
+    const onBack = vi.fn();
+    const mocks = [
+      createAdjustReservationTimeMock({
+        errors: [new GraphQLError("Boom", { extensions: { code: "GENERIC_ERROR" } })],
+      }),
+    ];
+    customRender({ mocks, onBack });
+
+    await acceptAllTerms();
+    await userEvent.click(screen.getByTestId("reservation__button--continue"));
+
+    await waitFor(() => expect(mockedDisplayError).toHaveBeenCalled());
+    expect(onBack).not.toHaveBeenCalled();
+  });
+
+  it("goes back to the calendar when the new time overlaps another reservation", async () => {
+    const onBack = vi.fn();
+    const mocks = [
+      createAdjustReservationTimeMock({
+        errors: [
+          new GraphQLError("Mutation was unsuccessful.", {
+            extensions: {
+              code: "MUTATION_VALIDATION_ERROR",
+              errors: [
+                {
+                  field: "nonFieldErrors",
+                  message: "Reservation overlaps with existing reservations.",
+                  code: "OVERLAPPING_RESERVATIONS",
+                },
+              ],
+            },
+          }),
+        ],
+      }),
+    ];
+    customRender({ mocks, onBack });
+
+    await acceptAllTerms();
+    await userEvent.click(screen.getByTestId("reservation__button--continue"));
+
+    await waitFor(() => expect(onBack).toHaveBeenCalledTimes(1));
+    expect(mockedDisplayError).toHaveBeenCalled();
+    expect(mockedRouterPush).not.toHaveBeenCalled();
+  });
 });
