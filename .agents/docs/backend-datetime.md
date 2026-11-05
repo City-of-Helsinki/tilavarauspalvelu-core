@@ -81,6 +81,9 @@ It does not use the real time between them.
 - A plain `+` on a local datetime can give a time in the gap. `local_add_days()` and `add_elapsed_time()` do not.
 - A time in the autumn hour is ambiguous. Python uses `fold=0` (the first one) by default, and gives no warning.
   Set `fold` when the code means the second one.
+- A `+` or `-` with a `timedelta` sets `fold=0` on the result, also for `timedelta(0)`.
+  A value in the second autumn hour then moves to the first one, one hour earlier.
+  Do the math in UTC, or skip it when there is nothing to add.
 - Comparisons in the autumn hour are wrong:
   - On two values in the same zone, `==` and `<` ignore `fold`. Two different moments compare equal.
   - On two values in different zones, `==` is `False`, even when they are the same moment.
