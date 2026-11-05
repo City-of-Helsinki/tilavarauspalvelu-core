@@ -9,12 +9,13 @@ and from the 2 or 3 hour difference between UTC and local time:
 
 - In spring, local time jumps from 03:00 to 04:00. The day has 23 hours, and 03:00 to 03:59 does not exist.
 - In autumn, local time goes back from 04:00 to 03:00. The day has 25 hours, and 03:00 to 03:59 occurs twice.
-- A UTC datetime between 21:00 and 23:59 is on the next local date.
+- The next local date starts at 21:00 UTC in summer and at 22:00 UTC in winter.
 
 ## Helpers
 
 `backend/utils/date_utils.py` has the correct way to do each of these. Use the helper, not a hand-written version.
-The helpers that take a datetime raise `NaiveDatetimeError` for a naive one.
+These helpers raise `NaiveDatetimeError` for a naive datetime: `local_date_of()`, `local_add_days()`, `add_elapsed_time()`,
+and `local_start_of_day()`, `local_next_start_of_day()` and `local_end_of_day()` when they get a datetime.
 
 | Need                                                  | Helper                                                                    |
 |-------------------------------------------------------|---------------------------------------------------------------------------|
@@ -106,7 +107,7 @@ It does not use the real time between them.
 
 - Read the time zone of each external API from its docs. Do not assume UTC or local time.
   Parse with `from_iso_format()` or `parse_naive_datetime()` and the zone of the API.
-  `from_iso_format()` keeps the offset when the input has one.
+  `from_iso_format()` keeps the moment when the input has an offset, and converts it to the zone you give.
 - Show users local time. Convert with `local_datetime_string()` or `local_iso_format()`.
 - A range that ends at the next midnight is shown as `24:00`, not `00:00`.
 
