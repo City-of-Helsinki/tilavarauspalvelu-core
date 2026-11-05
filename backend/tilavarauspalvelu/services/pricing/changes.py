@@ -7,7 +7,6 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from tilavarauspalvelu.models import PriceComponent, PricingGroup
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import local_date
 
 from .coverage import check_pricing_group_coverage
 
@@ -112,10 +111,7 @@ def _validate_new_component(
     has_saved_components: bool,
     pricing_group: PricingGroup,
 ) -> None:
-    today = local_date()
-    if has_saved_components and component.valid_from <= today:
-        msg = f"New price component must begin after today, not on {component.valid_from.isoformat()}."
-        raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_FROM_NOT_IN_FUTURE)
+    component.validators.validate_new_begins_in_future(has_saved_components=has_saved_components)
 
     component.pricing_group = pricing_group
     component.validators.validate_amount_not_negative()

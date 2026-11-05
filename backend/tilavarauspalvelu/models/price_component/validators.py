@@ -53,6 +53,16 @@ class PriceComponentValidator:
             msg = "Price option is not active."
             raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_OPTION_INACTIVE)
 
+    def validate_new_begins_in_future(self, *, has_saved_components: bool) -> None:
+        # The first prices of a new pricing group can begin in the past.
+        if not has_saved_components:
+            return
+
+        valid_from = self.price_component.valid_from
+        if valid_from <= local_date():
+            msg = f"New price component must begin after today, not on {valid_from.isoformat()}."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_FROM_NOT_IN_FUTURE)
+
     def validate_change(self, changed_component: PriceComponent) -> None:
         today = local_date()
         saved_component = self.price_component

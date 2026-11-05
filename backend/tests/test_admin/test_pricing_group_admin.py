@@ -1,16 +1,26 @@
 from __future__ import annotations
 
+import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
 from tilavarauspalvelu.typing import error_codes
 
-from tests.factories import PriceOptionFactory, ReservationUnitFactory, TaxLevelFactory, UnitGroupFactory, UserFactory
+from tests.factories import (
+    PriceComponentFactory,
+    PriceOptionFactory,
+    PricingGroupFactory,
+    ReservationUnitFactory,
+    TaxLevelFactory,
+    UnitGroupFactory,
+    UserFactory,
+)
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
 
 if TYPE_CHECKING:
@@ -44,6 +54,21 @@ def component_form_data(
         f"components-{index}-material_price_description_en": "",
         f"components-{index}-material_price_description_sv": "",
     }
+
+
+def saved_component_form_data(index: int, component: PriceComponent, **overrides: str) -> dict[str, Any]:
+    data = {
+        **component_form_data(
+            index,
+            valid_from=component.valid_from.isoformat(),
+            valid_until=component.valid_until.isoformat() if component.valid_until else "",
+            tax_level=component.tax_level,
+        ),
+        f"components-{index}-id": component.pk,
+        f"components-{index}-pricing_group": component.pricing_group.pk,
+    }
+    data.update({f"components-{index}-{key}": value for key, value in overrides.items()})
+    return data
 
 
 def group_form_data() -> dict[str, Any]:
@@ -223,3 +248,115 @@ def test_pricing_group_admin__invalid_reservation_unit_row_on_add_shows_errors(a
 
     assert response.status_code == 200
     assert not PricingGroup.objects.exists()
+
+
+# ── Edit rules ──
+
+
+@freeze_time("2026-02-15T12:00:00+02:00")
+def test_pricing_group_admin__active_component_amount_change_is_rejected(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    pricing_group = PricingGroupFactory.create(name_fi="Hinnasto")
+    component = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1))
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_change", args=[pricing_group.pk])
+    data = {
+        **group_form_data(),
+        **saved_component_form_data(0, component, amount="20.00"),
+        **management_form_data("components", total_forms=1, initial_forms=1),
+        **management_form_data("reservation_unit_pricing_groups", total_forms=0),
+    }
+
+    errors: list[dict[str, Any]] = []
+    with collect_admin_form_errors(errors):
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 200
+    assert errors == [
+        {
+            "code": error_codes.PRICE_COMPONENT_ACTIVE_CHANGED,
+            "message": f"Price component {component.pk} is active. Only its end date can be changed.",
+        },
+    ]
+    component.refresh_from_db()
+    assert component.amount == Decimal(10)
+
+
+@freeze_time("2026-02-15T12:00:00+02:00")
+def test_pricing_group_admin__active_component_delete_is_rejected(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    pricing_group = PricingGroupFactory.create(name_fi="Hinnasto")
+    component = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1))
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_change", args=[pricing_group.pk])
+    data = {
+        **group_form_data(),
+        **saved_component_form_data(0, component, DELETE="on"),
+        **management_form_data("components", total_forms=1, initial_forms=1),
+        **management_form_data("reservation_unit_pricing_groups", total_forms=0),
+    }
+
+    errors: list[dict[str, Any]] = []
+    with collect_admin_form_errors(errors):
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 200
+    assert errors == [
+        {
+            "code": error_codes.PRICE_COMPONENT_ACTIVE_DELETED,
+            "message": f"Price component {component.pk} is active and cannot be deleted.",
+        },
+    ]
+    assert PriceComponent.objects.filter(pk=component.pk).exists()
+
+
+@freeze_time("2026-02-15T12:00:00+02:00")
+def test_pricing_group_admin__new_component_from_today_is_rejected(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    pricing_group = PricingGroupFactory.create(name_fi="Hinnasto")
+    component = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1))
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_change", args=[pricing_group.pk])
+    data = {
+        **group_form_data(),
+        **saved_component_form_data(0, component, valid_until="2026-02-16"),
+        **component_form_data(1, valid_from="2026-02-15"),
+        **management_form_data("components", total_forms=2, initial_forms=1),
+        **management_form_data("reservation_unit_pricing_groups", total_forms=0),
+    }
+
+    errors: list[dict[str, Any]] = []
+    with collect_admin_form_errors(errors):
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 200
+    assert errors == [
+        {
+            "code": error_codes.PRICE_COMPONENT_VALID_FROM_NOT_IN_FUTURE,
+            "message": "New price component must begin after today, not on 2026-02-15.",
+        },
+    ]
+    assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
+
+
+@freeze_time("2026-02-15T12:00:00+02:00")
+def test_pricing_group_admin__price_change_from_future_date_is_saved(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    pricing_group = PricingGroupFactory.create(name_fi="Hinnasto")
+    component = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1))
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_change", args=[pricing_group.pk])
+    data = {
+        **group_form_data(),
+        **saved_component_form_data(0, component, valid_until="2026-03-01"),
+        **component_form_data(1, valid_from="2026-03-01"),
+        **management_form_data("components", total_forms=2, initial_forms=1),
+        **management_form_data("reservation_unit_pricing_groups", total_forms=0),
+    }
+    response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 302, response.content
+
+    component.refresh_from_db()
+    assert component.valid_until == datetime.date(2026, 3, 1)
+    assert PriceComponent.objects.filter(pricing_group=pricing_group, valid_from="2026-03-01").exists()
