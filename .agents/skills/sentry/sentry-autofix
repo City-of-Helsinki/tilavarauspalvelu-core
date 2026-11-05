@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+# Drive a Seer autofix run of a Sentry issue through the Sentry REST API.
+# This does the same as the buttons in the Seer panel of the Sentry web UI.
+# The pr command opens a pull request on GitHub. Run it only when the user asks for it.
+# The token is read from 1Password.
+#
+# Usage: sentry-autofix <command> <issue ID or URL> [arguments]
+#
+# Commands:
+#   state <issue>                      Show the current run.
+#   wait <issue>                       Poll until the run and its pull requests stop processing.
+#   start <issue>                      Start a new run. It stops after the root cause.
+#   plan <issue> ['<instruction>']     Accept the root cause and make a plan ("Yes, make a plan").
+#   code <issue> ['<instruction>']     Accept the plan and write the code changes.
+#   pr <issue>                         Open a pull request with the code changes.
+#   rethink <issue> <step> '<reason>'  Redo a step with feedback. <step> is root_cause or solution.
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  sed -n '/^# Usage:/,/^set -euo/p' "$0" | sed '$d; s/^# \{0,1\}//' >&2
+  exit 2
+}
+[[ $# -ge 2 ]] || usage
+
+command="$1"
+parse_issue "$2" || usage
+
+case "$command" in
+  state | wait | start | pr)
+    [[ $# -eq 2 ]] || usage
+    ;;
+  plan | code)
+    [[ $# -eq 2 || $# -eq 3 ]] || usage
+    instruction="${3:-}"
+    ;;
+  rethink)
+    [[ $# -eq 4 ]] || usage
+    step="$3"
+    reason="$4"
+    if [[ "$step" != "root_cause" && "$step" != "solution" ]]; then
+      echo "Can only rethink root_cause or solution, not: $step" >&2
+      usage
+    fi
+    if [[ -z "${reason// /}" ]]; then
+      echo "Give a reason for the rethink." >&2
+      usage
+    fi
+    ;;
+  *)
+    echo "Unknown command: $command" >&2
+    usage
+    ;;
+esac
+
+load_token
+
+autofix_path="issues/$issue_id/autofix/"
+
+api_get() {
+  api "$autofix_path?mode=explorer"
+}
+
+api_post() {
+  api "$autofix_path?mode=explorer" --header "Content-Type: application/json" --data "$1"
+}
+
+# Print the run in a short form. Sections are the steps in the Seer panel.
+# A block without a step belongs to the step before it, as in the web UI.
+# The index of a section is the block where the step starts. Rethink restarts from it.
+# Artifacts are the results of a step, such as the root cause or the plan.
+# File patches are the code changes, with the last patch of each file.
+show_state() {
+  jq '.autofix as $run | if $run == null then {run: null} else {
+    issue_id: "'"$issue_id"'",
+    run_id: ($run.sentry_run_id // $run.run_id),
+    status: $run.status,
+    failure_reason: $run.failure_reason,
+    updated_at: $run.updated_at,
+    pending_user_input: $run.pending_user_input,
+    sections: (
+      reduce ($run.blocks | to_entries[]) as $entry ({current: null, sections: []};
+        ($entry.value.message.metadata.step // .current
+          | if . == "pr_iteration" then "code_changes" else . end) as $step
+        | .current = $step
+        | if any(.sections[]; .step == $step) then . else .sections += [{step: $step, index: $entry.key, blocks: []}] end
+        | .sections |= map(if .step == $step then .blocks += [$entry.value] else . end)
+      ) | .sections | map({
+        step,
+        index,
+        artifacts: [.blocks[] | (.artifacts // [])[], ((.tool_results // [])[] | (.structuredContent.artifacts // [])[]?)
+          | {key, reason, data}],
+        file_patches: ([.blocks[] | (.merged_file_patches // [])[]]
+          | group_by("\(.repo_name):\(.patch.path)") | map(last | {repo: .repo_name, path: .patch.path, type: .patch.type, diff}))
+      })
+    ),
+    pull_requests: [($run.repo_pr_states // {}) | to_entries[] | {repo: .key, url: .value.pr_url, status: .value.pr_creation_status, error: .value.pr_creation_error, error_code: .value.pr_creation_error_code, branch: .value.branch_name, title: .value.title}]
+  } end'
+}
+
+get_state() {
+  api_get | show_state
+}
+
+# The run ID that a step continues. The API prefers the UUID over the old integer ID.
+run_id_data() {
+  local state="$1"
+  jq -e '.run_id | if type == "string" then {sentry_run_id: .} elif type == "number" then {run_id: .} else error("No run for this issue. Use start first.") end' \
+    <<<"$state"
+}
+
+start_step() {
+  local step="$1" extra="${2:-}" state data
+  [[ -n "$extra" ]] || extra='{}'
+  state="$(get_state)"
+  if [[ "$(jq -r '.status' <<<"$state")" == "processing" ]]; then
+    echo "A step is still processing. Use wait first." >&2
+    exit 1
+  fi
+  data="$(jq -n --arg step "$step" --argjson run "$(run_id_data "$state")" --argjson extra "$extra" \
+    '{step: $step} + $run + $extra')"
+  api_post "$data"
+  echo
+}
+
+case "$command" in
+  state)
+    get_state
+    ;;
+  wait)
+    # Stay under the 10 minute limit of an agent shell command.
+    deadline=$((SECONDS + 540))
+    while :; do
+      state="$(get_state)"
+      # A pull request is created after the step is completed, so wait for that too.
+      if [[ "$(jq '.status == "processing" or any(.pull_requests[]?; .status == "creating")' <<<"$state")" == "false" ]]; then
+        printf '%s\n' "$state"
+        break
+      fi
+      if ((SECONDS >= deadline)); then
+        echo "The run is still processing after 9 minutes. Use wait again." >&2
+        printf '%s\n' "$state"
+        exit 1
+      fi
+      sleep 10
+    done
+    ;;
+  start)
+    if [[ "$(get_state | jq -r '.run_id')" != "null" ]]; then
+      echo "The issue already has a run. Use state to read it." >&2
+      exit 1
+    fi
+    # No stopping point, so the run stops after the root cause.
+    api_post '{"step": "root_cause"}'
+    echo
+    ;;
+  plan | code)
+    step="solution"
+    [[ "$command" == "code" ]] && step="code_changes"
+    extra='{}'
+    if [[ -n "${instruction// /}" ]]; then
+      extra="$(jq -n --arg instruction "$instruction" '{user_context: $instruction}')"
+    fi
+    start_step "$step" "$extra"
+    ;;
+  pr)
+    if [[ "$(get_state | jq '[.sections[] | select(.step == "code_changes")] | length')" == "0" ]]; then
+      echo "The run has no code changes. Use code first." >&2
+      exit 1
+    fi
+    start_step open_pr
+    ;;
+  rethink)
+    state="$(get_state)"
+    index="$(jq -e --arg step "$step" '.sections[] | select(.step == $step) | .index' <<<"$state")" || {
+      echo "The run has no $step step to rethink." >&2
+      exit 1
+    }
+    start_step "$step" "$(jq -n --arg reason "$reason" --argjson index "$index" \
+      '{user_context: $reason, insert_index: $index}')"
+    ;;
+esac
