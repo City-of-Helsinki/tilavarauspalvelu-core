@@ -205,3 +205,21 @@ def test_pricing_group_admin__inactive_option_is_rejected(api_client):
         },
     ]
     assert not PricingGroup.objects.exists()
+
+
+def test_pricing_group_admin__invalid_reservation_unit_row_on_add_shows_errors(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_add")
+    data = {
+        **group_form_data(),
+        **component_form_data(0, valid_from="2026-01-01"),
+        "reservation_unit_pricing_groups-0-reservation_unit": "",
+        "reservation_unit_pricing_groups-0-begins": "2026-01-01",
+        **management_form_data("components", total_forms=1),
+        **management_form_data("reservation_unit_pricing_groups", total_forms=1),
+    }
+    response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 200
+    assert not PricingGroup.objects.exists()
