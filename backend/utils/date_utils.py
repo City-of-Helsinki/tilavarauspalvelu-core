@@ -43,7 +43,6 @@ __all__ = [
     "time_as_timedelta",
     "time_difference",
     "timedelta_as_time",
-    "timedelta_from_json",
     "timedelta_to_json",
     "utc_date",
     "utc_datetime",
@@ -399,15 +398,6 @@ def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes",
     if timespec == "minutes":
         return f"{sign}{hours:02}:{minutes:02}"
     return f"{sign}{hours:02}:{minutes:02}:{seconds:02}"
-
-
-def timedelta_from_json(delta: str) -> datetime.timedelta:
-    try:
-        time_ = datetime.datetime.strptime(delta, "%H:%M:%S")  # noqa: DTZ007
-    except ValueError:
-        time_ = datetime.datetime.strptime(delta, "%H:%M")  # noqa: DTZ007
-
-    return datetime.timedelta(hours=time_.hour, minutes=time_.minute, seconds=time_.second)
 
 
 def time_as_timedelta(_input: datetime.datetime | datetime.time, /) -> datetime.timedelta:
