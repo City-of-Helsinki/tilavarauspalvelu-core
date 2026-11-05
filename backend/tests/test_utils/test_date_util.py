@@ -12,9 +12,11 @@ from utils.date_utils import (
     DEFAULT_TIMEZONE,
     AwareTimeError,
     NaiveDatetimeError,
+    add_elapsed_time,
     datetime_difference,
     datetime_range_as_string,
     get_periods_between,
+    local_add_days,
     local_combine,
     local_date,
     local_date_of,
@@ -23,6 +25,7 @@ from utils.date_utils import (
     local_next_start_of_day,
     local_time,
     localized_short_weekday,
+    next_hour,
     utc_date,
     utc_datetime,
     utc_datetime_max,
@@ -135,6 +138,53 @@ def test_date_utils__local_next_start_of_day():
 
 # The clocks move from 03:00 to 04:00 on 2026-03-29, and from 04:00 back to 03:00 on 2026-10-25.
 @pytest.mark.parametrize(
+    ("value", "days", "expected"),
+    [
+        (
+            datetime.datetime(2026, 3, 28, 10, 0, tzinfo=DEFAULT_TIMEZONE),
+            1,
+            datetime.datetime(2026, 3, 29, 7, 0, tzinfo=datetime.UTC),
+        ),
+        (
+            datetime.datetime(2026, 10, 24, 10, 0, tzinfo=DEFAULT_TIMEZONE),
+            7,
+            datetime.datetime(2026, 10, 31, 8, 0, tzinfo=datetime.UTC),
+        ),
+        (
+            datetime.datetime(2026, 3, 28, 3, 30, tzinfo=DEFAULT_TIMEZONE),
+            1,
+            datetime.datetime(2026, 3, 29, 1, 30, tzinfo=datetime.UTC),
+        ),
+        (
+            datetime.datetime(2026, 10, 24, 22, 0, tzinfo=datetime.UTC),
+            1,
+            datetime.datetime(2026, 10, 25, 23, 0, tzinfo=datetime.UTC),
+        ),
+    ],
+)
+def test_date_utils__local_add_days(value, days, expected):
+    result = local_add_days(value, days=days)
+
+    assert result.astimezone(datetime.UTC) == expected
+    assert result.tzinfo is DEFAULT_TIMEZONE
+
+
+def test_date_utils__local_add_days__spring_gap_wall_clock():
+    result = local_add_days(datetime.datetime(2026, 3, 28, 3, 30, tzinfo=DEFAULT_TIMEZONE), days=1)
+
+    assert result.date() == datetime.date(2026, 3, 29)
+    assert result.time() == datetime.time(4, 30)
+    assert local_datetime_exists(result) is True
+
+
+def test_date_utils__local_add_days__naive_datetime():
+    msg = "Cannot add calendar days to a naive datetime."
+    with pytest.raises(NaiveDatetimeError, match=exact(msg)):
+        local_add_days(datetime.datetime(2026, 1, 1, 12), days=1)  # noqa: DTZ001
+
+
+# The clocks move from 03:00 to 04:00 on 2026-03-29, and from 04:00 back to 03:00 on 2026-10-25.
+@pytest.mark.parametrize(
     ("value", "exists"),
     [
         (datetime.datetime(2026, 3, 29, 2, 30, tzinfo=DEFAULT_TIMEZONE), True),
@@ -181,6 +231,39 @@ def test_date_utils__datetime_difference__across_daylight_saving_time_change():
     difference = datetime_difference(start_datetime=start_datetime, end_datetime=end_datetime)
 
     assert difference == datetime.timedelta(hours=7)
+
+
+def test_date_utils__add_elapsed_time__across_daylight_saving_time_change():
+    value = datetime.datetime(2026, 3, 28, 22, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    result = add_elapsed_time(value, delta=datetime.timedelta(hours=8))
+
+    assert result.astimezone(datetime.UTC) == datetime.datetime(2026, 3, 29, 4, 0, tzinfo=datetime.UTC)
+    assert result.date() == datetime.date(2026, 3, 29)
+    assert result.time() == datetime.time(7, 0)
+
+
+def test_date_utils__add_elapsed_time__naive_datetime():
+    msg = "Cannot add elapsed time to a naive datetime."
+    with pytest.raises(NaiveDatetimeError, match=exact(msg)):
+        add_elapsed_time(datetime.datetime(2026, 1, 1, 12), delta=datetime.timedelta(hours=1))  # noqa: DTZ001
+
+
+@freezegun.freeze_time(datetime.datetime(2026, 3, 29, 0, 30, tzinfo=datetime.UTC))
+def test_date_utils__next_hour__across_daylight_saving_time_change():
+    result = next_hour(plus_hours=1)
+
+    assert result.astimezone(datetime.UTC) == datetime.datetime(2026, 3, 29, 2, 0, tzinfo=datetime.UTC)
+    assert result.date() == datetime.date(2026, 3, 29)
+    assert result.time() == datetime.time(5, 0)
+
+
+@freezegun.freeze_time(datetime.datetime(2026, 3, 28, 10, 30, tzinfo=datetime.UTC))
+def test_date_utils__next_hour__plus_days_keeps_wall_clock_time():
+    result = next_hour(plus_days=1)
+
+    assert result.date() == datetime.date(2026, 3, 29)
+    assert result.time() == datetime.time(13, 0)
 
 
 class Params(NamedTuple):

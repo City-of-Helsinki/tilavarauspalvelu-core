@@ -16,9 +16,11 @@ __all__ = [
     "DEFAULT_TIMEZONE",
     "AwareTimeError",
     "NaiveDatetimeError",
+    "add_elapsed_time",
     "get_date_range",
     "get_periods_between",
     "get_time_range",
+    "local_add_days",
     "local_combine",
     "local_date",
     "local_date_of",
@@ -53,7 +55,7 @@ __all__ = [
 
 
 # Python compares, adds and subtracts two datetimes in the same zone on the wall clock. This is wrong across
-# a daylight saving time change, so do these in UTC, e.g. with 'utc_datetime' or 'datetime_difference'.
+# a daylight saving time change, so do these in UTC, e.g. with 'add_elapsed_time' or 'datetime_difference'.
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
@@ -133,6 +135,23 @@ def local_combine(_date: datetime.date, _time: datetime.time, /) -> datetime.dat
         raise AwareTimeError(msg)
 
     return datetime.datetime.combine(_date, _time, tzinfo=DEFAULT_TIMEZONE)
+
+
+def local_add_days(_datetime: datetime.datetime, /, *, days: int) -> datetime.datetime:
+    """
+    Add calendar days in the local timezone. The wall clock time stays the same across a daylight saving time change.
+    A wall clock time in the spring gap moves forward by one hour.
+    """
+    if _datetime.tzinfo is None:
+        msg = "Cannot add calendar days to a naive datetime."
+        raise NaiveDatetimeError(msg)
+
+    local_value = _datetime.astimezone(DEFAULT_TIMEZONE)
+    moved = local_value + datetime.timedelta(days=days)
+
+    # The round trip through UTC gives a time in the spring gap the offset that is valid after the change.
+    moved_utc = moved.astimezone(datetime.UTC)
+    return moved_utc.astimezone(DEFAULT_TIMEZONE)
 
 
 def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
@@ -248,9 +267,11 @@ def next_hour(*, plus_minutes: int = 0, plus_hours: int = 0, plus_days: int = 0)
     >>> next_hour(plus_hours=-1)
     12:00
     """
-    now = local_datetime()
+    # The local timezone has whole hour offsets, so the start of an hour in UTC is also the start of a local hour.
+    now = utc_datetime()
     start_of_hour = now.replace(minute=0, second=0, microsecond=0)
-    return start_of_hour + datetime.timedelta(hours=1 + plus_hours, minutes=plus_minutes, days=plus_days)
+    moved = start_of_hour + datetime.timedelta(hours=1 + plus_hours, minutes=plus_minutes)
+    return local_add_days(moved, days=plus_days)
 
 
 # UTC TIME #############################################################################################
@@ -320,6 +341,19 @@ def utc_iso_format(_datetime: datetime.datetime, /) -> str:
 
 
 # COMMON UTILS #########################################################################################
+
+
+def add_elapsed_time(_datetime: datetime.datetime, /, *, delta: datetime.timedelta) -> datetime.datetime:
+    """
+    Add real elapsed time, and keep the timezone of the given datetime.
+    A plain '+' on a datetime in the local timezone adds on the wall clock. This is wrong across a DST change.
+    """
+    if _datetime.tzinfo is None:
+        msg = "Cannot add elapsed time to a naive datetime."
+        raise NaiveDatetimeError(msg)
+
+    moved_utc = _datetime.astimezone(datetime.UTC) + delta
+    return moved_utc.astimezone(_datetime.tzinfo)
 
 
 def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes", "seconds"] = "seconds") -> str:
