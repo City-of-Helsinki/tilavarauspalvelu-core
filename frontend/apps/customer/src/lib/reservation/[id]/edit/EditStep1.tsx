@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
 import { errorToast } from "@ui/components/toast";
 import { useDisplayError } from "@ui/hooks";
+import { getValidationErrors } from "@ui/modules/apollo/helpers";
 import { breakpoints } from "@ui/modules/const";
 import type { OptionsRecord } from "@ui/types";
 import { useAdjustReservationTimeMutation } from "@gql/gql-types";
@@ -126,6 +127,11 @@ export function EditStep1({ reservation, options, onBack, form }: Props): React.
       await router.push(`${getReservationPath(reservation.pk)}?timeUpdated=true`);
     } catch (err) {
       displayError(err);
+      // Another reservation took the time. Go back to the calendar, so the user can choose another time.
+      const isOverlap = getValidationErrors(err).some((e) => e.validation_code === "OVERLAPPING_RESERVATIONS");
+      if (isOverlap) {
+        onBack();
+      }
     }
   };
 
