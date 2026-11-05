@@ -186,10 +186,10 @@ for pull requests and pushes to `main` that change `e2e/` or the GraphQL schema.
 ## GitHub Actions
 
 The "E2E tests" workflow (`.github/workflows/run-e2e.yml`) runs the suite against the test environment. Start it in
-the Actions tab and pick the suite ("All Tests" is `pnpm test:all`) and the mode (sequential is one worker with
-shared users).
+the Actions tab and pick the suite ("All Tests" is `pnpm test:all`), the mode (sequential is one worker with shared
+users) and the workers of a parallel run (3, 4 or 5).
 
-- It runs 3 workers, and one run at a time, because each run creates the test data again.
+- Only one run goes at a time, because each run creates the test data again.
 - The run's summary lists the results of each project and the failed and flaky tests, from
   `report_summary.py --markdown`. The reports are in its `e2e-reports-<run number>` artifact for 30 days.
 
