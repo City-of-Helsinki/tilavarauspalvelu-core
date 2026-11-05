@@ -14,10 +14,12 @@ if TYPE_CHECKING:
 
 __all__ = [
     "DEFAULT_TIMEZONE",
+    "NaiveDatetimeError",
     "get_date_range",
     "get_periods_between",
     "get_time_range",
     "local_date",
+    "local_date_of",
     "local_date_string",
     "local_datetime",
     "local_datetime_exists",
@@ -50,6 +52,10 @@ __all__ = [
 # Python compares, adds and subtracts two datetimes in the same zone on the wall clock. This is wrong across
 # a daylight saving time change, so do these in UTC, e.g. with 'utc_datetime' or 'datetime_difference'.
 DEFAULT_TIMEZONE = get_default_timezone()
+
+
+class NaiveDatetimeError(Exception):
+    """A datetime has no timezone. Python would read it in the system timezone without an error."""
 
 
 # LOCAL TIME ###########################################################################################
@@ -98,10 +104,22 @@ def local_time(
     return datetime.time(hour or 0, minute or 0, second or 0, microsecond or 0)
 
 
+def local_date_of(_datetime: datetime.datetime, /) -> datetime.date:
+    """
+    Get the local date of the given datetime.
+    'datetime.date()' on a UTC datetime gives the previous date for 00:00-02:59 local time.
+    """
+    if _datetime.tzinfo is None:
+        msg = "Cannot get the local date of a naive datetime."
+        raise NaiveDatetimeError(msg)
+
+    return _datetime.astimezone(DEFAULT_TIMEZONE).date()
+
+
 def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
     """Get the start of day (00:00:00) as datetime for the given date (or today if not given) in local timezone."""
     if isinstance(_date, datetime.datetime):
-        _date = _date.astimezone(DEFAULT_TIMEZONE).date()
+        _date = local_date_of(_date)
     if _date is None:
         _date = local_date()
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
@@ -110,7 +128,7 @@ def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /
 def local_end_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
     """Get the end of day (23:59:59) as datetime for the given date in local timezone."""
     if isinstance(_date, datetime.datetime):
-        _date = _date.astimezone(DEFAULT_TIMEZONE).date()
+        _date = local_date_of(_date)
     if _date is None:
         _date = local_date()
     return datetime.datetime.combine(_date, datetime.time.max, tzinfo=DEFAULT_TIMEZONE)

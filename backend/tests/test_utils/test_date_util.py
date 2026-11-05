@@ -10,10 +10,12 @@ from graphene_django_extensions.testing import parametrize_helper
 
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
+    NaiveDatetimeError,
     datetime_difference,
     datetime_range_as_string,
     get_periods_between,
     local_date,
+    local_date_of,
     local_datetime,
     local_datetime_exists,
     local_time,
@@ -89,6 +91,25 @@ def test_date_utils__local_time__given_time():
     assert local_time(10, 30) == datetime.time(10, 30)
     assert local_time(minute=30) == datetime.time(0, 30)
     assert local_time(10, 30).tzinfo is None
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (datetime.datetime(2026, 1, 1, 21, 59, tzinfo=datetime.UTC), datetime.date(2026, 1, 1)),
+        (datetime.datetime(2026, 1, 1, 22, 0, tzinfo=datetime.UTC), datetime.date(2026, 1, 2)),
+        (datetime.datetime(2026, 7, 1, 21, 0, tzinfo=datetime.UTC), datetime.date(2026, 7, 2)),
+        (datetime.datetime(2026, 1, 2, 0, 30, tzinfo=DEFAULT_TIMEZONE), datetime.date(2026, 1, 2)),
+    ],
+)
+def test_date_utils__local_date_of(value, expected):
+    assert local_date_of(value) == expected
+
+
+def test_date_utils__local_date_of__naive_datetime():
+    msg = "Cannot get the local date of a naive datetime."
+    with pytest.raises(NaiveDatetimeError, match=exact(msg)):
+        local_date_of(datetime.datetime(2026, 1, 1, 12))  # noqa: DTZ001
 
 
 # The clocks move from 03:00 to 04:00 on 2026-03-29, and from 04:00 back to 03:00 on 2026-10-25.
