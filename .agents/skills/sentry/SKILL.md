@@ -78,6 +78,8 @@ but it cannot accept a step, rethink a step or open a pull request.
 
 - `state` shows the run. `sections` has the steps in the run. Each step has its result in `artifacts`,
   such as the root cause or the plan. The code changes step has the diffs in `file_patches`.
+  `last_message` is the last text from Seer in the step. Read it. It tells what Seer did not do,
+  such as tests it could not run, and it can have an error that is not in the artifacts.
 - `wait` polls until `status` is not `processing` and no pull request is still being created.
   It gives up after 9 minutes. Then run it again.
   Give the shell command a timeout of 10 minutes.
@@ -127,3 +129,8 @@ The "Retry PR" button in the web UI fails in the same way.
 A `rethink` makes a new plan. Seer can change the approach even when the reason says to keep the plan.
 Read the new plan before you run `code`. If it is worse, give `code` an instruction that names the approach.
 Seer followed such an instruction over the plan in the first test.
+
+### Seer cannot run the backend tests
+
+The sandbox of Seer has no GDAL or PostGIS, so Django does not start there. Seer runs only `ruff`.
+The code changes are not tested. Tell the user, and let CI on the pull request run the tests.
