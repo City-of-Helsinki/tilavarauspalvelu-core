@@ -27,8 +27,7 @@ if TYPE_CHECKING:
 
 @with_logs
 def _create_pricing_groups(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
-    tax_level = tax_levels["general"]
-    shared_reservation_units = _create_shared_pricing_group(tax_level=tax_level)
+    shared_reservation_units = _create_shared_pricing_group(tax_level=tax_levels["general"])
 
     reservation_units = (
         ReservationUnit.objects
@@ -36,17 +35,19 @@ def _create_pricing_groups(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         .exclude(pk__in=[reservation_unit.pk for reservation_unit in shared_reservation_units])
         .distinct()
     )
-    create_own_pricing_groups(reservation_units, tax_level=tax_level)
+    create_own_pricing_groups(reservation_units)
 
 
-def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit], *, tax_level: TaxLevel) -> None:
+def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit]) -> None:
     """
     Make an own pricing group for each reservation unit, with one base component for each of its pricings.
     The reservation unit gets the payment type of its latest paid pricing.
     """
     paid_reservation_units: list[ReservationUnit] = []
     for reservation_unit in reservation_units:
-        pricings: list[ReservationUnitPricing] = list(reservation_unit.pricings.order_by("begins"))
+        pricings: list[ReservationUnitPricing] = list(
+            reservation_unit.pricings.select_related("tax_level").order_by("begins")
+        )
         if not pricings:
             continue
 
@@ -82,7 +83,7 @@ def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit], *, t
                 material_price_description_fi=pricing.material_price_description_fi or "",
                 material_price_description_en=pricing.material_price_description_en or "",
                 material_price_description_sv=pricing.material_price_description_sv or "",
-                tax_level=tax_level,
+                tax_level=pricing.tax_level,
             )
             for pricing, valid_until in zip(pricings, valid_until_dates, strict=True)
         ]
