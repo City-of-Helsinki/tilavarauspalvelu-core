@@ -66,7 +66,7 @@
       "CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed",
       "CANCELLATION_TIME_PAST": "Cancellation time is in the past",
       "CANCEL_REASON_DOES_NOT_EXIST": "Cancel reason does not exist",
-      "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
+      "OVERLAPPING_RESERVATIONS": "The selected time is already booked. Choose another time.",
       "REQUIRED_FIELD_MISSING": "Required field missing.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
