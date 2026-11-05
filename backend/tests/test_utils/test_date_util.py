@@ -414,7 +414,18 @@ def test_date_utils__get_periods_between__end_time_before_start_time():
     start_time = datetime.time(15, 0, 0)
     end_time = datetime.time(14, 0, 0)
 
-    msg = "End time cannot be at or before start time if on the same day."
+    msg = "End time cannot be at or before start time."
+    with pytest.raises(ValueError, match=exact(msg)):
+        list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
+
+
+def test_date_utils__get_periods_between__end_time_before_start_time__many_days():
+    start_date = datetime.date(2024, 1, 1)
+    end_date = datetime.date(2024, 1, 8)
+    start_time = datetime.time(22, 0, 0)
+    end_time = datetime.time(1, 0, 0)
+
+    msg = "End time cannot be at or before start time."
     with pytest.raises(ValueError, match=exact(msg)):
         list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
 
@@ -425,7 +436,7 @@ def test_date_utils__get_periods_between__end_time_same_as_start_time():
     start_time = datetime.time(14, 0, 0)
     end_time = datetime.time(14, 0, 0)
 
-    msg = "End time cannot be at or before start time if on the same day."
+    msg = "End time cannot be at or before start time."
     with pytest.raises(ValueError, match=exact(msg)):
         list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
 
