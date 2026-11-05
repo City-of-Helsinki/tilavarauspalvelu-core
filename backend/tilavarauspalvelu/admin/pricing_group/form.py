@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from typing import TYPE_CHECKING
 
 from django import forms
@@ -37,7 +38,10 @@ class PriceComponentForm(forms.ModelForm):
 
 
 class PriceComponentFormSet(BaseInlineFormSet):
-    """Check the coverage of the whole pricing group, with the reservation unit rows of the same form."""
+    """
+    Apply the edit rules of the API to the components.
+    Check the coverage of the whole pricing group, with the reservation unit rows of the same form.
+    """
 
     form = PriceComponentForm
     instance: PricingGroup
@@ -47,13 +51,29 @@ class PriceComponentFormSet(BaseInlineFormSet):
         if any(self.errors):
             return
 
+        saved_components: dict[int, PriceComponent] = {}
+        if self.instance.pk is not None:
+            saved_components = {component.pk: component for component in self.instance.components.all()}
+
         components: list[PriceComponent] = []
         for form in self.forms:
-            if not form.cleaned_data or self._should_delete_form(form):
+            if not form.cleaned_data:
                 continue
 
             component = form.instance
+            saved_component = saved_components.get(component.pk)
+
+            if self._should_delete_form(form):
+                if saved_component is not None:
+                    with only_django_validation_errors():
+                        saved_component.validators.validate_can_delete()
+                continue
+
             with only_django_validation_errors():
+                if saved_component is None:
+                    component.validators.validate_new_begins_in_future(has_saved_components=bool(saved_components))
+                else:
+                    saved_component.validators.validate_change(_with_changes(saved_component, form))
                 component.validators.validate_option_belongs_to_pricing_group_unit_group()
                 if component.pk is None or "price_option" in form.changed_data:
                     component.validators.validate_option_is_active()
@@ -85,6 +105,17 @@ class PriceComponentFormSet(BaseInlineFormSet):
             for form in reservation_unit_formset.forms
             if form.cleaned_data and not reservation_unit_formset._should_delete_form(form)  # noqa: SLF001
         ]
+
+
+def _with_changes(saved_component: PriceComponent, form: PriceComponentForm) -> PriceComponent:
+    """
+    Copy the saved component with only the fields that the user changed.
+    The form gives None for an empty translated text, and the saved component can have "" for it.
+    """
+    changed_component = copy.copy(saved_component)
+    for field_name in form.changed_data:
+        setattr(changed_component, field_name, getattr(form.instance, field_name))
+    return changed_component
 
 
 class PriceComponentInline(TranslationStackedInline):
