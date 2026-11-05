@@ -14,10 +14,12 @@ if TYPE_CHECKING:
 
 __all__ = [
     "DEFAULT_TIMEZONE",
+    "AwareTimeError",
     "NaiveDatetimeError",
     "get_date_range",
     "get_periods_between",
     "get_time_range",
+    "local_combine",
     "local_date",
     "local_date_of",
     "local_date_string",
@@ -56,6 +58,10 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 class NaiveDatetimeError(Exception):
     """A datetime has no timezone. Python would read it in the system timezone without an error."""
+
+
+class AwareTimeError(Exception):
+    """A time has a timezone. A time is a wall clock time, and only a date gives it an offset."""
 
 
 # LOCAL TIME ###########################################################################################
@@ -114,6 +120,18 @@ def local_date_of(_datetime: datetime.datetime, /) -> datetime.date:
         raise NaiveDatetimeError(msg)
 
     return _datetime.astimezone(DEFAULT_TIMEZONE).date()
+
+
+def local_combine(_date: datetime.date, _time: datetime.time, /) -> datetime.datetime:
+    """
+    Combine a date and a wall clock time to a datetime in the local timezone.
+    A time in the spring daylight saving time gap does not exist. Check it with 'local_datetime_exists'.
+    """
+    if _time.tzinfo is not None:
+        msg = "Cannot combine a time that has a timezone."
+        raise AwareTimeError(msg)
+
+    return datetime.datetime.combine(_date, _time, tzinfo=DEFAULT_TIMEZONE)
 
 
 def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
