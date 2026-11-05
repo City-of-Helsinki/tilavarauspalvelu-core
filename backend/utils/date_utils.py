@@ -17,6 +17,7 @@ __all__ = [
     "AwareTimeError",
     "NaiveDatetimeError",
     "add_elapsed_time",
+    "from_iso_format",
     "get_date_range",
     "get_periods_between",
     "get_time_range",
@@ -38,6 +39,7 @@ __all__ = [
     "local_timedelta_string",
     "next_date_matching_weekday",
     "next_hour",
+    "parse_naive_datetime",
     "time_as_timedelta",
     "time_difference",
     "timedelta_as_time",
@@ -206,8 +208,11 @@ def local_iso_format(_datetime: datetime.datetime, /) -> str:
 
 
 def local_from_iso_format(_string: str, /) -> datetime.datetime:
-    """Get the datetime from ISO string in the local timezone."""
-    return datetime.datetime.fromisoformat(_string).astimezone(DEFAULT_TIMEZONE)
+    """
+    Get the datetime from ISO string in the local timezone.
+    A string without an offset is read as local time.
+    """
+    return from_iso_format(_string, timezone=DEFAULT_TIMEZONE)
 
 
 def local_datetime_string(_datetime: datetime.datetime, /, *, seconds: bool = False) -> str:
@@ -354,6 +359,29 @@ def add_elapsed_time(_datetime: datetime.datetime, /, *, delta: datetime.timedel
 
     moved_utc = _datetime.astimezone(datetime.UTC) + delta
     return moved_utc.astimezone(_datetime.tzinfo)
+
+
+def from_iso_format(_string: str, /, *, timezone: zoneinfo.ZoneInfo | datetime.timezone) -> datetime.datetime:
+    """
+    Get the datetime from ISO string in the given timezone.
+    A string with an offset keeps its moment. A string without an offset is read as a wall clock time in the timezone.
+    """
+    value = datetime.datetime.fromisoformat(_string)
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone)
+    return value.astimezone(timezone)
+
+
+def parse_naive_datetime(
+    _string: str,
+    /,
+    *,
+    string_format: str,
+    timezone: zoneinfo.ZoneInfo | datetime.timezone,
+) -> datetime.datetime:
+    """Parse a string without an offset as a wall clock time in the given timezone."""
+    value = datetime.datetime.strptime(_string, string_format)  # noqa: DTZ007
+    return value.replace(tzinfo=timezone)
 
 
 def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes", "seconds"] = "seconds") -> str:
