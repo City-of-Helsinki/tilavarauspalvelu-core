@@ -10,26 +10,19 @@ from graphene_django_extensions.testing import parametrize_helper
 
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
-    combine,
     datetime_difference,
     datetime_range_as_string,
     get_periods_between,
     local_date,
     local_datetime,
     local_datetime_exists,
-    local_datetime_max,
-    local_datetime_min,
     local_time,
-    local_time_max,
-    local_time_min,
     localized_short_weekday,
     utc_date,
     utc_datetime,
     utc_datetime_max,
     utc_datetime_min,
     utc_time,
-    utc_time_max,
-    utc_time_min,
 )
 
 from tests.helpers import exact
@@ -87,22 +80,6 @@ def test_date_utils__local_time():
     assert local_time().tzinfo is None
 
 
-def test_date_utils__local_datetime_min():
-    assert local_datetime_min() == datetime.datetime.min.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
-
-
-def test_date_utils__local_datetime_max():
-    assert local_datetime_max() == datetime.datetime.max.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
-
-
-def test_date_utils__local_time_min():
-    assert local_time_min() == datetime.time.min.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
-
-
-def test_date_utils__local_time_max():
-    assert local_time_max() == datetime.time.max.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
-
-
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, 10, 15, tzinfo=datetime.UTC))
 def test_date_utils__local_time__midnight():
     assert local_time(0, 0) == datetime.time(0, 0)
@@ -153,33 +130,6 @@ def test_date_utils__utc_datetime_min():
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__utc_datetime_max():
     assert utc_datetime_max() == datetime.datetime.max.replace(tzinfo=datetime.UTC)
-
-
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
-def test_date_utils__utc_time_min():
-    assert utc_time_min() == datetime.time.min.replace(tzinfo=datetime.UTC)
-
-
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
-def test_date_utils__utc_time_max():
-    assert utc_time_max() == datetime.time.max.replace(tzinfo=datetime.UTC)
-
-
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
-def test_date_utils__combine():
-    date = datetime.date(2022, 1, 1)
-    time_naive = datetime.time(8, 0)
-    time_aware = datetime.time(8, 0, tzinfo=datetime.UTC)
-
-    dt = combine(date, time_naive, astimezone=datetime.UTC)
-    assert dt == datetime.datetime(2022, 1, 1, 8, 0, tzinfo=datetime.UTC)
-
-    dt = combine(date, time_naive, astimezone=DEFAULT_TIMEZONE)
-    assert dt == datetime.datetime(2022, 1, 1, 10, 0, tzinfo=DEFAULT_TIMEZONE)
-
-    msg = "Time must not be timezone-aware."
-    with pytest.raises(ValueError, match=exact(msg)):
-        combine(date, time_aware, astimezone=datetime.UTC)
 
 
 def test_date_utils__datetime_difference__across_daylight_saving_time_change():

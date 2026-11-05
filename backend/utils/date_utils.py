@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 
 __all__ = [
     "DEFAULT_TIMEZONE",
-    "combine",
     "get_date_range",
     "get_periods_between",
     "get_time_range",
@@ -22,16 +21,12 @@ __all__ = [
     "local_date_string",
     "local_datetime",
     "local_datetime_exists",
-    "local_datetime_max",
-    "local_datetime_min",
     "local_datetime_string",
     "local_end_of_day",
     "local_from_iso_format",
     "local_iso_format",
     "local_start_of_day",
     "local_time",
-    "local_time_max",
-    "local_time_min",
     "local_time_string",
     "local_timedelta_string",
     "next_date_matching_weekday",
@@ -49,8 +44,6 @@ __all__ = [
     "utc_iso_format",
     "utc_start_of_day",
     "utc_time",
-    "utc_time_max",
-    "utc_time_min",
 ]
 
 
@@ -103,26 +96,6 @@ def local_time(
         return local_datetime().time()
 
     return datetime.time(hour or 0, minute or 0, second or 0, microsecond or 0)
-
-
-def local_datetime_min() -> datetime.datetime:
-    """Get the minimum datetime of the day in the local timezone."""
-    return datetime.datetime.min.replace(tzinfo=DEFAULT_TIMEZONE)
-
-
-def local_datetime_max() -> datetime.datetime:
-    """Get the maximum datetime of the day in the local timezone."""
-    return datetime.datetime.max.replace(tzinfo=DEFAULT_TIMEZONE)
-
-
-def local_time_min() -> datetime.time:
-    """Get the minimum time of the day in the local timezone."""
-    return datetime.time.min.replace(tzinfo=DEFAULT_TIMEZONE)
-
-
-def local_time_max() -> datetime.time:
-    """Get the maximum time of the day in the local timezone."""
-    return datetime.time.max.replace(tzinfo=DEFAULT_TIMEZONE)
 
 
 def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
@@ -272,16 +245,6 @@ def utc_datetime_max() -> datetime.datetime:
     return datetime.datetime.max.replace(tzinfo=datetime.UTC)
 
 
-def utc_time_min() -> datetime.time:
-    """Get the minimum time of the day in UTC."""
-    return datetime.time.min.replace(tzinfo=datetime.UTC)
-
-
-def utc_time_max() -> datetime.time:
-    """Get the maximum time of the day in UTC."""
-    return datetime.time.max.replace(tzinfo=datetime.UTC)
-
-
 def utc_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
     """Get the start of day (00:00:00) as datetime for the given date (of today if None) in UTC."""
     if isinstance(_date, datetime.datetime):
@@ -304,20 +267,6 @@ def utc_iso_format(_datetime: datetime.datetime, /) -> str:
 
 
 # COMMON UTILS #########################################################################################
-
-
-def combine(
-    date: datetime.date,
-    time: datetime.time,
-    *,
-    astimezone: zoneinfo.ZoneInfo | datetime.timezone = datetime.UTC,
-) -> datetime.datetime:
-    """Combine a date and time to a UTC datetime, and then convert to the given timezone."""
-    if time.tzinfo is not None:
-        msg = "Time must not be timezone-aware."
-        raise ValueError(msg)
-
-    return datetime.datetime.combine(date, time, tzinfo=datetime.UTC).astimezone(astimezone)
 
 
 def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes", "seconds"] = "seconds") -> str:
