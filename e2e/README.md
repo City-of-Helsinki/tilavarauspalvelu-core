@@ -189,6 +189,9 @@ The "E2E tests" workflow (`.github/workflows/run-e2e.yml`) runs the suite agains
 the Actions tab and pick the suite ("All Tests" is `pnpm test:all`), the mode (sequential is one worker with shared
 users) and the workers of a parallel run (3, 4 or 5).
 
+Both workflows run in the official Playwright image (`.github/workflows/playwright-image.yml`). The image tag comes
+from the exact `@playwright/test` version in `package.json`. The image has the browsers, so the jobs do not install them.
+
 - Only one run goes at a time, because each run creates the test data again.
 - The run's summary lists the results of each project and the failed and flaky tests, from
   `report_summary.py --markdown`. The reports are in its `e2e-reports-<run number>` artifact for 30 days.

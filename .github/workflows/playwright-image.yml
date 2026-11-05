@@ -1,0 +1,44 @@
+# Give the official Playwright image for the Playwright version of the e2e suite.
+# The image has the browsers and their system packages. So a job does not install them with apt on each run.
+# The apt install took about 40 s, but it can take longer than the job timeout when the Ubuntu mirror is slow.
+# The tag comes from e2e/package.json, so a Playwright upgrade needs no change here.
+# The image also has git, Python and the time zone data that the e2e workflows use.
+name: "Playwright image"
+
+on:
+  workflow_call:
+    outputs:
+      image:
+        description: "The Playwright image to use as the job container."
+        value: ${{ jobs.image.outputs.image }}
+
+jobs:
+  image:
+    name: "Find the Playwright image"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: e2e/package.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      # The browsers in the image must match the Playwright version exactly, so the version must be pinned.
+      - name: "Create image name"
+        id: image
+        run: |
+          version=$(jq -r '.devDependencies["@playwright/test"] // .dependencies["@playwright/test"] // empty' e2e/package.json)
+          if ! printf '%s' "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error file=e2e/package.json::@playwright/test must be an exact version, not '$version'."
+            exit 1
+          fi
+          echo "image=mcr.microsoft.com/playwright:v$version-noble" >> "$GITHUB_OUTPUT"
