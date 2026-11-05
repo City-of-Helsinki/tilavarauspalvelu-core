@@ -21,9 +21,6 @@ import { TrackingWrapper } from "@/modules/tracking";
 import "../styles/global.scss";
 import sitesettings from "./sitesettings.json";
 
-// suppress useLayoutEffect warnings on SSR till it's fixed upstream in HDS
-if (typeof window === "undefined") React.useLayoutEffect = () => {};
-
 /// check if the user has accepted the statistics cookies
 /// only client side
 /// the HDS version of this hook doesn't work
