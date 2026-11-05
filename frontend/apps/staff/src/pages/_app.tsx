@@ -33,9 +33,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import "../styles/global.scss";
 import type { StaffEnvConfig } from "@/modules/serverUtils";
 
-// suppress useLayoutEffect warnings on SSR till it's fixed upstream in HDS
-if (typeof window === "undefined") React.useLayoutEffect = () => {};
-
 function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const { Component, pageProps, currentUser, handlingData, notificationsData, envConfig } = props;
   const { apiBaseUrl, isConsoleLoggingEnabled, version } = envConfig;
