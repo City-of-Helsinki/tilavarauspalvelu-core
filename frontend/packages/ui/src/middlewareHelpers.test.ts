@@ -97,6 +97,8 @@ const PAGE_PATHS = [
   // A file extension or an /api/ path in the query string must not match
   "/search?x=a.js",
   "/search?next=/api/graphql",
+  "/search?next=/monitoring",
+  "/monitoring-reports",
 ];
 
 describe("NON_PAGE_PATH", () => {
@@ -112,6 +114,10 @@ describe("NON_PAGE_PATH", () => {
     "/manifest.webmanifest",
     "/robots.txt",
     "/main.js?v=1",
+    // The Sentry tunnel, with and without the base path
+    "/monitoring",
+    "/monitoring?o=123&p=456&r=de",
+    "/kasittely/monitoring",
   ])("matches %s", (path) => {
     expect(NON_PAGE_PATH.test(path)).toBe(true);
   });
@@ -146,7 +152,7 @@ describe("isPageRequest", () => {
     expect(isPageRequest(new URL(path, "http://localhost:3000"))).toBe(true);
   });
 
-  it.each(["/_next/static/chunks/main.js", "/api/graphql", "/favicon.svg", "/healthcheck", "/en/503"])(
+  it.each(["/_next/static/chunks/main.js", "/api/graphql", "/favicon.svg", "/monitoring", "/healthcheck", "/en/503"])(
     "is false for %s",
     (path) => {
       expect(isPageRequest(new URL(path, "http://localhost:3000"))).toBe(false);

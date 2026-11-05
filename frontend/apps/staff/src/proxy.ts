@@ -5,7 +5,6 @@ import type { NextRequest } from "next/server";
 import { logError } from "@ui/modules/errors";
 import { isPageRequest, gqlQueryFetch, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
-import { removeTrailingSlash } from "ui/src/modules/urlBuilder";
 import { env } from "@/env.mjs";
 import { PUBLIC_URL } from "./modules/const";
 
@@ -46,15 +45,6 @@ async function fetchUserData(req: NextRequest): Promise<QueryResultType | null> 
 }
 
 async function handleRequest(req: NextRequest) {
-  const pathname = req.nextUrl.pathname;
-  const basePath = removeTrailingSlash(env.NEXT_PUBLIC_BASE_URL ?? "");
-  const sentryTunnelPath = `${basePath}/monitoring`;
-
-  // Allow Sentry tunnel route to pass through without auth/csrf middleware redirects.
-  if (pathname === sentryTunnelPath || pathname === "/monitoring") {
-    return NextResponse.next();
-  }
-
   if (!isPageRequest(new URL(req.url), PUBLIC_URL)) {
     return NextResponse.next();
   }
