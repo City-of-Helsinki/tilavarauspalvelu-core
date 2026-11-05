@@ -28,7 +28,11 @@ def parse_datetime(string: str | None) -> datetime.datetime | None:
     if string is None:
         return None
 
-    return datetime.datetime.fromisoformat(string).astimezone(settings.VERKKOKAUPPA_TIMEZONE)
+    value = datetime.datetime.fromisoformat(string)
+    # Verkkokauppa sends local time without an offset. Read it in the Verkkokauppa time zone.
+    if value.tzinfo is None:
+        return value.replace(tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+    return value.astimezone(settings.VERKKOKAUPPA_TIMEZONE)
 
 
 def get_formatted_reservation_time(reservation: Reservation) -> str:
