@@ -71,6 +71,7 @@ api_post() {
 # The index of a section is the block where the step starts. Rethink restarts from it.
 # Artifacts are the results of a step, such as the root cause or the plan.
 # File patches are the code changes, with the last patch of each file.
+# The last message is the last text from Seer in the step. A failure can show only there.
 show_state() {
   jq '.autofix as $run | if $run == null then {run: null} else {
     issue_id: "'"$issue_id"'",
@@ -89,6 +90,8 @@ show_state() {
       ) | .sections | map({
         step,
         index,
+        last_message: ([.blocks[] | select(.message.role == "assistant") | .message.content
+          | select(type == "string" and . != "")] | last),
         artifacts: [.blocks[] | (.artifacts // [])[], ((.tool_results // [])[] | (.structuredContent.artifacts // [])[]?)
           | {key, reason, data}],
         file_patches: ([.blocks[] | (.merged_file_patches // [])[]]
