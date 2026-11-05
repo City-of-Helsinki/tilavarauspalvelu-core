@@ -7,9 +7,11 @@ from typing import TYPE_CHECKING, ClassVar, Literal
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db import models
+from django.db.models.fields.json import KeyTextTransform
 from django.utils.translation import gettext_lazy as _
 from helusers.models import AbstractUser
 from lazy_managers import LazyModelAttribute, LazyModelManager
+from lookup_property import lookup_property
 
 from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import Language, ReservationNotification, UserRoleChoice
@@ -202,13 +204,37 @@ class User(AbstractUser):
         # we use the latest modified one.
         return self.social_auth.order_by("-modified").first()
 
-    @property
-    def id_token(self) -> IDToken | None:
+    @lookup_property
+    def current_id_token() -> str | None:
+        """The raw ID token from the user's latest social auth entry, if any."""
+        from social_django.models import UserSocialAuth
+
+        sq = models.Subquery(
+            queryset=(
+                UserSocialAuth.objects
+                .filter(user=models.OuterRef("pk"))
+                .order_by("-modified")
+                .annotate(id_token=KeyTextTransform("id_token", "extra_data"))
+                .values("id_token")[:1]
+            ),
+            output_field=models.TextField(null=True),
+        )
+        return sq  # type: ignore[return-value]  # noqa: RET504
+
+    @current_id_token.override
+    def _(self) -> str | None:
         social_auth = self.current_social_auth
         if social_auth is None:
             return None
+        return social_auth.extra_data.get("id_token")
 
-        payload = get_jwt_payload(social_auth.extra_data["id_token"])
+    @property
+    def id_token(self) -> IDToken | None:
+        raw_id_token: str | None = self.current_id_token  # type: ignore[assignment]
+        if raw_id_token is None:
+            return None
+
+        payload = get_jwt_payload(raw_id_token)
         return IDToken(
             iss=payload.get("iss"),
             sub=payload.get("sub"),

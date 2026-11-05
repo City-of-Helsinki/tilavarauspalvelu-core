@@ -6,7 +6,8 @@ import graphene
 from django.db.models import Value
 from django.db.models.functions import Concat, Trim
 from graphene_django_extensions import DjangoNode
-from query_optimizer import AnnotatedField, MultiField
+from lookup_property import L
+from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
 
 from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import User
@@ -16,6 +17,9 @@ from .permissions import UserPermission
 
 if TYPE_CHECKING:
     import datetime
+
+    from django.db import models
+    from query_optimizer.optimizer import QueryOptimizer
 
     from tilavarauspalvelu.models.general_role.queryset import GeneralRoleQuerySet
     from tilavarauspalvelu.models.unit_role.queryset import UnitRoleQuerySet
@@ -53,8 +57,8 @@ class UserNode(DjangoNode):
         required=True,
     )
 
-    is_ad_authenticated = graphene.Boolean(required=True)
-    is_strongly_authenticated = graphene.Boolean(required=True)
+    is_ad_authenticated = ManuallyOptimizedField(graphene.Boolean, required=True)
+    is_strongly_authenticated = ManuallyOptimizedField(graphene.Boolean, required=True)
     is_internal_user = MultiField(graphene.Boolean, fields=["email"], required=True)
     reservation_notification = graphene.Field(graphene.Enum.from_enum(ReservationNotification))
 
@@ -94,6 +98,16 @@ class UserNode(DjangoNode):
         if token is None:
             return False
         return token.is_strong_login
+
+    @staticmethod
+    def optimize_is_ad_authenticated(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        optimizer.annotations["current_id_token"] = L("current_id_token")
+        return queryset
+
+    @staticmethod
+    def optimize_is_strongly_authenticated(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        optimizer.annotations["current_id_token"] = L("current_id_token")
+        return queryset
 
     def resolve_is_internal_user(root: User, info: GQLInfo) -> bool:
         return root.actions.is_internal_user
