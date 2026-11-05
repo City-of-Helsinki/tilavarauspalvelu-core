@@ -1,6 +1,7 @@
 import { normalize } from "@sentry/core";
 import isObject from "lodash-es/isObject";
 import snakeCase from "lodash-es/snakeCase";
+import type { SamplingContext, TracesSamplerSamplingContext } from "@sentry/core";
 
 // https://github.com/getsentry/sentry-python/blob/8094c9e4462c7af4d73bfe3b6382791f9949e7f0/sentry_sdk/scrubber.py#L14
 const DEFAULT_DENYLIST = [
@@ -105,4 +106,40 @@ export function parseSampleRate(value?: string): number {
     return 0;
   }
   return Math.max(0, Math.min(1, n));
+}
+
+/// Returns true if the request URL has isPostLogin=true.
+/// Such a page runs a mutation in getServerSideProps, for example CreateReservation.
+function isPostLoginRequest({ normalizedRequest, attributes }: SamplingContext): boolean {
+  const candidates = [normalizedRequest?.url, normalizedRequest?.query_string, attributes?.["http.target"]];
+  for (const value of candidates) {
+    if (typeof value !== "string") {
+      continue;
+    }
+    const query = value.includes("?") ? value.slice(value.indexOf("?") + 1) : value;
+    if (new URLSearchParams(query).get("isPostLogin") === "true") {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Creates a Sentry tracesSampler for the server.
+ * It samples all post login requests. The browser comes back from the login with a full page load.
+ * A full page load has no incoming trace, so the normal sample rate drops most of these requests.
+ * They are rare, so sampling all of them costs little.
+ * Other requests inherit the sample rate and decision of the incoming trace, or use the given sample rate.
+ * A sample rate of 0 turns tracing off.
+ */
+export function createServerTracesSampler(sampleRate: number) {
+  return (samplingContext: TracesSamplerSamplingContext): number => {
+    if (sampleRate === 0) {
+      return 0;
+    }
+    if (isPostLoginRequest(samplingContext)) {
+      return 1;
+    }
+    return samplingContext.inheritOrSampleWith(sampleRate);
+  };
 }

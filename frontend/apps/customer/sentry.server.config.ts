@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { beforeSend, beforeSendTransaction, parseSampleRate } from "ui/src";
+import { beforeSend, beforeSendTransaction, createServerTracesSampler, parseSampleRate } from "ui/src";
 import { env } from "@/env.mjs";
 import { getCustomerRelease } from "@/modules/baseUtils";
 
@@ -10,11 +10,9 @@ if (env.SENTRY_DSN) {
     dsn: env.SENTRY_DSN,
     environment: env.SENTRY_ENVIRONMENT,
     release,
-    // Adjust this value in production, or use tracesSampler for greater control
-    // @see https://develop.sentry.dev/sdk/performance/
-    // To turn it off, remove the line
-    // @see https://github.com/getsentry/sentry-javascript/discussions/4503#discussioncomment-2143116
-    tracesSampleRate: parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE),
+    // Samples all post login requests and uses SENTRY_TRACES_SAMPLE_RATE for the rest.
+    // A rate of 0 turns tracing off.
+    tracesSampler: createServerTracesSampler(parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE)),
     normalizeDepth: 3,
     integrations: [Sentry.extraErrorDataIntegration({ depth: 3 })],
     beforeSend,
