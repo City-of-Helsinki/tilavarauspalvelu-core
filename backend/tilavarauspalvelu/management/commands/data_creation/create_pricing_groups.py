@@ -98,13 +98,18 @@ def create_own_pricing_groups(reservation_units: Iterable[ReservationUnit]) -> N
 def _create_shared_pricing_group(*, tax_level: TaxLevel) -> list[ReservationUnit]:
     """
     Make a shared pricing group with two price options and a price change in the future,
-    and move two reservation units of the first unit group to it.
+    and move two paid reservation units of the first unit group to it.
     """
     unit_group = UnitGroup.objects.order_by("pk").first()
     if unit_group is None:
         return []
 
-    reservation_units = list(ReservationUnit.objects.filter(unit__unit_groups=unit_group).order_by("pk")[:2])
+    reservation_units = list(
+        ReservationUnit.objects
+        .filter(unit__unit_groups=unit_group, pricings__highest_price__gt=0)
+        .distinct()
+        .order_by("pk")[:2]
+    )
     if not reservation_units:
         return []
 
