@@ -10,10 +10,12 @@ from graphene_django_extensions.testing import parametrize_helper
 
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
+    AwareTimeError,
     NaiveDatetimeError,
     datetime_difference,
     datetime_range_as_string,
     get_periods_between,
+    local_combine,
     local_date,
     local_date_of,
     local_datetime,
@@ -110,6 +112,18 @@ def test_date_utils__local_date_of__naive_datetime():
     msg = "Cannot get the local date of a naive datetime."
     with pytest.raises(NaiveDatetimeError, match=exact(msg)):
         local_date_of(datetime.datetime(2026, 1, 1, 12))  # noqa: DTZ001
+
+
+def test_date_utils__local_combine():
+    value = local_combine(datetime.date(2026, 7, 1), datetime.time(10, 0))
+
+    assert value == datetime.datetime(2026, 7, 1, 7, 0, tzinfo=datetime.UTC)
+
+
+def test_date_utils__local_combine__aware_time():
+    msg = "Cannot combine a time that has a timezone."
+    with pytest.raises(AwareTimeError, match=exact(msg)):
+        local_combine(datetime.date(2026, 7, 1), datetime.time(10, 0, tzinfo=datetime.UTC))
 
 
 # The clocks move from 03:00 to 04:00 on 2026-03-29, and from 04:00 back to 03:00 on 2026-10-25.
