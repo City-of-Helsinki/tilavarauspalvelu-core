@@ -10,7 +10,7 @@ from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory, UserFactory
 
 # Applied to all tests
 pytestmark = [
@@ -260,3 +260,67 @@ def test_reservation__affecting__affected_reservation_units(graphql):
             ],
         },
     ]
+
+
+def test_reservation__affecting__user_authentication_flags(graphql):
+    parent_space = SpaceFactory.create()
+    reservation_unit = ReservationUnitFactory.create(spaces=[parent_space])
+
+    ad_user = UserFactory.create_ad_user()
+    strong_user = UserFactory.create_profile_user()
+    no_social_auth_user = UserFactory.create()
+
+    reservation_1 = ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        user=ad_user,
+        state=ReservationStateChoice.CREATED,
+    )
+    reservation_2 = ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        user=strong_user,
+        state=ReservationStateChoice.CREATED,
+    )
+    reservation_3 = ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        user=no_social_auth_user,
+        state=ReservationStateChoice.CREATED,
+    )
+
+    ReservationUnitHierarchy.refresh()
+
+    graphql.login_with_superuser()
+
+    fields = "pk user { pk isAdAuthenticated isStronglyAuthenticated }"
+    query = affecting_reservations_query(fields=fields, for_reservation_units=[reservation_unit.pk])
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object == [
+        {
+            "pk": reservation_1.pk,
+            "user": {"pk": ad_user.pk, "isAdAuthenticated": True, "isStronglyAuthenticated": False},
+        },
+        {
+            "pk": reservation_2.pk,
+            "user": {"pk": strong_user.pk, "isAdAuthenticated": False, "isStronglyAuthenticated": True},
+        },
+        {
+            "pk": reservation_3.pk,
+            "user": {"pk": no_social_auth_user.pk, "isAdAuthenticated": False, "isStronglyAuthenticated": False},
+        },
+    ]
+    query_count = len(response.queries)
+
+    # Adding more reservations by other users must not add queries (no N+1 for the users' social auth).
+    for _ in range(3):
+        ReservationFactory.create(
+            reservation_unit=reservation_unit,
+            user=UserFactory.create_ad_user(),
+            state=ReservationStateChoice.CREATED,
+        )
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.first_query_object) == 6
+    response.assert_query_count(query_count)
