@@ -164,6 +164,11 @@ def test_date_utils__local_next_start_of_day():
             1,
             datetime.datetime(2026, 10, 25, 23, 0, tzinfo=datetime.UTC),
         ),
+        (
+            datetime.datetime(2026, 10, 25, 1, 30, tzinfo=datetime.UTC),
+            0,
+            datetime.datetime(2026, 10, 25, 1, 30, tzinfo=datetime.UTC),
+        ),
     ],
 )
 def test_date_utils__local_add_days(value, days, expected):
@@ -260,6 +265,13 @@ def test_date_utils__next_hour__across_daylight_saving_time_change():
     assert result.astimezone(datetime.UTC) == datetime.datetime(2026, 3, 29, 2, 0, tzinfo=datetime.UTC)
     assert result.date() == datetime.date(2026, 3, 29)
     assert result.time() == datetime.time(5, 0)
+
+
+@freezegun.freeze_time(datetime.datetime(2026, 10, 25, 0, 30, tzinfo=datetime.UTC))
+def test_date_utils__next_hour__into_repeated_autumn_hour():
+    result = next_hour()
+
+    assert result.astimezone(datetime.UTC) == datetime.datetime(2026, 10, 25, 1, 0, tzinfo=datetime.UTC)
 
 
 @freezegun.freeze_time(datetime.datetime(2026, 3, 28, 10, 30, tzinfo=datetime.UTC))
