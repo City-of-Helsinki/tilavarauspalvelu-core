@@ -23,6 +23,7 @@ from utils.utils import get_jwt_payload
 
 if TYPE_CHECKING:
     import datetime
+    from collections.abc import Iterable
 
     from lazy_managers import LazyAttribute
     from social_django.models import UserSocialAuth
@@ -108,6 +109,12 @@ class User(AbstractUser):
         if hasattr(self, "_general_roles"):
             return self._general_roles
 
+        # Use prefetched roles if available (see `UserQuerySet.with_active_roles`)
+        prefetched: list[GeneralRole] | None = getattr(self, "prefetched_active_general_roles", None)
+        if prefetched is not None:
+            self._general_roles = [UserRoleChoice(general_role.role) for general_role in prefetched]
+            return self._general_roles
+
         qs = self.general_roles.filter(is_role_active=True).values_list("role", flat=True)
         self._general_roles = [UserRoleChoice(role) for role in qs]
         return self._general_roles
@@ -183,8 +190,13 @@ class User(AbstractUser):
         unit_roles: dict[int, list[UserRoleChoice]] = {}
         unit_group_roles: dict[int, list[UserRoleChoice]] = {}
 
+        # Use prefetched roles if available (see `UserQuerySet.with_active_roles`)
+        active_unit_roles: Iterable[UnitRole] | None = getattr(self, "prefetched_active_unit_roles", None)
+        if active_unit_roles is None:
+            active_unit_roles = self.unit_roles.filter(is_role_active=True).prefetch_related("units", "unit_groups")
+
         unit_role: UnitRole
-        for unit_role in self.unit_roles.filter(is_role_active=True).prefetch_related("units", "unit_groups"):
+        for unit_role in active_unit_roles:
             for unit in unit_role.units.all():
                 if unit_role.is_from_ad_group and not unit.allow_permissions_from_ad_groups:
                     continue

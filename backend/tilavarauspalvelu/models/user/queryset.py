@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
 
+from tilavarauspalvelu.models import GeneralRole, UnitRole
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_date
@@ -20,6 +21,26 @@ __all__ = [
 
 
 class UserQuerySet(ModelQuerySet[User]):
+    def with_active_roles(self) -> Self:
+        """
+        Prefetch the users' active general roles and active unit roles (with their units and unit groups)
+        so that permission checks for multiple users don't require additional queries per user.
+        """
+        return self.prefetch_related(
+            models.Prefetch(
+                "general_roles",
+                queryset=GeneralRole.objects.filter(is_role_active=True).order_by("pk"),
+                to_attr="prefetched_active_general_roles",
+            ),
+            models.Prefetch(
+                "unit_roles",
+                queryset=(
+                    UnitRole.objects.filter(is_role_active=True).prefetch_related("units", "unit_groups").order_by("pk")
+                ),
+                to_attr="prefetched_active_unit_roles",
+            ),
+        )
+
     def remove_old_superuser_and_staff_permissions(self) -> None:
         """Remove superuser and staff permissions from inactive users."""
         self.should_deactivate_permissions().update(is_staff=False, is_superuser=False)
