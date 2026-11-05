@@ -260,6 +260,37 @@ def test_calculate_price__per_week():
     assert result.total == Decimal("300.00")
 
 
+@pytest.mark.parametrize(
+    ("price_unit", "begin_date", "end_date"),
+    [
+        (PriceUnit.PER_DAY, datetime.date(2026, 3, 29), datetime.date(2026, 3, 30)),
+        (PriceUnit.PER_DAY, datetime.date(2026, 10, 25), datetime.date(2026, 10, 26)),
+        (PriceUnit.PER_WEEK, datetime.date(2026, 3, 23), datetime.date(2026, 3, 30)),
+        (PriceUnit.PER_WEEK, datetime.date(2026, 10, 19), datetime.date(2026, 10, 26)),
+    ],
+)
+def test_calculate_price__day_and_week_units_follow_the_local_calendar_over_daylight_saving_change(
+    price_unit, begin_date, end_date
+):
+    row = create_pricing_group_row()
+    PriceComponentFactory.create(
+        pricing_group=row.pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(100),
+        price_unit=price_unit,
+    )
+
+    result = calculate_price(
+        reservation_unit=row.reservation_unit,
+        price_option=None,
+        begin=local_datetime(begin_date.year, begin_date.month, begin_date.day, 0),
+        end=local_datetime(end_date.year, end_date.month, end_date.day, 0),
+    )
+
+    assert result.lines[0].quantity == Decimal(1)
+    assert result.total == Decimal("100.00")
+
+
 # ── Price change ──
 
 
