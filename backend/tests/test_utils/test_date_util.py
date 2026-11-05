@@ -20,6 +20,7 @@ from utils.date_utils import (
     local_date_of,
     local_datetime,
     local_datetime_exists,
+    local_next_start_of_day,
     local_time,
     localized_short_weekday,
     utc_date,
@@ -124,6 +125,12 @@ def test_date_utils__local_combine__aware_time():
     msg = "Cannot combine a time that has a timezone."
     with pytest.raises(AwareTimeError, match=exact(msg)):
         local_combine(datetime.date(2026, 7, 1), datetime.time(10, 0, tzinfo=datetime.UTC))
+
+
+def test_date_utils__local_next_start_of_day():
+    value = local_next_start_of_day(datetime.datetime(2026, 1, 1, 22, 30, tzinfo=datetime.UTC))
+
+    assert value == datetime.datetime(2026, 1, 3, 0, 0, tzinfo=DEFAULT_TIMEZONE)
 
 
 # The clocks move from 03:00 to 04:00 on 2026-03-29, and from 04:00 back to 03:00 on 2026-10-25.
