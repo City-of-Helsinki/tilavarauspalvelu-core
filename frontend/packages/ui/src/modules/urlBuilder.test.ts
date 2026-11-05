@@ -79,4 +79,25 @@ describe("getClientOrigin", () => {
     expect(getClientOrigin(new Headers())).toBeNull();
     expect(getClientOrigin({})).toBeNull();
   });
+
+  it("removes the default port of the protocol", () => {
+    const https = new Headers({ "x-forwarded-host": "varaamo.hel.fi:443", "x-forwarded-proto": "https" });
+    expect(getClientOrigin(https)).toBe("https://varaamo.hel.fi");
+    expect(getClientOrigin({ host: "varaamo.hel.fi:80" }, "http")).toBe("http://varaamo.hel.fi");
+  });
+
+  it("keeps a port that is not the default port of the protocol", () => {
+    expect(getClientOrigin({ host: "varaamo.hel.fi:80" }, "https")).toBe("https://varaamo.hel.fi:80");
+    expect(getClientOrigin({ host: "varaamo.hel.fi:8443" }, "https")).toBe("https://varaamo.hel.fi:8443");
+  });
+
+  it("returns null for a host that is not valid", () => {
+    expect(getClientOrigin({ host: "varaamo.hel.fi/path" })).toBeNull();
+    expect(getClientOrigin({ host: "user@varaamo.hel.fi" })).toBeNull();
+    expect(getClientOrigin({ host: "varaamo hel fi" })).toBeNull();
+  });
+
+  it("returns null for a protocol that is not http or https", () => {
+    expect(getClientOrigin({ host: "varaamo.hel.fi", "x-forwarded-proto": "ftp" })).toBeNull();
+  });
 });
