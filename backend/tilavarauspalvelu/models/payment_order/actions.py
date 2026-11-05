@@ -17,7 +17,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrder
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentGateway, WebShopPaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
+from utils.date_utils import local_date, local_date_of, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -242,7 +242,7 @@ class PaymentOrderActions:
             self.payment_order.reservation is not None
             and self.payment_order.reservation.price_net > 0
             # Reservation start date is not in the past
-            and local_date() <= self.payment_order.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+            and local_date() <= local_date_of(self.payment_order.reservation.begins_at)
             # Has been paid in webshop using invoice
             and self.payment_order.status == OrderStatus.PAID_BY_INVOICE
         )

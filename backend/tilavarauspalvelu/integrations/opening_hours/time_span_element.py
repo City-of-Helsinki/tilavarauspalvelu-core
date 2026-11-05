@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from tilavarauspalvelu.enums import HaukiResourceState
 from tilavarauspalvelu.exceptions import TimeSpanElementError
-from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string, local_date_of, local_start_of_day
 
 if TYPE_CHECKING:
     import zoneinfo
@@ -320,6 +320,6 @@ class TimeSpanElement:
         >>> time_span.get_dates_range()
         [datetime.date(2021, 1, 1), datetime.date(2021, 1, 2), datetime.date(2021, 1, 3)]
         """
-        start_date = self.buffered_start_datetime.astimezone(DEFAULT_TIMEZONE).date()
-        end_date = self.buffered_end_datetime.astimezone(DEFAULT_TIMEZONE).date()
+        start_date = local_date_of(self.buffered_start_datetime)
+        end_date = local_date_of(self.buffered_end_datetime)
         return [start_date + datetime.timedelta(i) for i in range(int((end_date - start_date).days) + 1)]
