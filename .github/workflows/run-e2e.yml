@@ -52,11 +52,21 @@ env:
   PNPM_VERSION: 11.3.0
 
 jobs:
+  playwright-image:
+    uses: ./.github/workflows/playwright-image.yml
+    permissions:
+      contents: read
+
   run-e2e:
     name: E2E tests
     runs-on: ubuntu-latest
+    needs: playwright-image
     # A sequential run of all tests takes the longest
     timeout-minutes: 120
+    # The image has the browsers. The user is the runner user, as the Playwright docs say for GitHub Actions.
+    container:
+      image: ${{ needs.playwright-image.outputs.image }}
+      options: --user 1001
     defaults:
       run:
         working-directory: e2e
@@ -81,9 +91,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Install browsers
-        run: pnpm e2e:install-deps
 
       - name: Run tests
         env:

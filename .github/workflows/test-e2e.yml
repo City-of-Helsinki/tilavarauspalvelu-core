@@ -8,6 +8,7 @@ on:
       - e2e/**
       - tilavaraus.graphql
       - .github/workflows/test-e2e.yml
+      - .github/workflows/playwright-image.yml
     branches:
       - main
   pull_request:
@@ -15,6 +16,7 @@ on:
       - e2e/**
       - tilavaraus.graphql
       - .github/workflows/test-e2e.yml
+      - .github/workflows/playwright-image.yml
   workflow_dispatch:
 
 concurrency:
@@ -29,10 +31,20 @@ env:
   PNPM_VERSION: 11.3.0
 
 jobs:
+  playwright-image:
+    uses: ./.github/workflows/playwright-image.yml
+    permissions:
+      contents: read
+
   check-e2e:
     name: E2E lint and unit tests
     runs-on: ubuntu-latest
+    needs: playwright-image
     timeout-minutes: 15
+    # The image has the browsers. The user is the runner user, as the Playwright docs say for GitHub Actions.
+    container:
+      image: ${{ needs.playwright-image.outputs.image }}
+      options: --user 1001
     defaults:
       run:
         working-directory: e2e
@@ -65,11 +77,6 @@ jobs:
 
       - name: Check that all tests load
         run: pnpm run list
-
-      # About 40 s, half of the job. A pinned Playwright image is large to pull too, and its tag would have to follow
-      # every Playwright upgrade
-      - name: Install browsers
-        run: pnpm e2e:install-deps
 
       - name: Run e2e suite
         run: pnpm test:unit
