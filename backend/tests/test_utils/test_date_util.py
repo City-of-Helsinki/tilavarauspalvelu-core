@@ -15,6 +15,7 @@ from utils.date_utils import (
     add_elapsed_time,
     datetime_difference,
     datetime_range_as_string,
+    from_iso_format,
     get_periods_between,
     local_add_days,
     local_combine,
@@ -22,10 +23,12 @@ from utils.date_utils import (
     local_date_of,
     local_datetime,
     local_datetime_exists,
+    local_from_iso_format,
     local_next_start_of_day,
     local_time,
     localized_short_weekday,
     next_hour,
+    parse_naive_datetime,
     utc_date,
     utc_datetime,
     utc_datetime_max,
@@ -264,6 +267,34 @@ def test_date_utils__next_hour__plus_days_keeps_wall_clock_time():
 
     assert result.date() == datetime.date(2026, 3, 29)
     assert result.time() == datetime.time(13, 0)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("2026-01-01T10:00:00", datetime.datetime(2026, 1, 1, 8, 0, tzinfo=datetime.UTC)),
+        ("2026-07-01T10:00:00", datetime.datetime(2026, 7, 1, 7, 0, tzinfo=datetime.UTC)),
+        ("2026-01-01T10:00:00+00:00", datetime.datetime(2026, 1, 1, 10, 0, tzinfo=datetime.UTC)),
+    ],
+)
+def test_date_utils__from_iso_format(value, expected):
+    result = from_iso_format(value, timezone=DEFAULT_TIMEZONE)
+
+    assert result == expected
+    assert result.tzinfo is DEFAULT_TIMEZONE
+
+
+def test_date_utils__local_from_iso_format__no_offset():
+    result = local_from_iso_format("2026-01-01T10:00:00")
+
+    assert result == datetime.datetime(2026, 1, 1, 8, 0, tzinfo=datetime.UTC)
+
+
+def test_date_utils__parse_naive_datetime():
+    result = parse_naive_datetime("20260701-100000", string_format="%Y%m%d-%H%M%S", timezone=DEFAULT_TIMEZONE)
+
+    assert result == datetime.datetime(2026, 7, 1, 7, 0, tzinfo=datetime.UTC)
+    assert result.tzinfo is DEFAULT_TIMEZONE
 
 
 class Params(NamedTuple):

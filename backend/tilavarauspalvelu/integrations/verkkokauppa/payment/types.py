@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import datetime
 import uuid
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 
@@ -15,6 +14,10 @@ from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import (
     ParseRefundError,
     ParseRefundStatusError,
 )
+from utils.date_utils import parse_naive_datetime
+
+if TYPE_CHECKING:
+    import datetime
 
 
 class WebShopPaymentStatus(StrEnum):
@@ -106,8 +109,7 @@ class Payment:
 
     @classmethod
     def _parse_datetime(cls, string: str) -> datetime.datetime:
-        # Verkkokauppa sends local time without an offset. Read it in the Verkkokauppa time zone.
-        return datetime.datetime.strptime(string, "%Y%m%d-%H%M%S").replace(tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+        return parse_naive_datetime(string, string_format="%Y%m%d-%H%M%S", timezone=settings.VERKKOKAUPPA_TIMEZONE)
 
 
 @dataclass(frozen=True)
