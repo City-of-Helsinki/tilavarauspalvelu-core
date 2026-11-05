@@ -75,6 +75,9 @@ class PriceComponentFormSet(BaseInlineFormSet):
             prefix=RESERVATION_UNITS_PREFIX,
         )
         if not reservation_unit_formset.is_valid():
+            # The reservation unit inline shows its own errors. Check against the saved rows meanwhile.
+            if self.instance.pk is None:
+                return []
             return list(self.instance.reservation_unit_pricing_groups.values_list("begins", flat=True))
 
         return [
