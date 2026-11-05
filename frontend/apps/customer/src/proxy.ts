@@ -6,7 +6,7 @@ import { logError } from "@ui/modules/errors";
 import { getClientUrl, gqlQueryFetch, isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
-import { getSignInUrl, removeTrailingSlash } from "ui/src/modules/urlBuilder";
+import { getSignInUrl } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { env } from "@/env.mjs";
@@ -256,15 +256,6 @@ function getLangPrefix(url: URL): "" | "en" | "sv" {
 }
 
 async function handleRequest(req: NextRequest) {
-  const pathname = req.nextUrl.pathname;
-  const basePath = removeTrailingSlash(env.NEXT_PUBLIC_BASE_URL ?? "");
-  const sentryTunnelPath = `${basePath}/monitoring`;
-
-  // Allow Sentry tunnel route to pass through without auth/csrf middleware redirects.
-  if (pathname === sentryTunnelPath || pathname === "/monitoring") {
-    return NextResponse.next();
-  }
-
   // don't make unnecessary requests to the backend for every asset
   if (!isPageRequest(new URL(req.url))) {
     return NextResponse.next();
