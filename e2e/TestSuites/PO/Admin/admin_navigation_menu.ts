@@ -1,5 +1,5 @@
 /** Port of PO/Admin/admin_navigation_menu.robot */
-import { step } from "../../../lib/runtime";
+import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
 export class AdminNavigationMenu extends PageObject {
@@ -7,6 +7,9 @@ export class AdminNavigationMenu extends PageObject {
   async adminNavigatesToRequestedReservations() {
     await this.page.locator('[href="/kasittely/reservations/requested"]').click();
     await this.page.waitForURL((url) => url.pathname === "/kasittely/reservations/requested");
+    // The page puts its default filters in the URL after it opens and then resets the filter form to them, which
+    // empties a search typed before the reset. The state filter shows the default states only after the reset.
+    await expect(this.page.getByRole("combobox", { name: "Käsittelyn tilanne" })).toContainText("Hyväksytty");
   }
 
   @step("admin_navigation_menu.Admin Navigates To Reservations")
