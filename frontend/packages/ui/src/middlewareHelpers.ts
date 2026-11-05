@@ -6,9 +6,10 @@ import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 // Only the part before the query string can match.
 const FILE_EXTENSIONS = "webmanifest|js|css|png|jpe?g|svg|gif|ico|json|woff2?|ttf|eot|otf|pdf|txt";
 
-/// Matches the paths of requests that are not pages: Next.js files, API routes and public files.
+/// Matches the paths of requests that are not pages: Next.js files, API routes, the Sentry tunnel and public files.
 /// The proxy skips these requests. The Sentry server configs drop the proxy transactions for them.
-export const NON_PAGE_PATH = new RegExp(`^[^?]*(/(_next|api)/|\\.(${FILE_EXTENSIONS})(\\?|$))`);
+/// The Sentry tunnel is the tunnelRoute in next.config.ts. The SDK does not drop it when the app has a base path.
+export const NON_PAGE_PATH = new RegExp(`^[^?]*(/(_next|api)/|/monitoring/?(\\?|$)|\\.(${FILE_EXTENSIONS})(\\?|$))`);
 
 /// Matches the paths of public files, such as /favicon.svg. Paths under /_next/ do not match.
 /// The Sentry server configs drop the transactions for these files.
