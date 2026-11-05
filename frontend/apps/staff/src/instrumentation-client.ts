@@ -32,6 +32,9 @@ if (env.SENTRY_DSN) {
     ignoreErrors: [
       "ResizeObserver loop completed with undelivered notifications",
       "ResizeObserver loop limit exceeded",
+      // hds-react cookie consent monitor reads the bare `indexedDB` global on a timer. Safari throws this
+      // when that global is missing. Match the exact type and value.
+      /^ReferenceError: Can't find variable: indexedDB$/,
     ],
     tracesSampleRate: parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE),
     tracePropagationTargets: env.SENTRY_TRACE_PROPAGATION_TARGETS
