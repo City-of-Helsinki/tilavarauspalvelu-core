@@ -31,6 +31,7 @@ from utils.date_utils import (
     DEFAULT_TIMEZONE,
     datetime_difference,
     local_date,
+    local_date_of,
     local_datetime,
     local_datetime_exists,
     local_end_of_day,
@@ -382,7 +383,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return None
 
     def get_access_type_at(self, moment: datetime.datetime, *, default: AccessType | None = None) -> AccessType | None:
-        on_date = moment.astimezone(DEFAULT_TIMEZONE).date()
+        on_date = local_date_of(moment)
         qs = self.reservation_unit.access_types.active(on_date=on_date)
         return qs.values_list("access_type", flat=True).first() or default
 

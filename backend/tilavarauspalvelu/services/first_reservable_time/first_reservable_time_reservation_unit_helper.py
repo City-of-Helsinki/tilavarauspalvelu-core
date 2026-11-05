@@ -10,7 +10,7 @@ from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_rese
     ReservableTimeSpanFirstReservableTimeHelper,
 )
 from tilavarauspalvelu.services.first_reservable_time.utils import ReservableTimeOutput
-from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day, utc_datetime_max, utc_datetime_min
+from utils.date_utils import local_date_of, local_start_of_day, utc_datetime_max, utc_datetime_min
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import AccessType
@@ -161,7 +161,7 @@ class ReservationUnitFirstReservableTimeHelper:
         if is_closed or first_reservable_time is None:
             access_type_date = self.parent.filter_date_start
         else:
-            access_type_date = first_reservable_time.astimezone(DEFAULT_TIMEZONE).date()
+            access_type_date = local_date_of(first_reservable_time)
 
         # Find the access type active at the first reservable time (These are sorted in reverse order in the QuerySet)
         for access_type in self.reservation_unit.access_types.all():

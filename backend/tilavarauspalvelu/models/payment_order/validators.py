@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, local_date
+from utils.date_utils import local_date, local_date_of
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder
@@ -40,7 +40,7 @@ class PaymentOrderValidator:
             msg = "Only orders paid by invoice can be cancelled."
             raise ValidationError(msg, code=error_codes.ORDER_CANCELLATION_NOT_ALLOWED)
 
-        begin_date = self.payment_order.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+        begin_date = local_date_of(self.payment_order.reservation.begins_at)
 
         if local_date() > begin_date:
             msg = "Order cannot be cancelled after its reservation start date."
