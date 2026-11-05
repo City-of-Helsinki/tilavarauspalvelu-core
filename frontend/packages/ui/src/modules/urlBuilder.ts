@@ -28,15 +28,33 @@ function getFirstHeaderValue(headers: Headers | IncomingHttpHeaders, name: strin
 /// A gateway sets the x-forwarded headers. Without a gateway, the Host header has the host that the client used.
 /// @param headers - request headers in the proxy (Headers) or in getServerSideProps (IncomingHttpHeaders)
 /// @param requestProtocol - protocol of the connection to this server, "http" or "https"
-/// @returns origin or null if the request has no host header
+/// The origin does not have the default port of the protocol, for example ":443" for https.
+/// Some clients send "Host: varaamo.hel.fi:443". Django CSRF compares the Referer host and port exactly,
+/// so a Referer with the default port fails with 403.
+/// @param headers - request headers in the proxy (Headers) or in getServerSideProps (IncomingHttpHeaders)
+/// @param requestProtocol - protocol of the connection to this server, "http" or "https"
+/// @returns origin or null if the request has no valid host header
 export function getClientOrigin(headers: Headers | IncomingHttpHeaders, requestProtocol?: string): string | null {
   const host = getFirstHeaderValue(headers, "x-forwarded-host") ?? getFirstHeaderValue(headers, "host");
   if (host == null) {
     return null;
   }
   // Without a gateway, the client connects to this server, so the protocol of that connection is correct.
-  const proto = getFirstHeaderValue(headers, "x-forwarded-proto") ?? requestProtocol ?? "http";
-  return `${proto}://${host}`;
+  const proto = (getFirstHeaderValue(headers, "x-forwarded-proto") ?? requestProtocol ?? "http").toLowerCase();
+  if (proto !== "http" && proto !== "https") {
+    return null;
+  }
+  // A valid host header has only a host and a port.
+  // Check the raw value first. URL removes empty parts, for example "host#" or "@host".
+  if (/[/\\?#@]/.test(host)) {
+    return null;
+  }
+  // URL removes the default port of the protocol.
+  const url = URL.parse(`${proto}://${host}`);
+  if (url == null || url.pathname !== "/" || url.search !== "" || url.hash !== "" || url.username !== "") {
+    return null;
+  }
+  return url.origin;
 }
 
 function buildAuthUrl(apiUrl: string) {
