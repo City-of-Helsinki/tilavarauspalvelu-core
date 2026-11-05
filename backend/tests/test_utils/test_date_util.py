@@ -83,7 +83,8 @@ def test_date_utils__local_date():
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__local_time():
-    assert local_time() == datetime.time(2, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
+    assert local_time() == datetime.time(2)
+    assert local_time().tzinfo is None
 
 
 def test_date_utils__local_datetime_min():
@@ -100,6 +101,17 @@ def test_date_utils__local_time_min():
 
 def test_date_utils__local_time_max():
     assert local_time_max() == datetime.time.max.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
+
+
+@freezegun.freeze_time(datetime.datetime(2024, 1, 1, 10, 15, tzinfo=datetime.UTC))
+def test_date_utils__local_time__midnight():
+    assert local_time(0, 0) == datetime.time(0, 0)
+
+
+def test_date_utils__local_time__given_time():
+    assert local_time(10, 30) == datetime.time(10, 30)
+    assert local_time(minute=30) == datetime.time(0, 30)
+    assert local_time(10, 30).tzinfo is None
 
 
 # The clocks move from 03:00 to 04:00 on 2026-03-29, and from 04:00 back to 03:00 on 2026-10-25.
@@ -127,9 +139,10 @@ def test_date_utils__utc_date():
     assert utc_date() == datetime.datetime.now(tz=datetime.UTC).date()
 
 
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
+@freezegun.freeze_time(datetime.datetime(2024, 1, 1, 10, 15, tzinfo=datetime.UTC))
 def test_date_utils__utc_time():
-    assert utc_time() == datetime.datetime.now(tz=datetime.UTC).timetz()
+    assert utc_time() == datetime.time(10, 15)
+    assert utc_time().tzinfo is None
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
