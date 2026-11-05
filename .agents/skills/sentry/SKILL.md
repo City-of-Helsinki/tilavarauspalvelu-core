@@ -1,24 +1,25 @@
 ---
 name: sentry
 description: >-
-  Fetch a Sentry issue and one of its events through the Sentry REST API and present its details.
-  Use when the user references a Sentry issue either with a URL or an issue ID.
+  Fetch a Sentry issue and its events, and drive a Seer autofix run up to the code changes,
+  through the Sentry REST API. Use when the user references a Sentry issue with a URL or an issue ID,
+  or asks to run or continue Seer or autofix on an issue.
 ---
 
-How to fetch a Sentry issue to find the cause of an error.
+How to fetch a Sentry issue to find the cause of an error, and how to take it through Seer.
 
 ## 1. Authentication
 
-The `sentry-issue` script next to this file reads the token from 1Password with `op read`.
+The scripts next to this file read the token from 1Password with `op read`.
 1Password asks the user to unlock. Wait for it.
 
-The script needs this setup. If a call fails because of it, stop and tell the user which part is missing:
+The scripts need this setup. If a call fails because of it, stop and tell the user which part is missing:
 
 - `op` (1Password CLI) is installed.
 - The 1Password desktop app has Settings → Developer → "Integrate with 1Password CLI" turned on.
 - The 1Password vault has an "API Credential" item. `credential` is a personal token from
-  https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/ with the `event:read`,
-  `org:read` and `project:read` scopes.
+  https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/. Set "Issue & Event" to Read & Write,
+  "Organization" to Read and "Project" to Read. Only `sentry-autofix` needs the write permission.
 - The user's shell profile sets these variables:
 
 | Variable                  | Meaning                                               |
@@ -27,12 +28,16 @@ The script needs this setup. If a call fails because of it, stop and tell the us
 | `SENTRY_ISSUE_OP_VAULT`   | Vault that has the item, for example `Private`.       |
 | `SENTRY_ISSUE_OP_ITEM`    | Name of the item, for example `Sentry API PAT`.       |
 
-Never print the token or call `op` for it yourself. Use only the script.
+Never print the token or call `op` for it yourself. Use only the scripts.
 
-## 2. Fetch the issue
+## 2. Run a script
 
-Run the script from the repository root. Give it the issue ID or the URL from the user as is.
-Put a URL in single quotes:
+Run the scripts from the repository root. The shell can be in another directory after an earlier command.
+Give them the issue ID or the URL from the user as is. Put a URL or a free text argument in single quotes.
+A free text argument cannot have a single quote inside.
+A hook blocks the command if it is in any other form. Run each script as a single command, without pipes.
+
+### Fetch an issue
 
 ```bash
 .agents/skills/sentry/sentry-issue 153768154
@@ -40,13 +45,12 @@ Put a URL in single quotes:
 ```
 
 The script fetches the issue and one event. The event is the one in the URL, or the latest event.
-A hook blocks the command if it is in any other form. Run it as a single command, without pipes.
 
 Stack frames are oldest first. Only in-app frames have code context.
 Use the `release` and `environment` tags to find the code version the error came from.
 Performance issues, such as N+1 queries, have no exceptions. Their `evidence` field has the repeated queries.
 
-## 3. Check all events with tag counts
+### Check all events with tag counts
 
 One event can mislead. To see if a pattern holds for all events of the issue, add tag keys after the issue.
 The keys are the same as in the event `tags`, for example `browser.name`, `os.name`, `url` or `release`:
@@ -56,3 +60,70 @@ The keys are the same as in the event `tags`, for example `browser.name`, `os.na
 ```
 
 The `tags` field then has the top values of each key over all events, with a count for each.
+
+### Run Seer autofix
+
+`sentry-autofix` does the same as the buttons in the Seer panel of the web UI.
+Use it even if the Sentry MCP server is connected. The MCP can start a run and read its result,
+but it cannot accept a step, rethink a step or open a pull request.
+
+```bash
+.agents/skills/sentry/sentry-autofix state 158537513
+.agents/skills/sentry/sentry-autofix wait 158537513
+.agents/skills/sentry/sentry-autofix start 158537513
+.agents/skills/sentry/sentry-autofix plan 158537513
+.agents/skills/sentry/sentry-autofix code 158537513 'Also cover a user with no social auth row in the test'
+.agents/skills/sentry/sentry-autofix rethink 158537513 root_cause 'The N+1 is in X, not in Y'
+```
+
+- `state` shows the run. `sections` has the steps in the run. Each step has its result in `artifacts`,
+  such as the root cause or the plan. The code changes step has the diffs in `file_patches`.
+- `wait` polls until `status` is not `processing` and no pull request is still being created.
+  It gives up after 9 minutes. Then run it again.
+  Give the shell command a timeout of 10 minutes.
+- `start` starts a new run that stops after the root cause. It refuses if the issue already has a run.
+- `plan` accepts the root cause and makes a plan. This is "Yes, make a plan" in the web UI.
+- `code` accepts the plan and writes the code changes.
+- `plan` and `code` take an optional instruction. Use it for small changes, instead of a rethink.
+- `rethink` redoes `root_cause` or `solution` with your reason. This removes the later steps.
+- `pr` opens a pull request on GitHub with the code changes. Run it only when the user asks for a pull request.
+  After it, run `wait`. The link is in `pull_requests`.
+
+Seer runs cost money, so do not start or rethink without a reason.
+
+## 3. Seer workflow
+
+1. Run `state`. If there is no run, run `start`. Then run `wait`.
+2. Judge the root cause against the code in this repository at the `release` of the issue.
+   Use `sentry-issue` for the event data. Check each claim in the root cause in the code.
+3. Tell the user what you found. Then run `rethink` with a precise reason, or run `plan`. Then run `wait`.
+4. Judge the plan in the same way, against the docs in `.agents/docs/` for the code it changes.
+   Then run `rethink` on `solution`, or run `code`. Then run `wait`.
+5. Judge the code changes. Look for scratch files that Seer left in `file_patches`. See section 4.
+   Then stop and give the user the result and the issue URL.
+6. The user checks the changes. If the user asks for a pull request, run `pr` and then `wait`.
+   If a pull request has `status` `error`, its `error` field has the reason. Tell the user.
+
+If `status` is `error` or `awaiting_user_input`, stop and tell the user.
+After two rethinks of the same step, stop and ask the user.
+
+## 4. Known problems
+
+### A scratch file makes the pull request fail
+
+Seer can leave a scratch file in the code changes, such as `backend/_check_tmp.py`.
+It shows in `file_patches` with `type` `M` and an empty `diff`, but the file is not in the repository.
+Then `pr` fails with the error "File contents must be provided for modify or delete operations."
+The "Retry PR" button in the web UI fails in the same way.
+
+- Look for such a file before you run `pr`. Tell the user about it.
+- Running `code` again with an instruction to leave out the file does not help.
+  The file stays in `file_patches`, because the new code step adds to the old one.
+- `rethink` on `solution` removes the code step and the file with it.
+  Then run `code` with an instruction to write no scratch file in the repository, and run `pr` again.
+
+### Seer changes the plan in a rethink
+
+A `rethink` makes a new plan. Seer can change the approach even when the reason says to keep the plan.
+Read the new plan before you run `code`. If it is worse, give `code` an instruction that names the approach.
+Seer followed such an instruction over the plan in the first test.
