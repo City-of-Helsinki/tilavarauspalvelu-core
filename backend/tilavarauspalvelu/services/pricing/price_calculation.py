@@ -59,6 +59,7 @@ def calculate_price(
 
     The duration of the reservation is rounded up to the next 15 minutes.
     Durations are real time, so a night with a daylight saving change is one hour shorter or longer.
+    Day and week units follow the local calendar, so a day with a daylight saving change is one day.
 
     :raises PriceCalculationError: If the reservation unit has no pricing group, the price option belongs to
                                    another unit group, or there is no price on a date.
@@ -115,7 +116,7 @@ def calculate_price(
 
         if price_unit in {PriceUnit.PER_HALF_DAY, PriceUnit.PER_DAY, PriceUnit.PER_WEEK}:
             quantities[component.pk] = quantity + 1
-            moment += datetime.timedelta(minutes=price_unit.in_minutes)
+            moment = _start_of_next_unit(moment=moment, price_unit=price_unit)
             continue
 
         next_midnight = local_start_of_day(moment_date + datetime.timedelta(days=1)).astimezone(datetime.UTC)
@@ -159,3 +160,14 @@ def _component_for_date(*, components: list[PriceComponent], date: datetime.date
 
     msg = f"Reservation unit has no price on {date.isoformat()}."
     raise PriceCalculationError(msg)
+
+
+def _start_of_next_unit(*, moment: datetime.datetime, price_unit: PriceUnit) -> datetime.datetime:
+    unit_length = datetime.timedelta(minutes=price_unit.in_minutes)
+    if price_unit == PriceUnit.PER_HALF_DAY:
+        return moment + unit_length
+
+    # Python adds to a datetime with a zoneinfo timezone in wall time, so a day stays a calendar day.
+    local_moment = moment.astimezone(DEFAULT_TIMEZONE)
+    next_local_moment = local_moment + unit_length
+    return next_local_moment.astimezone(datetime.UTC)
