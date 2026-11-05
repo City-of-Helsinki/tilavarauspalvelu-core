@@ -1,0 +1,8 @@
+.claude/settings.json
+.claude/hooks
+.claude/skills
+CLAUDE.md
+backend/local_settings.py
+backend/pytest.ini
+frontend/apps/*/.env.local
+local.just
