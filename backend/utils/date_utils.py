@@ -149,6 +149,11 @@ def local_add_days(_datetime: datetime.datetime, /, *, days: int) -> datetime.da
         raise NaiveDatetimeError(msg)
 
     local_value = _datetime.astimezone(DEFAULT_TIMEZONE)
+
+    # Datetime arithmetic resets 'fold', which moves a time in the repeated autumn hour to its first occurrence.
+    if days == 0:
+        return local_value
+
     moved = local_value + datetime.timedelta(days=days)
 
     # The round trip through UTC gives a time in the spring gap the offset that is valid after the change.
