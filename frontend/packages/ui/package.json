@@ -19,7 +19,7 @@
     "test:coverage": "CI=true pnpm test --coverage"
   },
   "dependencies": {
-    "@sentry/core": "^10.76.2",
+    "@sentry/core": "^11.10.0",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "focus-trap-react": "^11.0.6",
