@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, Any
 
 import graphene
@@ -128,8 +129,6 @@ from .types.payment_order.permissions import PaymentOrderPermission
 from .types.reservation_cancel_reason.types import CancelReasonDict
 
 if TYPE_CHECKING:
-    import datetime
-
     from django.db import models
 
     from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
@@ -283,6 +282,11 @@ class Query(graphene.ObjectType):
         ends_at: datetime.datetime,
         price_option: int | None = None,
     ) -> PriceLines:
+        # The price calculation loops once for each day, and this query is public.
+        if ends_at - begins_at > datetime.timedelta(days=366):
+            msg = "Reservation price can be calculated for at most 366 days."
+            raise GQLCodeError(msg, code=error_codes.RESERVATION_PRICE_INTERVAL_TOO_LONG)
+
         reservation_unit_instance = ReservationUnit.objects.filter(pk=reservation_unit).first()
         if reservation_unit_instance is None:
             msg = f"Reservation unit with pk {reservation_unit} does not exist."

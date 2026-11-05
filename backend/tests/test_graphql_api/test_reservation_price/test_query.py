@@ -238,6 +238,22 @@ def test_reservation_price__ends_before_it_begins(graphql):
     assert response.error_code() == error_codes.PRICE_CALCULATION_FAILED
 
 
+def test_reservation_price__interval_too_long(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    query = build_query(
+        "reservationPrice",
+        fields="total",
+        reservation_unit=reservation_unit.pk,
+        begins_at=local_datetime(2026, 2, 1, 10).isoformat(),
+        ends_at=local_datetime(2027, 2, 2, 10, 15).isoformat(),
+    )
+    response = graphql(query)
+
+    assert response.error_message() == "Reservation price can be calculated for at most 366 days."
+    assert response.error_code() == error_codes.RESERVATION_PRICE_INTERVAL_TOO_LONG
+
+
 def test_reservation_price__reservation_unit_not_found(graphql):
     query = build_query(
         "reservationPrice",
