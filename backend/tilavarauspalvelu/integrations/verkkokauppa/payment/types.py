@@ -106,7 +106,8 @@ class Payment:
 
     @classmethod
     def _parse_datetime(cls, string: str) -> datetime.datetime:
-        return datetime.datetime.strptime(string, "%Y%m%d-%H%M%S").astimezone(settings.VERKKOKAUPPA_TIMEZONE)
+        # Verkkokauppa sends local time without an offset. Read it in the Verkkokauppa time zone.
+        return datetime.datetime.strptime(string, "%Y%m%d-%H%M%S").replace(tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
 
 
 @dataclass(frozen=True)
