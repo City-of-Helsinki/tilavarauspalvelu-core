@@ -293,8 +293,8 @@ async function handleRequest(req: NextRequest) {
     const pk = Number(id);
     if (pk > 0) {
       applicationPk = pk;
-    } else if (id == null && id !== "") {
-      logError(`Middleware: Invalid application id: ${id} of type ${typeof id} at path ${url.pathname}`, "warning");
+    } else if (id != null && id !== "") {
+      logError(`Middleware: Invalid application id: ${id} at path ${url.pathname}`, "warning");
     }
   }
 
