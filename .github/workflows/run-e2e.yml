@@ -1,5 +1,6 @@
 name: "E2E tests"
-run-name: "E2E tests: ${{ inputs.test_suite }}, ${{ inputs.execution_mode == 'sequential' && 'sequential' || format('{0} workers', inputs.workers) }}"
+# The notification suite always runs with one worker (pnpm test:notifications)
+run-name: "E2E tests: ${{ inputs.test_suite }}, ${{ inputs.execution_mode == 'sequential' && 'sequential' || inputs.test_suite == 'Tests_admin_notifications_serial' && '1 worker' || format('{0} workers', inputs.workers) }}"
 
 # Runs the e2e suite against the test environment (https://varaamo.test.hel.ninja/), only when started by hand
 on:
