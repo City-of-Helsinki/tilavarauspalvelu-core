@@ -29,6 +29,7 @@ from utils.date_utils import (
     localized_short_weekday,
     next_hour,
     parse_naive_datetime,
+    timedelta_to_json,
     utc_date,
     utc_datetime,
     utc_datetime_max,
@@ -295,6 +296,19 @@ def test_date_utils__parse_naive_datetime():
 
     assert result == datetime.datetime(2026, 7, 1, 7, 0, tzinfo=datetime.UTC)
     assert result.tzinfo is DEFAULT_TIMEZONE
+
+
+@pytest.mark.parametrize(
+    ("delta", "seconds_result", "minutes_result"),
+    [
+        (datetime.timedelta(minutes=30), "00:30:00", "00:30"),
+        (datetime.timedelta(hours=25, seconds=5), "25:00:05", "25:00"),
+        (datetime.timedelta(minutes=-5), "-00:05:00", "-00:05"),
+    ],
+)
+def test_date_utils__timedelta_to_json(delta, seconds_result, minutes_result):
+    assert timedelta_to_json(delta) == seconds_result
+    assert timedelta_to_json(delta, timespec="minutes") == minutes_result
 
 
 class Params(NamedTuple):

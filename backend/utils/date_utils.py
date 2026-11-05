@@ -385,10 +385,15 @@ def parse_naive_datetime(
 
 
 def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes", "seconds"] = "seconds") -> str:
-    result = str(delta).zfill(8)
+    """Format a timedelta as '[-]HH:MM:SS' or '[-]HH:MM'. The hours count the whole duration, not only one day."""
+    total_seconds = int(delta.total_seconds())
+    sign = "-" if total_seconds < 0 else ""
+    hours, remaining_seconds = divmod(abs(total_seconds), 3600)
+    minutes, seconds = divmod(remaining_seconds, 60)
+
     if timespec == "minutes":
-        return result[:5]
-    return result
+        return f"{sign}{hours:02}:{minutes:02}"
+    return f"{sign}{hours:02}:{minutes:02}:{seconds:02}"
 
 
 def timedelta_from_json(delta: str) -> datetime.timedelta:
