@@ -1,5 +1,5 @@
 ---
-name: sentry-issue
+name: sentry
 description: >-
   Fetch a Sentry issue and one of its events through the Sentry REST API and present its details.
   Use when the user references a Sentry issue either with a URL or an issue ID.
@@ -35,8 +35,8 @@ Run the script from the repository root. Give it the issue ID or the URL from th
 Put a URL in single quotes:
 
 ```bash
-.agents/skills/sentry-issue/sentry-issue 153768154
-.agents/skills/sentry-issue/sentry-issue 'https://city-of-helsinki.sentry.io/issues/153768154/?project=4511422016192592'
+.agents/skills/sentry/sentry-issue 153768154
+.agents/skills/sentry/sentry-issue 'https://city-of-helsinki.sentry.io/issues/153768154/?project=4511422016192592'
 ```
 
 The script fetches the issue and one event. The event is the one in the URL, or the latest event.
@@ -52,7 +52,7 @@ One event can mislead. To see if a pattern holds for all events of the issue, ad
 The keys are the same as in the event `tags`, for example `browser.name`, `os.name`, `url` or `release`:
 
 ```bash
-.agents/skills/sentry-issue/sentry-issue 153768154 browser.name os.name
+.agents/skills/sentry/sentry-issue 153768154 browser.name os.name
 ```
 
 The `tags` field then has the top values of each key over all events, with a count for each.
