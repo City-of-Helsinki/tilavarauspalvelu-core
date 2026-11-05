@@ -1,5 +1,5 @@
 name: "E2E tests"
-run-name: "E2E tests: ${{ inputs.test_suite }}, ${{ inputs.execution_mode }}"
+run-name: "E2E tests: ${{ inputs.test_suite }}, ${{ inputs.execution_mode == 'sequential' && 'sequential' || format('{0} workers', inputs.workers) }}"
 
 # Runs the e2e suite against the test environment (https://varaamo.test.hel.ninja/), only when started by hand
 on:
@@ -27,6 +27,16 @@ on:
         options:
           - parallel
           - sequential
+      # A GitHub runner has 4 CPUs
+      workers:
+        description: "Workers in a parallel run"
+        required: true
+        default: "3"
+        type: choice
+        options:
+          - "3"
+          - "4"
+          - "5"
 
 # One run at a time: each run deletes and creates the shared test data again
 concurrency:
@@ -78,8 +88,7 @@ jobs:
         env:
           SUITE: ${{ inputs.test_suite }}
           MODE: ${{ inputs.execution_mode }}
-          # The Robot suite's CI ran 3 processes; a GitHub runner has 4 CPUs
-          WORKERS: 3
+          WORKERS: ${{ inputs.workers }}
           WAF_BYPASS_SECRET: ${{ secrets.WAF_BYPASS_SECRET }}
           ROBOT_API_TOKEN: ${{ secrets.ROBOT_API_TOKEN }}
           DJANGO_ADMIN_PASSWORD: ${{ secrets.DJANGO_ADMIN_PASSWORD }}
