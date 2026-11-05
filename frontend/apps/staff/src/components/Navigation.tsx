@@ -30,7 +30,6 @@ type Props = {
 const BackgroundHeader = styled(Header)`
   && {
     --actionbar-background-color: var(--color-bus-dark);
-    --notification-bubble-background-color: var(--tilavaraus-admin-handling-count-color);
     --action-bar-item-title-font-color: white;
 
     [class^="HeaderActionBarItem-module_dropdown"],
@@ -38,19 +37,6 @@ const BackgroundHeader = styled(Header)`
       --action-bar-item-title-font-color: black;
     }
 
-    /* retain text-decoration: underline on the plain text in navigation items, but disable it in the notificationBubble */
-    [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:hover,
-    [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:focus-within {
-      a {
-        text-decoration: none;
-        span {
-          text-decoration: underline;
-        }
-        [class^="HeaderActionBarSubItem-module_notificationBubble__"] {
-          text-decoration: none;
-        }
-      }
-    }
     #hds-mobile-menu {
       #user-menu * {
         box-sizing: border-box;
@@ -62,10 +48,6 @@ const BackgroundHeader = styled(Header)`
         > span {
           box-sizing: border-box;
           padding: var(--spacing-s);
-          li {
-            width: 100%;
-            font-size: var(--fontsize-body-xl);
-          }
           .active {
             font-weight: bold;
           }
@@ -91,6 +73,34 @@ const NavigationMenuWrapper = styled.div`
     /* using box-shadow for a bottom border inside of the element, without affecting text positioning */
     box-shadow: 0 -4px 0 0 var(--color-black) inset;
   }
+`;
+
+// HDS underlines the whole link on hover. The link is a flex container, so the underline also reaches the bubble.
+// Underline only the label instead. The triple "&" beats the HDS selector ".headerLink.headerLink:hover".
+const NavigationAnchorLink = styled.a`
+  &&&:hover {
+    text-decoration: none;
+  }
+  &&&:hover > span:first-child {
+    text-decoration: underline;
+    text-decoration-color: var(--nav-link-hover-color);
+  }
+`;
+
+// Same look as the HDS notification bubble of Header.ActionBarSubItem.
+const NotificationBubble = styled.span`
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: var(--spacing-m);
+  margin-left: var(--spacing-2-xs);
+  padding: 0 6px;
+  border-radius: var(--spacing-xs);
+  background: var(--tilavaraus-admin-handling-count-color);
+  color: var(--color-white);
+  font-size: var(--fontsize-body-s);
+  font-weight: normal;
+  line-height: var(--spacing-m);
+  text-align: center;
 `;
 
 const ProfileMenuLink = styled.div`
@@ -216,18 +226,35 @@ function NavigationLink({
   const excludesWithPrefix = exclude?.map((route) => `${PUBLIC_URL}${route}`);
   const isActive = checkActive(pathname, routesWithPrefix, exact, excludesWithPrefix);
 
+  // NOTE Use Header.Link here. HDS wraps each menu child in an <li>.
+  // Header.ActionBarSubItem renders its own <li>, which causes a hydration error.
   return (
-    <Header.ActionBarSubItem
-      key={routes[0]}
+    <Header.Link
+      as={NavigationAnchor}
       onClick={handleClick}
       href={routesWithPrefix[0]}
       label={t(title)}
       aria-label={t(title)}
+      active={isActive}
       className={isActive ? "active" : ""}
-      notificationBubbleAriaLabel={shouldDisplayCount ? "Määrä" : undefined}
-      notificationBubbleContent={shouldDisplayCount ? count?.toString() : undefined}
+      count={shouldDisplayCount ? count : undefined}
       aria-current={isActive}
     />
+  );
+}
+
+/// The link element for Header.Link. HDS passes the label as children.
+/// It shows the count in a notification bubble after the label.
+function NavigationAnchor({
+  children,
+  count,
+  ...rest
+}: React.ComponentPropsWithoutRef<"a"> & Readonly<{ count?: number }>) {
+  return (
+    <NavigationAnchorLink {...rest}>
+      <span>{children}</span>
+      {count != null && <NotificationBubble>{count}</NotificationBubble>}
+    </NavigationAnchorLink>
   );
 }
 
