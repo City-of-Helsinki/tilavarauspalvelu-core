@@ -90,22 +90,19 @@ def local_date(
 
 
 def local_time(
-    hour: int = 0,
-    minute: int = 0,
-    second: int = 0,
-    microsecond: int = 0,
-    *,
-    date: datetime.date | None = None,
+    hour: int | None = None,
+    minute: int | None = None,
+    second: int | None = None,
+    microsecond: int | None = None,
 ) -> datetime.time:
     """
-    Get time in the local timezone on the given date (or today by default).
-    Without arguments, the current time is returned.
+    Get a wall clock time without a timezone, like a 'TimeField' value.
+    Without arguments, the current time in the local timezone is returned.
     """
-    if any((hour, minute, second, microsecond)):
-        today = date or local_date()
-        return local_datetime(today.year, today.month, today.day, hour, minute, second, microsecond).timetz()
+    if hour is None and minute is None and second is None and microsecond is None:
+        return local_datetime().time()
 
-    return local_datetime().timetz()
+    return datetime.time(hour or 0, minute or 0, second or 0, microsecond or 0)
 
 
 def local_datetime_min() -> datetime.datetime:
@@ -260,20 +257,9 @@ def utc_date(
     return utc_datetime(year, month, day).date()
 
 
-def utc_time(
-    hour: int = 0,
-    minute: int = 0,
-    second: int = 0,
-    microsecond: int = 0,
-    *,
-    date: datetime.date | None = None,
-) -> datetime.time:
-    """Get time in UTC on the given date (or today by default). Without arguments, the current time is returned."""
-    if any((hour, minute, second, microsecond)):
-        today = date or local_date()
-        return utc_datetime(today.year, today.month, today.day, hour, minute, second, microsecond).timetz()
-
-    return utc_datetime().timetz()
+def utc_time() -> datetime.time:
+    """Get the current wall clock time in UTC, without a timezone."""
+    return utc_datetime().time()
 
 
 def utc_datetime_min() -> datetime.datetime:
