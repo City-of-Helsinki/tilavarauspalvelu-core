@@ -29,6 +29,7 @@ __all__ = [
     "local_end_of_day",
     "local_from_iso_format",
     "local_iso_format",
+    "local_next_start_of_day",
     "local_start_of_day",
     "local_time",
     "local_time_string",
@@ -143,8 +144,24 @@ def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
 
 
+def local_next_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
+    """
+    Get the start of the next day (00:00:00) for the given date (or today if not given) in local timezone.
+    Use it as the end of a day in a half-open range: 'begin <= value < end'.
+    """
+    if isinstance(_date, datetime.datetime):
+        _date = local_date_of(_date)
+    if _date is None:
+        _date = local_date()
+    next_date = _date + datetime.timedelta(days=1)
+    return datetime.datetime.combine(next_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
+
+
 def local_end_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
-    """Get the end of day (23:59:59) as datetime for the given date in local timezone."""
+    """
+    Get the end of day (23:59:59.999999) as datetime for the given date in local timezone.
+    Use it with '<='. For the end of a range, use 'local_next_start_of_day' with '<'.
+    """
     if isinstance(_date, datetime.datetime):
         _date = local_date_of(_date)
     if _date is None:
