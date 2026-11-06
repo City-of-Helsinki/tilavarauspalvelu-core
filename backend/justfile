@@ -52,6 +52,35 @@ scheduler:
 schema:
     @python manage.py update_graphql_schema
 
+# Use pyproject.toml so that the git-ignored pytest.ini does not add its own options.
+pytest := "pytest -c pyproject.toml --disable-warnings"
+pytest_workers := env("PYTEST_WORKERS", "8")
+
+# Run tests. Skips slow tests and migrations. Reuses the test database.
+[positional-arguments]
+test *args:
+    @{{ pytest }} --no-migrations --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
+
+# Run tests, including slow tests
+[positional-arguments]
+test-all *args:
+    @{{ pytest }} --no-migrations --reuse-db -n {{ pytest_workers }} "$@"
+
+# Run tests with migrations. Skips slow tests.
+[positional-arguments]
+test-migrate *args:
+    @{{ pytest }} --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
+
+# Recreate the test database with migrations, then run tests. Skips slow tests.
+[positional-arguments]
+test-fresh *args:
+    @{{ pytest }} --create-db --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
+
+# Run only frontend query tests
+[positional-arguments]
+test-frontend-query *args:
+    @{{ pytest }} --no-migrations --reuse-db --only-frontend-query-tests "$@"
+
 # Compile translation strings
 translate:
     @echo ""
