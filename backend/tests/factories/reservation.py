@@ -29,7 +29,14 @@ from utils.date_utils import (
 )
 from utils.decimal_utils import round_decimal
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseOneToOneFactory
+from ._base import (
+    FakerFI,
+    ForeignKeyFactory,
+    GenericDjangoModelFactory,
+    ModelFactoryBuilder,
+    ReverseForeignKeyFactory,
+    ReverseOneToOneFactory,
+)
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing, User
@@ -103,6 +110,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory")
 
     payment_order = ReverseOneToOneFactory("tests.factories.PaymentOrderFactory")
+    price_lines = ReverseForeignKeyFactory("tests.factories.ReservationPriceLineFactory")
 
     @classmethod
     def create_for_reservation_unit(cls, reservation_unit: ReservationUnit, **kwargs: Any) -> Reservation:
