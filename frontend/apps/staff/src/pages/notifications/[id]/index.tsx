@@ -14,6 +14,7 @@ import { z } from "zod";
 import type { TFunction } from "next-i18next/pages";
 import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { breakpoints } from "@ui/modules/const";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
@@ -42,7 +43,6 @@ import {
 } from "@gql/gql-types";
 import type { BannerNotificationPageQuery } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getNotificationListUrl } from "@/modules/urls";

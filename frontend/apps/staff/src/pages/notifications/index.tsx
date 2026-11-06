@@ -4,6 +4,7 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import type { TFunction } from "next-i18next/pages";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
@@ -20,7 +21,6 @@ import type {
   BannerNotificationsListQuery,
 } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { More } from "@/components/More";
 import { CustomTable } from "@/components/Table";
 import { createClient } from "@/modules/apolloClient";
