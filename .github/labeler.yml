@@ -58,3 +58,11 @@ feature:
 refactor:
   - head-branch:
       - '^(TILA-\d+[/-])?refactor[/-]'
+
+improvement:
+  - head-branch:
+      - '^(TILA-\d+[/-])?(improve|improvement|perf|update)[/-]'
+
+chore:
+  - head-branch:
+      - '^(TILA-\d+[/-])?chore[/-]'
