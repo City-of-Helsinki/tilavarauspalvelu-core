@@ -473,23 +473,18 @@ export function getPaymentUrl(
 }
 
 /// Get the pending payment url for a reservation (handled reservations)
-/// browser only. Without getBrowserApiBaseUrl, the backend is on the same origin.
+/// browser only. The url starts with getBrowserApiBaseUrl, like the other backend urls.
+/// The backend needs a full url in redirect_on_error, so it uses window.location.origin.
 function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages): string {
   if (!isBrowser) {
     throw new NotBrowserError("getCheckoutRedirectUrlrequires window.location.origin");
   }
   const langPrefix = lang !== "fi" ? `/${lang}` : "";
-  const errorUrl = new URL(`${langPrefix}/reservations/${pk}`, window.location.origin);
-  try {
-    const url = new URL(`/v1/pay_pending_reservation/${pk}/`, getBrowserApiBaseUrl() || window.location.origin);
-    const { searchParams } = url;
-    searchParams.set("lang", lang);
-    searchParams.set("redirect_on_error", errorUrl.toString());
-    return url.toString();
-  } catch (err) {
-    logError(err);
-  }
-  return "";
+  const searchParams = new URLSearchParams({
+    lang,
+    redirect_on_error: `${window.location.origin}${langPrefix}/reservations/${pk}`,
+  });
+  return `${getBrowserApiBaseUrl()}/v1/pay_pending_reservation/${pk}/?${searchParams.toString()}`;
 }
 
 /// Get the direct payment (webstore) url for a reservation
