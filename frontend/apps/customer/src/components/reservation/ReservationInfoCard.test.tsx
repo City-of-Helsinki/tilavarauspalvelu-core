@@ -4,7 +4,7 @@ import { createNodeId } from "ui/src/modules/helpers";
 import { AccessType, ReservationUnitImageType, PaymentType, PriceUnit, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import { createReservationPriceLine, future1hReservation } from "@test/reservation.mocks";
+import { createReservationPriceLine, future1hReservation, generateDescriptionFragment } from "@test/reservation.mocks";
 import { generateNameFragment } from "@test/test.gql.utils";
 import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
@@ -90,6 +90,53 @@ describe("Component: ReservationInfoCard", () => {
     ).toBeInTheDocument();
   });
 
+  describe("with the price lines of the reservation", () => {
+    it("shows the override amount of the handler instead of the amount", () => {
+      customRender({
+        reservation: createMockReservationInfoCard("10", {
+          priceLines: [createPriceLine({ amount: "10.00", overrideAmount: "4.00" })],
+        }),
+      });
+      expect(getPriceText()).toBe(
+        'common:price: 4,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
+      );
+    });
+
+    it("shows the price as a range from 0 while the discount is pending", () => {
+      customRender({
+        reservation: createMockReservationInfoCard("10", {
+          applyingForFreeOfCharge: true,
+          state: ReservationStateChoice.RequiresHandling,
+        }),
+      });
+      expect(getPriceText()).toBe(
+        'common:price: 0 - 10,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
+      );
+    });
+
+    it("uses the price of the reservation when the reservation has no price lines", () => {
+      customRender({
+        reservation: createMockReservationInfoCard("12", { priceLines: [], taxPercentageValue: "24" }),
+      });
+      expect(getPriceText()).toBe(
+        'common:price: 12,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"24"})'
+      );
+    });
+
+    it("lists the price lines when there are more than one", () => {
+      customRender({
+        reservation: createMockReservationInfoCard("15", {
+          priceLines: [
+            createPriceLine({ descriptionFi: "Tilan vuokra", amount: "10.00" }),
+            createPriceLine({ id: "2", descriptionFi: "Siivous", amount: "5.00" }),
+          ],
+        }),
+      });
+      expect(screen.getByText("Tilan vuokra: 10,00 €")).toBeInTheDocument();
+      expect(screen.getByText("Siivous: 5,00 €")).toBeInTheDocument();
+    });
+  });
+
   describe("with the price calculation of the backend", () => {
     it("shows the total price and the tax percentage", () => {
       customRender({
@@ -152,7 +199,23 @@ describe("Component: ReservationInfoCard", () => {
   });
 });
 
-function createMockReservationInfoCard(price?: string): ReservationInfoCardFragment {
+type PriceLine = NonNullable<ReservationInfoCardFragment["priceLines"]>[number];
+
+function createPriceLine(overrides: Partial<PriceLine> = {}): PriceLine {
+  return {
+    id: createNodeId("ReservationPriceLineNode", 1),
+    ...generateDescriptionFragment("Space rent"),
+    amount: "10.00",
+    overrideAmount: null,
+    taxPercentage: "25.5",
+    ...overrides,
+  };
+}
+
+function createMockReservationInfoCard(
+  price?: string,
+  overrides: Partial<ReservationInfoCardFragment> = {}
+): ReservationInfoCardFragment {
   return {
     accessType: AccessType.Unrestricted,
     applyingForFreeOfCharge: false,
@@ -163,10 +226,8 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
     },
     pk: 1,
     price: price ?? "10",
-    appliedPricing: {
-      highestPrice: price ?? "10.0",
-      taxPercentage: "25.5",
-    },
+    taxPercentageValue: "25.5",
+    priceLines: [createPriceLine({ amount: price ?? "10.00" })],
     reservationUnit: {
       id: createNodeId("ReservationUnitNode", 2),
       images: [
@@ -198,8 +259,6 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
           materialPriceDescriptionSv: "Testmaterial",
         },
       ],
-      reservationBeginsAt: new Date(2024, 0, 0, 0, 0).toISOString(),
-      reservationEndsAt: new Date(2025, 0, 0, 0, 0).toISOString(),
       ...generateNameFragment("Test reservation unit"),
       unit: {
         id: "3",
@@ -207,7 +266,7 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
       },
     },
     state: ReservationStateChoice.Confirmed,
-    taxPercentageValue: "25.5",
+    ...overrides,
   };
 }
 

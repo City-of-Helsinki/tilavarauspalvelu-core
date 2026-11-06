@@ -9,14 +9,12 @@ import { formatDateTime, parseValidDateObject } from "@ui/modules/date-utils";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex, fontMedium } from "@ui/styled";
 import { ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
-import type { ReservationPaymentUrlFragment, ReservationPriceFieldsFragment } from "@gql/gql-types";
+import type { ReservationPaymentUrlFragment, ReservationPriceLinesFieldsFragment } from "@gql/gql-types";
+import { formatPrice, getPriceLineStringList, getReservationPriceDisplayFromLines } from "@/modules/price";
 import { getPaymentUrl } from "@/modules/reservation";
 
 type PaymentNotificationProps = {
-  reservation: ReservationPaymentUrlFragment & Pick<ReservationPriceFieldsFragment, "price">;
-  appliedPricing: {
-    taxPercentage: string;
-  } | null;
+  reservation: ReservationPaymentUrlFragment & ReservationPriceLinesFieldsFragment;
   paymentOrder: {
     handledPaymentDueBy: string | null;
     checkoutUrl: string | null;
@@ -37,18 +35,16 @@ const PriceDetails = styled.div`
   }
 `;
 
-export const PaymentNotification = ({
-  reservation,
-  appliedPricing,
-  paymentOrder,
-  apiBaseUrl,
-}: PaymentNotificationProps) => {
+export const PaymentNotification = ({ reservation, paymentOrder, apiBaseUrl }: PaymentNotificationProps) => {
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
-  const formatter = formatters["currencyWithDecimals"];
-  const price = formatter?.format(Number.parseFloat(reservation.price ?? "") ?? 0);
+  const lang = getLocalizationLang(i18n.language);
+  // The notification shows the amount to pay, without the material price text
+  const priceDisplay = getReservationPriceDisplayFromLines(reservation, lang, false);
+  const price = formatPrice(priceDisplay.total, true, lang);
+  const priceLineList = getPriceLineStringList(priceDisplay, lang);
   const taxPercentage =
-    formatters.strippedDecimal?.format(Number.parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
+    priceDisplay.taxPercentage != null ? formatters.strippedDecimal?.format(priceDisplay.taxPercentage) : null;
 
   const deadline =
     paymentOrder?.handledPaymentDueBy != null
@@ -57,7 +53,6 @@ export const PaymentNotification = ({
           includeWeekday: false,
         })
       : "-";
-  const lang = getLocalizationLang(i18n.language);
   const isExpired =
     reservation.state === ReservationStateChoice.Cancelled &&
     reservation.cancelReason === ReservationCancelReasonChoice.NotPaid;
@@ -70,7 +65,10 @@ export const PaymentNotification = ({
         <PriceDetails>
           <div data-testid="reservation__payment-notification__price">
             {t("common:price")}: {price}
-            {` (${t("common:inclTax", { taxPercentage: taxPercentage })})`}
+            {taxPercentage != null && ` (${t("common:inclTax", { taxPercentage: taxPercentage })})`}
+            {priceLineList.map((priceLine) => (
+              <div key={priceLine}>{priceLine}</div>
+            ))}
           </div>
           <div data-testid="reservation__payment-notification__deadline">
             {t("common:deadline")}: {deadline}

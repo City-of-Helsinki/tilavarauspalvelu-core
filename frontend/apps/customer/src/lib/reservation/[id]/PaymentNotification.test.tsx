@@ -2,22 +2,16 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import type { TFunction } from "i18next";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
-import { OrderStatus, PaymentType, PriceUnit } from "@gql/gql-types";
+import { OrderStatus, PaymentType } from "@gql/gql-types";
 import type { PaymentOrderNode } from "@gql/gql-types";
 import { createReservationPageMock } from "@test/reservation.mocks";
 import { PaymentNotification } from "./PaymentNotification";
 
 function customRender() {
   const paymentOrder = createPaymentOrderMock();
-  const appliedPricing = createAppliedPricingMock();
   const reservation = createReservationPageMock({});
   return render(
-    <PaymentNotification
-      reservation={reservation}
-      paymentOrder={paymentOrder}
-      appliedPricing={appliedPricing}
-      apiBaseUrl="http://localhost:8000"
-    />
+    <PaymentNotification reservation={reservation} paymentOrder={paymentOrder} apiBaseUrl="http://localhost:8000" />
   );
 }
 
@@ -33,7 +27,7 @@ describe("Component: Payment Notification", () => {
     const reservation = createReservationPageMock({});
     const formattedPrice = reservation.price?.split(".").join(",") + "0";
     // eslint-disable-next-line no-irregular-whitespace
-    const priceText = `common:price: ${formattedPrice} € (common:inclTax {"taxPercentage":"25,5"})`;
+    const priceText = `common:price: ${formattedPrice} € (common:inclTax {"taxPercentage":"24,5"})`;
     const priceElement = screen.getByTestId("reservation__payment-notification__price");
 
     expect(screen.getByText((_, element) => element?.textContent?.trim() === priceText)).toBeInTheDocument();
@@ -64,15 +58,5 @@ function createPaymentOrderMock(): PaymentOrderNode {
     reservation: null,
     id: "paymentOrderId",
     status: OrderStatus.Pending,
-  };
-}
-
-function createAppliedPricingMock() {
-  return {
-    begins: new Date("2023-10-01T12:00:00Z").toISOString(),
-    highestPrice: "10.0",
-    lowestPrice: "0",
-    priceUnit: PriceUnit.PerHour,
-    taxPercentage: "25.5",
   };
 }

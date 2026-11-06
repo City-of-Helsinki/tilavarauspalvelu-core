@@ -3,8 +3,12 @@ import type { TFunction } from "i18next";
 import { formatters as getFormatters } from "@ui/index";
 import { capitalize, getTranslation, stripHtml, toNumber } from "@ui/modules/helpers";
 import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
-import { PriceUnit } from "@gql/gql-types";
-import type { PriceSummaryFieldsFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
+import { PriceUnit, ReservationStateChoice } from "@gql/gql-types";
+import type {
+  PriceSummaryFieldsFragment,
+  ReservationPriceCalculationFieldsFragment,
+  ReservationPriceLinesFieldsFragment,
+} from "@gql/gql-types";
 
 type PriceSummary = NonNullable<PriceSummaryFieldsFragment["priceSummary"]>;
 
@@ -85,6 +89,42 @@ export function getReservationPriceDisplay(
   };
 }
 
+/// The price of a reservation from its price lines. The override of the handler replaces the amount of a line.
+/// Reservations made before price lines have no lines. For these, use the price of the reservation.
+export function getReservationPriceDisplayFromLines(
+  reservation: ReservationPriceLinesFieldsFragment,
+  lang: LocalizationLanguages,
+  hasMaterialPrice: boolean
+): ReservationPriceDisplay {
+  const priceLineList = reservation.priceLines ?? [];
+  if (priceLineList.length === 0) {
+    const taxPercentage = toNumber(reservation.taxPercentageValue);
+    return {
+      total: toNumber(reservation.price) ?? 0,
+      lineList: [],
+      taxPercentage: taxPercentage != null && taxPercentage > 0 ? taxPercentage : null,
+      hasMaterialPrice,
+    };
+  }
+  const lineList = priceLineList.map((line) => ({
+    description: getTranslation(line, "description", lang),
+    amount: toNumber(line.overrideAmount ?? line.amount) ?? 0,
+  }));
+  return {
+    total: lineList.reduce((sum, line) => sum + line.amount, 0),
+    lineList,
+    taxPercentage: getCommonTaxPercentage(priceLineList.map((line) => toNumber(line.taxPercentage) ?? 0)),
+    hasMaterialPrice,
+  };
+}
+
+/// Before the handler decides on the discount, the price of the reservation is the normal price
+export function isDiscountPending(
+  reservation: Readonly<{ applyingForFreeOfCharge?: boolean | null; state?: ReservationStateChoice | null }>
+): boolean {
+  return reservation.applyingForFreeOfCharge === true && reservation.state === ReservationStateChoice.RequiresHandling;
+}
+
 /// If the customer applies for a discount, the price is a range from 0 to the normal price.
 export function getReservationPriceString(
   t: TFunction,
@@ -122,6 +162,23 @@ export const RESERVATION_PRICE_CALCULATION_FRAGMENT = gql`
       materialPriceDescriptionFi
       materialPriceDescriptionEn
       materialPriceDescriptionSv
+    }
+  }
+`;
+
+export const RESERVATION_PRICE_LINES_FRAGMENT = gql`
+  fragment ReservationPriceLinesFields on ReservationNode {
+    id
+    price
+    taxPercentageValue
+    priceLines {
+      id
+      descriptionFi
+      descriptionEn
+      descriptionSv
+      amount
+      overrideAmount
+      taxPercentage
     }
   }
 `;

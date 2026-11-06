@@ -356,7 +356,6 @@ function Reservation({
             <PaymentNotification
               reservation={reservation}
               paymentOrder={reservation.paymentOrder}
-              appliedPricing={reservation.appliedPricing}
               apiBaseUrl={env.apiBaseUrl}
             />
           )}
