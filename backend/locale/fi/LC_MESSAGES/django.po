@@ -2317,13 +2317,26 @@ msgid "Tax percentage"
 msgstr "Veroprosentti"
 
 #: tilavarauspalvelu/admin/tax_level/form.py
+msgid "VAT code"
+msgstr "ALV-koodi"
+
+#: tilavarauspalvelu/admin/tax_level/form.py
 msgid ""
 "The date when the rate takes effect. Rates that began before today cannot be "
-"changed or deleted. To change the tax percentage, add a new rate."
+"deleted, and only their VAT code can be changed. To change the tax "
+"percentage, add a new rate."
 msgstr ""
 "Päivä, josta alkaen veroprosentti on voimassa. Ennen tätä päivää alkaneita "
-"veroprosentteja ei voi muuttaa eikä poistaa. Lisää uusi veroprosentti, jos "
-"haluat muuttaa veroa."
+"veroprosentteja ei voi poistaa, ja niistä voi muuttaa vain ALV-koodia. Lisää "
+"uusi veroprosentti, jos haluat muuttaa veroa."
+
+#: tilavarauspalvelu/admin/tax_level/form.py
+msgid ""
+"The SAP VAT code for this tax percentage, e.g. '48'. Leave empty if SAP has "
+"no code for it."
+msgstr ""
+"SAP:n ALV-koodi tälle veroprosentille, esim. '48'. Jätä tyhjäksi, jos "
+"SAP:ssa ei ole koodia sille."
 
 #: tilavarauspalvelu/admin/tax_level/form.py
 msgid "At least one rate in effect today is required."
