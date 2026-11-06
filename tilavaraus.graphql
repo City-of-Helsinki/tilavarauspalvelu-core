@@ -1533,6 +1533,7 @@ type ReservationNode implements Node {
   denyReason: ReservationDenyReasonNode
   purpose: ReservationPurposeNode
   ageGroup: AgeGroupNode
+  priceOption: PriceOptionNode
   paymentOrder: PaymentOrderNode
   priceLines: [ReservationPriceLineNode!]
 
@@ -1800,6 +1801,14 @@ type ReservationSeriesNode implements Node {
   usedAccessTypes: [AccessType]!
   shouldHaveActiveAccessCode: Boolean!
   isAccessCodeIsActiveCorrect: Boolean!
+
+  """
+  Sum of the prices of the reservations in the series that are going to occur.
+  """
+  price: Decimal
+
+  """Price option of the application section that the series was made for."""
+  priceOption: PriceOptionNode
 
   """
   Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized.
