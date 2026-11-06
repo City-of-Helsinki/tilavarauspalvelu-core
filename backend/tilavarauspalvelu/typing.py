@@ -647,6 +647,7 @@ class error_codes(StrEnum):  # noqa: N801
     RESERVATION_UNIT_USES_SHARED_PRICING_GROUP = auto()
     RESERVATION_WRONG_ACCESS_TYPE = auto()
     TAX_LEVEL_HAS_NO_RATE = auto()
+    TERMS_OF_USE_TYPE_CHANGED_WHILE_IN_USE = auto()
     UPSTREAM_CALL_FAILED = auto()
     USER_NOT_INTERNAL_USER = auto()
     USER_NOT_OF_AGE = auto()
