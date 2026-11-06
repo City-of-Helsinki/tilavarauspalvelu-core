@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   getOpeningHoursUrl,
   getApplicationRoundUrl,
@@ -16,40 +16,47 @@ import {
   getAccessibilityTermsUrl,
 } from "./urls";
 
-const API_BASE_URL = "https://api.test.hel.ninja";
+// vitest moves vi.hoisted and vi.mock above the imports
+const envMock = vi.hoisted(() => ({ NEXT_PUBLIC_LOCAL_CUSTOMER_URL: undefined as string | undefined }));
+vi.mock("@/env.mjs", () => ({ env: envMock }));
 
 function getReservationUnits(url: string): string | null {
-  return new URL(url).searchParams.get("reservation_units");
+  return new URL(url, "https://example.com").searchParams.get("reservation_units");
 }
 
 describe("getOpeningHoursUrl", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("builds the opening hours url for a single reservation unit", () => {
-    const url = getOpeningHoursUrl(API_BASE_URL, 5);
-    expect(new URL(url).pathname).toBe("/v1/edit_opening_hours/");
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
+    const url = getOpeningHoursUrl(5);
+    expect(url.startsWith("/v1/edit_opening_hours/?")).toBe(true);
     expect(getReservationUnits(url)).toBe("5");
   });
 
   it("keeps only the positive pks in a list", () => {
-    const url = getOpeningHoursUrl(API_BASE_URL, [1, 0, -2, 3]);
+    const url = getOpeningHoursUrl([1, 0, -2, 3]);
     expect(getReservationUnits(url)).toBe("1,3");
   });
 
   it("returns an empty string when none of the pks in a list are positive", () => {
-    expect(getOpeningHoursUrl(API_BASE_URL, [0, -2])).toBe("");
+    expect(getOpeningHoursUrl([0, -2])).toBe("");
   });
 
   it("returns an empty string for an empty list", () => {
-    expect(getOpeningHoursUrl(API_BASE_URL, [])).toBe("");
+    expect(getOpeningHoursUrl([])).toBe("");
   });
 
   it.each([null, 0, -1])("returns an empty string for the pk %s", (pk) => {
-    expect(getOpeningHoursUrl(API_BASE_URL, pk)).toBe("");
+    expect(getOpeningHoursUrl(pk)).toBe("");
   });
 
   it("adds the error url as a redirect target", () => {
     const errorUrl = "https://staff.test.hel.ninja/units/5";
-    const url = getOpeningHoursUrl(API_BASE_URL, 5, errorUrl);
-    expect(new URL(url).searchParams.get("redirect_on_error")).toBe(errorUrl);
+    const url = getOpeningHoursUrl(5, errorUrl);
+    expect(new URL(url, "https://example.com").searchParams.get("redirect_on_error")).toBe(errorUrl);
   });
 });
 
@@ -245,9 +252,17 @@ describe("URL generation functions", () => {
   });
 
   describe("getAccessibilityTermsUrl", () => {
-    it("returns a URL with accessibility terms path", () => {
-      const url = getAccessibilityTermsUrl();
-      expect(url).toContain("/terms/accessibility-admin");
+    afterEach(() => {
+      envMock.NEXT_PUBLIC_LOCAL_CUSTOMER_URL = undefined;
+    });
+
+    it("uses the page origin without NEXT_PUBLIC_LOCAL_CUSTOMER_URL", () => {
+      expect(getAccessibilityTermsUrl()).toBe(`${window.location.origin}/terms/accessibility-admin`);
+    });
+
+    it("uses NEXT_PUBLIC_LOCAL_CUSTOMER_URL without a trailing slash", () => {
+      envMock.NEXT_PUBLIC_LOCAL_CUSTOMER_URL = "http://localhost:3000/";
+      expect(getAccessibilityTermsUrl()).toBe("http://localhost:3000/terms/accessibility-admin");
     });
   });
 });

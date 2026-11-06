@@ -12,7 +12,6 @@ import {
 import { Flex } from "ui/src/styled";
 import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";
-import { useEnvContext } from "@/context/EnvContext";
 import type { SelectedRow } from "@/lib/reservation-units";
 import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
 import { truncate } from "@/modules/helpers";
@@ -132,12 +131,11 @@ type ActionButtonsProps = {
   selectedRows: SelectedRow[];
 };
 function ActionButtons({ selectedRows }: ActionButtonsProps): React.ReactElement {
-  const { env } = useEnvContext();
   const { t } = useTranslation();
 
   const selectedPks = selectedRows.map(Number).filter((id) => !Number.isNaN(id));
   const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
-  const openingHoursUrl = getOpeningHoursUrl(env.apiBaseUrl, selectedPks, redirectOnErrorUrl);
+  const openingHoursUrl = getOpeningHoursUrl(selectedPks, redirectOnErrorUrl);
   const editLink = openingHoursUrl !== "" ? openingHoursUrl : undefined;
   return (
     <Flex $gap="s" $direction="row" $wrap="wrap" $justifyContent="space-between" $grow>

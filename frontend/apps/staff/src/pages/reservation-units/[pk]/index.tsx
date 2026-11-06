@@ -197,14 +197,12 @@ function ReservationUnitEditor({
   refetch,
   previewUrlPrefix,
   unitPk,
-  apiBaseUrl,
 }: {
   reservationUnit?: Node;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
   previewUrlPrefix: string;
   unitPk: number;
-  apiBaseUrl: string;
 }): React.ReactElement | null {
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
@@ -342,11 +340,7 @@ function ReservationUnitEditor({
           />
         )}
         <CommunicationSection form={form} />
-        <OpeningHoursSection
-          reservationUnit={reservationUnit}
-          previewUrlPrefix={previewUrlPrefix}
-          apiBaseUrl={apiBaseUrl}
-        />
+        <OpeningHoursSection reservationUnit={reservationUnit} previewUrlPrefix={previewUrlPrefix} />
 
         {isSeasonal && <SeasonalSection form={form} />}
         <AccessTypeSection form={form} accessTypes={reservationUnit?.accessTypes || []} />
@@ -422,7 +416,6 @@ export default function EditorPage(props: PropsNarrowed): React.ReactElement {
         refetch={refetch}
         previewUrlPrefix={cleanPreviewUrlPrefix}
         unitPk={unitPk}
-        apiBaseUrl={env.apiBaseUrl}
       />
     </AuthorizationChecker>
   );

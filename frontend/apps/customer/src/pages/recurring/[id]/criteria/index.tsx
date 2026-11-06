@@ -20,7 +20,6 @@ import type { ApplicationRoundCriteriaQuery, ApplicationRoundCriteriaQueryVariab
 import { NotesWhenApplying } from "@/components/application";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -93,8 +92,7 @@ function Criteria({ applicationRound }: Readonly<PropsNarrowed>): React.ReactEle
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const notFound = {
     notFound: true,

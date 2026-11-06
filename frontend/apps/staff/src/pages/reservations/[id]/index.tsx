@@ -33,7 +33,6 @@ import {
   formatReservationPrice,
   translateReservationCustomerType,
 } from "@/modules/reservation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import {
   ApprovalButtons,
@@ -353,8 +352,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     return NOT_FOUND_SSR_VALUE;
   }
 
-  const { apiBaseUrl } = await getCommonServerSideProps();
-  const apolloClient = createClient(apiBaseUrl, req);
+  const apolloClient = createClient(req);
   const reservationPageQuery = await apolloClient.query<ReservationPageQuery>({
     query: ReservationPageDocument,
     variables: { id: createNodeId("ReservationNode", pk) },

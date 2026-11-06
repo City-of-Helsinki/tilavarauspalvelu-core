@@ -24,7 +24,6 @@ export interface CustomerEnvConfig extends CommonEnvConfig {
 
 export function getDefaultServerSideProps(): CustomerEnvConfig {
   return {
-    apiBaseUrl: "",
     isConsoleLoggingEnabled: true,
     isErrorTriggerEnabled: false,
     isHotjarEnabled: false,
@@ -41,12 +40,10 @@ export function getCommonServerSideProps(): CustomerEnvConfig {
   const isMatomoEnabled = env.MATOMO_ENABLED ?? false;
   const isHotjarEnabled = env.HOTJAR_ENABLED ?? false;
   const profileLink = env.PROFILE_UI_URL ?? "";
-  const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
   const feedbackUrl = env.FEEDBACK_URL ?? "";
   const version = getVersion();
 
   return {
-    apiBaseUrl,
     isConsoleLoggingEnabled: env.ENABLE_CONSOLE_LOGGING ?? false,
     isErrorTriggerEnabled: env.ENABLE_ERROR_TRIGGER ?? false,
     isHotjarEnabled,

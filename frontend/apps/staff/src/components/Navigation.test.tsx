@@ -63,14 +63,14 @@ beforeEach(() => {
 
 describe("Navigation", () => {
   test("renders navigation header", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" />);
+    render(<Navigation />);
 
     const header = screen.getByRole("banner");
     expect(header).toBeInTheDocument();
   });
 
   test("renders user name in menu", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" />);
+    render(<Navigation />);
 
     expect(screen.getByText("John Doe")).toBeInTheDocument();
   });
@@ -85,7 +85,7 @@ describe("Navigation", () => {
       error: null,
     });
 
-    render(<Navigation apiBaseUrl="http://localhost:3000" />);
+    render(<Navigation />);
 
     expect(screen.getByText("navigation:noName")).toBeInTheDocument();
   });
@@ -97,7 +97,7 @@ describe("Navigation", () => {
       refetch: vi.fn(),
     });
 
-    render(<Navigation apiBaseUrl="http://localhost:3000" />);
+    render(<Navigation />);
 
     // My Units menu item should be rendered
     expect(screen.getByText("navigation:myUnits")).toBeInTheDocument();
@@ -116,7 +116,7 @@ describe("Navigation", () => {
       refetch: vi.fn(),
     });
 
-    render(<Navigation apiBaseUrl="http://localhost:3000" />);
+    render(<Navigation />);
 
     // Navigation header should still be present
     expect(screen.getByRole("banner")).toBeInTheDocument();

@@ -36,14 +36,12 @@ import { ListWithPagination } from "@/components/ListWithPagination";
 import { SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import type { SearchFormValues } from "@/components/SeasonalSearchForm";
 import { SortingComponent } from "@/components/SortingComponent";
-import { useEnvContext } from "@/context/EnvContext";
 import { useReservationUnitList } from "@/hooks";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { StartApplicationBar, RecurringCard } from "@/lib/recurring/[id]";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 
 type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" | "options">>;
@@ -52,7 +50,6 @@ function SeasonalSearch({ applicationRound, options }: Readonly<SeasonalSearchPr
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const searchValues = useSearchParams();
-  const { env } = useEnvContext();
 
   const { handleSearch } = useSearchModify();
 
@@ -121,10 +118,7 @@ function SeasonalSearch({ applicationRound, options }: Readonly<SeasonalSearchPr
         fetchMore={(cursor) => fetchMore(cursor)}
         sortingComponent={<SortingComponent />}
       />
-      {createPortal(
-        <StartApplicationBar applicationRound={applicationRound} apiBaseUrl={env.apiBaseUrl} />,
-        document.body
-      )}
+      {createPortal(<StartApplicationBar applicationRound={applicationRound} />, document.body)}
     </>
   );
 }
@@ -134,8 +128,7 @@ type NarrowedProps = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params, query } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
   const pk = toNumber(ignoreMaybeArray(params?.id));
   const isPostLogin = query.isPostLogin === "true";
 

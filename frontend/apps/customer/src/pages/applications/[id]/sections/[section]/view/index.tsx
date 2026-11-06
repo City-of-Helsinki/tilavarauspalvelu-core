@@ -10,7 +10,6 @@ import type { ApplicationSectionViewQuery, ApplicationSectionViewQueryVariables 
 import { AllReservations } from "@/components/application/ApprovedReservations";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 
 function ViewAll({ applicationSection }: PropsNarrowed): React.ReactElement {
@@ -71,8 +70,7 @@ export const APPLICATION_SECTION_VIEW_QUERY = gql`
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const { query } = ctx;
   const { section } = query;

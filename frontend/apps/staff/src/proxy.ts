@@ -58,7 +58,7 @@ async function handleRequest(req: NextRequest) {
   if (!isPageRequest(new URL(req.url), PUBLIC_URL)) {
     return NextResponse.next();
   }
-  const csrfRedirectUrl = redirectCsrfToken(req, API_BASE_URL);
+  const csrfRedirectUrl = redirectCsrfToken(req);
   if (csrfRedirectUrl) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {

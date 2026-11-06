@@ -58,38 +58,38 @@ describe("Navigation", () => {
   });
 
   test("renders navigation header", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
   });
 
   test("renders user name when authenticated", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     const userMenu = screen.getByLabelText("John Doe");
     expect(userMenu).toBeInTheDocument();
   });
 
   test("renders navigation menu with home link", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.getByText("navigation:Item.home")).toBeInTheDocument();
   });
 
   test("renders reservation unit search link", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.getByText("navigation:Item.reservationUnitSearch")).toBeInTheDocument();
   });
 
   test("renders space reservation link", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.getByText("navigation:Item.spaceReservation")).toBeInTheDocument();
   });
 
   test("renders logo and application name", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.getByAltText("common:helsinkiCity")).toBeInTheDocument();
     expect(screen.getByText("common:applicationName")).toBeInTheDocument();
@@ -101,7 +101,7 @@ describe("Navigation", () => {
       isAuthenticated: false,
     });
 
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.getByRole("button", { name: "common:login" })).toBeInTheDocument();
   });
@@ -112,13 +112,13 @@ describe("Navigation", () => {
       isAuthenticated: false,
     });
 
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.queryByText("navigation:Item.reservations")).not.toBeInTheDocument();
   });
 
   test("shows reservations link when authenticated", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.getByText("navigation:Item.reservations")).toBeInTheDocument();
   });
@@ -129,13 +129,13 @@ describe("Navigation", () => {
       isAuthenticated: false,
     });
 
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.queryByText("navigation:Item.applications")).not.toBeInTheDocument();
   });
 
   test("shows applications link when authenticated", () => {
-    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+    render(<Navigation profileLink="http://profile.example.com" />);
 
     expect(screen.getByText("navigation:Item.applications")).toBeInTheDocument();
   });

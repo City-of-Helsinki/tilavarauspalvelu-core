@@ -9,7 +9,6 @@ import { UserPermissionChoice } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
 import { createClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { ReservationUnitsDataReader, Filters } from "@lib/reservation-units/";
 import type { SelectedRow } from "@lib/reservation-units/";
 
@@ -54,8 +53,7 @@ export default function Page({ optionsData }: PageProps): React.ReactElement {
 }
 
 export async function getServerSideProps({ locale, req }: GetServerSidePropsContext) {
-  const { apiBaseUrl } = await getCommonServerSideProps();
-  const apolloClient = createClient(apiBaseUrl, req);
+  const apolloClient = createClient(req);
 
   const options = await fetchFilterOptionsSafe(apolloClient);
   return {

@@ -208,7 +208,6 @@ function getRedirectProtectedRoute(req: NextRequest, user: User | null): string 
   if (user == null) {
     const url = getClientUrl(req);
     return getSignInUrl({
-      apiBaseUrl: API_BASE_URL,
       callBackUrl: `${url.pathname}${url.search}`,
       language: getLocalizationLang(getLocalizationFromUrl(url)),
       originOverride: url.origin,
@@ -265,7 +264,7 @@ async function handleRequest(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const csrfRedirectUrl = redirectCsrfToken(req, API_BASE_URL);
+  const csrfRedirectUrl = redirectCsrfToken(req);
   if (csrfRedirectUrl) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {

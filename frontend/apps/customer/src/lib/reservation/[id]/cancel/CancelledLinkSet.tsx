@@ -6,19 +6,13 @@ import { signOut } from "ui/src/modules/browserHelpers";
 import { Flex } from "ui/src/styled";
 import { getSingleSearchPath } from "@/modules/urls";
 
-type Props =
-  | {
-      apiBaseUrl: string;
-    }
-  | {
-      reservationUnitHome: string;
-      apiBaseUrl: string;
-    };
+type Props = {
+  reservationUnitHome?: string;
+};
 
-function BaseLinkSet(props: Props): React.ReactElement {
-  const { apiBaseUrl } = props;
+function BaseLinkSet({ reservationUnitHome }: Props): React.ReactElement {
   const { t } = useTranslation();
-  const resUnitUrl = "reservationUnitHome" in props ? props.reservationUnitHome : null;
+  const resUnitUrl = reservationUnitHome ?? null;
 
   return (
     <Flex $gap="2-xs">
@@ -41,7 +35,7 @@ function BaseLinkSet(props: Props): React.ReactElement {
         icon={<IconArrowRight size={IconSize.Medium} aria-hidden="true" />}
       />
       <IconButton
-        onClick={() => signOut(apiBaseUrl)}
+        onClick={() => signOut()}
         label={t("common:logout")}
         icon={<IconSignout size={IconSize.Medium} aria-hidden="true" />}
       />
@@ -49,10 +43,10 @@ function BaseLinkSet(props: Props): React.ReactElement {
   );
 }
 
-export function CancelledLinkSet({ apiBaseUrl }: Props) {
-  return <BaseLinkSet apiBaseUrl={apiBaseUrl} />;
+export function CancelledLinkSet() {
+  return <BaseLinkSet />;
 }
 
-export function BackLinkList(props: { reservationUnitHome: string; apiBaseUrl: string }): React.ReactElement {
+export function BackLinkList(props: { reservationUnitHome: string }): React.ReactElement {
   return <BaseLinkSet {...props} />;
 }
