@@ -218,6 +218,9 @@ When `NEXT_PUBLIC_LOCAL_API_URL` is empty, the browser sends its backend request
 On the servers, the gateway sends these paths to the backend. Next.js writes the value into the build, so a change needs a restart of `next dev`.
 Do not set it in an image build. If your `.env.local` is older than this variable, add it from `.env.example`.
 
+The staff UI links to some pages of the customer UI. `NEXT_PUBLIC_LOCAL_CUSTOMER_URL` works in the same way.
+It is empty on the server environments, where the customer UI is on the same origin. In local development it is `http://localhost:3000`.
+
 ### Development setup
 
 The development setup has three profiles. Without a profile, only the database and Redis start.

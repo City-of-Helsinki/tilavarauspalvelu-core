@@ -1,5 +1,6 @@
-import { getBrowserApiBaseUrl } from "@ui/modules/urlBuilder";
+import { getBrowserApiBaseUrl, removeTrailingSlash } from "@ui/modules/urlBuilder";
 import type { Maybe } from "@gql/gql-types";
+import { env } from "@/env.mjs";
 import { isBrowser, PUBLIC_URL } from "./const";
 
 export const APPLICATIONS_URL_PREFIX = "/applications";
@@ -10,7 +11,6 @@ export const MY_UNITS_URL_PREFIX = "/my-units";
 export const UNITS_URL_PREFIX = "/units";
 export const BANNER_NOTIFICATIONS_URL_PREFIX = "/notifications";
 export const REQUESTED_RESERVATIONS_URL_PREFIX = "/reservations/requested";
-const LOCAL_CLIENT_BASE_URL = "http://localhost:3000";
 
 type ApplicationRoundPages = "criteria" | "";
 export function getApplicationRoundUrl(
@@ -120,12 +120,13 @@ export function getNotificationUrl(pk: Maybe<number> | undefined): string {
   return `${BANNER_NOTIFICATIONS_URL_PREFIX}/${pk}`;
 }
 
+/// On the server environments, the customer UI is on the same origin.
+/// Local development sets NEXT_PUBLIC_LOCAL_CUSTOMER_URL, because the customer UI runs on another port.
 function getCustomerUrl(): string {
   if (!isBrowser) {
     return "";
   }
-  // Return the localhost client side base URL if in dev environment, to ease with development & testing
-  return process.env.NODE_ENV === "development" ? LOCAL_CLIENT_BASE_URL : window.location.origin;
+  return removeTrailingSlash(env.NEXT_PUBLIC_LOCAL_CUSTOMER_URL ?? window.location.origin);
 }
 
 export function getAccessibilityTermsUrl(): string {
