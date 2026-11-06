@@ -17,7 +17,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ProfileUser
 
 if TYPE_CHECKING:
-    from promise import Promise
+    from django.utils.functional import Promise
     from rest_framework.request import Request
 
 
