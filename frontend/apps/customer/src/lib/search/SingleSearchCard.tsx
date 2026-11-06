@@ -10,7 +10,7 @@ import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";
 import type { SingleSearchCardFragment } from "@gql/gql-types";
 import { isBrowser } from "@/modules/const";
-import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
+import { getPriceSummaryString } from "@/modules/price";
 import { getReservationUnitPath } from "@/modules/urls";
 
 function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">): React.ReactElement {
@@ -73,8 +73,7 @@ export function SingleSearchCard({ reservationUnit }: PropsT): React.ReactElemen
   const link = useConstructLink(reservationUnit);
   const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
-  const pricing = getActivePricing(reservationUnit);
-  const unitPrice = pricing != null ? getPriceString({ t, pricing }) : undefined;
+  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary);
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
@@ -146,9 +145,7 @@ export function SingleSearchCard({ reservationUnit }: PropsT): React.ReactElemen
 export const SINGLE_SEARCH_CARD_FRAGMENT = gql`
   fragment SingleSearchCard on ReservationUnitNode {
     ...RecurringCard
-    pricings {
-      ...PricingFields
-    }
+    ...PriceSummaryFields
     reservationBeginsAt
     reservationEndsAt
     isClosed
