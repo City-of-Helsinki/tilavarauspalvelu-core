@@ -6,7 +6,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { AccessType, PaymentType, PriceUnit, ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitHeadFragment } from "@gql/gql-types";
-import { getActivePricing, getReservationUnitAccessPeriods, isReservationUnitPaid } from "@/modules/reservationUnit";
+import { getActivePricing, getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { Head as ReservationUnitHead } from "./Head";
 
 vi.mock("./Images", () => ({
@@ -15,9 +15,7 @@ vi.mock("./Images", () => ({
 
 vi.mock("@/modules/reservationUnit", () => ({
   getActivePricing: vi.fn(() => undefined),
-  getPriceString: vi.fn(() => "10,00 - 20,00 € / tunti"),
   getReservationUnitAccessPeriods: vi.fn(() => []),
-  isReservationUnitPaid: vi.fn(() => false),
 }));
 
 function createReservationUnit(overrides: Partial<ReservationUnitHeadFragment> = {}): ReservationUnitHeadFragment {
@@ -35,9 +33,22 @@ function createReservationUnit(overrides: Partial<ReservationUnitHeadFragment> =
     currentAccessType: null,
     unit: { id: "unit-1", nameFi: "Test Unit", nameSv: "Test Unit SV", nameEn: "Test Unit EN" },
     pricings: [],
+    priceSummary: null,
     accessTypes: [],
     reservationUnitType: null,
     images: [],
+    ...overrides,
+  };
+}
+
+type PriceSummary = NonNullable<ReservationUnitHeadFragment["priceSummary"]>;
+
+function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary {
+  return {
+    isFree: false,
+    lowestAmount: "20",
+    priceUnit: PriceUnit.PerHour,
+    canApplyForDiscount: false,
     ...overrides,
   };
 }
@@ -58,7 +69,6 @@ const pricing = {
 describe("Head", () => {
   beforeEach(() => {
     vi.mocked(getActivePricing).mockReturnValue(undefined);
-    vi.mocked(isReservationUnitPaid).mockReturnValue(false);
     vi.mocked(getReservationUnitAccessPeriods).mockReturnValue([]);
   });
 
@@ -119,9 +129,6 @@ describe("Head", () => {
   });
 
   test("shows reservation unit type, person range, duration and price when present", () => {
-    vi.mocked(getActivePricing).mockReturnValue(pricing);
-    vi.mocked(isReservationUnitPaid).mockReturnValue(true);
-
     render(
       <ReservationUnitHead
         reservationUnit={createReservationUnit({
@@ -136,6 +143,7 @@ describe("Head", () => {
           minPersons: 2,
           minReservationDuration: 3600,
           maxReservationDuration: 7200,
+          priceSummary: createPriceSummary({ canApplyForDiscount: true }),
         })}
         reservationUnitIsReservable
         subventionSuffix={<span>Subvention</span>}
@@ -145,23 +153,35 @@ describe("Head", () => {
     expect(screen.getByText("Meeting room")).toBeInTheDocument();
     expect(screen.getByLabelText("reservationUnit:maxPersons")).toBeInTheDocument();
     expect(screen.getByLabelText("reservationCalendar:eventDuration")).toBeInTheDocument();
-    expect(screen.getByText(/10,00 - 20,00 € \/ tunti/)).toBeInTheDocument();
-    // subvention suffix is only shown alongside a paid, active pricing
+    expect(screen.getByText(/^0 - 20,00 € \/ prices:priceUnits.PER_HOUR/)).toBeInTheDocument();
     expect(screen.getByText("Subvention")).toBeInTheDocument();
   });
 
-  test("does not show the subvention suffix when the unit is free of charge", () => {
-    vi.mocked(getActivePricing).mockReturnValue(pricing);
-    vi.mocked(isReservationUnitPaid).mockReturnValue(false);
-
+  test("shows a fixed price without the subvention suffix when the customer can not apply for a discount", () => {
     render(
       <ReservationUnitHead
-        reservationUnit={createReservationUnit()}
+        reservationUnit={createReservationUnit({ priceSummary: createPriceSummary() })}
         reservationUnitIsReservable
         subventionSuffix={<span>Subvention</span>}
       />
     );
 
+    expect(screen.getByText("20,00 € / prices:priceUnits.PER_HOUR")).toBeInTheDocument();
+    expect(screen.queryByText("Subvention")).not.toBeInTheDocument();
+  });
+
+  test("shows free of charge without the subvention suffix when the unit is free of charge", () => {
+    render(
+      <ReservationUnitHead
+        reservationUnit={createReservationUnit({
+          priceSummary: createPriceSummary({ isFree: true, lowestAmount: "0" }),
+        })}
+        reservationUnitIsReservable
+        subventionSuffix={<span>Subvention</span>}
+      />
+    );
+
+    expect(screen.getByText("prices:priceFree")).toBeInTheDocument();
     expect(screen.queryByText("Subvention")).not.toBeInTheDocument();
   });
 
@@ -214,9 +234,13 @@ describe("Head", () => {
   test("shows a material price description tooltip when present", async () => {
     const user = userEvent.setup();
     vi.mocked(getActivePricing).mockReturnValue({ ...pricing, materialPriceDescriptionFi: "<p>Extra fee applies</p>" });
-    vi.mocked(isReservationUnitPaid).mockReturnValue(true);
 
-    render(<ReservationUnitHead reservationUnit={createReservationUnit()} reservationUnitIsReservable />);
+    render(
+      <ReservationUnitHead
+        reservationUnit={createReservationUnit({ priceSummary: createPriceSummary() })}
+        reservationUnitIsReservable
+      />
+    );
 
     await user.click(screen.getByRole("button", { name: "Tooltip" }));
 
