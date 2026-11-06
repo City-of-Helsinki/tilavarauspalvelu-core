@@ -874,7 +874,7 @@ def create_reservation_units() -> None:
     TaxLevelRate.objects.get_or_create(
         tax_level=yleinen_verotaso,
         begins=local_date(2024, 9, 1),
-        defaults={"percentage": Decimal("25.5")},
+        defaults={"percentage": Decimal("25.5"), "vat_code": "48"},
     )
 
     alennettu_verotaso, _ = TaxLevel.objects.get_or_create(
@@ -898,7 +898,7 @@ def create_reservation_units() -> None:
     TaxLevelRate.objects.get_or_create(
         tax_level=alennettu_verotaso,
         begins=local_date(2026, 1, 1),
-        defaults={"percentage": Decimal("13.5")},
+        defaults={"percentage": Decimal("13.5"), "vat_code": "47"},
     )
 
     veroton_verotaso, _ = TaxLevel.objects.get_or_create(
@@ -912,7 +912,7 @@ def create_reservation_units() -> None:
     TaxLevelRate.objects.get_or_create(
         tax_level=veroton_verotaso,
         begins=local_date(2000, 1, 1),
-        defaults={"percentage": Decimal("0.0")},
+        defaults={"percentage": Decimal("0.0"), "vat_code": "4U"},
     )
 
     harakka_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2952865")

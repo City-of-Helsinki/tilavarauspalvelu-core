@@ -210,11 +210,26 @@ def _create_tax_levels() -> dict[TaxLevelKey, TaxLevel]:
 
     TaxLevelRate.objects.bulk_create([
         TaxLevelRateFactory.build(tax_level=general, begins=datetime.date(2000, 1, 1), percentage=Decimal(24)),
-        TaxLevelRateFactory.build(tax_level=general, begins=datetime.date(2024, 9, 1), percentage=Decimal("25.5")),
+        TaxLevelRateFactory.build(
+            tax_level=general,
+            begins=datetime.date(2024, 9, 1),
+            percentage=Decimal("25.5"),
+            vat_code="48",
+        ),
         TaxLevelRateFactory.build(tax_level=reduced, begins=datetime.date(2000, 1, 1), percentage=Decimal(10)),
         TaxLevelRateFactory.build(tax_level=reduced, begins=datetime.date(2025, 1, 1), percentage=Decimal(14)),
-        TaxLevelRateFactory.build(tax_level=reduced, begins=datetime.date(2026, 1, 1), percentage=Decimal("13.5")),
-        TaxLevelRateFactory.build(tax_level=tax_free, begins=datetime.date(2000, 1, 1), percentage=Decimal(0)),
+        TaxLevelRateFactory.build(
+            tax_level=reduced,
+            begins=datetime.date(2026, 1, 1),
+            percentage=Decimal("13.5"),
+            vat_code="47",
+        ),
+        TaxLevelRateFactory.build(
+            tax_level=tax_free,
+            begins=datetime.date(2000, 1, 1),
+            percentage=Decimal(0),
+            vat_code="4U",
+        ),
     ])
 
     return {"general": general, "reduced": reduced, "tax_free": tax_free}
