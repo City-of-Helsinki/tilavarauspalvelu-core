@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
-import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
+import { formatters as getFormatters, getReservationPrice } from "@ui/index";
 import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { convertWeekday } from "ui/src/modules/conversion";
 import {
@@ -10,7 +10,6 @@ import {
   formatDateTimeRange,
   formatDuration,
   formatTimeRange,
-  parseApiDate,
   fromApiDateTime,
   parseValidDateObject,
   formatDateTime,
@@ -20,12 +19,10 @@ import { PriceUnit, ReservationTypeChoice } from "@gql/gql-types";
 import type {
   CreateTagStringFragment,
   Maybe,
-  PricingFieldsFragment,
   ReservationNode,
   ReservationPageQuery,
   ReserveeType,
   ReservationPriceDetailsFieldsFragment,
-  ReservationUnitPricingFieldsFragment,
   EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
 import { getReserveeName, getReserveeTypeTranslationKey } from "@/modules/helpers";
@@ -56,84 +53,54 @@ export function formatReservationPriceLong(t: TFunction, reservation: Reservatio
   return `${formatReservationPrice(t, reservation)}${dueByString}${subventionString}`;
 }
 
-function getBeginTime(p: PricingFieldsFragment): number {
-  return parseApiDate(p.begins)?.getTime() ?? 0;
-}
-
-/// @returns reservation unit pricing at given date
-export function getReservationUnitPricing(
-  reservationUnit: ReservationUnitPricingFieldsFragment,
-  from: Date
-): PricingFieldsFragment | null {
-  if (reservationUnit.pricings.length === 0) {
-    return null;
-  }
-
-  const pricings = sort(reservationUnit.pricings, (a, b) => getBeginTime(a) - getBeginTime(b));
-
-  // Find the first pricing that is valid at the given date
-  // requires using reduce because we have no end dates
-  return pricings.reduce<(typeof pricings)[0] | null>((prev, current) => {
-    const begin = parseApiDate(current.begins);
-    if (begin != null && begin.getTime() <= from.getTime()) {
-      return current;
-    }
-    return prev;
-  }, null);
-}
-
-export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
-  fragment ReservationUnitPricingFields on ReservationUnitNode {
-    id
-    pricings {
-      id
-      ...PricingFields
-    }
-  }
-`;
-
 export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
   fragment ReservationPriceDetailsFields on ReservationNode {
     id
-    beginsAt
-    endsAt
-    appliedPricing {
+    price
+    priceLines {
+      id
+      pk
+      quantity
+      priceUnit
+      unitAmount
+      amount
+      overrideAmount
       taxPercentage
-    }
-    reservationUnit {
-      ...ReservationUnitPricingFields
     }
   }
 `;
 
-export function getReservationPriceDetails(reservation: ReservationPriceDetailsFieldsFragment, t: TFunction): string {
-  const begin = new Date(reservation.beginsAt);
-  const end = new Date(reservation.endsAt);
-  const resUnit = reservation.reservationUnit ?? null;
-  const durationMinutes = differenceInMinutes(end, begin);
-  const pricing = resUnit ? getReservationUnitPricing(resUnit, begin) : null;
+/// The normal price of the reservation is free. A handler override of a line does not change it.
+/// Reservations made before price lines have no lines. For these, the price of the reservation is used.
+export function isReservationPriceFree(reservation: ReservationPriceDetailsFieldsFragment): boolean {
+  const priceLineList = reservation.priceLines ?? [];
+  if (priceLineList.length === 0) {
+    return (toNumber(reservation.price) ?? 0) === 0;
+  }
+  return priceLineList.every((line) => (toNumber(line.amount) ?? 0) === 0);
+}
 
-  if (pricing == null) {
-    return "???";
+/// The calculation of the normal price, for the handler.
+/// The text supports one price line. Without exactly one line, it shows only the price of the reservation.
+export function getReservationPriceDetails(reservation: ReservationPriceDetailsFieldsFragment, t: TFunction): string {
+  const priceLineList = reservation.priceLines ?? [];
+  const line = priceLineList.length === 1 ? priceLineList[0] : undefined;
+  if (line == null) {
+    return getReservationPrice(reservation.price, t("reservation:noPrice"), false);
+  }
+  if (line.priceUnit === PriceUnit.Fixed) {
+    return getReservationPrice(line.amount, t("reservation:noPrice"), false);
   }
 
-  const { priceUnit } = pricing;
-  const volume = getUnRoundedReservationVolume(durationMinutes, priceUnit);
-
-  const maxPrice = pricing.highestPrice;
   const formatters = getFormatters("fi");
-
-  const taxPercentage = toNumber(reservation.appliedPricing?.taxPercentage) ?? 0;
-  return priceUnit === PriceUnit.Fixed
-    ? getReservationPrice(maxPrice, t("reservation:noPrice"), false)
-    : t("reservation:ApproveDialog.priceBreakdown", {
-        volume: formatters.strippedDecimal?.format(volume),
-        units: t(`reservation:ApproveDialog.priceUnits.${priceUnit}`),
-        vatPercent: formatters.oneDecimal?.format(taxPercentage),
-        unit: t(`reservation:ApproveDialog.priceUnit.${priceUnit}`),
-        unitPrice: getReservationPrice(maxPrice, "", false),
-        price: getReservationPrice(String(volume * (toNumber(maxPrice) ?? 0)), t("reservation:noPrice"), false),
-      });
+  return t("reservation:ApproveDialog.priceBreakdown", {
+    volume: formatters.strippedDecimal?.format(toNumber(line.quantity) ?? 0),
+    units: t(`reservation:ApproveDialog.priceUnits.${line.priceUnit}`),
+    vatPercent: formatters.oneDecimal?.format(toNumber(line.taxPercentage) ?? 0),
+    unit: t(`reservation:ApproveDialog.priceUnit.${line.priceUnit}`),
+    unitPrice: getReservationPrice(line.unitAmount, "", false),
+    price: getReservationPrice(line.amount, t("reservation:noPrice"), false),
+  });
 }
 
 export function getTranslationKeyForCustomerTypeChoice(
