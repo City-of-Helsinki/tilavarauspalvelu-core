@@ -8,6 +8,7 @@ import { serverSideTranslations } from "next-i18next/pages/serverSideTranslation
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { ApplicationRoundStatusLabel } from "ui/src/components/statuses";
 import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
@@ -29,7 +30,6 @@ import type {
   CheckPermissionsQuery,
   CheckPermissionsQueryVariables,
 } from "@gql/gql-types";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { createClient } from "@/modules/apolloClient";
