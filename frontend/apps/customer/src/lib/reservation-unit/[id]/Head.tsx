@@ -13,12 +13,8 @@ import { Flex, H1, H3 } from "ui/src/styled";
 import { ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitHeadFragment } from "@gql/gql-types";
 import { IconWithText } from "@/components/IconWithText";
-import {
-  getActivePricing,
-  getPriceString,
-  getReservationUnitAccessPeriods,
-  isReservationUnitPaid,
-} from "@/modules/reservationUnit";
+import { getPriceSummaryString } from "@/modules/price";
+import { getActivePricing, getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { Images } from "./Images";
 
 interface HeadProps {
@@ -171,10 +167,8 @@ function IconList({
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(t, { seconds: minDur });
   const maxReservationDuration = formatDuration(t, { seconds: maxDur });
-  const pricing = getActivePricing(reservationUnit);
-  const isPaid = isReservationUnitPaid(reservationUnit.pricings);
-  const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;
-  const hasSubventionSuffix = pricing && isPaid && subventionSuffix != null;
+  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary);
+  const hasSubventionSuffix = reservationUnit.priceSummary?.canApplyForDiscount === true && subventionSuffix != null;
 
   type IconTextType = ReadonlyArray<{
     key: string;
@@ -290,6 +284,7 @@ export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
     pricings {
       ...PricingFields
     }
+    ...PriceSummaryFields
     currentAccessType
     accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
       id

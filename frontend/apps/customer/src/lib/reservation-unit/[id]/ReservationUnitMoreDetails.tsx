@@ -50,14 +50,7 @@ export function ReservationUnitMoreDetails({
       (a, b) => convertWeekday(a.weekday) - convertWeekday(b.weekday)
     );
   }, [reservationUnit.applicationRoundTimeSlots]);
-  const shouldDisplayPricingTerms = useMemo(() => {
-    const pricings = filterNonNullable(reservationUnit?.pricings);
-    if (pricings.length === 0) {
-      return false;
-    }
-    const isPaid = pricings.some((pricing) => !isPriceFree(pricing));
-    return reservationUnit?.canApplyFreeOfCharge && isPaid;
-  }, [reservationUnit?.canApplyFreeOfCharge, reservationUnit?.pricings]);
+  const shouldDisplayPricingTerms = reservationUnit.priceSummary?.canApplyForDiscount === true;
 
   const paymentTermsContent = reservationUnit.paymentTerms
     ? getTranslation(reservationUnit.paymentTerms, "text", lang)
@@ -267,13 +260,9 @@ export const RESERVATION_UNIT_MODE_DETAILS_FRAGMENT = gql`
     }
     ...TermsOfUse
     ...ReservationQuotaReached
-    canApplyFreeOfCharge
+    ...PriceSummaryFields
     ...NoticeWhenReserving
     ...ReservationInfoSection
-    pricings {
-      id
-      highestPrice
-    }
     unit {
       ...AddressFields
     }
