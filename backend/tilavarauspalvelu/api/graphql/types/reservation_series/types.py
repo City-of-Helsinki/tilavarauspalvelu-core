@@ -95,7 +95,7 @@ class ReservationSeriesNode(DjangoNode):
                 .annotate(total=models.Sum("price"))
                 .values("total")[:1]
             ),
-            models.Value(Decimal(0)),
+            models.Value(Decimal("0.00")),
         ),
         description="Sum of the prices of the reservations in the series that are going to occur.",
     )
