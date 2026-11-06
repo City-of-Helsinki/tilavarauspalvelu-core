@@ -45,12 +45,12 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { LabelValuePair } from "@/components/LabelValuePair";
 import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { useEnvContext } from "@/context/EnvContext";
+import { usePaymentUrl } from "@/hooks/usePaymentUrl";
 import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
 import { createApolloClient } from "@/modules/apolloClient";
 import { queryOptions } from "@/modules/queryOptions";
 import {
   getNormalizedReservationOrderStatus,
-  getPaymentUrl,
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
@@ -221,7 +221,7 @@ export default function Reservation({
   const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
-  const paymentUrl = getPaymentUrl(reservation, lang);
+  const paymentUrl = usePaymentUrl(reservation, lang);
   const hasCheckoutUrl = paymentUrl != null;
   const isWaitingForPayment = reservation.state === ReservationStateChoice.WaitingForPayment;
 
