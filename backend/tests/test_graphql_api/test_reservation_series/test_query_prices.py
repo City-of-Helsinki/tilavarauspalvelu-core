@@ -13,6 +13,8 @@ from tests.factories import (
     ReservationFactory,
     ReservationPriceLineFactory,
     ReservationSeriesFactory,
+    ReservationUnitFactory,
+    UserFactory,
 )
 
 from .helpers import reservation_series_many_query, reservation_series_single_query
@@ -70,7 +72,7 @@ def test_reservation_series__query__price_without_reservations(graphql):
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert response.first_query_object == {"price": "0"}
+    assert response.first_query_object == {"price": "0.00"}
 
 
 # ── Price option ──
@@ -111,7 +113,7 @@ def test_reservation_series__query__prices_of_many_series_do_not_grow_queries(gr
     create_series_with_price_option(name="Aikuiset")
     response = graphql(reservation_series_many_query(fields=fields))
     assert response.has_errors is False, response
-    queries_for_one = len(response.queries)
+    response.assert_query_count(7)
 
     create_series_with_price_option(name="Juniorit")
     create_series_with_price_option(name="Seniorit")
@@ -125,4 +127,24 @@ def test_reservation_series__query__prices_of_many_series_do_not_grow_queries(gr
         "Seniorit",
     ]
     assert all(response.node(index)["price"] == "20.00" for index in range(3))
-    assert len(response.queries) == queries_for_one, response.query_log
+    response.assert_query_count(7)
+
+
+# ── Permissions ──
+
+
+def test_reservation_series__query__prices_for_staff_without_permission_to_the_series(graphql):
+    series = create_series_with_price_option(name="Aikuiset")
+    other_unit = ReservationUnitFactory.create().unit
+    user = UserFactory.create_with_unit_role(units=[other_unit])
+
+    graphql.force_login(user)
+    query = reservation_series_single_query(
+        fields="pk price priceOption { nameFi }",
+        id=to_global_id("ReservationSeriesNode", series.pk),
+    )
+    response = graphql(query)
+
+    assert response.error_message("price") == "No permission to access field."
+    assert response.error_message("priceOption") == "No permission to access field."
+    assert response.first_query_object == {"pk": series.pk, "price": None, "priceOption": None}
