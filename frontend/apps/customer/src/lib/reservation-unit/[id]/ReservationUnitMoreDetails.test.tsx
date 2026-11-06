@@ -65,6 +65,18 @@ const pricing = {
   taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
 };
 
+type PriceSummary = NonNullable<ReservationUnitMoreDetailsFragment["priceSummary"]>;
+
+function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary {
+  return {
+    isFree: false,
+    lowestAmount: "20",
+    priceUnit: PriceUnit.PerHour,
+    canApplyForDiscount: false,
+    ...overrides,
+  };
+}
+
 function createReservationUnit(
   overrides: Partial<ReservationUnitMoreDetailsFragment> = {}
 ): ReservationUnitMoreDetailsFragment {
@@ -72,7 +84,7 @@ function createReservationUnit(
     nameFi: "Test Reservation Unit",
     nameEn: "Test Reservation Unit EN",
     nameSv: "Test Reservation Unit SV",
-    canApplyFreeOfCharge: false,
+    priceSummary: null,
     id: "1",
     notesWhenApplyingFi: null,
     notesWhenApplyingEn: null,
@@ -279,13 +291,12 @@ describe("ReservationUnitMoreDetails", () => {
     expect(screen.getByText("reservationUnit:paymentAndCancellationTerms")).toBeInTheDocument();
   });
 
-  test("hides the pricing terms accordion when the unit cannot apply free-of-charge", () => {
+  test("hides the pricing terms accordion when the customer can not apply for a discount", () => {
     render(
       <ReservationUnitMoreDetails
         reservationUnit={createReservationUnit({
-          canApplyFreeOfCharge: false,
+          priceSummary: createPriceSummary({ canApplyForDiscount: false }),
           pricingTerms: termsOfUseText,
-          pricings: [pricing],
         })}
         isReservable
       />
@@ -293,13 +304,12 @@ describe("ReservationUnitMoreDetails", () => {
     expect(screen.queryByTestId("reservation-unit__pricing-terms")).not.toBeInTheDocument();
   });
 
-  test("shows the pricing terms accordion when the unit can apply free-of-charge on a paid pricing", () => {
+  test("shows the pricing terms accordion when the customer can apply for a discount", () => {
     render(
       <ReservationUnitMoreDetails
         reservationUnit={createReservationUnit({
-          canApplyFreeOfCharge: true,
+          priceSummary: createPriceSummary({ canApplyForDiscount: true }),
           pricingTerms: termsOfUseText,
-          pricings: [pricing],
         })}
         isReservable
       />
