@@ -29,11 +29,15 @@ const buttonStyles = css`
   white-space: nowrap;
 `;
 
-export const NextLink = styled(Link)<ButtonStyleProps>`
+// These props only drive the styles. Do not pass them to the DOM element.
+const STYLE_ONLY_PROPS = new Set<string>(["variant", "size", "fontSize", "width"]);
+const shouldForwardProp = (prop: string) => !STYLE_ONLY_PROPS.has(prop);
+
+export const NextLink = styled(Link).withConfig({ shouldForwardProp })<ButtonStyleProps>`
   ${buttonStyles}
 `;
 
-export const AnchorLink = styled.a<ButtonStyleProps>`
+export const AnchorLink = styled.a.withConfig({ shouldForwardProp })<ButtonStyleProps>`
   ${buttonStyles}
 `;
 
