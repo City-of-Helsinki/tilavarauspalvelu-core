@@ -797,7 +797,6 @@ type ReservationUnitNode implements Node {
   requireAdultReservee: Boolean!
   requireReservationHandling: Boolean!
   reservationBlockWholeDay: Boolean!
-  canApplyFreeOfCharge: Boolean!
   authentication: AuthenticationType!
   reservationStartInterval: ReservationStartInterval!
   reservationKind: ReservationKind!
@@ -914,7 +913,6 @@ type ReservationUnitNode implements Node {
     orderBy: [ReservationUnitAccessTypeOrderingChoices]
   ): [ReservationUnitAccessTypeNode!]!
   images: [ReservationUnitImageNode!]!
-  pricings: [ReservationUnitPricingNode!]!
   reservationUnitPricingGroups: [ReservationUnitPricingGroupNode!]!
 
   """The ID of the object"""
@@ -1550,11 +1548,6 @@ type ReservationNode implements Node {
   Which reservation units' reserveability is affected by this reservation?
   """
   affectedReservationUnits: [Int]
-
-  """
-  Details on the pricing that should be currently applied to this reservation.
-  """
-  appliedPricing: AppliedPricingInfo
 
   """
   Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized.
@@ -2354,32 +2347,6 @@ enum PriceUnit {
   FIXED
 }
 
-type AppliedPricingInfo {
-  """
-  This is a 'Date', but graphene doesn't know how to serialize it from string...
-  """
-  begins: String!
-  priceUnit: PriceUnit!
-
-  """
-  This is a 'Decimal', but graphene doesn't know how to serialize it from string...
-  """
-  lowestPrice: String!
-
-  """
-  This is a 'Decimal', but graphene doesn't know how to serialize it from string...
-  """
-  highestPrice: String!
-
-  """
-  This is a 'Decimal', but graphene doesn't know how to serialize it from string...
-  """
-  taxPercentage: String!
-  materialPriceDescriptionFi: String
-  materialPriceDescriptionEn: String
-  materialPriceDescriptionSv: String
-}
-
 type PindoraReservationInfoType {
   accessCode: String!
   accessCodeGeneratedAt: DateTime!
@@ -2430,35 +2397,6 @@ enum ReservationUnitImageType {
   OTHER
 }
 
-type ReservationUnitPricingNode implements Node {
-  begins: Date!
-  priceUnit: PriceUnit!
-  paymentType: PaymentType
-  lowestPrice: Decimal!
-  highestPrice: Decimal!
-  materialPriceDescriptionFi: String
-  materialPriceDescriptionEn: String
-  materialPriceDescriptionSv: String
-  taxLevel: TaxLevelNode!
-
-  """The ID of the object"""
-  id: ID!
-  lowestPriceNet: Decimal!
-  highestPriceNet: Decimal!
-  pk: Int
-}
-
-type TaxLevelNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-
-  """The ID of the object"""
-  id: ID!
-  currentPercentage: Decimal
-  pk: Int
-}
-
 type ReservationUnitPricingGroupNode implements Node {
   reservationUnit: ReservationUnitNode!
   pricingGroup: PricingGroupNode!
@@ -2506,6 +2444,17 @@ type PriceComponentNode implements Node {
 enum PriceComponentKind {
   """Base"""
   BASE
+}
+
+type TaxLevelNode implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+
+  """The ID of the object"""
+  id: ID!
+  currentPercentage: Decimal
+  pk: Int
 }
 
 type SalesItemNode implements Node {
@@ -4023,7 +3972,6 @@ type ReservationUnitCreateMutationPayload {
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
-  canApplyFreeOfCharge: Boolean
   authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
@@ -4043,7 +3991,6 @@ type ReservationUnitCreateMutationPayload {
   intendedUses: [Int]
   equipments: [Int]
   images: [ReservationUnitImageNode]
-  pricings: [ReservationUnitPricingNode]
   accessTypes: [ReservationUnitAccessTypeNode]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
 }
@@ -4093,7 +4040,6 @@ input ReservationUnitCreateMutationInput {
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
-  canApplyFreeOfCharge: Boolean
   authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
@@ -4112,7 +4058,6 @@ input ReservationUnitCreateMutationInput {
   intendedUses: [Int]
   equipments: [Int]
   images: [ReservationUnitImageFieldSerializerInput]
-  pricings: [ReservationUnitPricingSerializerInput]
   accessTypes: [ReservationUnitAccessTypeSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
   ownPricings: [OwnPricingInputSerializerInput]
@@ -4128,19 +4073,6 @@ input ReservationUnitImageFieldSerializerInput {
 
 """Represents a file upload."""
 scalar Upload
-
-input ReservationUnitPricingSerializerInput {
-  pk: Int
-  begins: Date!
-  paymentType: PaymentType
-  priceUnit: PriceUnit
-  lowestPrice: Decimal
-  highestPrice: Decimal
-  taxLevel: Int!
-  materialPriceDescriptionFi: String
-  materialPriceDescriptionEn: String
-  materialPriceDescriptionSv: String
-}
 
 input ReservationUnitAccessTypeSerializerInput {
   pk: Int
@@ -4218,7 +4150,6 @@ type ReservationUnitUpdateMutationPayload {
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
-  canApplyFreeOfCharge: Boolean
   authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
@@ -4238,7 +4169,6 @@ type ReservationUnitUpdateMutationPayload {
   intendedUses: [Int]
   equipments: [Int]
   images: [ReservationUnitImageNode]
-  pricings: [ReservationUnitPricingNode]
   accessTypes: [ReservationUnitAccessTypeNode]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
 }
@@ -4288,7 +4218,6 @@ input ReservationUnitUpdateMutationInput {
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
-  canApplyFreeOfCharge: Boolean
   authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
@@ -4307,7 +4236,6 @@ input ReservationUnitUpdateMutationInput {
   intendedUses: [Int]
   equipments: [Int]
   images: [UpdateReservationUnitImageFieldSerializerInput]
-  pricings: [UpdateReservationUnitPricingSerializerInput]
   accessTypes: [UpdateReservationUnitAccessTypeSerializerInput]
   applicationRoundTimeSlots: [UpdateApplicationRoundTimeSlotSerializerInput]
   ownPricings: [OwnPricingInputSerializerInput]
@@ -4319,19 +4247,6 @@ input UpdateReservationUnitImageFieldSerializerInput {
   mediumUrl: String
   smallUrl: String
   imageType: ReservationUnitImageType
-}
-
-input UpdateReservationUnitPricingSerializerInput {
-  pk: Int
-  begins: Date
-  paymentType: PaymentType
-  priceUnit: PriceUnit
-  lowestPrice: Decimal
-  highestPrice: Decimal
-  taxLevel: Int
-  materialPriceDescriptionFi: String
-  materialPriceDescriptionEn: String
-  materialPriceDescriptionSv: String
 }
 
 input UpdateReservationUnitAccessTypeSerializerInput {

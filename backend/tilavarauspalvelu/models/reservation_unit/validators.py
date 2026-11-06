@@ -5,12 +5,18 @@ import datetime
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.db import models
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.enums import ReservationKind, ReservationTypeChoice, ReservationUnitPublishingState
-from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.enums import (
+    PriceComponentKind,
+    ReservationKind,
+    ReservationTypeChoice,
+    ReservationUnitPublishingState,
+)
+from tilavarauspalvelu.models import PriceComponent, Reservation, ReservationUnitPricingGroup
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import local_datetime, local_start_of_day, utc_datetime
+from utils.date_utils import local_date, local_datetime, local_start_of_day, utc_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -25,6 +31,28 @@ __all__ = [
 @dataclasses.dataclass(slots=True, frozen=True)
 class ReservationUnitValidator:
     reservation_unit: ReservationUnit
+
+    def validate_has_price_today(self) -> None:
+        """A free price is a price too. A reservation unit without a price in effect today cannot be published."""
+        today = local_date()
+        pricing_group_row = (
+            ReservationUnitPricingGroup.objects
+            .filter(reservation_unit=self.reservation_unit, begins__lte=today)
+            .order_by("-begins")
+            .first()
+        )
+        has_price = (
+            pricing_group_row is not None
+            and PriceComponent.objects.filter(
+                models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+                pricing_group_id=pricing_group_row.pricing_group_id,
+                kind=PriceComponentKind.BASE,
+                valid_from__lte=today,
+            ).exists()
+        )
+        if not has_price:
+            msg = "Not draft reservation unit must have a price in effect today."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PRICE)
 
     def validate_reservation_unit_is_published(self) -> None:
         if self.reservation_unit.publishing_state not in ReservationUnitPublishingState.states_that_are_visible:

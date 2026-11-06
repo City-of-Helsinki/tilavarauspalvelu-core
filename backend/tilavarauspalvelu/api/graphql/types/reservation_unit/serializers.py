@@ -20,20 +20,11 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializer
     ReservationUnitAccessTypeSerializer,
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
-from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
 from tilavarauspalvelu.enums import AccessType, PriceUnit, ReservationStartInterval, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import (
-    ReservationUnit,
-    ReservationUnitAccessType,
-    ReservationUnitPricing,
-    Resource,
-    SalesItem,
-    Space,
-    TaxLevel,
-)
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, Resource, SalesItem, Space, TaxLevel
 from tilavarauspalvelu.services.pricing.own_pricing import OwnPricing, save_own_pricings
 from tilavarauspalvelu.services.pricing.sales_items import validate_sales_items_for_payment_type
 from tilavarauspalvelu.typing import error_codes
@@ -74,7 +65,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
     instance: ReservationUnit | None
 
     images = ReservationUnitImageFieldSerializer(many=True, required=False)
-    pricings = ReservationUnitPricingSerializer(many=True, required=False)
     own_pricings = OwnPricingInputSerializer(many=True, required=False, write_only=True)
     application_round_time_slots = ApplicationRoundTimeSlotSerializer(many=True, required=False)
     access_types = ReservationUnitAccessTypeSerializer(many=True, required=False)
@@ -119,7 +109,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "require_adult_reservee",
             "require_reservation_handling",
             "reservation_block_whole_day",
-            "can_apply_free_of_charge",
             #
             # Enums
             "authentication",
@@ -149,7 +138,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             #
             # Reverse one-to-many related
             "images",
-            "pricings",
             "access_types",
             "application_round_time_slots",
             #
@@ -162,7 +150,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
         self._validate_spaces_and_resources_in_unit(data)
         self._validate_reservation_duration_fields(data)
-        self._validate_pricings(data)
         self._validate_access_types(access_types=data.get("access_types", []), is_draft=is_draft)
 
         if self.instance is not None and "payment_type" in data:
@@ -279,61 +266,24 @@ class ReservationUnitSerializer(NestingModelSerializer):
             msg = "minPersons can't be more than maxPersons"
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MIN_PERSONS_GREATER_THAN_MAX_PERSONS)
 
-    def _validate_pricings(self, data: dict[str, Any]) -> None:
-        """
-        When reservation unit is draft, pricings are not required,
-        but if they are given, they must be valid.
-        """
-        is_draft = self.get_or_default("is_draft", data)
-        pricings = data.get("pricings")
+        self._validate_price_for_publish(data)
 
-        # Pricings are optional when reservation unit is draft
-        if is_draft and not pricings:
+    def _validate_price_for_publish(self, data: dict[str, Any]) -> None:
+        # The given pricings are saved after validation, so they are checked here instead of the saved prices.
+        # The pricings must include the active one, and the coverage check of the save does not allow gaps.
+        own_pricings: list[dict[str, Any]] | None = data.get("own_pricings")
+        if own_pricings:
+            today = local_date()
+            if not any(pricing["begins"] <= today for pricing in own_pricings):
+                msg = "Not draft reservation unit must have a price in effect today."
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PRICE)
             return
 
-        # If the pricings were not given, but the reservation unit has some, skip validation and assume they are valid
-        if pricings is None and self.instance and self.instance.pricings.exists():
-            return
+        if self.instance is None:
+            msg = "Not draft reservation unit must have a price in effect today."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PRICE)
 
-        if not pricings:
-            msg = "Pricings are required for non-draft reservation units."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_MISSING)
-
-        # At least one given pricing must be currently active (begin date is today or earlier)
-        today = local_date()
-        has_active_pricing = any(p["begins"] <= today for p in pricings)
-        if not has_active_pricing:
-            msg = "At least one active pricing is required."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING)
-
-        # Only one pricing per date is allowed
-        pricing_dates = [p.get("begins") for p in pricings]
-        if len(pricing_dates) != len(set(pricing_dates)):
-            msg = "Reservation unit can have only one pricing per date."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_DUPLICATE_DATE)
-
-        for pricing in pricings:
-            # Reservations use the tax rate of the date they are created or paid, even for future pricings.
-            tax_level = pricing.get("tax_level")
-            if tax_level is not None:
-                tax_level.validators.validate_has_rate_today()
-
-            # Highest price cannot be less than the lowest price
-            highest_price = pricing.get("highest_price")
-            lowest_price = pricing.get("lowest_price")
-
-            if not lowest_price and not highest_price:  # = Free
-                continue
-            if lowest_price is None or highest_price is None:
-                msg = "Both lowest and highest price must be given or neither."
-                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
-            if highest_price < lowest_price:
-                msg = "Highest price cannot be less than lowest price."
-                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
-
-            if pricing.get("payment_type") is None:
-                msg = "Pricing has no payment type defined"
-                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICING_NO_PAYMENT_TYPE)
+        self.instance.validators.validate_has_price_today()
 
     def _validate_access_types(self, *, access_types: list[dict[str, Any]], is_draft: bool) -> None:  # noqa: PLR0912
         editing = getattr(self.instance, "pk", None) is not None
@@ -438,21 +388,17 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data: dict[str, Any]) -> ReservationUnit:
-        pricings = validated_data.pop("pricings", [])
         own_pricings = validated_data.pop("own_pricings", [])
         access_types = validated_data.pop("access_types", [])
         reservation_unit = super().create(validated_data)
-        self.handle_pricings(pricings, reservation_unit)
         self.handle_own_pricings(own_pricings, reservation_unit)
         self.handle_access_types(access_types, reservation_unit)
         return reservation_unit
 
     @transaction.atomic
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
-        pricings = validated_data.pop("pricings", [])
         own_pricings = validated_data.pop("own_pricings", [])
         access_types = validated_data.pop("access_types", [])
-        self.handle_pricings(pricings, instance)
         self.handle_own_pricings(own_pricings, instance)
         self.handle_access_types(access_types, instance)
         # Reservation Unit needs to be updated last, due to post_save signals.
@@ -475,25 +421,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             except ExternalServiceError as err:
                 msg = "Sending reservation unit as resource to HAUKI failed."
                 raise GQLCodeError(msg, code=error_codes.HAUKI_EXPORTS_ERROR) from err
-
-    @staticmethod
-    def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
-        with transaction.atomic():
-            # Delete future pricings that are not in the payload.
-            # Past or Active pricings can not be deleted.
-            pricing_pks = [pricing.get("pk") for pricing in pricings if "pk" in pricing]
-            ReservationUnitPricing.objects.filter(
-                reservation_unit=reservation_unit,
-                begins__gt=local_date(),
-            ).exclude(
-                pk__in=pricing_pks,
-            ).delete()
-
-            for pricing in pricings:
-                if "pk" in pricing:  # Update existing pricings
-                    ReservationUnitPricing.objects.update_or_create(pk=pricing["pk"], defaults=pricing)
-                else:  # Create new pricings
-                    ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
     @staticmethod
     def handle_own_pricings(own_pricings: list[dict[str, Any]], reservation_unit: ReservationUnit) -> None:
