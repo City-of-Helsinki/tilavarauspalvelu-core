@@ -30,7 +30,8 @@ export function TermsInfoSection({
       return false;
     }
     const isFreeOfCharge = getReservationPriceDisplayFromLines(reservation, lang).total === 0;
-    return reservation.applyingForFreeOfCharge || (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge);
+    const canApplyForDiscount = reservationUnit.priceSummary?.canApplyForDiscount === true;
+    return reservation.applyingForFreeOfCharge || (canApplyForDiscount && !isFreeOfCharge);
   }, [reservation, reservationUnit, lang]);
   const paymentTermsContent =
     reservationUnit.paymentTerms != null ? getTranslation(reservationUnit.paymentTerms, "text", lang) : undefined;
