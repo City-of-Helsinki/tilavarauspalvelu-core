@@ -152,5 +152,6 @@
     "delete": "Delete",
     "back": "Back",
     "backTo": "Back to {{destination}}"
-  }
+  },
+  "unsavedChangesConfirm": "This page has changes that are not saved. If you leave the page, the changes are lost. Do you want to leave?"
 }

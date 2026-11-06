@@ -152,5 +152,6 @@
     "delete": "Radera",
     "back": "Tillbaka",
     "backTo": "Tillbaka till {{destination}}"
-  }
+  },
+  "unsavedChangesConfirm": "Sidan har ändringar som inte är sparade. Om du lämnar sidan försvinner ändringarna. Vill du lämna sidan?"
 }

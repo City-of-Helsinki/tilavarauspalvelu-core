@@ -7,6 +7,9 @@ export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 
 export const ANALYTICS_COOKIE_GROUP_NAME = "statistics";
 
+/// Message of the error that cancels a route change (see useUnsavedChangesWarning). Sentry ignores it.
+export const ROUTE_CHANGE_CANCELLED_MESSAGE = "Route change cancelled because of unsaved changes";
+
 // Poll other reservations when user is looking at the reservation calendar
 export const BLOCKING_RESERVATIONS_POLL_INTERVAL_MS = 30 * 1000;
 // Poll after webstore redirect to success to wait for backend webhook to be activated

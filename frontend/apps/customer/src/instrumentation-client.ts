@@ -7,6 +7,7 @@ import { captureRouterTransitionStart } from "@sentry/nextjs";
 import { beforeSend, beforeSendTransaction, parseSampleRate } from "ui/src";
 import { env } from "@/env.mjs";
 import { SENTRY_APPLICATION_KEY, getCustomerRelease } from "@/modules/baseUtils";
+import { ROUTE_CHANGE_CANCELLED_MESSAGE } from "@/modules/const";
 
 if (env.SENTRY_DSN) {
   const release = getCustomerRelease();
@@ -35,6 +36,8 @@ if (env.SENTRY_DSN) {
       // iOS Safari throws this after a suspended background tab wakes up. A string would match any message
       // that contains it, so match the exact type and value.
       /^TypeError: Internal error$/,
+      // Expected when the user cancels a navigation away from a page with unsaved changes.
+      new RegExp(`^Error: ${ROUTE_CHANGE_CANCELLED_MESSAGE}$`),
     ],
     tracesSampleRate: parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE),
     tracePropagationTargets: env.SENTRY_TRACE_PROPAGATION_TARGETS

@@ -1,6 +1,6 @@
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi, expect, test, describe } from "vitest";
+import { vi, expect, test, describe, beforeEach } from "vitest";
 import type { ApplicationPage3Query } from "@gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
 import Page3 from "@/pages/applications/[id]/page3";
@@ -20,8 +20,25 @@ function deferred<T>() {
 }
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
+  type Handler = (...args: unknown[]) => void;
+  const handlers = new Map<string, Set<Handler>>();
+  const events = {
+    on: (type: string, fn: Handler) => handlers.set(type, (handlers.get(type) ?? new Set<Handler>()).add(fn)),
+    off: (type: string, fn: Handler) => handlers.get(type)?.delete(fn),
+  };
   const mockedRouterReplace = vi.fn();
-  const mockedRouterPush = vi.fn();
+  // Like Next.js, push emits routeChangeStart, so the unsaved changes warning runs.
+  // A cancelled route change resolves to false here. Next.js rejects instead.
+  const mockedRouterPush = vi.fn((url: string) => {
+    try {
+      for (const fn of handlers.get("routeChangeStart") ?? []) {
+        fn(url);
+      }
+    } catch {
+      return Promise.resolve(false);
+    }
+    return Promise.resolve(true);
+  });
   const query = {
     id: "1",
   };
@@ -29,6 +46,8 @@ const { mockedRouterPush, useRouter } = vi.hoisted(() => {
     useRouter: () => ({
       replace: mockedRouterReplace,
       push: mockedRouterPush,
+      events,
+      beforePopState: vi.fn(),
       query,
       asPath: "/applications/1/page1",
       pathname: "/applications/[id]/[page]",
@@ -110,5 +129,43 @@ describe("Application Page3", () => {
 
     nav.resolve(true);
     await nav.promise;
+  });
+});
+
+describe("Application page3 unsaved changes", () => {
+  // happy-dom has no window.confirm
+  const confirm = vi.fn<(message?: string) => boolean>();
+  beforeEach(() => {
+    confirm.mockReset().mockReturnValue(false);
+    window.confirm = confirm;
+    mockedRouterPush.mockClear();
+  });
+
+  test("does not ask to confirm when there are no changes", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page3" });
+    await user.click(view.getByRole("button", { name: "common:prev" }));
+    expect(confirm).not.toHaveBeenCalled();
+    expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page2"));
+    await expect(mockedRouterPush.mock.results[0]?.value).resolves.toBe(true);
+  });
+
+  test("asks to confirm before the user leaves with unsaved changes", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page3" });
+    await user.type(view.getByRole("textbox", { name: /organisationName/ }), " changed");
+    await user.click(view.getByRole("button", { name: "common:prev" }));
+    expect(confirm).toHaveBeenCalledWith("common:unsavedChangesConfirm");
+    // the user did not confirm, so the route change is cancelled
+    await expect(mockedRouterPush.mock.results[0]?.value).resolves.toBe(false);
+  });
+
+  test("does not ask to confirm when the user saves with next", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page3" });
+    await user.type(view.getByRole("textbox", { name: /organisationName/ }), " changed");
+    await user.click(view.getByRole("button", { name: "common:next" }));
+    expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page4"));
+    expect(confirm).not.toHaveBeenCalled();
   });
 });
