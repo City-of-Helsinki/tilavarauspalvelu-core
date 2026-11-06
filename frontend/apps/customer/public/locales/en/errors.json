@@ -66,7 +66,7 @@
       "CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed",
       "CANCELLATION_TIME_PAST": "Cancellation time is in the past",
       "CANCEL_REASON_DOES_NOT_EXIST": "Cancel reason does not exist",
-      "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
+      "OVERLAPPING_RESERVATIONS": "The selected time is already booked. Choose another time.",
       "REQUIRED_FIELD_MISSING": "Required field missing.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
@@ -74,7 +74,7 @@
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "You have the maximum number of bookings for this space.",
       "RESERVATION_MODIFICATION_NOT_ALLOWED": "Unfortunately, the booking could not be changed.",
       "TAX_LEVEL_HAS_NO_RATE": "The price of the space cannot be calculated now. Try again later or contact the administrator of the space.",
-      "USER_NOT_INTERNAL_USER": "Making a booking is not allowed.",
+      "USER_NOT_INTERNAL_USER": "You cannot make a booking with this City of Helsinki employee account. Only internal City accounts (@hel.fi or @edu.hel.fi) can make bookings. Log out and log in with your Helsinki profile.",
       "generic_validation_error": "An error occurred.",
       "invalid": "Invalid value."
     }

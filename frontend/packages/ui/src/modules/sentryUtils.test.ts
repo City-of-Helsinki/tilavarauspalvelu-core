@@ -1,5 +1,77 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { beforeSend, beforeSendTransaction, cleanSensitiveData, parseSampleRate } from "./sentryUtils";
+import type { SamplingContext, TracesSamplerSamplingContext } from "@sentry/core";
+import {
+  beforeSend,
+  beforeSendTransaction,
+  cleanSensitiveData,
+  createServerTracesSampler,
+  parseSampleRate,
+} from "./sentryUtils";
+
+describe("createServerTracesSampler", () => {
+  const POST_LOGIN_URL =
+    "https://varaamo.hel.fi/reservation-unit/972?begin=2026-11-14T10%3A30%3A00.000Z&isPostLogin=true";
+
+  // Same logic as inheritOrSampleWith in @sentry/core sampleSpan.
+  function createContext(context: SamplingContext): TracesSamplerSamplingContext {
+    return {
+      ...context,
+      inheritOrSampleWith: (fallbackSampleRate) => {
+        if (typeof context.parentSampleRate === "number") {
+          return context.parentSampleRate;
+        }
+        if (typeof context.parentSampled === "boolean") {
+          return Number(context.parentSampled);
+        }
+        return fallbackSampleRate;
+      },
+    };
+  }
+
+  it("samples all post login requests", () => {
+    const sampler = createServerTracesSampler(0.2);
+    expect(sampler(createContext({ name: "GET", normalizedRequest: { url: POST_LOGIN_URL } }))).toBe(1);
+    expect(sampler(createContext({ name: "GET", normalizedRequest: { query_string: "isPostLogin=true" } }))).toBe(1);
+    expect(
+      sampler(createContext({ name: "GET", attributes: { "http.target": "/reservation-unit/972?isPostLogin=true" } }))
+    ).toBe(1);
+  });
+
+  it("samples a post login request with a not sampled parent", () => {
+    const sampler = createServerTracesSampler(0.2);
+    const context = createContext({
+      name: "GET",
+      normalizedRequest: { url: POST_LOGIN_URL },
+      parentSampled: false,
+      parentSampleRate: 0.2,
+    });
+    expect(sampler(context)).toBe(1);
+  });
+
+  it("uses the sample rate for other requests", () => {
+    const sampler = createServerTracesSampler(0.2);
+    const url = "https://varaamo.hel.fi/reservation-unit/972";
+    expect(sampler(createContext({ name: "GET", normalizedRequest: { url } }))).toBe(0.2);
+    expect(sampler(createContext({ name: "GET", normalizedRequest: { url: `${url}?isPostLogin=false` } }))).toBe(0.2);
+  });
+
+  it("inherits the parent sample rate for other requests", () => {
+    const sampler = createServerTracesSampler(0.2);
+    expect(sampler(createContext({ name: "GET", parentSampled: true, parentSampleRate: 0.5 }))).toBe(0.5);
+    expect(sampler(createContext({ name: "GET", parentSampled: false, parentSampleRate: 0.05 }))).toBe(0.05);
+  });
+
+  it("uses the parent decision when the parent has no sample rate", () => {
+    const sampler = createServerTracesSampler(0.2);
+    expect(sampler(createContext({ name: "GET", parentSampled: true }))).toBe(1);
+    expect(sampler(createContext({ name: "GET", parentSampled: false }))).toBe(0);
+  });
+
+  it("does not sample when the sample rate is 0", () => {
+    const sampler = createServerTracesSampler(0);
+    expect(sampler(createContext({ name: "GET", normalizedRequest: { url: POST_LOGIN_URL } }))).toBe(0);
+  });
+});
 
 describe("parseSampleRate", () => {
   it("returns 0 for undefined or empty string", () => {

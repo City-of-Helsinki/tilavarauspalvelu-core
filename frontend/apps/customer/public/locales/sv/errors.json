@@ -66,7 +66,7 @@
       "CANCELLATION_NOT_ALLOWED": "Avbokning är inte tillåten.",
       "CANCELLATION_TIME_PAST": "Avbokningstiden är passerad.",
       "CANCEL_REASON_DOES_NOT_EXIST": "Avbokningsorsak finns inte.",
-      "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
+      "OVERLAPPING_RESERVATIONS": "Den valda tiden är redan bokad. Välj en annan tid.",
       "REQUIRED_FIELD_MISSING": "Obligatoriskt fält saknas.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Avbokning är inte tillåten.",
       "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
@@ -74,7 +74,7 @@
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Du har det maximala antalet bokningar för detta objekt.",
       "RESERVATION_MODIFICATION_NOT_ALLOWED": "Tyvärr går det inte att ändra bokningen.",
       "TAX_LEVEL_HAS_NO_RATE": "Objektets pris kan inte beräknas just nu. Försök igen senare eller kontakta objektets administratör.",
-      "USER_NOT_INTERNAL_USER": "Det är inte tillåtet att göra en bokning.",
+      "USER_NOT_INTERNAL_USER": "Du kan inte göra en bokning med detta anställningskonto vid Helsingfors stad. Endast stadens interna konton (@hel.fi eller @edu.hel.fi) kan göra bokningar. Logga ut och logga in med din Helsingforsprofil.",
       "generic_validation_error": "Ett fel uppstod.",
       "invalid": "Ogiltigt värde."
     }

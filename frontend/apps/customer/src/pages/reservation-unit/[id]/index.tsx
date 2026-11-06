@@ -10,7 +10,7 @@ import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { getApiErrors, logGraphQLQuery } from "@ui/modules/apollo/helpers";
+import { NETWORK_ERROR_TOAST_ID, getApiErrors, logGraphQLQuery } from "@ui/modules/apollo/helpers";
 import type { ApiError } from "@ui/modules/apollo/helpers";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
@@ -185,15 +185,36 @@ function ReservationUnit({
   const displayError = useDisplayError();
 
   useEffect(() => {
-    if (mutationErrors != null && mutationErrors.length > 0) {
-      const msgs = mutationErrors.map((e) => formatErrorMessage(t, e));
-      for (const text of msgs) {
-        errorToast({
-          text,
-        });
-      }
+    if (mutationErrors == null) {
+      return;
+    }
+    if (mutationErrors.length === 0) {
+      // The create failed without a GraphQL error, for example a network error on the server.
+      // A client query can fail for the same reason and show a network error toast.
+      // Use the same toast id, so the user sees only one toast.
+      errorToast({
+        text: t("errors:general_error"),
+        options: { toastId: NETWORK_ERROR_TOAST_ID },
+      });
+      return;
+    }
+    const msgs = mutationErrors.map((e) => formatErrorMessage(t, e));
+    for (const text of msgs) {
+      errorToast({
+        text,
+      });
     }
   }, [mutationErrors, t]);
+
+  // The post login create failed. Remove its query params, so a reload does not try to create it again.
+  useEffect(() => {
+    // An empty list is still a failed create. The error was not a GraphQL error, for example a network error.
+    if (mutationErrors == null || router.query.isPostLogin == null) {
+      return;
+    }
+    const { isPostLogin: _isPostLogin, begin: _begin, end: _end, ...query } = router.query;
+    void router.replace({ pathname: router.pathname, query }, undefined, { shallow: true, scroll: false });
+  }, [mutationErrors, router]);
 
   const focusDate = useMemo(() => {
     return createDateTime(dateValue, timeValue);

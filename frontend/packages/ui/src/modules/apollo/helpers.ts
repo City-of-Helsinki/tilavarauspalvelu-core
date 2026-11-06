@@ -248,6 +248,32 @@ function getExtensionCode(e: GraphQLFormattedError): string | null {
   return null;
 }
 
+/// Validation codes that are a normal outcome for the user, not a bug.
+/// The UI shows these to the user, so they are not sent to Sentry.
+/// OVERLAPPING_RESERVATIONS: another reservation took the time first,
+/// for example while the user was in the login.
+/// RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED: the user has the maximum number of reservations
+/// for the reservation unit. The UI cannot check this before the login.
+/// USER_NOT_INTERNAL_USER: the user signed in with a City employee (AD) account that is not
+/// an internal account, for example a guest account. Such an account cannot make reservations.
+const EXPECTED_VALIDATION_CODES = new Set([
+  "OVERLAPPING_RESERVATIONS",
+  "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED",
+  "USER_NOT_INTERNAL_USER",
+]);
+
+function isExpectedError(error: QueryErrorT): boolean {
+  if (error.type !== "GRAPHQL_ERROR" || error.details.length === 0) {
+    return false;
+  }
+  return error.details.every(
+    (e) =>
+      "validation_code" in e &&
+      typeof e.validation_code === "string" &&
+      EXPECTED_VALIDATION_CODES.has(e.validation_code)
+  );
+}
+
 /// Capture all graphql errors as warnings in Sentry
 /// if some errors are properly handled in the UI add filter here
 /// During development log to console
@@ -258,6 +284,10 @@ export const errorLink = onError(({ graphQLErrors, networkError, operation }) =>
     toastNetworkError(networkError);
   }
   const errors = transformApolloError(new ApolloError({ graphQLErrors, networkError }));
+  if (isExpectedError(errors)) {
+    log.info(`expected graphql error in ${operation.operationName}: ${errors.message}`);
+    return;
+  }
   logGraphQLError(errors, operation);
 });
 
@@ -288,6 +318,10 @@ const NETWORK_ERROR_TRANSLATIONS: Record<LocalizationLanguages, string> = {
   sv: "Det går inte att ansluta till tjänsten. Försök igen.",
 };
 
+/// Toast id for network and other generic errors.
+/// Use it for any toast of such an error, so the user sees only one toast for them.
+export const NETWORK_ERROR_TOAST_ID = "network_error";
+
 function toastNetworkError(error: Error | ServerParseError | ServerError): void {
   if (!isBrowser) {
     return;
@@ -299,7 +333,7 @@ function toastNetworkError(error: Error | ServerParseError | ServerError): void 
   const lang = getLocalizationLang(document.documentElement.lang);
   let errorMsg = NETWORK_ERROR_TRANSLATIONS[lang];
 
-  const errorToastId = "network_error";
+  const errorToastId = NETWORK_ERROR_TOAST_ID;
 
   // don't create multiple toasts
   if (!document.querySelector(`#${errorToastId}`)) {
