@@ -26,7 +26,14 @@ if TYPE_CHECKING:
         ReserveeType,
         Weekday,
     )
-    from tilavarauspalvelu.models import AgeGroup, ReservationDenyReason, ReservationPurpose, ReservationUnit, User
+    from tilavarauspalvelu.models import (
+        AgeGroup,
+        PriceOption,
+        ReservationDenyReason,
+        ReservationPurpose,
+        ReservationUnit,
+        User,
+    )
 
 __all__ = [
     "AffectedTimeSpan",
@@ -444,6 +451,7 @@ class ReservationDetails(TypedDict, total=False):
     user: int | User | None
     purpose: int | ReservationPurpose | None
     age_group: int | AgeGroup | None
+    price_option: int | PriceOption | None
 
 
 class PreSaveKwargs[TModel: models.Model](TypedDict):
