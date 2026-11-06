@@ -25,7 +25,6 @@ import {
   getReservationPriceString,
   isDiscountPending,
 } from "@/modules/price";
-import { hasMaterialPrice } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 
 const InfoCard = styled(Card)`
@@ -110,7 +109,7 @@ export function ReservationInfoCard({
   const priceDisplay =
     reservationPrice != null
       ? getReservationPriceDisplay(reservationPrice, lang)
-      : getReservationPriceDisplayFromLines(reservation, lang, hasMaterialPrice(reservationUnit));
+      : getReservationPriceDisplayFromLines(reservation, lang);
   const price = getReservationPriceString(t, priceDisplay, isDiscountRange ?? isDiscountPending(reservation), lang);
   const priceLineList = getPriceLineStringList(priceDisplay, lang);
   const taxPercentage = priceDisplay.total > 0 ? priceDisplay.taxPercentage : null;
@@ -191,9 +190,6 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
       nameFi
       nameEn
       nameSv
-      pricings {
-        ...PricingFields
-      }
       images {
         ...Image
       }

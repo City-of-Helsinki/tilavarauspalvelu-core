@@ -91,10 +91,10 @@ export function getReservationPriceDisplay(
 
 /// The price of a reservation from its price lines. The override of the handler replaces the amount of a line.
 /// Reservations made before price lines have no lines. For these, use the price of the reservation.
+/// The price lines have no material price description, so the price has no material price text.
 export function getReservationPriceDisplayFromLines(
   reservation: ReservationPriceLinesFieldsFragment,
-  lang: LocalizationLanguages,
-  hasMaterialPrice: boolean
+  lang: LocalizationLanguages
 ): ReservationPriceDisplay {
   const priceLineList = reservation.priceLines ?? [];
   if (priceLineList.length === 0) {
@@ -103,7 +103,7 @@ export function getReservationPriceDisplayFromLines(
       total: toNumber(reservation.price) ?? 0,
       lineList: [],
       taxPercentage: taxPercentage != null && taxPercentage > 0 ? taxPercentage : null,
-      hasMaterialPrice,
+      hasMaterialPrice: false,
     };
   }
   const lineList = priceLineList.map((line) => ({
@@ -114,7 +114,7 @@ export function getReservationPriceDisplayFromLines(
     total: lineList.reduce((sum, line) => sum + line.amount, 0),
     lineList,
     taxPercentage: getCommonTaxPercentage(priceLineList.map((line) => toNumber(line.taxPercentage) ?? 0)),
-    hasMaterialPrice,
+    hasMaterialPrice: false,
   };
 }
 
