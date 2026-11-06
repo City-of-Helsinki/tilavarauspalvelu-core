@@ -1210,6 +1210,7 @@ msgid "Refund ID"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment type"
 msgstr ""
 
@@ -2256,13 +2257,26 @@ msgid "Tax percentage"
 msgstr "Skattesats"
 
 #: tilavarauspalvelu/admin/tax_level/form.py
+msgid "VAT code"
+msgstr "Momskod"
+
+#: tilavarauspalvelu/admin/tax_level/form.py
 msgid ""
 "The date when the rate takes effect. Rates that began before today cannot be "
-"changed or deleted. To change the tax percentage, add a new rate."
+"deleted, and only their VAT code can be changed. To change the tax "
+"percentage, add a new rate."
 msgstr ""
 "Datumet då skattesatsen börjar gälla. Skattesatser som började före i dag "
-"kan inte ändras eller tas bort. Lägg till en ny skattesats för att ändra "
-"skatten."
+"kan inte tas bort, och endast deras momskod kan ändras. Lägg till en ny "
+"skattesats för att ändra skatten."
+
+#: tilavarauspalvelu/admin/tax_level/form.py
+msgid ""
+"The SAP VAT code for this tax percentage, e.g. '48'. Leave empty if SAP has "
+"no code for it."
+msgstr ""
+"SAP:s momskod för denna skattesats, t.ex. '48'. Lämna tomt om SAP inte har "
+"någon kod för den."
 
 #: tilavarauspalvelu/admin/tax_level/form.py
 msgid "At least one rate in effect today is required."
