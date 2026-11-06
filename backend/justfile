@@ -16,6 +16,23 @@ check-translations:
 clear-db schema='public':
     @python manage.py dbshell -- -c "DROP SCHEMA {{ schema }} CASCADE;CREATE SCHEMA {{ schema }};"
 
+# Run tests with coverage and show the coverage report. Skips slow tests.
+[positional-arguments]
+coverage *args:
+    @{{ pytest }} --no-migrations --reuse-db --skip-slow -n {{ pytest_workers }} --cov --cov-report=term "$@"
+
+# Show files without full test coverage. Run 'coverage' first.
+coverage-missing:
+    @coverage report --skip-covered --show-missing
+
+# Print outdated top level dependencies
+deps-out:
+    @poetry show --outdated --top-level
+
+# Print all dependencies as a tree
+deps-tree:
+    @poetry show --tree
+
 # Run local backend
 dev:
     @python manage.py runserver localhost:8000
@@ -32,9 +49,17 @@ generate:
 hooks:
     @pre-commit install
 
+# Install all dependencies and remove packages that are not in the lock file
+install:
+    @poetry sync
+
 # Run pre-commit hooks
 lint:
     @pre-commit run --all-files
+
+# Update the lock file from pyproject.toml
+lock:
+    @poetry lock
 
 # Run database migrations
 migrate:
