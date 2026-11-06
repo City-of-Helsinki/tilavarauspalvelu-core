@@ -16,6 +16,10 @@ import {
   getAccessibilityTermsUrl,
 } from "./urls";
 
+// vitest moves vi.hoisted and vi.mock above the imports
+const envMock = vi.hoisted(() => ({ NEXT_PUBLIC_LOCAL_CUSTOMER_URL: undefined as string | undefined }));
+vi.mock("@/env.mjs", () => ({ env: envMock }));
+
 function getReservationUnits(url: string): string | null {
   return new URL(url, "https://example.com").searchParams.get("reservation_units");
 }
@@ -248,9 +252,17 @@ describe("URL generation functions", () => {
   });
 
   describe("getAccessibilityTermsUrl", () => {
-    it("returns a URL with accessibility terms path", () => {
-      const url = getAccessibilityTermsUrl();
-      expect(url).toContain("/terms/accessibility-admin");
+    afterEach(() => {
+      envMock.NEXT_PUBLIC_LOCAL_CUSTOMER_URL = undefined;
+    });
+
+    it("uses the page origin without NEXT_PUBLIC_LOCAL_CUSTOMER_URL", () => {
+      expect(getAccessibilityTermsUrl()).toBe(`${window.location.origin}/terms/accessibility-admin`);
+    });
+
+    it("uses NEXT_PUBLIC_LOCAL_CUSTOMER_URL without a trailing slash", () => {
+      envMock.NEXT_PUBLIC_LOCAL_CUSTOMER_URL = "http://localhost:3000/";
+      expect(getAccessibilityTermsUrl()).toBe("http://localhost:3000/terms/accessibility-admin");
     });
   });
 });
