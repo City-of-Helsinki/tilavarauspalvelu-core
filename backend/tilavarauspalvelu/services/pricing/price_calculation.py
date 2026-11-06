@@ -22,7 +22,6 @@ __all__ = [
     "PriceCalculation",
     "PriceCalculationLine",
     "PricingData",
-    "calculate_price",
     "calculate_price_with_data",
     "load_pricing_data",
 ]
@@ -114,28 +113,6 @@ def load_pricing_data(*, reservation_unit_pks: Collection[int]) -> PricingData:
         tax_rates.setdefault(rate.tax_level_id, []).append(rate)
 
     return PricingData(pricing_group_rows=pricing_group_rows, components=components, tax_rates=tax_rates)
-
-
-def calculate_price(
-    *,
-    reservation_unit: ReservationUnit,
-    price_option: PriceOption | None,
-    begin: datetime.datetime,
-    end: datetime.datetime,
-) -> PriceCalculation:
-    """
-    Calculate the price of a reservation. See `calculate_price_with_data`.
-
-    :raises PriceCalculationError: If the price cannot be calculated.
-    """
-    pricing_data = load_pricing_data(reservation_unit_pks=[reservation_unit.pk])
-    return calculate_price_with_data(
-        pricing_data=pricing_data,
-        reservation_unit=reservation_unit,
-        price_option=price_option,
-        begin=begin,
-        end=end,
-    )
 
 
 def calculate_price_with_data(
