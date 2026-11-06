@@ -56,6 +56,53 @@ pytestmark = [
 ]
 
 
+# ── Helpers ──
+
+
+JAN_1_2024 = datetime.date(2024, 1, 1)
+JAN_8_2024 = datetime.date(2024, 1, 8)
+
+
+def create_round_on_mondays(*, reservation_units: list[ReservationUnit], weeks: int = 3) -> ApplicationRound:
+    """A handled round with an allocation on Mondays 12-14 for each reservation unit, from January 1st 2024."""
+    return ApplicationRoundFactory.create_with_allocations(
+        allocations=[
+            Allocation(
+                reservation_unit=reservation_unit,
+                day_of_the_week=Weekday.MONDAY,
+                begin_time=local_time(12, 0),
+                end_time=local_time(14, 0),
+            )
+            for reservation_unit in reservation_units
+        ],
+        reservation_period_begin_date=JAN_1_2024,
+        reservation_period_end_date=JAN_1_2024 + datetime.timedelta(weeks=weeks - 1),
+        user=UserFactory.create(),
+    )
+
+
+def create_priced_reservation_unit(*, price_option: PriceOption | None = None) -> ReservationUnit:
+    unit_group = price_option.unit_group if price_option is not None else None
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        price_option=price_option,
+        valid_from=JAN_1_2024,
+        amount=Decimal(10),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    reservation_unit = ReservationUnitBuilder().with_unrestricted_access().create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1_2024,
+    )
+    return reservation_unit
+
+
+# ── Reservation series ──
+
+
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
 def test_generate_reservation_series_from_allocations():
     user = UserFactory.create()
@@ -553,47 +600,6 @@ def test_generate_reservation_series_from_allocations__two_reservation_units_wit
 
 
 # ── Prices ──
-
-
-JAN_1_2024 = datetime.date(2024, 1, 1)
-JAN_8_2024 = datetime.date(2024, 1, 8)
-
-
-def create_round_on_mondays(*, reservation_units: list[ReservationUnit], weeks: int = 3) -> ApplicationRound:
-    """A handled round with an allocation on Mondays 12-14 for each reservation unit, from January 1st 2024."""
-    return ApplicationRoundFactory.create_with_allocations(
-        allocations=[
-            Allocation(
-                reservation_unit=reservation_unit,
-                day_of_the_week=Weekday.MONDAY,
-                begin_time=local_time(12, 0),
-                end_time=local_time(14, 0),
-            )
-            for reservation_unit in reservation_units
-        ],
-        reservation_period_begin_date=JAN_1_2024,
-        reservation_period_end_date=JAN_1_2024 + datetime.timedelta(weeks=weeks - 1),
-        user=UserFactory.create(),
-    )
-
-
-def create_priced_reservation_unit(*, price_option: PriceOption | None = None) -> ReservationUnit:
-    unit_group = price_option.unit_group if price_option is not None else None
-    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
-    PriceComponentFactory.create(
-        pricing_group=pricing_group,
-        price_option=price_option,
-        valid_from=JAN_1_2024,
-        amount=Decimal(10),
-        price_unit=PriceUnit.PER_HOUR,
-    )
-    reservation_unit = ReservationUnitBuilder().with_unrestricted_access().create()
-    ReservationUnitPricingGroupFactory.create(
-        reservation_unit=reservation_unit,
-        pricing_group=pricing_group,
-        begins=JAN_1_2024,
-    )
-    return reservation_unit
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
