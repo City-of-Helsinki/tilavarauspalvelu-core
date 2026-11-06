@@ -47,6 +47,9 @@ jobs:
       options: --user 1001
     defaults:
       run:
+        # In a container job, the default shell is sh. In the Playwright image, sh is dash.
+        # Use bash, like the run-e2e job and jobs on the host runner.
+        shell: bash
         working-directory: e2e
     steps:
       - name: Checkout code
