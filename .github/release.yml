@@ -1,22 +1,21 @@
-
 changelog:
   categories:
     - title: Features
       labels:
-        - "*"
-      exclude:
-        labels:
-          - fix
-          - improvement
-          - refactor
-          - dependencies
+        - feature
+    - title: Improvements
+      labels:
+        - improvement
     - title: Fixes
       labels:
         - fix
-    - title: Updates
+    - title: Maintenance
       labels:
-        - improvement
         - refactor
-    - title: Automated
+        - chore
+    - title: Dependencies
       labels:
         - dependencies
+    - title: Other
+      labels:
+        - "*"
