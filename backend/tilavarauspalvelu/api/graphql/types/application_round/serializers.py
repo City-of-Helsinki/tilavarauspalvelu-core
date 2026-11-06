@@ -4,10 +4,11 @@ from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
 from lookup_property import L
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
+from tilavarauspalvelu.services.pricing.application_round_prices import check_application_round_prices
 from tilavarauspalvelu.tasks import (
     generate_reservation_series_from_allocations_task,
     send_application_handled_email_task,
@@ -33,6 +34,11 @@ class SetApplicationRoundHandledSerializer(NestingModelSerializer):
         if self.instance.applications.filter(L(status=ApplicationStatusChoice.IN_ALLOCATION)).exists():
             msg = "Application round has applications still in allocation."
             raise ValidationError(msg, code=error_codes.APPLICATION_ROUND_HAS_UNHANDLED_APPLICATIONS)
+
+        price_errors = check_application_round_prices(self.instance)
+        if price_errors:
+            details = [ErrorDetail(error.message, code=error.code) for error in price_errors]
+            raise ValidationError(details)
 
         return attrs
 
