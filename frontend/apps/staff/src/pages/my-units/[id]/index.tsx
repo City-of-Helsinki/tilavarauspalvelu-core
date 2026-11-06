@@ -8,6 +8,7 @@ import { serverSideTranslations } from "next-i18next/pages/serverSideTranslation
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate } from "ui/src/modules/date-utils";
@@ -15,7 +16,6 @@ import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers
 import { Flex, H1, TabWrapper, TitleSection } from "ui/src/styled";
 import { FilterOptionsDocument, UnitViewDocument, UserPermissionChoice } from "@gql/gql-types";
 import type { UnitViewQuery, UnitViewQueryVariables } from "@gql/gql-types";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
 import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
