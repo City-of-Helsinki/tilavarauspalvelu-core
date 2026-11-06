@@ -6,7 +6,6 @@ import {
   MunicipalityChoice,
   OrderStatus,
   PaymentType,
-  PriceUnit,
   ReservationCancelReasonChoice,
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -226,24 +225,6 @@ export function createMockReservation(
       cancellationTerms: cancellationTerms,
       paymentTerms: paymentTerms,
       pricingTerms: pricingTerms,
-      pricings: [
-        {
-          id: createNodeId("PricingNode", 1),
-          begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
-          priceUnit: PriceUnit.PerHour,
-          paymentType: PaymentType.Online,
-          highestPrice: price,
-          lowestPrice: "0.0",
-          taxLevel: {
-            id: createNodeId("TaxLevelNode", 1),
-            pk: 1,
-            currentPercentage: "24.5",
-          },
-          materialPriceDescriptionFi: "Testimateriaali FI",
-          materialPriceDescriptionEn: "Test material EN",
-          materialPriceDescriptionSv: "Testmaterial SV",
-        },
-      ],
       cancellationRule: cancellable
         ? {
             id: createNodeId("ReservationUnitCancellationRuleNode", 1),

@@ -4,9 +4,9 @@ import userEvent from "@testing-library/user-event";
 import { addDays } from "date-fns";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
-import { AccessType, PaymentType, PriceUnit, ReservationKind } from "@gql/gql-types";
+import { AccessType, PriceUnit, ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitHeadFragment } from "@gql/gql-types";
-import { getActivePricing, getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
+import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { Head as ReservationUnitHead } from "./Head";
 
 vi.mock("./Images", () => ({
@@ -14,7 +14,6 @@ vi.mock("./Images", () => ({
 }));
 
 vi.mock("@/modules/reservationUnit", () => ({
-  getActivePricing: vi.fn(() => undefined),
   getReservationUnitAccessPeriods: vi.fn(() => []),
 }));
 
@@ -32,7 +31,6 @@ function createReservationUnit(overrides: Partial<ReservationUnitHeadFragment> =
     minPersons: null,
     currentAccessType: null,
     unit: { id: "unit-1", nameFi: "Test Unit", nameSv: "Test Unit SV", nameEn: "Test Unit EN" },
-    pricings: [],
     priceSummary: null,
     accessTypes: [],
     reservationUnitType: null,
@@ -53,22 +51,8 @@ function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary
   };
 }
 
-const pricing = {
-  id: "pricing-1",
-  begins: "2020-01-01",
-  priceUnit: PriceUnit.PerHour,
-  paymentType: PaymentType.Online,
-  lowestPrice: "10",
-  highestPrice: "20",
-  materialPriceDescriptionFi: "",
-  materialPriceDescriptionEn: "",
-  materialPriceDescriptionSv: "",
-  taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
-};
-
 describe("Head", () => {
   beforeEach(() => {
-    vi.mocked(getActivePricing).mockReturnValue(undefined);
     vi.mocked(getReservationUnitAccessPeriods).mockReturnValue([]);
   });
 
@@ -229,21 +213,5 @@ describe("Head", () => {
 
     expect(screen.getByText(new RegExp(`reservationUnit:accessTypes.${AccessType.Unrestricted}`))).toBeInTheDocument();
     expect(screen.getByText(/common:dateGte/)).toBeInTheDocument();
-  });
-
-  test("shows a material price description tooltip when present", async () => {
-    const user = userEvent.setup();
-    vi.mocked(getActivePricing).mockReturnValue({ ...pricing, materialPriceDescriptionFi: "<p>Extra fee applies</p>" });
-
-    render(
-      <ReservationUnitHead
-        reservationUnit={createReservationUnit({ priceSummary: createPriceSummary() })}
-        reservationUnitIsReservable
-      />
-    );
-
-    await user.click(screen.getByRole("button", { name: "Tooltip" }));
-
-    expect(screen.getByText("Extra fee applies")).toBeInTheDocument();
   });
 });

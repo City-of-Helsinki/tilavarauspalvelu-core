@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import { AccessType, ReservationUnitImageType, PaymentType, PriceUnit, ReservationStateChoice } from "@gql/gql-types";
+import { AccessType, ReservationUnitImageType, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createReservationPriceLine, future1hReservation, generateDescriptionFragment } from "@test/reservation.mocks";
@@ -65,15 +65,11 @@ describe("Component: ReservationInfoCard", () => {
     expect(screen.getByTestId("reservation__reservation-info-card__duration").textContent).toContain(durationHoursText);
   });
 
-  it("should show the text for material price, when the price is 0", () => {
+  it("shows free of charge when the price is 0", () => {
     customRender({
       reservation: createMockReservationInfoCard("0"),
     });
-    expect(
-      screen.getByText((_, element) => {
-        return element?.textContent?.trim() === "common:price: Prices:materialPrice";
-      })
-    ).toBeInTheDocument();
+    expect(getPriceText()).toBe("common:price: prices:priceFree");
   });
 
   it("should show the reservation price if it's defined", () => {
@@ -82,10 +78,7 @@ describe("Component: ReservationInfoCard", () => {
     });
     expect(
       screen.getByText((_, element) => {
-        return (
-          element?.textContent?.trim() ===
-          'common:price: 10,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
-        );
+        return element?.textContent?.trim() === 'common:price: 10,00 € (common:inclTax {"taxPercentage":"25,5"})';
       })
     ).toBeInTheDocument();
   });
@@ -97,9 +90,7 @@ describe("Component: ReservationInfoCard", () => {
           priceLines: [createPriceLine({ amount: "10.00", overrideAmount: "4.00" })],
         }),
       });
-      expect(getPriceText()).toBe(
-        'common:price: 4,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
-      );
+      expect(getPriceText()).toBe('common:price: 4,00 € (common:inclTax {"taxPercentage":"25,5"})');
     });
 
     it("shows the price as a range from 0 while the discount is pending", () => {
@@ -109,18 +100,14 @@ describe("Component: ReservationInfoCard", () => {
           state: ReservationStateChoice.RequiresHandling,
         }),
       });
-      expect(getPriceText()).toBe(
-        'common:price: 0 - 10,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
-      );
+      expect(getPriceText()).toBe('common:price: 0 - 10,00 € (common:inclTax {"taxPercentage":"25,5"})');
     });
 
     it("uses the price of the reservation when the reservation has no price lines", () => {
       customRender({
         reservation: createMockReservationInfoCard("12", { priceLines: [], taxPercentageValue: "24" }),
       });
-      expect(getPriceText()).toBe(
-        'common:price: 12,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"24"})'
-      );
+      expect(getPriceText()).toBe('common:price: 12,00 € (common:inclTax {"taxPercentage":"24"})');
     });
 
     it("lists the price lines when there are more than one", () => {
@@ -241,24 +228,6 @@ function createMockReservationInfoCard(
         },
       ],
       pk: 2,
-      pricings: [
-        {
-          id: "3",
-          begins: new Date(2024, 0, 0, 0, 0).toISOString(),
-          highestPrice: "10.0",
-          lowestPrice: "0.0",
-          priceUnit: PriceUnit.PerHour,
-          paymentType: PaymentType.OnlineOrInvoice,
-          taxLevel: {
-            id: "123",
-            pk: 123,
-            currentPercentage: "25.5",
-          },
-          materialPriceDescriptionFi: "Testimateriaali",
-          materialPriceDescriptionEn: "Test material",
-          materialPriceDescriptionSv: "Testmaterial",
-        },
-      ],
       ...generateNameFragment("Test reservation unit"),
       unit: {
         id: "3",

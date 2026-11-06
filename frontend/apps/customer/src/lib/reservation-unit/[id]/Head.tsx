@@ -4,17 +4,16 @@ import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Toolt
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
-import { Sanitize } from "@ui/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
-import { filterNonNullable, getLocalizationLang, getTranslation, stripHtml } from "ui/src/modules/helpers";
+import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { Flex, H1, H3 } from "ui/src/styled";
 import { ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitHeadFragment } from "@gql/gql-types";
 import { IconWithText } from "@/components/IconWithText";
 import { getPriceSummaryString } from "@/modules/price";
-import { getActivePricing, getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
+import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { Images } from "./Images";
 
 interface HeadProps {
@@ -230,7 +229,6 @@ function IconList({
         }
       : null,
   ] as const);
-  const activePricing = getActivePricing(reservationUnit);
   return (
     <IconListWrapper>
       {iconsTexts.map(({ icon, key, text }) => {
@@ -241,17 +239,6 @@ function IconList({
                 <IconWithText icon={icon} text={text} />
                 {reservationUnit.accessTypes.length > 1 && (
                   <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />
-                )}
-              </TooltipWrapper>
-            );
-          case "unitPrice":
-            return (
-              <TooltipWrapper key={key}>
-                <IconWithText icon={icon} text={text} />
-                {activePricing && stripHtml(getTranslation(activePricing, "materialPriceDescription", lang)) !== "" && (
-                  <Tooltip>
-                    <Sanitize html={getTranslation(activePricing, "materialPriceDescription", lang)} />
-                  </Tooltip>
                 )}
               </TooltipWrapper>
             );
@@ -281,9 +268,6 @@ export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
     maxReservationDuration
     maxPersons
     minPersons
-    pricings {
-      ...PricingFields
-    }
     ...PriceSummaryFields
     currentAccessType
     accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {

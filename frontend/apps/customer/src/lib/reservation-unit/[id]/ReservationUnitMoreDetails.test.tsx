@@ -2,9 +2,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, test, expect, vi } from "vitest";
 import { useGenericTerms } from "@ui/hooks";
-import { PaymentType, PriceUnit, TermsOfUseTypeChoices, Weekday } from "@gql/gql-types";
+import { PriceUnit, TermsOfUseTypeChoices, Weekday } from "@gql/gql-types";
 import type { ReservationUnitMoreDetailsFragment } from "@gql/gql-types";
-import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { ReservationUnitMoreDetails } from "./ReservationUnitMoreDetails";
 
 vi.mock("next-i18next/pages", async (importOriginal) => ({
@@ -22,11 +21,6 @@ vi.mock("next-i18next/pages", async (importOriginal) => ({
 }));
 
 vi.mock("@ui/hooks", () => ({ useGenericTerms: vi.fn(() => null) }));
-
-vi.mock("@/modules/reservationUnit", () => ({
-  getFuturePricing: vi.fn(() => null),
-  getPriceString: vi.fn(() => "10,00 € / tunti"),
-}));
 
 vi.mock("./ReservationInfoSection", () => ({
   ReservationInfoSection: () => <div data-testid="reservation-info-section-stub" />,
@@ -50,19 +44,6 @@ const termsOfUseText = {
   nameFi: null,
   nameEn: null,
   nameSv: null,
-};
-
-const pricing = {
-  id: "pricing-1",
-  highestPrice: "20",
-  begins: "2020-01-01",
-  priceUnit: PriceUnit.PerHour,
-  paymentType: PaymentType.Online,
-  lowestPrice: "10",
-  materialPriceDescriptionFi: "",
-  materialPriceDescriptionEn: "",
-  materialPriceDescriptionSv: "",
-  taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
 };
 
 type PriceSummary = NonNullable<ReservationUnitMoreDetailsFragment["priceSummary"]>;
@@ -98,7 +79,6 @@ function createReservationUnit(
     minReservationDuration: null,
     maxReservationDuration: null,
     applicationRoundTimeSlots: [],
-    pricings: [],
     unit: {
       id: "unit-1",
       pk: 1,
@@ -153,7 +133,7 @@ describe("ReservationUnitMoreDetails", () => {
     expect(termsAccordion).toHaveTextContent("Service terms");
   });
 
-  test("hides the reservation-notice accordion when there is no future pricing or notes", () => {
+  test("hides the reservation-notice accordion when there are no notes", () => {
     render(<ReservationUnitMoreDetails reservationUnit={createReservationUnit()} isReservable />);
     expect(screen.queryByTestId("reservation-unit__reservation-notice")).not.toBeInTheDocument();
   });
@@ -166,52 +146,6 @@ describe("ReservationUnitMoreDetails", () => {
       />
     );
     expect(screen.getByTestId("reservation-unit__reservation-notice")).toHaveTextContent("Please arrive early");
-  });
-
-  test("shows a future price-change notice with a tax notice when the tax rate is above zero", () => {
-    vi.mocked(getFuturePricing).mockReturnValue({
-      ...pricing,
-      taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
-    });
-
-    render(
-      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
-    );
-
-    const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
-    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
-    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePriceNoticeTax");
-  });
-
-  test("omits the tax notice when the future pricing is free", () => {
-    vi.mocked(getFuturePricing).mockReturnValue({
-      ...pricing,
-      taxLevel: { id: "tax-1", pk: 1, currentPercentage: "0" },
-    });
-    vi.mocked(getPriceString).mockReturnValue("Free");
-
-    render(
-      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
-    );
-
-    const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
-    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
-    expect(noticeAccordion).not.toHaveTextContent("reservationUnit:futurePriceNoticeTax");
-  });
-
-  test("omits the tax notice when the tax level of the future pricing has no rate today", () => {
-    vi.mocked(getFuturePricing).mockReturnValue({
-      ...pricing,
-      taxLevel: { id: "tax-1", pk: 1, currentPercentage: null },
-    });
-
-    render(
-      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
-    );
-
-    const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
-    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
-    expect(noticeAccordion).not.toHaveTextContent("reservationUnit:futurePriceNoticeTax");
   });
 
   test("hides the application-round schedule accordion when there are no active application rounds", () => {

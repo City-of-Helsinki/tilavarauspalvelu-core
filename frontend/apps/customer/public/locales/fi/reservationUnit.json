@@ -47,8 +47,6 @@
     "maxReservationsPerUser_one": "vain yksi varaus",
     "maxReservationsPerUser_other": "enintään {{count}} varausta"
   },
-  "futurePricingNotice": "<bold>Tämän kohteen hinta muuttuu {{date}} alkaen. Uusi hinta on {{price}}</bold>",
-  "futurePriceNoticeTax": " (sis. alv. {{tax}}%)",
   "notifications": {
     "notReservable": "Kohde ei ole tällä hetkellä varattavissa.",
     "onlyRecurring": "Varattavissa vain kausittain.",
