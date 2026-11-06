@@ -39,8 +39,7 @@ export const PaymentNotification = ({ reservation, paymentOrder, apiBaseUrl }: P
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const lang = getLocalizationLang(i18n.language);
-  // The notification shows the amount to pay, without the material price text
-  const priceDisplay = getReservationPriceDisplayFromLines(reservation, lang, false);
+  const priceDisplay = getReservationPriceDisplayFromLines(reservation, lang);
   const price = formatPrice(priceDisplay.total, true, lang);
   const priceLineList = getPriceLineStringList(priceDisplay, lang);
   const taxPercentage =

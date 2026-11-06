@@ -20,8 +20,6 @@ import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
-  capitalize,
-  cleanHtmlContent,
   createNodeId,
   filterNonNullable,
   getLocalizationLang,
@@ -64,7 +62,7 @@ import { getPostLoginUrl } from "@/modules/helpers";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
 import { convertFormToFocustimeSlot, createDateTime, getDurationOptions } from "@/modules/reservation";
 import type { FocusTimeSlot } from "@/modules/reservation";
-import { getActivePricing, isReservationUnitPublished, isReservationUnitReservable } from "@/modules/reservationUnit";
+import { isReservationUnitPublished, isReservationUnitReservable } from "@/modules/reservationUnit";
 import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -328,8 +326,6 @@ function ReservationUnit({
     ? getTranslation(reservationUnit.pricingTerms, "text", lang)
     : undefined;
 
-  const activePricing = getActivePricing(reservationUnit);
-
   return (
     <>
       <TimeZoneNotification />
@@ -362,13 +358,6 @@ function ReservationUnit({
             <H4 as="h2">{t("reservationUnit:description")}</H4>
             <Sanitize html={getTranslation(reservationUnit, "description", lang)} />
           </div>
-          {activePricing?.materialPriceDescriptionFi &&
-            cleanHtmlContent(activePricing?.materialPriceDescriptionFi.trim()).length > 0 && (
-              <div>
-                <H4 as="h2">{capitalize(t("prices:materialPrice"))}</H4>
-                <Sanitize html={getTranslation(activePricing, "materialPriceDescription", lang)} />
-              </div>
-            )}
           {equipment.length > 0 && (
             <div data-testid="reservation-unit__equipment">
               <H4 as="h2">{t("reservationUnit:equipment")}</H4>

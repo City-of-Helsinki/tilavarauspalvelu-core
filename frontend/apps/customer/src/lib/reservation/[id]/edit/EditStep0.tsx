@@ -254,9 +254,6 @@ export const EDIT_PAGE_RESERVATION_UNIT_FRAGMENT = gql`
   fragment EditPageReservationUnit on ReservationUnitNode {
     id
     ...IsReservableFields
-    pricings {
-      ...PricingFields
-    }
     ...TermsOfUse
     ...ReservationTimePickerFields
     reservationForm

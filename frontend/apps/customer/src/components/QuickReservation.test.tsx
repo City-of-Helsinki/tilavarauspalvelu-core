@@ -22,7 +22,6 @@ function createMockReservationUnit(
   return {
     id: "ru-1",
     pk: 1,
-    pricings: [],
     ...overrides,
   } as ReservationTimePickerFieldsFragment;
 }
