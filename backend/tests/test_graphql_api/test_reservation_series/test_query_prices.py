@@ -1,0 +1,128 @@
+from __future__ import annotations
+
+from decimal import Decimal
+
+import pytest
+from graphql_relay import to_global_id
+
+from tilavarauspalvelu.enums import ReservationStateChoice
+
+from tests.factories import (
+    ApplicationSectionFactory,
+    PriceOptionFactory,
+    ReservationFactory,
+    ReservationPriceLineFactory,
+    ReservationSeriesFactory,
+)
+
+from .helpers import reservation_series_many_query, reservation_series_single_query
+
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
+
+
+# ── Helpers ──
+
+
+def create_series_with_price_option(*, name: str):
+    price_option = PriceOptionFactory.create(name=name)
+    section = ApplicationSectionFactory.create(price_option=price_option)
+    series = ReservationSeriesFactory.create(allocated_time_slot__reservation_unit_option__application_section=section)
+    for _ in range(2):
+        reservation = ReservationFactory.create(
+            reservation_series=series,
+            price=Decimal(10),
+            state=ReservationStateChoice.CONFIRMED,
+        )
+        ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+    return series
+
+
+# ── Price ──
+
+
+def test_reservation_series__query__price_sums_reservations_that_are_going_to_occur(graphql):
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(reservation_series=series, price=Decimal(10), state=ReservationStateChoice.CONFIRMED)
+    ReservationFactory.create(
+        reservation_series=series,
+        price=Decimal(20),
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+    )
+    ReservationFactory.create(reservation_series=series, price=Decimal(100), state=ReservationStateChoice.CANCELLED)
+    ReservationFactory.create(reservation_series=series, price=Decimal(100), state=ReservationStateChoice.DENIED)
+
+    graphql.login_with_superuser()
+    query = reservation_series_single_query(fields="price", id=to_global_id("ReservationSeriesNode", series.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"price": "30.00"}
+
+
+def test_reservation_series__query__price_without_reservations(graphql):
+    series = ReservationSeriesFactory.create()
+
+    graphql.login_with_superuser()
+    query = reservation_series_single_query(fields="price", id=to_global_id("ReservationSeriesNode", series.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"price": "0"}
+
+
+# ── Price option ──
+
+
+def test_reservation_series__query__price_option_from_application_section(graphql):
+    series = create_series_with_price_option(name="Aikuiset")
+
+    graphql.login_with_superuser()
+    query = reservation_series_single_query(
+        fields="priceOption { nameFi }",
+        id=to_global_id("ReservationSeriesNode", series.pk),
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"priceOption": {"nameFi": "Aikuiset"}}
+
+
+def test_reservation_series__query__price_option_without_allocated_time_slot(graphql):
+    series = ReservationSeriesFactory.create()
+
+    graphql.login_with_superuser()
+    query = reservation_series_single_query(
+        fields="priceOption { nameFi }",
+        id=to_global_id("ReservationSeriesNode", series.pk),
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"priceOption": None}
+
+
+def test_reservation_series__query__prices_of_many_series_do_not_grow_queries(graphql):
+    graphql.login_with_superuser()
+    fields = "pk price priceOption { nameFi } reservations { price priceLines { amount } }"
+
+    create_series_with_price_option(name="Aikuiset")
+    response = graphql(reservation_series_many_query(fields=fields))
+    assert response.has_errors is False, response
+    queries_for_one = len(response.queries)
+
+    create_series_with_price_option(name="Juniorit")
+    create_series_with_price_option(name="Seniorit")
+    response = graphql(reservation_series_many_query(fields=fields))
+    assert response.has_errors is False, response
+
+    assert len(response.edges) == 3
+    assert sorted(response.node(index)["priceOption"]["nameFi"] for index in range(3)) == [
+        "Aikuiset",
+        "Juniorit",
+        "Seniorit",
+    ]
+    assert all(response.node(index)["price"] == "20.00" for index in range(3))
+    assert len(response.queries) == queries_for_one, response.query_log
