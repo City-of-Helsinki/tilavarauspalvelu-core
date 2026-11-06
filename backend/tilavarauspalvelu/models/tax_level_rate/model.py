@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
@@ -33,6 +34,7 @@ class TaxLevelRate(models.Model):
     )
     begins: datetime.date = models.DateField()
     percentage: Decimal = models.DecimalField(max_digits=5, decimal_places=2)
+    vat_code: str = models.CharField(max_length=2, blank=True, default="", validators=[MinLengthValidator(2)])
 
     objects: ClassVar[TaxLevelRateManager] = LazyModelManager.new()
     actions: LazyAttribute[TaxLevelRateActions] = LazyModelAttribute.new()
