@@ -1,0 +1,54 @@
+# Find out if a pull request changes only the e2e suite.
+# The e2e suite is a separate project. Its changes cannot break the backend or the frontend.
+# So the backend and frontend workflows skip their jobs for such a pull request.
+#
+# GitHub counts a skipped required check as passed, but a required check that never starts blocks the merge.
+# This is why the workflows skip their jobs, and do not use "paths-ignore" to skip the whole workflow.
+#
+# Pushes, tags and manual runs always give "false".
+# If this job fails, the output is empty. The callers use "!cancelled()", so they run all their jobs.
+name: "Detect e2e only changes"
+
+on:
+  workflow_call:
+    outputs:
+      e2e-only:
+        description: "'true' if the pull request changes only files under e2e/ or the e2e workflows."
+        value: ${{ jobs.detect.outputs.e2e-only }}
+
+jobs:
+  detect:
+    name: "Detect e2e only changes"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      pull-requests: read
+
+    # "other" is "false" when no changed file is outside the e2e paths.
+    # The API lists at most 3000 files. So "all_count" must also match the file count of the pull request.
+    outputs:
+      e2e-only: >-
+        ${{
+          github.event_name == 'pull_request'
+          && steps.filter.outputs.other == 'false'
+          && steps.filter.outputs.all_count == github.event.pull_request.changed_files
+        }}
+
+    steps:
+      # For a pull request, the action gets the changed files from the GitHub API. It needs no checkout.
+      - name: "Compare changed files to the e2e paths"
+        id: filter
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          # A file matches "other" if it matches "**" and none of the negated patterns
+          predicate-quantifier: some-with-excludes
+          filters: |
+            all:
+              - '**'
+            other:
+              - '**'
+              - '!e2e/**'
+              - '!.github/workflows/test-e2e.yml'
+              - '!.github/workflows/run-e2e.yml'
