@@ -8,6 +8,7 @@ import { useGridNavigation } from "../CalendarGrid/useGridNavigation";
 import type { GridAddress } from "../CalendarGrid/useGridNavigation";
 import {
   assertValidStep,
+  changedRuns,
   groupAvailability,
   gridToPattern,
   isEditableFor,
@@ -50,8 +51,8 @@ export type WeeklyPatternOptions<TData extends CalendarData> = Pick<
 
 // A pointer drag: the cell it started on, the cell the pointer is over now, and whether it paints or erases.
 type Gesture<TData> = { weekday: Weekday; anchor: number; current: number; mode: PaintMode<TData> };
-// A Shift+Arrow keyboard sweep on one weekday. The mode is fixed when the sweep starts.
-type Sweep<TData> = { weekday: Weekday; anchor: number; mode: PaintMode<TData> };
+// A Shift+Arrow keyboard sweep on one weekday. The mode and the grid before the sweep are fixed when it starts.
+type Sweep<TData> = { weekday: Weekday; anchor: number; mode: PaintMode<TData>; origin: CellGrid<TData> };
 
 export type GridRow = {
   index: number;
@@ -169,10 +170,10 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   const modeAt = (weekday: Weekday, index: number): PaintMode<TData> | null =>
     interactive ? paintModeFor(baseGrid[weekday]?.[index], brush, isPaintable(weekday, index), isDataEqual) : null;
 
-  // The single path through which every gesture changes `value`. `spanFrom` is where the whole
-  // gesture began, so validation and the announcement describe the entire span, not just the last step.
+  // The single path through which every gesture changes `value`. A sweep commits once per step, so it passes
+  // itself in. Validation and the announcement then cover every cell the sweep changed, not only the last step.
   const commit = useCallback(
-    (weekday: Weekday, from: number, to: number, mode: PaintMode<TData>, spanFrom: number = from) => {
+    (weekday: Weekday, from: number, to: number, mode: PaintMode<TData>, activeSweep?: Sweep<TData>) => {
       const current = latest.current;
       const next = paintRange(
         current.baseGrid,
@@ -186,18 +187,28 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       if (next === current.baseGrid) {
         return;
       }
-      const beginMinutes = Math.min(spanFrom, from, to) * current.step;
-      const endMinutes = (Math.max(spanFrom, from, to) + 1) * current.step;
+      // `paintRange` skips cells it cannot edit and cells that already hold the target data.
+      // Those cells split the gesture into separate runs, and each run is validated and announced alone.
+      const anchor = activeSweep?.anchor ?? from;
+      const before = activeSweep?.origin ?? current.baseGrid;
+      const runs = changedRuns(before[weekday], next[weekday], Math.min(anchor, from, to), Math.max(anchor, from, to));
+      const spans = runs.map((run) => ({
+        beginMinutes: run.first * current.step,
+        endMinutes: (run.last + 1) * current.step,
+      }));
       if (mode.kind === "paint" && current.isValidSelection) {
-        const reason = current.isValidSelection({ weekday, beginMinutes, endMinutes, data: mode.data });
-        if (reason) {
-          announce(reason);
-          return;
+        for (const span of spans) {
+          const reason = current.isValidSelection({ weekday, ...span, data: mode.data });
+          if (reason) {
+            announce(reason);
+            return;
+          }
         }
       }
       current.onChange(gridToPattern(next, current.step, current.isDataEqual));
       const verb = mode.kind === "paint" ? current.announcements.painted : current.announcements.erased;
-      announce(`${verb}: ${current.describeSpan(weekday, beginMinutes, endMinutes)}`);
+      const described = spans.map((span) => current.describeSpan(weekday, span.beginMinutes, span.endMinutes));
+      announce(`${verb}: ${described.join(", ")}`);
     },
     [announce]
   );
@@ -271,10 +282,10 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       if (!mode) {
         return;
       }
-      running = { weekday, anchor, mode };
+      running = { weekday, anchor, mode, origin: baseGrid };
       sweepRef.current = running;
     }
-    commit(weekday, from, to, running.mode, running.anchor);
+    commit(weekday, from, to, running.mode, running);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTableCellElement>, weekday: Weekday, index: number) => {
@@ -380,8 +391,9 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     onPointerEnter: () => extendGesture(weekday, index),
     // Stops the browser's native text-selection drag from fighting the paint gesture.
     onMouseDown: (event: MouseEvent<HTMLTableCellElement>) => event.preventDefault(),
-    onClick: () => {
-      if (pointerTypeRef.current === "touch") {
+    onClick: (event: MouseEvent<HTMLTableCellElement>) => {
+      // detail === 0 is a click synthesized by assistive technology, with no preceding pointer events.
+      if (pointerTypeRef.current === "touch" || event.detail === 0) {
         toggleCell(weekday, index);
       }
     },

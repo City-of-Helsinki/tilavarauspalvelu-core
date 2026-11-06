@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
+import type { ReservableTimeSlots } from "@ui/modules/suitableTimes";
 import { Priority, Weekday } from "@gql/gql-types";
 import type { SuitableTimeRangeFormValues } from "./form";
 import { addTimeRange, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
-import type { DailyOpeningHours } from "./timeSelectorModule";
 
 function range(
   dayOfTheWeek: Weekday,
@@ -13,7 +13,7 @@ function range(
   return { dayOfTheWeek, beginTime, endTime, priority };
 }
 
-const weekdayOpen: DailyOpeningHours = [
+const weekdayOpen: ReservableTimeSlots = [
   { weekday: Weekday.Monday, isClosed: false, reservableTimes: [{ begin: "08:00:00", end: "18:00:00" }] },
 ];
 

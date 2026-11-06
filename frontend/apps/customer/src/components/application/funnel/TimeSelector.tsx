@@ -199,7 +199,7 @@ const PriorityRadioButton = styled(RadioButton)`
       border-top: 10px solid var(--color-black);
     }
   }
-  [checked] + [class*="hds-radio-button__label"] {
+  :checked + [class*="hds-radio-button__label"] {
     ${fontBold};
   }
   [class*="radio-button_hds-radio-button__label"] {
@@ -211,7 +211,10 @@ const PriorityRadioButton = styled(RadioButton)`
   }
 `;
 
-function PrioritySelector({ index, control }: { index: number; control: Control<ApplicationPage2FormValues> }) {
+function PrioritySelector({
+  index,
+  control,
+}: Readonly<{ index: number; control: Control<ApplicationPage2FormValues> }>) {
   const { t } = useTranslation();
   const { field } = useController({ name: `applicationSections.${index}.priority`, control });
   const priorityOptions = [Priority.Primary, Priority.Secondary].map((n) => ({
@@ -221,19 +224,16 @@ function PrioritySelector({ index, control }: { index: number; control: Control<
   return (
     <RadioGroup>
       <legend style={{ marginBottom: "var(--spacing-2-xs)" }}>{t("application:Page2.prioritySelectLabel")}</legend>
-      {priorityOptions.map((opt) => {
-        const checked = field.value === opt.value;
-        return (
-          <PriorityRadioButton
-            id={`applicationSections.${index}.priority.${opt.value}`}
-            name={`applicationSections.${index}.priority`}
-            key={opt.label + checked}
-            label={opt.label}
-            onChange={() => field.onChange(opt.value)}
-            checked={checked}
-          />
-        );
-      })}
+      {priorityOptions.map((opt) => (
+        <PriorityRadioButton
+          id={`applicationSections.${index}.priority.${opt.value}`}
+          name={`applicationSections.${index}.priority`}
+          key={opt.value}
+          label={opt.label}
+          onChange={() => field.onChange(opt.value)}
+          checked={field.value === opt.value}
+        />
+      ))}
     </RadioGroup>
   );
 }

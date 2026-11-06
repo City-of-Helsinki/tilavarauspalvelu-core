@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { Weekday } from "../../../gql/gql-types";
 import {
   assertValidStep,
+  changedRuns,
   gridToPattern,
   groupAvailability,
   isEditableFor,
@@ -126,6 +127,27 @@ describe("paintRange", () => {
     );
     const mode = { kind: "paint", data: { priority: "primary" } } as const;
     expect(paintRange(painted, Weekday.Monday, 8, 8, mode, isEditableFor(mode, open), shallowEqual)).toBe(painted);
+  });
+});
+
+describe("changedRuns", () => {
+  test("splits the span at cells that were not editable or already held the data", () => {
+    const before = patternToGrid<Data>(
+      [{ weekday: Weekday.Monday, beginMinutes: 600, endMinutes: 660, data: primary }],
+      60
+    );
+    const mode = { kind: "paint", data: primary } as const;
+    const editable = isEditableFor(mode, (index) => index !== 9);
+    const after = paintRange(before, Weekday.Monday, 8, 12, mode, editable, shallowEqual);
+    expect(changedRuns(before[Weekday.Monday], after[Weekday.Monday], 8, 12)).toEqual([
+      { first: 8, last: 8 },
+      { first: 11, last: 12 },
+    ]);
+  });
+
+  test("returns no runs when nothing changed", () => {
+    const grid = patternToGrid<Data>([], 60);
+    expect(changedRuns(grid[Weekday.Monday], grid[Weekday.Monday], 0, 23)).toEqual([]);
   });
 });
 
