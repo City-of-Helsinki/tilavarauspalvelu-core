@@ -35,6 +35,7 @@ if TYPE_CHECKING:
         AffectingTimeSpan,
         AgeGroup,
         PaymentOrder,
+        PriceOption,
         ReservationDenyReason,
         ReservationPriceLine,
         ReservationPurpose,
@@ -162,6 +163,13 @@ class Reservation(SerializableModelMixin, models.Model):
         "tilavarauspalvelu.AgeGroup",
         related_name="reservations",
         on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    price_option: PriceOption | None = models.ForeignKey(
+        "tilavarauspalvelu.PriceOption",
+        related_name="reservations",
+        on_delete=models.PROTECT,
         blank=True,
         null=True,
     )
