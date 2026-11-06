@@ -129,7 +129,12 @@ ${applicationId ? "$applicationId: ID!" : ""}
     return null;
   }
 
-  const userPkToCheck = res.reservation?.user?.pk || res.application?.user.pk;
+  // A missing object is not an access problem. The page shows its own 404.
+  // The backend hides the owner of a reservation from users with no access to it.
+  // So a null owner means that the current user has no access.
+  const currentUserPk = res.currentUser.pk;
+  const isOwner = (item: { user: { pk: number } | null } | null | undefined) =>
+    item == null || item.user?.pk === currentUserPk;
   return {
     reservation: {
       state: res.reservation?.state ?? null,
@@ -137,8 +142,8 @@ ${applicationId ? "$applicationId: ID!" : ""}
       resUnitPk: res.reservation?.reservationUnit.pk ?? null,
     },
     user: {
-      pk: res.currentUser.pk,
-      hasAccess: userPkToCheck == null || res.currentUser.pk === userPkToCheck,
+      pk: currentUserPk,
+      hasAccess: isOwner(res.reservation) && isOwner(res.application),
     },
   };
 }
