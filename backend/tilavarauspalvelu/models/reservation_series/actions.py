@@ -184,6 +184,15 @@ class ReservationSeriesActions:
         periods: Iterable[ReservationPeriod],
         reservation_details: ReservationDetails,
     ) -> list[Reservation]:
+        reservations = self.build_reservations_for_periods(periods=periods, reservation_details=reservation_details)
+        return Reservation.objects.bulk_create(reservations)
+
+    def build_reservations_for_periods(
+        self,
+        periods: Iterable[ReservationPeriod],
+        reservation_details: ReservationDetails,
+    ) -> list[Reservation]:
+        """Make the unsaved reservations of the series for the given periods."""
         if not periods:
             return []
 
@@ -218,7 +227,7 @@ class ReservationSeriesActions:
             )
             reservations.append(reservation)
 
-        return Reservation.objects.bulk_create(reservations)
+        return reservations
 
     def bulk_create_rejected_occurrences_for_periods(
         self,

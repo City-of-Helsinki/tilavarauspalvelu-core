@@ -151,7 +151,6 @@ class ApplicationRoundActions:
         ]
 
         reservation_pks: set[int] = set()
-        priced_reservations: list[Reservation] = []
         price_lines: list[ReservationPriceLine] = []
 
         with transaction.atomic():
@@ -170,11 +169,10 @@ class ApplicationRoundActions:
                     closed_hours=closed_time_spans.get(hauki_resource_id, []),
                 )
 
-                reservations = series.actions.bulk_create_reservation_for_periods(
+                reservations = series.actions.build_reservations_for_periods(
                     periods=slots.possible,
                     reservation_details=reservation_details,
                 )
-                reservation_pks.update(reservation.pk for reservation in reservations)
 
                 if pricing_data is not None:
                     for reservation in reservations:
@@ -191,7 +189,9 @@ class ApplicationRoundActions:
 
                         reservation.price = reservation_price_lines.calculation.total
                         reservation.non_subsidised_price = reservation_price_lines.calculation.total
-                        priced_reservations.append(reservation)
+
+                reservations = Reservation.objects.bulk_create(reservations)
+                reservation_pks.update(reservation.pk for reservation in reservations)
 
                 series.actions.bulk_create_rejected_occurrences_for_periods(
                     overlapping=slots.overlapping,
@@ -200,7 +200,6 @@ class ApplicationRoundActions:
                 )
 
             ReservationPriceLine.objects.bulk_create(price_lines)
-            Reservation.objects.bulk_update(priced_reservations, fields=["price", "non_subsidised_price"])
 
         # Must refresh the materialized view after the reservation is created.
         # TODO: Disabled for now, since it might contribute to timeouts in production.
