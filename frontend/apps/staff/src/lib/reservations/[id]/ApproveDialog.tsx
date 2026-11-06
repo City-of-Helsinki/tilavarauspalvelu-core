@@ -49,9 +49,11 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
     }
   };
 
-  const [price, setPrice] = useState(toNumber(reservation.price) ?? 0);
+  const priceLine = getOnlyPriceLine(reservation);
+  const initialPrice = priceLine != null ? (priceLine.overrideAmount ?? priceLine.amount) : reservation.price;
+  const [price, setPrice] = useState(toNumber(initialPrice) ?? 0);
   const [handlingDetails, setHandlingDetails] = useState<string>(reservation.handlingDetails ?? "");
-  const hasPrice = reservation.price != null && Number(reservation.price) > 0;
+  const hasPrice = initialPrice != null && Number(initialPrice) > 0;
   const priceIsValid = !hasPrice || !Number.isNaN(price);
 
   const handleApprove: () => Promise<void> = async () => {
@@ -60,8 +62,8 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
     }
     await approveReservation({
       pk: reservation.pk,
-      price: price.toString(),
       handlingDetails,
+      ...getPriceInput(reservation, price),
     });
   };
 
@@ -133,6 +135,29 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   );
 };
 
+type PriceLine = NonNullable<ApprovalDialogFieldsFragment["priceLines"]>[number];
+
+function getOnlyPriceLine(reservation: ApprovalDialogFieldsFragment): PriceLine | null {
+  const priceLineList = reservation.priceLines ?? [];
+  return priceLineList.length === 1 ? (priceLineList[0] ?? null) : null;
+}
+
+/// The handler can only change the price when the reservation applies for a free of charge reservation.
+/// In other cases, keep the current override of the price line.
+/// Reservations made before price lines have no lines. For these, send the price.
+/// The dialog has one price input, so it supports only reservations with one price line.
+function getPriceInput(
+  reservation: ApprovalDialogFieldsFragment,
+  price: number
+): Pick<ReservationApproveMutationInput, "price" | "priceLines"> {
+  const priceLine = getOnlyPriceLine(reservation);
+  if (priceLine?.pk == null) {
+    return { price: price.toString() };
+  }
+  const overrideAmount = reservation.applyingForFreeOfCharge ? price.toString() : (priceLine.overrideAmount ?? null);
+  return { priceLines: [{ pk: priceLine.pk, overrideAmount }] };
+}
+
 export function ApproveDialog({
   reservation,
   isFree,
@@ -169,6 +194,12 @@ export const APPROVAL_DIALOG_FRAGMENT = gql`
     handlingDetails
     applyingForFreeOfCharge
     freeOfChargeReason
+    priceLines {
+      id
+      pk
+      amount
+      overrideAmount
+    }
     ...ReservationPriceDetailsFields
   }
 `;
