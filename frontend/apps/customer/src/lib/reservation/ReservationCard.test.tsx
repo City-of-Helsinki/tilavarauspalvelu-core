@@ -48,7 +48,6 @@ function createMockReservation(overrides: Partial<ReservationCardFragment> = {})
       nameFi: "Test Unit",
       nameEn: "Test Unit",
       nameSv: "Test Unit",
-      pricings: [],
       images: [],
       unit: {
         id: "unit-1",
