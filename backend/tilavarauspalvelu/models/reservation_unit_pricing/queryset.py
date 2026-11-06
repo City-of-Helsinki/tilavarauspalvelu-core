@@ -19,22 +19,6 @@ __all__ = [
 
 
 class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
-    def exclude_past(self) -> Self:
-        """Return all currently active and future pricings."""
-        today = local_date()
-
-        return self.alias(
-            reservation_unit_active_pricing_begins_date=models.Subquery(
-                self.model.objects
-                .filter(
-                    reservation_unit=models.OuterRef("reservation_unit"),
-                    begins__lte=today,
-                )
-                .values("begins")
-                .order_by("-begins")[:1]
-            )
-        ).filter(begins__gte=models.F("reservation_unit_active_pricing_begins_date"))
-
     def past_or_active(self, from_date: datetime.date | models.F | None = None) -> Self:
         """Get only past or active pricings, ordered from most recent to oldest."""
         if from_date is None:

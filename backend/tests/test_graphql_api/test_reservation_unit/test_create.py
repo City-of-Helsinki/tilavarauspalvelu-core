@@ -9,11 +9,13 @@ from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.typing import error_codes
+from utils.date_utils import local_date
 
 from tests.factories import ResourceFactory, SpaceFactory, UnitFactory, UserFactory
 from tests.helpers import patch_method
 
-from .helpers import CREATE_MUTATION, get_create_non_draft_input_data
+from .helpers import CREATE_MUTATION, get_create_non_draft_input_data, get_free_own_pricing_data
 
 # Applied to all tests
 pytestmark = [
@@ -224,6 +226,32 @@ def test_reservation_unit__create__non_draft(graphql):
     assert response.has_errors is False
 
     assert ReservationUnit.objects.filter(pk=response.first_query_object["pk"]).exists()
+
+
+@pytest.mark.parametrize("value", [[], None], ids=["empty", "missing"])
+def test_reservation_unit__create__non_draft__no_price(graphql, value):
+    data = get_create_non_draft_input_data()
+    if value is None:
+        del data["ownPricings"]
+    else:
+        data["ownPricings"] = value
+
+    graphql.login_with_superuser()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.field_error_codes() == [error_codes.RESERVATION_UNIT_MISSING_PRICE]
+    assert ReservationUnit.objects.count() == 0
+
+
+def test_reservation_unit__create__non_draft__only_future_price(graphql):
+    tomorrow = local_date() + datetime.timedelta(days=1)
+    data = get_create_non_draft_input_data(ownPricings=[get_free_own_pricing_data(begins=tomorrow)])
+
+    graphql.login_with_superuser()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.field_error_codes() == [error_codes.RESERVATION_UNIT_MISSING_PRICE]
+    assert ReservationUnit.objects.count() == 0
 
 
 @pytest.mark.parametrize("field", ["nameEn", "descriptionEn"])
