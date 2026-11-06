@@ -10,18 +10,19 @@ from tilavarauspalvelu.models import ReservationPriceLine
 from utils.date_utils import local_date
 from utils.decimal_utils import round_decimal
 
-from .price_calculation import calculate_price
+from .price_calculation import calculate_price_with_data, load_pricing_data
 
 if TYPE_CHECKING:
     import datetime
 
     from tilavarauspalvelu.models import PriceOption, Reservation, ReservationUnit
 
-    from .price_calculation import PriceCalculation
+    from .price_calculation import PriceCalculation, PricingData
 
 __all__ = [
     "PriceLines",
     "build_price_lines",
+    "build_price_lines_with_data",
     "set_price_line_taxes",
     "set_reservation_price_lines",
 ]
@@ -45,7 +46,32 @@ def build_price_lines(
 
     :raises PriceCalculationError: If the price cannot be calculated.
     """
-    calculation = calculate_price(
+    pricing_data = load_pricing_data(reservation_unit_pks=[reservation_unit.pk])
+    return build_price_lines_with_data(
+        pricing_data=pricing_data,
+        reservation_unit=reservation_unit,
+        price_option=price_option,
+        begin=begin,
+        end=end,
+    )
+
+
+def build_price_lines_with_data(
+    *,
+    pricing_data: PricingData,
+    reservation_unit: ReservationUnit,
+    price_option: PriceOption | None,
+    begin: datetime.datetime,
+    end: datetime.datetime,
+) -> PriceLines:
+    """
+    Make the unsaved price lines that a reservation with the given input gets.
+    The pricing comes from `pricing_data`, so this makes no queries.
+
+    :raises PriceCalculationError: If the price cannot be calculated.
+    """
+    calculation = calculate_price_with_data(
+        pricing_data=pricing_data,
         reservation_unit=reservation_unit,
         price_option=price_option,
         begin=begin,
@@ -76,7 +102,7 @@ def build_price_lines(
             override_amount=None,
             sales_item=component.sales_item,
             tax_level=tax_level,
-            tax_percentage=tax_level.actions.get_percentage(on_date=today),
+            tax_percentage=pricing_data.tax_percentage(tax_level=tax_level, on_date=today),
             vat_code="",
             payment_product=None,
         )
