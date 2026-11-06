@@ -33,7 +33,7 @@ from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservati
 from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_date_of, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -205,7 +205,7 @@ class ReservationActions:
             msg = "Reservation has no reservation unit"
             raise ReservationPriceCalculationError(msg)
 
-        begin_date = begin_datetime.astimezone(DEFAULT_TIMEZONE).date()
+        begin_date = local_date_of(begin_datetime)
         pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
         if pricing is None:
             msg = "Reservation unit has no pricing information"
@@ -373,7 +373,7 @@ class ReservationActions:
 
         invoicing_date: datetime.date | None = None
         if self.should_offer_invoicing():
-            invoicing_date = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+            invoicing_date = local_date_of(self.reservation.begins_at)
 
         order_params = get_verkkokauppa_order_params(self.reservation, invoicing_date=invoicing_date)
 
@@ -414,7 +414,7 @@ class ReservationActions:
 
         reservation_unit: ReservationUnit = self.reservation.reservation_unit
 
-        begin_date = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+        begin_date = local_date_of(self.reservation.begins_at)
         pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
         if pricing is None:
             return False
@@ -433,7 +433,7 @@ class ReservationActions:
         return (
             self.reservation.reservation_unit.access_types
             .all()
-            .filter(begin_date__lte=self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date())
+            .filter(begin_date__lte=local_date_of(self.reservation.begins_at))
             .order_by("-begin_date")
             .first()
         )

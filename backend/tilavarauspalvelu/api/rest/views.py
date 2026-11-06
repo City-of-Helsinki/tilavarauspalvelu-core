@@ -28,7 +28,7 @@ from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, Reservatio
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from tilavarauspalvelu.tasks import create_robot_test_data_task
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, utc_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_date_of, local_datetime, utc_datetime
 from utils.db import advisory_lock_is_held
 from utils.utils import comma_sep_str, ical_hmac_signature, update_query_params
 
@@ -442,7 +442,7 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     if is_valid_url(payment_order.checkout_url) and payment_order.expires_at > cutoff:
         return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url, request))
 
-    begin_date = reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+    begin_date = local_date_of(reservation.begins_at)
     reservation_unit: ReservationUnit = reservation.reservation_unit
     pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
 

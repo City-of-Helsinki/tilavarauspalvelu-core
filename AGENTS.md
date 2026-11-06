@@ -55,3 +55,4 @@ that a new maintainer can read. When a pattern exists to survive a scale this se
 - [`Backend code style`](.agents/docs/backend-code-style.md). Read before writing or editing code under `backend/`.
 - [`Backend testing`](.agents/docs/backend-testing.md). Read before writing or editing tests under `backend/tests/`.
 - [`Backend ORM`](.agents/docs/backend-orm.md). Read before writing or editing code under `backend/` that reaches the database.
+- [`Backend datetime`](.agents/docs/backend-datetime.md). Read before writing or editing code under `backend/` that handles dates, times or durations.

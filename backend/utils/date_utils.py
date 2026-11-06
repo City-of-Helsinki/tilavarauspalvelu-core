@@ -14,32 +14,35 @@ if TYPE_CHECKING:
 
 __all__ = [
     "DEFAULT_TIMEZONE",
-    "combine",
+    "AwareTimeError",
+    "NaiveDatetimeError",
+    "add_elapsed_time",
+    "from_iso_format",
     "get_date_range",
     "get_periods_between",
     "get_time_range",
+    "local_add_days",
+    "local_combine",
     "local_date",
+    "local_date_of",
     "local_date_string",
     "local_datetime",
     "local_datetime_exists",
-    "local_datetime_max",
-    "local_datetime_min",
     "local_datetime_string",
     "local_end_of_day",
     "local_from_iso_format",
     "local_iso_format",
+    "local_next_start_of_day",
     "local_start_of_day",
     "local_time",
-    "local_time_max",
-    "local_time_min",
     "local_time_string",
     "local_timedelta_string",
     "next_date_matching_weekday",
     "next_hour",
+    "parse_naive_datetime",
     "time_as_timedelta",
     "time_difference",
     "timedelta_as_time",
-    "timedelta_from_json",
     "timedelta_to_json",
     "utc_date",
     "utc_datetime",
@@ -49,14 +52,20 @@ __all__ = [
     "utc_iso_format",
     "utc_start_of_day",
     "utc_time",
-    "utc_time_max",
-    "utc_time_min",
 ]
 
 
 # Python compares, adds and subtracts two datetimes in the same zone on the wall clock. This is wrong across
-# a daylight saving time change, so do these in UTC, e.g. with 'utc_datetime' or 'datetime_difference'.
+# a daylight saving time change, so do these in UTC, e.g. with 'add_elapsed_time' or 'datetime_difference'.
 DEFAULT_TIMEZONE = get_default_timezone()
+
+
+class NaiveDatetimeError(Exception):
+    """A datetime has no timezone. Python would read it in the system timezone without an error."""
+
+
+class AwareTimeError(Exception):
+    """A time has a timezone. A time is a wall clock time, and only a date gives it an offset."""
 
 
 # LOCAL TIME ###########################################################################################
@@ -90,57 +99,96 @@ def local_date(
 
 
 def local_time(
-    hour: int = 0,
-    minute: int = 0,
-    second: int = 0,
-    microsecond: int = 0,
-    *,
-    date: datetime.date | None = None,
+    hour: int | None = None,
+    minute: int | None = None,
+    second: int | None = None,
+    microsecond: int | None = None,
 ) -> datetime.time:
     """
-    Get time in the local timezone on the given date (or today by default).
-    Without arguments, the current time is returned.
+    Get a wall clock time without a timezone, like a 'TimeField' value.
+    Without arguments, the current time in the local timezone is returned.
     """
-    if any((hour, minute, second, microsecond)):
-        today = date or local_date()
-        return local_datetime(today.year, today.month, today.day, hour, minute, second, microsecond).timetz()
+    if hour is None and minute is None and second is None and microsecond is None:
+        return local_datetime().time()
 
-    return local_datetime().timetz()
-
-
-def local_datetime_min() -> datetime.datetime:
-    """Get the minimum datetime of the day in the local timezone."""
-    return datetime.datetime.min.replace(tzinfo=DEFAULT_TIMEZONE)
+    return datetime.time(hour or 0, minute or 0, second or 0, microsecond or 0)
 
 
-def local_datetime_max() -> datetime.datetime:
-    """Get the maximum datetime of the day in the local timezone."""
-    return datetime.datetime.max.replace(tzinfo=DEFAULT_TIMEZONE)
+def local_date_of(_datetime: datetime.datetime, /) -> datetime.date:
+    """
+    Get the local date of the given datetime.
+    'datetime.date()' on a UTC datetime gives the previous date for 00:00-02:59 local time.
+    """
+    if _datetime.tzinfo is None:
+        msg = "Cannot get the local date of a naive datetime."
+        raise NaiveDatetimeError(msg)
+
+    return _datetime.astimezone(DEFAULT_TIMEZONE).date()
 
 
-def local_time_min() -> datetime.time:
-    """Get the minimum time of the day in the local timezone."""
-    return datetime.time.min.replace(tzinfo=DEFAULT_TIMEZONE)
+def local_combine(_date: datetime.date, _time: datetime.time, /) -> datetime.datetime:
+    """
+    Combine a date and a wall clock time to a datetime in the local timezone.
+    A time in the spring daylight saving time gap does not exist. Check it with 'local_datetime_exists'.
+    """
+    if _time.tzinfo is not None:
+        msg = "Cannot combine a time that has a timezone."
+        raise AwareTimeError(msg)
+
+    return datetime.datetime.combine(_date, _time, tzinfo=DEFAULT_TIMEZONE)
 
 
-def local_time_max() -> datetime.time:
-    """Get the maximum time of the day in the local timezone."""
-    return datetime.time.max.replace(tzinfo=DEFAULT_TIMEZONE)
+def local_add_days(_datetime: datetime.datetime, /, *, days: int) -> datetime.datetime:
+    """
+    Add calendar days in the local timezone. The wall clock time stays the same across a daylight saving time change.
+    A wall clock time in the spring gap moves forward by one hour.
+    """
+    if _datetime.tzinfo is None:
+        msg = "Cannot add calendar days to a naive datetime."
+        raise NaiveDatetimeError(msg)
+
+    local_value = _datetime.astimezone(DEFAULT_TIMEZONE)
+
+    # Datetime arithmetic resets 'fold', which moves a time in the repeated autumn hour to its first occurrence.
+    if days == 0:
+        return local_value
+
+    moved = local_value + datetime.timedelta(days=days)
+
+    # The round trip through UTC gives a time in the spring gap the offset that is valid after the change.
+    moved_utc = moved.astimezone(datetime.UTC)
+    return moved_utc.astimezone(DEFAULT_TIMEZONE)
 
 
 def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
     """Get the start of day (00:00:00) as datetime for the given date (or today if not given) in local timezone."""
     if isinstance(_date, datetime.datetime):
-        _date = _date.astimezone(DEFAULT_TIMEZONE).date()
+        _date = local_date_of(_date)
     if _date is None:
         _date = local_date()
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
 
 
-def local_end_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
-    """Get the end of day (23:59:59) as datetime for the given date in local timezone."""
+def local_next_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
+    """
+    Get the start of the next day (00:00:00) for the given date (or today if not given) in local timezone.
+    Use it as the end of a day in a half-open range: 'begin <= value < end'.
+    """
     if isinstance(_date, datetime.datetime):
-        _date = _date.astimezone(DEFAULT_TIMEZONE).date()
+        _date = local_date_of(_date)
+    if _date is None:
+        _date = local_date()
+    next_date = _date + datetime.timedelta(days=1)
+    return datetime.datetime.combine(next_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
+
+
+def local_end_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
+    """
+    Get the end of day (23:59:59.999999) as datetime for the given date in local timezone.
+    Use it with '<='. For the end of a range, use 'local_next_start_of_day' with '<'.
+    """
+    if isinstance(_date, datetime.datetime):
+        _date = local_date_of(_date)
     if _date is None:
         _date = local_date()
     return datetime.datetime.combine(_date, datetime.time.max, tzinfo=DEFAULT_TIMEZONE)
@@ -164,8 +212,11 @@ def local_iso_format(_datetime: datetime.datetime, /) -> str:
 
 
 def local_from_iso_format(_string: str, /) -> datetime.datetime:
-    """Get the datetime from ISO string in the local timezone."""
-    return datetime.datetime.fromisoformat(_string).astimezone(DEFAULT_TIMEZONE)
+    """
+    Get the datetime from ISO string in the local timezone.
+    A string without an offset is read as local time.
+    """
+    return from_iso_format(_string, timezone=DEFAULT_TIMEZONE)
 
 
 def local_datetime_string(_datetime: datetime.datetime, /, *, seconds: bool = False) -> str:
@@ -225,9 +276,11 @@ def next_hour(*, plus_minutes: int = 0, plus_hours: int = 0, plus_days: int = 0)
     >>> next_hour(plus_hours=-1)
     12:00
     """
-    now = local_datetime()
+    # The local timezone has whole hour offsets, so the start of an hour in UTC is also the start of a local hour.
+    now = utc_datetime()
     start_of_hour = now.replace(minute=0, second=0, microsecond=0)
-    return start_of_hour + datetime.timedelta(hours=1 + plus_hours, minutes=plus_minutes, days=plus_days)
+    moved = start_of_hour + datetime.timedelta(hours=1 + plus_hours, minutes=plus_minutes)
+    return local_add_days(moved, days=plus_days)
 
 
 # UTC TIME #############################################################################################
@@ -260,20 +313,9 @@ def utc_date(
     return utc_datetime(year, month, day).date()
 
 
-def utc_time(
-    hour: int = 0,
-    minute: int = 0,
-    second: int = 0,
-    microsecond: int = 0,
-    *,
-    date: datetime.date | None = None,
-) -> datetime.time:
-    """Get time in UTC on the given date (or today by default). Without arguments, the current time is returned."""
-    if any((hour, minute, second, microsecond)):
-        today = date or local_date()
-        return utc_datetime(today.year, today.month, today.day, hour, minute, second, microsecond).timetz()
-
-    return utc_datetime().timetz()
+def utc_time() -> datetime.time:
+    """Get the current wall clock time in UTC, without a timezone."""
+    return utc_datetime().time()
 
 
 def utc_datetime_min() -> datetime.datetime:
@@ -284,16 +326,6 @@ def utc_datetime_min() -> datetime.datetime:
 def utc_datetime_max() -> datetime.datetime:
     """Get the maximum datetime of the day in UTC."""
     return datetime.datetime.max.replace(tzinfo=datetime.UTC)
-
-
-def utc_time_min() -> datetime.time:
-    """Get the minimum time of the day in UTC."""
-    return datetime.time.min.replace(tzinfo=datetime.UTC)
-
-
-def utc_time_max() -> datetime.time:
-    """Get the maximum time of the day in UTC."""
-    return datetime.time.max.replace(tzinfo=datetime.UTC)
 
 
 def utc_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
@@ -320,34 +352,52 @@ def utc_iso_format(_datetime: datetime.datetime, /) -> str:
 # COMMON UTILS #########################################################################################
 
 
-def combine(
-    date: datetime.date,
-    time: datetime.time,
-    *,
-    astimezone: zoneinfo.ZoneInfo | datetime.timezone = datetime.UTC,
-) -> datetime.datetime:
-    """Combine a date and time to a UTC datetime, and then convert to the given timezone."""
-    if time.tzinfo is not None:
-        msg = "Time must not be timezone-aware."
-        raise ValueError(msg)
+def add_elapsed_time(_datetime: datetime.datetime, /, *, delta: datetime.timedelta) -> datetime.datetime:
+    """
+    Add real elapsed time, and keep the timezone of the given datetime.
+    A plain '+' on a datetime in the local timezone adds on the wall clock. This is wrong across a DST change.
+    """
+    if _datetime.tzinfo is None:
+        msg = "Cannot add elapsed time to a naive datetime."
+        raise NaiveDatetimeError(msg)
 
-    return datetime.datetime.combine(date, time, tzinfo=datetime.UTC).astimezone(astimezone)
+    moved_utc = _datetime.astimezone(datetime.UTC) + delta
+    return moved_utc.astimezone(_datetime.tzinfo)
+
+
+def from_iso_format(_string: str, /, *, timezone: zoneinfo.ZoneInfo | datetime.timezone) -> datetime.datetime:
+    """
+    Get the datetime from ISO string in the given timezone.
+    A string with an offset keeps its moment. A string without an offset is read as a wall clock time in the timezone.
+    """
+    value = datetime.datetime.fromisoformat(_string)
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone)
+    return value.astimezone(timezone)
+
+
+def parse_naive_datetime(
+    _string: str,
+    /,
+    *,
+    string_format: str,
+    timezone: zoneinfo.ZoneInfo | datetime.timezone,
+) -> datetime.datetime:
+    """Parse a string without an offset as a wall clock time in the given timezone."""
+    value = datetime.datetime.strptime(_string, string_format)  # noqa: DTZ007
+    return value.replace(tzinfo=timezone)
 
 
 def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes", "seconds"] = "seconds") -> str:
-    result = str(delta).zfill(8)
+    """Format a timedelta as '[-]HH:MM:SS' or '[-]HH:MM'. The hours count the whole duration, not only one day."""
+    total_seconds = int(delta.total_seconds())
+    sign = "-" if total_seconds < 0 else ""
+    hours, remaining_seconds = divmod(abs(total_seconds), 3600)
+    minutes, seconds = divmod(remaining_seconds, 60)
+
     if timespec == "minutes":
-        return result[:5]
-    return result
-
-
-def timedelta_from_json(delta: str) -> datetime.timedelta:
-    try:
-        time_ = datetime.datetime.strptime(delta, "%H:%M:%S")  # noqa: DTZ007
-    except ValueError:
-        time_ = datetime.datetime.strptime(delta, "%H:%M")  # noqa: DTZ007
-
-    return datetime.timedelta(hours=time_.hour, minutes=time_.minute, seconds=time_.second)
+        return f"{sign}{hours:02}:{minutes:02}"
+    return f"{sign}{hours:02}:{minutes:02}:{seconds:02}"
 
 
 def time_as_timedelta(_input: datetime.datetime | datetime.time, /) -> datetime.timedelta:
@@ -467,8 +517,8 @@ def get_periods_between(
     if end_date < start_date:
         msg = "End date cannot be before start date."
         raise ValueError(msg)
-    if end_date == start_date and end_time <= start_time and end_time != datetime.time(0, 0):
-        msg = "End time cannot be at or before start time if on the same day."
+    if end_time <= start_time and end_time != datetime.time(0, 0):
+        msg = "End time cannot be at or before start time."
         raise ValueError(msg)
 
     start_datetime = datetime.datetime.combine(start_date, start_time, tzinfo=tzinfo)

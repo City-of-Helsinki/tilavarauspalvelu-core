@@ -18,7 +18,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     WebShopOrderStatus,
 )
 from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, localized_short_weekday, utc_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, from_iso_format, local_datetime, localized_short_weekday, utc_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
@@ -28,7 +28,7 @@ def parse_datetime(string: str | None) -> datetime.datetime | None:
     if string is None:
         return None
 
-    return datetime.datetime.fromisoformat(string).astimezone(settings.VERKKOKAUPPA_TIMEZONE)
+    return from_iso_format(string, timezone=settings.VERKKOKAUPPA_TIMEZONE)
 
 
 def get_formatted_reservation_time(reservation: Reservation) -> str:
