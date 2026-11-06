@@ -68,7 +68,7 @@ describe("Component: Reservation page terms info section", () => {
         },
         price: "0",
         applyingForFreeOfCharge: true,
-        canApplyFreeOfCharge: true,
+        canApplyForDiscount: true,
       });
       customRender(applyingFreePricingTerms);
       const reservationUnit = applyingFreePricingTerms.reservationUnit;
@@ -83,9 +83,9 @@ describe("Component: Reservation page terms info section", () => {
             price: "0",
           }),
         },
-        "reservation unit can't be applied for free": {
+        "the customer can not apply for a discount": {
           ...createMockReservation({
-            canApplyFreeOfCharge: false,
+            canApplyForDiscount: false,
           }),
         },
         "reservation unit has no pricing terms": {

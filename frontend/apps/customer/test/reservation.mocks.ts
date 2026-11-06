@@ -6,6 +6,7 @@ import {
   MunicipalityChoice,
   OrderStatus,
   PaymentType,
+  PriceUnit,
   ReservationCancelReasonChoice,
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -66,7 +67,7 @@ export type MockReservationProps = {
   price?: string;
   paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
   cancellable?: boolean;
-  canApplyFreeOfCharge?: boolean;
+  canApplyForDiscount?: boolean;
   applyingForFreeOfCharge?: boolean;
   reservationConfirmedInstructions?: string;
   cancellationTerms?: {
@@ -110,7 +111,7 @@ export function createMockReservation(
     applyingForFreeOfCharge = false,
     reservationConfirmedInstructions = "Test confirmed instructions",
     beginsAt = new Date(2024, 0, 1, 10, 0, 0, 0).toISOString(),
-    canApplyFreeOfCharge = true,
+    canApplyForDiscount = true,
     cancellable = false,
     cancellationTerms = {
       id: createNodeId("CancellationTermsNode", 1),
@@ -207,7 +208,12 @@ export function createMockReservation(
         addressCitySv: "Helsingfors",
         ...generateNameFragment("Test Unit"),
       },
-      canApplyFreeOfCharge: canApplyFreeOfCharge,
+      priceSummary: {
+        isFree: false,
+        lowestAmount: price,
+        priceUnit: PriceUnit.PerHour,
+        canApplyForDiscount,
+      },
       reservationForm: ReservationFormType.PurposeForm,
       reservationPendingInstructionsFi: "Test pending instructions FI",
       reservationPendingInstructionsEn: "Test pending instructions EN",

@@ -518,7 +518,7 @@ export const RESERVATION_PAGE_QUERY = gql`
         unit {
           ...AddressFields
         }
-        canApplyFreeOfCharge
+        ...PriceSummaryFields
         ...TermsOfUse
       }
     }

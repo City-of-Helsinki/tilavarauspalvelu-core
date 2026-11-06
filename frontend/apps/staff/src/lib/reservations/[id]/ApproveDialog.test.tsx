@@ -4,7 +4,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ApproveReservationDocument } from "@gql/gql-types";
+import { ApproveReservationDocument, PriceUnit } from "@gql/gql-types";
 import type { ApprovalDialogFieldsFragment } from "@gql/gql-types";
 import { ApproveDialog } from "./ApproveDialog";
 
@@ -29,8 +29,12 @@ function createPriceLine(overrides: Partial<PriceLine> = {}): PriceLine {
   return {
     id: "UmVzZXJ2YXRpb25QcmljZUxpbmVOb2RlOjI=",
     pk: 2,
+    quantity: "1.0000",
+    priceUnit: PriceUnit.PerHour,
+    unitAmount: "0",
     amount: "0",
     overrideAmount: null,
+    taxPercentage: "25.5",
     ...overrides,
   };
 }
