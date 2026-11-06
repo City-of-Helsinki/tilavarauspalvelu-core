@@ -353,11 +353,7 @@ export default function Reservation({
         </div>
         <Flex>
           {shouldShowPaymentNotification(reservation) && (
-            <PaymentNotification
-              reservation={reservation}
-              paymentOrder={reservation.paymentOrder}
-              appliedPricing={reservation.appliedPricing}
-            />
+            <PaymentNotification reservation={reservation} paymentOrder={reservation.paymentOrder} />
           )}
           <Instructions reservation={reservation} />
           <SummaryGeneralFields reservation={reservation} options={options} />

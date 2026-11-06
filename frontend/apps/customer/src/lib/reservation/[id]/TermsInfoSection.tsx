@@ -4,7 +4,7 @@ import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { Sanitize } from "ui/src/components/Sanitize";
 import type { ReservationPageQuery } from "@gql/gql-types";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
-import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
+import { getReservationPriceDisplayFromLines } from "@/modules/price";
 import type { getServerSideProps } from "@/pages/reservations/[id]";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -15,21 +15,23 @@ export function TermsInfoSection({
   reservation,
   termsOfUse,
 }: Readonly<{
-  reservation: Pick<NodeT, "reservationUnit" | "beginsAt" | "applyingForFreeOfCharge">;
+  reservation: Pick<
+    NodeT,
+    "reservationUnit" | "applyingForFreeOfCharge" | "id" | "price" | "taxPercentageValue" | "priceLines"
+  >;
   termsOfUse: PropsNarrowed["termsOfUse"];
 }>) {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnit;
+  const lang = getLocalizationLang(i18n.language);
 
   const shouldDisplayPricingTerms: boolean = useMemo(() => {
     if (!reservationUnit) {
       return false;
     }
-    const isFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.beginsAt));
+    const isFreeOfCharge = getReservationPriceDisplayFromLines(reservation, lang, false).total === 0;
     return reservation.applyingForFreeOfCharge || (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge);
-  }, [reservation, reservationUnit]);
-
-  const lang = getLocalizationLang(i18n.language);
+  }, [reservation, reservationUnit, lang]);
   const paymentTermsContent =
     reservationUnit.paymentTerms != null ? getTranslation(reservationUnit.paymentTerms, "text", lang) : undefined;
   const cancellationTermsContent =
