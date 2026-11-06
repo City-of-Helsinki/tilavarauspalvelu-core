@@ -63,10 +63,32 @@
   "TimeSelector": {
     "calendarLabel": "Valitse aikatoiveet kalenterista",
     "legend": {
-      "unavailable": "Ei varattavissa",
+      "unavailable": "Ei varattavissa missään hakemukselle valituista tiloista",
+      "closed": "Ei varattavissa tässä tilassa",
       "primary": "Ensisijainen toive",
       "secondary": "Muu toive",
-      "open": "Varattavissa"
+      "open": "Varattavissa tässä tilassa"
+    },
+    "skipToForm": "Siirry lomakkeeseen, jolla voit lisätä aikoja",
+    "announcements": {
+      "painted": "Lisätty",
+      "erased": "Poistettu"
+    },
+    "form": {
+      "legend": "Lisää aikoja lomakkeella",
+      "priorityNote": "Uudet ajat saavat yllä valitun toiveen tyypin.",
+      "day": "Päivä",
+      "from": "Alkaa",
+      "to": "Päättyy",
+      "add": "Lisää aika",
+      "listLabel": "Valitut ajat",
+      "empty": "Ei valittuja aikoja.",
+      "remove": "Poista",
+      "removeTime": "Poista {{time}}",
+      "errors": {
+        "endAfterStart": "Päättymisajan täytyy olla alkamisajan jälkeen.",
+        "outsideReservable": "Aika ei ole varattavissa missään hakemukselle valitussa tilassa."
+      }
     }
   },
   "Page2": {
@@ -75,11 +97,11 @@
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",
-    "prioritySelectLabel": "Aikatoiveen tyyppi",
+    "prioritySelectLabel": "Valitse aikatoiveen tyyppi",
     "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
     "priorityLabels": {
-      "primary": "Valitse ensisijaiset aikatoiveet",
-      "secondary": "Valitse muut aikatoiveet"
+      "primary": "Ensisijaiset aikatoiveet",
+      "secondary": "Vaihtoehtoiset aikatoiveet"
     },
     "notification": {
       "copyCells": "Ajat kopioitu kaikille varaustoiveille"

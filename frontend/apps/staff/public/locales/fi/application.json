@@ -17,7 +17,8 @@
       "primary": "Ensisijainen toive",
       "secondary": "Muu toive",
       "open": "Varattavissa"
-    }
+    },
+    "skipToList": "Siirry hakijan toivomien aikojen luetteloon"
   },
   "id": "Hakemustunnus",
   "application_one": "Hakemus",

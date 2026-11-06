@@ -1,0 +1,303 @@
+import React from "react";
+import styled, { css } from "styled-components";
+import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
+import { fontBold } from "@ui/styled";
+import { gridTableStyles } from "../CalendarGrid/styles";
+import type { CellAppearance } from "./types";
+
+export type LegendState = CellAppearance | "open" | "closed" | "unavailable";
+export type LegendItem = { state: LegendState; label: string; current?: boolean };
+
+export const arrow = css`
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 8px;
+  top: 3px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+`;
+
+// The fill (background and text colour) applies to every cell of a run. The arrow indicator
+// is split out separately so it can be restricted to just the first cell of a run.
+export const primaryFill = css`
+  background: var(--color-bus);
+  color: var(--color-white);
+`;
+
+export const secondaryFill = css`
+  background: var(--color-engel);
+  color: var(--color-black);
+`;
+
+// Primary and secondary differ by shape as well as colour, so they stay distinguishable without colour.
+const primaryIndicator = css`
+  &::after {
+    ${arrow};
+    border-bottom: 8px solid var(--color-white);
+  }
+`;
+
+const secondaryIndicator = css`
+  &::after {
+    ${arrow};
+    border-top: 8px solid var(--color-black);
+  }
+`;
+
+// Full fragment (fill + indicator), for contexts like the legend swatch where there's
+// no "run" to speak of and the arrow should always be shown.
+const primaryFragment = css`
+  ${primaryFill};
+  ${primaryIndicator};
+`;
+
+const secondaryFragment = css`
+  ${secondaryFill};
+  ${secondaryIndicator};
+`;
+
+// The cell stays in the table's flow (the shared styles make it `position: relative`, the box `::before` fills).
+// An absolute cell would leave its row, and the cells after it would slide one column to the left.
+const eventBackground = (appearance: CellAppearance) => css`
+  background: transparent;
+  padding-right: 4px;
+  &::before {
+    display: block;
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: 0 var(--event-gap) -1px; /* The event should be drawn on top of eventual cell bottom-border. */
+    padding-inline: 4px;
+    ${appearance === "secondary" && "border-inline: 1px solid var(--border-color)"};
+    font-size: var(--fontsize-body-s);
+    text-align: right;
+    color: ${appearance === "primary" ? "var(--color-white)" : "var(--color-black)"};
+    background-color: ${appearance === "primary" ? "var(--color-bus)" : "var(--color-engel)"};
+  }
+
+  &[data-run-start] {
+    z-index: 2;
+    &::before {
+      padding-top: 2px;
+      content: attr(data-runtime-start) "–" attr(data-runtime-end);
+      border-top-left-radius: var(--event-border-radius);
+      border-top-right-radius: var(--event-border-radius);
+    }
+    &[data-run-end] {
+      &::before {
+        padding-top: 0;
+        margin-top: -1px /* Make the time text fit inside the box */;
+      }
+      &::after {
+        top: 1px;
+      }
+    }
+  }
+
+  &[data-run-end] {
+    &::before {
+      bottom: 0;
+      border-bottom-left-radius: var(--event-border-radius);
+      border-bottom-right-radius: var(--event-border-radius);
+    }
+  }
+`;
+
+export const WeeklyPatternRoot = styled.div`
+  --border-color: var(--color-black-50);
+  ${gridTableStyles};
+
+  position: relative;
+  overflow-x: auto;
+  height: var(--weekly-pattern-height, auto);
+
+  /*
+    The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
+    Keeps every day column at least as wide as the original per-cell min-width.
+    The container's overflow-x: auto scrolls instead of squeezing columns too thin.
+  */
+  table {
+    min-width: calc(30px + 7 * 110px);
+    user-select: none;
+    touch-action: manipulation;
+
+    --step-height: 12px;
+    --time-column-width: 30px; /* Just wide enough for a time label like "14". The other columns split the rest evenly. */
+    --event-gap: 4px;
+    --event-border-radius: 4px;
+  }
+
+  thead th,
+  thead td {
+    font-size: var(--fontsize-body-m);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 3;
+  }
+
+  thead td {
+    border: none;
+    padding: 0;
+  }
+
+  tbody th {
+    ${fontBold};
+    font-size: var(--fontsize-body-m);
+    text-align: center;
+    vertical-align: top;
+    white-space: nowrap;
+    z-index: 2;
+    border-top: 1px solid var(--color-black-20);
+  }
+
+  tbody td {
+    padding-right: var(--spacing-2-xs);
+    width: calc((100% - 30px) / 7);
+    cursor: pointer;
+    text-align: center;
+    font-size: 12px;
+    line-height: 0.9;
+    color: transparent;
+    transition:
+      color 0.1s ease-in-out,
+      background 0.1s ease-in-out,
+      box-shadow 0.1s ease-in-out;
+    border-top: 1px solid var(--color-black-10);
+
+    &[data-hour-start] {
+      border-top: 1px solid var(--border-color);
+    }
+
+    &[data-appearance="primary"] {
+      ${eventBackground("primary")};
+    }
+
+    &[data-appearance="secondary"] {
+      ${eventBackground("secondary")};
+      border-inline: 1px solid var(--border-color);
+
+      &[data-run-start]::before {
+        box-shadow: inset 0 1px 0 var(--color-black-50);
+      }
+
+      &[data-run-end]::before {
+        box-shadow: inset 0 -1px 0 var(--color-black-50);
+      }
+
+      &[data-run-start][data-run-end]::before {
+        box-shadow:
+          inset 0 1px 0 var(--color-black-50),
+          inset 0 -1px 0 var(--color-black-50);
+      }
+    }
+
+    &[aria-disabled="true"] {
+      cursor: default;
+    }
+
+    &[data-availability="closed"] {
+      /* A run can be painted on closed cells, as long as at least one space has the time reservable. Then the
+         hatch-pattern shows through it. So a run can be placed on closed cells, but not on unavailable ones. */
+      &[data-appearance="primary"],
+      &[data-appearance="secondary"] {
+        cursor: pointer;
+        background-image: ${unavailableBackgroundSVG};
+        background-size: auto calc(var(--step-height) / 2);
+      }
+
+      /* Due to the opacity being lower, a darker background can be used. It also makes a clearer distinction between
+         the parts of the run which are on closed cells. */
+      &[data-appearance="primary"]::before {
+        background-color: rgb(from var(--color-bus-dark) r g b / 0.6);
+      }
+
+      &[data-appearance="secondary"]::before {
+        background-color: rgb(from var(--color-engel-dark) r g b / 0.75);
+      }
+    }
+
+    /* None of the reservation units can be booked here, so nothing can be painted either. */
+    &[data-availability="unavailable"] {
+      border-top-color: rgb(from var(--color-black) r g b / 0.1);
+      background: var(--color-black-30);
+      &[data-hour-start] {
+        border-top-color: rgb(from var(--color-black) r g b / 0.5);
+      }
+    }
+
+    /* The arrow only marks where a run begins, not every cell in it. */
+    &[data-appearance="primary"][data-run-start] {
+      ${primaryIndicator};
+    }
+
+    &[data-appearance="secondary"][data-run-start] {
+      ${secondaryIndicator};
+    }
+  }
+
+  [data-readonly] td,
+  [data-disabled] td {
+    cursor: default;
+  }
+
+  tr:last-child td {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  table:not([aria-readonly]) tbody td[data-availability="open"]:not([data-appearance]):hover {
+    color: var(--color-black-30);
+    background: var(--color-black-5);
+  }
+`;
+
+const LegendList = styled.ul`
+  display: flex;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+`;
+
+const LegendItemRow = styled.li`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2-xs);
+  white-space: nowrap;
+  &[aria-current="true"] {
+    font-family: var(--font-bold), sans-serif;
+  }
+`;
+
+const LegendBox = styled.div<{ $state: LegendState }>`
+  position: relative;
+  box-sizing: border-box;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-black-50);
+  background-color: ${({ $state }) =>
+    $state === "unavailable"
+      ? "var(--color-black-30)"
+      : $state === "closed"
+        ? "var(--color-black-5)"
+        : "var(--color-white)"};
+  ${({ $state }) => ($state === "primary" ? primaryFragment : $state === "secondary" ? secondaryFragment : "")}
+  ${({ $state }) => $state === "closed" && `background-color: var(--color-black-10); background-image: ${unavailableBackgroundSVG}; background-size: auto 10px; background-repeat: repeat;`}
+  [aria-current="true"] > & {
+    box-shadow: 0 0 0 2px var(--color-focus-outline);
+  }
+`;
+
+export function WeeklyPatternLegend({ items }: { items: ReadonlyArray<LegendItem> }): React.ReactElement {
+  return (
+    <LegendList data-testid="weekly-pattern__legend">
+      {items.map(({ state, label, current }) => (
+        <LegendItemRow key={state} aria-current={current ? "true" : undefined}>
+          <LegendBox $state={state} aria-hidden="true" />
+          <span>{label}</span>
+        </LegendItemRow>
+      ))}
+    </LegendList>
+  );
+}

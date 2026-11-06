@@ -63,10 +63,32 @@
   "TimeSelector": {
     "calendarLabel": "Välj önskade tider",
     "legend": {
-      "unavailable": "Kan inte bokas",
+      "unavailable": "Kan inte bokas i någon av ansökningens lokaler",
+      "closed": "Kan inte bokas i denna lokal",
       "primary": "Prioriterat önskemål",
       "secondary": "Alternativt önskemål",
-      "open": "Kan reserveras"
+      "open": "Kan reserveras i denna lokal"
+    },
+    "skipToForm": "Hoppa till formuläret för att lägga till tider",
+    "announcements": {
+      "painted": "Tillagd",
+      "erased": "Borttagen"
+    },
+    "form": {
+      "legend": "Lägg till tider med ett formulär",
+      "priorityNote": "Nya tider får den typ av önskemål som valts ovan.",
+      "day": "Dag",
+      "from": "Från",
+      "to": "Till",
+      "add": "Lägg till tid",
+      "listLabel": "Valda tider",
+      "empty": "Inga valda tider.",
+      "remove": "Ta bort",
+      "removeTime": "Ta bort {{time}}",
+      "errors": {
+        "endAfterStart": "Sluttiden måste vara efter starttiden.",
+        "outsideReservable": "Tiden kan inte bokas i någon av ansökningens lokaler."
+      }
     }
   },
   "Page2": {
@@ -75,11 +97,11 @@
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
     "summary": "Sammanfattning",
-    "prioritySelectLabel": "Typ av tidsönskemål",
+    "prioritySelectLabel": "Välj typ av tidsönskemål",
     "reservationUnitSelectLabel": "Visa säsongbokningstider för lokalen",
     "priorityLabels": {
-      "primary": "Välj prioriterade tidsönskemål",
-      "secondary": "Välj alternativa tidsönskemål"
+      "primary": "Prioriterade tidsönskemål",
+      "secondary": "Alternativa tidsönskemål"
     },
     "notification": {
       "copyCells": "Önskade tider kopierades till alla bokningar"

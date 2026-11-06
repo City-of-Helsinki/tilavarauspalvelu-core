@@ -63,10 +63,32 @@
   "TimeSelector": {
     "calendarLabel": "Select time slots from the calendar",
     "legend": {
-      "unavailable": "Not available",
+      "unavailable": "Not available in any space on this application",
+      "closed": "Not available in this space",
       "primary": "Preferred time slots",
       "secondary": "Other request",
-      "open": "Reservable"
+      "open": "Reservable in this space"
+    },
+    "skipToForm": "Skip to the form for adding times",
+    "announcements": {
+      "painted": "Added",
+      "erased": "Removed"
+    },
+    "form": {
+      "legend": "Add times with a form",
+      "priorityNote": "New times use the type of booking request selected above.",
+      "day": "Day",
+      "from": "From",
+      "to": "To",
+      "add": "Add time",
+      "listLabel": "Selected times",
+      "empty": "No times selected.",
+      "remove": "Remove",
+      "removeTime": "Remove {{time}}",
+      "errors": {
+        "endAfterStart": "The end time must be after the start time.",
+        "outsideReservable": "The time is not available in any space on this application."
+      }
     }
   },
   "Page2": {
@@ -75,11 +97,11 @@
     "copyTimes": "Copy times for all booking requests",
     "resetTimes": "Clear calendar",
     "summary": "Summary",
-    "prioritySelectLabel": "Type of booking request",
+    "prioritySelectLabel": "Select type of booking request",
     "reservationUnitSelectLabel": "Available seasonal booking times for",
     "priorityLabels": {
-      "primary": "Select preferred time slots",
-      "secondary": "Select other time slots"
+      "primary": "Preferred time slots",
+      "secondary": "Other suitable time slots"
     },
     "notification": {
       "copyCells": "Times copied to all booking requests"
