@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
 import type { CurrentUserQuery } from "@gql/gql-types";
@@ -7,6 +7,7 @@ import { Navigation } from "./Navigation";
 
 const mockUseSession = vi.fn();
 const mockUseHandling = vi.fn();
+const mockPush = vi.fn();
 
 vi.mock("@/hooks", () => ({
   useSession: () => mockUseSession(),
@@ -15,7 +16,7 @@ vi.mock("@/hooks", () => ({
 
 vi.mock("next/router", () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockPush,
     pathname: "/",
   }),
 }));
@@ -48,6 +49,8 @@ function createMockUser(overrides: Partial<NonNullable<CurrentUserQuery["current
 }
 
 beforeEach(() => {
+  mockPush.mockReset();
+  window.innerWidth = 1024;
   mockUseSession.mockReturnValue({
     user: createMockUser(),
     isAuthenticated: true,
@@ -122,5 +125,43 @@ describe("Navigation", () => {
     expect(screen.getByRole("banner")).toBeInTheDocument();
     // My Units menu item should be absent
     expect(screen.queryByText("navigation:myUnits")).not.toBeInTheDocument();
+  });
+
+  // HDS wraps each menu link in an <li>. A nested <li> is invalid HTML and causes a hydration error.
+  test.each([
+    ["desktop", 1024],
+    ["mobile", 400],
+  ])("does not nest list items on %s", (_name, width) => {
+    window.innerWidth = width;
+    const { container } = render(<Navigation apiBaseUrl="http://localhost:3000" />);
+
+    expect(screen.getByText("navigation:myUnits")).toBeInTheDocument();
+    expect(container.querySelector("li li")).toBeNull();
+  });
+
+  test("shows the handling count in the requested reservations link", () => {
+    mockUseSession.mockReturnValue({
+      user: createMockUser({ isSuperuser: true }),
+      isAuthenticated: true,
+      error: null,
+    });
+    mockUseHandling.mockReturnValue({
+      handlingCount: 7,
+      hasOwnUnits: false,
+      refetch: vi.fn(),
+    });
+
+    render(<Navigation apiBaseUrl="http://localhost:3000" />);
+
+    const link = screen.getByRole("link", { name: "navigation:requestedReservations" });
+    expect(link).toHaveTextContent("7");
+  });
+
+  test("navigates with the router when a menu link is clicked", () => {
+    render(<Navigation apiBaseUrl="http://localhost:3000" />);
+
+    fireEvent.click(screen.getByRole("link", { name: "navigation:myUnits" }));
+
+    expect(mockPush).toHaveBeenCalledWith("/my-units");
   });
 });
