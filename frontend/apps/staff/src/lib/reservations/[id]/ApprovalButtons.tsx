@@ -20,6 +20,7 @@ export const APPROVAL_BUTTONS_FRAGMENT = gql`
   fragment ApprovalButtons on ReservationNode {
     id
     state
+    endsAt
     ...DenyDialogFields
     ...ApprovalDialogFields
     reservationSeries {

@@ -3,64 +3,48 @@ import { describe, expect, test } from "vitest";
 import type { TFunction } from "i18next";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import { PaymentType, PriceUnit, Weekday, ReservationTypeChoice } from "@gql/gql-types";
+import { PriceUnit, Weekday, ReservationTypeChoice } from "@gql/gql-types";
 import type {
   CreateTagStringFragment,
-  PricingFieldsFragment,
-  ReservationUnitPricingFieldsFragment,
   ReservationPageQuery,
+  ReservationPriceDetailsFieldsFragment,
 } from "@gql/gql-types";
 import { doesIntervalCollide, getBufferTime, reservationToInterval } from "./helpers";
 import {
   createTagString,
-  getReservationUnitPricing,
   formatReservationPrice,
+  getReservationPriceDetails,
+  isReservationPriceFree,
   formatReservationPriceLong,
 } from "./reservation";
 
 const mockT = ((x: string) => x) as TFunction;
 
-function constructPricing({
-  lowestPrice,
-  highestPrice,
-  begin,
-}: {
-  lowestPrice: number;
-  highestPrice: number;
-  begin: Date;
-}): PricingFieldsFragment {
+type PriceLine = NonNullable<ReservationPriceDetailsFieldsFragment["priceLines"]>[number];
+
+function createPriceLine(overrides: Partial<PriceLine> = {}): PriceLine {
   return {
-    begins: formatApiDateUnsafe(begin),
-    id: "1",
+    id: createNodeId("ReservationPriceLineNode", 1),
+    pk: 1,
+    quantity: "2.0000",
     priceUnit: PriceUnit.PerHour,
-    lowestPrice: lowestPrice.toString(),
-    highestPrice: highestPrice.toString(),
-    taxLevel: {
-      id: "1",
-      pk: 1,
-      currentPercentage: "24",
-    },
-    paymentType: PaymentType.Online,
-    materialPriceDescriptionFi: "",
-    materialPriceDescriptionEn: "",
-    materialPriceDescriptionSv: "",
+    unitAmount: "10.00",
+    amount: "20.00",
+    overrideAmount: null,
+    taxPercentage: "25.50",
+    ...overrides,
   };
 }
 
-function constructFreePricing(): PricingFieldsFragment {
-  return constructPricing({
-    lowestPrice: 0,
-    highestPrice: 0,
-    begin: new Date("2021-01-01"),
-  });
-}
-
-function constructPaidPricing(): PricingFieldsFragment {
-  return constructPricing({
-    lowestPrice: 120,
-    highestPrice: 120,
-    begin: new Date("2022-03-01"),
-  });
+function createPriceDetails(
+  overrides: Partial<ReservationPriceDetailsFieldsFragment> = {}
+): ReservationPriceDetailsFieldsFragment {
+  return {
+    id: createNodeId("ReservationNode", 1),
+    price: "20.00",
+    priceLines: [createPriceLine()],
+    ...overrides,
+  };
 }
 
 function constructReservation({
@@ -97,35 +81,41 @@ function constructReservation({
   };
 }
 
-describe("getReservationUnitPricing", () => {
-  test("returns correct pricing based on reservation date", () => {
-    const input: ReservationUnitPricingFieldsFragment = {
-      id: "1",
-      pricings: [constructFreePricing(), constructPaidPricing()],
-    };
-
-    const first = getReservationUnitPricing(input, new Date("2021-02-01T00:00:01Z"));
-    const second = getReservationUnitPricing(input, new Date("2022-04-01T00:00:01Z"));
-    expect(first?.lowestPrice).toBe("0");
-    expect(second?.lowestPrice).toBe("120");
+describe("isReservationPriceFree", () => {
+  test("is not free when a price line has an amount", () => {
+    expect(isReservationPriceFree(createPriceDetails())).toBe(false);
   });
 
-  test("returns null for empty pricings", () => {
-    const input: ReservationUnitPricingFieldsFragment = {
-      id: "1",
-      pricings: [],
-    };
-    const result = getReservationUnitPricing(input, new Date());
-    expect(result).toBeNull();
+  test("is not free when the handler made the price free", () => {
+    const reservation = createPriceDetails({ price: "0", priceLines: [createPriceLine({ overrideAmount: "0" })] });
+    expect(isReservationPriceFree(reservation)).toBe(false);
   });
 
-  test("returns the first pricing when date is before all pricings", () => {
-    const input: ReservationUnitPricingFieldsFragment = {
-      id: "1",
-      pricings: [constructFreePricing(), constructPaidPricing()],
-    };
-    const result = getReservationUnitPricing(input, new Date("2020-01-01"));
-    expect(result).toBeNull();
+  test("is free when the price lines have no amount", () => {
+    const reservation = createPriceDetails({ price: "0", priceLines: [createPriceLine({ amount: "0" })] });
+    expect(isReservationPriceFree(reservation)).toBe(true);
+  });
+
+  test("uses the price when the reservation has no price lines", () => {
+    expect(isReservationPriceFree(createPriceDetails({ priceLines: [] }))).toBe(false);
+    expect(isReservationPriceFree(createPriceDetails({ price: "0", priceLines: [] }))).toBe(true);
+  });
+});
+
+describe("getReservationPriceDetails", () => {
+  test("shows the calculation of the price line", () => {
+    expect(getReservationPriceDetails(createPriceDetails(), mockT)).toBe("reservation:ApproveDialog.priceBreakdown");
+  });
+
+  test("shows only the price for a fixed price", () => {
+    const reservation = createPriceDetails({ priceLines: [createPriceLine({ priceUnit: PriceUnit.Fixed })] });
+    expect(getReservationPriceDetails(reservation, mockT)).toMatch(/^20\s€$/);
+  });
+
+  test("shows only the price of the reservation without exactly one price line", () => {
+    expect(getReservationPriceDetails(createPriceDetails({ price: "12.00", priceLines: [] }), mockT)).toMatch(
+      /^12\s€$/
+    );
   });
 });
 

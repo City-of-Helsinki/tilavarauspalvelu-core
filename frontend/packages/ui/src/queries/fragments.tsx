@@ -27,25 +27,6 @@ export const TERMS_OF_USE_FRAGMENT = gql`
   }
 `;
 
-export const PRICING_FRAGMENT = gql`
-  fragment PricingFields on ReservationUnitPricingNode {
-    id
-    begins
-    priceUnit
-    paymentType
-    lowestPrice
-    highestPrice
-    taxLevel {
-      id
-      pk
-      currentPercentage
-    }
-    materialPriceDescriptionFi
-    materialPriceDescriptionEn
-    materialPriceDescriptionSv
-  }
-`;
-
 export const IMAGE_FRAGMENT = gql`
   fragment Image on ReservationUnitImageNode {
     id
