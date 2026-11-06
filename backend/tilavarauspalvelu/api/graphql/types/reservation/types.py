@@ -218,6 +218,7 @@ class ReservationNode(DjangoNode):
             "unit_price",
             "tax_percentage_value",
             "price_lines",
+            "price_option",
             #
             "access_type",
             "access_code_generated_at",

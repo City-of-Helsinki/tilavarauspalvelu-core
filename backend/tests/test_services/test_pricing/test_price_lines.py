@@ -11,8 +11,10 @@ from freezegun import freeze_time
 from tilavarauspalvelu.enums import PriceUnit
 from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.models import Reservation, ReservationPriceLine
+from tilavarauspalvelu.services.pricing.price_calculation import load_pricing_data
 from tilavarauspalvelu.services.pricing.price_lines import (
     build_price_lines,
+    build_price_lines_with_data,
     set_price_line_taxes,
     set_reservation_price_lines,
 )
@@ -188,6 +190,65 @@ def test_build_price_lines__no_pricing_group():
             begin=local_datetime(2026, 2, 1, 10),
             end=local_datetime(2026, 2, 1, 11),
         )
+
+
+@freeze_time("2026-02-15T12:00:00+02:00")
+def test_build_price_lines__tax_level_without_rate_today():
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1,
+    )
+    tax_level = TaxLevelFactory.create(name="Future", rates=[])
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=datetime.date(2100, 1, 1), percentage=Decimal(24))
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, tax_level=tax_level)
+
+    msg = "Tax level 'Future' has no rate on 2026-02-15."
+    with pytest.raises(PriceCalculationError, match=exact(msg)):
+        build_price_lines(
+            reservation_unit=reservation_unit,
+            price_option=None,
+            begin=local_datetime(2026, 3, 10, 10),
+            end=local_datetime(2026, 3, 10, 11),
+        )
+
+
+@freeze_time("2026-02-15T12:00:00+02:00")
+def test_build_price_lines_with_data__makes_no_queries(django_assert_num_queries):
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1,
+    )
+    tax_level = create_tax_level_with_rate_change()
+    sales_item = SalesItemFactory.create(tax_level=tax_level)
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(10),
+        tax_level=tax_level,
+        sales_item=sales_item,
+    )
+
+    pricing_data = load_pricing_data(reservation_unit_pks=[reservation_unit.pk])
+
+    with django_assert_num_queries(0):
+        result = build_price_lines_with_data(
+            pricing_data=pricing_data,
+            reservation_unit=reservation_unit,
+            price_option=None,
+            begin=local_datetime(2026, 3, 10, 10),
+            end=local_datetime(2026, 3, 10, 11),
+        )
+        line = result.lines[0]
+        assert line.sales_item == sales_item
+        assert line.tax_level == tax_level
+
+    assert line.tax_percentage == Decimal(24)
 
 
 # ── Set reservation price lines ──

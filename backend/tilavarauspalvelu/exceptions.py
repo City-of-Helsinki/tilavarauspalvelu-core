@@ -31,6 +31,10 @@ class PriceCalculationError(Exception):
     """Error when a price cannot be calculated for a reservation"""
 
 
+class ApplicationRoundPricingGroupsMixedError(PriceCalculationError):
+    """Error when only some reservation units of an application round have a pricing group"""
+
+
 class ReservableTimeSpanClientError(Exception):
     """Error in reservable time span client"""
 

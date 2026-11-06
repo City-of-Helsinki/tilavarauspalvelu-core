@@ -1,24 +1,34 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import graphene
+from django.db import models
+from django.db.models.functions import Coalesce
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import AnnotatedField, MultiField
+from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
+from query_optimizer.optimizer import QueryOptimizer
 
-from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
+from tilavarauspalvelu.api.graphql.types.price_option.types import PriceOptionNode
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, ReservationStateChoice, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import ReservationSeries
+from tilavarauspalvelu.models import (
+    AllocatedTimeSlot,
+    ApplicationSection,
+    PriceOption,
+    Reservation,
+    ReservationSeries,
+    ReservationUnitOption,
+)
 from utils.date_utils import local_date
 
 from .filtersets import ReservationSeriesFilterSet
 from .permissions import ReservationSeriesPermission
 
 if TYPE_CHECKING:
-    from django.db import models
-
     from tilavarauspalvelu.typing import GQLInfo, PindoraSeriesInfoData
 
 __all__ = [
@@ -72,6 +82,28 @@ class ReservationSeriesNode(DjangoNode):
         required=True,
     )
 
+    price = AnnotatedField(
+        graphene.Decimal,
+        expression=Coalesce(
+            models.Subquery(
+                Reservation.objects
+                .filter(
+                    reservation_series=models.OuterRef("pk"),
+                    state__in=ReservationStateChoice.states_going_to_occur,
+                )
+                .values("reservation_series")
+                .annotate(total=models.Sum("price"))
+                .values("total")[:1]
+            ),
+            models.Value(Decimal("0.00")),
+        ),
+        description="Sum of the prices of the reservations in the series that are going to occur.",
+    )
+    price_option = ManuallyOptimizedField(
+        PriceOptionNode,
+        description="Price option of the application section that the series was made for.",
+    )
+
     pindora_info = MultiField(
         PindoraSeriesInfoType,
         fields=["ext_uuid", "end_date"],
@@ -104,6 +136,8 @@ class ReservationSeriesNode(DjangoNode):
             "should_have_active_access_code",
             "access_type",
             "pindora_info",
+            "price",
+            "price_option",
         ]
         restricted_fields = {
             "name": lambda user, res: user.permissions.can_view_reservation_series(res),
@@ -112,6 +146,8 @@ class ReservationSeriesNode(DjangoNode):
             "allocated_time_slot": lambda user, res: user.permissions.can_view_reservation_series(res),
             "should_have_active_access_code": lambda user, res: user.permissions.can_view_reservation_series(res),
             "pindora_info": lambda user, res: user.permissions.can_view_reservation_series(res),
+            "price": lambda user, res: user.permissions.can_view_reservation_series(res),
+            "price_option": lambda user, res: user.permissions.can_view_reservation_series(res),
         }
         filterset_class = ReservationSeriesFilterSet
         permission_classes = [ReservationSeriesPermission]
@@ -125,6 +161,61 @@ class ReservationSeriesNode(DjangoNode):
         if not user.permissions.has_any_role():
             return queryset.filter(user=user)
         return queryset
+
+    @staticmethod
+    def optimize_price_option(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        optimizer.only_fields.append("allocated_time_slot")
+        allocation_optimizer = optimizer.get_or_set_child_optimizer(
+            name="allocated_time_slot",
+            optimizer=QueryOptimizer(
+                AllocatedTimeSlot,
+                optimizer.info,
+                name="allocated_time_slot",
+                parent=optimizer,
+            ),
+        )
+
+        allocation_optimizer.only_fields.append("reservation_unit_option")
+        option_optimizer = allocation_optimizer.get_or_set_child_optimizer(
+            name="reservation_unit_option",
+            optimizer=QueryOptimizer(
+                ReservationUnitOption,
+                optimizer.info,
+                name="reservation_unit_option",
+                parent=allocation_optimizer,
+            ),
+        )
+
+        option_optimizer.only_fields.append("application_section")
+        section_optimizer = option_optimizer.get_or_set_child_optimizer(
+            name="application_section",
+            optimizer=QueryOptimizer(
+                ApplicationSection,
+                optimizer.info,
+                name="application_section",
+                parent=option_optimizer,
+            ),
+        )
+
+        section_optimizer.only_fields.append("price_option")
+        price_option_optimizer = section_optimizer.get_or_set_child_optimizer(
+            name="price_option",
+            optimizer=QueryOptimizer(
+                PriceOption,
+                optimizer.info,
+                name="price_option",
+                parent=section_optimizer,
+            ),
+        )
+
+        # The field returns a whole price option node, so load every column.
+        price_option_optimizer.only_fields.extend(field.attname for field in PriceOption._meta.concrete_fields)
+        return queryset
+
+    def resolve_price_option(root: ReservationSeries, info: GQLInfo) -> PriceOption | None:
+        if root.allocated_time_slot is None:
+            return None
+        return root.allocated_time_slot.reservation_unit_option.application_section.price_option
 
     def resolve_pindora_info(root: ReservationSeries, info: GQLInfo) -> PindoraSeriesInfoData | None:
         # Not using access codes

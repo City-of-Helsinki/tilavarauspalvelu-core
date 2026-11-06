@@ -6,22 +6,24 @@ import math
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from django.db import models
-
 from tilavarauspalvelu.enums import PriceUnit
 from tilavarauspalvelu.exceptions import PriceCalculationError
-from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup
+from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup, TaxLevelRate
 from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
 from utils.decimal_utils import round_decimal
 
 if TYPE_CHECKING:
+    from collections.abc import Collection
+
     from tilavarauspalvelu.enums import PaymentType
-    from tilavarauspalvelu.models import PriceOption, ReservationUnit
+    from tilavarauspalvelu.models import PriceOption, ReservationUnit, TaxLevel
 
 __all__ = [
     "PriceCalculation",
     "PriceCalculationLine",
-    "calculate_price",
+    "PricingData",
+    "calculate_price_with_data",
+    "load_pricing_data",
 ]
 
 
@@ -41,8 +43,81 @@ class PriceCalculation:
     can_apply_for_discount: bool
 
 
-def calculate_price(
+@dataclasses.dataclass(frozen=True, slots=True)
+class PricingData:
+    """The pricing of a set of reservation units, so that their prices can be calculated without queries."""
+
+    pricing_group_rows: dict[int, list[ReservationUnitPricingGroup]]
+    """The pricing group rows of each reservation unit, from the latest to the earliest."""
+
+    components: dict[int, list[PriceComponent]]
+    """The price components of each pricing group, ordered by their start date."""
+
+    tax_rates: dict[int, list[TaxLevelRate]]
+    """The rates of each tax level, from the latest to the earliest."""
+
+    def pricing_group_row(self, *, reservation_unit_pk: int, on_date: datetime.date) -> ReservationUnitPricingGroup:
+        """
+        Return the pricing group row that the reservation unit uses on the given date.
+
+        :raises PriceCalculationError: If the reservation unit has no pricing group on the date.
+        """
+        for row in self.pricing_group_rows.get(reservation_unit_pk, []):
+            if row.begins <= on_date:
+                return row
+
+        msg = f"Reservation unit has no pricing group on {on_date.isoformat()}."
+        raise PriceCalculationError(msg)
+
+    def tax_percentage(self, *, tax_level: TaxLevel, on_date: datetime.date) -> Decimal:
+        """
+        Return the percentage of the rate of the tax level that is in effect on the given date.
+
+        :raises PriceCalculationError: If the tax level has no rate on the date.
+        """
+        for rate in self.tax_rates.get(tax_level.pk, []):
+            if rate.begins <= on_date:
+                return rate.percentage
+
+        msg = f"Tax level '{tax_level}' has no rate on {on_date.isoformat()}."
+        raise PriceCalculationError(msg)
+
+
+def load_pricing_data(*, reservation_unit_pks: Collection[int]) -> PricingData:
+    """Load the pricing of the given reservation units with a fixed number of queries."""
+    rows = list(
+        ReservationUnitPricingGroup.objects
+        .filter(reservation_unit__in=reservation_unit_pks)
+        .select_related("pricing_group")
+        .order_by("-begins")
+    )
+    pricing_group_rows: dict[int, list[ReservationUnitPricingGroup]] = {}
+    for row in rows:
+        pricing_group_rows.setdefault(row.reservation_unit_id, []).append(row)
+
+    pricing_group_pks = {row.pricing_group_id for row in rows}
+    component_list = list(
+        PriceComponent.objects
+        .filter(pricing_group__in=pricing_group_pks)
+        .select_related("tax_level", "sales_item")
+        .order_by("valid_from")
+    )
+    components: dict[int, list[PriceComponent]] = {}
+    for component in component_list:
+        components.setdefault(component.pricing_group_id, []).append(component)
+
+    tax_level_pks = {component.tax_level_id for component in component_list}
+    rate_list = list(TaxLevelRate.objects.filter(tax_level__in=tax_level_pks).order_by("-begins"))
+    tax_rates: dict[int, list[TaxLevelRate]] = {}
+    for rate in rate_list:
+        tax_rates.setdefault(rate.tax_level_id, []).append(rate)
+
+    return PricingData(pricing_group_rows=pricing_group_rows, components=components, tax_rates=tax_rates)
+
+
+def calculate_price_with_data(
     *,
+    pricing_data: PricingData,
     reservation_unit: ReservationUnit,
     price_option: PriceOption | None,
     begin: datetime.datetime,
@@ -50,6 +125,7 @@ def calculate_price(
 ) -> PriceCalculation:
     """
     Calculate the price of a reservation from the pricing group that the reservation unit uses on its start date.
+    The pricing comes from `pricing_data`, so this makes no queries.
 
     The reservation is walked through from its begin. Each step is priced by the component that is active
     on the date of the step's start:
@@ -72,27 +148,22 @@ def calculate_price(
         raise PriceCalculationError(msg)
 
     begin_date = begin.astimezone(DEFAULT_TIMEZONE).date()
-    reservation_unit_pricing_group = (
-        ReservationUnitPricingGroup.objects
-        .filter(reservation_unit=reservation_unit, begins__lte=begin_date)
-        .order_by("-begins")
-        .select_related("pricing_group")
-        .first()
+    reservation_unit_pricing_group = pricing_data.pricing_group_row(
+        reservation_unit_pk=reservation_unit.pk,
+        on_date=begin_date,
     )
-    if reservation_unit_pricing_group is None:
-        msg = f"Reservation unit has no pricing group on {begin_date.isoformat()}."
-        raise PriceCalculationError(msg)
 
     pricing_group = reservation_unit_pricing_group.pricing_group
     if price_option is not None and price_option.unit_group_id != pricing_group.unit_group_id:
         msg = "Price option does not belong to the unit group of the pricing group."
         raise PriceCalculationError(msg)
 
-    option_filter = models.Q(price_option__isnull=True)
-    if price_option is not None:
-        option_filter |= models.Q(price_option=price_option)
-
-    components = list(PriceComponent.objects.filter(option_filter, pricing_group=pricing_group).order_by("valid_from"))
+    price_option_pk = price_option.pk if price_option is not None else None
+    components = [
+        component
+        for component in pricing_data.components.get(pricing_group.pk, [])
+        if component.price_option_id is None or component.price_option_id == price_option_pk
+    ]
 
     # Same rounding as in the old pricing model (`ReservationUnitPricingActions.calculate_reservation_price`).
     duration_minutes = math.ceil((end - begin).total_seconds() / 60 / 15) * 15
