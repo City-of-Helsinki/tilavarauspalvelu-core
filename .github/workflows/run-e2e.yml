@@ -69,6 +69,9 @@ jobs:
       options: --user 1001
     defaults:
       run:
+        # In a container job, the default shell is sh. In the Playwright image, sh is dash.
+        # The steps use bash syntax, so set bash here.
+        shell: bash
         working-directory: e2e
     env:
       # report_summary.py prints times in Helsinki time, like the suite
