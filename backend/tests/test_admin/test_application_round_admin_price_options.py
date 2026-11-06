@@ -6,7 +6,6 @@ from typing import Any
 import pytest
 from django.urls import reverse
 
-from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 from tilavarauspalvelu.models import ApplicationRound
 
 from tests.factories import (
@@ -14,14 +13,12 @@ from tests.factories import (
     PriceComponentFactory,
     PriceOptionFactory,
     PricingGroupFactory,
-    ReservationPurposeFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
-    TermsOfUseFactory,
     UnitGroupFactory,
     UserFactory,
 )
-from tests.test_admin.helpers import collect_admin_form_errors
+from tests.test_admin.helpers import collect_admin_form_errors, round_form_data
 
 # Applied to all tests
 pytestmark = [
@@ -33,35 +30,6 @@ JAN_1 = datetime.date(2027, 1, 1)
 
 
 # ── Helpers ──
-
-
-def round_form_data(*, name: str, reservation_unit_pks: list[int]) -> dict[str, Any]:
-    terms_of_use = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.RECURRING)
-    purpose = ReservationPurposeFactory.create()
-    return {
-        "name_fi": name,
-        "name_en": "",
-        "name_sv": "",
-        "terms_of_use": terms_of_use.pk,
-        "purposes": [purpose.pk],
-        "reservation_units": reservation_unit_pks,
-        "application_period_begins_at_0": "2027-01-01",
-        "application_period_begins_at_1": "00:00:00",
-        "application_period_ends_at_0": "2027-02-01",
-        "application_period_ends_at_1": "00:00:00",
-        "reservation_period_begin_date": "2027-05-01",
-        "reservation_period_end_date": "2027-08-31",
-        "public_display_begins_at_0": "2027-01-01",
-        "public_display_begins_at_1": "00:00:00",
-        "public_display_ends_at_0": "2027-09-01",
-        "public_display_ends_at_1": "00:00:00",
-        "criteria_fi": "",
-        "criteria_en": "",
-        "criteria_sv": "",
-        "notes_when_applying_fi": "",
-        "notes_when_applying_en": "",
-        "notes_when_applying_sv": "",
-    }
 
 
 def create_unit_with_options(*options):

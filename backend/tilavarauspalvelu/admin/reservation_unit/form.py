@@ -422,6 +422,13 @@ class ReservationUnitAdminForm(forms.ModelForm):
         is_draft = cleaned_data.get("is_draft", False)
         reservation_kind = ReservationKind(cleaned_data["reservation_kind"])
 
+        if self.instance.pk is not None:
+            self.instance.validators.validate_not_removed_from_pending_application_rounds(
+                is_draft=is_draft,
+                is_archived=cleaned_data.get("is_archived", False),
+                reservation_kind=reservation_kind,
+            )
+
         if not is_draft and reservation_kind.allows_direct:
             cancellation_terms = cleaned_data.get("cancellation_terms")
             if not cancellation_terms:

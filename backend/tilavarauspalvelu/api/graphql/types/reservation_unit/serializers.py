@@ -168,6 +168,14 @@ class ReservationUnitSerializer(NestingModelSerializer):
         if self.instance is not None and "payment_type" in data:
             validate_sales_items_for_payment_type(reservation_unit=self.instance, payment_type=data["payment_type"])
 
+        if self.instance is not None:
+            reservation_kind = self.get_or_default("reservation_kind", data)
+            self.instance.validators.validate_not_removed_from_pending_application_rounds(
+                is_draft=is_draft,
+                is_archived=self.instance.is_archived,
+                reservation_kind=reservation_kind,
+            )
+
         if not is_draft:
             self._validate_for_publish(data)
 
@@ -558,6 +566,12 @@ class ReservationUnitArchiveSerializer(NestingModelSerializer):
         if future_reservations.exists():
             msg = "Reservation unit can't be archived if it has any reservations in the future"
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
+
+        self.instance.validators.validate_not_removed_from_pending_application_rounds(
+            is_draft=True,
+            is_archived=True,
+            reservation_kind=self.instance.reservation_kind,
+        )
 
         data["is_archived"] = True
 

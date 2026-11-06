@@ -5,9 +5,12 @@ from typing import Self
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models.functions import Coalesce
+from lookup_property import L
 
+from tilavarauspalvelu.enums import ApplicationRoundReservationCreationStatusChoice
 from tilavarauspalvelu.models import ApplicationRound, Unit
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from utils.date_utils import local_date
 
 __all__ = [
     "ApplicationRoundManager",
@@ -18,6 +21,14 @@ __all__ = [
 class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
     def active(self) -> Self:
         return self.filter(sent_at=None)
+
+    def reservations_pending(self) -> Self:
+        """Rounds whose reservations are not made yet."""
+        return (
+            self.exclude(L(reservation_creation_status=ApplicationRoundReservationCreationStatusChoice.COMPLETED))
+            # A handled round without allocations never becomes completed.
+            .exclude(reservation_period_end_date__lt=local_date())
+        )
 
     def _fetch_all(self) -> None:
         super()._fetch_all()

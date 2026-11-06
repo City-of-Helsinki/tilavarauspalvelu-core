@@ -11,6 +11,7 @@ from tinymce.widgets import TinyMCE
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
 from tilavarauspalvelu.services.pricing.application_round_options import check_application_round_change
+from utils.utils import only_django_validation_errors
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
@@ -46,6 +47,22 @@ class ApplicationRoundAdminForm(forms.ModelForm):
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
+
+        reservation_units = cleaned_data.get("reservation_units")
+        if reservation_units is not None:
+            saved_reservation_unit_pks: set[int] = set()
+            if self.instance.pk is not None:
+                saved_reservation_unit_pks = set(self.instance.reservation_units.values_list("pk", flat=True))
+
+            for reservation_unit in reservation_units:
+                if reservation_unit.pk in saved_reservation_unit_pks:
+                    continue
+
+                try:
+                    with only_django_validation_errors():
+                        reservation_unit.validators.validate_can_be_added_to_application_round()
+                except ValidationError as error:
+                    self.add_error("reservation_units", error)
 
         price_option_fields = {"reservation_units", "reservation_period_begin_date", "reservation_period_end_date"}
         if self.instance.pk is not None and not price_option_fields.intersection(self.changed_data):
