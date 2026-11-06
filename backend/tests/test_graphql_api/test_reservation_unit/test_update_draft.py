@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import pytest
 
 from tilavarauspalvelu.enums import (
@@ -12,9 +14,13 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.typing import error_codes
 from utils.auditlog_util import AuditLogger
+from utils.date_utils import local_date
 
 from tests.factories import (
+    PriceComponentFactory,
+    PricingGroupFactory,
     ReservationUnitFactory,
+    ReservationUnitPricingGroupFactory,
     ResourceFactory,
     SpaceFactory,
     TermsOfUseFactory,
@@ -338,9 +344,15 @@ def test_reservation_unit__update__publish(graphql):
         description_fi="foo",
         description_sv="foo",
         description_en="foo",
-        pricings__highest_price=20,
         access_types__access_type=AccessType.UNRESTRICTED,
     )
+    pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=local_date() - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=local_date() - datetime.timedelta(days=10))
     data = get_draft_update_input_data(reservation_unit, isDraft=False)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -350,7 +362,7 @@ def test_reservation_unit__update__publish(graphql):
     assert reservation_unit.is_draft is False
 
 
-def test_reservation_unit__update__publish__no_pricings_fails(graphql):
+def test_reservation_unit__update__publish__no_price(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(
@@ -363,10 +375,12 @@ def test_reservation_unit__update__publish__no_pricings_fails(graphql):
         description_fi="foo",
         description_sv="foo",
         description_en="foo",
-        pricings=[],
+        access_types__access_type=AccessType.UNRESTRICTED,
     )
     data = get_draft_update_input_data(reservation_unit, isDraft=False)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
-    assert response.has_errors is True, response
-    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_MISSING
+    assert response.field_error_codes() == [error_codes.RESERVATION_UNIT_MISSING_PRICE]
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_draft is True

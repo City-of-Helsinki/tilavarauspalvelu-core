@@ -155,7 +155,6 @@ class ReservationUnitNode(DjangoNode):
             "require_adult_reservee",
             "require_reservation_handling",
             "reservation_block_whole_day",
-            "can_apply_free_of_charge",
             #
             # Enums
             "authentication",
@@ -193,7 +192,6 @@ class ReservationUnitNode(DjangoNode):
             #
             # Reverse one-to-many related
             "images",
-            "pricings",
             "reservation_unit_pricing_groups",
             "access_types",
             "application_round_time_slots",

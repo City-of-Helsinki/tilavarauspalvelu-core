@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from decimal import Decimal
 
 import pytest
 from graphql_relay import to_global_id
@@ -140,7 +139,6 @@ def test_reservation_unit__query__all_fields(graphql):
         isArchived
         requireReservationHandling
         reservationBlockWholeDay
-        canApplyFreeOfCharge
 
         authentication
         reservationStartInterval
@@ -216,7 +214,6 @@ def test_reservation_unit__query__all_fields(graphql):
         "isArchived": reservation_unit.is_archived,
         "requireReservationHandling": reservation_unit.require_reservation_handling,
         "reservationBlockWholeDay": reservation_unit.reservation_block_whole_day,
-        "canApplyFreeOfCharge": reservation_unit.can_apply_free_of_charge,
         #
         "authentication": reservation_unit.authentication.upper(),
         "reservationStartInterval": reservation_unit.reservation_start_interval.upper(),
@@ -310,12 +307,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
 def test_reservation_unit__query__all_one_to_many_relations(graphql):
     fields = """
         pk
-        pricings {
-            begins
-            taxLevel {
-                currentPercentage
-            }
-        }
         images {
             largeUrl
         }
@@ -332,7 +323,6 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
     """
 
     reservation_unit = ReservationUnitFactory.create(
-        pricings__highest_price=20,
         images__large_url="https://example.com",
         application_round_time_slots__is_closed=False,
         access_types__begin_date=local_date(),
@@ -347,14 +337,6 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": reservation_unit.pk,
-        "pricings": [
-            {
-                "begins": reservation_unit.pricings.first().begins.isoformat(),
-                "taxLevel": {
-                    "currentPercentage": "25.50",
-                },
-            },
-        ],
         "images": [
             {
                 "largeUrl": reservation_unit.images.first().large_url,
@@ -423,61 +405,6 @@ def test_reservation_unit__query__images__image_url(graphql):
             {"imageUrl": "http://testserver/media/reservation_unit_images/3.jpg"},
         ],
     }
-
-
-def test_reservation_unit__query__pricings__net_prices(graphql):
-    fields = """
-        pricings {
-            lowestPriceNet
-            highestPriceNet
-        }
-    """
-
-    ReservationUnitFactory.create(
-        pricings__lowest_price=Decimal("12.55"),
-        pricings__highest_price=Decimal("25.10"),
-        pricings__tax_level__rates__percentage=Decimal("25.5"),
-    )
-
-    graphql.login_with_superuser()
-    query = reservation_units_query(fields=fields)
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert response.node(0) == {
-        "pricings": [
-            {
-                "lowestPriceNet": "10.00000000000000000000",
-                "highestPriceNet": "20.00000000000000000000",
-            },
-        ],
-    }
-
-
-def test_reservation_unit__query__pricings__net_prices__query_count(graphql):
-    fields = """
-        pricings {
-            lowestPriceNet
-            highestPriceNet
-        }
-    """
-
-    ReservationUnitFactory.create(pricings__tax_level__rates__percentage=Decimal("25.5"))
-
-    graphql.login_with_superuser()
-    query = reservation_units_query(fields=fields)
-    response_one_pricing = graphql(query)
-
-    assert response_one_pricing.has_errors is False, response_one_pricing.errors
-
-    ReservationUnitFactory.create(pricings__tax_level__rates__percentage=Decimal(24))
-    ReservationUnitFactory.create(pricings__tax_level__rates__percentage=Decimal(0))
-
-    response_three_pricings = graphql(query)
-
-    assert response_three_pricings.has_errors is False, response_three_pricings.errors
-    assert len(response_three_pricings.edges) == 3
-    assert len(response_three_pricings.queries) == len(response_one_pricing.queries), response_three_pricings.query_log
 
 
 def test_reservation_unit__query__all_many_to_many_relations(graphql):
