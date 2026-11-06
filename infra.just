@@ -144,8 +144,25 @@ oc-copy-from app env path dest=".": (oc-select env)
         echo "No running pod for '{{ app }}' in '{{ env }}'." >&2
         exit 1
     fi
+    echo "Using pod ${pod#pod/}" >&2
 
     oc rsync "${pod#pod/}:{{ path }}" "{{ dest }}"
+
+# Copy a local directory to a running pod of an app for an env
+oc-copy-to app env src path: (oc-select env)
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    deploymentconfig=$(just --justfile "{{ source_file() }}" _oc-deploymentconfig "{{ app }}")
+
+    pod=$(oc get pods -l deploymentconfig="${deploymentconfig}" --field-selector=status.phase=Running -o name | head -n 1)
+    if [ -z "${pod}" ]; then
+        echo "No running pod for '{{ app }}' in '{{ env }}'." >&2
+        exit 1
+    fi
+    echo "Using pod ${pod#pod/}" >&2
+
+    oc rsync "{{ src }}" "${pod#pod/}:{{ path }}"
 
 # Log in to Azure DevOps in the City of Helsinki tenant
 az-login:
