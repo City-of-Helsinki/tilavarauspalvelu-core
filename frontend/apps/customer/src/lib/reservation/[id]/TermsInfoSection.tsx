@@ -29,7 +29,7 @@ export function TermsInfoSection({
     if (!reservationUnit) {
       return false;
     }
-    const isFreeOfCharge = getReservationPriceDisplayFromLines(reservation, lang, false).total === 0;
+    const isFreeOfCharge = getReservationPriceDisplayFromLines(reservation, lang).total === 0;
     return reservation.applyingForFreeOfCharge || (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge);
   }, [reservation, reservationUnit, lang]);
   const paymentTermsContent =

@@ -47,8 +47,6 @@
     "maxReservationsPerUser_one": "only one booking at a time",
     "maxReservationsPerUser_other": "up to {{count}} bookings at a time"
   },
-  "futurePricingNotice": "<bold>The price will change on {{date}}. The new price is {{price}}</bold>.",
-  "futurePriceNoticeTax": "(incl. VAT {{tax}} %)",
   "notifications": {
     "notReservable": "This item is not available for booking at the moment.",
     "onlyRecurring": "Can only be booked seasonally",

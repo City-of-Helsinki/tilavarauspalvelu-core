@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import {
   addDays,
   addMinutes,
-  differenceInMinutes,
   getHours,
   getMinutes,
   isAfter,
@@ -12,44 +11,24 @@ import {
   startOfDay,
   sub,
 } from "date-fns";
-import { trim, uniq } from "lodash-es";
+import { uniq } from "lodash-es";
 import type { TFunction } from "i18next";
-import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import { getIntervalMinutes } from "@ui/modules/conversion";
-import { formatApiDate, parseApiDate, timeToMinutes } from "@ui/modules/date-utils";
-import { logError } from "@ui/modules/errors";
-import {
-  capitalize,
-  getTranslation,
-  dayMax,
-  dayMin,
-  filterNonNullable,
-  formatTimeStruct,
-  isPriceFree,
-} from "@ui/modules/helpers";
-import type { ReadonlyDeep } from "@ui/modules/helpers";
+import { parseApiDate, timeToMinutes } from "@ui/modules/date-utils";
+import { getTranslation, dayMax, dayMin, filterNonNullable, formatTimeStruct } from "@ui/modules/helpers";
 import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
-import {
-  PriceUnit,
-  ReservationKind,
-  ReservationStateChoice,
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-} from "@gql/gql-types";
+import { ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
 import type {
   AvailableTimesReservationUnitFieldsFragment,
   BlockingReservationFieldsFragment,
   EquipmentFieldsFragment,
   IsReservableFieldsFragment,
   NotReservableFieldsFragment,
-  PriceReservationUnitFieldsFragment,
-  PricingFieldsFragment,
-  ReservationPriceFieldsFragment,
   ReservationUnitAccessTypeNode,
   ReservationUnitNode,
   ReservationStartInterval,
 } from "@gql/gql-types";
-import { dateToKey, isRangeReservable, isSlotWithinReservationTime } from "@/modules/reservable";
+import { dateToKey, isRangeReservable } from "@/modules/reservable";
 import type { ReservableMap, RoundPeriod } from "@/modules/reservable";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {
@@ -132,255 +111,6 @@ export function getEquipmentList(
   );
 
   return sortedEquipment.map((n) => getTranslation(n, "name", lang));
-}
-
-function isActivePricing(pricing: PricingFieldsFragment): boolean {
-  const begins = parseApiDate(pricing.begins);
-  return begins != null && begins <= new Date();
-}
-
-function isFuturePricing(pricing: PricingFieldsFragment): boolean {
-  const begins = parseApiDate(pricing.begins);
-  return begins != null && begins > new Date();
-}
-
-export function getActivePricing(
-  reservationUnit: Readonly<{
-    pricings: Readonly<PricingFieldsFragment[]>;
-  }>
-): PricingFieldsFragment | undefined {
-  const { pricings } = reservationUnit;
-  return pricings.find((pricing) => isActivePricing(pricing));
-}
-
-/// The price lines of a reservation have no material price description, so it comes from the active pricing
-export function hasMaterialPrice(reservationUnit: Readonly<{ pricings: Readonly<PricingFieldsFragment[]> }>): boolean {
-  return Boolean(getActivePricing(reservationUnit)?.materialPriceDescriptionFi);
-}
-
-export const RESERVATION_UNIT_PRICE_FRAGMENT = gql`
-  fragment PriceReservationUnitFields on ReservationUnitNode {
-    id
-    pricings {
-      ...PricingFields
-    }
-    reservationBeginsAt
-    reservationEndsAt
-  }
-`;
-
-export function getFuturePricing(
-  reservationUnit: PriceReservationUnitFieldsFragment,
-  applicationRounds: ReadonlyDeep<RoundPeriod[]> = [],
-  reservationDate?: Readonly<Date>
-): PricingFieldsFragment | null {
-  if (!reservationUnit) {
-    return null;
-  }
-  const { pricings, reservationBeginsAt, reservationEndsAt } = reservationUnit;
-
-  if (!pricings || pricings.length === 0) {
-    return null;
-  }
-
-  const begin = reservationBeginsAt ? new Date(reservationBeginsAt) : undefined;
-  const end = reservationEndsAt ? new Date(reservationEndsAt) : undefined;
-
-  const futurePricings = pricings
-    .filter((p) => isFuturePricing(p))
-    .filter((fp) => {
-      const fpBegin = parseApiDate(fp.begins);
-      if (fpBegin == null) {
-        return false;
-      }
-      return isSlotWithinReservationTime({
-        start: fpBegin,
-        reservationBeginsAt: begin,
-        reservationEndsAt: end,
-      });
-    })
-    .filter((futurePricing) => {
-      return !applicationRounds.some((applicationRound) => {
-        const { reservationPeriodBeginDate, reservationPeriodEndDate } = applicationRound;
-        if (!reservationPeriodBeginDate || !reservationPeriodEndDate) {
-          return false;
-        }
-        const begins = parseApiDate(futurePricing.begins);
-        const periodStart = parseApiDate(reservationPeriodBeginDate);
-        const periodEnd = parseApiDate(reservationPeriodEndDate);
-        if (begins == null || periodStart == null || periodEnd == null) {
-          return false;
-        }
-        return begins >= periodStart && begins <= periodEnd;
-      });
-    })
-    .sort((a, b) => (a.begins > b.begins ? 1 : -1));
-
-  if (futurePricings.length === 0) {
-    return null;
-  }
-
-  return reservationDate
-    ? (futurePricings.reverse().find((n) => {
-        const apiDate = formatApiDate(new Date(reservationDate));
-        return apiDate ? n.begins <= apiDate : false;
-      }) ?? null)
-    : (futurePricings[0] ?? null);
-}
-
-function formatPrice(price: number, toCurrency?: boolean): string {
-  const enableDecimals = price !== 0;
-  const currencyFormatter = enableDecimals ? "currencyWithDecimals" : "currency";
-  const floatFormatter = enableDecimals ? "twoDecimal" : "strippedDecimal";
-  const formatters = getFormatters("fi");
-  const formatter = formatters[toCurrency ? currencyFormatter : floatFormatter];
-  return formatter?.format(price) ?? "";
-}
-
-export type GetPriceType = {
-  t: TFunction;
-  pricing: PricingFieldsFragment;
-  minutes?: number; // additional minutes for total price calculation
-};
-
-function getReservationVolume(minutes: number, unit: PriceUnit): number {
-  if (!minutes) {
-    return 1;
-  }
-
-  return getUnRoundedReservationVolume(minutes, unit);
-}
-
-export function getPriceString(props: GetPriceType): string {
-  const { t, pricing, minutes = 0 } = props;
-
-  if (isPriceFree(pricing)) {
-    if (pricing.materialPriceDescriptionFi !== "") {
-      return capitalize(t("prices:materialPrice"));
-    }
-    return t("prices:priceFree") ?? "0";
-  }
-
-  const volume = getReservationVolume(minutes, pricing.priceUnit);
-  const highestPrice = Number.parseFloat(pricing.highestPrice) * volume;
-  const lowestPrice = Number.parseFloat(pricing.lowestPrice) * volume;
-  const priceString =
-    lowestPrice === highestPrice
-      ? formatPrice(lowestPrice, true)
-      : `${formatPrice(lowestPrice)} - ${formatPrice(highestPrice, true)}`;
-  const unitString =
-    pricing.priceUnit === PriceUnit.Fixed || minutes ? "" : t(`prices:priceUnits.${pricing.priceUnit.toUpperCase()}`);
-  const returnPriceString = trim(`${priceString} / ${unitString}`, " / ");
-  const materialPriceDescription = pricing.materialPriceDescriptionFi ? ` + ${t("prices:materialPrice")}` : "";
-  return `${returnPriceString}${materialPriceDescription}`;
-}
-
-export type GetReservationUnitPriceProps = {
-  t: TFunction;
-  reservationUnit: ReadonlyDeep<PriceReservationUnitFieldsFragment>;
-  pricingDate: Date;
-  minutes?: number;
-};
-
-export function getReservationUnitPrice(props: GetReservationUnitPriceProps): string | null {
-  const { t, reservationUnit: ru, pricingDate, minutes } = props;
-  if (Number.isNaN(pricingDate.getTime())) {
-    logError(`Invalid pricing date ${JSON.stringify(props)}`);
-    return null;
-  }
-
-  // The price comes from the pricing on the reservation date. A VAT change does not change the pricing.
-  const pricing = getFuturePricing(ru, [], pricingDate) ?? getActivePricing(ru);
-  if (pricing == null) {
-    return null;
-  }
-
-  return getPriceString({
-    t,
-    pricing,
-    minutes,
-  });
-}
-
-export const RESERVATION_PRICE_FRAGMENT = gql`
-  fragment ReservationPriceFields on ReservationNode {
-    id
-    reservationUnit {
-      ...PriceReservationUnitFields
-    }
-    price
-    state
-    beginsAt
-    endsAt
-    applyingForFreeOfCharge
-    appliedPricing {
-      highestPrice
-      taxPercentage
-    }
-  }
-`;
-
-export function getPrice(
-  t: TFunction,
-  reservation: ReservationPriceFieldsFragment,
-  lang: LocalizationLanguages,
-  reservationUnitPriceOnly = false
-): string | null {
-  const reservationUnit = reservation.reservationUnit;
-  const begin = new Date(reservation.beginsAt);
-  const end = new Date(reservation.endsAt);
-  const minutes = differenceInMinutes(end, begin);
-
-  const subventionState = getSubventionState(reservation);
-  const showReservationUnitPrice = reservationUnitPriceOnly || subventionState === "pending";
-
-  if (showReservationUnitPrice && reservationUnit) {
-    return getReservationUnitPrice({
-      t,
-      reservationUnit,
-      pricingDate: begin,
-      minutes,
-    });
-  }
-  const showOnlyMaterialPrice =
-    Number(reservation.price) === 0 && getActivePricing(reservation.reservationUnit)?.materialPriceDescriptionFi;
-  if (showOnlyMaterialPrice) {
-    return capitalize(t("prices:materialPrice"));
-  }
-  const reservationPrice = getReservationPrice(reservation.price, t("prices:priceFree"), true, lang);
-  const materialPriceDescription = getActivePricing(reservation.reservationUnit)?.materialPriceDescriptionFi
-    ? ` + ${t("prices:materialPrice")}`
-    : "";
-  return `${reservationPrice}${materialPriceDescription}`;
-}
-
-function getSubventionState(
-  reservation: Pick<ReservationPriceFieldsFragment, "applyingForFreeOfCharge" | "state">
-): "pending" | "none" | "done" {
-  if (reservation.applyingForFreeOfCharge && reservation.state === ReservationStateChoice.RequiresHandling) {
-    return "pending";
-  }
-  if (!reservation.applyingForFreeOfCharge) {
-    return "none";
-  }
-  return "done";
-}
-
-export function isReservationUnitFreeOfCharge(pricings: Readonly<PricingFieldsFragment[]>, date?: Date): boolean {
-  return !isReservationUnitPaid(pricings, date);
-}
-
-export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]>, date?: Date): boolean {
-  const active = pricings.filter((p) => isActivePricing(p));
-  const future = pricings.filter((p) => isFuturePricing(p));
-  const d =
-    date == null
-      ? active
-      : [...active, ...future].filter((p) => {
-          const start = parseApiDate(p.begins);
-          return start != null && start <= date;
-        });
-  return d.some((p) => !isPriceFree(p));
 }
 
 /// Returns true if the given time is 'inside' the time span

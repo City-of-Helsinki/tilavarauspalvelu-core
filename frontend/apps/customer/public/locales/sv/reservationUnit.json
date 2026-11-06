@@ -47,8 +47,6 @@
     "maxReservationsPerUser_one": "högst en bokning i taget",
     "maxReservationsPerUser_other": "högst {{count}} bokningar i taget"
   },
-  "futurePricingNotice": "<bold>Priset ändras från och med {{date}}. Det nya priset är {{price}}</bold>.",
-  "futurePriceNoticeTax": "(inkl. moms {{tax}} %)",
   "notifications": {
     "notReservable": "Objektet går inte att boka just nu.",
     "onlyRecurring": "Kan bokas endast säsongsbokning",
