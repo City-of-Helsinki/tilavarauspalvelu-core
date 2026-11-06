@@ -49,6 +49,7 @@ export const MYBOOKINGS_STATUS_CONFIRMED = "Hyväksytty";
 export const MYBOOKINGS_STATUS_REJECTED = "Hylätty";
 export const MYBOOKINGS_STATUS_REFUNDED = "Maksu palautettu";
 export const MYBOOKINGS_STATUS_PROCESSED = "Käsiteltävänä";
+// Also the toast that the reservation's page shows after a cancellation
 export const MYBOOKINGS_STATUS_CANCELED = "Varauksesi on peruttu!";
 export const IN_RESERVATIONS_STATUS_CANCELED = "Peruttu";
 export const MYBOOKINGS_STATUS_PAID_CONFIRMED = "Maksettu";
@@ -89,6 +90,12 @@ export const ADMIN_BEHALF_PHONE_FI = "9876543210";
 export const ADMIN_REASON_REJECTED = "Varaus on peruttu pyynnöstäsi";
 export const RESERVATION_TIME_NOT_FREE = "Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika.";
 export const RESERVATION_STATUS_DIALOG = "Palauta käsiteltäväksi";
+// The toasts that the admin UI shows after an action
+export const ADMIN_TOAST_APPROVED = "Varaus hyväksytty.";
+export const ADMIN_TOAST_REJECTED = "Varaus hylätty";
+export const ADMIN_TOAST_RETURNED_TO_HANDLING = "Varaus palautettu käsiteltäväksi";
+export const ADMIN_TOAST_NEW_TIME_SAVED = "Uusi aika tallennettu";
+export const ADMIN_TOAST_ACCESS_CODE_CHANGED = "Ovikoodi vaihdettu";
 export const CONFIRMATION_AND_RECEIPT_TEXT_IN_MAIL = "Tilausvahvistus ja kuitti";
 export const CONFIRMATION_TEXT_IN_MAIL = "Olet tehnyt uuden varauksen.";
 export const CANCELLATION_TEXT_IN_MAIL = "Varauksesi on peruttu";

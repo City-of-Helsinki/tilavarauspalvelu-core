@@ -4,6 +4,10 @@ import { PageObject } from "../../page-object";
 import {
   ADMIN_REASON_REJECTED,
   ADMIN_STATUS_PROCESSED,
+  ADMIN_TOAST_ACCESS_CODE_CHANGED,
+  ADMIN_TOAST_APPROVED,
+  ADMIN_TOAST_REJECTED,
+  ADMIN_TOAST_RETURNED_TO_HANDLING,
   DEFAULT_PRICE_ALWAYS_REQUESTED_UNIT,
   MYBOOKINGS_STATUS_CONFIRMED,
   MYBOOKINGS_STATUS_REJECTED,
@@ -44,6 +48,7 @@ export class AppAdmin extends PageObject {
     await this.pages.adminReservations.adminClicksButtonInReservationPage(
       this.page.getByTestId("approval-dialog__accept-button")
     );
+    await this.pages.popups.checkAndCloseTheToast(ADMIN_TOAST_APPROVED);
     // The checks wait until the payment status is updated
     await this.pages.adminReservations.adminChecksReservationInfoAfterHandling(
       SINGLEBOOKING_NO_PAYMENT_ADMIN_SIDE,
@@ -92,6 +97,7 @@ export class AppAdmin extends PageObject {
       .locator("#info-dialog")
       .getByRole("button", { name: RESERVATION_STATUS_DIALOG, exact: true })
       .click();
+    await this.pages.popups.checkAndCloseTheToast(ADMIN_TOAST_RETURNED_TO_HANDLING);
     await this.pages.adminReservations.adminChecksReservationStatus(ADMIN_STATUS_PROCESSED);
   }
 
@@ -151,6 +157,7 @@ export class AppAdmin extends PageObject {
   async adminChangesAccessCode() {
     await this.pages.adminReservations.adminChangesAccessCode();
     await this.pages.adminReservations.adminClicksConfirmAccessCodeButton();
+    await this.pages.popups.checkAndCloseTheToast(ADMIN_TOAST_ACCESS_CODE_CHANGED);
     // Admin Checks Access Code Does Not Match waits until the access code has changed
     await expect(this.page.getByTestId("reservation__info--Ovikoodi")).toBeVisible();
   }
@@ -386,6 +393,7 @@ export class AppAdmin extends PageObject {
     await this.page.getByTestId("approval-buttons__reject-button").last().click();
     await this.pages.adminReservations.adminSelectsReasonForRejection(ADMIN_REASON_REJECTED);
     await this.page.getByTestId("deny-dialog__deny-button").click();
+    await this.pages.popups.checkAndCloseTheToast(ADMIN_TOAST_REJECTED);
     await this.pages.adminReservations.adminChecksReservationStatus(MYBOOKINGS_STATUS_REJECTED);
   }
 

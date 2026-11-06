@@ -98,7 +98,7 @@ async function siteAnswers(api: APIRequestContext): Promise<boolean> {
 }
 
 /**
- * Waits until the site has answered normally three times in a row, 5 s apart, for at most 2 minutes, so that the tests
+ * Waits until the site has answered normally three times in a row, 2 s apart, for at most 2 minutes, so that the tests
  * don't start while the backend still fails after the data creation (a 502, the customer app's error page). After
  * 2 minutes the tests start anyway, with a warning.
  */
@@ -112,7 +112,7 @@ async function waitUntilTheSiteAnswers(api: APIRequestContext): Promise<void> {
             answers_in_a_row = (await siteAnswers(api)) ? answers_in_a_row + 1 : 0;
             return answers_in_a_row;
           },
-          { intervals: [5000], timeout: 120_000 }
+          { intervals: [2000], timeout: 120_000 }
         )
         .toBeGreaterThanOrEqual(3);
       await log("The site answers normally");
@@ -182,7 +182,8 @@ export class CreateData extends PageObject {
                   const pk = await freeUnitPk(api);
                   return pk != null && pk !== old_pk;
                 },
-                { intervals: [10_000], timeout: 300_000 }
+                // Every 2 s: the backend usually has the data ready within seconds
+                { intervals: [2000], timeout: 300_000 }
               )
               .toBe(true);
           } catch {

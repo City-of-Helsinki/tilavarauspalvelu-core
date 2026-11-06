@@ -6,6 +6,7 @@ import { BASIC_ADMIN_MALE } from "../../Resources/serial_users";
 import {
   ADMIN_BEHALF_FIRSTNAME_FI,
   ADMIN_BEHALF_PHONE_FI,
+  ADMIN_TOAST_NEW_TIME_SAVED,
   CALENDAR_CHANGE_TIME_FI,
   JUSTIFICATION_FOR_SUBVENTION,
   PREFIX_RESERVATIONS_BY_ADMIN_BEHALF_FI,
@@ -410,6 +411,7 @@ export class AdminReservations extends PageObject {
     await submit.click();
     // Saving the new time closes the dialog
     await expect(this.page.locator("#info-dialog")).toBeHidden({ timeout: 15_000 });
+    await this.pages.popups.checkAndCloseTheToast(ADMIN_TOAST_NEW_TIME_SAVED);
 
     // Not currently in use
     // This was used to navigate to reservations through calendar view
