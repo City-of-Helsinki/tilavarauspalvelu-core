@@ -51,12 +51,12 @@ that a new maintainer can read. When a pattern exists to survive a scale this se
 
 ## Conditional
 
-- [`Glossary`](GLOSSARY.md). Read before you name a thing, or write text a user reads - especially when regarding 
-  calendar. 
-  Keep to the words in it.
 - [`Backend architecture`](.agents/docs/backend-architecture.md). Read if you need to understand the code under `backend/`.
 - [`Backend code style`](.agents/docs/backend-code-style.md). Read before writing or editing code under `backend/`.
 - [`Backend testing`](.agents/docs/backend-testing.md). Read before writing or editing tests under `backend/tests/`.
 - [`Backend ORM`](.agents/docs/backend-orm.md). Read before writing or editing code under `backend/` that reaches the database.
-- [`Frontend architecture`](.agents/docs/frontend-code-style.md). Read if you need to understand the code under 
-  `frontend/`.
+- [`Frontend architecture`](.agents/docs/frontend-architecture.md). Read if you need to understand the code under `frontend/`.
+- [`Frontend code style`](.agents/docs/frontend-code-style.md). Read before writing or editing code under `frontend/`.
+- [`Frontend testing`](.agents/docs/frontend-testing.md). Read before writing or editing tests under `frontend/`.
+- [`Frontend glossary`](.agents/docs/frontend-glossary.md). Read before naming things under or writing text
+  that reaches the user interface in `frontend/`.
