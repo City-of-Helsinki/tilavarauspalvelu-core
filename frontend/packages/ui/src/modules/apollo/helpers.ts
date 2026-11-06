@@ -254,9 +254,12 @@ function getExtensionCode(e: GraphQLFormattedError): string | null {
 /// for example while the user was in the login.
 /// RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED: the user has the maximum number of reservations
 /// for the reservation unit. The UI cannot check this before the login.
+/// USER_NOT_INTERNAL_USER: the user signed in with a City employee (AD) account that is not
+/// an internal account, for example a guest account. Such an account cannot make reservations.
 const EXPECTED_VALIDATION_CODES = new Set([
   "OVERLAPPING_RESERVATIONS",
   "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED",
+  "USER_NOT_INTERNAL_USER",
 ]);
 
 function isExpectedError(error: QueryErrorT): boolean {
