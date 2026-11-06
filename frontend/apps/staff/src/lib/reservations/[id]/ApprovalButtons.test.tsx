@@ -34,6 +34,7 @@ function createInput({
     handlingDetails: null,
     applyingForFreeOfCharge: false,
     freeOfChargeReason: null,
+    priceLines: [],
     appliedPricing: null,
   };
 }
