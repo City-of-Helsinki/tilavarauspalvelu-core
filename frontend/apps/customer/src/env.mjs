@@ -38,8 +38,6 @@ const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string().optional(),
   NEXT_PUBLIC_SOURCE_BRANCH_NAME: z.string().optional(),
   NEXT_PUBLIC_SOURCE_VERSION: z.string().optional(),
-  // Local development only. Keep it empty on the server environments. See getBrowserApiBaseUrl in ui.
-  NEXT_PUBLIC_LOCAL_API_URL: optionalUrl,
 });
 
 // Public settings that are read at runtime, so the same image runs in all environments.
@@ -84,7 +82,6 @@ function createEnv() {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_SOURCE_BRANCH_NAME: process.env.NEXT_PUBLIC_SOURCE_BRANCH_NAME,
     NEXT_PUBLIC_SOURCE_VERSION: process.env.NEXT_PUBLIC_SOURCE_VERSION,
-    NEXT_PUBLIC_LOCAL_API_URL: process.env.NEXT_PUBLIC_LOCAL_API_URL,
   });
 
   if (!clientConfig.success) {
@@ -96,14 +93,6 @@ function createEnv() {
   if (!runtimeConfig.success) {
     // eslint-disable-next-line no-console
     console.error("Runtime env validation failed", runtimeConfig.error);
-  }
-
-  if (isServer && process.env.NODE_ENV === "development" && !process.env.NEXT_PUBLIC_LOCAL_API_URL) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      "NEXT_PUBLIC_LOCAL_API_URL is not set. The browser sends its backend requests to its own origin, " +
-        "which works only behind a gateway. See .env.example."
-    );
   }
 
   return {

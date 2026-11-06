@@ -1,4 +1,6 @@
 import type { IncomingHttpHeaders } from "node:http";
+import { z } from "zod";
+import { InvalidEnvError } from "./errors";
 
 export type UserTypeChoice = "customer" | "admin";
 export type LocalizationLanguages = "fi" | "sv" | "en";
@@ -39,13 +41,34 @@ export function getClientOrigin(headers: Headers | IncomingHttpHeaders, requestP
   return `${proto}://${host}`;
 }
 
+// z.url() accepts "localhost:8000" with "localhost" as the protocol, so allow only http and https.
+// z.httpUrl() is not enough, because it rejects "localhost" as a host.
+const LocalApiUrlSchema = z.union([z.literal(""), z.url({ protocol: /^https?$/ })]);
+
 /// Returns the base url of the backend for the urls that the browser uses, for example "http://localhost:8000".
 /// It is empty on the server environments. There the gateway puts the backend on the same origin, so the urls are paths.
 /// Local development sets NEXT_PUBLIC_LOCAL_API_URL, because the backend runs on another port.
 /// Next.js writes the value into the build, also for the proxy and the server side rendering.
 /// The server side requests to the backend use TILAVARAUS_API_URL.
+/// Throws if the value is not a url, so a wrong local setting fails at once.
 export function getBrowserApiBaseUrl(): string {
-  return removeTrailingSlash(process.env.NEXT_PUBLIC_LOCAL_API_URL ?? "");
+  const value = process.env.NEXT_PUBLIC_LOCAL_API_URL ?? "";
+  if (!LocalApiUrlSchema.safeParse(value).success) {
+    throw new InvalidEnvError(`NEXT_PUBLIC_LOCAL_API_URL must be a url or empty, not "${value}"`);
+  }
+  return removeTrailingSlash(value);
+}
+
+/// Server only. Call it once when the server starts, from register() in instrumentation.ts.
+/// Without NEXT_PUBLIC_LOCAL_API_URL, local backend requests from the browser work only behind a gateway.
+export function warnIfLocalApiUrlMissing(): void {
+  if (process.env.NODE_ENV === "development" && !process.env.NEXT_PUBLIC_LOCAL_API_URL) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "NEXT_PUBLIC_LOCAL_API_URL is not set. The browser sends its backend requests to its own origin, " +
+        "which works only behind a gateway. See .env.example."
+    );
+  }
 }
 
 const AUTH_PATH = "/helauth/";

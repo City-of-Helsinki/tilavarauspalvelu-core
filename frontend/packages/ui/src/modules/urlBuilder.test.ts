@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getBrowserApiBaseUrl, getClientOrigin, getSignInUrl, getSignOutUrl } from "./urlBuilder";
+import { InvalidEnvError } from "./errors";
+import {
+  getBrowserApiBaseUrl,
+  getClientOrigin,
+  getSignInUrl,
+  getSignOutUrl,
+  warnIfLocalApiUrlMissing,
+} from "./urlBuilder";
 
 beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
@@ -7,6 +14,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 
 describe("getBrowserApiBaseUrl", () => {
@@ -17,6 +25,35 @@ describe("getBrowserApiBaseUrl", () => {
   it("returns NEXT_PUBLIC_LOCAL_API_URL without a trailing slash", () => {
     vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://localhost:8000/");
     expect(getBrowserApiBaseUrl()).toBe("http://localhost:8000");
+  });
+
+  it("throws if NEXT_PUBLIC_LOCAL_API_URL is not a url", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "localhost:8000");
+    expect(() => getBrowserApiBaseUrl()).toThrow(InvalidEnvError);
+  });
+});
+
+describe("warnIfLocalApiUrlMissing", () => {
+  it("warns in development without NEXT_PUBLIC_LOCAL_API_URL", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    warnIfLocalApiUrlMissing();
+    expect(warn).toHaveBeenCalledOnce();
+  });
+
+  it("does not warn with NEXT_PUBLIC_LOCAL_API_URL", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://localhost:8000");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    warnIfLocalApiUrlMissing();
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("does not warn in production, where the value is empty", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    warnIfLocalApiUrlMissing();
+    expect(warn).not.toHaveBeenCalled();
   });
 });
 
