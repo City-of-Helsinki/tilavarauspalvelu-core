@@ -8,6 +8,10 @@ from django.db import connection
 from django.template.response import TemplateResponse
 from django.test.utils import CaptureQueriesContext
 
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+
+from tests.factories import ReservationPurposeFactory, TermsOfUseFactory
+
 if TYPE_CHECKING:
     from collections.abc import Generator
 
@@ -68,6 +72,35 @@ def required_reservation_unit_form_data(reservation_unit: ReservationUnit) -> di
         **management_form_data("pricings"),
         **management_form_data("application_round_time_slots"),
         **management_form_data("access_types"),
+    }
+
+
+def round_form_data(*, name: str, reservation_unit_pks: list[int]) -> dict[str, Any]:
+    terms_of_use = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.RECURRING)
+    purpose = ReservationPurposeFactory.create()
+    return {
+        "name_fi": name,
+        "name_en": "",
+        "name_sv": "",
+        "terms_of_use": terms_of_use.pk,
+        "purposes": [purpose.pk],
+        "reservation_units": reservation_unit_pks,
+        "application_period_begins_at_0": "2027-01-01",
+        "application_period_begins_at_1": "00:00:00",
+        "application_period_ends_at_0": "2027-02-01",
+        "application_period_ends_at_1": "00:00:00",
+        "reservation_period_begin_date": "2027-05-01",
+        "reservation_period_end_date": "2027-08-31",
+        "public_display_begins_at_0": "2027-01-01",
+        "public_display_begins_at_1": "00:00:00",
+        "public_display_ends_at_0": "2027-09-01",
+        "public_display_ends_at_1": "00:00:00",
+        "criteria_fi": "",
+        "criteria_en": "",
+        "criteria_sv": "",
+        "notes_when_applying_fi": "",
+        "notes_when_applying_en": "",
+        "notes_when_applying_sv": "",
     }
 
 
