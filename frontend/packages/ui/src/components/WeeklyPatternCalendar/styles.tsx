@@ -22,12 +22,12 @@ export const arrow = css`
 
 // The fill (background and text colour) applies to every cell of a run. The arrow indicator
 // is split out separately so it can be restricted to just the first cell of a run.
-const primaryFill = css`
+export const primaryFill = css`
   background: var(--color-bus);
   color: var(--color-white);
 `;
 
-const secondaryFill = css`
+export const secondaryFill = css`
   background: var(--color-engel);
   color: var(--color-black);
 `;
@@ -114,7 +114,7 @@ export const WeeklyPatternRoot = styled.div`
   overflow-x: auto;
   height: var(--weekly-pattern-height, auto);
 
-  /* 
+  /*
     The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
     Keeps every day column at least as wide as the original per-cell min-width.
     The container's overflow-x: auto scrolls instead of squeezing columns too thin.

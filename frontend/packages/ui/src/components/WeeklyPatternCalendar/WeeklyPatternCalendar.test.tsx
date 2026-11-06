@@ -138,6 +138,36 @@ describe("WeeklyPatternCalendar", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Too short");
   });
 
+  test("a sweep over an already painted cell validates and announces each changed run alone", async () => {
+    const isValidSelection = vi.fn(() => null);
+    const user = userEvent.setup();
+    render(
+      <Harness
+        initial={[{ weekday: Weekday.Monday, beginMinutes: 510, endMinutes: 540, data: primary }]}
+        isValidSelection={isValidSelection}
+      />
+    );
+
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
+    await user.keyboard("{Shift>}{ArrowDown}{ArrowDown}{/Shift}");
+    expect(isValidSelection).toHaveBeenLastCalledWith({
+      weekday: Weekday.Monday,
+      beginMinutes: 540,
+      endMinutes: 570,
+      data: primary,
+    });
+    expect(isValidSelection).toHaveBeenCalledWith({
+      weekday: Weekday.Monday,
+      beginMinutes: 480,
+      endMinutes: 510,
+      data: primary,
+    });
+    expect(isValidSelection).not.toHaveBeenCalledWith(expect.objectContaining({ beginMinutes: 480, endMinutes: 570 }));
+    expect(screen.getByRole("status").textContent?.trim()).toBe(
+      "Added: common:weekdayLongEnum.MONDAY, 08:00–08:30, common:weekdayLongEnum.MONDAY, 09:00–09:30"
+    );
+  });
+
   test("saved times in closed cells stay visible and can be erased", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
@@ -218,6 +248,31 @@ describe("WeeklyPatternCalendar", () => {
       expect(onChange).toHaveBeenLastCalledWith([
         { weekday: Weekday.Wednesday, beginMinutes: 510, endMinutes: 540, data: primary },
       ]);
+    });
+
+    test("a drag across an unavailable cell validates and announces the cells on each side alone", async () => {
+      // Thursday 08:30 to 09:00 is unavailable, between two paintable cells.
+      const withGap = [
+        { weekday: Weekday.Thursday, beginMinutes: 480, endMinutes: 510 },
+        { weekday: Weekday.Thursday, beginMinutes: 540, endMinutes: 570 },
+      ];
+      const isValidSelection = vi.fn(() => null);
+      const user = userEvent.setup();
+      render(<Harness paintable={withGap} getStateLabel={label} isValidSelection={isValidSelection} />);
+
+      await user.pointer([
+        { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.THURSDAY, 08:00–08:30/) },
+        { target: cell(/^common:weekdayLongEnum.THURSDAY, 08:30–09:00/) },
+        { target: cell(/^common:weekdayLongEnum.THURSDAY, 09:00–09:30/) },
+        { keys: "[/MouseLeft]" },
+      ]);
+      expect(isValidSelection.mock.calls).toEqual([
+        [{ weekday: Weekday.Thursday, beginMinutes: 480, endMinutes: 510, data: primary }],
+        [{ weekday: Weekday.Thursday, beginMinutes: 540, endMinutes: 570, data: primary }],
+      ]);
+      expect(screen.getByRole("status").textContent?.trim()).toBe(
+        "Added: common:weekdayLongEnum.THURSDAY, 08:00–08:30, common:weekdayLongEnum.THURSDAY, 09:00–09:30"
+      );
     });
   });
 

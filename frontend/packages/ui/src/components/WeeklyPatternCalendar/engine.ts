@@ -214,3 +214,33 @@ export function paintRange<TData>(
   }
   return next ? { ...grid, [weekday]: next } : grid;
 }
+
+/** An inclusive range of cell indexes. */
+export type CellRun = { first: number; last: number };
+
+/**
+ * The contiguous runs of cells between `first` and `last` that differ between `before` and `after`.
+ * Compares by reference, because `paintRange` keeps the existing object in every cell it skips.
+ */
+export function changedRuns<TData>(
+  before: DayCells<TData>,
+  after: DayCells<TData>,
+  first: number,
+  last: number
+): CellRun[] {
+  const runs: CellRun[] = [];
+  let open: CellRun | null = null;
+  for (let index = first; index <= last; index++) {
+    if (before[index] === after[index]) {
+      open = null;
+      continue;
+    }
+    if (open) {
+      open.last = index;
+    } else {
+      open = { first: index, last: index };
+      runs.push(open);
+    }
+  }
+  return runs;
+}

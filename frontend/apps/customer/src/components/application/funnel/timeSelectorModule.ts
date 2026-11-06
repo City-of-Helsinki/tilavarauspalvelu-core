@@ -12,8 +12,6 @@ import type { ReservableTimeSlots, SuitableTimeData } from "ui/src/modules/suita
 import type { Priority, Weekday } from "@gql/gql-types";
 import type { SuitableTimeRangeFormValues } from "./form";
 
-export type DailyOpeningHours = ReservableTimeSlots;
-
 export type TimeRangeInput = { weekday: Weekday; beginMinutes: number; endMinutes: number; priority: Priority };
 
 // The saved ranges as the calendar shows them. Neighbouring ranges with the same priority are joined.
@@ -31,7 +29,7 @@ export function listTimeRanges(
 export function addTimeRange(
   ranges: ReadonlyArray<SuitableTimeRangeFormValues>,
   { weekday, beginMinutes, endMinutes, priority }: TimeRangeInput,
-  openingHours: DailyOpeningHours
+  openingHours: ReservableTimeSlots
 ): SuitableTimeRangeFormValues[] | null {
   const step = SUITABLE_TIME_STEP_MINUTES;
   const open = groupAvailability(toAvailability(openingHours))[weekday];

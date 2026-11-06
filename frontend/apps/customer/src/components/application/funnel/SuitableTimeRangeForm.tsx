@@ -3,12 +3,14 @@ import { useFormContext } from "react-hook-form";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import { primaryFill, secondaryFill } from "@ui/components/WeeklyPatternCalendar/styles";
+import { fontBold } from "@ui/styled";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
+import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
 import { priorityKey, SUITABLE_TIME_STEP_MINUTES, SUITABLE_TIME_VISIBLE_HOURS } from "ui/src/modules/suitableTimes";
 import { Weekday } from "@gql/gql-types";
 import type { ApplicationPage2FormValues, SuitableTimeRangeFormValues } from "./form";
 import { addTimeRange, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
-import type { DailyOpeningHours } from "./timeSelectorModule";
 
 const Fieldset = styled.fieldset`
   display: grid;
@@ -65,7 +67,34 @@ const TimeListItem = styled.li<{ $priority?: "primary" | "secondary" }>`
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-s);
-  ${({ $priority }) => $priority === "primary" && `background-color: var(--color-bus); color: var(--color-white);`}
+  padding-left: var(--spacing-2-xs);
+  ${({ $priority }) => $priority === "primary" && primaryFill}
+  ${({ $priority }) => $priority === "secondary" && secondaryFill}
+`;
+
+const RemoveButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  line-height: 1;
+  padding: 0;
+  height: 30px;
+  width: 30px;
+  font-size: var(--fontsize-heading-l);
+  font-family: var(--font-bold), sans-serif;
+  background-color: transparent;
+  border: 0;
+  color: inherit;
+  transition:
+    scale 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+  ${fontBold}
+  &:hover {
+    color: inherit;
+    scale: 1.2;
+    background-color: transparent;
+  }
 `;
 
 const pad = (value: number) => value.toString().padStart(2, "0");
@@ -79,14 +108,18 @@ function minuteOptions(begin: number, end: number): number[] {
   return options;
 }
 
-type Props = {
+type SuitableTimeRangeFormProps = {
   id: string;
   index: number;
-  openingHours: DailyOpeningHours;
+  openingHours: ReservableTimeSlots;
 };
 
 /** The same task as the calendar, done with form fields. It is an equal alternative to the calendar. */
-export function SuitableTimeRangeForm({ id, index, openingHours }: Props): React.ReactElement {
+export function SuitableTimeRangeForm({
+  id,
+  index,
+  openingHours,
+}: Readonly<SuitableTimeRangeFormProps>): React.ReactElement {
   const { t } = useTranslation();
   const { getValues, setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
@@ -192,7 +225,7 @@ export function SuitableTimeRangeForm({ id, index, openingHours }: Props): React
                   {describe(day, beginMinutes, endMinutes)},{" "}
                   {t(`application:TimeSelector.legend.${priorityKey(data.priority)}`)}
                 </span>
-                <Button
+                <RemoveButton
                   type="button"
                   size={ButtonSize.Small}
                   variant={ButtonVariant.Secondary}
@@ -201,8 +234,8 @@ export function SuitableTimeRangeForm({ id, index, openingHours }: Props): React
                     time: describe(day, beginMinutes, endMinutes),
                   })}
                 >
-                  {t("application:TimeSelector.form.remove")}
-                </Button>
+                  ×
+                </RemoveButton>
               </TimeListItem>
             ))}
           </TimeList>
