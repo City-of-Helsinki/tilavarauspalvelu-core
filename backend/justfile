@@ -16,6 +16,23 @@ check-translations:
 clear-db schema='public':
     @python manage.py dbshell -- -c "DROP SCHEMA {{ schema }} CASCADE;CREATE SCHEMA {{ schema }};"
 
+# Run tests with coverage and show the coverage report. Skips slow tests.
+[positional-arguments]
+coverage *args:
+    @{{ pytest }} --no-migrations --reuse-db --skip-slow -n {{ pytest_workers }} --cov --cov-report=term "$@"
+
+# Show files without full test coverage. Run 'coverage' first.
+coverage-missing:
+    @coverage report --skip-covered --show-missing
+
+# Print outdated top level dependencies
+deps-out:
+    @poetry show --outdated --top-level
+
+# Print all dependencies as a tree
+deps-tree:
+    @poetry show --tree
+
 # Run local backend
 dev:
     @python manage.py runserver localhost:8000
@@ -32,9 +49,17 @@ generate:
 hooks:
     @pre-commit install
 
+# Install all dependencies and remove packages that are not in the lock file
+install:
+    @poetry sync
+
 # Run pre-commit hooks
 lint:
     @pre-commit run --all-files
+
+# Update the lock file from pyproject.toml
+lock:
+    @poetry lock
 
 # Run database migrations
 migrate:
@@ -51,6 +76,35 @@ scheduler:
 # Update the GraphQL schema file
 schema:
     @python manage.py update_graphql_schema
+
+# Use pyproject.toml so that the git-ignored pytest.ini does not add its own options.
+pytest := "pytest -c pyproject.toml --disable-warnings"
+pytest_workers := env("PYTEST_WORKERS", "8")
+
+# Run tests. Skips slow tests and migrations. Reuses the test database.
+[positional-arguments]
+test *args:
+    @{{ pytest }} --no-migrations --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
+
+# Run tests, including slow tests
+[positional-arguments]
+test-all *args:
+    @{{ pytest }} --no-migrations --reuse-db -n {{ pytest_workers }} "$@"
+
+# Run tests with migrations. Skips slow tests.
+[positional-arguments]
+test-migrate *args:
+    @{{ pytest }} --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
+
+# Recreate the test database with migrations, then run tests. Skips slow tests.
+[positional-arguments]
+test-fresh *args:
+    @{{ pytest }} --create-db --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
+
+# Run only frontend query tests
+[positional-arguments]
+test-frontend-query *args:
+    @{{ pytest }} --no-migrations --reuse-db --only-frontend-query-tests "$@"
 
 # Compile translation strings
 translate:
