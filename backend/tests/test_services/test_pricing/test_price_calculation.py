@@ -8,7 +8,11 @@ import pytest
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from tilavarauspalvelu.exceptions import PriceCalculationError
-from tilavarauspalvelu.services.pricing.price_calculation import calculate_price
+from tilavarauspalvelu.services.pricing.price_calculation import (
+    calculate_price,
+    calculate_price_with_data,
+    load_pricing_data,
+)
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -421,6 +425,78 @@ def test_calculate_price__pricing_group_is_chosen_by_start_date():
 
     assert before.total == Decimal("10.00")
     assert after.total == Decimal("30.00")
+
+
+# ── Loaded pricing data ──
+
+
+def test_calculate_price_with_data__pricing_group_changes_inside_the_loaded_period(django_assert_num_queries):
+    row = create_pricing_group_row()
+    reservation_unit = row.reservation_unit
+    PriceComponentFactory.create(pricing_group=row.pricing_group, valid_from=JAN_1, amount=Decimal(10))
+
+    second_group = PricingGroupFactory.create()
+    PriceComponentFactory.create(pricing_group=second_group, valid_from=MAR_1, amount=Decimal(30))
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=second_group,
+        begins=MAR_1,
+    )
+
+    pricing_data = load_pricing_data(reservation_unit_pks=[reservation_unit.pk])
+
+    with django_assert_num_queries(0):
+        before = calculate_price_with_data(
+            pricing_data=pricing_data,
+            reservation_unit=reservation_unit,
+            price_option=None,
+            begin=local_datetime(2026, 2, 28, 10),
+            end=local_datetime(2026, 2, 28, 11),
+        )
+        after = calculate_price_with_data(
+            pricing_data=pricing_data,
+            reservation_unit=reservation_unit,
+            price_option=None,
+            begin=local_datetime(2026, 3, 1, 10),
+            end=local_datetime(2026, 3, 1, 11),
+        )
+
+    assert before.total == Decimal("10.00")
+    assert after.total == Decimal("30.00")
+
+
+def test_calculate_price_with_data__reservation_unit_not_in_the_loaded_data():
+    row = create_pricing_group_row()
+    PriceComponentFactory.create(pricing_group=row.pricing_group, valid_from=JAN_1)
+    other_unit = ReservationUnitFactory.create()
+
+    pricing_data = load_pricing_data(reservation_unit_pks=[row.reservation_unit.pk])
+
+    with pytest.raises(PriceCalculationError, match=exact("Reservation unit has no pricing group on 2026-03-01.")):
+        calculate_price_with_data(
+            pricing_data=pricing_data,
+            reservation_unit=other_unit,
+            price_option=None,
+            begin=local_datetime(2026, 3, 1, 10),
+            end=local_datetime(2026, 3, 1, 11),
+        )
+
+
+@pytest.mark.parametrize("number_of_units", [1, 5])
+def test_load_pricing_data__query_count_does_not_grow_with_reservation_units(
+    number_of_units,
+    django_assert_num_queries,
+):
+    reservation_unit_pks: list[int] = []
+    for _ in range(number_of_units):
+        row = create_pricing_group_row()
+        PriceComponentFactory.create(pricing_group=row.pricing_group, valid_from=JAN_1)
+        reservation_unit_pks.append(row.reservation_unit.pk)
+
+    with django_assert_num_queries(3):
+        pricing_data = load_pricing_data(reservation_unit_pks=reservation_unit_pks)
+
+    assert set(pricing_data.pricing_group_rows) == set(reservation_unit_pks)
 
 
 # ── Price options ──
