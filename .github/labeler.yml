@@ -1,0 +1,60 @@
+# Configuration for actions/labeler: https://github.com/actions/labeler
+# Branch rules accept an optional Jira ticket prefix, e.g. "TILA-1234/fix-..." or "fix/...".
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "backend/**"
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "frontend/**"
+
+e2e:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "e2e/**"
+          - ".github/workflows/*e2e*.yml"
+          - ".github/workflows/playwright-image.yml"
+
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/Dockerfile*"
+          - "**/.dockerignore"
+          - "docker-compose.yml"
+
+infra:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+          - "**/azure-pipelines-*.yml"
+          - "*.just"
+          - "**/justfile"
+
+github_actions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/poetry.lock"
+          - "**/pnpm-lock.yaml"
+  - head-branch:
+      - '^dependabot'
+      - '^pre-commit-ci-update-config$'
+
+fix:
+  - head-branch:
+      - '^(TILA-\d+[/-])?fix[/-]'
+
+feature:
+  - head-branch:
+      - '^(TILA-\d+[/-])?(feat|feature|add)[/-]'
+
+refactor:
+  - head-branch:
+      - '^(TILA-\d+[/-])?refactor[/-]'

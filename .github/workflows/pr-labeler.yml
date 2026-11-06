@@ -4,6 +4,8 @@ on:
   pull_request:
     types:
       - opened
+      - reopened
+      - synchronize
 
 permissions:
   contents: read
@@ -17,6 +19,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: TimonVS/pr-labeler-action@f9c084306ce8b3f488a8f3ee1ccedc6da131d1af # v5
+      - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # Only add labels. Do not remove labels that were added by hand.
+          sync-labels: false
