@@ -66,7 +66,6 @@ export type MockReservationProps = {
   type?: ReservationTypeChoice;
   price?: string;
   paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
-  appliedPricing?: { highestPrice: string; taxPercentage: string };
   cancellable?: boolean;
   canApplyFreeOfCharge?: boolean;
   applyingForFreeOfCharge?: boolean;
@@ -133,15 +132,6 @@ export function createMockReservation(
       id: createNodeId("PaymentTermsNode", 1),
       ...generateTextFragment("Test payment terms"),
     },
-    appliedPricing = {
-      id: createNodeId("AppliedPricingNode", 1),
-      begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
-      priceUnit: PriceUnit.PerHour,
-      paymentType: PaymentType.Online,
-      highestPrice: "10.0",
-      lowestPrice: "0.0",
-      taxPercentage: "24.5",
-    },
     pk = 1,
     price = "10.0",
     pricingTerms = {
@@ -172,11 +162,19 @@ export function createMockReservation(
     id: createNodeId("ReservationNode", pk),
     isHandled: cancellable ? false : isHandled,
     numPersons: 5,
-    appliedPricing: appliedPricing,
     paymentOrder: paymentOrder,
     pindoraInfo: null,
     pk: pk,
     price: price,
+    priceLines: [
+      {
+        id: createNodeId("ReservationPriceLineNode", 1),
+        ...generateDescriptionFragment("Space rent"),
+        amount: price,
+        overrideAmount: null,
+        taxPercentage: "24.5",
+      },
+    ],
     cancelReason: ReservationCancelReasonChoice.NotPaid,
     purpose: {
       ...generatePurposeFragment("Test Purpose"),
@@ -228,8 +226,6 @@ export function createMockReservation(
       cancellationTerms: cancellationTerms,
       paymentTerms: paymentTerms,
       pricingTerms: pricingTerms,
-      reservationBeginsAt: null,
-      reservationEndsAt: null,
       pricings: [
         {
           id: createNodeId("PricingNode", 1),

@@ -153,6 +153,11 @@ export function getActivePricing(
   return pricings.find((pricing) => isActivePricing(pricing));
 }
 
+/// The price lines of a reservation have no material price description, so it comes from the active pricing
+export function hasMaterialPrice(reservationUnit: Readonly<{ pricings: Readonly<PricingFieldsFragment[]> }>): boolean {
+  return Boolean(getActivePricing(reservationUnit)?.materialPriceDescriptionFi);
+}
+
 export const RESERVATION_UNIT_PRICE_FRAGMENT = gql`
   fragment PriceReservationUnitFields on ReservationUnitNode {
     id
