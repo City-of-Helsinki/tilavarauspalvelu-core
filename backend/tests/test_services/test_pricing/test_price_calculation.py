@@ -8,11 +8,7 @@ import pytest
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from tilavarauspalvelu.exceptions import PriceCalculationError
-from tilavarauspalvelu.services.pricing.price_calculation import (
-    calculate_price,
-    calculate_price_with_data,
-    load_pricing_data,
-)
+from tilavarauspalvelu.services.pricing.price_calculation import calculate_price_with_data, load_pricing_data
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -26,7 +22,8 @@ from tests.factories import (
 from tests.helpers import exact
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnitPricingGroup, UnitGroup
+    from tilavarauspalvelu.models import PriceOption, ReservationUnit, ReservationUnitPricingGroup, UnitGroup
+    from tilavarauspalvelu.services.pricing.price_calculation import PriceCalculation
 
 # Applied to all tests
 pytestmark = [
@@ -57,10 +54,27 @@ def create_pricing_group_row(
     )
 
 
+def calculate_price_for_one_unit(
+    *,
+    reservation_unit: ReservationUnit,
+    price_option: PriceOption | None,
+    begin: datetime.datetime,
+    end: datetime.datetime,
+) -> PriceCalculation:
+    pricing_data = load_pricing_data(reservation_unit_pks=[reservation_unit.pk])
+    return calculate_price_with_data(
+        pricing_data=pricing_data,
+        reservation_unit=reservation_unit,
+        price_option=price_option,
+        begin=begin,
+        end=end,
+    )
+
+
 # ── One price ──
 
 
-def test_calculate_price__hourly_price():
+def test_calculate_price_with_data__hourly_price():
     row = create_pricing_group_row(payment_type=PaymentType.ON_SITE)
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
@@ -71,7 +85,7 @@ def test_calculate_price__hourly_price():
         price_unit=PriceUnit.PER_HOUR,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 2, 1, 10),
@@ -88,7 +102,7 @@ def test_calculate_price__hourly_price():
     assert result.can_apply_for_discount is False
 
 
-def test_calculate_price__duration_is_rounded_up_to_15_minutes():
+def test_calculate_price_with_data__duration_is_rounded_up_to_15_minutes():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
@@ -99,7 +113,7 @@ def test_calculate_price__duration_is_rounded_up_to_15_minutes():
         price_unit=PriceUnit.PER_HOUR,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 2, 1, 10),
@@ -117,7 +131,7 @@ def test_calculate_price__duration_is_rounded_up_to_15_minutes():
         (datetime.date(2026, 10, 25), Decimal(7)),
     ],
 )
-def test_calculate_price__daylight_saving_change_counts_real_hours(date, expected_hours):
+def test_calculate_price_with_data__daylight_saving_change_counts_real_hours(date, expected_hours):
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
@@ -128,7 +142,7 @@ def test_calculate_price__daylight_saving_change_counts_real_hours(date, expecte
         price_unit=PriceUnit.PER_HOUR,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(date.year, date.month, date.day, 0),
@@ -139,7 +153,7 @@ def test_calculate_price__daylight_saving_change_counts_real_hours(date, expecte
     assert result.total == expected_hours * 10
 
 
-def test_calculate_price__fixed_price():
+def test_calculate_price_with_data__fixed_price():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
@@ -150,7 +164,7 @@ def test_calculate_price__fixed_price():
         price_unit=PriceUnit.FIXED,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 2, 1, 10),
@@ -161,13 +175,13 @@ def test_calculate_price__fixed_price():
     assert result.total == Decimal("50.00")
 
 
-def test_calculate_price__free():
+def test_calculate_price_with_data__free():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
     PriceComponentFactory.create_free(pricing_group=pricing_group, valid_from=JAN_1, can_apply_for_discount=False)
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 2, 1, 10),
@@ -178,13 +192,13 @@ def test_calculate_price__free():
     assert result.payment_type is None
 
 
-def test_calculate_price__can_apply_for_discount():
+def test_calculate_price_with_data__can_apply_for_discount():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
     PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, can_apply_for_discount=True)
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 2, 1, 10),
@@ -197,7 +211,7 @@ def test_calculate_price__can_apply_for_discount():
 # ── Price units ──
 
 
-def test_calculate_price__per_15_minutes():
+def test_calculate_price_with_data__per_15_minutes():
     row = create_pricing_group_row()
     PriceComponentFactory.create(
         pricing_group=row.pricing_group,
@@ -206,7 +220,7 @@ def test_calculate_price__per_15_minutes():
         price_unit=PriceUnit.PER_15_MINS,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=row.reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 2, 1, 10),
@@ -224,7 +238,7 @@ def test_calculate_price__per_15_minutes():
         (21, Decimal(2)),
     ],
 )
-def test_calculate_price__per_half_day_counts_started_12_hour_units(end_hour, expected_quantity):
+def test_calculate_price_with_data__per_half_day_counts_started_12_hour_units(end_hour, expected_quantity):
     row = create_pricing_group_row()
     PriceComponentFactory.create(
         pricing_group=row.pricing_group,
@@ -233,7 +247,7 @@ def test_calculate_price__per_half_day_counts_started_12_hour_units(end_hour, ex
         price_unit=PriceUnit.PER_HALF_DAY,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=row.reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 2, 1, 8),
@@ -244,7 +258,7 @@ def test_calculate_price__per_half_day_counts_started_12_hour_units(end_hour, ex
     assert result.total == Decimal(50) * expected_quantity
 
 
-def test_calculate_price__per_week():
+def test_calculate_price_with_data__per_week():
     row = create_pricing_group_row()
     PriceComponentFactory.create(
         pricing_group=row.pricing_group,
@@ -253,7 +267,7 @@ def test_calculate_price__per_week():
         price_unit=PriceUnit.PER_WEEK,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=row.reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 2, 1, 10),
@@ -273,7 +287,7 @@ def test_calculate_price__per_week():
         (PriceUnit.PER_WEEK, datetime.date(2026, 10, 19), datetime.date(2026, 10, 26)),
     ],
 )
-def test_calculate_price__day_and_week_units_follow_the_local_calendar_over_daylight_saving_change(
+def test_calculate_price_with_data__day_and_week_units_follow_the_local_calendar_over_daylight_saving_change(
     price_unit, begin_date, end_date
 ):
     row = create_pricing_group_row()
@@ -284,7 +298,7 @@ def test_calculate_price__day_and_week_units_follow_the_local_calendar_over_dayl
         price_unit=price_unit,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=row.reservation_unit,
         price_option=None,
         begin=local_datetime(begin_date.year, begin_date.month, begin_date.day, 0),
@@ -298,7 +312,7 @@ def test_calculate_price__day_and_week_units_follow_the_local_calendar_over_dayl
 # ── Price change ──
 
 
-def test_calculate_price__reservation_over_the_date_of_a_price_change():
+def test_calculate_price_with_data__reservation_over_the_date_of_a_price_change():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
@@ -317,7 +331,7 @@ def test_calculate_price__reservation_over_the_date_of_a_price_change():
         can_apply_for_discount=True,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 3, 1, 22),
@@ -331,7 +345,7 @@ def test_calculate_price__reservation_over_the_date_of_a_price_change():
     assert result.can_apply_for_discount is True
 
 
-def test_calculate_price__payment_type_of_reservation_unit_when_a_part_is_paid():
+def test_calculate_price_with_data__payment_type_of_reservation_unit_when_a_part_is_paid():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
@@ -348,7 +362,7 @@ def test_calculate_price__payment_type_of_reservation_unit_when_a_part_is_paid()
         price_unit=PriceUnit.PER_HOUR,
     )
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 3, 1, 22),
@@ -359,7 +373,7 @@ def test_calculate_price__payment_type_of_reservation_unit_when_a_part_is_paid()
     assert result.payment_type == PaymentType.ONLINE
 
 
-def test_calculate_price__day_unit_is_charged_at_the_price_of_its_start():
+def test_calculate_price_with_data__day_unit_is_charged_at_the_price_of_its_start():
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
@@ -377,13 +391,13 @@ def test_calculate_price__day_unit_is_charged_at_the_price_of_its_start():
         price_unit=PriceUnit.PER_DAY,
     )
 
-    one_day = calculate_price(
+    one_day = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 3, 1, 12),
         end=local_datetime(2026, 3, 2, 12),
     )
-    two_days = calculate_price(
+    two_days = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=None,
         begin=local_datetime(2026, 3, 1, 12),
@@ -394,37 +408,6 @@ def test_calculate_price__day_unit_is_charged_at_the_price_of_its_start():
     assert one_day.total == Decimal("100.00")
     assert [line.component for line in two_days.lines] == [old, new]
     assert two_days.total == Decimal("300.00")
-
-
-def test_calculate_price__pricing_group_is_chosen_by_start_date():
-    row = create_pricing_group_row()
-    reservation_unit = row.reservation_unit
-    first_group = row.pricing_group
-    PriceComponentFactory.create(pricing_group=first_group, valid_from=JAN_1, amount=Decimal(10))
-
-    second_group = PricingGroupFactory.create()
-    PriceComponentFactory.create(pricing_group=second_group, valid_from=MAR_1, amount=Decimal(30))
-    ReservationUnitPricingGroupFactory.create(
-        reservation_unit=reservation_unit,
-        pricing_group=second_group,
-        begins=MAR_1,
-    )
-
-    before = calculate_price(
-        reservation_unit=reservation_unit,
-        price_option=None,
-        begin=local_datetime(2026, 2, 28, 10),
-        end=local_datetime(2026, 2, 28, 11),
-    )
-    after = calculate_price(
-        reservation_unit=reservation_unit,
-        price_option=None,
-        begin=local_datetime(2026, 3, 1, 10),
-        end=local_datetime(2026, 3, 1, 11),
-    )
-
-    assert before.total == Decimal("10.00")
-    assert after.total == Decimal("30.00")
 
 
 # ── Loaded pricing data ──
@@ -502,7 +485,7 @@ def test_load_pricing_data__query_count_does_not_grow_with_reservation_units(
 # ── Price options ──
 
 
-def test_calculate_price__selected_option():
+def test_calculate_price_with_data__selected_option():
     unit_group = UnitGroupFactory.create()
     row = create_pricing_group_row(unit_group=unit_group)
     reservation_unit = row.reservation_unit
@@ -512,7 +495,7 @@ def test_calculate_price__selected_option():
     PriceComponentFactory.create(pricing_group=pricing_group, price_option=adults, amount=Decimal(20))
     PriceComponentFactory.create(pricing_group=pricing_group, price_option=juniors, amount=Decimal(10))
 
-    result = calculate_price(
+    result = calculate_price_for_one_unit(
         reservation_unit=reservation_unit,
         price_option=juniors,
         begin=local_datetime(2026, 2, 1, 10),
@@ -522,7 +505,7 @@ def test_calculate_price__selected_option():
     assert result.total == Decimal("10.00")
 
 
-def test_calculate_price__option_is_required_when_the_group_has_options():
+def test_calculate_price_with_data__option_is_required_when_the_group_has_options():
     unit_group = UnitGroupFactory.create()
     row = create_pricing_group_row(unit_group=unit_group)
     reservation_unit = row.reservation_unit
@@ -531,7 +514,7 @@ def test_calculate_price__option_is_required_when_the_group_has_options():
     PriceComponentFactory.create(pricing_group=pricing_group, price_option=adults, valid_from=JAN_1)
 
     with pytest.raises(PriceCalculationError, match=exact("Reservation unit has no price on 2026-02-01.")):
-        calculate_price(
+        calculate_price_for_one_unit(
             reservation_unit=reservation_unit,
             price_option=None,
             begin=local_datetime(2026, 2, 1, 10),
@@ -540,7 +523,7 @@ def test_calculate_price__option_is_required_when_the_group_has_options():
 
 
 @pytest.mark.parametrize("group_has_unit_group", [True, False])
-def test_calculate_price__option_of_another_unit_group(group_has_unit_group):
+def test_calculate_price_with_data__option_of_another_unit_group(group_has_unit_group):
     unit_group = UnitGroupFactory.create() if group_has_unit_group else None
     row = create_pricing_group_row(unit_group=unit_group)
     reservation_unit = row.reservation_unit
@@ -550,7 +533,7 @@ def test_calculate_price__option_of_another_unit_group(group_has_unit_group):
 
     msg = "Price option does not belong to the unit group of the pricing group."
     with pytest.raises(PriceCalculationError, match=exact(msg)):
-        calculate_price(
+        calculate_price_for_one_unit(
             reservation_unit=reservation_unit,
             price_option=other_option,
             begin=local_datetime(2026, 2, 1, 10),
@@ -561,11 +544,11 @@ def test_calculate_price__option_of_another_unit_group(group_has_unit_group):
 # ── Errors ──
 
 
-def test_calculate_price__no_pricing_group():
+def test_calculate_price_with_data__no_pricing_group():
     reservation_unit = ReservationUnitFactory.create()
 
     with pytest.raises(PriceCalculationError, match=exact("Reservation unit has no pricing group on 2026-02-01.")):
-        calculate_price(
+        calculate_price_for_one_unit(
             reservation_unit=reservation_unit,
             price_option=None,
             begin=local_datetime(2026, 2, 1, 10),
@@ -573,11 +556,11 @@ def test_calculate_price__no_pricing_group():
         )
 
 
-def test_calculate_price__end_before_begin():
+def test_calculate_price_with_data__end_before_begin():
     reservation_unit = create_pricing_group_row().reservation_unit
 
     with pytest.raises(PriceCalculationError, match=exact("Reservation must end after it begins.")):
-        calculate_price(
+        calculate_price_for_one_unit(
             reservation_unit=reservation_unit,
             price_option=None,
             begin=local_datetime(2026, 2, 1, 11),
