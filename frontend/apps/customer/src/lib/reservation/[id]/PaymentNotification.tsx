@@ -10,7 +10,7 @@ import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex, fontMedium } from "@ui/styled";
 import { ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationPaymentUrlFragment, ReservationPriceFieldsFragment } from "@gql/gql-types";
-import { getPaymentUrl } from "@/modules/reservation";
+import { usePaymentUrl } from "@/hooks/usePaymentUrl";
 
 type PaymentNotificationProps = {
   reservation: ReservationPaymentUrlFragment & Pick<ReservationPriceFieldsFragment, "price">;
@@ -56,7 +56,7 @@ export const PaymentNotification = ({ reservation, appliedPricing, paymentOrder 
     reservation.state === ReservationStateChoice.Cancelled &&
     reservation.cancelReason === ReservationCancelReasonChoice.NotPaid;
   const translationPath = isExpired ? "reservation:paymentBanner.expired" : "reservation:paymentBanner";
-  const paymentUrl = getPaymentUrl(reservation, lang);
+  const paymentUrl = usePaymentUrl(reservation, lang);
   return (
     <Notification data-testid="reservation__payment-notification" type="alert" label={t(`${translationPath}.title`)}>
       <Flex $direction="column" $gap="2-xs">

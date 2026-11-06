@@ -600,8 +600,8 @@ describe("getPaymentUrl", () => {
     vi.unstubAllEnvs();
   });
 
-  test("returns webstore checkout url for direct payments", () => {
-    expect(getPaymentUrl(createPaymentReservation(), "fi")).toBe(
+  test("returns webstore checkout url for direct payments, also without the page origin", () => {
+    expect(getPaymentUrl(createPaymentReservation(), "fi", null)).toBe(
       "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=fi"
     );
   });
@@ -618,17 +618,21 @@ describe("getPaymentUrl", () => {
     });
   }
 
-  test("returns handled payment redirect url on the page origin when payment is pending", () => {
+  test("returns handled payment redirect url with the page origin when payment is pending", () => {
     vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
-    const origin = window.location.origin;
-    expect(getPaymentUrl(createPendingHandledPayment(), "sv")).toBe(
+    const origin = "https://varaamo.example";
+    expect(getPaymentUrl(createPendingHandledPayment(), "sv", origin)).toBe(
       `/v1/pay_pending_reservation/1/?lang=sv&redirect_on_error=${encodeURIComponent(`${origin}/sv/reservations/1`)}`
     );
   });
 
+  test("returns undefined for a pending handled payment without the page origin", () => {
+    expect(getPaymentUrl(createPendingHandledPayment(), "fi", null)).toBeUndefined();
+  });
+
   test("keeps the path of NEXT_PUBLIC_LOCAL_API_URL in the handled payment redirect url", () => {
     vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://host/api");
-    const url = getPaymentUrl(createPendingHandledPayment(), "fi");
+    const url = getPaymentUrl(createPendingHandledPayment(), "fi", "http://localhost:3000");
     expect(url?.startsWith("http://host/api/v1/pay_pending_reservation/1/?lang=fi&")).toBe(true);
   });
 
@@ -639,7 +643,8 @@ describe("getPaymentUrl", () => {
           state: ReservationStateChoice.Cancelled,
           cancelReason: ReservationCancelReasonChoice.NotPaid,
         }),
-        "fi"
+        "fi",
+        "https://varaamo.example"
       )
     ).toBeUndefined();
   });
