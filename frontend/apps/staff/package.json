@@ -33,7 +33,7 @@
     "import-in-the-middle": "^3.5.2",
     "lodash-es": "^4.18.1",
     "next": "^16.4.2",
-    "next-i18next": "^16.4.3",
+    "next-i18next": "^16.4.4",
     "quill": "^2.0.3",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
