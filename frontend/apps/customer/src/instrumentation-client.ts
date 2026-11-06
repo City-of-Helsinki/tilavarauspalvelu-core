@@ -35,6 +35,9 @@ if (env.SENTRY_DSN) {
       // iOS Safari throws this after a suspended background tab wakes up. A string would match any message
       // that contains it, so match the exact type and value.
       /^TypeError: Internal error$/,
+      // hds-react cookie consent monitor reads the bare `indexedDB` global on a timer. Safari throws this
+      // when that global is missing. Match the exact type and value.
+      /^ReferenceError: Can't find variable: indexedDB$/,
     ],
     tracesSampleRate: parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE),
     tracePropagationTargets: env.SENTRY_TRACE_PROPAGATION_TARGETS
