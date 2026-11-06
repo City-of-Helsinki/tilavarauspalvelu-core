@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { warnIfLocalApiUrlMissing } from "@ui/modules/urlBuilder";
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
@@ -10,6 +11,7 @@ export async function register() {
     const { default: events } = await import("node:events");
     events.defaultMaxListeners = 12;
     await import("../sentry.server.config");
+    warnIfLocalApiUrlMissing();
   }
 }
 
