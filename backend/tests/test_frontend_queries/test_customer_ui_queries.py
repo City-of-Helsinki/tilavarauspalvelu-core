@@ -14,7 +14,13 @@ from tilavarauspalvelu.enums import BannerNotificationTarget
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import local_date, local_datetime, local_time, next_hour
 
-from tests.factories import ReservationFactory, ReservationUnitFactory
+from tests.factories import (
+    PriceComponentFactory,
+    PricingGroupFactory,
+    ReservationFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingGroupFactory,
+)
 
 from .helpers import assert_no_undefined_variables, get_customer_query_info
 
@@ -817,6 +823,38 @@ def test_frontend_queries__customer_ui__ReservationQuotaReached(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
+
+
+def test_frontend_queries__customer_ui__ReservationPrice(graphql):
+    customer_factories = get_customer_query_info()
+    factories = customer_factories["ReservationPrice"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+    assert query_info.factory is None
+
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=local_date(2024, 1, 1),
+    )
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=local_date(2024, 1, 1))
+
+    variables = deepcopy(query_info.variables)
+    variables["reservationUnit"] = reservation_unit.pk
+    variables["beginsAt"] = local_datetime(2024, 2, 1, 10).isoformat()
+    variables["endsAt"] = local_datetime(2024, 2, 1, 12).isoformat()
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.first_query_object["lines"]) == 1
 
 
 def test_frontend_queries__customer_ui__ReservationState(graphql):
