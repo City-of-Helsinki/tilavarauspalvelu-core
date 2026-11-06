@@ -51,7 +51,32 @@ class RedisSentinelHealthCheck(HealthCheck):
 
 @dataclasses.dataclass
 class CeleryHealthCheck(Ping):
-    """Celery health check using a dedicated broker connection for queue inspection."""
+    """Celery health check using dedicated broker connections for ping and queue inspection."""
+
+    def run(self) -> None:
+        connection = self.app.connection_for_write()
+
+        try:
+            with connection:
+                ping_result = self.app.control.ping(
+                    timeout=self.timeout.total_seconds(),
+                    limit=self.limit,
+                    connection=connection,
+                )
+            if not ping_result:
+                msg = "Celery workers unavailable"
+                raise ServiceUnavailable(msg)
+
+            self.check_active_queues(*self.active_workers(ping_result))
+        except OSError as error:
+            msg = "IOError"
+            raise ServiceUnavailable(msg) from error
+        except NotImplementedError as error:
+            msg = "NotImplementedError: Make sure CELERY_RESULT_BACKEND is set"
+            raise ServiceUnavailable(msg) from error
+        except connection.connection_errors as error:
+            msg = "Unable to connect to the Celery broker."
+            raise ServiceUnavailable(msg) from error
 
     def check_active_queues(self, *active_workers: str) -> None:
         try:
@@ -62,7 +87,7 @@ class CeleryHealthCheck(Ping):
         with self.app.connection_for_read() as conn:
             active_queues = {
                 queue.get("name")
-                for queues in self.app.control.inspect(active_workers, connection=conn).active_queues().values()
+                for queues in (self.app.control.inspect(active_workers, connection=conn).active_queues() or {}).values()
                 for queue in queues
             }
 
