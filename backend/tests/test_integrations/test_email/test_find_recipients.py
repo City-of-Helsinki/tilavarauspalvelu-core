@@ -268,3 +268,33 @@ def test_get_reservation_staff_notification_recipients__no_email():
 
     result = get_reservation_staff_notification_recipients_by_language(reservation)
     assert result == {}
+
+
+def test_get_reservation_staff_notification_recipients__query_count_does_not_grow_with_users(query_counter):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
+
+    def create_staff_user(number: int) -> None:
+        UserFactory.create_with_unit_role(
+            email=f"admin{number}@example.com",
+            units=[reservation_unit.unit],
+            reservation_notification=ReservationNotification.ALL,
+            preferred_language="fi",
+        )
+
+    create_staff_user(1)
+
+    with query_counter() as counter:
+        result = get_reservation_staff_notification_recipients_by_language(reservation)
+
+    assert result == {"fi": {"admin1@example.com"}}
+    queries_for_one_user = len(counter.queries)
+
+    for number in range(2, 6):
+        create_staff_user(number)
+
+    with query_counter() as counter:
+        result = get_reservation_staff_notification_recipients_by_language(reservation)
+
+    assert result == {"fi": {f"admin{number}@example.com" for number in range(1, 6)}}
+    assert len(counter.queries) == queries_for_one_user

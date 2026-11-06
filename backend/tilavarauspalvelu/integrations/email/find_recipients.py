@@ -111,7 +111,7 @@ def get_reservation_staff_notification_recipients_by_language(
     ).exclude(email="")
 
     # Skip the reservation creator
-    users = users.exclude(pk=reservation.user.pk)
+    users = users.exclude(pk=reservation.user.pk).distinct().with_active_roles()
 
     units = (
         Unit.objects
@@ -148,7 +148,7 @@ def get_application_section_staff_notification_recipients_by_language(
     ).exclude(email="")
 
     # Skip the application creator
-    users = users.exclude(pk=application_section.application.user.pk)
+    users = users.exclude(pk=application_section.application.user.pk).distinct().with_active_roles()
 
     units = (
         Unit.objects
