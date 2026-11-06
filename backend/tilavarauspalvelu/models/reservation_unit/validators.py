@@ -158,6 +158,49 @@ class ReservationUnitValidator:
             msg = "Reservation unit is in an open application round."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_IN_OPEN_ROUND)
 
+    def validate_can_be_added_to_application_round(self) -> None:
+        name = self.reservation_unit.name
+
+        if self.reservation_unit.is_archived:
+            msg = f"Reservation unit '{name}' is archived, so it cannot be added to an application round."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NOT_FOR_APPLICATION_ROUND)
+
+        if self.reservation_unit.is_draft:
+            msg = f"Reservation unit '{name}' is a draft, so it cannot be added to an application round."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NOT_FOR_APPLICATION_ROUND)
+
+    def validate_not_removed_from_pending_application_rounds(
+        self,
+        *,
+        is_draft: bool,
+        is_archived: bool,
+        reservation_kind: ReservationKind,
+    ) -> None:
+        """
+        Check that the new values keep the reservation unit usable in the application rounds
+        whose reservations are not made yet. Values that do not change are not checked.
+        """
+        becomes_draft = is_draft and not self.reservation_unit.is_draft
+        becomes_archived = is_archived and not self.reservation_unit.is_archived
+        becomes_direct_only = (
+            reservation_kind == ReservationKind.DIRECT
+            and self.reservation_unit.reservation_kind != ReservationKind.DIRECT
+        )
+        if not becomes_draft and not becomes_archived and not becomes_direct_only:
+            return
+
+        pending_rounds = self.reservation_unit.application_rounds.all().reservations_pending().order_by("name")
+        round_names = list(pending_rounds.values_list("name", flat=True))
+        if not round_names:
+            return
+
+        msg = (
+            f"Reservation unit is in application rounds whose reservations are not made yet: "
+            f"{', '.join(round_names)}. It cannot be a draft, be archived, or allow only direct reservations "
+            f"until it is removed from these rounds."
+        )
+        raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_IN_PENDING_APPLICATION_ROUND)
+
     def validate_has_payment_product(self) -> None:
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             return
