@@ -12,6 +12,7 @@ import {
   HOME_CITY,
   IN_RESERVATIONS_STATUS_CANCELED,
   MYBOOKINGS_FI,
+  MYBOOKINGS_STATUS_CANCELED,
   MYBOOKINGS_STATUS_CONFIRMED,
   MYBOOKINGS_STATUS_REJECTED,
   PURPOSE_OF_THE_BOOKING,
@@ -472,6 +473,7 @@ export class AppUser extends PageObject {
     await this.pages.mybookings.clickReasonForCancellation();
     await this.pages.mybookings.selectReasonForCancellation(REASON_FOR_CANCELLATION);
     await this.pages.mybookings.clickCancelButton();
+    await this.pages.popups.checkAndCloseTheToast(MYBOOKINGS_STATUS_CANCELED);
     await this.pages.mybookings.checkReservationStatus(IN_RESERVATIONS_STATUS_CANCELED);
     await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
   }

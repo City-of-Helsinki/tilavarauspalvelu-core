@@ -42,7 +42,7 @@ time**. The endpoint also rejects a second call within 60 seconds. The backend c
 and pages fail or hang until it has been saved, so the project waits (up to 5 minutes) until the always free unit
 has a new id. If the id can't be read before the call, it waits 3 minutes like the Robot suite. The backend can
 still fail for a while after that (a 502, the customer app's error page), so the project then waits until the
-customer landing page, the search page and GraphQL answer normally three times in a row, 5 seconds apart. After
+customer landing page, the search page and GraphQL answer normally three times in a row, 2 seconds apart. After
 2 minutes the tests start anyway, with a warning in the report.
 
 The app shows times only in Helsinki time, so the config runs the suite in it: it sets `TZ` and the browsers' time
@@ -148,6 +148,11 @@ tests in `unit/`, which need no test environment.
 - **Mobile menu:** the app opens a page from the HDS mobile menu without a reload, so the menu stays open, and while
   it is open HDS uses the next click outside it only to close the menu. `topnav.Navigate To My Bookings Mobile` and
   `Navigate To Single Booking Page Mobile` close it with Escape.
+- **Cookie banner:** `popups.User Accepts Cookies If Dialog Is Visible` waits up to 10 seconds for the banner, but not
+  when the browser has saved the consent already (in the `varaamo-cookie-consents` cookie), like on a second login.
+- **Toasts:** after a cancellation and after the admin's actions, `popups.Check And Close The Toast` checks the toast's
+  text and closes it. A toast stays at the top right for 5 seconds and covers the header's buttons there (the menu on
+  phones, the admin's user menu), so the next click on one would wait for it.
 - **Interrupted payment:** if the "Varauksesi on keskeneräinen" banner doesn't show in 5 seconds, the page is
   reloaded (at most 3 tries). The banner's query runs only once per page load.
 - **Recurring application:** the test first cancels applications that an earlier attempt left, and sends the

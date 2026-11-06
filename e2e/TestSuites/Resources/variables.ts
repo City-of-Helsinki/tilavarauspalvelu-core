@@ -10,6 +10,8 @@ export const EMAIL_FILE_PATH = `${import.meta.dirname}/downloads/cleaned_emails.
 // Milliseconds, like Playwright's timeouts
 export const BROWSER_TIMEOUT_GLOBAL = 40_000;
 export const CONTENT_WAIT_TIMEOUT = 10_000;
+// The cookie in which the customer site's cookie banner saves the consent (the app's sitesettings.json)
+export const COOKIE_CONSENT_COOKIE = "varaamo-cookie-consents";
 export const ROBOT_EMAIL = "django_email_robot@mailiposti.com";
 export const DJANGO_ROBO_MAIL = "https://varaamo.test.hel.ninja/v1/robot_email_cache/";
 export const WAIT_FOR_EMAIL_SECONDS = 5;
