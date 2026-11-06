@@ -9,6 +9,7 @@ import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import { getSeriesOverlapErrors } from "@ui/modules/apollo/helpers";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { ControlledDateInput, TimeInput } from "ui/src/components/form";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
@@ -41,7 +42,6 @@ import type {
   ReservationSeriesRescheduleMutationInput,
 } from "@gql/gql-types";
 import { BufferToggles } from "@/components/BufferToggles";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { Error403 } from "@/components/Error403";
 import { Error404 } from "@/components/Error404";
 import { LinkPrev } from "@/components/LinkPrev";
