@@ -8,6 +8,7 @@ import {
   ReservationFormType,
   ReservationKind,
   ReservationStartInterval,
+  TermsOfUseTypeChoices,
   Weekday,
 } from "@gql/gql-types";
 import type { ReservationUnitEditQuery } from "@gql/gql-types";
@@ -150,6 +151,44 @@ describe("convertReservationUnit", () => {
     const monday = values.seasons.find((s) => s.weekday === Weekday.Monday);
     expect(monday?.reservableTimes).toEqual([{ begin: "08:00", end: "10:00" }]);
   });
+
+  it("records no terms of the wrong type when all terms have the correct type", () => {
+    const values = convertReservationUnit({
+      pricingTerms: { id: "1", pk: "pricing_a", termsType: TermsOfUseTypeChoices.Pricing },
+      paymentTerms: { id: "2", pk: "payment_a", termsType: TermsOfUseTypeChoices.Payment },
+      serviceSpecificTerms: { id: "3", pk: "service_a", termsType: TermsOfUseTypeChoices.Service },
+      cancellationTerms: { id: "4", pk: "cancel_a", termsType: TermsOfUseTypeChoices.Cancellation },
+    } as unknown as QueryData);
+    expect(values.pricingTerms).toBe("pricing_a");
+    expect(values.paymentTerms).toBe("payment_a");
+    expect(values.serviceSpecificTerms).toBe("service_a");
+    expect(values.cancellationTerms).toBe("cancel_a");
+    expect(values.termsWithWrongType).toEqual({
+      pricingTerms: null,
+      paymentTerms: null,
+      serviceSpecificTerms: null,
+      cancellationTerms: null,
+    });
+  });
+
+  it("keeps terms of the wrong type and records them", () => {
+    const values = convertReservationUnit({
+      pricingTerms: { id: "1", pk: "pricing_nupa", termsType: TermsOfUseTypeChoices.Payment },
+      paymentTerms: { id: "2", pk: "payment_a", termsType: TermsOfUseTypeChoices.Pricing },
+      serviceSpecificTerms: { id: "3", pk: "service_a", termsType: TermsOfUseTypeChoices.Payment },
+      cancellationTerms: { id: "4", pk: "cancel_a", termsType: TermsOfUseTypeChoices.Service },
+    } as unknown as QueryData);
+    expect(values.pricingTerms).toBe("pricing_nupa");
+    expect(values.paymentTerms).toBe("payment_a");
+    expect(values.serviceSpecificTerms).toBe("service_a");
+    expect(values.cancellationTerms).toBe("cancel_a");
+    expect(values.termsWithWrongType).toEqual({
+      pricingTerms: "pricing_nupa",
+      paymentTerms: "payment_a",
+      serviceSpecificTerms: "service_a",
+      cancellationTerms: "cancel_a",
+    });
+  });
 });
 
 describe("transformReservationUnit", () => {
@@ -157,6 +196,19 @@ describe("transformReservationUnit", () => {
     const values = createValidFormValues({ pk: 0 });
     const result = transformReservationUnit(values, TAX_OPTIONS);
     expect(result.pk).toBeUndefined();
+  });
+
+  it("does not send the record of terms of the wrong type", () => {
+    const result = transformReservationUnit(createValidFormValues(), TAX_OPTIONS);
+    expect(result).not.toHaveProperty("termsWithWrongType");
+  });
+
+  it("sends null for cleared pricing terms, so that the saved value is removed", () => {
+    const cleared = createValidFormValues({ pricingTerms: undefined });
+    expect(transformReservationUnit(cleared, TAX_OPTIONS).pricingTerms).toBeNull();
+
+    const selected = createValidFormValues({ pricingTerms: "pricing_a" });
+    expect(transformReservationUnit(selected, TAX_OPTIONS).pricingTerms).toBe("pricing_a");
   });
 
   it("includes pk for an existing reservation unit and trims the fi name", () => {
@@ -452,6 +504,63 @@ describe("ReservationUnitEditSchema", () => {
     if (!result.success) {
       expect(result.error.issues.map((i) => i.path.join("."))).toContain("pricingTerms");
     }
+  });
+
+  it("rejects terms of the wrong type until the user selects other terms", () => {
+    const termsWithWrongType = {
+      paymentTerms: "payment_wrong",
+      pricingTerms: null,
+      serviceSpecificTerms: "service_wrong",
+      cancellationTerms: "cancel_wrong",
+    };
+    const loaded = createValidFormValues({
+      paymentTerms: "payment_wrong",
+      serviceSpecificTerms: "service_wrong",
+      cancellationTerms: "cancel_wrong",
+      termsWithWrongType,
+    });
+    const loadedResult = ReservationUnitEditSchema.safeParse(loaded);
+    expect(loadedResult.success).toBe(false);
+    if (!loadedResult.success) {
+      const termsIssues = loadedResult.error.issues.filter((i) => i.message === "Terms of wrong type");
+      expect(termsIssues.map((i) => i.path.join("."))).toEqual([
+        "paymentTerms",
+        "cancellationTerms",
+        "serviceSpecificTerms",
+      ]);
+    }
+
+    const fixed = createValidFormValues({
+      paymentTerms: "payment_ok",
+      serviceSpecificTerms: "",
+      cancellationTerms: "cancel_ok",
+      termsWithWrongType,
+    });
+    expect(ReservationUnitEditSchema.safeParse(fixed).success).toBe(true);
+  });
+
+  it("rejects pricing terms of the wrong type also when canApplyFreeOfCharge is not set", () => {
+    const values = createValidFormValues({
+      canApplyFreeOfCharge: false,
+      pricingTerms: "pricing_nupa",
+      termsWithWrongType: {
+        paymentTerms: null,
+        pricingTerms: "pricing_nupa",
+        serviceSpecificTerms: null,
+        cancellationTerms: null,
+      },
+    });
+    const result = ReservationUnitEditSchema.safeParse(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const termsIssues = result.error.issues.filter((i) => i.message === "Terms of wrong type");
+      expect(termsIssues.map((i) => i.path.join("."))).toEqual(["pricingTerms"]);
+    }
+  });
+
+  it("accepts cleared pricing terms when they are not required", () => {
+    const values = createValidFormValues({ canApplyFreeOfCharge: false, pricingTerms: undefined });
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
   });
 
   it("rejects duplicate or unparseable access type begin dates", () => {

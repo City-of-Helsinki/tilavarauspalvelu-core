@@ -94,6 +94,18 @@ function makeTermsOptions(
     });
 }
 
+// The options only have terms of the correct type. Add saved terms of the wrong type, so the user can see and change them.
+function addSavedTermsOfWrongType(
+  options: Array<{ value: string; label: string }>,
+  savedTerms: { pk?: string | null; nameFi?: string | null; termsType: TermsOfUseTypeChoices } | null | undefined,
+  termsType: TermsOfUseTypeChoices
+) {
+  if (savedTerms?.pk == null || savedTerms.termsType === termsType) {
+    return options;
+  }
+  return [...options, { value: savedTerms.pk, label: savedTerms.nameFi ?? savedTerms.pk }];
+}
+
 // The pricing mutation rejects a tax level that has no rate in effect today, so it is not an option
 function makeTaxLevelOptions(parameters: ReservationUnitEditorParametersQuery | undefined): TaxLevelOption[] {
   const formatters = getFormatters("fi");
@@ -245,11 +257,26 @@ function ReservationUnitEditor({
   // ----------------------------- Constants ---------------------------------
 
   const taxLevelOptions = makeTaxLevelOptions(parametersData);
-  const pricingTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Pricing);
-
-  const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Service);
-  const paymentTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Payment);
-  const cancellationTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Cancellation);
+  const pricingTermsOptions = addSavedTermsOfWrongType(
+    makeTermsOptions(parametersData, TermsOfUseTypeChoices.Pricing),
+    reservationUnit?.pricingTerms,
+    TermsOfUseTypeChoices.Pricing
+  );
+  const serviceSpecificTermsOptions = addSavedTermsOfWrongType(
+    makeTermsOptions(parametersData, TermsOfUseTypeChoices.Service),
+    reservationUnit?.serviceSpecificTerms,
+    TermsOfUseTypeChoices.Service
+  );
+  const paymentTermsOptions = addSavedTermsOfWrongType(
+    makeTermsOptions(parametersData, TermsOfUseTypeChoices.Payment),
+    reservationUnit?.paymentTerms,
+    TermsOfUseTypeChoices.Payment
+  );
+  const cancellationTermsOptions = addSavedTermsOfWrongType(
+    makeTermsOptions(parametersData, TermsOfUseTypeChoices.Cancellation),
+    reservationUnit?.cancellationTerms,
+    TermsOfUseTypeChoices.Cancellation
+  );
 
   const cancellationRuleOptions = filterNonNullable(
     parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)
@@ -505,6 +532,8 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       pricingTerms {
         id
         pk
+        nameFi
+        termsType
       }
       reservationUnitType {
         id
@@ -549,14 +578,20 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       paymentTerms {
         id
         pk
+        nameFi
+        termsType
       }
       cancellationTerms {
         id
         pk
+        nameFi
+        termsType
       }
       serviceSpecificTerms {
         id
         pk
+        nameFi
+        termsType
       }
       reservationBlockWholeDay
       bufferTimeBefore

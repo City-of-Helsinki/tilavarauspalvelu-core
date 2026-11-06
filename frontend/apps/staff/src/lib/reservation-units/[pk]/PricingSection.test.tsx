@@ -20,10 +20,13 @@ function nameLike(base: string): RegExp {
   return new RegExp(`^${escaped}(\\s\\*)?$`);
 }
 
-function Harness({ taxLevel }: { taxLevel?: number }) {
+function Harness({ taxLevel, pricingTerms }: { taxLevel?: number; pricingTerms?: string }) {
   const defaultValues = convertReservationUnit(undefined);
   if (taxLevel != null) {
     defaultValues.pricings = defaultValues.pricings.map((p) => ({ ...p, taxLevel }));
+  }
+  if (pricingTerms != null) {
+    defaultValues.pricingTerms = pricingTerms;
   }
   const form = useForm<ReservationUnitEditFormValues>({ defaultValues });
   return <PricingSection form={form} taxLevelOptions={TAX_LEVEL_OPTIONS} pricingTermsOptions={PRICING_TERMS_OPTIONS} />;
@@ -134,6 +137,18 @@ describe("PricingSection", () => {
 
     expect(screen.getByRole("button", { name: /^label\.pricingTerms/ })).toBeInTheDocument();
   }, 10_000);
+
+  it("shows saved pricing terms when canApplyFreeOfCharge is not checked, and hides them once cleared", async () => {
+    render(<Harness pricingTerms="terms-1" />);
+    const user = await openAccordion();
+
+    expect(screen.getByRole("button", { name: /^label\.pricingTerms\..*"Terms 1"/ })).toBeInTheDocument();
+
+    // The clear button has a localized HDS name that ends with the selected label
+    await user.click(screen.getByRole("button", { name: /^(?!label\.pricingTerms).*"Terms 1"\.$/ }));
+
+    expect(screen.queryByRole("button", { name: /^label\.pricingTerms/ })).not.toBeInTheDocument();
+  });
 
   it("reveals the future pricing section (with a begins date) when hasFuturePricing is toggled", async () => {
     render(<Harness />);
