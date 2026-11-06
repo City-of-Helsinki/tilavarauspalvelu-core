@@ -38,6 +38,7 @@ def existing_rate_form_data(index: int, rate: TaxLevelRate, *, delete: bool = Fa
         f"rates-{index}-tax_level": rate.tax_level.pk,
         f"rates-{index}-begins": rate.begins.isoformat(),
         f"rates-{index}-percentage": str(rate.percentage),
+        f"rates-{index}-vat_code": rate.vat_code,
     }
     if delete:
         data[f"rates-{index}-DELETE"] = "on"
@@ -292,6 +293,61 @@ def test_tax_level_admin__locked_rates__change_rate_that_begins_today(api_client
 
     rates = list(TaxLevelRate.objects.filter(tax_level=tax_level).values_list("begins", "percentage"))
     assert rates == [(local_date(), Decimal("25.5"))]
+
+
+def test_tax_level_admin__locked_rates__change_vat_code_of_rate_that_began_yesterday(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    yesterday = local_date() - datetime.timedelta(days=1)
+
+    tax_level = TaxLevelFactory.create(rates__begins=yesterday, rates__percentage=Decimal("25.5"))
+    rate = tax_level.rates.get()
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_change", args=[tax_level.pk])
+    data = {
+        **tax_level_form_data(tax_level),
+        **existing_rate_form_data(0, rate),
+        "rates-0-vat_code": "48",
+        **management_form_data("rates", total_forms=1, initial_forms=1),
+    }
+    response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 302, response.content
+
+    rates = TaxLevelRate.objects.filter(tax_level=tax_level)
+    assert list(rates.values_list("begins", "percentage", "vat_code")) == [(yesterday, Decimal("25.5"), "48")]
+
+
+# ── VAT code ──
+
+
+def test_tax_level_admin__vat_code__too_short(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+
+    tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
+    rate = tax_level.rates.get()
+
+    url = reverse("admin:tilavarauspalvelu_taxlevel_change", args=[tax_level.pk])
+    data = {
+        **tax_level_form_data(tax_level),
+        **existing_rate_form_data(0, rate),
+        "rates-0-vat_code": "4",
+        **management_form_data("rates", total_forms=1, initial_forms=1),
+    }
+
+    errors: list[dict[str, Any]] = []
+    with collect_admin_form_errors(errors):
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 200
+    assert errors == [
+        {
+            "code": "",
+            "message": "Ensure this value has at least 2 characters (it has 1).",
+        },
+    ]
+
+    rates = TaxLevelRate.objects.filter(tax_level=tax_level)
+    assert list(rates.values_list("vat_code", flat=True)) == [""]
 
 
 # ── List ──
