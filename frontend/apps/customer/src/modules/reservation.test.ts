@@ -606,27 +606,30 @@ describe("getPaymentUrl", () => {
     );
   });
 
+  function createPendingHandledPayment(): ReservationPaymentUrlFragment {
+    return createPaymentReservation({
+      state: ReservationStateChoice.Confirmed,
+      paymentOrder: {
+        id: "PaymentOrderNode:1",
+        status: OrderStatus.Pending,
+        handledPaymentDueBy: addDays(new Date(), 1).toISOString(),
+        checkoutUrl: null,
+      },
+    });
+  }
+
   test("returns handled payment redirect url on the page origin when payment is pending", () => {
     vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
     const origin = window.location.origin;
-    expect(
-      getPaymentUrl(
-        createPaymentReservation({
-          state: ReservationStateChoice.Confirmed,
-          paymentOrder: {
-            id: "PaymentOrderNode:1",
-            status: OrderStatus.Pending,
-            handledPaymentDueBy: addDays(new Date(), 1).toISOString(),
-            checkoutUrl: null,
-          },
-        }),
-        "sv"
-      )
-    ).toBe(
-      `${origin}/v1/pay_pending_reservation/1/?lang=sv&redirect_on_error=${encodeURIComponent(
-        `${origin}/sv/reservations/1`
-      )}`
+    expect(getPaymentUrl(createPendingHandledPayment(), "sv")).toBe(
+      `/v1/pay_pending_reservation/1/?lang=sv&redirect_on_error=${encodeURIComponent(`${origin}/sv/reservations/1`)}`
     );
+  });
+
+  test("keeps the path of NEXT_PUBLIC_LOCAL_API_URL in the handled payment redirect url", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://host/api");
+    const url = getPaymentUrl(createPendingHandledPayment(), "fi");
+    expect(url?.startsWith("http://host/api/v1/pay_pending_reservation/1/?lang=fi&")).toBe(true);
   });
 
   test("returns undefined for expired not-paid reservations", () => {
