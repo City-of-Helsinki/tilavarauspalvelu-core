@@ -30,16 +30,21 @@ class TaxLevelRateForm(forms.ModelForm):
         fields = [
             "begins",
             "percentage",
+            "vat_code",
         ]
         labels = {
             "begins": _("Begin date"),
             "percentage": _("Tax percentage"),
+            "vat_code": _("VAT code"),
         }
         help_texts = {
             "begins": _(
                 "The date when the rate takes effect. "
-                "Rates that began before today cannot be changed or deleted. "
+                "Rates that began before today cannot be deleted, and only their VAT code can be changed. "
                 "To change the tax percentage, add a new rate."
+            ),
+            "vat_code": _(
+                "The SAP VAT code for this tax percentage, e.g. '48'. Leave empty if SAP has no code for it."
             ),
         }
 
