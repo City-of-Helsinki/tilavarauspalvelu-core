@@ -318,10 +318,10 @@ function ReservationUnit({
 
   const subventionSuffix = useMemo(
     () =>
-      reservationUnit.canApplyFreeOfCharge ? (
+      reservationUnit.priceSummary?.canApplyForDiscount ? (
         <SubventionSuffix setIsDialogOpen={setIsPricingTermsDialogOpen} />
       ) : undefined,
-    [reservationUnit.canApplyFreeOfCharge]
+    [reservationUnit.priceSummary?.canApplyForDiscount]
   );
 
   const pricingTermsContent = reservationUnit.pricingTerms
@@ -554,7 +554,7 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       descriptionFi
       descriptionEn
       descriptionSv
-      canApplyFreeOfCharge
+      ...PriceSummaryFields
       ...ReservationInfoSection
       ...ReservationQuotaReached
       publishingState

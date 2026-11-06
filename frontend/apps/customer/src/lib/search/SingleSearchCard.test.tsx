@@ -2,9 +2,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { addDays } from "date-fns";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { AccessType } from "@gql/gql-types";
+import { AccessType, PriceUnit } from "@gql/gql-types";
 import type { SingleSearchCardFragment } from "@gql/gql-types";
-import { getActivePricing } from "@/modules/reservationUnit";
 import { SingleSearchCard } from "./SingleSearchCard";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
@@ -23,20 +22,8 @@ vi.mock("@/modules/const", () => ({
   },
 }));
 
-vi.mock("@/modules/reservationUnit", () => ({
-  getActivePricing: vi.fn(() => undefined),
-  getPriceString: vi.fn(() => "10,00 - 20,00 € / tunti"),
-}));
-
 vi.mock("@/modules/urls", () => ({
   getReservationUnitPath: (pk: number) => `/reservation-unit/${pk}`,
-}));
-
-vi.mock("ui/src/modules/helpers", () => ({
-  getLocalizationLang: () => "fi",
-  getTranslation: (obj: unknown) => (typeof obj === "object" && obj != null && "nameFi" in obj ? obj.nameFi : null),
-  getImageSource: (img: unknown) => (img ? "https://example.com/image.jpg" : undefined),
-  getMainImage: (ru: { images?: ReadonlyArray<unknown> }) => ru?.images?.[0] ?? null,
 }));
 
 function createMockReservationUnit(overrides: Partial<SingleSearchCardFragment> = {}): SingleSearchCardFragment {
@@ -53,7 +40,7 @@ function createMockReservationUnit(overrides: Partial<SingleSearchCardFragment> 
     currentAccessType: null,
     effectiveAccessType: null,
     maxPersons: null,
-    pricings: [],
+    priceSummary: null,
     accessTypes: [],
     reservationUnitType: null,
     images: [],
@@ -71,7 +58,6 @@ describe("SingleSearchCard", () => {
   beforeEach(() => {
     mockedSearchParams.mockReturnValue(new URLSearchParams());
     constState.isBrowser = true;
-    vi.mocked(getActivePricing).mockReturnValue(undefined);
   });
 
   afterEach(() => {
@@ -86,9 +72,14 @@ describe("SingleSearchCard", () => {
   });
 
   test("renders optional infos when data is present", () => {
-    vi.mocked(getActivePricing).mockReturnValue({} as ReturnType<typeof getActivePricing>);
     const reservationUnit = createMockReservationUnit({
       maxPersons: 5,
+      priceSummary: {
+        isFree: false,
+        lowestAmount: "20",
+        priceUnit: PriceUnit.PerHour,
+        canApplyForDiscount: true,
+      },
       effectiveAccessType: AccessType.AccessCode,
       reservationUnitType: {
         id: "type-1",
@@ -101,7 +92,7 @@ describe("SingleSearchCard", () => {
     render(<SingleSearchCard reservationUnit={reservationUnit} />);
 
     expect(screen.getByText("Meeting room")).toBeInTheDocument();
-    expect(screen.getByText("10,00 - 20,00 € / tunti")).toBeInTheDocument();
+    expect(screen.getByText("0 - 20,00 € / prices:priceUnits.PER_HOUR")).toBeInTheDocument();
     expect(screen.getByLabelText(/reservationUnitCard:maxPersons/)).toBeInTheDocument();
     expect(screen.getByText(/reservationUnitCard:maxPersons/)).toBeInTheDocument();
     expect(screen.getByLabelText("reservationUnit:accessType")).toBeInTheDocument();
