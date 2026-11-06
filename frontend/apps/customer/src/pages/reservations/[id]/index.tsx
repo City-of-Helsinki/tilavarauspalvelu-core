@@ -157,7 +157,7 @@ function convertNotify(str: string | null): ReservationNotifications | null {
   return null;
 }
 
-function Reservation({
+export default function Reservation({
   termsOfUse,
   reservation,
   options,
@@ -475,8 +475,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return notFound;
 }
-
-export default Reservation;
 
 export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   query ApplicationReservationSeries($id: ID!) {
