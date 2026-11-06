@@ -33,6 +33,57 @@ pytestmark = [
 ]
 
 
+# ── Helpers ──
+
+
+JAN_1 = datetime.date(2027, 1, 1)
+MAY_3 = datetime.date(2027, 5, 3)  # Monday
+MAY_17 = datetime.date(2027, 5, 17)  # Monday
+MAY_31 = datetime.date(2027, 5, 31)  # Monday
+
+
+def create_allocation(*, application_round, reservation_unit, section_name="Kenttä", price_option=None):
+    """An allocation on Mondays 12-14 in May 2027, in a handled application."""
+    application = ApplicationFactory.create_in_status_handled_no_sections(application_round=application_round)
+    section = ApplicationSectionFactory.create(
+        application=application,
+        name=section_name,
+        price_option=price_option,
+        applied_reservations_per_week=1,
+        reservations_begin_date=MAY_3,
+        reservations_end_date=MAY_31,
+    )
+    option = ReservationUnitOptionFactory.create(application_section=section, reservation_unit=reservation_unit)
+    AllocatedTimeSlotFactory.create(
+        reservation_unit_option=option,
+        day_of_the_week=Weekday.MONDAY,
+        begin_time=datetime.time(12),
+        end_time=datetime.time(14),
+    )
+
+
+def create_unit_with_price(*, name, price_option=None, valid_until=None):
+    unit_group = price_option.unit_group if price_option is not None else None
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        price_option=price_option,
+        valid_from=JAN_1,
+        valid_until=valid_until,
+        amount=Decimal(10),
+    )
+    reservation_unit = ReservationUnitFactory.create(name=name)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1,
+    )
+    return reservation_unit
+
+
+# ── Set handled ──
+
+
 def test_application_round__set_handled(graphql):
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
@@ -204,51 +255,6 @@ def test_application_round__set_handled__error__has_applications_in_status(graph
 
 
 # ── Prices ──
-
-
-JAN_1 = datetime.date(2027, 1, 1)
-MAY_3 = datetime.date(2027, 5, 3)  # Monday
-MAY_17 = datetime.date(2027, 5, 17)  # Monday
-MAY_31 = datetime.date(2027, 5, 31)  # Monday
-
-
-def create_allocation(*, application_round, reservation_unit, section_name="Kenttä", price_option=None):
-    """An allocation on Mondays 12-14 in May 2027, in a handled application."""
-    application = ApplicationFactory.create_in_status_handled_no_sections(application_round=application_round)
-    section = ApplicationSectionFactory.create(
-        application=application,
-        name=section_name,
-        price_option=price_option,
-        applied_reservations_per_week=1,
-        reservations_begin_date=MAY_3,
-        reservations_end_date=MAY_31,
-    )
-    option = ReservationUnitOptionFactory.create(application_section=section, reservation_unit=reservation_unit)
-    AllocatedTimeSlotFactory.create(
-        reservation_unit_option=option,
-        day_of_the_week=Weekday.MONDAY,
-        begin_time=datetime.time(12),
-        end_time=datetime.time(14),
-    )
-
-
-def create_unit_with_price(*, name, price_option=None, valid_until=None):
-    unit_group = price_option.unit_group if price_option is not None else None
-    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
-    PriceComponentFactory.create(
-        pricing_group=pricing_group,
-        price_option=price_option,
-        valid_from=JAN_1,
-        valid_until=valid_until,
-        amount=Decimal(10),
-    )
-    reservation_unit = ReservationUnitFactory.create(name=name)
-    ReservationUnitPricingGroupFactory.create(
-        reservation_unit=reservation_unit,
-        pricing_group=pricing_group,
-        begins=JAN_1,
-    )
-    return reservation_unit
 
 
 def test_application_round__set_handled__all_prices_exist(graphql):
