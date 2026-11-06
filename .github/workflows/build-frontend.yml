@@ -18,9 +18,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Build both ui and admin-ui dockers
+  # Skip the builds when a pull request changes only the e2e suite. See detect-e2e-only.yml.
+  changes:
+    uses: ./.github/workflows/detect-e2e-only.yml
+    permissions:
+      contents: read
+      pull-requests: read
+
+  # Build both ui and admin-ui dockers.
+  # The jobs pass "skip" to the build workflow, and do not skip themselves.
+  # A skipped caller job does not report the "<caller> / <job>" check that is required for the merge.
   build-ui-docker:
     name: "Build customer ui docker"
+    needs: changes
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/build-ui-docker.yml
     permissions:
       contents: read
@@ -29,10 +40,13 @@ jobs:
       app-name: "customer"
       sentry-project: "tilavarauspalvelu-customer-ui"
       base-url: ""
+      skip: ${{ needs.changes.outputs.e2e-only == 'true' }}
     secrets: inherit
 
   build-admin-ui-docker:
     name: "Build staff ui docker"
+    needs: changes
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/build-ui-docker.yml
     permissions:
       contents: read
@@ -41,4 +55,5 @@ jobs:
       app-name: "staff"
       sentry-project: "tilavarauspalvelu-staff-ui"
       base-url: "/kasittely"
+      skip: ${{ needs.changes.outputs.e2e-only == 'true' }}
     secrets: inherit

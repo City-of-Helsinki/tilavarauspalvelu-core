@@ -20,8 +20,17 @@ env:
   PNPM_VERSION: 11.3.0
 
 jobs:
+  # Skip the jobs when a pull request changes only the e2e suite. See detect-e2e-only.yml.
+  changes:
+    uses: ./.github/workflows/detect-e2e-only.yml
+    permissions:
+      contents: read
+      pull-requests: read
+
   lint-staff-ui:
     name: Staff ui lint
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.e2e-only != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -53,6 +62,8 @@ jobs:
 
   test-staff-ui:
     name: Staff ui unit test
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.e2e-only != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -90,6 +101,8 @@ jobs:
 
   lint-customer-ui:
     name: Customer ui lint
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.e2e-only != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -121,6 +134,8 @@ jobs:
 
   test-customer-ui:
     name: Customer ui unit tests
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.e2e-only != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -158,6 +173,8 @@ jobs:
 
   test-ui-package:
     name: Shared ui package unit tests
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.e2e-only != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

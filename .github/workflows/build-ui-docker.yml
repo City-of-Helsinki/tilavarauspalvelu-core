@@ -16,6 +16,11 @@ on:
       base-url:
         required: true
         type: string
+      # Skip the build. The job still reports a check with its full name, so the required check passes.
+      skip:
+        required: false
+        type: boolean
+        default: false
 
 env:
   SKIP_ENV_VALIDATION: "true"
@@ -26,6 +31,7 @@ env:
 jobs:
   build-and-push:
     name: "Build and push Frontend Docker images to GitHub Packages"
+    if: ${{ !inputs.skip }}
     runs-on: ubuntu-latest
     env:
       BUILD_APP: ${{ inputs.app-name }}

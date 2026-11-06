@@ -21,8 +21,17 @@ env:
   REGISTRY: "ghcr.io"
 
 jobs:
+  # Skip the jobs when a pull request changes only the e2e suite. See detect-e2e-only.yml.
+  changes:
+    uses: ./.github/workflows/detect-e2e-only.yml
+    permissions:
+      contents: read
+      pull-requests: read
+
   build-and-push:
     name: "Build and push Backend Docker image to GitHub Packages"
+    needs: changes
+    if: ${{ !cancelled() && needs.changes.outputs.e2e-only != 'true' }}
     runs-on: ubuntu-latest
 
     permissions:
