@@ -13,19 +13,22 @@ const CLIENT_MAX_ATTEMPTS = 3;
 /// The wait before a retry doubles after each attempt, with a random part so the clients don't retry at the same time
 const RETRY_DELAY = { initial: 300, max: 2000, jitter: true };
 
-const RETRY_HTTP_STATUSES = new Set([502, 503, 504]);
+/// 502 and 503 fail fast, the gateway has no backend to send the request to.
+/// Not 504, the backend can still be busy with the request.
+const RETRY_HTTP_STATUSES = new Set([502, 503]);
 
 /// True if the same request can succeed when we send it again.
-/// For example the backend restarts in a deploy, or the gateway has no backend to send the request to.
-export function isTransientError(error: FetchError, isServer: boolean): boolean {
+/// For example the backend restarts in a deploy.
+/// Only errors that fail fast. After a timeout or a 504 the backend can still run the request,
+/// so a retry adds more work to a backend that is already slow.
+export function isTransientError(error: FetchError): boolean {
   switch (error.kind) {
     case "connection":
       return true;
     case "http":
       return RETRY_HTTP_STATUSES.has(error.status);
     case "timeout":
-      // In the browser the user has already waited for the full CLIENT_FETCH_TIMEOUT_MS
-      return isServer;
+      return false;
     // The backend answered, the same request gets the same answer
     case "graphql":
     case "invalid_query":
@@ -48,7 +51,7 @@ export function createRetryLink(isServer: boolean): RetryLink {
     delay: RETRY_DELAY,
     attempts: {
       max: isServer ? SERVER_MAX_ATTEMPTS : CLIENT_MAX_ATTEMPTS,
-      retryIf: (error, operation) => isQuery(operation) && isTransientError(classifyError(error), isServer),
+      retryIf: (error, operation) => isQuery(operation) && isTransientError(classifyError(error)),
     },
   });
 }

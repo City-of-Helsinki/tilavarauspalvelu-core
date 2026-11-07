@@ -64,7 +64,7 @@ describe("createRetryLink", () => {
     expect(getCalls()).toBe(3);
   });
 
-  test.each([502, 503, 504])("retries a query that failed with %i", async (status) => {
+  test.each([502, 503])("retries a query that failed with %i", async (status) => {
     const { client, getCalls } = createClient(false, [serverError(status)]);
     const result = await run(client.query({ query: QUERY }));
     expect(result.status).toBe("fulfilled");
@@ -85,17 +85,9 @@ describe("createRetryLink", () => {
     expect(getCalls()).toBe(2);
   });
 
-  test("retries a timeout on the server", async () => {
+  test.each([true, false])("does not retry a timeout (server: %s)", async (isServer) => {
     const timeout = new DOMException("Request timed out", "TimeoutError");
-    const { client, getCalls } = createClient(true, [timeout]);
-    const result = await run(client.query({ query: QUERY }));
-    expect(result.status).toBe("fulfilled");
-    expect(getCalls()).toBe(2);
-  });
-
-  test("does not retry a timeout in the browser", async () => {
-    const timeout = new DOMException("Request timed out", "TimeoutError");
-    const { client, getCalls } = createClient(false, [timeout]);
+    const { client, getCalls } = createClient(isServer, [timeout]);
     const result = await run(client.query({ query: QUERY }));
     expect(result.status).toBe("rejected");
     expect(getCalls()).toBe(1);
@@ -108,7 +100,7 @@ describe("createRetryLink", () => {
     expect(getCalls()).toBe(1);
   });
 
-  test.each([400, 403, 500])("does not retry a query that failed with %i", async (status) => {
+  test.each([400, 403, 500, 504])("does not retry a query that failed with %i", async (status) => {
     const { client, getCalls } = createClient(false, [serverError(status)]);
     const result = await run(client.query({ query: QUERY }));
     expect(result.status).toBe("rejected");
