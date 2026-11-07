@@ -17,7 +17,9 @@ import {
 } from "@ui/modules/helpers";
 import { Flex, fontMedium, Strong } from "@ui/styled";
 import { AccessType, ReservationStateChoice, useAccessCodeQuery } from "@gql/gql-types";
-import type { ReservationInfoCardFragment } from "@gql/gql-types";
+import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
+import { getPriceLineStringList, getReservationPriceDisplay, getReservationPriceString } from "@/modules/price";
+import type { ReservationPriceDisplay } from "@/modules/price";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 
@@ -49,7 +51,10 @@ const Subheading = styled.p`
 
 type Props = {
   reservation: ReservationInfoCardFragment;
-  shouldDisplayReservationUnitPrice?: boolean;
+  /// The price calculated by the backend for the time of the reservation
+  reservationPrice?: ReservationPriceCalculationFieldsFragment | null;
+  /// Show the price as a range from 0, because the customer applies for a discount
+  isDiscountRange?: boolean;
   // Background color of the card
   bgColor?: "gold" | "silver";
   // Hide the reservation unit image
@@ -61,7 +66,8 @@ type Props = {
 export function ReservationInfoCard({
   reservation,
   bgColor = "silver",
-  shouldDisplayReservationUnitPrice = false,
+  reservationPrice,
+  isDiscountRange = false,
   disableImage = false,
   className,
   style,
@@ -95,16 +101,19 @@ export function ReservationInfoCard({
 
   const duration = differenceInMinutes(new Date(endsAt), new Date(beginsAt));
   const lang = getLocalizationLang(i18n.language);
-  const price: string | null = getPrice(t, reservation, lang, shouldDisplayReservationUnitPrice);
+  const priceDisplay = reservationPrice != null ? getReservationPriceDisplay(reservationPrice, lang) : null;
+  const price: string | null =
+    priceDisplay != null
+      ? getReservationPriceString(t, priceDisplay, isDiscountRange, lang)
+      : getPrice(t, reservation, lang);
+  const priceLineList = priceDisplay != null ? getPriceLineStringList(priceDisplay, lang) : [];
 
-  const { taxPercentageValue, state } = reservation;
+  const { state } = reservation;
 
   const showReservationNumber = state != null && state !== ReservationStateChoice.Created;
 
-  const shouldDisplayTaxPercentage: boolean =
-    state === ReservationStateChoice.RequiresHandling
-      ? isReservationUnitPaid(reservationUnit.pricings, new Date(beginsAt))
-      : Number(reservation?.price) > 0;
+  const taxPercentage =
+    priceDisplay != null ? getTaxPercentage(priceDisplay) : getReservationTaxPercentage(reservation);
 
   const name = getTranslation(reservationUnit, "name", lang);
   const img = getMainImage(reservationUnit);
@@ -139,11 +148,13 @@ export function ReservationInfoCard({
         </div>
         <div data-testid="reservation__reservation-info-card__price">
           {t("common:price")}: <Strong>{price}</Strong>{" "}
-          {taxPercentageValue &&
-            shouldDisplayTaxPercentage &&
+          {taxPercentage != null &&
             `(${t("common:inclTax", {
-              taxPercentage: formatters.strippedDecimal?.format(Number.parseFloat(taxPercentageValue)),
+              taxPercentage: formatters.strippedDecimal?.format(taxPercentage),
             })})`}
+          {priceLineList.map((priceLine) => (
+            <div key={priceLine}>{priceLine}</div>
+          ))}
         </div>
         {reservation.accessType !== AccessType.Unrestricted && (
           <div data-testid="reservation__reservation-info-card__accessType">
@@ -155,6 +166,22 @@ export function ReservationInfoCard({
       </Flex>
     </InfoCard>
   );
+}
+
+function getTaxPercentage(price: ReservationPriceDisplay): number | null {
+  return price.total > 0 ? price.taxPercentage : null;
+}
+
+function getReservationTaxPercentage(reservation: ReservationInfoCardFragment): number | null {
+  const { taxPercentageValue, state, reservationUnit, beginsAt } = reservation;
+  if (!taxPercentageValue) {
+    return null;
+  }
+  const shouldDisplayTaxPercentage: boolean =
+    state === ReservationStateChoice.RequiresHandling
+      ? isReservationUnitPaid(reservationUnit.pricings, new Date(beginsAt))
+      : Number(reservation.price) > 0;
+  return shouldDisplayTaxPercentage ? Number.parseFloat(taxPercentageValue) : null;
 }
 
 export const RESERVATION_INFO_CARD_FRAGMENT = gql`
