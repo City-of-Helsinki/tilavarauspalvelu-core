@@ -22,7 +22,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnit, Resource, Space
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 
-from .form import ReservationUnitAccessTypeInline, ReservationUnitAdminForm, ReservationUnitPricingInline
+from .form import PricingGroupOfReservationUnitInline, ReservationUnitAccessTypeInline, ReservationUnitAdminForm
 
 if TYPE_CHECKING:
     from django import forms
@@ -211,7 +211,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
     ]
     inlines = [
         ReservationUnitImageInline,
-        ReservationUnitPricingInline,
+        PricingGroupOfReservationUnitInline,
         ApplicationRoundTimeSlotInline,
         ReservationUnitAccessTypeInline,
     ]
