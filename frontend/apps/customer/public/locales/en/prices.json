@@ -11,5 +11,6 @@
   "priceFree": "Free",
   "taxPercentage": "VAT {{count}}%",
   "total": "Total",
-  "materialPrice": "material price"
+  "materialPrice": "material price",
+  "loading": "Loading the price"
 }

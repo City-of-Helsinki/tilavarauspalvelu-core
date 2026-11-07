@@ -1,3 +1,4 @@
+import type { MockedResponse } from "@apollo/client/testing";
 import { createNodeId } from "ui/src/modules/helpers";
 import {
   AccessType,
@@ -12,8 +13,14 @@ import {
   ReserveeType,
   TermsOfUseTypeChoices,
   ReservationFormType,
+  ReservationPriceDocument,
 } from "@gql/gql-types";
-import type { ReservationFormFieldsFragment, PaymentOrderNode, ReservationPageQuery } from "@gql/gql-types";
+import type {
+  ReservationFormFieldsFragment,
+  PaymentOrderNode,
+  ReservationPageQuery,
+  ReservationPriceCalculationFieldsFragment,
+} from "@gql/gql-types";
 import { generateNameFragment } from "@test/test.gql.utils";
 
 export function generateTextFragment(text: string) {
@@ -503,4 +510,48 @@ export function createSupportedFieldsMock(type: ReserveeType | "reservation" = "
     case ReserveeType.Individual:
       return baseReserveeFields;
   }
+}
+
+type ReservationPriceLine = ReservationPriceCalculationFieldsFragment["lines"][number];
+
+export function createReservationPriceLine(overrides: Partial<ReservationPriceLine> = {}): ReservationPriceLine {
+  return {
+    ...generateDescriptionFragment("Space rent"),
+    amount: "40.00",
+    taxPercentage: "25.5",
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
+    ...overrides,
+  };
+}
+
+/// Mock of the price calculation query of the backend for one reservation unit and time
+export function createReservationPriceQueryMock({
+  reservationUnit = 1,
+  beginsAt,
+  endsAt,
+  price,
+}: {
+  reservationUnit?: number;
+  beginsAt: Date;
+  endsAt: Date;
+  price: ReservationPriceCalculationFieldsFragment;
+}): MockedResponse {
+  return {
+    request: {
+      query: ReservationPriceDocument,
+      variables: { reservationUnit, beginsAt: beginsAt.toISOString(), endsAt: endsAt.toISOString() },
+    },
+    result: {
+      data: {
+        // The fragment needs the type names to match the response
+        reservationPrice: {
+          __typename: "ReservationPriceType",
+          ...price,
+          lines: price.lines.map((line) => ({ __typename: "ReservationPriceCalculationLineType", ...line })),
+        },
+      },
+    },
+  };
 }
