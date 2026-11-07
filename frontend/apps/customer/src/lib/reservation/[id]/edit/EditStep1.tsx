@@ -15,6 +15,7 @@ import { useAdjustReservationTimeMutation } from "@gql/gql-types";
 import type { EditPageReservationFragment } from "@gql/gql-types";
 import { AcceptTerms } from "@/components/AcceptTerms";
 import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
+import { useReservationPrice } from "@/hooks";
 import { convertReservationFormToApi } from "@/modules/reservation";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
@@ -139,6 +140,10 @@ export function EditStep1({ reservation, options, onBack, form }: Props): React.
     beginsAt: apiValues?.beginsAt ?? reservation.beginsAt,
     endsAt: apiValues?.endsAt ?? reservation.endsAt,
   };
+  const { reservationPrice } = useReservationPrice(reservationUnit?.pk, {
+    start: new Date(modifiedReservation.beginsAt),
+    end: new Date(modifiedReservation.endsAt),
+  });
 
   if (reservationUnit == null) {
     return <ErrorComponent statusCode={404} />;
@@ -146,7 +151,7 @@ export function EditStep1({ reservation, options, onBack, form }: Props): React.
 
   return (
     <>
-      <StyledReservationInfoCard reservation={modifiedReservation} bgColor="gold" />
+      <StyledReservationInfoCard reservation={modifiedReservation} reservationPrice={reservationPrice} bgColor="gold" />
       <StyledForm onSubmit={handleSubmit(onSubmit)}>
         <SummaryGeneralFields reservation={reservation} options={options} />
         <SummaryReserveeFields reservation={reservation} options={options} />
