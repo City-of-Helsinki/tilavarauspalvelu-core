@@ -9,9 +9,14 @@ import type { ApolloLink } from "@apollo/client";
 import type { DocumentNode } from "graphql";
 import { RESERVEE_PI_FIELDS } from "@ui/components/reservation-form/utils";
 import { toast } from "../../components/toast";
-import { CLIENT_FETCH_TIMEOUT_MS, CLIENT_UPLOAD_TIMEOUT_MS, SERVER_FETCH_TIMEOUT_MS } from "../const";
+import {
+  CLIENT_FETCH_TIMEOUT_MS,
+  CLIENT_UPLOAD_TIMEOUT_MS,
+  SERVER_MUTATION_TIMEOUT_MS,
+  SERVER_QUERY_TIMEOUT_MS,
+} from "../const";
 import { CsrfTokenNotFound } from "../errors";
-import { fetchWithTimeout } from "../fetch";
+import { fetchWithTimeout, getOperationType } from "../fetch";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import { getClientOrigin } from "../urlBuilder";
 import type { LocalizationLanguages } from "../urlBuilder";
@@ -124,7 +129,10 @@ function getServerCookie(headers: IncomingHttpHeaders | undefined, name: string)
 
 function getTimeoutMs(isServer: boolean, init: RequestInit | undefined, clientTimeoutMs: number): number {
   if (isServer) {
-    return SERVER_FETCH_TIMEOUT_MS;
+    // A mutation can call external services, and after a timeout we do not know if it completed
+    return getOperationType(init?.body) === OperationTypeNode.MUTATION
+      ? SERVER_MUTATION_TIMEOUT_MS
+      : SERVER_QUERY_TIMEOUT_MS;
   }
   // The upload link sends files as multipart form data
   if (init?.body instanceof FormData) {
@@ -134,7 +142,7 @@ function getTimeoutMs(isServer: boolean, init: RequestInit | undefined, clientTi
 }
 
 /// @param req - the incoming request, required on the server
-/// @param clientTimeoutMs - timeout in the browser, the server always uses SERVER_FETCH_TIMEOUT_MS
+/// @param clientTimeoutMs - timeout in the browser. The server uses SERVER_QUERY_TIMEOUT_MS or SERVER_MUTATION_TIMEOUT_MS.
 export function enchancedFetch(req?: IncomingMessage, clientTimeoutMs: number = CLIENT_FETCH_TIMEOUT_MS) {
   return (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const isServer = typeof window === "undefined";

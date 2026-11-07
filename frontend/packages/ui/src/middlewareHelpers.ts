@@ -1,8 +1,8 @@
-import { getOperationAST, OperationTypeNode, parse } from "graphql";
+import { OperationTypeNode } from "graphql";
 import type { NextRequest } from "next/server";
-import { SERVER_FETCH_TIMEOUT_MS } from "./modules/const";
+import { MIDDLEWARE_FETCH_TIMEOUT_MS } from "./modules/const";
 import { GraphQLFetchError } from "./modules/errors";
-import { fetchWithTimeout, getConnectionErrorCode } from "./modules/fetch";
+import { fetchWithTimeout, getConnectionErrorCode, getOperationType } from "./modules/fetch";
 import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 
 // The regexes below work on a path with or without a query string and with or without a base path.
@@ -86,14 +86,6 @@ export type GqlQuery = {
   variables?: Record<string, unknown>;
 };
 
-function isQuery(query: GqlQuery): boolean {
-  try {
-    return getOperationAST(parse(query.query))?.operation === OperationTypeNode.QUERY;
-  } catch {
-    return false;
-  }
-}
-
 /// Fetch a query from the backend
 /// @param req - NextRequest used to read cookies and the referer
 /// @param query - Query object with query and variables
@@ -138,14 +130,18 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   const body: string = JSON.stringify(query);
 
   const send = () =>
-    fetchWithTimeout(buildGraphQLUrl(apiUrl), { method: "POST", headers: newHeaders, body }, SERVER_FETCH_TIMEOUT_MS);
+    fetchWithTimeout(
+      buildGraphQLUrl(apiUrl),
+      { method: "POST", headers: newHeaders, body },
+      MIDDLEWARE_FETCH_TIMEOUT_MS
+    );
   let res: Response;
   try {
     res = await send();
   } catch (err) {
     // Send a query again once if there was no connection, for example a backend pod restarts.
     // Never send a mutation again, it can have completed on the backend.
-    if (!isQuery(query) || getConnectionErrorCode(err) == null) {
+    if (getOperationType(body) !== OperationTypeNode.QUERY || getConnectionErrorCode(err) == null) {
       throw err;
     }
     res = await send();
