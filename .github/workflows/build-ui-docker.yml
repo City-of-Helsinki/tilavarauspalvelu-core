@@ -42,8 +42,10 @@ jobs:
       # required because error pages use build time env vars, not runtime env vars
       # it's the same on every environment
       FEEDBACK_URL: "https://lomake.hel.fi/varaamo-palaute"
-      # NOTE this should only be ran for release tags (v*), but {{ github.event.release.tag_name }} is not correct during a run
-      SENTRY_ENABLE_SOURCE_MAPS: true
+      # Upload source maps and create a Sentry release only for release tags (v*).
+      # Only tagged builds go to production. Other builds (pull requests, main) would create
+      # extra unfinalized releases, for example "tilavarauspalvelu-customer-ui@1234-merge".
+      SENTRY_ENABLE_SOURCE_MAPS: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
       SENTRY_URL: "https://city-of-helsinki.sentry.io"
       SENTRY_ORG: "city-of-helsinki"
       SENTRY_PROJECT: ${{ inputs.sentry-project }}
