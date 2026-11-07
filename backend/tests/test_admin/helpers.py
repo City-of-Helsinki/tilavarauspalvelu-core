@@ -69,7 +69,7 @@ def required_reservation_unit_form_data(reservation_unit: ReservationUnit) -> di
         #
         # Inline form metadata
         **management_form_data("images"),
-        **management_form_data("pricings"),
+        **management_form_data("reservation_unit_pricing_groups"),
         **management_form_data("application_round_time_slots"),
         **management_form_data("access_types"),
     }
