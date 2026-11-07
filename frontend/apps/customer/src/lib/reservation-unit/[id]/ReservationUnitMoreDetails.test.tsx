@@ -54,6 +54,9 @@ function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary
     lowestAmount: "20",
     priceUnit: PriceUnit.PerHour,
     canApplyForDiscount: false,
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
     ...overrides,
   };
 }

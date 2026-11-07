@@ -20,6 +20,7 @@ import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
+  capitalize,
   createNodeId,
   filterNonNullable,
   getLocalizationLang,
@@ -59,6 +60,7 @@ import {
 import { isReservationQuotaReached } from "@/lib/reservation-unit/[id]/ReservationUnitCalendarSection";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getPostLoginUrl } from "@/modules/helpers";
+import { getMaterialPriceDescription } from "@/modules/price";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
 import { convertFormToFocustimeSlot, createDateTime, getDurationOptions } from "@/modules/reservation";
 import type { FocusTimeSlot } from "@/modules/reservation";
@@ -325,6 +327,7 @@ function ReservationUnit({
   const pricingTermsContent = reservationUnit.pricingTerms
     ? getTranslation(reservationUnit.pricingTerms, "text", lang)
     : undefined;
+  const materialPriceDescription = getMaterialPriceDescription(reservationUnit.priceSummary, lang);
 
   return (
     <>
@@ -358,6 +361,12 @@ function ReservationUnit({
             <H4 as="h2">{t("reservationUnit:description")}</H4>
             <Sanitize html={getTranslation(reservationUnit, "description", lang)} />
           </div>
+          {materialPriceDescription !== "" && (
+            <div>
+              <H4 as="h2">{capitalize(t("prices:materialPrice"))}</H4>
+              <Sanitize html={materialPriceDescription} />
+            </div>
+          )}
           {equipment.length > 0 && (
             <div data-testid="reservation-unit__equipment">
               <H4 as="h2">{t("reservationUnit:equipment")}</H4>
