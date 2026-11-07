@@ -1,51 +1,17 @@
 import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
-import z from "zod";
 import type { NextRequest } from "next/server";
 import { logError } from "@ui/modules/errors";
-import { isPageRequest, gqlQueryFetch, redirectCsrfToken } from "ui/src/middlewareHelpers";
-import type { GqlQuery } from "ui/src/middlewareHelpers";
+import { isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import { removeTrailingSlash } from "ui/src/modules/urlBuilder";
 import { env } from "@/env.mjs";
 import { PUBLIC_URL } from "./modules/const";
 
 const API_BASE_URL = env.TILAVARAUS_API_URL ?? "";
 
-const CurrentUserSchema = z.object({
-  pk: z.number(),
-});
-const QueryResultSchema = z.object({
-  currentUser: CurrentUserSchema.nullable(),
-});
-const CurrentUserQuerySchema = z.object({
-  data: QueryResultSchema,
-});
-
-type QueryResultType = z.infer<typeof QueryResultSchema>;
-
-async function fetchUserData(req: NextRequest): Promise<QueryResultType | null> {
-  const { cookies } = req;
-  const sessionid = cookies.get("sessionid");
-
-  if (sessionid == null) {
-    return null;
-  }
-  const userQuery: GqlQuery = {
-    query: `
-      query GetCurrentUser {
-        currentUser {
-          pk
-        }
-      }
-    `,
-    variables: {},
-  };
-
-  const data = await gqlQueryFetch(req, userQuery, API_BASE_URL);
-  return CurrentUserQuerySchema.parse(data).data;
-}
-
-async function handleRequest(req: NextRequest) {
+/// Redirect to the backend when the CSRF token is missing.
+/// The middleware makes no backend requests. The pages query the user themselves, in _app.
+function handleRequest(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const basePath = removeTrailingSlash(env.NEXT_PUBLIC_BASE_URL ?? "");
   const sentryTunnelPath = `${basePath}/monitoring`;
@@ -67,18 +33,7 @@ async function handleRequest(req: NextRequest) {
     }
     return NextResponse.redirect(csrfRedirectUrl);
   }
-
-  // The pages make their own queries, so a failed query here must not stop the page.
-  // If the backend is down, the query of the page fails and the page shows the error.
-  try {
-    const data = await fetchUserData(req);
-    const res = NextResponse.next();
-    res.headers.set("x-session-is-valid", String(data?.currentUser?.pk != null));
-    return res;
-  } catch (err) {
-    logError(err);
-    return NextResponse.next();
-  }
+  return NextResponse.next();
 }
 
 // Turbopack does not add the Sentry wrapper automatically.
