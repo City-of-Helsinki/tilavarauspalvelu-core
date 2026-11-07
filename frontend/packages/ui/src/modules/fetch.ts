@@ -1,3 +1,25 @@
+import { getOperationAST, parse } from "graphql";
+import type { OperationTypeNode } from "graphql";
+
+/// The operation type of a GraphQL request body, or null if the body is not a GraphQL request
+/// @param body - the body of the fetch request, a JSON string with "query" and "operationName"
+export function getOperationType(body: unknown): OperationTypeNode | null {
+  if (typeof body !== "string") {
+    return null;
+  }
+  try {
+    const request: unknown = JSON.parse(body);
+    if (typeof request !== "object" || request == null || !("query" in request) || typeof request.query !== "string") {
+      return null;
+    }
+    const operationName =
+      "operationName" in request && typeof request.operationName === "string" ? request.operationName : undefined;
+    return getOperationAST(parse(request.query), operationName)?.operation ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /// Error name of a request that fetchWithTimeout stopped.
 /// It is the same name that AbortSignal.timeout uses.
 export const FETCH_TIMEOUT_ERROR_NAME = "TimeoutError";
