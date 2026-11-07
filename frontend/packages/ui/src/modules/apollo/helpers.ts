@@ -20,7 +20,7 @@ import { fetchWithTimeout, getOperationType } from "../fetch";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import { getClientOrigin } from "../urlBuilder";
 import type { LocalizationLanguages } from "../urlBuilder";
-import { classifyError, isPermissionErrorCode } from "./errors";
+import { classifyError, isPermissionErrorCode, isToastedByErrorLink } from "./errors";
 import type { ApiError, FetchError } from "./errors";
 
 /// Log all errors of the backend requests to Sentry, and toast the errors that the UI can not handle.
@@ -53,21 +53,20 @@ function toastFetchError(error: FetchError, operation: ApolloLink.Operation): vo
   if (!isBrowser) {
     return;
   }
-  // The UI handles the GraphQL errors.
-  // An invalid query is a bug, the user can not do anything about it.
   // The admin UI has no middleware that could redirect to the backend when the CSRF token is missing.
   // In practice this is not a problem, because login sets the CSRF token and the login page is static.
-  if (error.kind === "graphql" || error.kind === "invalid_query" || error.kind === "csrf") {
+  if (!isToastedByErrorLink(error)) {
     return;
   }
-  const errorToastId = "network_error";
+  const isMutationTimeout = error.kind === "timeout" && isMutation(operation);
+  // The mutation timeout has its own toast, so an open network error toast does not hide it
+  const errorToastId = isMutationTimeout ? "mutation_timeout_error" : "network_error";
   // don't create multiple toasts
   if (document.querySelector(`#${errorToastId}`)) {
     return;
   }
   // Not translated because of how difficult it is to pass the translation function here
   const lang = getLocalizationLang(document.documentElement.lang);
-  const isMutationTimeout = error.kind === "timeout" && isMutation(operation);
   let errorMsg = isMutationTimeout ? MUTATION_TIMEOUT_TRANSLATIONS[lang] : NETWORK_ERROR_TRANSLATIONS[lang];
   if (error.kind === "http") {
     errorMsg += `: ${error.status}`;
