@@ -13,6 +13,7 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   disabled?: boolean;
   id?: string;
   label?: string;
+  helperText?: string;
   maxDate?: Date;
   minDate?: Date;
   initialMonth?: Date;
@@ -28,6 +29,7 @@ export function ControlledDateInput<T extends FieldValues>({
   disabled,
   id,
   label,
+  helperText,
   maxDate,
   minDate,
   initialMonth,
@@ -44,6 +46,7 @@ export function ControlledDateInput<T extends FieldValues>({
       {...rest}
       id={id ?? `controlled-date-input__${name}`}
       label={label ?? t(`common:${name}`)}
+      helperText={helperText}
       minDate={startOfDay(minDate ?? new Date())}
       maxDate={maxDate ?? addYears(new Date(), 2)}
       initialMonth={initialMonth}

@@ -34,13 +34,9 @@ describe("ErrorInfo", () => {
   });
 
   it("renders pricing errors from the pricings field array", async () => {
-    render(
-      <Harness apply={(form) => form.setError("pricings.0.lowestPrice", { type: "custom", message: "Required" })} />
-    );
+    render(<Harness apply={(form) => form.setError("pricings.0.price", { type: "custom", message: "Required" })} />);
 
-    expect(
-      await screen.findByText("reservationUnitEditor:label.lowestPrice : forms:errors.Required")
-    ).toBeInTheDocument();
+    expect(await screen.findByText("reservationUnitEditor:label.price : forms:errors.Required")).toBeInTheDocument();
   });
 
   it("renders per-item access type errors", async () => {
@@ -82,14 +78,14 @@ describe("ErrorInfo", () => {
       <Harness
         apply={(form) => {
           form.setError("nameFi", { type: "custom", message: "Required" });
-          form.setError("pricings.0.lowestPrice", { type: "custom", message: "Required" });
+          form.setError("pricings.0.price", { type: "custom", message: "Required" });
           form.setError("accessTypes", { type: "custom", message: "Required" });
         }}
       />
     );
 
     expect(await screen.findByText("reservationUnitEditor:label.nameFi: forms:errors.Required")).toBeInTheDocument();
-    expect(screen.getByText("reservationUnitEditor:label.lowestPrice : forms:errors.Required")).toBeInTheDocument();
+    expect(screen.getByText("reservationUnitEditor:label.price : forms:errors.Required")).toBeInTheDocument();
     expect(screen.getByText("reservationUnitEditor:label.accessTypes : forms:errors.Required")).toBeInTheDocument();
   });
 });
