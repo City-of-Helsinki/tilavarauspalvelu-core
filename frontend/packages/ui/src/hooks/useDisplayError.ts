@@ -1,7 +1,7 @@
 import { useTranslation } from "next-i18next/pages";
 import type { TFunction } from "next-i18next/pages";
 import { errorToast } from "../components/toast";
-import { getApiErrors } from "../modules/apollo/errors";
+import { getApiErrors, hasErrorLinkToast } from "../modules/apollo/errors";
 import type { ApiError } from "../modules/apollo/errors";
 
 /// formatErrorMessage
@@ -26,6 +26,10 @@ export function useDisplayError() {
   const { t } = useTranslation();
 
   return function displayError(error: unknown) {
+    // For example a timeout. The error link has already told the user what happened.
+    if (hasErrorLinkToast(error)) {
+      return;
+    }
     const errs = getApiErrors(error);
     if (errs.length > 0) {
       const msgs = errs.map((e) => formatErrorMessage(t, e));

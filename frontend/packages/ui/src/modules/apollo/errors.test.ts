@@ -1,4 +1,6 @@
+import { ApolloClient, ApolloLink, InMemoryCache, gql } from "@apollo/client";
 import { CombinedGraphQLErrors, ServerError, ServerParseError } from "@apollo/client/errors";
+import { throwError } from "rxjs";
 import { describe, expect, test } from "vitest";
 import type { GraphQLFormattedError } from "graphql";
 import {
@@ -7,6 +9,7 @@ import {
   getPermissionErrors,
   getSeriesOverlapErrors,
   getValidationErrors,
+  hasErrorLinkToast,
   isNotFoundError,
 } from "./errors";
 
@@ -147,5 +150,46 @@ describe("getApiErrors", () => {
   test("extensions with an unexpected shape do not throw", () => {
     const error = graphQLErrors({ message: "x", extensions: { error_code: 5, errors: "not a list" } });
     expect(getApiErrors(error)).toEqual([{ code: "UNKNOWN" }]);
+  });
+});
+
+describe("hasErrorLinkToast", () => {
+  const MUTATION = gql`
+    mutation Test {
+      test
+    }
+  `;
+
+  /// The error that the mutation throws when the backend request fails with the error
+  async function mutationError(error: Error): Promise<unknown> {
+    const client = new ApolloClient({
+      cache: new InMemoryCache(),
+      link: new ApolloLink(() => throwError(() => error)),
+    });
+    try {
+      await client.mutate({ mutation: MUTATION });
+    } catch (err) {
+      return err;
+    }
+    throw new Error("the mutation did not fail");
+  }
+
+  test.each([
+    ["a timeout", new DOMException("Request timed out", "TimeoutError")],
+    ["no connection", new TypeError("Failed to fetch")],
+    ["a 502 from the gateway", serverError(502, "Bad Gateway")],
+  ])("is true for %s", async (_name, error) => {
+    expect(hasErrorLinkToast(await mutationError(error))).toBe(true);
+  });
+
+  test.each([
+    ["GraphQL errors", graphQLErrors({ message: "x", extensions: { error_code: "NOT_FOUND" } })],
+    ["an invalid query", serverError(400, "{}")],
+  ])("is false for %s", async (_name, error) => {
+    expect(hasErrorLinkToast(await mutationError(error))).toBe(false);
+  });
+
+  test("is false for an error that did not come from a request", () => {
+    expect(hasErrorLinkToast(new Error("a bug in the form"))).toBe(false);
   });
 });
