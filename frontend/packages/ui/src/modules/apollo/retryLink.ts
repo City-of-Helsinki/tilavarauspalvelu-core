@@ -6,7 +6,7 @@ import { classifyError } from "./errors";
 import type { FetchError } from "./errors";
 
 /// The first request and the retries.
-/// On the server all attempts must fit well below the gateway timeout (SERVER_FETCH_TIMEOUT_MS for each attempt).
+/// Only fast failures are retried, so the retries add little time before the gateway timeout.
 const SERVER_MAX_ATTEMPTS = 2;
 const CLIENT_MAX_ATTEMPTS = 3;
 

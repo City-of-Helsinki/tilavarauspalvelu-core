@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { fetchWithTimeout, isTimeoutError } from "./fetch";
+import { fetchWithTimeout, getOperationType, isTimeoutError } from "./fetch";
 
 function abortReason(signal: AbortSignal | null | undefined): Error {
   return signal?.reason instanceof Error ? signal.reason : new Error("aborted");
@@ -91,5 +91,22 @@ describe("fetchWithTimeout", () => {
       "http://localhost",
       expect.objectContaining({ method: "POST", body: "{}", signal: expect.any(AbortSignal) })
     );
+  });
+});
+
+describe("getOperationType", () => {
+  test.each([
+    ["a query", JSON.stringify({ query: "query Test { test }" }), "query"],
+    ["a mutation", JSON.stringify({ query: "mutation Test { test }" }), "mutation"],
+    [
+      "the named operation of many",
+      JSON.stringify({ query: "query A { a } mutation B { b }", operationName: "B" }),
+      "mutation",
+    ],
+    ["a body that is not JSON", "not json", null],
+    ["a query that is not valid", JSON.stringify({ query: "not graphql" }), null],
+    ["form data", new FormData(), null],
+  ])("returns the type of %s", (_name, body, expected) => {
+    expect(getOperationType(body)).toBe(expected);
   });
 });
