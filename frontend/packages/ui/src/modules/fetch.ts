@@ -35,3 +35,15 @@ export async function fetchWithTimeout(
 export function isTimeoutError(error: unknown): boolean {
   return error instanceof Error && error.name === FETCH_TIMEOUT_ERROR_NAME;
 }
+
+/// The error code when Node.js fetch can not connect (for example ECONNREFUSED or ECONNRESET), else null
+export function getConnectionErrorCode(error: unknown): string | null {
+  if (!(error instanceof TypeError)) {
+    return null;
+  }
+  const { cause } = error;
+  if (typeof cause === "object" && cause != null && "code" in cause && typeof cause.code === "string") {
+    return cause.code;
+  }
+  return null;
+}

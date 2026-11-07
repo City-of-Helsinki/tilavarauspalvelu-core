@@ -1,7 +1,7 @@
 import { CombinedGraphQLErrors, LinkError, ServerError, ServerParseError } from "@apollo/client/errors";
 import { z } from "zod";
 import type { GraphQLFormattedError } from "graphql";
-import { isTimeoutError } from "../fetch";
+import { getConnectionErrorCode, isTimeoutError } from "../fetch";
 
 /// An error code from the backend (in the GraphQL error extensions)
 export interface ApiError {
@@ -121,15 +121,6 @@ const BROWSER_FETCH_FAILED_MESSAGES = [
   "Load failed", // Safari
 ];
 
-/// The error code of a failed Node.js fetch (for example ECONNREFUSED)
-function getNodeErrorCode(error: Error): string | null {
-  const { cause } = error;
-  if (typeof cause === "object" && cause != null && "code" in cause && typeof cause.code === "string") {
-    return cause.code;
-  }
-  return null;
-}
-
 function isCsrfFailure(error: ServerError): boolean {
   if (error.statusCode !== 403) {
     return false;
@@ -164,14 +155,12 @@ export function classifyError(error: unknown): FetchError {
   if (isTimeoutError(error)) {
     return { kind: "timeout" };
   }
-  if (error instanceof TypeError) {
-    const code = getNodeErrorCode(error);
-    if (code != null) {
-      return { kind: "connection", code };
-    }
-    if (BROWSER_FETCH_FAILED_MESSAGES.some((msg) => error.message.startsWith(msg))) {
-      return { kind: "connection", code: "BROWSER_FETCH_FAILED" };
-    }
+  const code = getConnectionErrorCode(error);
+  if (code != null) {
+    return { kind: "connection", code };
+  }
+  if (error instanceof TypeError && BROWSER_FETCH_FAILED_MESSAGES.some((msg) => error.message.startsWith(msg))) {
+    return { kind: "connection", code: "BROWSER_FETCH_FAILED" };
   }
   if (error instanceof Error) {
     return { kind: "unknown", message: `${error.name}: ${error.message}` };
