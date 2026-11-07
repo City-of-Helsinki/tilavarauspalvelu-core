@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
 import { AccessType, ReservationUnitImageType, PaymentType, PriceUnit, ReservationStateChoice } from "@gql/gql-types";
-import type { ReservationInfoCardFragment } from "@gql/gql-types";
+import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import { future1hReservation } from "@test/reservation.mocks";
+import { createReservationPriceLine, future1hReservation } from "@test/reservation.mocks";
 import { generateNameFragment } from "@test/test.gql.utils";
 import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
@@ -12,20 +12,31 @@ import { ReservationInfoCard } from "./";
 
 interface CustomRenderProps extends CreateGraphQLMockProps {
   reservation?: ReservationInfoCardFragment;
+  reservationPrice?: ReservationPriceCalculationFieldsFragment;
+  isDiscountRange?: boolean;
 }
 
 const customRender = (
-  { reservation, ...mockProps }: CustomRenderProps = {
+  { reservation, reservationPrice, isDiscountRange, ...mockProps }: CustomRenderProps = {
     reservation: createMockReservationInfoCard(),
   }
 ) => {
   const renderReservation = reservation ?? createInfoCardReservationMock();
   return render(
     <MockedGraphQLProvider mocks={createGraphQLMocks(mockProps)}>
-      <ReservationInfoCard reservation={renderReservation} />
+      <ReservationInfoCard
+        reservation={renderReservation}
+        reservationPrice={reservationPrice}
+        isDiscountRange={isDiscountRange}
+      />
     </MockedGraphQLProvider>
   );
 };
+
+function getPriceText(): string {
+  const text = screen.getByTestId("reservation__reservation-info-card__price").textContent ?? "";
+  return text.replaceAll(/\s+/g, " ").trim();
+}
 
 describe("Component: ReservationInfoCard", () => {
   it("should render the component", () => {
@@ -77,6 +88,67 @@ describe("Component: ReservationInfoCard", () => {
         );
       })
     ).toBeInTheDocument();
+  });
+
+  describe("with the price calculation of the backend", () => {
+    it("shows the total price and the tax percentage", () => {
+      customRender({
+        reservation: createMockReservationInfoCard(),
+        reservationPrice: { total: "40.00", canApplyForDiscount: false, lines: [createReservationPriceLine()] },
+      });
+      expect(getPriceText()).toBe('common:price: 40,00 € (common:inclTax {"taxPercentage":"25,5"})');
+    });
+
+    it("shows the price as a range from 0 when the customer applies for a discount", () => {
+      customRender({
+        reservation: createMockReservationInfoCard(),
+        reservationPrice: { total: "40.00", canApplyForDiscount: true, lines: [createReservationPriceLine()] },
+        isDiscountRange: true,
+      });
+      expect(getPriceText()).toBe('common:price: 0 - 40,00 € (common:inclTax {"taxPercentage":"25,5"})');
+    });
+
+    it("shows free of charge without the tax percentage", () => {
+      customRender({
+        reservation: createMockReservationInfoCard(),
+        reservationPrice: {
+          total: "0.00",
+          canApplyForDiscount: false,
+          lines: [createReservationPriceLine({ amount: "0.00" })],
+        },
+      });
+      expect(getPriceText()).toBe("common:price: prices:priceFree");
+    });
+
+    it("adds the material price when a line has a material price description", () => {
+      customRender({
+        reservation: createMockReservationInfoCard(),
+        reservationPrice: {
+          total: "40.00",
+          canApplyForDiscount: false,
+          lines: [createReservationPriceLine({ materialPriceDescriptionFi: "<p>Materiaali</p>" })],
+        },
+      });
+      expect(getPriceText()).toBe(
+        'common:price: 40,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
+      );
+    });
+
+    it("lists the price lines when there are more than one", () => {
+      customRender({
+        reservation: createMockReservationInfoCard(),
+        reservationPrice: {
+          total: "50.00",
+          canApplyForDiscount: false,
+          lines: [
+            createReservationPriceLine({ descriptionFi: "Tilan vuokra", amount: "40.00" }),
+            createReservationPriceLine({ descriptionFi: "Siivous", amount: "10.00" }),
+          ],
+        },
+      });
+      expect(screen.getByText("Tilan vuokra: 40,00 €")).toBeInTheDocument();
+      expect(screen.getByText("Siivous: 10,00 €")).toBeInTheDocument();
+    });
   });
 });
 

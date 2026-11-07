@@ -7,15 +7,15 @@ import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate, formatDate } from "ui/src/modules/date-utils";
+import { getLocalizationLang } from "ui/src/modules/helpers";
 import { Flex, fontMedium, H4, NoWrap } from "ui/src/styled";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { Carousel } from "@/components/Carousel";
+import { LoadingPrice } from "@/components/reservation/LoadingPrice";
+import { useReservationPrice } from "@/hooks";
+import { getReservationPriceDisplay, getReservationPriceString } from "@/modules/price";
 import type { FocusTimeSlot } from "@/modules/reservation";
-import {
-  getLastPossibleReservationDate,
-  getReservationUnitPrice,
-  isReservationUnitFreeOfCharge,
-} from "@/modules/reservationUnit";
+import { getLastPossibleReservationDate } from "@/modules/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 
 type Props = {
@@ -50,12 +50,6 @@ const Price = styled.div`
   display: inline-grid;
   padding-bottom: var(--spacing-m);
   height: var(--spacing-m);
-
-  flex-grow: 1;
-
-  &:empty {
-    display: none;
-  }
 `;
 
 const Selects = styled.div`
@@ -128,6 +122,11 @@ const SlotContainer = styled.div`
   }
 `;
 
+const TwoColumns = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+`;
+
 export function QuickReservation({
   reservationUnit,
   subventionSuffix,
@@ -141,20 +140,22 @@ export function QuickReservation({
   className,
   style,
 }: Readonly<Props>): React.ReactElement | null {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = getLocalizationLang(i18n.language);
   const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
   const dateValue = useMemo(() => parseUIDate(formDate ?? ""), [formDate]);
   const duration = watch("duration");
 
-  const isFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit?.pricings ?? [], dateValue ?? new Date());
-
-  const price = getReservationUnitPrice({
-    t,
-    reservationUnit,
-    pricingDate: dateValue ?? new Date(),
-    minutes: duration,
-  });
+  const { reservationPrice, isLoading: isPriceLoading } = useReservationPrice(
+    reservationUnit.pk,
+    focusSlot?.isReservable ? focusSlot : null
+  );
+  const canApplyForDiscount = reservationPrice?.canApplyForDiscount === true;
+  const price =
+    reservationPrice != null
+      ? getReservationPriceString(t, getReservationPriceDisplay(reservationPrice, lang), canApplyForDiscount, lang)
+      : null;
 
   const lastPossibleDate = getLastPossibleReservationDate(reservationUnit);
 
@@ -197,17 +198,23 @@ export function QuickReservation({
           durationString={durationOptions.find((opt) => opt.value === duration)?.label ?? ""}
         />
       </SlotContainer>
-      <Flex $direction="row" $justifyContent="space-between">
-        <Price data-testid="quick-reservation__price">
-          {focusSlot?.isReservable && (
-            <>
-              {t("common:price")}: <PriceValue>{price}</PriceValue>
-              <NoWrap>{!isFreeOfCharge && subventionSuffix}</NoWrap>
-            </>
-          )}
-        </Price>
-        {focusSlot?.isReservable && LoginAndSubmit}
-      </Flex>
+      {focusSlot?.isReservable && (
+        <TwoColumns>
+          {/* Without a price, for example after an error, the cell stays empty so that the button keeps its place */}
+          <Price data-testid="quick-reservation__price">
+            {(price != null || isPriceLoading) && (
+              <>
+                {t("common:price")}:{" "}
+                <PriceValue>
+                  <LoadingPrice price={price} isLoading={isPriceLoading} />
+                </PriceValue>
+                <NoWrap>{canApplyForDiscount && subventionSuffix}</NoWrap>
+              </>
+            )}
+          </Price>
+          {LoginAndSubmit}
+        </TwoColumns>
+      )}
     </Form>
   );
 }
