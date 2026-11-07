@@ -31,9 +31,8 @@
     "Too big. expected string to have <=2000 characters": "Viesti ei saa olla yli 2000 merkkiä",
     "Too big. expected string to have <=4000 characters": "Viesti ei saa olla yli 4000 merkkiä",
     "must be a number": "Pitää olla numero",
-    "lowestPrice must be lower than highestPrice": "Alin hinta pitää olla pienempi kuin ylin hinta",
     "taxLevel must be selected": "Verotaso pitää valita",
-    "Begin needs to be in the future": "Alkamisajan tulee olla tulevaisuudessa",
+    "Begin needs to be in the future": "Valitse huominen tai myöhempi päivä.",
     "Number must be greater than or equal to 1": "Pitää olla vähintään 1",
     "Expected number, received null": "Pakollinen",
     "Max persons must be greater than min persons": "Maksimi henkilömäärä pitää olla suurempi kuin minimi henkilömäärä",
@@ -53,6 +52,7 @@
     "duration must be a multiple of the reservation start interval": "Keston on oltava varauksen alkamisvälin kerrannainen",
     "access type duplicate beginDate": "Kulkutavoilla on oltava eri alkamisajat",
     "access type invalid beginDate": "Kulkutavalla on virheellinen alkamisaika",
-    "access types are required for publish": "Varausyksikölle täytyy määrittää vähintään yksi kulkutapa ennen julkaisua"
+    "access types are required for publish": "Varausyksikölle täytyy määrittää vähintään yksi kulkutapa ennen julkaisua",
+    "Begin can't be in the future": "Valitse tämä päivä tai aiempi päivä."
   }
 }
