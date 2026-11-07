@@ -13,6 +13,9 @@ function createPriceSummary(
     lowestAmount: "20.00",
     priceUnit: PriceUnit.PerHour,
     canApplyForDiscount: false,
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
     ...overrides,
   };
 }
@@ -30,6 +33,27 @@ describe("getPriceSummaryString", () => {
 
   test("returns the price with its unit", () => {
     expect(getPriceSummaryString(t, createPriceSummary())).toBe("20,00 € / prices:priceUnits.PER_HOUR");
+  });
+
+  test("adds the material price to a paid price", () => {
+    const priceSummary = createPriceSummary({ materialPriceDescriptionFi: "<p>Materiaalit</p>" });
+    expect(getPriceSummaryString(t, priceSummary)).toBe(
+      "20,00\u00A0€ / prices:priceUnits.PER_HOUR + prices:materialPrice"
+    );
+  });
+
+  test("returns the material price for a free reservation unit with a material price", () => {
+    const priceSummary = createPriceSummary({
+      isFree: true,
+      lowestAmount: "0.00",
+      materialPriceDescriptionFi: "<p>Materiaalit</p>",
+    });
+    expect(getPriceSummaryString(t, priceSummary)).toBe("Prices:materialPrice");
+  });
+
+  test("does not add a material price that has only empty HTML", () => {
+    const priceSummary = createPriceSummary({ materialPriceDescriptionFi: "<p></p>" });
+    expect(getPriceSummaryString(t, priceSummary)).toBe("20,00\u00A0€ / prices:priceUnits.PER_HOUR");
   });
 
   test("returns the price without a unit for a fixed price", () => {

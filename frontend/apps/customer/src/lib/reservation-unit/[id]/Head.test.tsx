@@ -47,6 +47,9 @@ function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary
     lowestAmount: "20",
     priceUnit: PriceUnit.PerHour,
     canApplyForDiscount: false,
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
     ...overrides,
   };
 }
@@ -213,5 +216,21 @@ describe("Head", () => {
 
     expect(screen.getByText(new RegExp(`reservationUnit:accessTypes.${AccessType.Unrestricted}`))).toBeInTheDocument();
     expect(screen.getByText(/common:dateGte/)).toBeInTheDocument();
+  });
+
+  test("shows the material price description in a tooltip next to the price", async () => {
+    const user = userEvent.setup();
+    render(
+      <ReservationUnitHead
+        reservationUnit={createReservationUnit({
+          priceSummary: createPriceSummary({ materialPriceDescriptionFi: "<p>Extra fee applies</p>" }),
+        })}
+        reservationUnitIsReservable
+      />
+    );
+
+    expect(screen.getByText("20,00 € / prices:priceUnits.PER_HOUR + prices:materialPrice")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Tooltip" }));
+    expect(screen.getByText("Extra fee applies")).toBeInTheDocument();
   });
 });
