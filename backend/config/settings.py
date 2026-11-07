@@ -683,7 +683,8 @@ class Common(Environment):
         init_sentry(
             dsn=cls.SENTRY_DSN,
             environment=cls.SENTRY_ENVIRONMENT,
-            release=cls.SENTRY_RELEASE,
+            # Without a release, the Sentry SDK takes the full commit hash from 'SOURCE_VERSION'.
+            release=cls.SENTRY_RELEASE or cls.APP_VERSION,
             profile_session_sample_rate=cls.SENTRY_PROFILE_SESSION_SAMPLE_RATE,
         )
 
