@@ -169,6 +169,42 @@ def test_sentry_post_setup_initializes_sdk_with_configured_options(environment: 
 
 
 @pytest.mark.parametrize("environment", [Docker, Platta])
+def test_sentry_post_setup_uses_release_tag_when_release_is_not_configured(
+    environment: type[Docker | Platta],
+) -> None:
+    with (
+        patch.object(environment, "SENTRY_ENABLED", new=True),
+        patch.object(environment, "SENTRY_DSN", "https://public@example.ingest.sentry.io/1"),
+        patch.object(environment, "SENTRY_RELEASE", None),
+        patch.object(environment, "SOURCE_BRANCH_NAME", "v1.73.0"),
+        patch.object(environment, "SOURCE_VERSION", "0123456789abcdef0123456789abcdef01234567"),
+        patch("sentry_sdk.init") as sentry_init,
+    ):
+        environment.post_setup()
+
+    sentry_init.assert_called_once()
+    assert sentry_init.call_args.kwargs["release"] == "v1.73.0"
+
+
+@pytest.mark.parametrize("environment", [Docker, Platta])
+def test_sentry_post_setup_uses_short_commit_hash_on_main_when_release_is_not_configured(
+    environment: type[Docker | Platta],
+) -> None:
+    with (
+        patch.object(environment, "SENTRY_ENABLED", new=True),
+        patch.object(environment, "SENTRY_DSN", "https://public@example.ingest.sentry.io/1"),
+        patch.object(environment, "SENTRY_RELEASE", None),
+        patch.object(environment, "SOURCE_BRANCH_NAME", "main"),
+        patch.object(environment, "SOURCE_VERSION", "0123456789abcdef0123456789abcdef01234567"),
+        patch("sentry_sdk.init") as sentry_init,
+    ):
+        environment.post_setup()
+
+    sentry_init.assert_called_once()
+    assert sentry_init.call_args.kwargs["release"] == "01234567"
+
+
+@pytest.mark.parametrize("environment", [Docker, Platta])
 def test_sentry_post_setup_skips_sdk_initialization_without_dsn(environment: type[Docker | Platta]) -> None:
     with (
         patch.object(environment, "SENTRY_ENABLED", new=True),
