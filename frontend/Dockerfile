@@ -57,7 +57,8 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
     sentry-cli sourcemaps upload --ignore "node_modules" --release "$RELEASE_NAME" /app/apps/$APP/.next/ && \
     sentry-cli releases new "$RELEASE_NAME" ; \
   fi
-RUN find /app/apps/$APP/.next/ -name "*.map" -print0 | xargs -0 rm
+# Builds without source maps have no .map files. The -delete flag does not fail on no matches.
+RUN find /app/apps/$APP/.next/ -name "*.map" -delete
 
 FROM base AS runner
 ARG APP
