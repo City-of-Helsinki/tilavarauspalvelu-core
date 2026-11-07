@@ -37,7 +37,7 @@ def _create_users() -> list[User]:
             first_name="Varaamo",
             is_staff=True,
             is_superuser=False,
-            last_name=f"General-{UserRoleChoice.RESERVER.value}",
+            last_name=f"General-{UserRoleChoice.ADMIN.value}",
             password=make_password(None),
             profile_id="UHJvZmlsZU5vZGU6ZGNkNTViZWYtOGI5MC00ODk4LTg3ZDgtYWY2ZWU2ZDI3NmU3",
             reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
