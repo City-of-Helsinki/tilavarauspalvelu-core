@@ -69,6 +69,9 @@ class PriceSummaryType(graphene.ObjectType):
     price_unit = graphene.Field(graphene.Enum.from_enum(PriceUnit), required=True)
     varies = graphene.Boolean(required=True)
     can_apply_for_discount = graphene.Boolean(required=True)
+    material_price_description_fi = graphene.String(required=True)
+    material_price_description_en = graphene.String(required=True)
+    material_price_description_sv = graphene.String(required=True)
 
     def resolve_price_unit(root: PriceSummary, info: GQLInfo) -> str:
         return root.price_unit.value
@@ -408,6 +411,9 @@ class ReservationUnitNode(DjangoNode):
                 amount=Decimal(component["amount"]),
                 price_unit=PriceUnit(component["price_unit"]),
                 can_apply_for_discount=component["can_apply_for_discount"],
+                material_price_description_fi=component["material_price_description_fi"] or "",
+                material_price_description_en=component["material_price_description_en"] or "",
+                material_price_description_sv=component["material_price_description_sv"] or "",
             )
             for component in components
         ]
@@ -483,6 +489,9 @@ def _active_base_component_data() -> ArraySubquery:
                 amount=Cast("amount", models.CharField()),
                 price_unit="price_unit",
                 can_apply_for_discount="can_apply_for_discount",
+                material_price_description_fi="material_price_description_fi",
+                material_price_description_en="material_price_description_en",
+                material_price_description_sv="material_price_description_sv",
             ),
         )
         .values("data")
