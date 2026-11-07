@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
-import type { ApolloError } from "@apollo/client";
+import type { ErrorLike } from "@apollo/client";
 import { useCurrentUserQuery } from "@gql/gql-types";
 import type { CurrentUserQuery } from "@gql/gql-types";
 
 export function useCurrentUser(): {
   currentUser?: CurrentUserQuery["currentUser"] | undefined;
-  error: ApolloError | undefined;
+  error: ErrorLike | undefined;
   loading: boolean;
 } {
   const { data, error, previousData, loading } = useCurrentUserQuery({

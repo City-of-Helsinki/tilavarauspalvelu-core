@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, TextArea } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
-import type { FetchResult } from "@apollo/client";
+import type { ApolloLink } from "@apollo/client";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { ButtonContainer } from "ui/src/styled";
@@ -17,7 +17,7 @@ function WorkingMemo({
   initialValue: string;
   onMutate: (
     memo: string
-  ) => Promise<FetchResult<UpdateReservationWorkingMemoMutation | UpdateApplicationWorkingMemoMutation>>;
+  ) => Promise<ApolloLink.Result<UpdateReservationWorkingMemoMutation | UpdateApplicationWorkingMemoMutation>>;
   onSuccess: () => void;
 }) {
   const [workingMemo, setWorkingMemo] = useState<string>(initialValue);

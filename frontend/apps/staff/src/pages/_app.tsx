@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { FC } from "react";
-import { ApolloProvider } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import { appWithTranslation } from "next-i18next/pages";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
@@ -58,7 +58,7 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps & ErrorPageProps): React.Reac
       },
     });
   }
-  if (handlingData) {
+  if (handlingData && props.handlingVariables) {
     apolloClient.writeQuery({
       query: HandlingDataDocument,
       data: handlingData,
@@ -182,10 +182,10 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     return {
       ...ctx,
       envConfig: commonProps,
-      currentUser: currentUserData.currentUser,
-      handlingData,
+      currentUser: currentUserData?.currentUser ?? null,
+      handlingData: handlingData ?? null,
       handlingVariables,
-      notificationsData: notificationsData,
+      notificationsData: notificationsData ?? null,
     };
   } catch (err) {
     const error = transformQueryError(err);

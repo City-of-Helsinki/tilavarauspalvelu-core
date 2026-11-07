@@ -49,8 +49,8 @@ export function createApplicationMutationMocks(): CreateGraphQLMocksReturn {
     {
       request: {
         query: UpdateApplicationDocument,
+        variables: () => true,
       },
-      variableMatcher: () => true,
       result: {
         data: updateMutation,
       },

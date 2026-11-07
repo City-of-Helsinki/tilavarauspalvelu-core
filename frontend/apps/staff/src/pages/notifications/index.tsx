@@ -130,7 +130,7 @@ function Notifications({ notifications: notificationsOriginal }: PageProps) {
     fetchPolicy: "cache-and-network",
   });
 
-  const { bannerNotifications } = data ?? previousData ?? notificationsOriginal;
+  const bannerNotifications = (data ?? previousData ?? notificationsOriginal)?.bannerNotifications;
   const notifications = filterNonNullable(bannerNotifications?.edges?.map((edge) => edge?.node));
 
   const { t } = useTranslation();
@@ -224,7 +224,7 @@ export async function getServerSideProps({ locale, req }: GetServerSidePropsCont
   });
   return {
     props: {
-      notifications: notifications.data,
+      notifications: notifications.data ?? null,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

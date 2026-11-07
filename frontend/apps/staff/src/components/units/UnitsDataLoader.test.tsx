@@ -1,10 +1,10 @@
 import React from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { UnitListDocument } from "@gql/gql-types";
 import type { UnitTableElementFragment } from "@gql/gql-types";
 import { UnitsDataLoader } from "./UnitsDataLoader";
@@ -42,10 +42,9 @@ function createUnit(overrides: Partial<UnitTableElementFragment> = {}): UnitTabl
   } as UnitTableElementFragment;
 }
 
-function listMock(units: UnitTableElementFragment[], totalCount: number, hasNextPage = false): MockedResponse {
+function listMock(units: UnitTableElementFragment[], totalCount: number, hasNextPage = false): MockLink.MockedResponse {
   return {
-    request: { query: UnitListDocument },
-    variableMatcher: () => true,
+    request: { query: UnitListDocument, variables: () => true },
     result: {
       data: {
         units: {
@@ -59,15 +58,14 @@ function listMock(units: UnitTableElementFragment[], totalCount: number, hasNext
   };
 }
 
-function errorMock(): MockedResponse {
+function errorMock(): MockLink.MockedResponse {
   return {
-    request: { query: UnitListDocument },
-    variableMatcher: () => true,
+    request: { query: UnitListDocument, variables: () => true },
     result: { errors: [new GraphQLError("Error")] },
   };
 }
 
-function renderLoader(mocks: MockedResponse[]) {
+function renderLoader(mocks: MockLink.MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks}>
       <UnitsDataLoader />

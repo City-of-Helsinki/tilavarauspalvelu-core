@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
@@ -44,7 +44,7 @@ export function useUnitResources({
 }: UseUnitResourcesProps) {
   const { t } = useTranslation();
 
-  const { data, previousData, loading } = useReservationUnitsByUnitQuery({
+  const { error, data, previousData, loading } = useReservationUnitsByUnitQuery({
     skip: Number(unitPk) <= 0,
     variables: {
       id: createNodeId("UnitNode", unitPk),
@@ -53,10 +53,8 @@ export function useUnitResources({
       endDate: formatApiDate(begin) ?? "",
       state: RELATED_RESERVATION_STATES,
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const { affectingReservations, unit } = data ?? previousData ?? {};
 

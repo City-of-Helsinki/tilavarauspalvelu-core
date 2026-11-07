@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
 import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
@@ -37,12 +37,10 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): Rea
       status: sectionStatusFilter,
       applicantType: applicantTypeFilter,
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
+  useQueryErrorToast(query.error, t("errors:errorFetchingData"));
 
   const { fetchMore, previousData, loading, data } = query;
 

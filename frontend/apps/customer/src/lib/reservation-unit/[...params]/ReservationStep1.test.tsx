@@ -1,9 +1,9 @@
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { ConfirmReservationDocument, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationQuery } from "@gql/gql-types";
 import { getCheckoutUrl } from "@/modules/reservation";
@@ -60,8 +60,8 @@ function createConfirmReservationMock({
   return {
     request: {
       query: ConfirmReservationDocument,
+      variables: () => true,
     },
-    variableMatcher: () => true,
     result: errors ? { errors } : { data: { confirmReservation: data } },
   };
 }
@@ -87,7 +87,7 @@ function customRender({
   requiresPayment = false,
 }: {
   reservation?: ReservationT;
-  mocks?: ReadonlyArray<MockedResponse>;
+  mocks?: ReadonlyArray<MockLink.MockedResponse>;
   requiresPayment?: boolean;
 } = {}): ReturnType<typeof render> {
   return render(

@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
-import { errorToast, successToast } from "ui/src/components/toast";
-import { useDisplayError } from "ui/src/hooks";
+import { successToast } from "ui/src/components/toast";
+import { useDisplayError, useQueryErrorToast } from "ui/src/hooks";
 import { createNodeId } from "ui/src/modules/helpers";
 import { ButtonContainer, CenterSpinner } from "ui/src/styled";
 import { ResourceLocationType, useUpdateResourceMutation, useResourceQuery } from "@gql/gql-types";
@@ -28,16 +28,14 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const { t } = useTranslation();
   const displayError = useDisplayError();
 
-  const { data, loading, previousData, refetch } = useResourceQuery({
+  const { data, loading, previousData, refetch, error } = useResourceQuery({
     variables: {
       id: createNodeId("ResourceNode", resourcePk ?? 0),
       unitId: createNodeId("UnitNode", unitPk),
     },
     skip: !resourcePk || Number.isNaN(resourcePk),
-    onError: (e) => {
-      errorToast({ text: t("errors:errorFetchingData", { error: e }) });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const [mutation, { loading: isMutationLoading }] = useUpdateResourceMutation();
 

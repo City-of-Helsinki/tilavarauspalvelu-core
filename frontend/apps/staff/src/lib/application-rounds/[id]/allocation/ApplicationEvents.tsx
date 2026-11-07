@@ -1,16 +1,11 @@
 import React from "react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
-import type { ApolloQueryResult } from "@apollo/client";
 import { breakpoints } from "ui/src/modules/const";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { Flex, H4, fontMedium } from "ui/src/styled";
 import { ApplicationSectionStatusChoice } from "@gql/gql-types";
-import type {
-  ApplicationRoundStatusChoice,
-  ApplicationSectionAllocationsQuery,
-  ReservationUnitNode,
-} from "@gql/gql-types";
+import type { ApplicationRoundStatusChoice, ReservationUnitNode } from "@gql/gql-types";
 import { Accordion } from "@/components/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
@@ -63,7 +58,7 @@ function EventGroupList({
   applicationSections: SectionNodeT[];
   reservationUnit: Pick<ReservationUnitNode, "pk">;
   type: AllocationApplicationSectionCardType;
-  refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
+  refetch: () => Promise<unknown>;
 }): React.ReactElement {
   if (applicationSections.length === 0) {
     return <div>-</div>;
@@ -87,7 +82,7 @@ function EventGroupList({
 type ApplicationEventsProps = {
   applicationSections: SectionNodeT[];
   reservationUnit: Pick<ReservationUnitNode, "pk">;
-  refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
+  refetchApplicationEvents: () => Promise<unknown>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
   relatedAllocations: Array<Pick<AllocatedTimeSlotNodeT, "dayOfTheWeek" | "beginTime" | "endTime">>;
 };

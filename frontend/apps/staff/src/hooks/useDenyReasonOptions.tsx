@@ -1,20 +1,18 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { useReservationDenyReasonsQuery, ReservationDenyReasonOrderingChoices } from "@gql/gql-types";
 
 export function useDenyReasonOptions() {
   const { t } = useTranslation();
 
-  const { data, loading } = useReservationDenyReasonsQuery({
+  const { error, data, loading } = useReservationDenyReasonsQuery({
     variables: {
       orderBy: [ReservationDenyReasonOrderingChoices.RankAsc],
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
   const { reservationDenyReasons } = data ?? {};
   const denyReasonOptions = filterNonNullable(reservationDenyReasons?.edges.map((x) => x?.node)).map((dr) => ({
     value: dr?.pk ?? 0,

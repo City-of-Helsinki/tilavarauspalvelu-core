@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { isBefore } from "date-fns";
 import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
@@ -285,17 +285,11 @@ export function DenyDialog({
         throw new Error("Reservation PK undefined");
       }
 
-      const res = await denyReservation({
+      await denyReservation({
         pk: reservation.pk,
         denyReason: denyReasonPk,
         handlingDetails,
       });
-
-      if (res.errors != null && res.errors.length > 0) {
-        throw new ApolloError({
-          graphQLErrors: res.errors,
-        });
-      }
       if (shouldRefund) {
         await refundReservation({ pk: reservation.pk });
       } else {
@@ -358,13 +352,7 @@ export function DenyDialogSeries({
         denyReason: denyReasonPk,
         handlingDetails,
       };
-      const res = await denyMutation({ variables: { input } });
-
-      if (res.errors != null && res.errors.length > 0) {
-        throw new ApolloError({
-          graphQLErrors: res.errors,
-        });
-      }
+      await denyMutation({ variables: { input } });
       successToast({
         text: t("reservation:DenyDialog.successNotify"),
       });

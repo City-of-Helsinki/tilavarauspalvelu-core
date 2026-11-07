@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import type { ReadonlyURLSearchParams } from "next/navigation";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { parseUIDate, formatApiDate } from "ui/src/modules/date-utils";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
@@ -89,7 +89,7 @@ export function ReservationsDataLoader(): React.ReactElement {
 
   const orderBy = filterEmptyArray(transformSortString(sort));
   const searchParams = useSearchParams();
-  const { fetchMore, loading, data, previousData } = useReservationListQuery({
+  const { error, fetchMore, loading, data, previousData } = useReservationListQuery({
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
     errorPolicy: "all",
@@ -98,10 +98,8 @@ export function ReservationsDataLoader(): React.ReactElement {
       first: LIST_PAGE_SIZE,
       ...mapFilterParams(searchParams),
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const currData = data ?? previousData;
 

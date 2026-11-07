@@ -1,9 +1,8 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import type { ApolloError } from "@apollo/client";
 import { getPermissionErrors } from "@ui/modules/apollo/helpers";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
 import {
@@ -52,17 +51,11 @@ export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): 
       accessCodeState: accessCodeStateFilter,
       dayOfTheWeek: weekDayFilter,
     },
-    onError: (err: ApolloError) => {
-      const permErrors = getPermissionErrors(err);
-      if (permErrors.length > 0) {
-        errorToast({ text: t("errors:noPermission") });
-      } else {
-        errorToast({ text: t("errors:errorFetchingData") });
-      }
-    },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
+  const hasPermissionError = getPermissionErrors(query.error).length > 0;
+  useQueryErrorToast(query.error, hasPermissionError ? t("errors:noPermission") : t("errors:errorFetchingData"));
 
   const { fetchMore, previousData, loading, data } = query;
 

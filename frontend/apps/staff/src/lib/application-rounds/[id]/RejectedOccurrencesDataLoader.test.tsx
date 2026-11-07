@@ -1,12 +1,12 @@
 import React from "react";
 import { InMemoryCache } from "@apollo/client";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { RejectedOccurrencesDocument } from "@gql/gql-types";
 import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
 import { RejectedOccurrencesDataLoader } from "./RejectedOccurrencesDataLoader";
@@ -56,10 +56,9 @@ function listMock(
   rejectedOccurrences: RejectedOccurrencesTableElementFragment[],
   totalCount: number,
   hasNextPage = false
-): MockedResponse {
+): MockLink.MockedResponse {
   return {
-    request: { query: RejectedOccurrencesDocument },
-    variableMatcher: () => true,
+    request: { query: RejectedOccurrencesDocument, variables: () => true },
     result: {
       data: {
         rejectedOccurrences: {
@@ -80,10 +79,9 @@ function listMock(
   };
 }
 
-function errorMock(): MockedResponse {
+function errorMock(): MockLink.MockedResponse {
   return {
-    request: { query: RejectedOccurrencesDocument },
-    variableMatcher: () => true,
+    request: { query: RejectedOccurrencesDocument, variables: () => true },
     result: { errors: [new GraphQLError("Error")] },
   };
 }
@@ -102,7 +100,7 @@ function createCache(): InMemoryCache {
   });
 }
 
-function renderLoader(mocks: MockedResponse[]) {
+function renderLoader(mocks: MockLink.MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks} cache={createCache()}>
       <RejectedOccurrencesDataLoader applicationRoundPk={1} unitOptions={[]} />
@@ -147,7 +145,7 @@ describe("RejectedOccurrencesDataLoader", () => {
       listMock([createRejectedOccurrence({ pk: 1 })], 2, true),
       {
         ...listMock([createRejectedOccurrence({ pk: 2 })], 2),
-        variableMatcher: secondPageMatcher,
+        request: { query: RejectedOccurrencesDocument, variables: secondPageMatcher },
       },
     ]);
 

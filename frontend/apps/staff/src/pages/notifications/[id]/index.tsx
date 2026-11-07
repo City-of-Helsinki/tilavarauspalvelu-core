@@ -2,7 +2,7 @@ import React from "react";
 import type { ReactNode } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
-import { ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, RadioButton, SelectionGroup } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
@@ -471,18 +471,13 @@ function useRemoveNotification({ notification }: { notification?: BannerNotifica
 
   const removeNotification = async () => {
     try {
-      const res = await removeMutation({
+      await removeMutation({
         variables: {
           input: {
             pk: String(notification?.pk ?? 0),
           },
         },
       });
-      if (res.errors != null && res.errors?.length > 0) {
-        throw new ApolloError({
-          graphQLErrors: res.errors,
-        });
-      }
 
       successToast({ text: t("notification:success.removed") });
       await router.replace(getNotificationListUrl());

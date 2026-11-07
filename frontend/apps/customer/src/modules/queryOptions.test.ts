@@ -3,10 +3,10 @@ import type { ApolloClient } from "@apollo/client";
 import type { OptionsQuery } from "@gql/gql-types";
 import { queryOptions } from "./queryOptions";
 
-function createMockApolloClient(data: OptionsQuery): ApolloClient<unknown> {
+function createMockApolloClient(data: OptionsQuery): ApolloClient {
   return {
     query: vi.fn().mockResolvedValue({ data }),
-  } as unknown as ApolloClient<unknown>;
+  } as unknown as ApolloClient;
 }
 
 function createOptionsData(overrides: Partial<OptionsQuery> = {}): OptionsQuery {

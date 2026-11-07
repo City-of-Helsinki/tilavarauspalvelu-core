@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next/pages";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import { ReservationStateChoice, ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
@@ -22,7 +22,7 @@ export function useReservationCalendarData({
 
   const today = new Date();
 
-  const { data, ...rest } = useReservationsByReservationUnitQuery({
+  const { error, data, ...rest } = useReservationsByReservationUnitQuery({
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk,
     variables: {
@@ -38,10 +38,8 @@ export function useReservationCalendarData({
         ReservationStateChoice.WaitingForPayment,
       ],
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const blockedName = t("reservationUnit:reservationState.RESERVATION_CLOSED");
 

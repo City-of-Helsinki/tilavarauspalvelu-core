@@ -37,6 +37,13 @@ const gqlConfig = {
   defaultScalarType: "unknown",
   strictScalars: true,
   scalars,
+  // Apollo Client 4 exports the React hooks and their types from a separate entry point
+  apolloReactCommonImportFrom: "@apollo/client/react",
+  // A wrapper of @apollo/client/react, so the proxy middleware can import the generated file (see the wrapper)
+  apolloReactHooksImportFrom: "@ui/modules/apollo/reactHooks",
+  // Apollo Client 4 removed the types these use (MutationFunction and BaseMutationOptions)
+  withMutationFn: false,
+  withMutationOptionsType: false,
 };
 
 const schema = "../tilavaraus.graphql";

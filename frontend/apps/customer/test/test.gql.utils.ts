@@ -16,9 +16,8 @@ export interface CreateGraphQLMockProps extends ICreateGraphQLMock {
 export type CreateGraphQLMocksReturn = Array<{
   request: {
     query: DocumentNode;
-    variables?: Record<string, unknown>;
+    variables?: Record<string, unknown> | ((variables: Record<string, unknown>) => boolean);
   };
-  variableMatcher?: (variables: unknown) => true;
   result: {
     data: Record<string, unknown>;
   };

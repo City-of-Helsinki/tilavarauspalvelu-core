@@ -1,9 +1,9 @@
 import React from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { ApplicationSectionsDocument } from "@gql/gql-types";
 import type { ApplicationSectionTableElementFragment } from "@gql/gql-types";
 import { ApplicationSectionDataLoader } from "./ApplicationSectionDataLoader";
@@ -27,15 +27,14 @@ vi.mock("ui/src/components/toast", () => ({
   errorToast: (...args: unknown[]) => mockErrorToast(...args),
 }));
 
-function listMock(totalCount: number = 0, hasNextPage = false): MockedResponse {
+function listMock(totalCount: number = 0, hasNextPage = false): MockLink.MockedResponse {
   const applicationSections: ApplicationSectionTableElementFragment[] = Array.from({ length: totalCount }, (_, i) => ({
     __typename: "ApplicationSectionNode",
     pk: i + 1,
   })) as unknown as ApplicationSectionTableElementFragment[];
 
   return {
-    request: { query: ApplicationSectionsDocument },
-    variableMatcher: () => true,
+    request: { query: ApplicationSectionsDocument, variables: () => true },
     result: {
       data: {
         applicationSections: {
@@ -52,15 +51,14 @@ function listMock(totalCount: number = 0, hasNextPage = false): MockedResponse {
   };
 }
 
-function errorMock(): MockedResponse {
+function errorMock(): MockLink.MockedResponse {
   return {
-    request: { query: ApplicationSectionsDocument },
-    variableMatcher: () => true,
+    request: { query: ApplicationSectionsDocument, variables: () => true },
     result: { errors: [new GraphQLError("Error")] },
   };
 }
 
-function renderLoader(mocks: MockedResponse[]) {
+function renderLoader(mocks: MockLink.MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks}>
       <ApplicationSectionDataLoader applicationRoundPk={1} />
