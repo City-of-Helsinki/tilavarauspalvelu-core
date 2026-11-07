@@ -1239,6 +1239,7 @@ msgid "Refund ID"
 msgstr "Maksun palautuksen tunniste"
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment type"
 msgstr "Maksutyyppi"
 
@@ -1860,15 +1861,6 @@ msgid "At least one active access type is required."
 msgstr "Varausyksiköllä on oltava vähintään yksi aktiivinen kulkutapa."
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
-msgid "This tax level has no rate in effect today."
-msgstr "Verotasolla ei ole tänään voimassa olevaa veroprosenttia."
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Payment terms are required for direct booking of paid reservation units"
-msgstr "Maksuehdot vaaditaan suoravaraamiseen maksullisille varausyksiköihin"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
 "Additional search terms that will bring up this reservation unit when making "
 "text searches in the customer UI. These terms should be added to make sure "
@@ -2288,6 +2280,10 @@ msgstr ""
 "Hinnoitteluehdot vaaditaan suoravaraamiseen jos varaaja voi hakea "
 "maksuttomuutta"
 
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment terms are required for direct booking of paid reservation units"
+msgstr "Maksuehdot vaaditaan suoravaraamiseen maksullisille varausyksiköihin"
+
 #: tilavarauspalvelu/admin/reservation_unit_option/admin.py
 msgid ""
 "Search by reservation unit, unit, application section, user's first or last "
@@ -2295,6 +2291,10 @@ msgid ""
 msgstr ""
 "Hae varausyksikön, toimipisteen, hakemuksen osan tai käyttäjän etunimen, "
 "sukunimen tai sähköpostiosoitteen perusteella"
+
+#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
+msgid "This tax level has no rate in effect today."
+msgstr "Verotasolla ei ole tänään voimassa olevaa veroprosenttia."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"

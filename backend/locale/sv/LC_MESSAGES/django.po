@@ -1210,6 +1210,7 @@ msgid "Refund ID"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment type"
 msgstr ""
 
@@ -1819,15 +1820,6 @@ msgid "At least one active access type is required."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
-msgid "This tax level has no rate in effect today."
-msgstr "Skattenivån har ingen skattesats som gäller i dag."
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Payment terms are required for direct booking of paid reservation units"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
 "Additional search terms that will bring up this reservation unit when making "
 "text searches in the customer UI. These terms should be added to make sure "
@@ -2229,11 +2221,19 @@ msgid ""
 "free of charge"
 msgstr ""
 
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment terms are required for direct booking of paid reservation units"
+msgstr ""
+
 #: tilavarauspalvelu/admin/reservation_unit_option/admin.py
 msgid ""
 "Search by reservation unit, unit, application section, user's first or last "
 "name or email"
 msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
+msgid "This tax level has no rate in effect today."
+msgstr "Skattenivån har ingen skattesats som gäller i dag."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
