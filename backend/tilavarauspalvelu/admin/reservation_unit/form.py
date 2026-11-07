@@ -2,30 +2,36 @@ from __future__ import annotations
 
 import datetime
 import json
-from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import models, transaction
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
+from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationStackedInline
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.enums import AccessType, ReservationKind
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
+from tilavarauspalvelu.models import (
+    PriceComponent,
+    PricingGroup,
+    ReservationUnit,
+    ReservationUnitAccessType,
+    ReservationUnitPricingGroup,
+)
 from tilavarauspalvelu.services.pricing.sales_items import validate_sales_items_for_payment_type
 from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import TaxLevel
+    from tilavarauspalvelu.typing import WSGIRequest
 
 # Access type
 
@@ -123,81 +129,31 @@ class ReservationUnitAccessTypeInline(admin.TabularInline):
 # Pricing
 
 
-class ReservationUnitPricingParentForm(forms.ModelForm):
-    class Meta:
-        model = ReservationUnit
-        fields = [
-            "reservation_kind",
-            "payment_terms",
-        ]
+class PricingGroupOfReservationUnitInline(admin.TabularInline):
+    """The pricing groups that the reservation unit uses. The prices are edited on the page of the pricing group."""
 
-
-class ReservationUnitPricingForm(forms.ModelForm):
-    instance: ReservationUnitPricing
-
-    class Meta:
-        model = ReservationUnitPricing
-        fields = []  # Use fields from Inline
-        widgets = {
-            "material_price_description": TinyMCE(mce_attrs={"height": "250px"}),
-        }
-
-    def clean_tax_level(self) -> TaxLevel:
-        tax_level: TaxLevel = self.cleaned_data["tax_level"]
-
-        today = local_date()
-        has_rate = tax_level.rates.effective_on(on_date=today).exists()
-        if not has_rate:
-            msg = _("This tax level has no rate in effect today.")
-            raise ValidationError(msg)
-
-        return tax_level
-
-
-class ReservationUnitPricingFormSet(BaseInlineFormSet):
-    form = ReservationUnitPricingForm
-    instance: ReservationUnit
-
-    def clean(self) -> None:
-        parent_form = ReservationUnitPricingParentForm(self.data)
-        parent_form.full_clean()
-        parent_data = parent_form.cleaned_data
-        if not parent_data:
-            return
-
-        is_draft = parent_data.get("is_draft", False)
-        reservation_kind = ReservationKind(parent_data["reservation_kind"])
-
-        if not is_draft and reservation_kind.allows_direct:
-            payment_terms = parent_data.get("payment_terms")
-
-            form: ReservationUnitPricingForm
-            for form in self.forms:
-                cleaned_data: dict[str, Any] | None = form.cleaned_data
-                if not cleaned_data:
-                    continue
-
-                highest_price: Decimal = cleaned_data["highest_price"]
-                if highest_price > Decimal(0) and not payment_terms:
-                    msg = _("Payment terms are required for direct booking of paid reservation units")
-                    raise ValidationError(msg)
-
-
-class ReservationUnitPricingInline(TranslationStackedInline):
-    model = ReservationUnitPricing
+    model = ReservationUnitPricingGroup
     fields = [
+        "pricing_group_link",
         "begins",
-        "lowest_price",
-        "highest_price",
-        "price_unit",
-        "payment_type",
-        "tax_level",
-        "material_price_description",
     ]
-    form = ReservationUnitPricingForm
-    formset = ReservationUnitPricingFormSet
-    show_change_link = True
+    readonly_fields = fields
+    ordering = ["begins"]
     extra = 0
+
+    def has_add_permission(self, request: WSGIRequest, obj: ReservationUnit | None = None) -> bool:
+        return False
+
+    def has_change_permission(self, request: WSGIRequest, obj: ReservationUnit | None = None) -> bool:
+        return False
+
+    def has_delete_permission(self, request: WSGIRequest, obj: ReservationUnit | None = None) -> bool:
+        return False
+
+    @admin.display(description=PricingGroup._meta.verbose_name)
+    def pricing_group_link(self, obj: ReservationUnitPricingGroup) -> str:
+        url = reverse("admin:tilavarauspalvelu_pricinggroup_change", args=[obj.pricing_group_id])
+        return format_html('<a href="{}">{}</a>', url, obj.pricing_group)
 
 
 # Reservation unit
@@ -439,3 +395,20 @@ class ReservationUnitAdminForm(forms.ModelForm):
             if can_apply_free_of_charge and not pricing_terms:
                 msg = _("Pricing terms are required for direct booking if the reservee can apply for free of charge")
                 raise ValidationError({"pricing_terms": msg})
+
+            payment_terms = cleaned_data.get("payment_terms")
+            if not payment_terms and self._has_paid_price():
+                msg = _("Payment terms are required for direct booking of paid reservation units")
+                raise ValidationError({"payment_terms": msg})
+
+    def _has_paid_price(self) -> bool:
+        """The reservation unit has a paid price that is in effect today or in the future."""
+        if self.instance.pk is None:
+            return False
+
+        today = local_date()
+        return PriceComponent.objects.filter(
+            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+            pricing_group__reservation_unit_pricing_groups__reservation_unit=self.instance,
+            amount__gt=0,
+        ).exists()
