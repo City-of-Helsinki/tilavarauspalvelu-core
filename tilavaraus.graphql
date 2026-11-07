@@ -2472,6 +2472,9 @@ type PriceSummaryType {
   priceUnit: PriceUnit!
   varies: Boolean!
   canApplyForDiscount: Boolean!
+  materialPriceDescriptionFi: String!
+  materialPriceDescriptionEn: String!
+  materialPriceDescriptionSv: String!
 }
 
 type ReservableTimeSpanType {

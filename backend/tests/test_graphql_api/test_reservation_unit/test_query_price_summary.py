@@ -32,6 +32,9 @@ pytestmark = [
 
 
 FIELDS = "priceSummary { isFree lowestAmount priceUnit varies canApplyForDiscount }"
+MATERIAL_PRICE_FIELDS = (
+    "priceSummary { isFree materialPriceDescriptionFi materialPriceDescriptionEn materialPriceDescriptionSv }"
+)
 
 
 # ── Price summary ──
@@ -357,3 +360,91 @@ def test_reservation_unit__query__price_summary__through_foreign_key(graphql):
         "30.00",
     ]
     assert len(response.queries) == 6, response.query_log
+
+
+# ── Material price ──
+
+
+def test_reservation_unit__query__price_summary__material_price(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        amount=Decimal(0),
+        material_price_description_fi="<p>Materiaalit</p>",
+        material_price_description_en="<p>Materials</p>",
+        material_price_description_sv="<p>Material</p>",
+    )
+
+    query = reservation_unit_query(
+        fields=MATERIAL_PRICE_FIELDS,
+        id=to_global_id("ReservationUnitNode", reservation_unit.pk),
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "priceSummary": {
+            "isFree": True,
+            "materialPriceDescriptionFi": "<p>Materiaalit</p>",
+            "materialPriceDescriptionEn": "<p>Materials</p>",
+            "materialPriceDescriptionSv": "<p>Material</p>",
+        },
+    }
+
+
+def test_reservation_unit__query__price_summary__no_material_price(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=today - datetime.timedelta(days=10))
+
+    query = reservation_unit_query(
+        fields=MATERIAL_PRICE_FIELDS,
+        id=to_global_id("ReservationUnitNode", reservation_unit.pk),
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object["priceSummary"]["materialPriceDescriptionFi"] == ""
+
+
+def test_reservation_unit__query__price_summary__material_price_of_the_cheapest_option_that_has_one(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    unit_group = UnitGroupFactory.create()
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    for amount, material_price in ((Decimal(10), ""), (Decimal(20), "B"), (Decimal(30), "C")):
+        PriceComponentFactory.create(
+            pricing_group=pricing_group,
+            valid_from=today - datetime.timedelta(days=10),
+            price_option=PriceOptionFactory.create(unit_group=unit_group),
+            amount=amount,
+            material_price_description_fi=material_price,
+        )
+
+    query = reservation_unit_query(
+        fields=MATERIAL_PRICE_FIELDS,
+        id=to_global_id("ReservationUnitNode", reservation_unit.pk),
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object["priceSummary"]["materialPriceDescriptionFi"] == "B"
