@@ -33,6 +33,7 @@ function createReservationUnit(overrides: Partial<Node> = {}): Node {
     pk: 5,
     extUuid: "uuid-1",
     nameFi: "Test unit",
+    reservationUnitPricingGroups: [],
     ...overrides,
   } as Node;
 }

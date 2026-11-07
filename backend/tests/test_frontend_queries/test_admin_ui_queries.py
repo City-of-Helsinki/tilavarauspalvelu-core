@@ -843,6 +843,8 @@ def test_frontend_queries__admin_ui__ReservationUnitEdit(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    # A price component must end after it begins. Without an end it lasts until the next one.
+    factory_args["reservation_unit_pricing_groups__pricing_group__components__valid_until"] = None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -861,7 +863,7 @@ def test_frontend_queries__admin_ui__ReservationUnitEditorParameters(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ReservationUnitEditorParameters"]
 
-    assert len(factories) == 6
+    assert len(factories) == 7
 
     for query_info in factories:
         factory_args = deepcopy(query_info.factory_args)
