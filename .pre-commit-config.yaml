@@ -10,6 +10,13 @@ repos:
     hooks:
       - id: check-toml
       - id: check-yaml
+        exclude: ^docker-compose[^/]*\.ya?ml$
+      # Compose files can use Compose tags such as "!reset" and "!override". The YAML loader does not know them,
+      # so check only the syntax of these files.
+      - id: check-yaml
+        name: check yaml syntax (compose)
+        files: ^docker-compose[^/]*\.ya?ml$
+        args: ["--unsafe"]
       - id: check-json
       - id: trailing-whitespace
         args: ["--markdown-linebreak-ext=md"]
