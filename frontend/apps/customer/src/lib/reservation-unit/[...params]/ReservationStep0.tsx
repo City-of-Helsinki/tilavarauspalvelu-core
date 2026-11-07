@@ -29,10 +29,17 @@ type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   cancelReservation: () => void;
   reservation: ReservationT;
+  /// From the price calculation of the backend
+  canApplyForDiscount: boolean;
   options: OptionsRecord;
 };
 
-export function ReservationStep0({ reservation, cancelReservation, options }: Props): React.ReactElement {
+export function ReservationStep0({
+  reservation,
+  canApplyForDiscount,
+  cancelReservation,
+  options,
+}: Props): React.ReactElement {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -168,6 +175,7 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
       <Flex>
         <ReservationForm
           reservation={reservation}
+          enableSubvention={canApplyForDiscount}
           options={options}
           form={form}
           onSubventionButtonClick={() => setIsDialogOpen(true)}
@@ -248,6 +256,7 @@ const MandatoryFieldsInfoText = styled.p`
 
 interface ReservationFormProps<T extends FieldValues> {
   reservation: NonNullable<ReservationQuery["reservation"]>;
+  enableSubvention: boolean;
   options: OptionsRecord;
   form: UseFormReturn<T>;
   onSubventionButtonClick: () => void;
@@ -255,6 +264,7 @@ interface ReservationFormProps<T extends FieldValues> {
 
 function ReservationForm<T extends FieldValues>({
   reservation,
+  enableSubvention,
   options,
   onSubventionButtonClick,
   form,
@@ -262,7 +272,6 @@ function ReservationForm<T extends FieldValues>({
   const { t } = useTranslation();
 
   const { reservationUnit } = reservation;
-  const enableSubvention = reservation.reservationUnit.canApplyFreeOfCharge;
 
   return (
     <FormProvider {...form}>

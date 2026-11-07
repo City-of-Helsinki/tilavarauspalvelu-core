@@ -52,14 +52,21 @@ function customRender({
   reservation = buildReservation(),
   mocks = [],
   cancelReservation = vi.fn(),
+  canApplyForDiscount = true,
 }: {
   reservation?: ReservationT;
+  canApplyForDiscount?: boolean;
   mocks?: ReadonlyArray<MockedResponse>;
   cancelReservation?: () => void;
 } = {}): ReturnType<typeof render> {
   return render(
     <MockedProvider mocks={mocks}>
-      <ReservationStep0 reservation={reservation} cancelReservation={cancelReservation} options={createOptionsMock()} />
+      <ReservationStep0
+        reservation={reservation}
+        canApplyForDiscount={canApplyForDiscount}
+        cancelReservation={cancelReservation}
+        options={createOptionsMock()}
+      />
     </MockedProvider>
   );
 }
