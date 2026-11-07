@@ -58,8 +58,8 @@ async function handleRequest(req: NextRequest) {
     return NextResponse.redirect(csrfRedirectUrl);
   }
 
-  // Do a user query to check that backend is alive
-  // => if it's not return a 503 page instead of 500 (uncaught exception)
+  // The pages make their own queries, so a failed query here must not stop the page.
+  // If the backend is down, the query of the page fails and the page shows the error.
   try {
     const data = await fetchUserData(req);
     const res = NextResponse.next();
@@ -67,8 +67,7 @@ async function handleRequest(req: NextRequest) {
     return res;
   } catch (err) {
     logError(err);
-    const rewriteUrl = new URL(`${env.NEXT_PUBLIC_BASE_URL ?? ""}/503`, req.url);
-    return NextResponse.rewrite(rewriteUrl);
+    return NextResponse.next();
   }
 }
 
