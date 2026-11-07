@@ -89,9 +89,19 @@ describe("QuickReservation", () => {
     expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
   });
 
-  test("does not render submit button when slot is not reservable", () => {
+  test("hides the submit button but keeps its place when slot is not reservable", () => {
     render(<QuickReservationWrapper focusSlot={{ isReservable: false }} showSubmit={false} />);
 
     expect(screen.queryByRole("button", { name: "Submit" })).not.toBeInTheDocument();
+    expect(screen.getByText("Submit")).not.toBeVisible();
+  });
+
+  test("shows the no times text only when there are no times, but keeps its place", () => {
+    const { unmount } = render(<QuickReservationWrapper focusSlot={{ isReservable: true }} />);
+    expect(screen.getByText(/reservationCalendar:quickReservation.noTimes/)).not.toBeVisible();
+    unmount();
+
+    render(<QuickReservationWrapper focusSlot={{ isReservable: false }} showSubmit={false} />);
+    expect(screen.getByText(/reservationCalendar:quickReservation.noTimes/)).toBeVisible();
   });
 });
