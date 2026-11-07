@@ -10,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { ApplicationRoundStatusLabel } from "ui/src/components/statuses";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "ui/src/styled";
 import {
@@ -68,13 +68,11 @@ export default function ApplicationRound({
 
   /// NOTE always valid since the application round exists if we are here
   const pk = applicationRoundOriginal?.pk ?? 0;
-  const { data, previousData, refetch } = useApplicationRoundQuery({
+  const { error, data, previousData, refetch } = useApplicationRoundQuery({
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
     pollInterval: isInProgress ? 10_000 : 0,
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
   const applicationRound = data?.applicationRound ?? previousData?.applicationRound ?? applicationRoundOriginal;
 
   const searchParams = useSearchParams();
@@ -226,7 +224,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     query: ApplicationRoundDocument,
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
   });
-  const { applicationRound } = data;
+  const applicationRound = data?.applicationRound;
   const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));
 
   if (!applicationRound) {
@@ -249,7 +247,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     },
   });
   const canSeePage =
-    viewPermissionData.checkPermissions?.hasPermission || managePermissionData.checkPermissions?.hasPermission;
+    viewPermissionData?.checkPermissions?.hasPermission || managePermissionData?.checkPermissions?.hasPermission;
 
   const options = await fetchFilterOptionsSafe(client, { applicationRound: pk });
 
@@ -257,7 +255,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const user = await client.query<CurrentUserQuery>({
     query: CurrentUserDocument,
   });
-  const unitOptions = getUserPermissionFilteredUnits(applicationRound, user.data.currentUser);
+  const unitOptions = getUserPermissionFilteredUnits(applicationRound, user.data?.currentUser ?? null);
 
   if (!canSeePage || unitOptions.length === 0) {
     return NOT_FOUND_SSR_VALUE;

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import type { ApolloClient } from "@apollo/client";
 import { logError } from "@ui/modules/errors";
 import type { CommonEnvConfig } from "@ui/types";
 import { TermsOfUseTypeChoices, TermsOfUseDocument, OrderDocument } from "@gql/gql-types";
@@ -58,7 +58,7 @@ export function getCommonServerSideProps(): CustomerEnvConfig {
 }
 
 type GetGenericTermsReturn = TermsOfUseFieldsFragment | null;
-export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Promise<GetGenericTermsReturn> {
+export async function getGenericTerms(apolloClient: ApolloClient): Promise<GetGenericTermsReturn> {
   const { data: tosData } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
     variables: {
@@ -79,7 +79,7 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
 }
 
 export async function getReservationByOrderUuid(
-  apolloClient: ApolloClient<NormalizedCacheObject>,
+  apolloClient: ApolloClient,
   uuid: string
 ): Promise<NonNullable<NonNullable<OrderQuery["order"]>["reservation"]> | null> {
   const { data } = await apolloClient.query<OrderQuery, OrderQueryVariables>({

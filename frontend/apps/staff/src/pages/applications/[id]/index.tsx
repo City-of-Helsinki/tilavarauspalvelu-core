@@ -7,7 +7,6 @@ import { isEqual, trim } from "lodash-es";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import styled from "styled-components";
-import type { ApolloQueryResult } from "@apollo/client";
 import type { TFunction } from "next-i18next/pages";
 import { logError } from "@ui/modules/errors";
 import { ApplicationTimePreview } from "ui/src/components/ApplicationTimePreview";
@@ -29,7 +28,6 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import type {
-  ApplicationAdminQuery,
   ApplicationPageFieldsFragment,
   ApplicationPageSectionFragment,
   Maybe,
@@ -112,7 +110,7 @@ function RejectOptionButton({
 }: {
   option: ReservationUnitOptionFieldsFragment;
   applicationStatus: ApplicationStatusChoice;
-  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
+  refetch: () => Promise<unknown>;
 }) {
   const [mutation, { loading }] = useRejectRestMutation();
   const units = [option.reservationUnit?.unit?.pk ?? 0];
@@ -182,7 +180,7 @@ function RejectAllOptionsButton({
 }: {
   section: ApplicationPageSectionFragment;
   applicationStatus: ApplicationStatusChoice;
-  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
+  refetch: () => Promise<unknown>;
 }) {
   const { t } = useTranslation();
   const units = filterNonNullable(section.reservationUnitOptions.map((x) => x.reservationUnit?.unit?.pk));
@@ -320,7 +318,7 @@ function ReservationUnitOptionsSection({
   applicationStatus,
 }: {
   section: Pick<ApplicationPageSectionFragment, "reservationUnitOptions">;
-  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
+  refetch: () => Promise<unknown>;
   applicationStatus: ApplicationStatusChoice;
 }) {
   const { t } = useTranslation();
@@ -384,7 +382,7 @@ function ApplicationSectionDetails({
 }: {
   section: ApplicationPageSectionFragment;
   application: ApplicationPageFieldsFragment;
-  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
+  refetch: () => Promise<unknown>;
 }): React.ReactElement {
   const { t } = useTranslation();
 
@@ -441,7 +439,7 @@ function RejectApplicationButton({
   refetch,
 }: {
   application: ApplicationPageFieldsFragment;
-  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
+  refetch: () => Promise<unknown>;
 }): React.ReactElement | null {
   const { t } = useTranslation();
   const units = filterNonNullable(

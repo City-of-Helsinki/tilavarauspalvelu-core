@@ -143,7 +143,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         endDate: formatApiDate(addYears(new Date(), 2)) ?? "",
       },
     });
-    const { reservation } = data;
+    const reservation = data?.reservation;
 
     if (reservation == null) {
       return notFound;

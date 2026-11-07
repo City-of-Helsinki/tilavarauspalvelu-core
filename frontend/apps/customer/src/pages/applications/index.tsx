@@ -80,20 +80,21 @@ function ApplicationsPage({ data: initialData }: PropsNarrowed): React.ReactElem
   // Requires a client side query because we can do modifications without leaving the page
   const [fetch, { data: appData }] = useApplicationsLazyQuery({
     fetchPolicy: "no-cache",
-    variables: {
-      user: currentUser?.pk ?? 0,
-      status: VALID_STATUSES,
-      orderBy: [ApplicationOrderingChoices.SentAtDesc],
-    },
   });
 
   const data = appData ?? initialData;
-  const applications = filterNonNullable(data.applications?.edges?.map((n) => n?.node));
+  const applications = filterNonNullable(data?.applications?.edges?.map((n) => n?.node));
 
   const actionCallback = async (type: "cancel" | "error") => {
     switch (type) {
       case "cancel":
-        await fetch();
+        await fetch({
+          variables: {
+            user: currentUser?.pk ?? 0,
+            status: VALID_STATUSES,
+            orderBy: [ApplicationOrderingChoices.SentAtDesc],
+          },
+        });
         successToast({ text: t("applicationCard:cancelled") });
         break;
       case "error":
@@ -133,7 +134,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: CurrentUserDocument,
   });
 
-  const { currentUser: user } = userData;
+  const user = userData?.currentUser;
 
   if (!user?.pk) {
     return {

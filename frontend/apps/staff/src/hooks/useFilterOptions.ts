@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import type { InteropApolloQueryResult } from "@apollo/client";
+import type { ApolloClient } from "@apollo/client";
 import type { TFunction } from "next-i18next/pages";
 import { filterNonNullable, sortAgeGroups } from "ui/src/modules/helpers";
 import {
@@ -144,7 +144,7 @@ export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
 export async function fetchFilterOptionsSafe(
   client: ReturnType<typeof createClient>,
   variables: FilterOptionsQueryVariables = {}
-): Promise<InteropApolloQueryResult<FilterOptionsQuery> | null> {
+): Promise<ApolloClient.QueryResult<FilterOptionsQuery> | null> {
   try {
     const options = await client.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
       query: FilterOptionsDocument,

@@ -18,11 +18,11 @@
     "test:coverage": "CI=true pnpm test --coverage"
   },
   "dependencies": {
-    "@apollo/client": "^3.14.1",
+    "@apollo/client": "^4.3.5",
     "@hookform/resolvers": "6.0.0",
     "@sentry/core": "^10.76.2",
     "@sentry/nextjs": "^10.76.2",
-    "apollo-upload-client": "18.0.1",
+    "apollo-upload-client": "20.0.0",
     "date-fns": "^4.4.0",
     "form-data": "^4.0.6",
     "graphql": "^16.14.1",
@@ -41,6 +41,7 @@
     "react-hook-form": "7.91.0",
     "react-use": "^17.6.1",
     "roarr": "^7.21.7",
+    "rxjs": "^7.8.2",
     "sass": "^1.105.0",
     "styled-components": "6.6.0",
     "tsconfig": "workspace:*",

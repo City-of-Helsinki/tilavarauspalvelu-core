@@ -1,7 +1,11 @@
 import "@testing-library/jest-dom/vitest";
+import { MockLink } from "@apollo/client/testing";
 import { cleanup } from "@testing-library/react";
 import { vi, expect, afterEach, afterAll, beforeAll } from "vitest";
 import type { Mock } from "vitest";
+
+// Apollo Client 4 delays mocked responses by 20-50 ms by default, the tests expect no delay (like Apollo Client 3)
+MockLink.defaultOptions = { delay: 0 };
 
 beforeAll(() => {
   // Workaround react-testing-library hard coding to jest.useFakeTimers
