@@ -143,7 +143,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: ApplicationPage4Document,
     variables: { id: createNodeId("ApplicationNode", pk) },
   });
-  const { application } = data;
+  const application = data?.application;
   if (application == null) {
     return notFound;
   }

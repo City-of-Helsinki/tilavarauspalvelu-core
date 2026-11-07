@@ -1,10 +1,10 @@
 import React from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { ReservationListDocument, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationTableElementFragment } from "@gql/gql-types";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
@@ -75,10 +75,9 @@ function listMock(
   reservations: ReservationTableElementFragment[],
   totalCount: number,
   hasNextPage = false
-): MockedResponse {
+): MockLink.MockedResponse {
   return {
-    request: { query: ReservationListDocument },
-    variableMatcher: () => true,
+    request: { query: ReservationListDocument, variables: () => true },
     result: {
       data: {
         reservations: {
@@ -92,15 +91,14 @@ function listMock(
   };
 }
 
-function errorMock(): MockedResponse {
+function errorMock(): MockLink.MockedResponse {
   return {
-    request: { query: ReservationListDocument },
-    variableMatcher: () => true,
+    request: { query: ReservationListDocument, variables: () => true },
     result: { errors: [new GraphQLError("Error")] },
   };
 }
 
-function renderLoader(mocks: MockedResponse[]) {
+function renderLoader(mocks: MockLink.MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks}>
       <ReservationsDataLoader />

@@ -80,7 +80,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
-  if (data.application == null) {
+  if (data?.application == null) {
     return notFound;
   }
   const { status } = data.application;

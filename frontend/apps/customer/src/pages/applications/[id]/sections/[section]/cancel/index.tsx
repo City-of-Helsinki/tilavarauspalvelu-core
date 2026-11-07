@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
@@ -69,7 +69,7 @@ function ReservationCancelPage(props: PropsNarrowed): React.ReactElement {
         throw new Error("Missing pk or reason");
       }
       setOnAcceptHandler(null);
-      const { data, errors } = await mutation({
+      const { data } = await mutation({
         variables: {
           input: {
             pk: applicationSection.pk,
@@ -77,17 +77,11 @@ function ReservationCancelPage(props: PropsNarrowed): React.ReactElement {
           },
         },
       });
-      if (errors != null && errors.length > 0) {
-        throw new ApolloError({
-          graphQLErrors: errors,
-        });
-      } else {
-        const res = data?.cancelAllApplicationSectionReservations;
-        if (res) {
-          const { future, cancelled } = res;
-          const url = `${backLink}?cancelled=${cancelled}&future=${future}`;
-          await router.push(url);
-        }
+      const res = data?.cancelAllApplicationSectionReservations;
+      if (res) {
+        const { future, cancelled } = res;
+        const url = `${backLink}?cancelled=${cancelled}&future=${future}`;
+        await router.push(url);
       }
     } catch (err) {
       displayError(err);

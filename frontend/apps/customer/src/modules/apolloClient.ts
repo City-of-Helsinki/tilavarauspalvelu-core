@@ -1,5 +1,5 @@
 import type { GetServerSidePropsContext } from "next";
-import { ApolloClient, from, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { relayStylePagination } from "@apollo/client/utilities";
 import type { FieldPolicy } from "@apollo/client";
@@ -55,14 +55,16 @@ export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsCont
 
   return new ApolloClient({
     ssrMode: isServer,
-    link: from([sentryLink, errorLink, httpLink]),
+    link: ApolloLink.from([sentryLink, errorLink, httpLink]),
     defaultOptions: {
       query: {
         fetchPolicy: isServer ? "no-cache" : "cache-first",
       },
-      // The client lives for the whole session, so fetch on mount to not show old data from an earlier page
       watchQuery: {
+        // The client lives for the whole session, so fetch on mount to not show old data from an earlier page
         fetchPolicy: "cache-and-network",
+        // Apollo Client 4 changed the default to true, keep the Apollo Client 3 behaviour
+        notifyOnNetworkStatusChange: false,
       },
     },
     cache: new InMemoryCache({

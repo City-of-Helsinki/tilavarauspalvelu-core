@@ -155,7 +155,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       id: createNodeId("ApplicationRoundNode", pk),
     },
   });
-  const { applicationRound } = data;
+  const applicationRound = data?.applicationRound;
   if (applicationRound == null) {
     return notFound;
   }
@@ -175,7 +175,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: CurrentUserDocument,
   });
 
-  if (isPostLogin && userData.currentUser != null) {
+  if (isPostLogin && userData?.currentUser != null) {
     const input: ApplicationCreateMutationInput = {
       applicationRound: applicationRound.pk ?? 0,
     };

@@ -250,7 +250,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { id: createNodeId("ReservationNode", reservationPk) },
   });
 
-  const { reservation } = resData;
+  const reservation = resData?.reservation;
 
   if (reservation?.pk == null) {
     // Valid path but no reservation found -> redirect to reservation unit page
@@ -292,7 +292,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       reservation,
-      reservationPrice: priceData.reservationPrice ?? null,
+      reservationPrice: priceData?.reservationPrice ?? null,
       options,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

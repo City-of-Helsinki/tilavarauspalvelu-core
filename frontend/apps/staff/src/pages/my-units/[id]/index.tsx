@@ -194,7 +194,7 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
     const optionsQuery = fetchFilterOptionsSafe(apolloClient);
 
     const [unitQueryRes, optionsQueryRes] = await Promise.all([unitQuery, optionsQuery]);
-    const unit = unitQueryRes.data.unit;
+    const unit = unitQueryRes.data?.unit;
     const optionsData = optionsQueryRes?.data ?? null;
 
     const end = performance.now();

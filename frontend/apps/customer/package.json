@@ -18,7 +18,7 @@
     "format:check": "oxfmt --check"
   },
   "dependencies": {
-    "@apollo/client": "^3.14.1",
+    "@apollo/client": "^4.3.5",
     "@hookform/resolvers": "6.0.0",
     "@sentry/core": "^10.76.2",
     "@sentry/nextjs": "^10.76.2",
@@ -40,6 +40,7 @@
     "react-transition-group": "^4.4.5",
     "react-use": "^17.6.1",
     "roarr": "^7.21.7",
+    "rxjs": "^7.8.2",
     "styled-components": "6.6.0",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",

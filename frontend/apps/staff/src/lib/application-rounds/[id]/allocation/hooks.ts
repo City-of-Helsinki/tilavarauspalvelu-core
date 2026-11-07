@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
-import type { ApolloQueryResult } from "@apollo/client";
 import { logError } from "@ui/modules/errors";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { numberToDayT } from "ui/src/modules/conversion";
 import { toNumber } from "ui/src/modules/helpers";
 import { useCreateAllocatedTimeSlotMutation, useDeleteAllocatedTimeSlotMutation } from "@gql/gql-types";
-import type { AllocatedTimeSlotCreateMutationInput, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
+import type { AllocatedTimeSlotCreateMutationInput } from "@gql/gql-types";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { decodeTimeSlot, timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
 import type {
@@ -133,7 +132,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
 
 // side effects that should happen when a modification is made
 export function useRefreshApplications(
-  fetchCallback: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>
+  fetchCallback: () => Promise<unknown>
 ): [(clearSelection?: boolean) => Promise<void>, boolean] {
   const [, setSelection] = useSlotSelection();
   const [isRefetchLoading, setIsRefetchLoading] = useState(false);
@@ -206,17 +205,11 @@ export function useAcceptSlotMutation({
     };
 
     try {
-      const { errors } = await acceptApplicationEvent({
+      await acceptApplicationEvent({
         variables: {
           input,
         },
       });
-      // NOTE there should be no errors here (the new api throws them as exceptions)
-      if (errors != null && errors.length > 0) {
-        throw new ApolloError({
-          graphQLErrors: errors,
-        });
-      }
       const { name } = applicationSection;
       const msg = t("allocation:acceptingSuccess", { name });
       successToast({ text: msg });
@@ -250,18 +243,13 @@ export function useRemoveAllocation({
       }
 
       const allocatedPk = allocatedTimeSlot.pk;
-      const { data, errors } = await resetApplicationEvent({
+      const { data } = await resetApplicationEvent({
         variables: {
           input: {
             pk: String(allocatedPk),
           },
         },
       });
-      if (errors != null && errors.length > 0) {
-        throw new ApolloError({
-          graphQLErrors: errors,
-        });
-      }
       const { deleteAllocatedTimeslot: res } = data || {};
       if (res?.deleted) {
         const { name } = applicationSection;

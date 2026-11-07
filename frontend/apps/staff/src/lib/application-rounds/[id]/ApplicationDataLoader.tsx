@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
 import { ApplicationOrderingChoices, useApplicationsQuery } from "@gql/gql-types";
@@ -22,7 +22,7 @@ export function ApplicationDataLoader({ applicationRoundPk }: Props): React.Reac
   const { textFilter, unitFilter, unitGroupFilter, applicationStatusFilter, applicantTypeFilter } =
     useGetFilterSearchParams();
 
-  const { fetchMore, previousData, loading, data } = useApplicationsQuery({
+  const { error, fetchMore, previousData, loading, data } = useApplicationsQuery({
     skip: !applicationRoundPk,
     variables: {
       first: LIST_PAGE_SIZE,
@@ -35,12 +35,10 @@ export function ApplicationDataLoader({ applicationRoundPk }: Props): React.Reac
       status: applicationStatusFilter ?? [],
       applicantType: applicantTypeFilter,
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const dataToUse = data ?? previousData;
   if (loading && !dataToUse) {

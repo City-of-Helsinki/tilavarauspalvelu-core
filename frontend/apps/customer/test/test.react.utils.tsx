@@ -1,5 +1,5 @@
 import React from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { CreateGraphQLMocksReturn } from "./test.gql.utils";
 
 export function MockedGraphQLProvider({

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { ReservationUnitOrderingChoices, SearchReservationUnitsDocument } from "@gql/gql-types";
 import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 import { ReservationUnitsDataReader } from "./ReservationUnitsDataLoader";
@@ -69,10 +69,9 @@ function listMock(
   reservationUnits: ReservationUnitTableElementFragment[],
   totalCount: number,
   hasNextPage = false
-): MockedResponse {
+): MockLink.MockedResponse {
   return {
-    request: { query: SearchReservationUnitsDocument },
-    variableMatcher: () => true,
+    request: { query: SearchReservationUnitsDocument, variables: () => true },
     result: {
       data: {
         reservationUnits: {
@@ -93,10 +92,9 @@ function listMock(
   };
 }
 
-function errorMock(): MockedResponse {
+function errorMock(): MockLink.MockedResponse {
   return {
-    request: { query: SearchReservationUnitsDocument },
-    variableMatcher: () => true,
+    request: { query: SearchReservationUnitsDocument, variables: () => true },
     result: { errors: [new GraphQLError("Error")] },
   };
 }
@@ -106,7 +104,7 @@ function Wrapper() {
   return <ReservationUnitsDataReader selectedRows={selectedRows} setSelectedRows={setSelectedRows} />;
 }
 
-function renderLoader(mocks: MockedResponse[]) {
+function renderLoader(mocks: MockLink.MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks}>
       <Wrapper />
@@ -175,12 +173,14 @@ describe("ReservationUnitsDataReader", () => {
     };
 
     // Create mocks for initial load + each column's ascending and descending orders
-    const mocks: MockedResponse[] = [
+    const mocks: MockLink.MockedResponse[] = [
       {
-        request: { query: SearchReservationUnitsDocument },
-        variableMatcher: (vars: Record<string, unknown>) => {
-          const orderBy = vars.orderBy as string[] | undefined;
-          return !orderBy || orderBy.length === 0;
+        request: {
+          query: SearchReservationUnitsDocument,
+          variables: (vars: Record<string, unknown>) => {
+            const orderBy = vars.orderBy as string[] | undefined;
+            return !orderBy || orderBy.length === 0;
+          },
         },
         result: {
           data: {
@@ -204,10 +204,12 @@ describe("ReservationUnitsDataReader", () => {
       },
       ...Object.entries(sortMap).flatMap(([_key, [asc, desc]]) => [
         {
-          request: { query: SearchReservationUnitsDocument },
-          variableMatcher: (vars: Record<string, unknown>) => {
-            const orderBy = vars.orderBy as string[] | undefined;
-            return orderBy?.[0] === asc;
+          request: {
+            query: SearchReservationUnitsDocument,
+            variables: (vars: Record<string, unknown>) => {
+              const orderBy = vars.orderBy as string[] | undefined;
+              return orderBy?.[0] === asc;
+            },
           },
           result: {
             data: {
@@ -230,10 +232,12 @@ describe("ReservationUnitsDataReader", () => {
           },
         },
         {
-          request: { query: SearchReservationUnitsDocument },
-          variableMatcher: (vars: Record<string, unknown>) => {
-            const orderBy = vars.orderBy as string[] | undefined;
-            return orderBy?.[0] === desc;
+          request: {
+            query: SearchReservationUnitsDocument,
+            variables: (vars: Record<string, unknown>) => {
+              const orderBy = vars.orderBy as string[] | undefined;
+              return orderBy?.[0] === desc;
+            },
           },
           result: {
             data: {

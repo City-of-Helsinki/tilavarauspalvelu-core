@@ -5,17 +5,14 @@ import type { OptionsRecord } from "@ui/types";
 import { OptionsDocument } from "@gql/gql-types";
 import type { OptionsQueryVariables, OptionsQuery } from "@gql/gql-types";
 
-export async function queryOptions(
-  apolloClient: ApolloClient<unknown>,
-  locale: string
-): Promise<Readonly<OptionsRecord>> {
+export async function queryOptions(apolloClient: ApolloClient, locale: string): Promise<Readonly<OptionsRecord>> {
   const { data } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,
     fetchPolicy: "no-cache",
   });
 
-  const reservationPurposes = filterNonNullable(data.reservationPurposes?.edges?.map((e) => e?.node));
-  const ageGroups = filterNonNullable(data.ageGroups?.edges?.map((e) => e?.node));
+  const reservationPurposes = filterNonNullable(data?.reservationPurposes?.edges?.map((e) => e?.node));
+  const ageGroups = filterNonNullable(data?.ageGroups?.edges?.map((e) => e?.node));
   if (!ageGroups || ageGroups.length === 0) {
     logError("No ageGroups received!", "warning");
   }

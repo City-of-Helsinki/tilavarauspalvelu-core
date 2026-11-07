@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
@@ -28,7 +28,7 @@ export function useCheckCollisions({
   const { t } = useTranslation();
   const today = new Date();
 
-  const { data, loading } = useReservationsByReservationUnitQuery({
+  const { error, data, loading } = useReservationsByReservationUnitQuery({
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk || !start || !end,
     variables: {
@@ -38,10 +38,8 @@ export function useCheckCollisions({
       endDate: formatApiDate(end ?? today) ?? "",
       state: RELATED_RESERVATION_STATES,
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const reservations = combineAffectingReservations(data, reservationUnitPk);
 

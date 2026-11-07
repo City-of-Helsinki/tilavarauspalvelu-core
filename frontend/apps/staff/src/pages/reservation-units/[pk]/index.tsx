@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
-import { ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { errorToast, successToast } from "ui/src/components/toast";
-import { useToastIfQueryParam } from "ui/src/hooks";
+import { successToast } from "ui/src/components/toast";
+import { useQueryErrorToast, useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { formatters as getFormatters } from "ui/src/modules/number-formatters";
@@ -230,14 +230,12 @@ function ReservationUnitEditor({
   const [updateMutation] = useUpdateReservationUnitMutation();
   const [createMutation] = useCreateReservationUnitMutation();
 
-  const { data: parametersData } = useReservationUnitEditorParametersQuery({
-    onError: (_) => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
+  const { data: parametersData, error: parametersError } = useReservationUnitEditorParametersQuery({
     variables: {
       equipmentsOrderBy: EquipmentOrderingChoices.CategoryRankAsc,
     },
   });
+  useQueryErrorToast(parametersError, t("errors:errorFetchingData"));
 
   // Fetch unit data only when creating a new reservation unit
   const { data: unitData } = useReservationUnitCreateUnitQuery({
@@ -290,12 +288,7 @@ function ReservationUnitEditor({
             variables: { input: { ...input, unit: unitPk } },
           });
 
-    const { data, errors: mutationErrors } = await promise;
-    if (mutationErrors != null && mutationErrors.length > 0) {
-      throw new ApolloError({
-        graphQLErrors: mutationErrors,
-      });
-    }
+    const { data } = await promise;
 
     const upPk = getPk(data);
 

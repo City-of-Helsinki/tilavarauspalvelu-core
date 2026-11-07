@@ -492,13 +492,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     logGraphQLQuery(performance.now() - startTime, req.url, ReservationUnitPageDocument);
 
-    const { reservationUnit } = reservationUnitData;
+    const reservationUnit = reservationUnitData?.reservationUnit;
 
     if (reservationUnit == null) {
       return notFound;
     }
 
-    const previewPass = uuid === reservationUnitData.reservationUnit?.extUuid;
+    const previewPass = uuid === reservationUnit.extUuid;
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return notFound;
     }

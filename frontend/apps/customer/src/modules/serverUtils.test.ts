@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import type { ApolloClient } from "@apollo/client";
 import { TermsOfUseTypeChoices } from "@gql/gql-types";
 import {
   getCommonServerSideProps,
@@ -119,14 +119,14 @@ describe("serverUtils", () => {
             },
           },
         }),
-    } satisfies Pick<ApolloClient<unknown>, "query">;
+    } satisfies Pick<ApolloClient, "query">;
 
-    expect(await getGenericTerms(apolloClient as unknown as ApolloClient<unknown>)).toMatchObject({
+    expect(await getGenericTerms(apolloClient as unknown as ApolloClient)).toMatchObject({
       pk: "booking",
       nameEn: "Terms",
     });
 
-    expect(await getGenericTerms(apolloClient as unknown as ApolloClient<unknown>)).toBeNull();
+    expect(await getGenericTerms(apolloClient as unknown as ApolloClient)).toBeNull();
     expect(logErrorMock).toHaveBeenCalledWith('No terms of use found for slug "booking"');
   });
 
@@ -158,15 +158,11 @@ describe("serverUtils", () => {
             },
           },
         }),
-    } satisfies Pick<ApolloClient<NormalizedCacheObject>, "query">;
+    } satisfies Pick<ApolloClient, "query">;
 
-    expect(
-      await getReservationByOrderUuid(apolloClient as unknown as ApolloClient<NormalizedCacheObject>, "uuid-1")
-    ).toMatchObject({
+    expect(await getReservationByOrderUuid(apolloClient as unknown as ApolloClient, "uuid-1")).toMatchObject({
       pk: 8,
     });
-    expect(
-      await getReservationByOrderUuid(apolloClient as unknown as ApolloClient<NormalizedCacheObject>, "uuid-2")
-    ).toBeNull();
+    expect(await getReservationByOrderUuid(apolloClient as unknown as ApolloClient, "uuid-2")).toBeNull();
   });
 });

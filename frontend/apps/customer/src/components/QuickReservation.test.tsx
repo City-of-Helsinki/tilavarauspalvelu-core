@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { addHours } from "date-fns";
 import { describe, test, expect, vi, beforeEach } from "vitest";

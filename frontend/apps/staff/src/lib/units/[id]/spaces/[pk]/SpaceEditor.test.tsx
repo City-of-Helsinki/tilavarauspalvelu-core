@@ -1,10 +1,10 @@
 import React from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { createNodeId } from "ui/src/modules/helpers";
 import { SpaceDocument, UnitSpacesDocument, UpdateSpaceDocument } from "@gql/gql-types";
 import { SpaceEditor } from "./SpaceEditor";
@@ -84,7 +84,7 @@ beforeEach(() => {
   mockSuccessToast.mockReset();
 });
 
-function renderEditor(mocks: ReadonlyArray<MockedResponse>, props: { space?: number; unit?: number } = {}) {
+function renderEditor(mocks: ReadonlyArray<MockLink.MockedResponse>, props: { space?: number; unit?: number } = {}) {
   return render(
     <MockedProvider
       mocks={mocks}
