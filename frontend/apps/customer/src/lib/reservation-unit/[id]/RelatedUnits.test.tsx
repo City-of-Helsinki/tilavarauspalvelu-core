@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, test, expect, vi } from "vitest";
-import { PaymentType, PriceUnit, RelatedReservationUnitsDocument } from "@gql/gql-types";
+import { PriceUnit, RelatedReservationUnitsDocument } from "@gql/gql-types";
 import type { RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { RelatedUnits } from "./RelatedUnits";
@@ -26,7 +26,7 @@ function createRelatedUnit(overrides: Partial<RelatedUnitCardFieldsFragment> = {
     nameSv: "Related Unit SV",
     maxPersons: null,
     reservationUnitType: null,
-    pricings: [],
+    priceSummary: null,
     images: [],
     unit: {
       id: "unit-2",
@@ -104,25 +104,21 @@ describe("RelatedUnits", () => {
             nameEn: "Meeting room",
             nameSv: "Meeting room",
           },
-          pricings: [
-            {
-              id: "pricing-1",
-              begins: "2020-01-01",
-              priceUnit: PriceUnit.PerHour,
-              paymentType: PaymentType.Online,
-              lowestPrice: "0",
-              highestPrice: "0",
-              materialPriceDescriptionFi: "",
-              materialPriceDescriptionEn: "",
-              materialPriceDescriptionSv: "",
-              taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
-            },
-          ],
+          priceSummary: {
+            isFree: true,
+            lowestAmount: "0",
+            priceUnit: PriceUnit.PerHour,
+            canApplyForDiscount: false,
+            materialPriceDescriptionFi: "",
+            materialPriceDescriptionEn: "",
+            materialPriceDescriptionSv: "",
+          },
         }),
       ],
     });
 
     expect(await screen.findByText("Meeting room")).toBeInTheDocument();
+    expect(screen.getByText("prices:priceFree")).toBeInTheDocument();
     expect(screen.getByText("reservationUnitCard:maxPersons", { exact: false })).toBeInTheDocument();
   });
 

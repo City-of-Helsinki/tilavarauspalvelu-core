@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import type { ApolloQueryResult } from "@apollo/client";
-import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "ui/src/modules/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { ButtonContainer } from "ui/src/styled";
 import {
   ReserveeType,
@@ -29,7 +29,7 @@ import {
   createTagString,
   formatReservationPriceLong,
   getName,
-  getReservationUnitPricing,
+  isReservationPriceFree,
   formatReservationPrice,
   translateReservationCustomerType,
 } from "@/modules/reservation";
@@ -277,9 +277,7 @@ function RequestedReservation({
 
   const ref = useRef<HTMLHeadingElement>(null);
 
-  const pricing = getReservationUnitPricing(reservation.reservationUnit, new Date(reservation.beginsAt));
-
-  const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
+  const isNonFree = !isReservationPriceFree(reservation);
 
   const reservationTagline = createTagString(reservation, t);
 

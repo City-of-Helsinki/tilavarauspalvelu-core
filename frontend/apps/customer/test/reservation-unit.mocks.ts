@@ -92,7 +92,6 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     currentAccessType: null,
     effectiveAccessType: null,
     maxPersons: null,
-    pricings: [],
     reservationUnitPricingGroups: [],
     priceSummary: null,
     unit: createMockUnit({ pk }),
@@ -119,7 +118,6 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     bufferTimeAfter: 0, //Scalars["Duration"]["output"];
     bufferTimeBefore: 0, // Scalars["Duration"]["output"];
     calculatedSurfaceArea: 0, // Scalars["Int"]["output"];
-    canApplyFreeOfCharge: false, // Scalars["Boolean"]["output"];
     cancellationRule: null, // Maybe<ReservationUnitCancellationRuleNode>;
     cancellationTerms: null, // Maybe<TermsOfUseNode>;
     contactInformation: "", // admin-ui only feature

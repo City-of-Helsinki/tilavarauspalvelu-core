@@ -17,8 +17,15 @@ import {
 } from "@ui/modules/helpers";
 import { Flex, fontMedium, Strong } from "@ui/styled";
 import { AccessType, ReservationStateChoice, useAccessCodeQuery } from "@gql/gql-types";
-import type { ReservationInfoCardFragment } from "@gql/gql-types";
-import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
+import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
+import {
+  getPriceLineStringList,
+  getReservationPriceDisplay,
+  getMaterialPriceDescription,
+  getReservationPriceDisplayFromLines,
+  getReservationPriceString,
+  isDiscountPending,
+} from "@/modules/price";
 import { getReservationUnitPath } from "@/modules/urls";
 
 const InfoCard = styled(Card)`
@@ -49,7 +56,11 @@ const Subheading = styled.p`
 
 type Props = {
   reservation: ReservationInfoCardFragment;
-  shouldDisplayReservationUnitPrice?: boolean;
+  /// The price calculated by the backend for the time of the reservation.
+  /// Without it, the card shows the price lines of the reservation.
+  reservationPrice?: ReservationPriceCalculationFieldsFragment | null;
+  /// Show the price as a range from 0, because the customer applies for a discount
+  isDiscountRange?: boolean;
   // Background color of the card
   bgColor?: "gold" | "silver";
   // Hide the reservation unit image
@@ -61,7 +72,8 @@ type Props = {
 export function ReservationInfoCard({
   reservation,
   bgColor = "silver",
-  shouldDisplayReservationUnitPrice = false,
+  reservationPrice,
+  isDiscountRange,
   disableImage = false,
   className,
   style,
@@ -95,16 +107,21 @@ export function ReservationInfoCard({
 
   const duration = differenceInMinutes(new Date(endsAt), new Date(beginsAt));
   const lang = getLocalizationLang(i18n.language);
-  const price: string | null = getPrice(t, reservation, lang, shouldDisplayReservationUnitPrice);
+  const priceDisplay =
+    reservationPrice != null
+      ? getReservationPriceDisplay(reservationPrice, lang)
+      : getReservationPriceDisplayFromLines(
+          reservation,
+          lang,
+          getMaterialPriceDescription(reservationUnit.priceSummary, lang) !== ""
+        );
+  const price = getReservationPriceString(t, priceDisplay, isDiscountRange ?? isDiscountPending(reservation), lang);
+  const priceLineList = getPriceLineStringList(priceDisplay, lang);
+  const taxPercentage = priceDisplay.total > 0 ? priceDisplay.taxPercentage : null;
 
-  const { taxPercentageValue, state } = reservation;
+  const { state } = reservation;
 
   const showReservationNumber = state != null && state !== ReservationStateChoice.Created;
-
-  const shouldDisplayTaxPercentage: boolean =
-    state === ReservationStateChoice.RequiresHandling
-      ? isReservationUnitPaid(reservationUnit.pricings, new Date(beginsAt))
-      : Number(reservation?.price) > 0;
 
   const name = getTranslation(reservationUnit, "name", lang);
   const img = getMainImage(reservationUnit);
@@ -139,11 +156,13 @@ export function ReservationInfoCard({
         </div>
         <div data-testid="reservation__reservation-info-card__price">
           {t("common:price")}: <Strong>{price}</Strong>{" "}
-          {taxPercentageValue &&
-            shouldDisplayTaxPercentage &&
+          {taxPercentage != null &&
             `(${t("common:inclTax", {
-              taxPercentage: formatters.strippedDecimal?.format(Number.parseFloat(taxPercentageValue)),
+              taxPercentage: formatters.strippedDecimal?.format(taxPercentage),
             })})`}
+          {priceLineList.map((priceLine) => (
+            <div key={priceLine}>{priceLine}</div>
+          ))}
         </div>
         {reservation.accessType !== AccessType.Unrestricted && (
           <div data-testid="reservation__reservation-info-card__accessType">
@@ -161,8 +180,10 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   fragment ReservationInfoCard on ReservationNode {
     id
     pk
-    ...ReservationPriceFields
-    taxPercentageValue
+    beginsAt
+    endsAt
+    applyingForFreeOfCharge
+    ...ReservationPriceLinesFields
     state
     accessType
     pindoraInfo {
@@ -174,6 +195,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
       nameFi
       nameEn
       nameSv
+      ...PriceSummaryFields
       images {
         ...Image
       }

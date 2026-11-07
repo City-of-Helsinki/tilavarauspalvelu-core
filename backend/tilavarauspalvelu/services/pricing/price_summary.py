@@ -20,6 +20,9 @@ class BasePrice:
     amount: Decimal
     price_unit: PriceUnit
     can_apply_for_discount: bool
+    material_price_description_fi: str
+    material_price_description_en: str
+    material_price_description_sv: str
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -29,6 +32,9 @@ class PriceSummary:
     price_unit: PriceUnit
     varies: bool
     can_apply_for_discount: bool
+    material_price_description_fi: str
+    material_price_description_en: str
+    material_price_description_sv: str
 
 
 def summarize_base_prices(base_prices: list[BasePrice]) -> PriceSummary | None:
@@ -37,12 +43,15 @@ def summarize_base_prices(base_prices: list[BasePrice]) -> PriceSummary | None:
 
     The lowest price is compared by amount only, even if the price units differ.
     Of equal amounts, the first one in the list gives the price unit.
+    The material price description comes from the cheapest base price that has one.
     """
     if not base_prices:
         return None
 
     cheapest = min(base_prices, key=lambda base_price: base_price.amount)
     distinct_prices = {(base_price.amount, base_price.price_unit) for base_price in base_prices}
+    prices_with_material_price = [base_price for base_price in base_prices if base_price.material_price_description_fi]
+    material_price = min(prices_with_material_price, key=lambda base_price: base_price.amount, default=None)
 
     return PriceSummary(
         is_free=all(base_price.amount == 0 for base_price in base_prices),
@@ -50,4 +59,7 @@ def summarize_base_prices(base_prices: list[BasePrice]) -> PriceSummary | None:
         price_unit=cheapest.price_unit,
         varies=len(distinct_prices) > 1,
         can_apply_for_discount=any(base_price.can_apply_for_discount for base_price in base_prices),
+        material_price_description_fi=material_price.material_price_description_fi if material_price else "",
+        material_price_description_en=material_price.material_price_description_en if material_price else "",
+        material_price_description_sv=material_price.material_price_description_sv if material_price else "",
     )

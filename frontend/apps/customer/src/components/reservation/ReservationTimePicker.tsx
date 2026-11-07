@@ -394,7 +394,8 @@ export const RESERVATION_TIME_PICKER_FRAGMENT = gql`
     id
     pk
     ...IsReservableFields
-    ...PriceReservationUnitFields
+    reservationBeginsAt
+    reservationEndsAt
     applicationRounds(ongoing: true) {
       id
       reservationPeriodBeginDate

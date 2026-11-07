@@ -1,32 +1,22 @@
 import React, { useMemo } from "react";
 import { gql } from "@apollo/client";
 import { Accordion } from "hds-react";
-import { Trans, useTranslation } from "next-i18next/pages";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { Sanitize } from "@ui/components/Sanitize";
 import { useGenericTerms } from "@ui/hooks";
-import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
 import { convertWeekday } from "@ui/modules/conversion";
-import { formatDate, formatTimeRange, parseApiDate, timeToMinutes } from "@ui/modules/date-utils";
-import {
-  filterNonNullable,
-  formatListToCSV,
-  getLocalizationLang,
-  getTranslation,
-  isPriceFree,
-  toNumber,
-} from "@ui/modules/helpers";
+import { formatTimeRange, timeToMinutes } from "@ui/modules/date-utils";
+import { filterNonNullable, formatListToCSV, getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import type {
   ApplicationRoundTimeSlotFieldsFragment,
   NoticeWhenReservingFragment,
   ReservationUnitMoreDetailsFragment,
-  PricingFieldsFragment,
   TimeSlotType,
 } from "@gql/gql-types";
 import { AddressSection } from "@/components/AddressSection";
 import { UnitMap } from "@/components/UnitMap";
-import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { JustForMobile } from "@/modules/style/layout";
 import { ReservationInfoSection } from "./ReservationInfoSection";
 
@@ -50,14 +40,7 @@ export function ReservationUnitMoreDetails({
       (a, b) => convertWeekday(a.weekday) - convertWeekday(b.weekday)
     );
   }, [reservationUnit.applicationRoundTimeSlots]);
-  const shouldDisplayPricingTerms = useMemo(() => {
-    const pricings = filterNonNullable(reservationUnit?.pricings);
-    if (pricings.length === 0) {
-      return false;
-    }
-    const isPaid = pricings.some((pricing) => !isPriceFree(pricing));
-    return reservationUnit?.canApplyFreeOfCharge && isPaid;
-  }, [reservationUnit?.canApplyFreeOfCharge, reservationUnit?.pricings]);
+  const shouldDisplayPricingTerms = reservationUnit.priceSummary?.canApplyForDiscount === true;
 
   const paymentTermsContent = reservationUnit.paymentTerms
     ? getTranslation(reservationUnit.paymentTerms, "text", lang)
@@ -131,10 +114,7 @@ function NoticeWhenReservingSection({
   const lang = getLocalizationLang(i18n.language);
   const notesWhenReserving = getTranslation(reservationUnit, "notesWhenApplying", lang);
 
-  const appRounds = reservationUnit.applicationRounds;
-  const futurePricing = getFuturePricing(reservationUnit, appRounds);
-
-  if (!futurePricing && !notesWhenReserving) {
+  if (!notesWhenReserving) {
     return null;
   }
   return (
@@ -144,46 +124,8 @@ function NoticeWhenReservingSection({
       closeButton={false}
       data-testid="reservation-unit__reservation-notice"
     >
-      {futurePricing && <PriceChangeNotice futurePricing={futurePricing} />}
-      {notesWhenReserving && <Sanitize html={notesWhenReserving} />}
+      <Sanitize html={notesWhenReserving} />
     </Accordion>
-  );
-}
-
-function PriceChangeNotice({ futurePricing }: Readonly<{ futurePricing: PricingFieldsFragment }>): React.ReactElement {
-  const { t, i18n } = useTranslation();
-
-  const isPaid = !isPriceFree(futurePricing);
-  // The VAT of a reservation is the rate on the day of sale, so this is the rate for a reservation made today
-  const taxPercentage = toNumber(futurePricing.taxLevel.currentPercentage) ?? 0;
-  const begins = parseApiDate(futurePricing.begins);
-  const priceString = getPriceString({
-    t,
-    pricing: futurePricing,
-  }).toLocaleLowerCase();
-  const showTaxNotice = isPaid && taxPercentage > 0;
-  const formatters = getFormatters(i18n.language);
-
-  return (
-    <p style={{ marginTop: 0 }}>
-      <Trans
-        i18nKey="reservationUnit:futurePricingNotice"
-        defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
-        values={{
-          date: formatDate(begins),
-          price: priceString,
-        }}
-        components={{ bold: <strong /> }}
-      />
-      {showTaxNotice && (
-        <strong>
-          {t("reservationUnit:futurePriceNoticeTax", {
-            tax: formatters.strippedDecimal?.format(taxPercentage),
-          })}
-        </strong>
-      )}
-      .
-    </p>
   );
 }
 
@@ -248,7 +190,6 @@ export const NOTICE_WHEN_RESERVING_FRAGMENT = gql`
     notesWhenApplyingEn
     notesWhenApplyingFi
     notesWhenApplyingSv
-    ...PriceReservationUnitFields
     applicationRounds(ongoing: true) {
       id
       reservationPeriodBeginDate
@@ -267,13 +208,9 @@ export const RESERVATION_UNIT_MODE_DETAILS_FRAGMENT = gql`
     }
     ...TermsOfUse
     ...ReservationQuotaReached
-    canApplyFreeOfCharge
+    ...PriceSummaryFields
     ...NoticeWhenReserving
     ...ReservationInfoSection
-    pricings {
-      id
-      highestPrice
-    }
     unit {
       ...AddressFields
     }

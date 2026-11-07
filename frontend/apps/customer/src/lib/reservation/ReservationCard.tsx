@@ -10,8 +10,13 @@ import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";
 import { ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationCardFragment } from "@gql/gql-types";
+import {
+  getMaterialPriceDescription,
+  getReservationPriceDisplayFromLines,
+  getReservationPriceString,
+  isDiscountPending,
+} from "@/modules/price";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
-import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
 
 type CardType = "upcoming" | "past" | "cancelled";
@@ -34,11 +39,17 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
   );
 
   const lang = getLocalizationLang(i18n.language);
-  const price = getPrice(t, reservation, lang);
 
   if (!reservationUnit) {
     return null;
   }
+
+  const priceDisplay = getReservationPriceDisplayFromLines(
+    reservation,
+    lang,
+    getMaterialPriceDescription(reservationUnit.priceSummary, lang) !== ""
+  );
+  const price = getReservationPriceString(t, priceDisplay, isDiscountPending(reservation), lang);
 
   const name = getTranslation(reservationUnit, "name", lang);
   const unitName = getTranslation(reservationUnit.unit, "name", lang);
@@ -138,6 +149,7 @@ export const RESERVATION_CARD_FRAGMENT = gql`
       nameFi
       nameSv
       nameEn
+      ...PriceSummaryFields
       images {
         ...Image
       }
@@ -148,7 +160,8 @@ export const RESERVATION_CARD_FRAGMENT = gql`
         nameEn
       }
     }
-    ...ReservationPriceFields
+    applyingForFreeOfCharge
+    ...ReservationPriceLinesFields
     ...ReservationOrderStatus
     ...ReservationPaymentUrl
     ...CanUserCancelReservation

@@ -1,3 +1,4 @@
+import type { MockedResponse } from "@apollo/client/testing";
 import { createNodeId } from "ui/src/modules/helpers";
 import {
   AccessType,
@@ -12,8 +13,14 @@ import {
   ReserveeType,
   TermsOfUseTypeChoices,
   ReservationFormType,
+  ReservationPriceDocument,
 } from "@gql/gql-types";
-import type { ReservationFormFieldsFragment, PaymentOrderNode, ReservationPageQuery } from "@gql/gql-types";
+import type {
+  ReservationFormFieldsFragment,
+  PaymentOrderNode,
+  ReservationPageQuery,
+  ReservationPriceCalculationFieldsFragment,
+} from "@gql/gql-types";
 import { generateNameFragment } from "@test/test.gql.utils";
 
 export function generateTextFragment(text: string) {
@@ -59,9 +66,8 @@ export type MockReservationProps = {
   type?: ReservationTypeChoice;
   price?: string;
   paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
-  appliedPricing?: { highestPrice: string; taxPercentage: string };
   cancellable?: boolean;
-  canApplyFreeOfCharge?: boolean;
+  canApplyForDiscount?: boolean;
   applyingForFreeOfCharge?: boolean;
   reservationConfirmedInstructions?: string;
   cancellationTerms?: {
@@ -105,7 +111,7 @@ export function createMockReservation(
     applyingForFreeOfCharge = false,
     reservationConfirmedInstructions = "Test confirmed instructions",
     beginsAt = new Date(2024, 0, 1, 10, 0, 0, 0).toISOString(),
-    canApplyFreeOfCharge = true,
+    canApplyForDiscount = true,
     cancellable = false,
     cancellationTerms = {
       id: createNodeId("CancellationTermsNode", 1),
@@ -125,15 +131,6 @@ export function createMockReservation(
     paymentTerms = {
       id: createNodeId("PaymentTermsNode", 1),
       ...generateTextFragment("Test payment terms"),
-    },
-    appliedPricing = {
-      id: createNodeId("AppliedPricingNode", 1),
-      begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
-      priceUnit: PriceUnit.PerHour,
-      paymentType: PaymentType.Online,
-      highestPrice: "10.0",
-      lowestPrice: "0.0",
-      taxPercentage: "24.5",
     },
     pk = 1,
     price = "10.0",
@@ -165,11 +162,19 @@ export function createMockReservation(
     id: createNodeId("ReservationNode", pk),
     isHandled: cancellable ? false : isHandled,
     numPersons: 5,
-    appliedPricing: appliedPricing,
     paymentOrder: paymentOrder,
     pindoraInfo: null,
     pk: pk,
     price: price,
+    priceLines: [
+      {
+        id: createNodeId("ReservationPriceLineNode", 1),
+        ...generateDescriptionFragment("Space rent"),
+        amount: price,
+        overrideAmount: null,
+        taxPercentage: "24.5",
+      },
+    ],
     cancelReason: ReservationCancelReasonChoice.NotPaid,
     purpose: {
       ...generatePurposeFragment("Test Purpose"),
@@ -203,7 +208,15 @@ export function createMockReservation(
         addressCitySv: "Helsingfors",
         ...generateNameFragment("Test Unit"),
       },
-      canApplyFreeOfCharge: canApplyFreeOfCharge,
+      priceSummary: {
+        isFree: false,
+        lowestAmount: price,
+        priceUnit: PriceUnit.PerHour,
+        canApplyForDiscount,
+        materialPriceDescriptionFi: "",
+        materialPriceDescriptionEn: "",
+        materialPriceDescriptionSv: "",
+      },
       reservationForm: ReservationFormType.PurposeForm,
       reservationPendingInstructionsFi: "Test pending instructions FI",
       reservationPendingInstructionsEn: "Test pending instructions EN",
@@ -221,26 +234,6 @@ export function createMockReservation(
       cancellationTerms: cancellationTerms,
       paymentTerms: paymentTerms,
       pricingTerms: pricingTerms,
-      reservationBeginsAt: null,
-      reservationEndsAt: null,
-      pricings: [
-        {
-          id: createNodeId("PricingNode", 1),
-          begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
-          priceUnit: PriceUnit.PerHour,
-          paymentType: PaymentType.Online,
-          highestPrice: price,
-          lowestPrice: "0.0",
-          taxLevel: {
-            id: createNodeId("TaxLevelNode", 1),
-            pk: 1,
-            currentPercentage: "24.5",
-          },
-          materialPriceDescriptionFi: "Testimateriaali FI",
-          materialPriceDescriptionEn: "Test material EN",
-          materialPriceDescriptionSv: "Testmaterial SV",
-        },
-      ],
       cancellationRule: cancellable
         ? {
             id: createNodeId("ReservationUnitCancellationRuleNode", 1),
@@ -503,4 +496,48 @@ export function createSupportedFieldsMock(type: ReserveeType | "reservation" = "
     case ReserveeType.Individual:
       return baseReserveeFields;
   }
+}
+
+type ReservationPriceLine = ReservationPriceCalculationFieldsFragment["lines"][number];
+
+export function createReservationPriceLine(overrides: Partial<ReservationPriceLine> = {}): ReservationPriceLine {
+  return {
+    ...generateDescriptionFragment("Space rent"),
+    amount: "40.00",
+    taxPercentage: "25.5",
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
+    ...overrides,
+  };
+}
+
+/// Mock of the price calculation query of the backend for one reservation unit and time
+export function createReservationPriceQueryMock({
+  reservationUnit = 1,
+  beginsAt,
+  endsAt,
+  price,
+}: {
+  reservationUnit?: number;
+  beginsAt: Date;
+  endsAt: Date;
+  price: ReservationPriceCalculationFieldsFragment;
+}): MockedResponse {
+  return {
+    request: {
+      query: ReservationPriceDocument,
+      variables: { reservationUnit, beginsAt: beginsAt.toISOString(), endsAt: endsAt.toISOString() },
+    },
+    result: {
+      data: {
+        // The fragment needs the type names to match the response
+        reservationPrice: {
+          __typename: "ReservationPriceType",
+          ...price,
+          lines: price.lines.map((line) => ({ __typename: "ReservationPriceCalculationLineType", ...line })),
+        },
+      },
+    },
+  };
 }

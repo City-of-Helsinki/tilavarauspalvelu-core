@@ -4,13 +4,7 @@ import type { OptionInProps } from "hds-react";
 import type { TFunction } from "i18next";
 import { minutesToHoursString, timeToMinutes } from "@ui/modules/date-utils/conversion";
 import { ReservationUnitImageType } from "../../gql/gql-types";
-import type {
-  AgeGroupNode,
-  ImageFragment,
-  Maybe,
-  PricingFieldsFragment,
-  SuitableTimeFragment,
-} from "../../gql/gql-types";
+import type { AgeGroupNode, ImageFragment, Maybe, SuitableTimeFragment } from "../../gql/gql-types";
 import { pixel } from "./const";
 import { convertWeekday } from "./conversion";
 import type { LocalizationLanguages } from "./urlBuilder";
@@ -149,13 +143,6 @@ function getImageSourceWithoutDefault(
 
 export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageFragment | null {
   return ru?.images.find((img) => img.imageType === ReservationUnitImageType.Main) ?? null;
-}
-
-/// Returns if price is free
-/// NOTE Only check highestPrice because lowestPrice < highestPrice
-export function isPriceFree(pricing: Pick<PricingFieldsFragment, "highestPrice">): boolean {
-  const price = toNumber(pricing.highestPrice);
-  return price == null || price === 0;
 }
 
 function pickMaybeDay(

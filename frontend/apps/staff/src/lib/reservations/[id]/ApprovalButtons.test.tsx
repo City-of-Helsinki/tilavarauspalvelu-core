@@ -26,15 +26,11 @@ function createInput({
     endsAt: endsAt.toISOString(),
     paymentOrder: null,
     reservationSeries: null,
-    reservationUnit: {
-      id: createNodeId("ReservationUnitNode", 1),
-      pricings: [],
-    },
     price: null,
     handlingDetails: null,
     applyingForFreeOfCharge: false,
     freeOfChargeReason: null,
-    appliedPricing: null,
+    priceLines: [],
   };
 }
 
