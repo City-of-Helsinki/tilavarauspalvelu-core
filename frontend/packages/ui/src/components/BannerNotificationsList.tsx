@@ -23,11 +23,8 @@ type NotificationsListItemProps = {
 };
 
 const PositionWrapper = styled.div`
-  width: 100vw;
+  width: 100%;
   display: grid;
-  position: relative;
-  margin-left: -50vw;
-  left: 50%;
 `;
 
 const BannerNotificationBackground = styled.div`
@@ -35,9 +32,6 @@ const BannerNotificationBackground = styled.div`
   display: flex;
   section {
     border-bottom: 1px solid var(--notification-border-color);
-    [class*="PageWrapper__Content"] & {
-      padding-right: var(--spacing-2-xl);
-    }
   }
   > div {
     width: 100%;

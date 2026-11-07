@@ -34,8 +34,8 @@ export function PageWrapper({ children }: Props): React.ReactElement {
   return (
     <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e)}>
       <Navigation apiBaseUrl={env.apiBaseUrl} />
+      {isAuthenticated && <BannerNotificationsList target={BannerNotificationTarget.Staff} />}
       <Content>
-        {isAuthenticated && <BannerNotificationsList target={BannerNotificationTarget.Staff} />}
         {children}
         <ToastContainer />
       </Content>
