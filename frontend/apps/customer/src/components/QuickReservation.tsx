@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
-import { Button } from "hds-react";
+import { Button, ButtonSize } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ControlledDateInput } from "ui/src/components/form";
@@ -37,7 +37,7 @@ const Form = styled.form`
   padding: var(--spacing-m);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-m);
+  gap: var(--spacing-s);
   justify-content: space-between;
 
   @media (min-width: ${breakpoints.m}) {
@@ -76,17 +76,22 @@ const Subheading = styled.div`
   font-size: var(--fontsize-heading-xs);
 `;
 
+const SLOT_HEIGHT = "32px";
+const SLOT_ROW_GAP = "var(--spacing-s)";
+
 const SlotGroup = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(4, 50px);
-  gap: var(--spacing-s) var(--spacing-2-xs);
+  /* Always keep space for two rows, so that the layout does not jump when the number of times changes */
+  grid-template-rows: repeat(2, ${SLOT_HEIGHT});
+  gap: ${SLOT_ROW_GAP} var(--spacing-2-xs);
   justify-content: center;
 
   @media (min-width: ${breakpoints.s}) {
-    gap: var(--spacing-s) var(--spacing-s);
+    gap: ${SLOT_ROW_GAP} var(--spacing-s);
   }
 `;
 
@@ -99,7 +104,7 @@ const Slot = styled(Flex).attrs({
   box-sizing: border-box;
   background-color: var(--color-white);
   font-size: var(--fontsize-body-s);
-  height: 32px;
+  height: ${SLOT_HEIGHT};
   border-width: 2px;
   border-style: solid;
   border-color: ${({ $active }) => ($active ? "var(--color-black-80)" : "var(--color-white)")};
@@ -115,8 +120,25 @@ const SlotButton = styled.button`
 
 const NoTimes = styled(Flex).attrs({
   $justifyContent: "space-between",
-})`
-  margin: var(--spacing-s) 0 calc(var(--spacing-s) * -1) 0;
+})<{ $isHidden: boolean }>`
+  visibility: ${({ $isHidden }) => ($isHidden ? "hidden" : "visible")};
+`;
+
+// The text and the times share one grid cell, so that the cell is always as high as the higher one
+const TimesOrNoTimes = styled.div`
+  display: grid;
+
+  > * {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+`;
+
+const PriceAndSubmit = styled(Flex).attrs({
+  $direction: "row",
+  $justifyContent: "space-between",
+})<{ $isHidden: boolean }>`
+  visibility: ${({ $isHidden }) => ($isHidden ? "hidden" : "visible")};
 `;
 
 // Make the slots fit a ~320px wide view
@@ -197,7 +219,8 @@ export function QuickReservation({
           durationString={durationOptions.find((opt) => opt.value === duration)?.label ?? ""}
         />
       </SlotContainer>
-      <Flex $direction="row" $justifyContent="space-between">
+      {/* The row is hidden, not removed, when the time is not reservable, so that the layout does not jump */}
+      <PriceAndSubmit $isHidden={focusSlot?.isReservable !== true}>
         <Price data-testid="quick-reservation__price">
           {focusSlot?.isReservable && (
             <>
@@ -206,8 +229,8 @@ export function QuickReservation({
             </>
           )}
         </Price>
-        {focusSlot?.isReservable && LoginAndSubmit}
-      </Flex>
+        {LoginAndSubmit}
+      </PriceAndSubmit>
     </Form>
   );
 }
@@ -257,18 +280,23 @@ function TimeChunkSection({
     return runner;
   }, [timeChunks, time]);
 
-  if (startingTimeOptions.length === 0) {
-    return (
-      <NoTimes>
+  const hasTimes = startingTimeOptions.length > 0;
+  const nextAvailableTimeLabel = t("reservationCalendar:quickReservation.nextAvailableTime");
+
+  return (
+    <TimesOrNoTimes>
+      {/* Always rendered, also when hidden, so that the layout does not jump when the times or the button change */}
+      <NoTimes $isHidden={hasTimes}>
         <span>
           {t("reservationCalendar:quickReservation.noTimes", {
             duration: durationString,
           })}
         </span>
-        {nextAvailableTime != null && (
+        {nextAvailableTime != null ? (
           <Button
             data-testid="quick-reservation__next-available-time"
             type="button"
+            size={ButtonSize.Small}
             onClick={(e) => {
               e.preventDefault();
               setValue("date", formatDate(nextAvailableTime), {
@@ -276,31 +304,35 @@ function TimeChunkSection({
               });
             }}
           >
-            {t("reservationCalendar:quickReservation.nextAvailableTime")}
+            {nextAvailableTimeLabel}
+          </Button>
+        ) : (
+          // Keeps the place of the button when there is no next available time
+          <Button type="button" size={ButtonSize.Small} style={{ visibility: "hidden" }}>
+            {nextAvailableTimeLabel}
           </Button>
         )}
       </NoTimes>
-    );
-  }
-
-  return (
-    <Carousel hideCenterControls wrapAround={false} slideIndex={activeChunk}>
-      {timeChunks.map((chunk: string[]) => (
-        <SlotGroup key={chunk[0]}>
-          {chunk.map((value: string) => (
-            <Slot $active={watch("time") === value} key={value}>
-              <SlotButton
-                data-testid="quick-reservation__slot"
-                onClick={() => setValue("time", value, { shouldDirty: true })}
-                type="button"
-                aria-pressed={watch("time") === value ? "true" : "false"}
-              >
-                {value}
-              </SlotButton>
-            </Slot>
+      {hasTimes && (
+        <Carousel hideCenterControls wrapAround={false} slideIndex={activeChunk}>
+          {timeChunks.map((chunk: string[]) => (
+            <SlotGroup key={chunk[0]}>
+              {chunk.map((value: string) => (
+                <Slot $active={watch("time") === value} key={value}>
+                  <SlotButton
+                    data-testid="quick-reservation__slot"
+                    onClick={() => setValue("time", value, { shouldDirty: true })}
+                    type="button"
+                    aria-pressed={watch("time") === value ? "true" : "false"}
+                  >
+                    {value}
+                  </SlotButton>
+                </Slot>
+              ))}
+            </SlotGroup>
           ))}
-        </SlotGroup>
-      ))}
-    </Carousel>
+        </Carousel>
+      )}
+    </TimesOrNoTimes>
   );
 }
