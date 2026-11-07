@@ -173,3 +173,16 @@ export function classifyError(error: unknown): FetchError {
 export function isRequestError(error: unknown): boolean {
   return CombinedGraphQLErrors.is(error) || LinkError.is(error);
 }
+
+/// True if the error link shows a toast for this error.
+/// The UI handles the GraphQL errors. An invalid query is a bug, the user can not do anything about it.
+/// The CSRF token is set at login, so a missing token is rare and a toast does not help.
+export function isToastedByErrorLink(error: FetchError): boolean {
+  return error.kind !== "graphql" && error.kind !== "invalid_query" && error.kind !== "csrf";
+}
+
+/// True if the error link has already shown a toast for this error, so the caller must not show another one
+/// @param error - an error that a query or a mutation threw
+export function hasErrorLinkToast(error: unknown): boolean {
+  return isRequestError(error) && isToastedByErrorLink(classifyError(error));
+}
