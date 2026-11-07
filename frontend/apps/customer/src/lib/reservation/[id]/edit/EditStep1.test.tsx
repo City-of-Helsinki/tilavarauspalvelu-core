@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { AdjustReservationTimeDocument } from "@gql/gql-types";
 import type { EditPageReservationFragment } from "@gql/gql-types";
 import { transformReservation } from "@/modules/reservation";
@@ -67,8 +67,8 @@ function createAdjustReservationTimeMock({
   return {
     request: {
       query: AdjustReservationTimeDocument,
+      variables: () => true,
     },
-    variableMatcher: () => true,
     result: errors ? { errors } : { data: { adjustReservationTime: data } },
   };
 }
@@ -109,7 +109,7 @@ function customRender({
   onBack = vi.fn(),
 }: {
   reservation?: EditPageReservationFragment;
-  mocks?: ReadonlyArray<MockedResponse>;
+  mocks?: ReadonlyArray<MockLink.MockedResponse>;
   onBack?: () => void;
 } = {}): ReturnType<typeof render> {
   return render(

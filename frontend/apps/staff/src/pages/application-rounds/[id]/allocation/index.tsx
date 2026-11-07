@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { useVisibilityChange } from "@ui/hooks";
 import { logError } from "@ui/modules/errors";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "ui/src/styled";
 import {
@@ -176,10 +176,8 @@ function ApplicationRoundAllocation({
     // Always fetch, because other staff users allocate at the same time
     fetchPolicy: "network-only",
     variables: queryVariables,
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(query.error, t("errors:errorFetchingData"));
   const { data: refreshedData, loading, refetch, previousData, fetchMore, stopPolling, startPolling } = query;
 
   useVisibilityChange({
@@ -444,7 +442,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
   });
 
-  const { applicationRound } = data;
+  const applicationRound = data?.applicationRound;
 
   if (applicationRound == null) {
     return NOT_FOUND_SSR_VALUE;

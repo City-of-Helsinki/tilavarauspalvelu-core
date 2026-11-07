@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import type { ReactElement } from "react";
 import { useForm } from "react-hook-form";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";

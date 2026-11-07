@@ -8,6 +8,7 @@ import { serverSideTranslations } from "next-i18next/pages/serverSideTranslation
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { TabWrapper, H1, CenterSpinner } from "ui/src/styled";
@@ -42,7 +43,11 @@ function Reservations(_props: InferGetServerSidePropsType<typeof getServerSidePr
   const [tab, setTab] = useState<"upcoming" | "past" | "cancelled">("upcoming");
 
   const today = useMemo(() => new Date(), []);
-  const { data, loading: isLoading } = useListReservationsQuery({
+  const {
+    data,
+    loading: isLoading,
+    error,
+  } = useListReservationsQuery({
     skip: !currentUser?.pk,
     variables: {
       state:
@@ -62,10 +67,9 @@ function Reservations(_props: InferGetServerSidePropsType<typeof getServerSidePr
       endDate: tab === "past" ? formatApiDate(addDays(today, -1)) : undefined,
       reservationType: ReservationTypeChoice.Normal,
     },
-    onError: () => {
-      errorToast({ text: t("common:error.dataError") });
-    },
   });
+
+  useQueryErrorToast(error, t("common:error.dataError"));
 
   useEffect(() => {
     if (routerError === "order1") {

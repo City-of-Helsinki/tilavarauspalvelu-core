@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
-import type { ApolloQueryResult } from "@apollo/client";
 import { Flex } from "ui/src/styled";
-import type { PageInfo, Query } from "@gql/gql-types";
+import type { PageInfo } from "@gql/gql-types";
 
 type Props = {
   count: number;
   totalCount: number;
   pageInfo: Pick<PageInfo, "hasNextPage" | "endCursor"> | undefined;
-  fetchMore: (cursor: string) => Promise<ApolloQueryResult<Query>>;
+  fetchMore: (cursor: string) => Promise<unknown>;
 };
 
 export function More({ count, totalCount, pageInfo, fetchMore }: Props): React.ReactElement {

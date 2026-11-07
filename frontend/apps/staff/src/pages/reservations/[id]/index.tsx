@@ -3,7 +3,6 @@ import type { GetServerSidePropsContext } from "next";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
-import type { ApolloQueryResult } from "@apollo/client";
 import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "ui/src/modules/helpers";
 import { ButtonContainer } from "ui/src/styled";
 import {
@@ -271,7 +270,7 @@ function RequestedReservation({
   refetch,
 }: {
   reservation: ReservationType;
-  refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
+  refetch: () => Promise<unknown>;
 }): React.ReactElement | null {
   const { t } = useTranslation();
 
@@ -329,11 +328,11 @@ function RequestedReservation({
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function Page({ reservation }: PropsNarrowed): React.ReactElement {
-  const [_fetch, query] = useReservationPageLazyQuery({
+  const [fetchReservation, query] = useReservationPageLazyQuery({
     // NOTE have to be no-cache because we have some key collisions (tag line disappears if cached)
     fetchPolicy: "no-cache",
-    variables: { id: createNodeId("ReservationNode", reservation.pk ?? 0) },
   });
+  const refetch = () => fetchReservation({ variables: { id: createNodeId("ReservationNode", reservation.pk ?? 0) } });
 
   const { user } = useSession();
   const unitPk = reservation.reservationUnit?.unit?.pk;
@@ -344,7 +343,7 @@ export default function Page({ reservation }: PropsNarrowed): React.ReactElement
 
   const reservationRefreshed = query.data?.reservation ?? reservation;
 
-  return <RequestedReservation reservation={reservationRefreshed} refetch={query.refetch} />;
+  return <RequestedReservation reservation={reservationRefreshed} refetch={refetch} />;
 }
 
 export async function getServerSideProps({ locale, query, req }: GetServerSidePropsContext) {
@@ -360,7 +359,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     variables: { id: createNodeId("ReservationNode", pk) },
   });
 
-  const reservation = reservationPageQuery.data.reservation;
+  const reservation = reservationPageQuery.data?.reservation;
   if (reservation == null) {
     return NOT_FOUND_SSR_VALUE;
   }

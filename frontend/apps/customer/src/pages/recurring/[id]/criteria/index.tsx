@@ -114,7 +114,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   });
 
-  const { applicationRound } = data;
+  const applicationRound = data?.applicationRound;
   if (applicationRound == null) {
     return notFound;
   }

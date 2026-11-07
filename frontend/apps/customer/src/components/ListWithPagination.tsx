@@ -2,9 +2,8 @@ import React from "react";
 import { Button, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
-import type { ApolloQueryResult } from "@apollo/client";
 import { CenterSpinner, Flex } from "ui/src/styled";
-import type { PageInfo, SearchReservationUnitsQuery } from "@gql/gql-types";
+import type { PageInfo } from "@gql/gql-types";
 
 const HitCountSummary = styled.div`
   font-size: var(--fontsize-body-l);
@@ -58,7 +57,7 @@ const NoResults = styled.div`
 
 type Props = {
   items: React.ReactElement[];
-  fetchMore: (cursor: string) => Promise<ApolloQueryResult<SearchReservationUnitsQuery>>;
+  fetchMore: (cursor: string) => Promise<unknown>;
   pageInfo?: Pick<PageInfo, "endCursor">;
   hasMoreData: boolean;
   isLoading: boolean;
