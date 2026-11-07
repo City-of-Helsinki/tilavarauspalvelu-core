@@ -301,10 +301,20 @@ async function handleRequest(req: NextRequest) {
 
   const langPrefix = getLangPrefix(url);
 
-  // Fallback all query errors to 503 page
+  let data: Data | null;
   try {
-    const data = await fetchUserData(req, options);
+    data = await fetchUserData(req, options);
+  } catch (err) {
+    logError(err);
+    // The access check of a reservation or an application needs the backend, so show the error page.
+    // The other pages make their own queries, so let the page decide if it can show.
+    if (reservationPk != null || applicationPk != null) {
+      return NextResponse.rewrite(new URL(`${langPrefix}/503`, req.url));
+    }
+    return NextResponse.next();
+  }
 
+  try {
     const user = data?.user ?? null;
     if (user != null && !user.hasAccess) {
       return NextResponse.error();
@@ -360,8 +370,6 @@ async function handleRequest(req: NextRequest) {
     return NextResponse.next();
   } catch (err) {
     logError(err);
-    // NOTE all backend errors will return the 503 page
-    // if the middleware request fails there is no way to recover
     const rewriteUrl = new URL(`${langPrefix}/503`, req.url);
     return NextResponse.rewrite(rewriteUrl);
   }
