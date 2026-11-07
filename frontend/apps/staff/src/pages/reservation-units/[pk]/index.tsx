@@ -59,7 +59,12 @@ import {
   PricingSection,
   ErrorInfo,
 } from "@lib/reservation-units/[pk]/";
-import type { ImageFormType, ReservationUnitEditFormValues, TaxLevelOption } from "@lib/reservation-units/[pk]/";
+import type {
+  ImageFormType,
+  ReservationUnitEditFormValues,
+  SalesItemOption,
+  TaxLevelOption,
+} from "@lib/reservation-units/[pk]/";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -109,6 +114,15 @@ function makeTaxLevelOptions(parameters: ReservationUnitEditorParametersQuery | 
         label: `${n.nameFi ?? "no-name"} (${formatters.strippedDecimal?.format(percentage)} %)`,
       },
     ];
+  });
+}
+
+function makeSalesItemOptions(parameters: ReservationUnitEditorParametersQuery | undefined): SalesItemOption[] {
+  return filterNonNullable(parameters?.salesItems?.edges.map((e) => e?.node)).flatMap((n) => {
+    if (n.pk == null || n.taxLevel.pk == null) {
+      return [];
+    }
+    return [{ pk: n.pk, label: n.name, taxLevel: n.taxLevel.pk }];
   });
 }
 
@@ -245,6 +259,7 @@ function ReservationUnitEditor({
   // ----------------------------- Constants ---------------------------------
 
   const taxLevelOptions = makeTaxLevelOptions(parametersData);
+  const salesItemOptions = makeSalesItemOptions(parametersData);
   const pricingTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Pricing);
 
   const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Service);
@@ -330,7 +345,12 @@ function ReservationUnitEditor({
           reservationUnitTypes={parametersData?.reservationUnitTypes}
         />
         <ReservationUnitSettingsSection form={form} cancellationRuleOptions={cancellationRuleOptions} />
-        <PricingSection form={form} taxLevelOptions={taxLevelOptions} pricingTermsOptions={pricingTermsOptions} />
+        <PricingSection
+          form={form}
+          taxLevelOptions={taxLevelOptions}
+          salesItemOptions={salesItemOptions}
+          pricingTermsOptions={pricingTermsOptions}
+        />
         {isDirect && (
           <TermsSection
             form={form}
@@ -529,7 +549,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       maxReservationDuration
       minReservationDuration
       reservationStartInterval
-      canApplyFreeOfCharge
+      paymentType
       reservationsMinDaysBefore
       reservationsMaxDaysBefore
       equipments {
@@ -567,10 +587,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       publishBeginsAt
       publishEndsAt
       maxReservationsPerUser
-      pricings {
-        pk
-        ...PricingFields
-      }
+      ...OwnPricingFields
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlots
       }
@@ -638,6 +655,19 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
           pk
           nameFi
           currentPercentage
+        }
+      }
+    }
+    salesItems(orderBy: [nameAsc]) {
+      edges {
+        node {
+          id
+          pk
+          name
+          taxLevel {
+            id
+            pk
+          }
         }
       }
     }
