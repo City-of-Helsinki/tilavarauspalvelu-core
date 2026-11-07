@@ -39,7 +39,7 @@ export const PaymentNotification = ({ reservation, paymentOrder, apiBaseUrl }: P
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const lang = getLocalizationLang(i18n.language);
-  const priceDisplay = getReservationPriceDisplayFromLines(reservation, lang);
+  const priceDisplay = getReservationPriceDisplayFromLines(reservation, lang, false);
   const price = formatPrice(priceDisplay.total, true, lang);
   const priceLineList = getPriceLineStringList(priceDisplay, lang);
   const taxPercentage =

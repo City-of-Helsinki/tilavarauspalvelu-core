@@ -4,6 +4,7 @@ import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Toolt
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
+import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
@@ -12,7 +13,7 @@ import { Flex, H1, H3 } from "ui/src/styled";
 import { ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitHeadFragment } from "@gql/gql-types";
 import { IconWithText } from "@/components/IconWithText";
-import { getPriceSummaryString } from "@/modules/price";
+import { getMaterialPriceDescription, getPriceSummaryString } from "@/modules/price";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { Images } from "./Images";
 
@@ -167,6 +168,7 @@ function IconList({
   const minReservationDuration = formatDuration(t, { seconds: minDur });
   const maxReservationDuration = formatDuration(t, { seconds: maxDur });
   const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary);
+  const materialPriceDescription = getMaterialPriceDescription(reservationUnit.priceSummary, lang);
   const hasSubventionSuffix = reservationUnit.priceSummary?.canApplyForDiscount === true && subventionSuffix != null;
 
   type IconTextType = ReadonlyArray<{
@@ -239,6 +241,17 @@ function IconList({
                 <IconWithText icon={icon} text={text} />
                 {reservationUnit.accessTypes.length > 1 && (
                   <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />
+                )}
+              </TooltipWrapper>
+            );
+          case "unitPrice":
+            return (
+              <TooltipWrapper key={key}>
+                <IconWithText icon={icon} text={text} />
+                {materialPriceDescription !== "" && (
+                  <Tooltip>
+                    <Sanitize html={materialPriceDescription} />
+                  </Tooltip>
                 )}
               </TooltipWrapper>
             );
