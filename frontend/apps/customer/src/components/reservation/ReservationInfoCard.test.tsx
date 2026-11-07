@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import { AccessType, ReservationUnitImageType, ReservationStateChoice } from "@gql/gql-types";
+import { AccessType, PriceUnit, ReservationUnitImageType, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createReservationPriceLine, future1hReservation, generateDescriptionFragment } from "@test/reservation.mocks";
@@ -108,6 +108,30 @@ describe("Component: ReservationInfoCard", () => {
         reservation: createMockReservationInfoCard("12", { priceLines: [], taxPercentageValue: "24" }),
       });
       expect(getPriceText()).toBe('common:price: 12,00 € (common:inclTax {"taxPercentage":"24"})');
+    });
+
+    it("adds the material price of the reservation unit as it is today", () => {
+      const reservation = createMockReservationInfoCard("10");
+      customRender({
+        reservation: {
+          ...reservation,
+          reservationUnit: {
+            ...reservation.reservationUnit,
+            priceSummary: {
+              isFree: false,
+              lowestAmount: "10.00",
+              priceUnit: PriceUnit.PerHour,
+              canApplyForDiscount: false,
+              materialPriceDescriptionFi: "<p>Materiaali</p>",
+              materialPriceDescriptionEn: "<p>Material</p>",
+              materialPriceDescriptionSv: "<p>Material</p>",
+            },
+          },
+        },
+      });
+      expect(getPriceText()).toBe(
+        'common:price: 10,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
+      );
     });
 
     it("lists the price lines when there are more than one", () => {
@@ -217,6 +241,7 @@ function createMockReservationInfoCard(
     priceLines: [createPriceLine({ amount: price ?? "10.00" })],
     reservationUnit: {
       id: createNodeId("ReservationUnitNode", 2),
+      priceSummary: null,
       images: [
         {
           id: createNodeId("ReservationUnitImageNode", 1),

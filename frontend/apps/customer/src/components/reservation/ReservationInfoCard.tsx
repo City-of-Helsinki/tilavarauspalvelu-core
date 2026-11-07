@@ -21,6 +21,7 @@ import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFrag
 import {
   getPriceLineStringList,
   getReservationPriceDisplay,
+  getMaterialPriceDescription,
   getReservationPriceDisplayFromLines,
   getReservationPriceString,
   isDiscountPending,
@@ -109,7 +110,11 @@ export function ReservationInfoCard({
   const priceDisplay =
     reservationPrice != null
       ? getReservationPriceDisplay(reservationPrice, lang)
-      : getReservationPriceDisplayFromLines(reservation, lang);
+      : getReservationPriceDisplayFromLines(
+          reservation,
+          lang,
+          getMaterialPriceDescription(reservationUnit.priceSummary, lang) !== ""
+        );
   const price = getReservationPriceString(t, priceDisplay, isDiscountRange ?? isDiscountPending(reservation), lang);
   const priceLineList = getPriceLineStringList(priceDisplay, lang);
   const taxPercentage = priceDisplay.total > 0 ? priceDisplay.taxPercentage : null;
@@ -190,6 +195,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
       nameFi
       nameEn
       nameSv
+      ...PriceSummaryFields
       images {
         ...Image
       }

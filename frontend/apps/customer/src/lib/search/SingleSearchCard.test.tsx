@@ -79,6 +79,9 @@ describe("SingleSearchCard", () => {
         lowestAmount: "20",
         priceUnit: PriceUnit.PerHour,
         canApplyForDiscount: true,
+        materialPriceDescriptionFi: "",
+        materialPriceDescriptionEn: "",
+        materialPriceDescriptionSv: "",
       },
       effectiveAccessType: AccessType.AccessCode,
       reservationUnitType: {

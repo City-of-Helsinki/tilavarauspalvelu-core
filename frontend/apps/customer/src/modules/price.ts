@@ -27,20 +27,35 @@ function getPriceUnitString(t: TFunction, priceUnit: PriceUnit): string {
   return ` / ${t(`prices:priceUnits.${priceUnit}`)}`;
 }
 
+/// The material price description of the prices in effect today, or an empty string.
+/// It is used where there is no reservation time, so a future price change does not show here.
+export function getMaterialPriceDescription(
+  priceSummary: PriceSummary | null | undefined,
+  lang: LocalizationLanguages
+): string {
+  if (priceSummary == null) {
+    return "";
+  }
+  const description = getTranslation(priceSummary, "materialPriceDescription", lang);
+  return stripHtml(description) !== "" ? description : "";
+}
+
 /// The price of a reservation unit for search cards, lists and the reservation unit page.
 /// If the customer can apply for a discount, the price is a range from 0 to the normal price.
 export function getPriceSummaryString(t: TFunction, priceSummary: PriceSummary | null | undefined): string | null {
   if (priceSummary == null) {
     return null;
   }
+  const hasMaterialPrice = getMaterialPriceDescription(priceSummary, "fi") !== "";
   const amount = toNumber(priceSummary.lowestAmount) ?? 0;
   if (priceSummary.isFree || amount === 0) {
-    return t("prices:priceFree");
+    return hasMaterialPrice ? capitalize(t("prices:materialPrice")) : t("prices:priceFree");
   }
   const priceString = priceSummary.canApplyForDiscount
     ? `${formatPrice(0, false)} - ${formatPrice(amount, true)}`
     : formatPrice(amount, true);
-  return `${priceString}${getPriceUnitString(t, priceSummary.priceUnit)}`;
+  const materialPriceString = hasMaterialPrice ? ` + ${t("prices:materialPrice")}` : "";
+  return `${priceString}${getPriceUnitString(t, priceSummary.priceUnit)}${materialPriceString}`;
 }
 
 export const PRICE_SUMMARY_FRAGMENT = gql`
@@ -51,6 +66,9 @@ export const PRICE_SUMMARY_FRAGMENT = gql`
       lowestAmount
       priceUnit
       canApplyForDiscount
+      materialPriceDescriptionFi
+      materialPriceDescriptionEn
+      materialPriceDescriptionSv
     }
   }
 `;
@@ -91,10 +109,11 @@ export function getReservationPriceDisplay(
 
 /// The price of a reservation from its price lines. The override of the handler replaces the amount of a line.
 /// Reservations made before price lines have no lines. For these, use the price of the reservation.
-/// The price lines have no material price description, so the price has no material price text.
+/// The price lines have no material price description, so it comes from the reservation unit as it is today.
 export function getReservationPriceDisplayFromLines(
   reservation: ReservationPriceLinesFieldsFragment,
-  lang: LocalizationLanguages
+  lang: LocalizationLanguages,
+  hasMaterialPrice: boolean
 ): ReservationPriceDisplay {
   const priceLineList = reservation.priceLines ?? [];
   if (priceLineList.length === 0) {
@@ -103,7 +122,7 @@ export function getReservationPriceDisplayFromLines(
       total: toNumber(reservation.price) ?? 0,
       lineList: [],
       taxPercentage: taxPercentage != null && taxPercentage > 0 ? taxPercentage : null,
-      hasMaterialPrice: false,
+      hasMaterialPrice,
     };
   }
   const lineList = priceLineList.map((line) => ({
@@ -114,7 +133,7 @@ export function getReservationPriceDisplayFromLines(
     total: lineList.reduce((sum, line) => sum + line.amount, 0),
     lineList,
     taxPercentage: getCommonTaxPercentage(priceLineList.map((line) => toNumber(line.taxPercentage) ?? 0)),
-    hasMaterialPrice: false,
+    hasMaterialPrice,
   };
 }
 
