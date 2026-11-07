@@ -27,6 +27,7 @@ const SmallArrowButton = styled.button`
 
   &:hover {
     opacity: 0.5;
+    cursor: pointer;
   }
   &:disabled {
     opacity: 0.1;
