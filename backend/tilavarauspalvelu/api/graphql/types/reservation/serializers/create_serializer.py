@@ -9,17 +9,20 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import DateTimeField, IntegerField
 
 from tilavarauspalvelu.enums import AccessType, PaymentType
+from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines, save_reservation_price_lines
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.services.pricing.price_lines import PriceLines
     from tilavarauspalvelu.typing import AnyUser, ReservationCreateData, WSGIRequest
 
 __all__ = [
@@ -31,6 +34,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
     """Create a tentative reservation before moving to the checkout flow."""
 
     instance: None
+    price_lines: PriceLines
 
     pk = IntegerField(read_only=True)
     reservation_unit = IntegerPrimaryKeyField(queryset=ReservationUnit.objects, required=True, write_only=True)
@@ -71,29 +75,26 @@ class ReservationCreateSerializer(NestingModelSerializer):
         reservation_unit.validators.validate_reservation_begin_time(begin=begins_at)
         reservation_unit.validators.validate_no_overlapping_reservations(begins_at=begins_at, ends_at=ends_at)
 
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begins_at.date())
+        try:
+            self.price_lines = build_price_lines(
+                reservation_unit=reservation_unit,
+                price_option=None,
+                begin=begins_at,
+                end=ends_at,
+            )
+        except PriceCalculationError as error:
+            raise ValidationError(str(error), code=error_codes.PRICE_CALCULATION_FAILED) from error
 
-        if pricing is None:
-            msg = "No pricing found for the given date."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
+        if self.price_lines.calculation.total > 0:
+            reservation_unit.validators.validate_has_payment_type()
 
-        if pricing.highest_price > 0:
-            pricing.validators.validate_has_payment_type()
-
-            if pricing.payment_type != PaymentType.ON_SITE:
+            if reservation_unit.payment_type != PaymentType.ON_SITE:
                 reservation_unit.validators.validate_has_payment_product()
 
         data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
         data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)
         data["user"] = user
         data["reservee_used_ad_login"] = getattr(user.id_token, "is_ad_login", False)
-
-        today = local_date()
-
-        data["price"] = pricing.actions.calculate_reservation_price(duration=duration)
-        data["unit_price"] = pricing.highest_price
-        data["tax_percentage_value"] = pricing.tax_level.actions.get_percentage(on_date=today)
-        data["non_subsidised_price"] = data["price"]
         data["access_type"] = reservation_unit.actions.get_access_type_at(begins_at, default=AccessType.UNRESTRICTED)
 
         if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA:
@@ -134,6 +135,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
 
     def create(self, validated_data: ReservationCreateData) -> Reservation:
         reservation: Reservation = super().create(validated_data)
+        save_reservation_price_lines(reservation=reservation, price_lines=self.price_lines)
 
         # After creating the reservation, check again if there are any overlapping reservations.
         # This can fail if two reservations are created for reservation units in the same

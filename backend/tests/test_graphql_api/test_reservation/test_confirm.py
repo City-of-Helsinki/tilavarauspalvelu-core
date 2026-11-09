@@ -30,7 +30,7 @@ from tests.factories import (
     OrderFactory,
     PaymentOrderFactory,
     ReservationFactory,
-    ReservationUnitPricingFactory,
+    TaxLevelFactory,
     TaxLevelRateFactory,
     UserFactory,
 )
@@ -104,7 +104,7 @@ def test_reservation__confirm__changes_state__requires_handling(graphql, outbox)
 @override_settings(SEND_EMAILS=True)
 def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_request(graphql, outbox):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__can_apply_free_of_charge=True,
+        price_lines__price_component__can_apply_for_discount=True,
         applying_for_free_of_charge=True,
         free_of_charge_reason="foo",
     )
@@ -132,9 +132,9 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
     assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit {unit_name}"
 
 
-def test_reservation__confirm__applying_for_free_of_charge_not_allowed_for_reservation_unit(graphql):
+def test_reservation__confirm__applying_for_free_of_charge_not_allowed_by_price(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__can_apply_free_of_charge=False,
+        price_lines__price_component__can_apply_for_discount=False,
         applying_for_free_of_charge=True,
         free_of_charge_reason="foo",
     )
@@ -144,7 +144,9 @@ def test_reservation__confirm__applying_for_free_of_charge_not_allowed_for_reser
     response = graphql(CONFIRM_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation unit does not allow applying for free of charge."]
+    assert response.field_error_messages() == [
+        "The price of the reservation does not allow applying for free of charge."
+    ]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -345,15 +347,15 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
 @freeze_time(local_datetime(2024, 1, 1, 0, 5))
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_date(graphql):
+    tax_level = TaxLevelFactory.create(rates__begins=local_date(2024, 1, 1), rates__percentage=Decimal("25.5"))
+    TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2000, 1, 1), percentage=Decimal(24))
+
     reservation = ReservationFactory.create_for_confirmation(
         created_at=local_datetime(2023, 12, 31, 23, 55),
         tax_percentage_value=Decimal(24),
         reservation_unit__payment_type=PaymentType.ONLINE,
-        reservation_unit__own_price__tax_level__rates__begins=local_date(2024, 1, 1),
+        price_lines__tax_level=tax_level,
     )
-
-    tax_level = reservation.reservation_unit.pricings.first().tax_level
-    TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2000, 1, 1), percentage=Decimal(24))
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
 
@@ -463,30 +465,6 @@ def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
     # 'invoicing_date' parameter is given so that invoicing is show in Verkkokauppa UI
     order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date is not None
-
-
-@freeze_time(local_datetime(2030, 1, 1, 12))
-def test_reservation__confirm__pricing_by_local_begin_date(graphql):
-    reservation = ReservationFactory.create_for_confirmation(
-        begins_at=local_datetime(2030, 1, 10, 1),
-        ends_at=local_datetime(2030, 1, 10, 2),
-        reservation_unit__payment_type=PaymentType.ONLINE,
-    )
-    ReservationUnitPricingFactory.create(
-        reservation_unit=reservation.reservation_unit,
-        begins=datetime.date(2030, 1, 10),
-        payment_type=PaymentType.ON_SITE,
-        highest_price=Decimal(20),
-    )
-
-    graphql.login_with_superuser()
-    data = get_confirm_data(reservation)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    payment_order = PaymentOrder.objects.get(reservation=reservation)
-    assert payment_order.payment_type == PaymentType.ON_SITE
 
 
 @freeze_time(local_datetime(2030, 1, 1, 12))
