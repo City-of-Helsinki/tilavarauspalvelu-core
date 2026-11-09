@@ -15,10 +15,10 @@ from tests.helpers import exact
 if TYPE_CHECKING:
     from django.db.migrations.state import StateApps
 
-migration = importlib.import_module("tilavarauspalvelu.migrations.0192_add_price_lines_to_reservations")
+migration = importlib.import_module("tilavarauspalvelu.migrations.0193_add_price_lines_to_reservations")
 
-BEFORE_MIGRATION = ("tilavarauspalvelu", "0191_migrate_pricings_to_pricing_groups")
-AFTER_MIGRATION = ("tilavarauspalvelu", "0192_add_price_lines_to_reservations")
+BEFORE_MIGRATION = ("tilavarauspalvelu", "0192_add_reservation_totals")
+AFTER_MIGRATION = ("tilavarauspalvelu", "0193_add_price_lines_to_reservations")
 
 # Applied to all tests
 pytestmark = [
@@ -205,6 +205,71 @@ def test_add_price_lines_to_reservations__skips_reservation_with_price_lines():
     ReservationPriceLine = apps.get_model("tilavarauspalvelu", "ReservationPriceLine")
     price_lines = ReservationPriceLine.objects.filter(reservation=reservation.pk)
     assert list(price_lines.values_list("quantity", "price_unit")) == [(Decimal(2), "PER_HOUR")]
+
+
+# ── Totals ──
+
+
+def test_add_price_lines_to_reservations__totals_from_new_line():
+    reservation = ReservationFactory.create(
+        price=Decimal("10.00"),
+        non_subsidised_price=Decimal("50.00"),
+        tax_percentage_value=Decimal("25.50"),
+    )
+
+    apps = migrate_to(BEFORE_MIGRATION)
+    create_tax_levels(apps)
+
+    apps = migrate_to(AFTER_MIGRATION)
+
+    Reservation = apps.get_model("tilavarauspalvelu", "Reservation")
+    reservations = Reservation.objects.filter(pk=reservation.pk)
+    assert list(reservations.values_list("total_price", "total_price_without_overrides", "total_price_net")) == [
+        (Decimal("10.00"), Decimal("50.00"), Decimal("7.97")),
+    ]
+
+
+def test_add_price_lines_to_reservations__totals_from_existing_lines():
+    reservation = ReservationFactory.create()
+
+    apps = migrate_to(BEFORE_MIGRATION)
+    create_tax_levels(apps)
+
+    TaxLevel = apps.get_model("tilavarauspalvelu", "TaxLevel")
+    ReservationPriceLine = apps.get_model("tilavarauspalvelu", "ReservationPriceLine")
+    ReservationPriceLine.objects.bulk_create([
+        ReservationPriceLine(
+            reservation_id=reservation.pk,
+            quantity=Decimal(1),
+            price_unit="FIXED",
+            unit_amount=Decimal("25.10"),
+            amount_before_adjustment=Decimal("25.10"),
+            amount=Decimal("25.10"),
+            override_amount=None,
+            tax_level=TaxLevel.objects.get(name="Yleinen"),
+            tax_percentage=Decimal("25.50"),
+        ),
+        ReservationPriceLine(
+            reservation_id=reservation.pk,
+            quantity=Decimal(1),
+            price_unit="FIXED",
+            unit_amount=Decimal("11.35"),
+            amount_before_adjustment=Decimal("11.35"),
+            amount=Decimal("11.35"),
+            override_amount=Decimal("5.00"),
+            tax_level=TaxLevel.objects.get(name="Alennettu"),
+            tax_percentage=Decimal("13.50"),
+        ),
+    ])
+
+    apps = migrate_to(AFTER_MIGRATION)
+
+    Reservation = apps.get_model("tilavarauspalvelu", "Reservation")
+    reservations = Reservation.objects.filter(pk=reservation.pk)
+    # Net amounts: 25.10 / 1.255 = 20.00 and 5.00 / 1.135 = 4.41.
+    assert list(reservations.values_list("total_price", "total_price_without_overrides", "total_price_net")) == [
+        (Decimal("30.10"), Decimal("36.45"), Decimal("24.41")),
+    ]
 
 
 # ── Errors ──

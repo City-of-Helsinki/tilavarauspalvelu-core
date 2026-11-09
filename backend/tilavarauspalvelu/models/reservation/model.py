@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
@@ -23,11 +22,12 @@ from tilavarauspalvelu.enums import (
 )
 from utils.auditlog_util import AuditLogger
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string
-from utils.decimal_utils import round_decimal
 from utils.fields.model import TextChoicesField
 from utils.mixins import SerializableModelMixin
 
 if TYPE_CHECKING:
+    from decimal import Decimal
+
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
@@ -105,7 +105,12 @@ class Reservation(SerializableModelMixin, models.Model):
     access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     access_code_is_active: bool = models.BooleanField(default=False)
 
-    # Pricing details
+    # Sums of the price lines. Gross amounts, VAT included, except the net total.
+    total_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_price_without_overrides: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_price_net: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # Not used. Kept so that migrations can be reversed. Removed in TILA-4558.
     price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     unit_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -222,18 +227,8 @@ class Reservation(SerializableModelMixin, models.Model):
         return f"<Reservation {self.name} ({dt_range})>"
 
     @property
-    def price_net(self) -> Decimal:
-        """Return the net price of the reservation. (Price without VAT)"""
-        return round_decimal(self.price / (1 + self.tax_percentage_value / Decimal(100)), 2)
-
-    @property
-    def price_vat_amount(self) -> Decimal:
-        """Return the VAT amount of the reservation."""
-        return round_decimal(self.price - self.price_net, 2)
-
-    @property
-    def non_subsidised_price_net(self) -> Decimal:
-        return round_decimal(self.non_subsidised_price / (1 + self.tax_percentage_value / Decimal(100)), 2)
+    def total_vat_amount(self) -> Decimal:
+        return self.total_price - self.total_price_net
 
     @lookup_property
     def reservee_name() -> str:
@@ -305,7 +300,7 @@ class Reservation(SerializableModelMixin, models.Model):
     @property
     def is_handled_paid(self) -> bool:
         return (
-            self.price > 0
+            self.total_price > 0
             and self.handled_at is not None
             and hasattr(self, "payment_order")
             and self.payment_order.is_handled_payment

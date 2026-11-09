@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from django.db import migrations, models
+from django.db.models.functions import Coalesce, Round
 
 BATCH_SIZE = 5_000
 
@@ -13,7 +14,8 @@ class PriceLineMigrationError(Exception):
 
 def add_price_lines_to_reservations(apps, schema_editor):
     """
-    Give each reservation that has no price lines one fixed price line from its saved price.
+    Give each reservation that has no price lines one fixed price line from its saved price,
+    and then set the totals of every reservation from its price lines.
     The price unit and the pricing of the reservation are not known reliably, because the pricing could change
     after the reservation was made. The tax level comes from the tax percentage that the reservation saved.
     """
@@ -79,10 +81,34 @@ def add_price_lines_to_reservations(apps, schema_editor):
 
     ReservationPriceLine.objects.bulk_create(price_lines)
 
+    set_reservation_totals(Reservation=Reservation, ReservationPriceLine=ReservationPriceLine)
+
+
+def set_reservation_totals(*, Reservation, ReservationPriceLine) -> None:  # noqa: N803
+    """Set the totals of every reservation from its price lines, with one update."""
+    final_amount = Coalesce("override_amount", "amount")
+    net_amount = Round(final_amount / (Decimal(1) + models.F("tax_percentage") / Decimal(100)), 2)
+
+    def line_sum(expression):
+        lines = (
+            ReservationPriceLine.objects
+            .filter(reservation=models.OuterRef("pk"))
+            .values("reservation")
+            .annotate(total=models.Sum(expression, output_field=models.DecimalField()))
+            .values("total")[:1]
+        )
+        return Coalesce(models.Subquery(lines), Decimal(0), output_field=models.DecimalField())
+
+    Reservation.objects.update(
+        total_price=line_sum(final_amount),
+        total_price_without_overrides=line_sum(models.F("amount")),
+        total_price_net=line_sum(net_amount),
+    )
+
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tilavarauspalvelu", "0191_migrate_pricings_to_pricing_groups"),
+        ("tilavarauspalvelu", "0192_add_reservation_totals"),
     ]
 
     operations = [

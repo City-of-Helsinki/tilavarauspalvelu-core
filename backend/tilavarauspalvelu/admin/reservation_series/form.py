@@ -108,9 +108,8 @@ class ReservationInline(admin.TabularInline):
         "ends_at",
         "state",
         "type",
-        "price",
-        "price_net",
-        "unit_price",
+        "total_price",
+        "total_price_net",
         "access_type",
     ]
     readonly_fields = fields
