@@ -13,6 +13,7 @@ from tilavarauspalvelu.enums import (
     AccessType,
     AuthenticationType,
     PaymentType,
+    PriceUnit,
     ReservationKind,
     ReservationStartInterval,
 )
@@ -101,11 +102,11 @@ def test_reservation_unit_export__multiple():
     assert row_2[next(index)] == reservation_unit_1.cancellation_terms.name
     assert row_2[next(index)] == reservation_unit_1.pricing_terms.name
     assert row_2[next(index)] == reservation_unit_1.cancellation_rule.name
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().price_unit
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().lowest_price
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().highest_price
+    assert row_2[next(index)] == PriceUnit.PER_HOUR
+    assert row_2[next(index)] == Decimal(20)
+    assert row_2[next(index)] == Decimal(20)
     assert row_2[next(index)] == "25.50%"
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().material_price_description
+    assert row_2[next(index)] == "Material price description"
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)
     assert row_2[next(index)] == reservation_unit_1.reservation_form
@@ -113,8 +114,8 @@ def test_reservation_unit_export__multiple():
     assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label
     assert row_2[next(index)] == ReservationKind(reservation_unit_1.reservation_kind).label
     assert row_2[next(index)] == AccessType(reservation_unit_1.current_access_type).label
-    assert row_2[next(index)] == PaymentType(reservation_unit_1.pricings.first().payment_type).label
-    assert row_2[next(index)] == reservation_unit_1.can_apply_free_of_charge
+    assert row_2[next(index)] == PaymentType.ONLINE.label
+    assert row_2[next(index)] is False
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_fi
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_sv
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_en
