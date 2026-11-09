@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from decimal import Decimal
+
 import pytest
 
 from tilavarauspalvelu.enums import ReservationStateChoice, UserRoleChoice
@@ -17,6 +19,7 @@ pytestmark = [
 def test_reservation__approve__allowed(graphql, role):
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
     reservation = ReservationFactory.create(
+        price_lines__amount=Decimal(0),
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservation_unit=reservation_unit,
     )
@@ -34,6 +37,7 @@ def test_reservation__approve__allowed__own(graphql):
 
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
     reservation = ReservationFactory.create(
+        price_lines__amount=Decimal(0),
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservation_unit=reservation_unit,
         user=user,
@@ -50,6 +54,7 @@ def test_reservation__approve__not_allowed(graphql):
 
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
     reservation = ReservationFactory.create(
+        price_lines__amount=Decimal(0),
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservation_unit=reservation_unit,
     )
@@ -67,6 +72,7 @@ def test_reservation__approve__not_allowed__own(graphql):
 
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
     reservation = ReservationFactory.create(
+        price_lines__amount=Decimal(0),
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservation_unit=reservation_unit,
         user=user,
