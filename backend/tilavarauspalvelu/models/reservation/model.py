@@ -6,7 +6,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
-from django.db.models.functions import Concat, Trim
+from django.db.models.functions import Coalesce, Concat, Round, Trim
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3TextField
@@ -23,6 +23,7 @@ from tilavarauspalvelu.enums import (
 )
 from utils.auditlog_util import AuditLogger
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string
+from utils.db import SubquerySum
 from utils.decimal_utils import round_decimal
 from utils.fields.model import TextChoicesField
 from utils.mixins import SerializableModelMixin
@@ -105,7 +106,7 @@ class Reservation(SerializableModelMixin, models.Model):
     access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     access_code_is_active: bool = models.BooleanField(default=False)
 
-    # Pricing details
+    # Not used. Kept so that migrations can be reversed. Removed in TILA-4558.
     price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     unit_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -222,18 +223,90 @@ class Reservation(SerializableModelMixin, models.Model):
         return f"<Reservation {self.name} ({dt_range})>"
 
     @property
-    def price_net(self) -> Decimal:
-        """Return the net price of the reservation. (Price without VAT)"""
-        return round_decimal(self.price / (1 + self.tax_percentage_value / Decimal(100)), 2)
+    def total_vat_amount(self) -> Decimal:
+        return self.total_price - self.total_price_net
 
-    @property
-    def price_vat_amount(self) -> Decimal:
-        """Return the VAT amount of the reservation."""
-        return round_decimal(self.price - self.price_net, 2)
+    @lookup_property
+    def total_price() -> Decimal:
+        """The sum of the final amounts of the price lines, including VAT."""
+        from tilavarauspalvelu.models import ReservationPriceLine
 
-    @property
-    def non_subsidised_price_net(self) -> Decimal:
-        return round_decimal(self.non_subsidised_price / (1 + self.tax_percentage_value / Decimal(100)), 2)
+        price_lines = (
+            ReservationPriceLine.objects
+            .filter(reservation=models.OuterRef("pk"))
+            .annotate(final_amount=Coalesce("override_amount", "amount"))
+            .values("final_amount")
+        )
+        return Coalesce(  # type: ignore[return-value]
+            SubquerySum(
+                queryset=price_lines,
+                aggregate_field="final_amount",
+                output_field=models.DecimalField(max_digits=10, decimal_places=2),
+            ),
+            models.Value(Decimal("0.00")),
+            output_field=models.DecimalField(max_digits=10, decimal_places=2),
+        )
+
+    @total_price.override
+    def _(self) -> Decimal:
+        total = Decimal(0)
+        for line in self.price_lines.all():
+            total += line.amount if line.override_amount is None else line.override_amount
+        return total
+
+    @lookup_property
+    def total_price_without_overrides() -> Decimal:
+        """The sum of the amounts of the price lines before overrides, including VAT."""
+        from tilavarauspalvelu.models import ReservationPriceLine
+
+        price_lines = ReservationPriceLine.objects.filter(reservation=models.OuterRef("pk")).values("amount")
+        return Coalesce(  # type: ignore[return-value]
+            SubquerySum(
+                queryset=price_lines,
+                aggregate_field="amount",
+                output_field=models.DecimalField(max_digits=10, decimal_places=2),
+            ),
+            models.Value(Decimal("0.00")),
+            output_field=models.DecimalField(max_digits=10, decimal_places=2),
+        )
+
+    @total_price_without_overrides.override
+    def _(self) -> Decimal:
+        total = Decimal(0)
+        for line in self.price_lines.all():
+            total += line.amount
+        return total
+
+    @lookup_property
+    def total_price_net() -> Decimal:
+        """The sum of the final amounts of the price lines, excluding VAT. Each line is rounded to cents."""
+        from tilavarauspalvelu.models import ReservationPriceLine
+
+        final_amount = Coalesce("override_amount", "amount")
+        net_amount = Round(final_amount / (Decimal(1) + models.F("tax_percentage") / Decimal(100)), 2)
+        price_lines = (
+            ReservationPriceLine.objects
+            .filter(reservation=models.OuterRef("pk"))
+            .annotate(net_amount=net_amount)
+            .values("net_amount")
+        )
+        return Coalesce(  # type: ignore[return-value]
+            SubquerySum(
+                queryset=price_lines,
+                aggregate_field="net_amount",
+                output_field=models.DecimalField(max_digits=10, decimal_places=2),
+            ),
+            models.Value(Decimal("0.00")),
+            output_field=models.DecimalField(max_digits=10, decimal_places=2),
+        )
+
+    @total_price_net.override
+    def _(self) -> Decimal:
+        total = Decimal(0)
+        for line in self.price_lines.all():
+            final_amount = line.amount if line.override_amount is None else line.override_amount
+            total += round_decimal(final_amount / (1 + line.tax_percentage / Decimal(100)), 2)
+        return total
 
     @lookup_property
     def reservee_name() -> str:
@@ -305,7 +378,7 @@ class Reservation(SerializableModelMixin, models.Model):
     @property
     def is_handled_paid(self) -> bool:
         return (
-            self.price > 0
+            self.total_price > 0
             and self.handled_at is not None
             and hasattr(self, "payment_order")
             and self.payment_order.is_handled_payment
@@ -384,5 +457,8 @@ AuditLogger.register(
         "_reservee_name",
         "_access_code_should_be_active",
         "_is_access_code_is_active_correct",
+        "_total_price",
+        "_total_price_without_overrides",
+        "_total_price_net",
     ],
 )
