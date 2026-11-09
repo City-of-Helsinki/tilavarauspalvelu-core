@@ -26,7 +26,8 @@ class SalesItemForm(forms.ModelForm):
             "name": "Name in Varaamo. Staff select the sales item by this name in pricings. It is not sent to SAP.",
             "material": (
                 "SAP material (nimike) of the product or service that is sold. "
-                "One material has one VAT percentage and one main ledger account. 8 digits."
+                "One material has one VAT percentage and one main ledger account. 8 digits. "
+                "Only invoicing needs it. Leave it empty if the sales item is only paid in the web shop."
             ),
             "main_ledger_account": (
                 "Revenue account where the income is booked. Varaamo usually uses 340025 (Tilojen muut vuokratuotot)."

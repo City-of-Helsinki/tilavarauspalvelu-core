@@ -51,25 +51,17 @@ def test_sales_item_admin__add(api_client):
     assert sales_item.material == "10000116"
 
 
-def test_sales_item_admin__material_is_required(api_client):
+def test_sales_item_admin__material_is_optional(api_client):
     api_client.force_login(UserFactory.create_superuser())
     tax_level = TaxLevelFactory.create()
+    SalesItemFactory.create(material="")
 
     url = reverse("admin:tilavarauspalvelu_salesitem_add")
     data = sales_item_form_data(tax_level=tax_level, material="")
+    response = api_client.post(path=url, data=data)
 
-    errors: list[dict[str, Any]] = []
-    with collect_admin_form_errors(errors):
-        response = api_client.post(path=url, data=data)
-
-    assert response.status_code == 200
-    assert errors == [
-        {
-            "code": "",
-            "message": "This field is required.",
-        },
-    ]
-    assert not SalesItem.objects.exists()
+    assert response.status_code == 302, response.content
+    assert list(SalesItem.objects.values_list("material", flat=True)) == ["", ""]
 
 
 def test_sales_item_admin__material_is_unique(api_client):
@@ -88,7 +80,7 @@ def test_sales_item_admin__material_is_unique(api_client):
     assert errors == [
         {
             "code": "",
-            "message": "Sales item with this Material already exists.",
+            "message": "Another sales item already has this material",
         },
     ]
     assert SalesItem.objects.count() == 1
