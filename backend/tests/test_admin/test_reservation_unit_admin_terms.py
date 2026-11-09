@@ -281,7 +281,7 @@ def test_reservation_unit_admin__terms_validation__no_service_specific_terms_for
     ]
 
 
-def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_booking_when_free_of_change_is_set():
+def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_booking_when_price_allows_discount():
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -292,12 +292,13 @@ def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_b
         cancellation_terms=cancellation_terms,
         service_specific_terms=service_specific_terms,
         pricing_terms=pricing_terms,
+        own_price__amount=Decimal(10),
+        own_price__can_apply_for_discount=True,
     )
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
     data = get_valid_data(reservation_unit=reservation_unit)
-    data["can_apply_free_of_charge"] = True
     data["pricing_terms"] = None
     data["payment_terms"] = payment_terms
     data["cancellation_terms"] = cancellation_terms
