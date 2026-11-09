@@ -1,10 +1,10 @@
-/** Port of PO/Common/checkout.robot */
 import { errors } from "@playwright/test";
 import { step, expect, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { SINGLEBOOKING_PAID_PRICE_CHECKOUT } from "../../Resources/texts_FI";
 import { URL_TEST } from "../../Resources/variables";
 
+/** The external payment page. */
 export class Checkout extends PageObject {
   @step("checkout.Allow All Cookies If Visible")
   async allowAllCookiesIfVisible() {
@@ -26,8 +26,8 @@ export class Checkout extends PageObject {
     }
     // A keyboard press, in the Android emulation the other cookie button blocks a mouse click
     await required_only.press("Enter");
-    await expect(required_only, "The cookie banner did not close").toBeHidden({ timeout: 5000 });
-    await log("Cookie consent button found and clicked");
+    await expect(required_only, "The payment page's cookie banner closes").toBeHidden({ timeout: 5000 });
+    await log("Cookie consent button found and clicked", { level: "DEBUG" });
   }
 
   @step("checkout.Select Payment Method OP")

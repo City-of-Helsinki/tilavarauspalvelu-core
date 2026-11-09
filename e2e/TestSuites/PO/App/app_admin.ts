@@ -1,4 +1,3 @@
-/** Port of PO/App/app_admin.robot */
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import {
@@ -26,6 +25,7 @@ import {
 } from "../../Resources/texts_FI";
 import { ALWAYS_PAID_UNIT_SUBVENTED_WITH_UNIT_LOCATION } from "../../Resources/variables";
 
+/** The admin's workflow keywords: handling bookings, access codes, menus by role and banners. */
 export class AppAdmin extends PageObject {
   @step("app_admin.Admin Checks The Info And Sets Reservation Free And Approves It")
   async adminChecksTheInfoAndSetsReservationFreeAndApprovesIt() {
@@ -103,7 +103,7 @@ export class AppAdmin extends PageObject {
 
   @step("app_admin.Admin Edits Reservation Time")
   async adminEditsReservationTime() {
-    await log("Reservation needs to be approved first in order to do this step");
+    await log("Reservation needs to be approved first in order to do this step", { level: "DEBUG" });
 
     // This sets the variables for ${MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION}, ${MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION}, ${MODIFIED_DATE_SUBVENTED_RESERVATION}, ${MODIFIED_STARTTIME_SUBVENTED_RESERVATION}
     await this.pages.adminReservations.adminOpensCalendarAndChangesReservationTime();
@@ -381,10 +381,7 @@ export class AppAdmin extends PageObject {
   @step("app_admin.Admin Clicks Make Reservation And Checks Dialog Opens")
   async adminClicksMakeReservationAndChecksDialogOpens() {
     await this.pages.adminMyUnits.adminClicksMakeReservation();
-    await expect(
-      this.page.locator("#info-dialog"),
-      "Info dialog should be visible after clicking make reservation button"
-    ).toBeVisible();
+    await expect(this.page.locator("#info-dialog"), "The reservation dialog opens").toBeVisible();
   }
 
   @step("app_admin.Admin Rejects Reservation And Checks The Status")
@@ -400,7 +397,8 @@ export class AppAdmin extends PageObject {
   @step("app_admin.Admin Makes Reservation For Behalf And Clicks Submit")
   async adminMakesReservationForBehalfAndClicksSubmit() {
     await log(
-      "This sets variables for MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION, MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION, MODIFIED_DATE_SUBVENTED_RESERVATION and MODIFIED_STARTTIME_SUBVENTED_RESERVATION"
+      "This sets variables for MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION, MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION, MODIFIED_DATE_SUBVENTED_RESERVATION and MODIFIED_STARTTIME_SUBVENTED_RESERVATION",
+      { level: "DEBUG" }
     );
 
     // Call the keyword and capture the returned values

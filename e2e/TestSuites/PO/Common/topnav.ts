@@ -33,7 +33,7 @@ async function clickAndWaitForLogout(page: Page, logout_button: Locator): Promis
  */
 async function closeMobileMenu(page: Page): Promise<void> {
   await page.keyboard.press("Escape");
-  await expect(page.locator('[aria-controls="hds-mobile-menu"]'), "The mobile menu did not close").toHaveAttribute(
+  await expect(page.locator('[aria-controls="hds-mobile-menu"]'), "The mobile menu is closed").toHaveAttribute(
     "aria-expanded",
     "false"
   );

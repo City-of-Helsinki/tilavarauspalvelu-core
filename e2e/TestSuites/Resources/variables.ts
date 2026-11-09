@@ -40,10 +40,10 @@ export const RECURRING_UNIT_MALMI = "KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI
 export const RECURRING_UNIT_KESKUSTA = "KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)";
 export const UNIT_LOCATION = "Harakka, piilokoju";
 export const UNIT_NAME_FOR_PICTURE_TEST = "Maksuton Mankeli";
-export const RECURRING_THU_22_23_OTHER = '[aria-label="Ei varattavissa: To 22 - 23"]';
-export const RECURRING_THU_23_24_OTHER = '[aria-label="Ei varattavissa: To 23 - 24"]';
-export const RECURRING_THU_09_10_PREFERRED = '[aria-label="Varattavissa: To 9 - 10"]';
-export const RECURRING_THU_10_11_PREFERRED = '[aria-label="Varattavissa: To 10 - 11"]';
+// The seasonal application's times: a weekday, and the start and end of the times painted in the calendar. The
+// calendar paints only inside the seasonal units' opening hours, 09:00–21:00 in the test data.
+export const RECURRING_THU_19_21_PRIMARY = ["Torstai", "19:00", "21:00"] as const;
+export const RECURRING_THU_09_11_SECONDARY = ["Torstai", "09:00", "11:00"] as const;
 export const QUICK_RESERVATION_DURATION = "60 min";
 export const RESERVATION_INDIVIDUAL = "#reserveeType__INDIVIDUAL";
 export const RESERVATION_NONPROFIT = "#reserveeType__NONPROFIT";

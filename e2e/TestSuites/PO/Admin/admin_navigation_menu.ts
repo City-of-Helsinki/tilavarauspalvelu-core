@@ -1,7 +1,7 @@
-/** Port of PO/Admin/admin_navigation_menu.robot */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
+/** The admin UI's navigation menu. */
 export class AdminNavigationMenu extends PageObject {
   @step("admin_navigation_menu.Admin Navigates To Requested Reservations")
   async adminNavigatesToRequestedReservations() {

@@ -1,15 +1,14 @@
 /**
- * Playwright config for the Varaamo e2e suite, ported from the tilavarauspalvelu-robot Robot Framework suite.
+ * Playwright config for the Varaamo e2e suite.
  *
- * One project per Robot suite file, with the same name. The suites depend on the `create_data` project, which
- * replaces Robot's `Suite Setup    Run Only Once    create_data.Create Robot Test Data`. The notification suite
- * has no data setup (like in Robot) and runs separately with one worker:
+ * One project per suite file, with the same name. The suites depend on the `create_data` project, which creates
+ * the test data once per run. The notification suite has no data setup and runs separately with one worker:
  *   playwright test --grep-invert @serialonly                                     # parallel run
  *   playwright test --project Tests_admin_notifications_serial --workers 1        # serial run
- * Sequential mode with shared users (robot --variable FORCE_SINGLE_USER:True):
+ * Sequential mode with shared users:
  *   FORCE_SINGLE_USER=True playwright test --workers 1
  *
- * Each project's browser and device are in its `use` options: the "Set Up … And Open Url" keywords of devices.robot
+ * Each project's browser and device are in its `use` options: the "Set Up … And Open Url" keywords of `devices`
  * open the test's page, which Playwright makes from them.
  */
 import { defineConfig, devices } from "@playwright/test";
@@ -26,7 +25,7 @@ const env = readEnv();
 // PW_TRACE=on (or another trace mode) records Playwright traces for local debugging. They aren't recorded in CI.
 const trace = env.CI ? "off" : env.PW_TRACE;
 
-// The desktop browser of devices.robot (Set Up Chromium Desktop Browser And Open Url)
+// The desktop browser (devices.Set Up Chromium Desktop Browser And Open Url)
 const desktop: Partial<PlaywrightTestOptions & PlaywrightWorkerOptions> = {
   browserName: "chromium",
   viewport: { width: 1440, height: 900 },
@@ -53,9 +52,9 @@ export default defineConfig({
   // Every test can run in its own worker
   fullyParallel: true,
   forbidOnly: env.CI,
-  // Replaces the end-of-run rerun of failed tests
+  // A failed test runs again (RETRIES, once by default)
   retries: env.RETRIES,
-  // docker-config.json "all_suites": 5
+  // WORKERS, 5 by default
   workers: env.WORKERS,
   // Only stops a test that hangs
   timeout: 15 * 60_000,
@@ -66,18 +65,18 @@ export default defineConfig({
     ["list"],
     ["html", { open: "never", outputFolder: "playwright-report" }],
     ["junit", { outputFile: "test-results/junit.xml" }],
-    // A skipped test fails the run, like in the Robot runners
+    // A skipped test fails the run: it checked nothing
     ["./lib/skips-fail-run-reporter.ts"],
   ],
   use: {
-    // ${URL_TEST} in variables.robot, for page.goto("/…") and URL checks in Playwright code
+    // URL_TEST of Resources/variables.ts, for page.goto("/…") and URL checks in Playwright code
     baseURL: "https://varaamo.test.hel.ninja/",
-    // The context options of devices.robot, for every browser of the suites
+    // The context options of every browser of the suites
     locale: "en-US",
     timezoneId: TIME_ZONE,
     ignoreHTTPSErrors: true,
     acceptDownloads: true,
-    // Set Browser Timeout    ${BROWSER_TIMEOUT_GLOBAL}
+    // BROWSER_TIMEOUT_GLOBAL of Resources/variables.ts
     actionTimeout: 40_000,
     navigationTimeout: 40_000,
     // The whole page, not only the part in the viewport

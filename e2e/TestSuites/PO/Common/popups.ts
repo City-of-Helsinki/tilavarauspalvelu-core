@@ -1,9 +1,9 @@
-/** Port of PO/Common/popups.robot */
 import { reachesState } from "../../../lib/locators";
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { COOKIE_CONSENT_COOKIE } from "../../Resources/variables";
 
+/** What can show over any page: the cookie banner, toasts and banner notifications. */
 export class Popups extends PageObject {
   /**
    * Ensures the visibility of the button with the specified text inside a dialog.
@@ -22,15 +22,15 @@ export class Popups extends PageObject {
       return;
     }
 
-    // The cookie banner's button (HDS cookie consent); the name is matched as a substring, like :has-text was
+    // The cookie banner's button (HDS cookie consent). Its name is matched as a substring.
     const accept = this.page.locator(".hds-cc__buttons").getByRole("button", { name: cookie_text });
-    // The click below waits for the button to stop moving (the Robot suite waited for "stable" here)
+    // The click below waits for the button to stop moving
     const dialog_visible = await reachesState(accept, "visible", 10_000);
 
     if (dialog_visible) {
-      await log(`Dialog is visible. Checking for the button with text "${cookie_text}".`);
+      await log(`Dialog is visible. Checking for the button with text "${cookie_text}".`, { level: "DEBUG" });
       await accept.click();
-      await log(`Clicked the "${cookie_text}" button.`);
+      await log(`Clicked the "${cookie_text}" button.`, { level: "DEBUG" });
       await this.page.locator(".hds-cc__buttons").waitFor({ state: "hidden", timeout: 5000 });
     } else {
       await log("Dialog is not visible. Continuing the test.");
@@ -90,7 +90,7 @@ export class Popups extends PageObject {
         .getByRole("button", { name: "Sulje", exact: true })
         .first()
         .click();
-      await log("Clicked close button on notification");
+      await log("Clicked close button on notification", { level: "DEBUG" });
 
       await this.reloadPage();
       attempt++;

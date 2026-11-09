@@ -1,5 +1,5 @@
 /**
- * Fails the run when a test was skipped at runtime, like the Robot runners did: a skipped test checked nothing.
+ * Fails the run when a test was skipped at runtime: a skipped test checked nothing.
  */
 import type { FullResult, Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 

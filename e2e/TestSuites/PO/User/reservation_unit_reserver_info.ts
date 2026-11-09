@@ -1,8 +1,8 @@
-/** Port of PO/User/reservation_unit_reserver_info.robot */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { FORM_ERRORS_TITLE_FI } from "../../Resources/texts_FI";
 
+/** The reserver's contact info on the booking form. */
 export class ReservationUnitReserverInfo extends PageObject {
   @step("reservation_unit_reserver_info.Enter First Name")
   async enterFirstName(firstname: string) {
@@ -45,8 +45,8 @@ export class ReservationUnitReserverInfo extends PageObject {
   @step("reservation_unit_reserver_info.Check Application Cannot Be Made Without Info")
   async checkApplicationCannotBeMadeWithoutInfo() {
     await this.page.getByTestId("reservation__button--continue").click();
-    // Port: kept on purpose. The form validates and re-renders after the empty submit, and text typed into it at
-    // the same time can lose keys (the first name was saved as "Mar" instead of "Marja").
+    // Kept on purpose: the form validates and re-renders after the empty submit, and text typed into it at the
+    // same time can lose keys (the first name was saved as "Mar" instead of "Marja").
     await this.page.waitForTimeout(1000);
 
     // Check that error notification banner is displayed

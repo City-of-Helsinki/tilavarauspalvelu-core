@@ -110,7 +110,7 @@ export class GraphqlCommands extends PageObject {
       expect(response.status).toBe(200);
       // oxlint-disable-next-line no-await-in-loop -- each page starts after the previous one
       const response_json = (await response.json()) as GraphQLResult<BannerNotificationsQuery>;
-      expect(response_json.errors ?? [], "The banner notifications query returned errors").toEqual([]);
+      expect(response_json.errors ?? [], "The banner notifications query has no errors").toEqual([]);
       const page = response_json.data.bannerNotifications;
       edges.push(...(page?.edges ?? []));
       after = page?.pageInfo.hasNextPage === true ? page.pageInfo.endCursor : null;
@@ -157,10 +157,10 @@ export class GraphqlCommands extends PageObject {
         const variables: UpdateBannerNotificationMutationVariables = { input: { pk: pk, draft: true } };
         // oxlint-disable-next-line no-await-in-loop -- one notification at a time
         const response = await this.makeGraphQLRequest(print(UPDATE_BANNER_NOTIFICATION_MUTATION), variables);
-        expect(response.status, `Drafting notification ${pk} failed`).toBe(200);
+        expect(response.status, `Drafting notification ${pk} succeeds`).toBe(200);
         // oxlint-disable-next-line no-await-in-loop -- one notification at a time
         const response_json = (await response.json()) as GraphQLResult<UpdateBannerNotificationMutation>;
-        expect(response_json.errors ?? [], `Drafting notification ${pk} returned errors`).toEqual([]);
+        expect(response_json.errors ?? [], `Drafting notification ${pk} has no errors`).toEqual([]);
         drafted_count++;
         // oxlint-disable-next-line no-await-in-loop -- log lines in order
         await log(`Drafted notification ${pk}`, { level: "DEBUG" });
@@ -203,10 +203,10 @@ export class GraphqlCommands extends PageObject {
         const variables: DeleteBannerNotificationMutationVariables = { input: { pk: pk } };
         // oxlint-disable-next-line no-await-in-loop -- one notification at a time
         const response = await this.makeGraphQLRequest(print(DELETE_BANNER_NOTIFICATION_MUTATION), variables);
-        expect(response.status, `Deleting notification ${pk} failed`).toBe(200);
+        expect(response.status, `Deleting notification ${pk} succeeds`).toBe(200);
         // oxlint-disable-next-line no-await-in-loop -- one notification at a time
         const response_json = (await response.json()) as GraphQLResult<DeleteBannerNotificationMutation>;
-        expect(response_json.errors ?? [], `Deleting notification ${pk} returned errors`).toEqual([]);
+        expect(response_json.errors ?? [], `Deleting notification ${pk} has no errors`).toEqual([]);
 
         deleted_count++;
       } else {

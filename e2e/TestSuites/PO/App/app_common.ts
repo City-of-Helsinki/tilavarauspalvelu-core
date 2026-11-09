@@ -1,5 +1,4 @@
 import type { Page } from "@playwright/test";
-/** Port of PO/App/app_common.robot */
 import { graphqlErrorsIn } from "../../../lib/responses";
 import { step, expect, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
@@ -12,6 +11,7 @@ import {
 } from "../../Resources/texts_FI";
 import { DOWNLOAD_DIR, URL_ADMIN, URL_DJANGO_ADMIN, URL_MAIL, URL_TEST } from "../../Resources/variables";
 
+/** Workflow keywords of both sides: opening the browsers, logging in and out, banners and pages. */
 export class AppCommon extends PageObject {
   // USER TEST SET UP
   // Desktop - iPhone - Android
@@ -104,12 +104,12 @@ export class AppCommon extends PageObject {
   /** Fails if a notification banner is shown. Use after the banners have loaded. */
   @step("app_common.Verify Notification Banner Message Is Not Visible")
   async verifyNotificationBannerMessageIsNotVisible() {
-    // Port: kept on purpose. The banners' query has returned, and when no banner should show there is nothing to
-    // wait for, so a banner that renders a moment late gets a second before the count.
+    // Kept on purpose: the banners' query has returned, and when no banner should show there is nothing to wait
+    // for, so a banner that renders a moment late gets a second before the count.
     await this.page.waitForTimeout(1000);
     await expect(
       this.page.getByTestId("BannerNotificationList__Notification"),
-      "A notification banner is visible but should not be"
+      "No notification banner shows"
     ).toHaveCount(0);
   }
 
@@ -294,8 +294,8 @@ export class AppCommon extends PageObject {
       this.page.reload(),
     ]);
     // A failed query shows no banners, which would let "not visible" checks pass for the wrong reason
-    expect(response.ok(), `Banner query failed: HTTP ${response.status()}`).toBe(true);
-    expect(await graphqlErrorsIn(response, 20_000), "Banner query returned errors").toBe(false);
+    expect(response.ok(), `The banner query succeeds (HTTP ${response.status()})`).toBe(true);
+    expect(await graphqlErrorsIn(response, 20_000), "The banner query has no errors").toBe(false);
 
     // END OF SWITCH PAGE
   }

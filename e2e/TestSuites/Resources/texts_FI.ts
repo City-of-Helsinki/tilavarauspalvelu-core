@@ -61,8 +61,10 @@ export const RECURRING_BOOKING_PURPOSE_TEXT = "Harrastustoiminta, muu";
 export const RECURRING_BOOKING_RESERVATION_PER_WEEK = "1";
 export const RECURRING_BOOKING_MIN_LENGTH_TEXT = "30 minuuttia";
 export const RECURRING_BOOKING_MAX_LENGTH_TEXT = "2 tuntia";
-export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY = "Valitse ensisijaiset aikatoiveet";
-export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY = "Valitse muut aikatoiveet";
+export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY = "Ensisijaiset aikatoiveet";
+export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY = "Vaihtoehtoiset aikatoiveet";
+// The application's calendar, where the times are painted
+export const RECURRING_BOOKING_CALENDAR_FI = "Valitse aikatoiveet kalenterista";
 export const RECURRING_BOOKING_UNIT_NAME_KESKUSTA =
   "Harakka, piilokoju: KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)";
 export const RECURRING_BOOKING_UNIT_NAME_MALMI =

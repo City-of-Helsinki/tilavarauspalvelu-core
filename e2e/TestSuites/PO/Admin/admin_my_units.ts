@@ -1,7 +1,7 @@
-/** Port of PO/Admin/admin_my_units.robot */
 import { expect, log, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
+/** The admin's own units page (Omat toimipisteet) and its reservation button. */
 export class AdminMyUnits extends PageObject {
   @step("admin_my_units.Admin Searches Own Unit And Clicks It")
   async adminSearchesOwnUnitAndClicksIt(units_location: string) {
@@ -40,7 +40,7 @@ export class AdminMyUnits extends PageObject {
     await expect(make_reservation).toBeVisible({ timeout: 15_000 });
     await expect(make_reservation).toBeDisabled({ timeout: 2000 });
 
-    await log("Button is properly disabled for VIEWER role");
+    await log("Button is properly disabled for VIEWER role", { level: "DEBUG" });
   }
 
   @step("admin_my_units.Admin Selects Unit From Reservation Units Dropdown")

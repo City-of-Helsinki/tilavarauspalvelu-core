@@ -87,6 +87,11 @@ export class TestState {
   unavailableReservationHourStarttime = "";
   /** Set by app_admin.Admin Makes Reservation For Behalf/Closed/Staff And Clicks Submit */
   unavailableReservationHourEndtime = "";
+  /**
+   * The days and start hours (e.g. "12.11.2026 10") that data_modification.Get Modified Date And Time has given in
+   * this test, so that it gives each only once. Set by data_modification.Get Modified Date And Time
+   */
+  modifiedDateAndHours: string[] = [];
 
   // The banner notifications
 

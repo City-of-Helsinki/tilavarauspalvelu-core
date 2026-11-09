@@ -33,8 +33,7 @@ export class CustomKeywords extends PageObject {
     // text="…" matches an element that has a text node with exactly the text, also when the element has other text
     // too. getByText(…, { exact: true }) would need the element's whole text to be the text.
     const target = this.locate(element_with_text).locator(`text="${wanted_text}"`).first();
-    // Port: Click waits for the element to be visible and enabled (Playwright's auto-waiting), so there's no
-    // separate Wait For Elements State
+    // The click waits for the element to be visible and enabled
     await target.click();
   }
 
@@ -57,10 +56,9 @@ export class CustomKeywords extends PageObject {
     // A click whose target element doesn't show is repeated after 2 s, at most max_attempts clicks in all
     await retry(max_attempts, 2000, async () => {
       attempt++;
-      await log(`Attempt ${attempt} of ${max_attempts}: Clicking ${formatValue(click_selector)}`);
+      await log(`Attempt ${attempt} of ${max_attempts}: Clicking ${formatValue(click_selector)}`, { level: "DEBUG" });
 
-      // Port: the click scrolls the element into view and waits until it's stable and enabled (Playwright's
-      // auto-waiting), so there's no Scroll To Element and Wait For Elements State before it
+      // The click scrolls the element into view and waits until it's stable and enabled
       await this.locate(click_selector).focus();
       await this.locate(click_selector).click();
 
@@ -68,7 +66,7 @@ export class CustomKeywords extends PageObject {
       try {
         await expect(
           this.locate(target_element_selector),
-          `ERROR: Failed to navigate. Target element '${formatValue(target_element_selector)}' not found. Check screenshot.`
+          `${formatValue(target_element_selector)} shows after the click`
         ).toBeVisible({ timeout: nav_timeout });
       } catch (err) {
         // Target element not found: log whether the page changed, then retry if there are attempts left
@@ -83,7 +81,7 @@ export class CustomKeywords extends PageObject {
         }
         throw err;
       }
-      await log(`✅ Successfully navigated on attempt ${attempt}`);
+      await log(`✅ Successfully navigated on attempt ${attempt}`, { level: "DEBUG" });
     });
   }
 
@@ -95,8 +93,8 @@ export class CustomKeywords extends PageObject {
   async clickAndWaitForPage(click_selector: string | Locator, url_part = "", timeout = BROWSER_TIMEOUT_GLOBAL) {
     const url_before = this.page.url();
     await this.locate(click_selector).click();
-    // Port: waitForURL waits for the new URL and then for the page to load, instead of Wait Until Keyword Succeeds
-    // with Url Should Have Changed and Wait For Load State. After a client side navigation the page has loaded already.
+    // waitForURL waits for the new URL and then for the page to load. After a client-side navigation the page has
+    // loaded already.
     await this.page.waitForURL((url) => (url_part !== "" ? url.href.includes(url_part) : url.href !== url_before), {
       timeout,
       waitUntil: "load",
@@ -105,15 +103,14 @@ export class CustomKeywords extends PageObject {
 
   @step("custom_keywords.Wait For Url To Contain")
   async waitForUrlToContain(url_part: string, timeout = 20_000) {
-    // Port: expect retries until the URL contains url_part, instead of Wait Until Keyword Succeeds with Url Should
-    // Have Changed
+    // expect retries until the URL contains url_part
     await expect(this.page).toHaveURL((url) => url.href.includes(url_part), { timeout });
   }
 
   /** An HDS Select ignores a close within 200 ms of opening, so its list can stay open after the pick. */
   @step("custom_keywords.Close Select List If Open")
   async closeSelectListIfOpen(main_button: string | Locator) {
-    // Port: expect(...).toPass retries every 300 ms, instead of Wait Until Keyword Succeeds
+    // Retried every 300 ms until the list is closed
     await expect(async () => {
       await this.selectListShouldBeClosed(main_button);
     }).toPass({ intervals: [300], timeout: 5000 });
@@ -126,7 +123,7 @@ export class CustomKeywords extends PageObject {
       await this.locate(main_button).click();
       expanded = await this.locate(main_button).getAttribute("aria-expanded");
     }
-    expect(expanded, "The select list did not close").not.toEqual("true");
+    expect(expanded, "The select list is closed").not.toEqual("true");
   }
 
   /**
@@ -153,11 +150,10 @@ export class CustomKeywords extends PageObject {
   /** This keyword verifies that an element containing the specified text is NOT found within a list of elements identified by the given selector. */
   @step("custom_keywords.Verify Element With Text Is Not Found")
   async verifyElementWithTextIsNotFound(element_with_text: string | Locator, wanted_text: string) {
-    // Port: expect.poll reads the elements' texts (stripped, for webkit) again until none of them is the text,
-    // instead of reading them once in a loop
+    // Reads the elements' texts (stripped, for WebKit) again until none of them is the text
     await expect
       .poll(async () => (await this.locate(element_with_text).allInnerTexts()).map((text) => text.trim()), {
-        message: `Element with text "${wanted_text}" was found but should not be present`,
+        message: `No element has the text "${wanted_text}"`,
       })
       .not.toContain(wanted_text);
   }
@@ -165,21 +161,15 @@ export class CustomKeywords extends PageObject {
   /** This keyword verifies that an element identified by the given selector is NOT found on the page. */
   @step("custom_keywords.Verify Element Is Not Found")
   async verifyElementIsNotFound(element_selector: string) {
-    // Port: waits until the element is gone (expect's timeout) instead of counting the elements once
-    await expect(
-      this.page.locator(element_selector),
-      `Element "${element_selector}" was found but should not be present`
-    ).toHaveCount(0);
+    // Waits until the element is gone (expect's timeout)
+    await expect(this.page.locator(element_selector), `The page has no ${element_selector}`).toHaveCount(0);
   }
 
   /** This keyword verifies that an element identified by the given selector IS found on the page. */
   @step("custom_keywords.Verify Element Is Found")
   async verifyElementIsFound(element_selector: string) {
-    // Port: waits until the element is there (expect's timeout) instead of counting the elements once
-    await expect(
-      this.page.locator(element_selector),
-      `Element "${element_selector}" was not found but should be present`
-    ).not.toHaveCount(0);
+    // Waits until the element is there (expect's timeout)
+    await expect(this.page.locator(element_selector), `The page has ${element_selector}`).not.toHaveCount(0);
   }
 
   @step("custom_keywords.Find And Click Element With Exact Text Using JS")
@@ -228,7 +218,7 @@ export class CustomKeywords extends PageObject {
       }
     }
 
-    // Port: the Robot keyword never set ${clicked} (the line above is commented out there), so it always logged this
+    // Logged after a click too: nothing sets the flag of the commented-out line above
     await log(`No element with text '${partial_text}' was found to click.`);
   }
 
@@ -375,26 +365,26 @@ export class CustomKeywords extends PageObject {
    */
   @step("custom_keywords.Verify Card Not Found In Group With Matching Conditions")
   async verifyCardNotFoundInGroupWithMatchingConditions(empty_state_message: string) {
-    await log("Context: Test creates 1 application, cancels it, then verifies no applications remain");
+    await log("Context: Test creates 1 application, cancels it, then verifies no applications remain", {
+      level: "DEBUG",
+    });
 
-    // The empty state is a span with only the message. Port: expect retries until the message shows, instead of
-    // reading the spans once.
+    // The empty state is a span with only the message, and expect retries until it shows
     await expect(
       this.page.locator("#main").getByText(empty_state_message, { exact: true }),
-      `Expected empty state message "${empty_state_message}" not found. This indicates applications still exist after cancellation, but none should remain.`
+      `The page says "${empty_state_message}": no applications are left`
     ).toBeVisible();
   }
 
   @step("custom_keywords.Find Text From Elements Or Fail")
   async findTextFromElementsOrFail(element_with_text: string | Locator, wanted_text: string) {
-    // Port: expect.poll reads the elements' texts again until one of them is the wanted text (both stripped),
-    // instead of reading them once in a loop
+    // Reads the elements' texts again until one of them is the wanted text (both stripped)
     await expect
       .poll(async () => (await this.locate(element_with_text).allInnerTexts()).map((text) => text.trim()), {
-        message: `"Text '${wanted_text}' not found in any given elements."`,
+        message: `An element has the text "${wanted_text}"`,
       })
       .toContain(wanted_text.trim());
-    await log(`Found element with text: "${wanted_text.trim()}."`);
+    await log(`Found element with text: "${wanted_text.trim()}."`, { level: "DEBUG" });
   }
 
   @step("custom_keywords.Find Text Element From Elements")
@@ -429,7 +419,7 @@ export class CustomKeywords extends PageObject {
     // Reads the element's digits again until they are the expected number
     await expect
       .poll(async () => (await number_element.innerText()).replaceAll(/[^0-9]/g, ""), {
-        message: `The number in ${formatValue(text_element)} is not ${number_equalTo}`,
+        message: `The number in ${formatValue(text_element)} is ${number_equalTo}`,
       })
       .toBe(number_equalTo);
   }
@@ -453,15 +443,15 @@ export class CustomKeywords extends PageObject {
   @step("custom_keywords.Get Number From Element Text")
   async getNumberFromElementText(text_element: string | Locator) {
     const element_text = await this.locate(text_element).innerText();
-    await log(`Original text: ${element_text}`);
+    await log(`Original text: ${element_text}`, { level: "DEBUG" });
     const numbers_only = element_text.replaceAll(/[^0-9]/g, "");
-    await log(`Extracted numbers: ${numbers_only}`);
+    await log(`Extracted numbers: ${numbers_only}`, { level: "DEBUG" });
     return numbers_only;
   }
 
   @step("custom_keywords.Check Elements Text With Remove Non-breaking Space")
   async checkElementsTextWithRemoveNonBreakingSpace(Element: string | Locator, Expected_text: string) {
-    // Port: expect waits until the text matches. It normalizes whitespace, non-breaking spaces included.
+    // expect waits until the text matches. It normalizes whitespace, non-breaking spaces included.
     await expect(this.locate(Element)).toHaveText(Expected_text, { useInnerText: true, timeout: 20_000 });
   }
 
@@ -554,23 +544,20 @@ Differences:
     Expected_text: string,
     { strip_spaces = true, ignore_case = false, return_status = false, message = null }: CheckTextOptions = {}
   ): Promise<boolean> {
-    // Determine the error message to use
-    const final_msg = message ?? `Element text does not match. Element: ${formatValue(Element)}`;
-
     // Return status boolean for loops vs fail test for assertions
     if (return_status) {
       // Wait until the element is visible on the page
       await this.locate(Element).waitFor({ state: "visible", timeout: 10_000 });
       try {
-        await this.elementTextShouldBe(Element, Expected_text, strip_spaces, ignore_case, final_msg);
+        await this.elementTextShouldBe(Element, Expected_text, strip_spaces, ignore_case, message);
         return true;
       } catch {
         return false;
       }
     }
-    // Port: expect waits for the element and retries until its text matches, instead of the visible wait (10 s) and
-    // Wait Until Keyword Succeeds (CONTENT_WAIT_TIMEOUT). It compares the text with its whitespace normalized.
-    await expect(this.locate(Element), final_msg).toHaveText(Expected_text, {
+    // expect waits for the element and retries until its text matches, for 10 s plus CONTENT_WAIT_TIMEOUT. It
+    // compares the text with its whitespace normalized.
+    await expect(this.locate(Element), message ?? undefined).toHaveText(Expected_text, {
       ignoreCase: ignore_case,
       useInnerText: true,
       timeout: 10_000 + CONTENT_WAIT_TIMEOUT,
@@ -626,12 +613,9 @@ Differences:
       }
       return haystack.includes(needle);
     }
-    // Port: expect waits for the element and retries until its text contains the expected text, instead of the
-    // Sleep (1 s) and reading the text once. It compares the text with its whitespace normalized.
-    await expect(
-      this.locate(Element),
-      `Element text does not contain expected text. Element: ${formatValue(Element)}`
-    ).toContainText(Expected_text, { ignoreCase: ignore_case, useInnerText: true });
+    // expect waits for the element and retries until its text contains the expected text. It compares the text with
+    // its whitespace normalized.
+    await expect(this.locate(Element)).toContainText(Expected_text, { ignoreCase: ignore_case, useInnerText: true });
     return true;
   }
 
@@ -643,7 +627,7 @@ Differences:
     const timezone = new Intl.DateTimeFormat("en-US", { timeZoneName: "short" })
       .formatToParts(new Date())
       .find((part) => part.type === "timeZoneName")?.value;
-    await log(`Current system time zone is: ${timezone}`);
+    await log(`Current system time zone is: ${timezone}`, { level: "DEBUG" });
 
     // Convert booking time to ICS format using the Python function
     const [ics_start, ics_end] = python_keywords.convert_booking_time_to_ics(time_string);
@@ -689,27 +673,26 @@ Differences:
   async verifyReservationSlotExists(TIME_TO_CHECK: string, DAY_TO_CHECK: string) {
     // normalize search key
     const normTime = normalizeTimeLabel(TIME_TO_CHECK);
-    await log(`Normalized search ➔ ${normTime}`);
+    await log(`Normalized search ➔ ${normTime}`, { level: "DEBUG" });
 
     // pick correct column index
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
     const dayIdx = days.indexOf(DAY_TO_CHECK);
-    expect(dayIdx, `Day "${DAY_TO_CHECK}" not found`).toBeGreaterThanOrEqual(0);
-    await log(`Checking column index ${dayIdx + 2}`);
+    expect(dayIdx, `"${DAY_TO_CHECK}" is a day of the week`).toBeGreaterThanOrEqual(0);
+    await log(`Checking column index ${dayIdx + 2}`, { level: "DEBUG" });
 
     const day_labels = this.page.locator(
       `.rbc-time-column:nth-child(${dayIdx + 2}) .rbc-events-container .rbc-event-label`
     );
     // The calendar's events are loaded after the page, so the first label is waited for as long as an action waits
-    await expect(
-      day_labels.first(),
-      `No reservation labels found. There should be at least one ${DAY_TO_CHECK}`
-    ).toBeAttached({ timeout: BROWSER_TIMEOUT_GLOBAL });
+    await expect(day_labels.first(), `The calendar shows reservations on ${DAY_TO_CHECK}`).toBeAttached({
+      timeout: BROWSER_TIMEOUT_GLOBAL,
+    });
 
-    // Port: expect.poll reads the labels again until one of them is the time, instead of reading them once in a loop
+    // Reads the labels again until one of them is the time
     await expect
       .poll(async () => (await day_labels.allInnerTexts()).map((label) => normalizeTimeLabel(label)), {
-        message: `Reservation not found for ${DAY_TO_CHECK} at ${TIME_TO_CHECK}`,
+        message: `The calendar has a reservation on ${DAY_TO_CHECK} at ${TIME_TO_CHECK}`,
       })
       .toContain(normTime);
 

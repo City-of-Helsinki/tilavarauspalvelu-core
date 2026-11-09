@@ -25,7 +25,7 @@ export class RecurringApplicationsPagePreview extends PageObject {
         }),
         this.page.locator("#button__application--submit").click(),
       ]);
-      expect(response.status(), "The backend failed to send the application").toBeLessThan(500);
+      expect(response.status(), "Sending the application gets no server error").toBeLessThan(500);
     });
     // Sending the application opens its sent page
     await this.page.waitForURL((url) => url.pathname.endsWith("/sent"));
