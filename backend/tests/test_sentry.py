@@ -169,7 +169,7 @@ def test_sentry_post_setup_initializes_sdk_with_configured_options(environment: 
 
 
 @pytest.mark.parametrize("environment", [Docker, Platta])
-def test_sentry_post_setup_uses_release_tag_when_release_is_not_configured(
+def test_sentry_post_setup_uses_project_and_semver_of_release_tag_when_release_is_not_configured(
     environment: type[Docker | Platta],
 ) -> None:
     with (
@@ -183,11 +183,11 @@ def test_sentry_post_setup_uses_release_tag_when_release_is_not_configured(
         environment.post_setup()
 
     sentry_init.assert_called_once()
-    assert sentry_init.call_args.kwargs["release"] == "v1.73.0"
+    assert sentry_init.call_args.kwargs["release"] == "tilavarauspalvelu-core@1.73.0"
 
 
 @pytest.mark.parametrize("environment", [Docker, Platta])
-def test_sentry_post_setup_uses_short_commit_hash_on_main_when_release_is_not_configured(
+def test_sentry_post_setup_uses_project_and_short_commit_hash_on_main_when_release_is_not_configured(
     environment: type[Docker | Platta],
 ) -> None:
     with (
@@ -201,7 +201,25 @@ def test_sentry_post_setup_uses_short_commit_hash_on_main_when_release_is_not_co
         environment.post_setup()
 
     sentry_init.assert_called_once()
-    assert sentry_init.call_args.kwargs["release"] == "01234567"
+    assert sentry_init.call_args.kwargs["release"] == "tilavarauspalvelu-core@01234567"
+
+
+@pytest.mark.parametrize("environment", [Docker, Platta])
+def test_sentry_post_setup_keeps_leading_v_of_branch_name_and_replaces_slashes_when_release_is_not_configured(
+    environment: type[Docker | Platta],
+) -> None:
+    with (
+        patch.object(environment, "SENTRY_ENABLED", new=True),
+        patch.object(environment, "SENTRY_DSN", "https://public@example.ingest.sentry.io/1"),
+        patch.object(environment, "SENTRY_RELEASE", None),
+        patch.object(environment, "SOURCE_BRANCH_NAME", "very/new-feature"),
+        patch.object(environment, "SOURCE_VERSION", "0123456789abcdef0123456789abcdef01234567"),
+        patch("sentry_sdk.init") as sentry_init,
+    ):
+        environment.post_setup()
+
+    sentry_init.assert_called_once()
+    assert sentry_init.call_args.kwargs["release"] == "tilavarauspalvelu-core@very-new-feature"
 
 
 @pytest.mark.parametrize("environment", [Docker, Platta])
