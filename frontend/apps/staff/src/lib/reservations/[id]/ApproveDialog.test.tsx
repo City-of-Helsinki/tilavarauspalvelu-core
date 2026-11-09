@@ -42,7 +42,7 @@ function createPriceLine(overrides: Partial<PriceLine> = {}): PriceLine {
 function createReservation(overrides: Partial<ApprovalDialogFieldsFragment> = {}): ApprovalDialogFieldsFragment {
   return {
     pk: 1,
-    price: "0",
+    totalPrice: "0",
     handlingDetails: "",
     applyingForFreeOfCharge: false,
     freeOfChargeReason: null,
@@ -113,7 +113,7 @@ describe("ApproveDialog", () => {
       <MockedProvider mocks={mocks}>
         <ApproveDialog
           reservation={createReservation({
-            price: "10",
+            totalPrice: "10",
             applyingForFreeOfCharge: true,
             freeOfChargeReason: "reason",
             priceLines: [createPriceLine({ amount: "10" })],
@@ -150,7 +150,7 @@ describe("ApproveDialog", () => {
       <MockedProvider mocks={mocks}>
         <ApproveDialog
           reservation={createReservation({
-            price: "10",
+            totalPrice: "10",
             applyingForFreeOfCharge: true,
             priceLines: [createPriceLine({ amount: "10" })],
           })}
@@ -197,14 +197,23 @@ describe("ApproveDialog", () => {
     await waitFor(() => expect(onAccept).toHaveBeenCalledTimes(1));
   });
 
-  it("sends the price when the reservation has no price lines", async () => {
+  it("makes every price line free and hides the price input when the reservation has many price lines", async () => {
     const onAccept = vi.fn();
     const user = userEvent.setup();
     const mocks = [
       {
         request: {
           query: ApproveReservationDocument,
-          variables: { input: { pk: 1, handlingDetails: "", price: "10" } },
+          variables: {
+            input: {
+              pk: 1,
+              handlingDetails: "",
+              priceLines: [
+                { pk: 2, overrideAmount: "0" },
+                { pk: 3, overrideAmount: "0" },
+              ],
+            },
+          },
         },
         result: { data: { approveReservation: { pk: 1, state: "CONFIRMED" } } },
       },
@@ -213,13 +222,21 @@ describe("ApproveDialog", () => {
     render(
       <MockedProvider mocks={mocks}>
         <ApproveDialog
-          reservation={createReservation({ price: "10", priceLines: [] })}
+          reservation={createReservation({
+            totalPrice: "30",
+            applyingForFreeOfCharge: true,
+            freeOfChargeReason: "reason",
+            priceLines: [createPriceLine({ pk: 2, amount: "10" }), createPriceLine({ pk: 3, amount: "20" })],
+          })}
           onClose={vi.fn()}
           onAccept={onAccept}
         />
       </MockedProvider>
     );
 
+    expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("checkbox", { name: "reservation:ApproveDialog.clearPrice" }));
     await user.click(screen.getByTestId("approval-dialog__accept-button"));
 
     await waitFor(() => expect(onAccept).toHaveBeenCalledTimes(1));
