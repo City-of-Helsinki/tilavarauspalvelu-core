@@ -10,10 +10,11 @@ from tilavarauspalvelu.enums import (
     AccessType,
     AuthenticationType,
     PaymentType,
+    PriceComponentKind,
     ReservationKind,
     ReservationStartInterval,
 )
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing, TaxLevel
+from tilavarauspalvelu.models import PriceComponent, ReservationUnit, ReservationUnitPricingGroup
 from utils.date_utils import local_date
 
 from ._base_exporter import BaseCSVExporter, BaseExportRow
@@ -114,8 +115,25 @@ class ReservationUnitExporter(BaseCSVExporter):
 
     @property
     def queryset(self) -> models.QuerySet:
-        tax_levels = TaxLevel.objects.annotate(current_percentage=L("current_percentage"))
-        pricings = ReservationUnitPricing.objects.active().prefetch_related(models.Prefetch("tax_level", tax_levels))
+        today = local_date()
+        components_today = (
+            PriceComponent.objects
+            .filter(
+                models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+                kind=PriceComponentKind.BASE,
+                valid_from__lte=today,
+            )
+            .annotate(tax_percentage=L("tax_level__current_percentage"))
+            .order_by("amount")
+        )
+        pricing_group_rows = (
+            ReservationUnitPricingGroup.objects
+            .filter(begins__lte=today)
+            .order_by("-begins")
+            .prefetch_related(
+                models.Prefetch("pricing_group__components", components_today, to_attr="components_today"),
+            )
+        )
 
         return (
             self._queryset
@@ -137,7 +155,9 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "resources",
                 "intended_uses",
                 "equipments",
-                models.Prefetch("pricings", pricings),
+                models.Prefetch(
+                    "reservation_unit_pricing_groups", pricing_group_rows, to_attr="past_pricing_group_rows"
+                ),
             )
             .annotate(
                 publishing_state=L("publishing_state"),
@@ -246,10 +266,17 @@ class ReservationUnitExporter(BaseCSVExporter):
         ]
 
     def get_data_rows(self, instance: ReservationUnit) -> Iterable[ReservationUnitExportRow]:
-        pricing: ReservationUnitPricing = next(iter(instance.pricings.all()), None)
+        # The base prices in effect today, from the lowest to the highest. There are many with price options.
+        pricing_group_rows: list[ReservationUnitPricingGroup] = instance.past_pricing_group_rows
+        components: list[PriceComponent] = (
+            pricing_group_rows[0].pricing_group.components_today if pricing_group_rows else []
+        )
+        lowest_component = components[0] if components else None
+        highest_component = components[-1] if components else None
+
         start_interval = ReservationStartInterval(instance.reservation_start_interval)
-        payment_type = getattr(pricing, "payment_type", None)
-        tax_percentage = pricing.tax_level.current_percentage if pricing is not None else None
+        payment_type = instance.payment_type
+        tax_percentage = highest_component.tax_percentage if highest_component is not None else None
         access_type = instance.current_access_type
         return [
             ReservationUnitExportRow(
@@ -280,11 +307,12 @@ class ReservationUnitExporter(BaseCSVExporter):
                 cancellation_terms=getattr(instance.cancellation_terms, "name", ""),
                 pricing_terms=getattr(instance.pricing_terms, "name", ""),
                 cancellation_rule=getattr(instance.cancellation_rule, "name", ""),
-                price_unit=getattr(pricing, "price_unit", ""),
-                lowest_price=getattr(pricing, "lowest_price", ""),
-                highest_price=getattr(pricing, "highest_price", ""),
+                price_unit=getattr(highest_component, "price_unit", ""),
+                lowest_price=getattr(lowest_component, "amount", ""),
+                highest_price=getattr(highest_component, "amount", ""),
                 tax_percentage=f"{tax_percentage}%" if tax_percentage is not None else "",
-                material_price_description=getattr(pricing, "material_price_description", ""),  # Includes any HTML tags
+                # Includes any HTML tags
+                material_price_description=getattr(highest_component, "material_price_description", ""),
                 reservation_begins_at=self.format_datetime(instance.reservation_begins_at),
                 reservation_ends_at=self.format_datetime(instance.reservation_ends_at),
                 reservation_form=getattr(instance, "reservation_form", ""),
@@ -293,7 +321,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 reservation_kind=str(ReservationKind(instance.reservation_kind).label),
                 access_type=str(AccessType(access_type).label) if access_type is not None else "",
                 payment_type=str(PaymentType(payment_type).label) if payment_type else "",
-                can_apply_free_of_charge=instance.can_apply_free_of_charge,
+                can_apply_free_of_charge=any(component.can_apply_for_discount for component in components),
                 additional_instructions_for_pending_reservation_fi=instance.reservation_pending_instructions_fi,
                 additional_instructions_for_pending_reservation_sv=instance.reservation_pending_instructions_sv,
                 additional_instructions_for_pending_reservation_en=instance.reservation_pending_instructions_en,
