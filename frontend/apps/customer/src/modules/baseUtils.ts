@@ -1,5 +1,5 @@
 // @ts-check
-import { getVersion as gitVersion } from "ui/src/modules/baseUtils";
+import { getReleaseVersion, getVersion as gitVersion } from "ui/src/modules/baseUtils";
 import { env } from "../env.mjs";
 
 /// Marks our own code in the browser bundle for thirdPartyErrorFilterIntegration.
@@ -18,6 +18,6 @@ export function getVersion() {
 export function getCustomerRelease() {
   // Use SENTRY_PROJECT for consistency with Sentry config and runtime
   const app = env.SENTRY_PROJECT || "tilavarauspalvelu-customer-ui";
-  const version = getVersion().replaceAll("/", "-");
+  const version = getReleaseVersion(env.NEXT_PUBLIC_SOURCE_BRANCH_NAME, env.NEXT_PUBLIC_SOURCE_VERSION);
   return `${app}@${version}`;
 }

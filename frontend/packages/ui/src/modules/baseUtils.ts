@@ -8,6 +8,16 @@ export function getVersion(branch?: string, sha?: string) {
   return branch?.replace("main", "") || sha?.slice(0, 8) || "local";
 }
 
+/**
+ * Sentry reads the release as semver only without the "v" of the git tag.
+ * The CI workflows build the same name. Keep them in sync.
+ */
+export function getReleaseVersion(branch?: string, sha?: string) {
+  return getVersion(branch, sha)
+    .replace(/^v(?=\d)/, "")
+    .replaceAll("/", "-");
+}
+
 const isDev = process.env.NODE_ENV === "development";
 // no form-action directive because it breaks redirects on chrome
 export const CSP_HEADER = `

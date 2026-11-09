@@ -79,8 +79,8 @@ jobs:
       run: pnpm codegen
 
     # The name must match the release that the app reports at runtime.
-    # See getVersion in frontend/packages/ui/src/modules/baseUtils.ts.
-    # Tag builds use the tag name. Main builds use the short commit hash.
+    # See getReleaseVersion in frontend/packages/ui/src/modules/baseUtils.ts.
+    # Tag builds use the tag without "v", so Sentry reads it as semver. Main builds use the short commit hash.
     - name: "Create release name"
       id: release
       env:
@@ -90,6 +90,7 @@ jobs:
       run: |
         version="${REF_NAME/main/}"
         version="${version:-${SHA:0:8}}"
+        if [[ "$version" =~ ^v[0-9] ]]; then version="${version#v}"; fi
         echo "release=${SENTRY_PROJECT_NAME}@${version//\//-}" >> "$GITHUB_OUTPUT"
 
     - name: "Set up Docker Buildx"
