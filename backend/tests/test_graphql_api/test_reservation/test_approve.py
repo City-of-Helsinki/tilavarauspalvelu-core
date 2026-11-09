@@ -565,10 +565,9 @@ def test_reservation__approve__no_pricing(graphql):
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__no_payment_product_if_paid_online(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        pricings__lowest_price=Decimal("10.00"),
-        pricings__highest_price=Decimal("20.00"),
-        pricings__tax_level__rates__percentage=Decimal("25.50"),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__amount=Decimal("20.00"),
+        own_price__tax_level__rates__percentage=Decimal("25.50"),
+        payment_type=PaymentType.ONLINE,
     )
 
     reservation = ReservationFactory.create(

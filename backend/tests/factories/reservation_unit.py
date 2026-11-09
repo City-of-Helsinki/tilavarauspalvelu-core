@@ -107,7 +107,6 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     require_adult_reservee = False
     require_reservation_handling = False
     reservation_block_whole_day = False
-    can_apply_free_of_charge = False
 
     # Enums
     authentication = AuthenticationType.WEAK.value
@@ -150,6 +149,26 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     reservation_unit_options = ReverseForeignKeyFactory("tests.factories.ReservationUnitOptionFactory")
     access_types = ReverseForeignKeyFactory("tests.factories.ReservationUnitAccessTypeFactory")
 
+    @factory.post_generation
+    def own_price(self: ReservationUnit, create: bool, value: Any, **kwargs: Any) -> None:
+        """
+        Give `own_price__<field>` arguments to give the reservation unit an own pricing group
+        with one base price component. `own_price__begins` sets when the pricing group and the price begin.
+        """
+        from .price_component import PriceComponentFactory
+        from .pricing_group import PricingGroupFactory
+        from .reservation_unit_pricing_group import ReservationUnitPricingGroupFactory
+
+        if not create or not kwargs:
+            return
+
+        begins = kwargs.pop("begins", datetime.date(2021, 1, 1))
+        pricing_group = PricingGroupFactory.create(name=self.name, unit_group=None)
+        ReservationUnitPricingGroupFactory.create(reservation_unit=self, pricing_group=pricing_group, begins=begins)
+
+        kwargs.setdefault("valid_from", begins)
+        PriceComponentFactory.create(pricing_group=pricing_group, **kwargs)
+
     @classmethod
     def create_reservable_now(cls, **kwargs: Any) -> ReservationUnit:
         """Create a reservation unit that is reservable for yesterday, the current day, and the next day."""
@@ -163,9 +182,8 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         kwargs.setdefault("origin_hauki_resource__id", "987")
         kwargs.setdefault("spaces", [space])
         kwargs.setdefault("unit", space.unit)
-        kwargs.setdefault("pricings__lowest_price", 0)
-        kwargs.setdefault("pricings__highest_price", 0)
-        kwargs.setdefault("pricings__tax_level__rates__percentage", 0)
+        kwargs.setdefault("own_price__amount", Decimal(0))
+        kwargs.setdefault("own_price__tax_level__rates__percentage", Decimal(0))
         reservation_unit = cls.create(**kwargs)
 
         ReservableTimeSpanFactory.create(
@@ -178,26 +196,23 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
 
     @classmethod
     def create_free(cls, **kwargs: Any) -> ReservationUnit:
-        kwargs.setdefault("pricings__lowest_price", Decimal(0))
-        kwargs.setdefault("pricings__highest_price", Decimal(0))
-        kwargs.setdefault("pricings__tax_level__rates__percentage", Decimal(0))
-        kwargs.setdefault("pricings__payment_type", None)
+        kwargs.setdefault("own_price__amount", Decimal(0))
+        kwargs.setdefault("own_price__tax_level__rates__percentage", Decimal(0))
+        kwargs.setdefault("payment_type", None)
         return cls.create(**kwargs)
 
     @classmethod
     def create_paid_on_site(cls, **kwargs: Any) -> ReservationUnit:
-        kwargs.setdefault("pricings__lowest_price", Decimal("10.00"))
-        kwargs.setdefault("pricings__highest_price", Decimal("20.00"))
-        kwargs.setdefault("pricings__tax_level__rates__percentage", Decimal("25.50"))
-        kwargs.setdefault("pricings__payment_type", PaymentType.ON_SITE)
+        kwargs.setdefault("own_price__amount", Decimal("20.00"))
+        kwargs.setdefault("own_price__tax_level__rates__percentage", Decimal("25.50"))
+        kwargs.setdefault("payment_type", PaymentType.ON_SITE)
         return cls.create(**kwargs)
 
     @classmethod
     def create_paid_in_webshop(cls, **kwargs: Any) -> ReservationUnit:
-        kwargs.setdefault("pricings__lowest_price", Decimal("10.00"))
-        kwargs.setdefault("pricings__highest_price", Decimal("20.00"))
-        kwargs.setdefault("pricings__tax_level__rates__percentage", Decimal("25.50"))
-        kwargs.setdefault("pricings__payment_type", PaymentType.ONLINE)
+        kwargs.setdefault("own_price__amount", Decimal("20.00"))
+        kwargs.setdefault("own_price__tax_level__rates__percentage", Decimal("25.50"))
+        kwargs.setdefault("payment_type", PaymentType.ONLINE)
         kwargs.setdefault("payment_product__id", uuid.uuid4())
         return cls.create(**kwargs)
 
@@ -277,14 +292,13 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
 
     def with_free_pricing(self, *, begin_date: datetime.date | None = None) -> Self:
         self.set(
-            pricings__price_unit=PriceUnit.FIXED,
-            pricings__lowest_price=Decimal(0),
-            pricings__highest_price=Decimal(0),
-            pricings__tax_level__rates__percentage=Decimal(0),
+            own_price__price_unit=PriceUnit.FIXED,
+            own_price__amount=Decimal(0),
+            own_price__tax_level__rates__percentage=Decimal(0),
         )
         if begin_date is not None:
             self.set(
-                pricings__begins=begin_date,
+                own_price__begins=begin_date,
             )
         return self
 
