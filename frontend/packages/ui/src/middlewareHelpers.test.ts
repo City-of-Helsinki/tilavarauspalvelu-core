@@ -8,6 +8,7 @@ import {
   isPageRequest,
   redirectCsrfToken,
 } from "./middlewareHelpers";
+import { GraphQLFetchError } from "./modules/errors";
 
 function createRequest(
   url: string,
@@ -229,6 +230,35 @@ describe("gqlQueryFetch", () => {
     const mutation = "mutation SaveUserLanguage { updateStaffUser(input: {}) { pk } }";
     await expect(gqlQueryFetch(createGqlRequest(), { query: mutation }, API_URL)).rejects.toThrow("fetch failed");
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  test("keeps the status of an error response that is not JSON", async () => {
+    const gatewayError = new Response("<html><body>502 Bad Gateway</body></html>", {
+      status: 502,
+      statusText: "Bad Gateway",
+    });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(gatewayError));
+
+    const request = gqlQueryFetch(
+      createGqlRequest(),
+      { query: "query GetCurrentUser { currentUser { pk } }" },
+      API_URL
+    );
+    await expect(request).rejects.toBeInstanceOf(GraphQLFetchError);
+    await expect(request).rejects.toThrow("GraphQLFetchError 502 Bad Gateway");
+    await expect(request).rejects.toMatchObject({ data: "<html><body>502 Bad Gateway</body></html>" });
+  });
+
+  test("keeps the JSON body of an error response", async () => {
+    const errorBody = { errors: [{ message: "Bad request" }] };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(errorBody), { status: 400 })));
+
+    const request = gqlQueryFetch(
+      createGqlRequest(),
+      { query: "query GetCurrentUser { currentUser { pk } }" },
+      API_URL
+    );
+    await expect(request).rejects.toMatchObject({ data: errorBody });
   });
 
   test("does not send a query again after other errors", async () => {

@@ -86,6 +86,15 @@ export type GqlQuery = {
   variables?: Record<string, unknown>;
 };
 
+/// The value of a JSON text, or the text itself if it is not JSON
+function parseJsonOrText(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
 /// Fetch a query from the backend
 /// @param req - NextRequest used to read cookies and the referer
 /// @param query - Query object with query and variables
@@ -147,11 +156,11 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
     res = await send();
   }
 
-  const data: unknown = await res.json();
-
   if (!res.ok) {
     const { status, statusText } = res;
-    throw new GraphQLFetchError(status, statusText, query, data);
+    // A gateway error, for example a 502, can have an HTML body. The error must keep the status.
+    throw new GraphQLFetchError(status, statusText, query, parseJsonOrText(await res.text()));
   }
+  const data: unknown = await res.json();
   return data;
 }
