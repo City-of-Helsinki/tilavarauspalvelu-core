@@ -27,13 +27,13 @@ from tests.factories import (
     ReservationUnitAccessTypeFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
-    ReservationUnitPricingFactory,
     ReservationUnitTypeFactory,
     SpaceFactory,
     TermsOfUseFactory,
     UnitFactory,
 )
 
+from .create_pricing_groups import OwnPrice, create_own_prices
 from .create_reservation_related_things import _fetch_and_build_reservation_unit_image
 from .utils import SetName, with_logs
 
@@ -685,7 +685,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         reservations_max_days_before=90,
         require_reservation_handling=True,
         reservation_kind=ReservationKind.DIRECT,
-        can_apply_free_of_charge=True,
+        payment_type=PaymentType.ONLINE,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_multipurpose,
         payment_terms=payment_terms_4,
@@ -723,15 +723,16 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         equipment_display,
         equipment_extension_cord,
     )
-    ReservationUnitPricingFactory.create(
-        reservation_unit=aina_kasiteltava_kellarikerros,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=0.0,
-        highest_price=40.0,
-        tax_level=tax_levels["general"],
-        payment_type=PaymentType.ONLINE,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=aina_kasiteltava_kellarikerros,
+            can_apply_for_discount=True,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=40.0,
+            tax_level=tax_levels["general"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_kasiteltava_kellarikerros,
         access_type=AccessType.UNRESTRICTED,
@@ -796,7 +797,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         reservations_max_days_before=90,
         require_reservation_handling=False,
         reservation_kind=ReservationKind.DIRECT,
-        can_apply_free_of_charge=False,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_gadget,
         payment_terms=payment_terms_free_of_charge,
@@ -818,14 +818,15 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         ),
     )
     maksuton_mankeli.equipments.add(equipment_click_share)
-    ReservationUnitPricingFactory.create(
-        reservation_unit=maksuton_mankeli,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=0.0,
-        highest_price=0.0,
-        tax_level=tax_levels["tax_free"],
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=maksuton_mankeli,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=0.0,
+            tax_level=tax_levels["tax_free"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=maksuton_mankeli,
         access_type=AccessType.UNRESTRICTED,
@@ -912,7 +913,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         reservations_max_days_before=90,
         require_reservation_handling=False,
         reservation_kind=ReservationKind.DIRECT,
-        can_apply_free_of_charge=False,
+        payment_type=PaymentType.ONLINE,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_exercise,
         payment_terms=payment_terms_1,
@@ -945,15 +946,15 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         equipment_billiard_table,
         equipment_exercise_equipment,
     )
-    ReservationUnitPricingFactory.create(
-        reservation_unit=aina_maksullinen_aitio,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=40.0,
-        highest_price=40.0,
-        tax_level=tax_levels["general"],
-        payment_type=PaymentType.ONLINE,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=aina_maksullinen_aitio,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=40.0,
+            tax_level=tax_levels["general"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_maksullinen_aitio,
         access_type=AccessType.UNRESTRICTED,
@@ -1021,7 +1022,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         reservations_max_days_before=90,
         require_reservation_handling=False,
         reservation_kind=ReservationKind.DIRECT_AND_SEASON,
-        can_apply_free_of_charge=True,
+        payment_type=PaymentType.ONLINE,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_teaching,
         payment_terms=payment_terms_3,
@@ -1056,15 +1057,16 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         equipment_freezer,
         equipment_mirror_wall,
     )
-    ReservationUnitPricingFactory.create(
-        reservation_unit=alennuskelpoinen_aula,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=0.0,
-        highest_price=30.0,
-        tax_level=tax_levels["general"],
-        payment_type=PaymentType.ONLINE,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=alennuskelpoinen_aula,
+            can_apply_for_discount=True,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=30.0,
+            tax_level=tax_levels["general"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=alennuskelpoinen_aula,
         access_type=AccessType.UNRESTRICTED,
@@ -1123,7 +1125,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         reservations_max_days_before=90,
         require_reservation_handling=False,
         reservation_kind=ReservationKind.DIRECT_AND_SEASON,
-        can_apply_free_of_charge=False,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_work,
         payment_terms=payment_terms_free_of_charge,
@@ -1144,14 +1145,15 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         ),
     )
     perumiskelvoton_parveke.equipments.add(equipment_billiard_table)
-    ReservationUnitPricingFactory.create(
-        reservation_unit=perumiskelvoton_parveke,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=0.0,
-        highest_price=0.0,
-        tax_level=tax_levels["tax_free"],
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=perumiskelvoton_parveke,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=0.0,
+            tax_level=tax_levels["tax_free"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=perumiskelvoton_parveke,
         access_type=AccessType.UNRESTRICTED,
@@ -1205,7 +1207,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         reservations_max_days_before=90,
         require_reservation_handling=False,
         reservation_kind=ReservationKind.DIRECT_AND_SEASON,
-        can_apply_free_of_charge=False,
+        payment_type=PaymentType.ONLINE,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_multipurpose,
         payment_terms=payment_terms_1,
@@ -1241,15 +1243,15 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         equipment_coffee_machine,
         equipment_extension_cord,
     )
-    ReservationUnitPricingFactory.create(
-        reservation_unit=perumiskelvoton_patio,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=0.0,
-        highest_price=30.0,
-        tax_level=tax_levels["general"],
-        payment_type=PaymentType.ONLINE,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=perumiskelvoton_patio,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=30.0,
+            tax_level=tax_levels["general"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=perumiskelvoton_patio,
         access_type=AccessType.UNRESTRICTED,
@@ -1311,7 +1313,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         reservations_max_days_before=90,
         require_reservation_handling=False,
         reservation_kind=ReservationKind.DIRECT_AND_SEASON,
-        can_apply_free_of_charge=False,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_multipurpose,
         payment_terms=payment_terms_free_of_charge,
@@ -1346,14 +1347,15 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         equipment_dishwasher,
         equipment_extension_cord,
     )
-    ReservationUnitPricingFactory.create(
-        reservation_unit=toistuvien_varausten_toimisto,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=0.0,
-        highest_price=0.0,
-        tax_level=tax_levels["tax_free"],
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=toistuvien_varausten_toimisto,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=0.0,
+            tax_level=tax_levels["tax_free"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=toistuvien_varausten_toimisto,
         access_type=AccessType.UNRESTRICTED,
@@ -1411,7 +1413,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         reservations_max_days_before=90,
         require_reservation_handling=False,
         reservation_kind=ReservationKind.DIRECT_AND_SEASON,
-        can_apply_free_of_charge=False,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_multipurpose,
         payment_terms=payment_terms_free_of_charge,
@@ -1437,14 +1438,15 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         equipment_billiard_table,
         equipment_dishwasher,
     )
-    ReservationUnitPricingFactory.create(
-        reservation_unit=tauotettu_takkahuone,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=0.0,
-        highest_price=0.0,
-        tax_level=tax_levels["tax_free"],
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=tauotettu_takkahuone,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=0.0,
+            tax_level=tax_levels["tax_free"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=tauotettu_takkahuone,
         access_type=AccessType.UNRESTRICTED,
@@ -1512,7 +1514,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         require_reservation_handling=True,
         authentication=AuthenticationType.WEAK,
         reservation_kind=ReservationKind.DIRECT_AND_SEASON,
-        can_apply_free_of_charge=False,
         unit=caisa,
         reservation_unit_type=reservation_unit_type_multipurpose,
         payment_terms=payment_terms_free_of_charge,
@@ -1539,14 +1540,15 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         equipment_sound,
         equipment_whiteboard,
     )
-    ReservationUnitPricingFactory.create(
-        reservation_unit=aina_kasiteltava_kammio,
-        begins=datetime.date(2023, 1, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        lowest_price=0.0,
-        highest_price=0.0,
-        tax_level=tax_levels["tax_free"],
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=aina_kasiteltava_kammio,
+            begins=datetime.date(2023, 1, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=0.0,
+            tax_level=tax_levels["tax_free"],
+        )
+    ])
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_kasiteltava_kammio,
         access_type=AccessType.UNRESTRICTED,

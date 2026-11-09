@@ -1,14 +1,12 @@
 from __future__ import annotations
 
+import dataclasses
 import datetime
-import math
 from collections import defaultdict
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from django.db.models import Prefetch
-
-from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
+from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit, ReservationTypeChoice
 from tilavarauspalvelu.models import (
     PriceComponent,
     PriceOption,
@@ -16,119 +14,114 @@ from tilavarauspalvelu.models import (
     Reservation,
     ReservationPriceLine,
     ReservationUnit,
-    ReservationUnitPricing,
     ReservationUnitPricingGroup,
     SalesItem,
     UnitGroup,
 )
+from tilavarauspalvelu.services.pricing.price_calculation import load_pricing_data
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
-from utils.decimal_utils import round_decimal
 
 from .utils import with_logs
 
 if TYPE_CHECKING:
-    from django.db.models import QuerySet
-
     from tilavarauspalvelu.models import TaxLevel
 
     from .utils import TaxLevelKey
 
 
-@with_logs
-def _create_pricing_groups(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
-    general_tax_level = tax_levels["general"]
-    shared_reservation_units = _create_shared_pricing_group(
-        tax_level=general_tax_level,
-        sales_item=get_or_create_sales_item(tax_level=general_tax_level),
-    )
+@dataclasses.dataclass(frozen=True, slots=True, kw_only=True)
+class OwnPrice:
+    """One base price of a reservation unit. It lasts until the next own price of the same reservation unit begins."""
 
-    reservation_units = (
-        ReservationUnit.objects
-        .filter(pricings__isnull=False)
-        .exclude(pk__in=[reservation_unit.pk for reservation_unit in shared_reservation_units])
-        .distinct()
-    )
-    create_own_pricing_groups(reservation_units)
+    reservation_unit: ReservationUnit
+    begins: datetime.date
+    amount: Decimal
+    price_unit: PriceUnit
+    tax_level: TaxLevel
+    can_apply_for_discount: bool = False
+    material_price_description_fi: str = ""
+    material_price_description_en: str = ""
+    material_price_description_sv: str = ""
 
 
-def create_own_pricing_groups(reservation_units: QuerySet[ReservationUnit]) -> None:
+def create_own_prices(prices: list[OwnPrice]) -> None:
     """
-    Make an own pricing group for each reservation unit, with one base component for each of its pricings.
-    The reservation unit gets the payment type of its latest paid pricing.
+    Make an own pricing group for each reservation unit in the given prices, with one base component for each price.
     The paid components of a reservation unit that is paid online get the sales item of their tax level.
+    The reservation units must be saved first.
     """
-    pricings_by_begins = Prefetch(
-        "pricings",
-        queryset=ReservationUnitPricing.objects.select_related("tax_level").order_by("begins"),
-    )
-    reservation_units_with_pricings = [
-        reservation_unit
-        for reservation_unit in reservation_units.prefetch_related(pricings_by_begins)
-        if reservation_unit.pricings.all()
-    ]
+    prices_by_reservation_unit: dict[int, list[OwnPrice]] = defaultdict(list)
+    reservation_units: dict[int, ReservationUnit] = {}
+    for price in prices:
+        prices_by_reservation_unit[price.reservation_unit.pk].append(price)
+        reservation_units[price.reservation_unit.pk] = price.reservation_unit
 
-    pricing_groups = [
-        PricingGroup(
+    pricing_groups = {
+        pk: PricingGroup(
             name=reservation_unit.name,
             name_fi=reservation_unit.name_fi,
             name_en=reservation_unit.name_en,
             name_sv=reservation_unit.name_sv,
             unit_group=None,
         )
-        for reservation_unit in reservation_units_with_pricings
-    ]
-    PricingGroup.objects.bulk_create(pricing_groups)
-
-    tax_levels = {
-        pricing.tax_level
-        for reservation_unit in reservation_units_with_pricings
-        for pricing in reservation_unit.pricings.all()
+        for pk, reservation_unit in reservation_units.items()
     }
-    sales_items = {tax_level.pk: get_or_create_sales_item(tax_level=tax_level) for tax_level in tax_levels}
+    PricingGroup.objects.bulk_create(pricing_groups.values())
 
+    sales_items: dict[int, SalesItem] = {}
     reservation_unit_pricing_groups: list[ReservationUnitPricingGroup] = []
     components: list[PriceComponent] = []
-    paid_reservation_units: list[ReservationUnit] = []
 
-    for reservation_unit, pricing_group in zip(reservation_units_with_pricings, pricing_groups, strict=True):
-        pricings: list[ReservationUnitPricing] = list(reservation_unit.pricings.all())
-
-        paid_pricings = [pricing for pricing in pricings if pricing.highest_price > 0]
-        if paid_pricings:
-            reservation_unit.payment_type = paid_pricings[-1].payment_type or PaymentType.ON_SITE
-            paid_reservation_units.append(reservation_unit)
+    for pk, unit_prices in prices_by_reservation_unit.items():
+        reservation_unit = reservation_units[pk]
+        pricing_group = pricing_groups[pk]
+        sorted_prices = sorted(unit_prices, key=lambda price: price.begins)
+        is_paid_online = reservation_unit.payment_type in PaymentType.requires_verkkokauppa
 
         reservation_unit_pricing_group = ReservationUnitPricingGroup(
             reservation_unit=reservation_unit,
             pricing_group=pricing_group,
-            begins=pricings[0].begins,
+            begins=sorted_prices[0].begins,
         )
         reservation_unit_pricing_groups.append(reservation_unit_pricing_group)
 
-        is_paid_online = reservation_unit.payment_type in PaymentType.requires_verkkokauppa
+        valid_until_dates = [price.begins for price in sorted_prices[1:]] + [None]
+        for price, valid_until in zip(sorted_prices, valid_until_dates, strict=True):
+            sales_item: SalesItem | None = None
+            if is_paid_online and price.amount > 0:
+                if price.tax_level.pk not in sales_items:
+                    sales_items[price.tax_level.pk] = get_or_create_sales_item(tax_level=price.tax_level)
+                sales_item = sales_items[price.tax_level.pk]
 
-        valid_until_dates = [pricing.begins for pricing in pricings[1:]] + [None]
-        for pricing, valid_until in zip(pricings, valid_until_dates, strict=True):
             component = PriceComponent(
                 pricing_group=pricing_group,
                 kind=PriceComponentKind.BASE,
-                valid_from=pricing.begins,
+                valid_from=price.begins,
                 valid_until=valid_until,
                 price_option=None,
-                amount=pricing.highest_price,
-                price_unit=pricing.price_unit,
-                can_apply_for_discount=reservation_unit.can_apply_free_of_charge and pricing.highest_price > 0,
-                material_price_description_fi=pricing.material_price_description_fi or "",
-                material_price_description_en=pricing.material_price_description_en or "",
-                material_price_description_sv=pricing.material_price_description_sv or "",
-                tax_level=pricing.tax_level,
-                sales_item=sales_items[pricing.tax_level_id] if is_paid_online and pricing.highest_price > 0 else None,
+                amount=price.amount,
+                price_unit=price.price_unit,
+                can_apply_for_discount=price.can_apply_for_discount and price.amount > 0,
+                material_price_description_fi=price.material_price_description_fi,
+                material_price_description_en=price.material_price_description_en,
+                material_price_description_sv=price.material_price_description_sv,
+                tax_level=price.tax_level,
+                sales_item=sales_item,
             )
             components.append(component)
 
     ReservationUnitPricingGroup.objects.bulk_create(reservation_unit_pricing_groups)
     PriceComponent.objects.bulk_create(components)
-    ReservationUnit.objects.bulk_update(paid_reservation_units, fields=["payment_type"])
+
+
+@with_logs
+def _create_shared_pricing_group(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
+    general_tax_level = tax_levels["general"]
+    _move_to_shared_pricing_group(
+        tax_level=general_tax_level,
+        sales_item=get_or_create_sales_item(tax_level=general_tax_level),
+    )
 
 
 def get_or_create_sales_item(*, tax_level: TaxLevel) -> SalesItem:
@@ -147,145 +140,104 @@ def get_or_create_sales_item(*, tax_level: TaxLevel) -> SalesItem:
 @with_logs
 def _create_reservation_price_lines() -> None:
     """
-    Add one price line to each reservation, from the component that is active on the start date of the reservation.
-    This is simpler than the real price calculation, which also splits a reservation at a price change.
+    Give each reservation without price lines the price lines of the price calculation, and its price from them.
+    A reservation in a shared pricing group without a price option uses the first option of the group by name.
+    Reservations that staff make are free, so their lines are overridden to zero.
     """
-    reservation_unit_pricing_groups: dict[int, list[ReservationUnitPricingGroup]] = defaultdict(list)
-    for reservation_unit_pricing_group in ReservationUnitPricingGroup.objects.order_by("-begins"):
-        reservation_unit_id = reservation_unit_pricing_group.reservation_unit_id
-        reservation_unit_pricing_groups[reservation_unit_id].append(reservation_unit_pricing_group)
+    reservations = list(
+        Reservation.objects
+        .filter(price_lines__isnull=True)
+        .select_related("reservation_unit", "price_option")
+        .order_by("pk")
+    )
+    reservation_unit_pks = {reservation.reservation_unit_id for reservation in reservations}
+    pricing_data = load_pricing_data(reservation_unit_pks=reservation_unit_pks)
 
-    components_by_pricing_group: dict[int, list[PriceComponent]] = defaultdict(list)
-    price_options_by_pricing_group: dict[int, PriceOption] = {}
-    for component in PriceComponent.objects.select_related("price_option", "tax_level", "sales_item").order_by(
-        "valid_from"
-    ):
-        components_by_pricing_group[component.pricing_group_id].append(component)
-
+    default_options: dict[int, PriceOption] = {}
+    for component in PriceComponent.objects.filter(price_option__isnull=False).select_related("price_option"):
         option = component.price_option
-        if option is None:
-            continue
-
-        current_option = price_options_by_pricing_group.get(component.pricing_group_id)
+        current_option = default_options.get(component.pricing_group_id)
         if current_option is None or option.name < current_option.name:
-            price_options_by_pricing_group[component.pricing_group_id] = option
-
-    reservations = Reservation.objects.filter(reservation_unit__in=list(reservation_unit_pricing_groups))
-
-    today = local_date()
-    tax_percentages: dict[int, Decimal] = {}
+            default_options[component.pricing_group_id] = option
 
     price_lines: list[ReservationPriceLine] = []
-    priced_reservations: list[Reservation] = []
 
     for reservation in reservations:
-        if reservation.begins_at >= reservation.ends_at:
-            continue
+        price_option = reservation.price_option
+        if price_option is None:
+            begin_date = reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+            pricing_group_row = pricing_data.pricing_group_row(
+                reservation_unit_pk=reservation.reservation_unit_id,
+                on_date=begin_date,
+            )
+            price_option = default_options.get(pricing_group_row.pricing_group_id)
 
-        begin_date = reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
-        pricing_group_id = next(
-            (
-                reservation_unit_pricing_group.pricing_group_id
-                for reservation_unit_pricing_group in reservation_unit_pricing_groups[reservation.reservation_unit_id]
-                if reservation_unit_pricing_group.begins <= begin_date
-            ),
-            None,
+        reservation_price_lines = build_price_lines_with_data(
+            pricing_data=pricing_data,
+            reservation_unit=reservation.reservation_unit,
+            price_option=price_option,
+            begin=reservation.begins_at,
+            end=reservation.ends_at,
         )
-        if pricing_group_id is None:
-            continue
 
-        price_option = price_options_by_pricing_group.get(pricing_group_id)
-        component = next(
-            (
-                component
-                for component in components_by_pricing_group[pricing_group_id]
-                if component.valid_from <= begin_date
-                and (component.valid_until is None or component.valid_until > begin_date)
-                and (component.price_option_id is None or component.price_option == price_option)
-            ),
-            None,
-        )
-        if component is None:
-            continue
+        is_free = reservation.type in ReservationTypeChoice.types_that_staff_can_create
+        for line in reservation_price_lines.lines:
+            line.reservation = reservation
+            if is_free:
+                line.override_amount = Decimal(0)
+            price_lines.append(line)
 
-        price_unit = PriceUnit(component.price_unit)
-        duration_seconds = (reservation.ends_at - reservation.begins_at).total_seconds()
-        duration_minutes = math.ceil(duration_seconds / 60 / 15) * 15
+        first_line = reservation_price_lines.lines[0]
+        reservation.non_subsidised_price = reservation_price_lines.calculation.total
+        reservation.price = Decimal(0) if is_free else reservation_price_lines.calculation.total
+        reservation.unit_price = first_line.unit_amount
+        reservation.tax_percentage_value = first_line.tax_percentage
 
-        if price_unit == PriceUnit.FIXED:
-            quantity = Decimal(1)
-        elif price_unit in {PriceUnit.PER_HALF_DAY, PriceUnit.PER_DAY, PriceUnit.PER_WEEK}:
-            quantity = Decimal(math.ceil(duration_minutes / price_unit.in_minutes))
-        else:
-            quantity = Decimal(duration_minutes) / price_unit.in_minutes
-
-        quantity = round_decimal(quantity, 4)
-        amount = round_decimal(component.amount * quantity, 2)
-
-        line_option = component.price_option
-
-        tax_level = component.tax_level
-        if tax_level.pk not in tax_percentages:
-            tax_percentages[tax_level.pk] = tax_level.actions.get_percentage(on_date=today)
-
-        line = ReservationPriceLine(
-            reservation=reservation,
-            price_component=component,
-            description_fi=line_option.name_fi if line_option is not None else "",
-            description_en=line_option.name_en if line_option is not None else "",
-            description_sv=line_option.name_sv if line_option is not None else "",
-            quantity=quantity,
-            price_unit=component.price_unit,
-            unit_amount=component.amount,
-            amount_before_adjustment=amount,
-            adjustment_percentage=Decimal(0),
-            amount=amount,
-            override_amount=None,
-            sales_item=component.sales_item,
-            tax_level=tax_level,
-            tax_percentage=tax_percentages[tax_level.pk],
-            vat_code="",
-            payment_product=None,
-        )
-        price_lines.append(line)
-
-        reservation.price = amount
-        reservation.non_subsidised_price = amount
-        priced_reservations.append(reservation)
-
-    ReservationPriceLine.objects.filter(reservation__in=reservations).delete()
-    ReservationPriceLine.objects.bulk_create(price_lines)
-    Reservation.objects.bulk_update(priced_reservations, fields=["price", "non_subsidised_price"], batch_size=1000)
+    ReservationPriceLine.objects.bulk_create(price_lines, batch_size=1000)
+    Reservation.objects.bulk_update(
+        reservations,
+        fields=["price", "non_subsidised_price", "unit_price", "tax_percentage_value"],
+        batch_size=1000,
+    )
 
 
 # Internals
 
 
-def _create_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem) -> list[ReservationUnit]:
+def _move_to_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem) -> None:
     """
     Make a shared pricing group with two price options and a price change in the future,
-    and move two paid reservation units of the first unit group to it.
+    and move two paid reservation units of the first unit group from their own pricing groups to it.
     """
     unit_group = UnitGroup.objects.order_by("pk").first()
     if unit_group is None:
-        return []
+        return
 
     reservation_units = list(
         ReservationUnit.objects
-        .filter(unit__unit_groups=unit_group, pricings__highest_price__gt=0)
+        .filter(
+            unit__unit_groups=unit_group,
+            reservation_unit_pricing_groups__pricing_group__components__amount__gt=0,
+        )
         .distinct()
         .order_by("pk")[:2]
     )
     if not reservation_units:
-        return []
+        return
 
     for reservation_unit in reservation_units:
         reservation_unit.payment_type = PaymentType.ONLINE
     ReservationUnit.objects.bulk_update(reservation_units, fields=["payment_type"])
 
-    today = local_date()
-    begins = today - datetime.timedelta(days=365)
-    price_change = today + datetime.timedelta(days=60)
+    own_rows = ReservationUnitPricingGroup.objects.filter(reservation_unit__in=reservation_units)
+    own_pricing_group_pks = list(own_rows.values_list("pricing_group", flat=True))
+
+    # The shared group begins when the own groups began, so that it covers the existing reservations.
+    begins = min(own_rows.values_list("begins", flat=True))
+    price_change = local_date() + datetime.timedelta(days=60)
+
+    own_rows.delete()
+    PricingGroup.objects.filter(pk__in=own_pricing_group_pks).delete()
 
     adults = PriceOption.objects.create(
         name="Aikuiset",
@@ -363,5 +315,3 @@ def _create_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem) 
         )
         for reservation_unit in reservation_units
     ])
-
-    return reservation_units

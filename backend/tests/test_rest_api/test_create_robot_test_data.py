@@ -24,12 +24,14 @@ from tilavarauspalvelu.models import (
     OriginHaukiResource,
     PaymentAccounting,
     PaymentProduct,
+    PriceComponent,
+    PricingGroup,
     Reservation,
     ReservationSeries,
     ReservationUnit,
     ReservationUnitAccessType,
     ReservationUnitCancellationRule,
-    ReservationUnitPricing,
+    ReservationUnitPricingGroup,
     Space,
     TaxLevel,
     TaxLevelRate,
@@ -185,7 +187,9 @@ def test_create_robot_test_data():
     assert UnitGroup.objects.count() == 1
     assert ReservationUnit.objects.count() == 23
     assert Space.objects.count() == 23
-    assert ReservationUnitPricing.objects.count() == 23
+    assert ReservationUnitPricingGroup.objects.count() == 23
+    assert PricingGroup.objects.count() == 23
+    assert PriceComponent.objects.count() == 23
     assert ReservationUnitAccessType.objects.count() == 23
     assert User.objects.count() == 39
     assert ApplicationRound.objects.count() == 1
@@ -287,7 +291,9 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
     assert Unit.objects.count() == 1 + 1  # +1 unit for 'other_reservation'
     assert ReservationUnit.objects.count() == 23 + 1  # +1 reservation unit for 'other_reservation'
     assert Space.objects.count() == 23
-    assert ReservationUnitPricing.objects.count() == 23
+    assert ReservationUnitPricingGroup.objects.count() == 23
+    assert PricingGroup.objects.count() == 23
+    assert PriceComponent.objects.count() == 23
     assert ReservationUnitAccessType.objects.count() == 23
     assert User.objects.count() == 39 + 1  # +1 user for other entities
     assert ApplicationRound.objects.count() == 1 + 1  # +1 application round for 'other_application'
@@ -365,7 +371,9 @@ def test_remove_existing_data():
     assert Unit.objects.count() == 0
     assert ReservationUnit.objects.count() == 0
     assert Space.objects.count() == 0
-    assert ReservationUnitPricing.objects.count() == 0
+    assert ReservationUnitPricingGroup.objects.count() == 0
+    assert PricingGroup.objects.count() == 0
+    assert PriceComponent.objects.count() == 0
     assert ReservationUnitAccessType.objects.count() == 0
     assert ApplicationRound.objects.count() == 0
     assert Reservation.objects.count() == 0
