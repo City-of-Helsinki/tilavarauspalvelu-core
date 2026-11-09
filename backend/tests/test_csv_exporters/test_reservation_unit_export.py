@@ -47,9 +47,9 @@ def test_reservation_unit_export__multiple():
         pricing_terms__name="Pricing terms",
         cancellation_rule__name="Cancellation rule",
         reservation_unit_type__name="Normal",
-        pricings__highest_price=Decimal(20),
-        pricings__payment_type=PaymentType.ONLINE,
-        pricings__material_price_description="Material price description",
+        own_price__amount=Decimal(20),
+        payment_type=PaymentType.ONLINE,
+        own_price__material_price_description="Material price description",
         access_types__access_type=AccessType.UNRESTRICTED,
     )
 
@@ -187,7 +187,7 @@ def test_reservation_unit_export__multiple():
                 column_value_mapping={"Cancellation rule": ""},
             ),
             "Missing Pricing": MissingParams(
-                missing=Missing(deleted=["pricings__highest_price"]),
+                missing=Missing(deleted=["own_price__amount"]),
                 column_value_mapping={
                     "Price unit": "",
                     "Lowest price": "",
@@ -229,7 +229,7 @@ def test_reservation_unit_export__missing_relations(column_value_mapping, missin
         "service_specific_terms__name": "Service specific terms",
         "pricing_terms__name": "Pricing terms",
         "cancellation_rule__name": "Cancellation rule",
-        "pricings__highest_price": Decimal(20),
+        "own_price__amount": Decimal(20),
         "access_types__access_type": AccessType.UNRESTRICTED,
     }
     missing.remove_from_data(data)
@@ -270,7 +270,7 @@ def test_reservation_unit_export__subset():
 
 def test_reservation_unit_export__query_count_does_not_grow_with_reservation_units():
     ReservationUnitFactory.create(
-        pricings__highest_price=Decimal(20),
+        own_price__amount=Decimal(20),
         access_types__access_type=AccessType.UNRESTRICTED,
     )
 
@@ -279,7 +279,7 @@ def test_reservation_unit_export__query_count_does_not_grow_with_reservation_uni
 
     ReservationUnitFactory.create_batch(
         3,
-        pricings__highest_price=Decimal(20),
+        own_price__amount=Decimal(20),
         access_types__access_type=AccessType.UNRESTRICTED,
     )
 
