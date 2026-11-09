@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django import forms
 from django.contrib import admin
@@ -11,6 +11,11 @@ from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationSeries
 from utils.external_service.errors import ExternalServiceError
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ReservationSeriesAdminForm(forms.ModelForm):
@@ -108,9 +113,11 @@ class ReservationInline(admin.TabularInline):
         "ends_at",
         "state",
         "type",
-        "price",
-        "price_net",
-        "unit_price",
+        "total_price",
+        "total_price_net",
         "access_type",
     ]
     readonly_fields = fields
+
+    def get_queryset(self, request: WSGIRequest) -> QuerySet[Reservation]:
+        return super().get_queryset(request).prefetch_related("price_lines")
