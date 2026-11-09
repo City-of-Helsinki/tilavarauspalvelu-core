@@ -343,6 +343,47 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     assert form.is_valid(), form.errors
 
 
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_after_change_to_free():
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
+    free_pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=free_pricing_group,
+        begins=local_date() - datetime.timedelta(days=5),
+    )
+    PriceComponentFactory.create(
+        pricing_group=free_pricing_group,
+        valid_from=local_date() - datetime.timedelta(days=5),
+        amount=Decimal(0),
+    )
+
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
+
+    assert form.is_valid(), form.errors
+
+
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid_in_future():
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(0))
+    paid_pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=paid_pricing_group,
+        begins=local_date() + datetime.timedelta(days=5),
+    )
+    PriceComponentFactory.create(
+        pricing_group=paid_pricing_group,
+        valid_from=local_date() + datetime.timedelta(days=5),
+        amount=Decimal(10),
+    )
+
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
+
+    assert not form.is_valid()
+    assert form.errors["payment_terms"] == [
+        "Payment terms are required for direct booking of paid reservation units",
+    ]
+
+
 # ── Pricing groups ──
 
 
