@@ -33,7 +33,7 @@ from tilavarauspalvelu.models import (
     ReservationUnitOption,
 )
 from tilavarauspalvelu.services.pricing.application_round_prices import load_application_round_pricing
-from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data, set_reservation_totals
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.translation import translate_for_user
 from tilavarauspalvelu.typing import ReservationDetails
@@ -187,8 +187,7 @@ class ApplicationRoundActions:
                             line.reservation = reservation
                             price_lines.append(line)
 
-                        reservation.price = reservation_price_lines.calculation.total
-                        reservation.non_subsidised_price = reservation_price_lines.calculation.total
+                        set_reservation_totals(reservation=reservation, price_lines=reservation_price_lines.lines)
 
                 reservations = Reservation.objects.bulk_create(reservations)
                 reservation_pks.update(reservation.pk for reservation in reservations)

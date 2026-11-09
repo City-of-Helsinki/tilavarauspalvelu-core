@@ -29,7 +29,7 @@ from tilavarauspalvelu.models import (
     User,
 )
 from tilavarauspalvelu.services.pricing.price_calculation import load_pricing_data
-from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data, set_reservation_totals
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
     get_date_range,
@@ -246,13 +246,9 @@ def _create_normal_reservations(
                     line.reservation = reservation
                     price_lines.append(line)
 
-                first_line = reservation_price_lines.lines[0]
-                reservation.price = reservation_price_lines.calculation.total
-                reservation.non_subsidised_price = reservation_price_lines.calculation.total
-                reservation.unit_price = first_line.unit_amount
-                reservation.tax_percentage_value = first_line.tax_percentage
+                set_reservation_totals(reservation=reservation, price_lines=reservation_price_lines.lines)
 
-                if reservation.price > 0:
+                if reservation.total_price > 0:
                     payment_type = PaymentType(reservation_unit.payment_type)
                     payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
                     payment_orders.append(payment_order)
@@ -274,9 +270,9 @@ def _build_payment_order(
 ) -> PaymentOrder:
     payment_order_builder = PaymentOrderBuilder().set(
         language=reservation.user.get_preferred_language(),
-        price_net=reservation.price_net,
-        price_vat=reservation.price_vat_amount,
-        price_total=reservation.price,
+        price_net=reservation.total_price_net,
+        price_vat=reservation.total_vat_amount,
+        price_total=reservation.total_price,
         reservation=reservation,
         reservation_user_uuid=reservation.user.uuid,
         payment_type=payment_type,

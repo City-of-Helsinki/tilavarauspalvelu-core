@@ -19,7 +19,7 @@ from tilavarauspalvelu.models import (
     UnitGroup,
 )
 from tilavarauspalvelu.services.pricing.price_calculation import load_pricing_data
-from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data, set_reservation_totals
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
 from .utils import with_logs
@@ -187,16 +187,12 @@ def _create_reservation_price_lines() -> None:
                 line.override_amount = Decimal(0)
             price_lines.append(line)
 
-        first_line = reservation_price_lines.lines[0]
-        reservation.non_subsidised_price = reservation_price_lines.calculation.total
-        reservation.price = Decimal(0) if is_free else reservation_price_lines.calculation.total
-        reservation.unit_price = first_line.unit_amount
-        reservation.tax_percentage_value = first_line.tax_percentage
+        set_reservation_totals(reservation=reservation, price_lines=reservation_price_lines.lines)
 
     ReservationPriceLine.objects.bulk_create(price_lines, batch_size=1000)
     Reservation.objects.bulk_update(
         reservations,
-        fields=["price", "non_subsidised_price", "unit_price", "tax_percentage_value"],
+        fields=["total_price", "total_price_without_overrides", "total_price_net"],
         batch_size=1000,
     )
 

@@ -272,15 +272,15 @@ def test_set_reservation_price_lines__saves_lines_and_price():
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2026, 2, 1, 10),
         ends_at=local_datetime(2026, 2, 1, 12),
-        price=Decimal(0),
-        non_subsidised_price=Decimal(0),
+        total_price=Decimal(0),
+        total_price_without_overrides=Decimal(0),
     )
 
     set_reservation_price_lines(reservation=reservation, price_option=None)
 
     reservation = Reservation.objects.get(pk=reservation.pk)
-    assert reservation.price == Decimal("20.00")
-    assert reservation.non_subsidised_price == Decimal("20.00")
+    assert reservation.total_price == Decimal("20.00")
+    assert reservation.total_price_without_overrides == Decimal("20.00")
 
     lines = list(reservation.price_lines.all())
     assert len(lines) == 1
@@ -319,8 +319,8 @@ def test_set_reservation_price_lines__replaces_old_lines():
     assert ReservationPriceLine.objects.filter(pk=old_line.pk).exists() is False
 
     reservation = Reservation.objects.get(pk=reservation.pk)
-    assert reservation.price == Decimal("10.00")
-    assert reservation.non_subsidised_price == Decimal("10.00")
+    assert reservation.total_price == Decimal("10.00")
+    assert reservation.total_price_without_overrides == Decimal("10.00")
 
     lines = list(reservation.price_lines.all())
     assert len(lines) == 1
@@ -333,8 +333,8 @@ def test_set_reservation_price_lines__nothing_changes_on_calculation_error():
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2026, 2, 1, 10),
         ends_at=local_datetime(2026, 2, 1, 11),
-        price=Decimal(30),
-        non_subsidised_price=Decimal(30),
+        total_price=Decimal(30),
+        total_price_without_overrides=Decimal(30),
     )
     old_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(30))
 
@@ -344,8 +344,8 @@ def test_set_reservation_price_lines__nothing_changes_on_calculation_error():
     assert ReservationPriceLine.objects.filter(pk=old_line.pk).exists() is True
 
     reservation = Reservation.objects.get(pk=reservation.pk)
-    assert reservation.price == Decimal(30)
-    assert reservation.non_subsidised_price == Decimal(30)
+    assert reservation.total_price == Decimal(30)
+    assert reservation.total_price_without_overrides == Decimal(30)
 
 
 # ── Set price line taxes ──

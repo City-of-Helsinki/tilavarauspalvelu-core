@@ -14,6 +14,7 @@ from .price_calculation import calculate_price_with_data, load_pricing_data
 
 if TYPE_CHECKING:
     import datetime
+    from collections.abc import Iterable
 
     from tilavarauspalvelu.models import PriceOption, Reservation, ReservationUnit
 
@@ -26,7 +27,10 @@ __all__ = [
     "save_reservation_price_lines",
     "set_price_line_taxes",
     "set_reservation_price_lines",
+    "set_reservation_totals",
 ]
+
+TOTAL_FIELDS = ["total_price", "total_price_without_overrides", "total_price_net"]
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -114,7 +118,7 @@ def build_price_lines_with_data(
 
 def set_reservation_price_lines(*, reservation: Reservation, price_option: PriceOption | None) -> None:
     """
-    Replace the price lines of the reservation, and set its price from them.
+    Replace the price lines of the reservation, and set its totals from them.
 
     :raises PriceCalculationError: If the price cannot be calculated. Nothing is changed then.
     """
@@ -128,38 +132,40 @@ def set_reservation_price_lines(*, reservation: Reservation, price_option: Price
 
 
 def save_reservation_price_lines(*, reservation: Reservation, price_lines: PriceLines) -> None:
-    """
-    Replace the price lines of the reservation with the given unsaved lines.
-    Set the price, the price before subsidy, the unit price and the tax percentage of the reservation from them.
-    """
+    """Replace the price lines of the reservation with the given unsaved lines, and set its totals from them."""
     for line in price_lines.lines:
         line.reservation = reservation
 
-    price = Decimal(0)
-    non_subsidised_price = Decimal(0)
-    for line in price_lines.lines:
-        price += line.amount if line.override_amount is None else line.override_amount
-        non_subsidised_price += line.amount
-
-    # A reservation has one unit price and tax percentage. They come from the first line until the
-    # webshop order has one row for each line (TILA-4594).
-    first_line = price_lines.lines[0]
-
-    reservation.price = price
-    reservation.non_subsidised_price = non_subsidised_price
-    reservation.unit_price = first_line.unit_amount
-    reservation.tax_percentage_value = first_line.tax_percentage
+    set_reservation_totals(reservation=reservation, price_lines=price_lines.lines)
 
     with transaction.atomic():
         reservation.price_lines.all().delete()
         ReservationPriceLine.objects.bulk_create(price_lines.lines)
-        reservation.save(update_fields=["price", "non_subsidised_price", "unit_price", "tax_percentage_value"])
+        reservation.save(update_fields=TOTAL_FIELDS)
+
+
+def set_reservation_totals(*, reservation: Reservation, price_lines: Iterable[ReservationPriceLine]) -> None:
+    """Set the totals of the reservation from the given price lines. Does not save the reservation."""
+    total_price = Decimal(0)
+    total_price_without_overrides = Decimal(0)
+    total_price_net = Decimal(0)
+
+    for line in price_lines:
+        final_amount = line.amount if line.override_amount is None else line.override_amount
+        total_price += final_amount
+        total_price_without_overrides += line.amount
+        total_price_net += round_decimal(final_amount / (1 + line.tax_percentage / Decimal(100)), 2)
+
+    reservation.total_price = total_price
+    reservation.total_price_without_overrides = total_price_without_overrides
+    reservation.total_price_net = total_price_net
 
 
 def set_price_line_taxes(*, reservation: Reservation, on_date: datetime.date) -> None:
     """
-    Set the tax percentage of each price line of the reservation from the rate of its tax level on the given date.
-    The amounts do not change. A reservation without price lines does not change.
+    Set the tax percentage of each price line of the reservation from the rate of its tax level on the given date,
+    and the net total of the reservation from them. The gross amounts do not change.
+    A reservation without price lines does not change.
 
     :raises TaxLevelHasNoRateError: If a tax level has no rate on the given date.
     """
@@ -170,4 +176,8 @@ def set_price_line_taxes(*, reservation: Reservation, on_date: datetime.date) ->
     for line in price_lines:
         line.tax_percentage = line.tax_level.actions.get_percentage(on_date=on_date)
 
-    ReservationPriceLine.objects.bulk_update(price_lines, fields=["tax_percentage"])
+    set_reservation_totals(reservation=reservation, price_lines=price_lines)
+
+    with transaction.atomic():
+        ReservationPriceLine.objects.bulk_update(price_lines, fields=["tax_percentage"])
+        reservation.save(update_fields=TOTAL_FIELDS)
