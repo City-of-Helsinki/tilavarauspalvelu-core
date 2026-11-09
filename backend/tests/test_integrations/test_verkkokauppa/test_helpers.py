@@ -79,7 +79,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
         user__preferred_language="en",
         reservee_type=ReserveeType.INDIVIDUAL,
     )
-    order_params = get_verkkokauppa_order_params(reservation_en)
+    order_params = get_verkkokauppa_order_params(reservation_en, vat_percentage=Decimal(24))
     assert order_params.items[0].product_name == "Name, NAME"
 
     reservation_sv = ReservationFactory.create(
@@ -87,7 +87,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
         user__preferred_language="sv",
         reservee_type=ReserveeType.INDIVIDUAL,
     )
-    order_params = get_verkkokauppa_order_params(reservation_sv)
+    order_params = get_verkkokauppa_order_params(reservation_sv, vat_percentage=Decimal(24))
     assert order_params.items[0].product_name == "Namn, NAMN"
 
 
@@ -121,8 +121,8 @@ def test_create_mock_verkkokauppa_order__returns_draft_order_with_mock_urls():
         user__first_name="John",
         user__last_name="Doe",
         user__email="john.doe@example.com",
-        price=Decimal("124.00"),
-        tax_percentage_value=Decimal("24.00"),
+        price_lines__amount=Decimal("124.00"),
+        price_lines__tax_percentage=Decimal("24.0"),
     )
 
     order = create_mock_verkkokauppa_order(reservation)

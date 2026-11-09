@@ -66,12 +66,12 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
     def validate_reservation_not_paid(self) -> None:
-        if self.reservation.price > 0:
+        if self.reservation.total_price > 0:
             msg = "Paid reservations cannot be modified"
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
     def validate_reservation_is_paid(self) -> None:
-        if self.reservation.price <= 0:
+        if self.reservation.total_price <= 0:
             msg = "Only paid reservations can be refunded."
             raise ValidationError(msg, code=error_codes.ORDER_REFUND_NOT_ALLOWED)
 
@@ -120,7 +120,7 @@ class ReservationValidator:
             msg = "Reservation cannot be cancelled based on its type"
             raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
 
-        if self.reservation.type == ReservationTypeChoice.SEASONAL.value and self.reservation.price > 0:
+        if self.reservation.type == ReservationTypeChoice.SEASONAL.value and self.reservation.total_price > 0:
             msg = "Paid seasonal reservations cannot be cancelled."
             raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
 
