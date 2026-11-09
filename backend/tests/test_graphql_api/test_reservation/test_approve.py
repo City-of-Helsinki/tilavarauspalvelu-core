@@ -455,6 +455,8 @@ def test_reservation__approve__pindora_api__call_succeeds(graphql):
     reservation = ReservationFactory.create(
         reservation_unit=reservation_unit,
         state=ReservationStateChoice.REQUIRES_HANDLING,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
         access_code_generated_at=local_datetime(),
@@ -484,6 +486,8 @@ def test_reservation__approve__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create(
         reservation_unit=reservation_unit,
         state=ReservationStateChoice.REQUIRES_HANDLING,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
         access_code_generated_at=local_datetime(),
