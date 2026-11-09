@@ -33,7 +33,6 @@ from .reservation_unit_access_type import ReservationUnitAccessTypeFactory
 from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleFactory
 from .reservation_unit_image import ReservationUnitImageFactory
 from .reservation_unit_option import ReservationUnitOptionFactory
-from .reservation_unit_pricing import ReservationUnitPricingFactory
 from .reservation_unit_pricing_group import ReservationUnitPricingGroupFactory
 from .reservation_unit_type import ReservationUnitTypeFactory
 from .resource import ResourceFactory
@@ -90,7 +89,6 @@ __all__ = [
     "ReservationUnitFactory",
     "ReservationUnitImageFactory",
     "ReservationUnitOptionFactory",
-    "ReservationUnitPricingFactory",
     "ReservationUnitPricingGroupFactory",
     "ReservationUnitTypeFactory",
     "ResourceFactory",
