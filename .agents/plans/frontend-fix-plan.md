@@ -11,11 +11,13 @@ These branches are in progress. Merge them first. This plan does not touch their
 
 Paths below are relative to `frontend/`. Line numbers are from the review date and can drift.
 
+Status checked on 2026-11-09 against `fetch-retry-fast-errors` (8bc44398b). Items fixed there are marked done.
+
 Effort: S is less than half a day. M is one or two days. L is more.
 
 ## Order
 
-1. PR 1. Run `ui` tests in CI and fix tooling. Done on branch `frontend-tooling-fixes`.
+1. PR 1. Run `ui` tests in CI and fix tooling. Done.
 2. PR 2. Customer payment flow.
 3. PR 3. Staff reservation handling.
 4. PR 4. Personal data in Sentry.
@@ -29,7 +31,7 @@ Effort: S is less than half a day. M is one or two days. L is more.
 
 Do this first. It protects PR 5.
 
-Status: done on branch `frontend-tooling-fixes`, not pushed yet. Review it, then push and open the PR.
+Status: done. The changes are in `fetch-retry-fast-errors`. Two items about local state are still open.
 
 The branch starts from `remove-turborepo`, which replaces turbo with `pnpm -r`. These commits are cherry-picked on top:
 
@@ -94,7 +96,7 @@ The branch starts from `remove-turborepo`, which replaces turbo with `pnpm -r`. 
 
 Do this after the Sentry branch and `remove-turborepo` merge. Both change `frontend/Dockerfile`.
 
-- [ ] **Date-only API values are one day off outside Helsinki.** `packages/ui/src/modules/date-utils/conversion.ts:27-29`. `parseApiDate` makes the instant of Helsinki midnight (commit `489f97260`, 2026-03-12, released since `v1.59`). For example, "2023-12-25" becomes `2023-12-24T22:00Z`. The consumers then use date-fns in the local time zone of the process: `formatDate`, `formatApiDate`, `setTimeOnDate` and `getDate`.
+- [ ] **Date-only API values are one day off outside Helsinki.** The `ENV TZ` fix (f8cb52be2) fixes the server side. Browsers outside Finland still get the wrong date, and `parseApiDate` is unchanged. `packages/ui/src/modules/date-utils/conversion.ts:27-29`. `parseApiDate` makes the instant of Helsinki midnight (commit `489f97260`, 2026-03-12, released since `v1.59`). For example, "2023-12-25" becomes `2023-12-24T22:00Z`. The consumers then use date-fns in the local time zone of the process: `formatDate`, `formatApiDate`, `setTimeOnDate` and `getDate`.
   - Result, checked in Node with date-fns-tz and date-fns:
 
     | Process `TZ` | `formatDate(parseApiDate("2023-12-25"))` | `fromApiDateTime("2023-12-25", "15:30")` |
@@ -104,7 +106,7 @@ Do this after the Sentry branch and `remove-turborepo` merge. Both change `front
     | not set, `/etc/localtime` is `Etc/UTC` | 24.12.2023 | 2023-12-24 15:30 UTC |
 
   - The staff series edit page builds mutation times this way. See `apps/staff/src/pages/reservations/[id]/series/index.tsx:71-76` and `apps/staff/src/modules/reservation.ts:221`. This code runs in the browser, so it depends on the time zone of the browser, not of the pods.
-- [ ] **The frontend pods run in UTC. Confirmed for dev and test.** On 2026-10-13, the dev and test clusters had no `TZ` set. Staging and production are not checked, but they are assumed to be the same. Check them with `oc exec <customer-pod> -- printenv TZ` and `oc exec <customer-pod> -- node -e "console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)"`.
+- [x] **The frontend pods run in UTC. Confirmed for dev and test.** Done in f8cb52be2. `frontend/Dockerfile` sets `ENV TZ=Europe/Helsinki` in the runner stage. Still check that staging, production and the pipeline templates do not override `TZ`. On 2026-10-13, the dev and test clusters had no `TZ` set. Staging and production are not checked, but they are assumed to be the same. Check them with `oc exec <customer-pod> -- printenv TZ` and `oc exec <customer-pod> -- node -e "console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)"`.
   - Cause: neither `Dockerfile` nor `Dockerfile.final` sets `TZ`. The runner stage is `node:24-slim` (Debian), where `/etc/localtime` points to `Etc/UTC`. No file in this repo sets `TZ` for the frontend at runtime. The only settings are `TZ=Europe/Helsinki` in the three `test` scripts. That is why the tests pass. The release pipelines (`apps/*/azure-pipelines-release.yml`) extend templates in the separate Azure DevOps repo `tilavarauspalvelu-pipelines`, so the pod env vars are set outside this repo.
   - The backend is not affected. Django sets the process `TZ` from `TIME_ZONE = "Europe/Helsinki"` (`backend/config/settings.py:329`). Node has no such setting.
   - Effect 1. The server HTML shows date-only values one day early. This affects 19 SSR pages that do date work, for example application round, pricing and reservation dates. In the pages router, all components on those pages render in Node first. React 19 renders the page again in the browser when text does not match. For users in Finland, the wrong date then shows only as a short flash, and each page load logs a hydration error. Users without JavaScript and crawlers keep the wrong date. React does not fix attributes that do not match, so a date in an attribute stays wrong. This was not checked.
@@ -125,9 +127,9 @@ Do this after the Sentry branch and `remove-turborepo` merge. Both change `front
   - `htmlFor={props.name}` points at no element.
   - The input has no `aria-invalid` or `aria-describedby`.
   - `pattern="[0-9]:*"` rejects "12:30".
-- [ ] **`ApplicationTimeSelector.tsx:112,178`.** It has `role="option"` with no listbox, inside `role="table"` with no rows. Remove the roles and use `aria-pressed`.
+- [x] **`ApplicationTimeSelector.tsx:112,178`.** Done in cfbf3eee1. The component is removed. The new `WeeklyPatternCalendar` uses `role="grid"` with rows and grid cells. It has `role="option"` with no listbox, inside `role="table"` with no rows. Remove the roles and use `aria-pressed`.
 - [ ] **`reservation-form/RadioButtonWithImage.tsx:76`.** It does not expose the checked state.
-- [ ] **`components/TimeZoneNotification.tsx:7`.** It reads `Intl` time zone during render, so the hydration does not match. Wrap it in `ClientOnly`.
+- [x] **`components/TimeZoneNotification.tsx:7`.** Done in cec606198. It reads `Intl` time zone during render, so the hydration does not match. Wrap it in `ClientOnly`.
 
 ## PR 7. Customer login flow (M)
 
@@ -151,34 +153,34 @@ Do this after the Sentry branch and `remove-turborepo` merge. Both change `front
   - `EditTimeModal.tsx:301` should use `errors:unexpectedError`.
   - `ReservationSeriesForm.tsx:186,191` translates twice.
 - [ ] **`ui`:**
-  - `helpers.ts:418`. `charCount().tooLong` is always false, because `length` is `window.length`.
+  - [x] `helpers.ts:418`. `charCount().tooLong` is always false, because `length` is `window.length`. Done in 9184cfa62.
   - `number-formatters.ts:3-8`. The currency format shows "12,5 €". Use 0 or 2 decimals.
   - `hooks/useToastIfQueryParam.ts:63`. The toast can show twice when callers pass inline values.
 - [ ] **Dead code:**
   - Staff `lib/my-units/[id]/recurring/utils.ts` `isOverlapping` is used only by its own test.
-  - Unused `ui` exports: `formatDurationFromDates`, `dateForInput`, `parseCombinedUIDateTime`, `parseDateTimeStruct`, `getApplicationRoundStatus`, `AnchorLink`, `OPEN_HOURS_STATES`, `borderBoxSizing`, `CSP_HEADER`, `CreateReservationFormType`, and unused `transform*Unsafe` helpers.
+  - Unused `ui` exports: `formatDurationFromDates`, `dateForInput`, `parseCombinedUIDateTime`, `parseDateTimeStruct`, `getApplicationRoundStatus`, `AnchorLink`, `borderBoxSizing`, `CreateReservationFormType`, and unused `transform*Unsafe` helpers. `getApplicationRoundStatus` and `AnchorLink` are used in their own file, so only remove the `export`. `OPEN_HOURS_STATES` was removed in cfbf3eee1. `CSP_HEADER` is not dead. Both `next.config.ts` files import it.
 - [ ] **Wrong comments:**
   - `applicationRoundAllocation.ts:220-224`.
   - `allocation/hooks.ts:204`. `force` does not skip the overlap checks.
 
 ## After the Apollo merge
 
-- [ ] **The unit calendar does not refetch after a staff reservation is created.** `apps/staff/src/pages/my-units/[id]/index.tsx:104,163` and `lib/my-units/[id]/UnitCalendar.tsx:226,554`. `onComplete={refetch}` is declared but never called.
-- [ ] **The staff reservation page refetches a lazy query that never ran.** `pages/reservations/[id]/index.tsx:347`. Check that the new data replaces the SSR prop.
+- [x] **The unit calendar does not refetch after a staff reservation is created.** Done in b243e319d. `apps/staff/src/pages/my-units/[id]/index.tsx:104,163` and `lib/my-units/[id]/UnitCalendar.tsx:226,554`. `onComplete={refetch}` is declared but never called.
+- [x] **The staff reservation page refetches a lazy query that never ran.** Done in 244013961. `pages/reservations/[id]/index.tsx:347`. Check that the new data replaces the SSR prop.
 
 ## Questionable, needs a separate check
 
 - `apps/staff/src/components/VisibleIfPermission.tsx:20` lets the owner see Approve and Deny without manage permission. When both users are null, `undefined === undefined` is true.
 - Customer SSR pages do not catch GraphQL errors. Examples are `callbacks/webstore/success.tsx:36` and `reservations/[id]/index.tsx:428`. An expired session after payment gives a 500.
 - There are two buffer collision versions. Customer `reservable.ts` `hasCollisions` and staff `useCheckCollisions` handle Blocked reservations differently. Check against the backend and keep one version in `ui`.
-- `useCheckCollisions` queries only the start date. Buffers that cross midnight are not checked.
+- `useCheckCollisions` queries only the start date. Buffers that cross midnight are not checked. Partly fixed. It now queries from the start date to the end date, but the range does not include the buffers.
 - The backend caps the staff start interval at 30 minutes. The schema does not.
 - Series schemas:
   - A one-day series is not possible.
   - There is no three-year limit.
   - The latest end time is 23:45 (`packages/ui/src/schemas/schemaCommon.ts:355`).
 - Series reschedule. `reservationsCount` (`series/index.tsx:287`) can subtract removed reservations that are no longer in the list.
-- Staff "isFree" (`pages/reservations/[id]/index.tsx:280-282`) comes from unit pricing, not from `reservation.price`.
+- Done. Staff "isFree" (`pages/reservations/[id]/index.tsx:280-282`) comes from unit pricing, not from `reservation.price`. It now uses `isReservationPriceFree` in `apps/staff/src/modules/reservation.ts`.
 - `ApprovalButtonsRecurring` edit links go to the first deniable reservation, not the current one.
 - `sanitizeConfig` allows `style` on all tags. Staff content can cover the page.
 - `getTimeStringSchema` sets the issue path to `[""]`.
@@ -189,10 +191,10 @@ Do this after the Sentry branch and `remove-turborepo` merge. Both change `front
   - `orderId`, `error_message`, `begin` and `end` are not in the excluded query params (`public/scripts/init-matomo.cjs`).
 - `callbacks/webstore/cancel.tsx` deletes the reservation inside `getServerSideProps`. A prefetch or reload repeats it.
 - `pages/sentry-example-page.tsx` and `pages/api/sentry-example-api.ts` can be reached in production. This can belong to the Sentry branch.
-- Roarr writes GraphQL variables to the browser console when `ENABLE_CONSOLE_LOGGING` is set. Check that it is off in production.
-- `removePi` (`packages/ui/src/modules/apollo/helpers.ts:462`) changes `operation.variables` in place. This is in the Apollo area.
+- Done. Roarr writes GraphQL variables to the browser console when `ENABLE_CONSOLE_LOGGING` is set. Check that it is off in production. The Apollo logs now contain only the error, the operation name and the timing. Only the production setting is left to check, outside the repo.
+- Done in 85cedd8f4. `removePi` (`packages/ui/src/modules/apollo/helpers.ts:462`) changes `operation.variables` in place. It now returns a copy.
 - Receipt link: `${receiptUrl}&lang=` expects `receiptUrl` to already contain a query string.
 - `ButtonLikeLink` has `role="button"` on links that navigate.
 - The customer `pages/reservations/index.tsx:79` shows "not authenticated" while the user loads.
-- The apps have 9 `react-hooks/exhaustive-deps` disables and 9 `set-state-in-effect` disables. A short pass can find more effect bugs.
+- The apps have 9 `react-hooks/exhaustive-deps` disables and 7 `set-state-in-effect` disables (9 on the review date). A short pass can find more effect bugs.
 - Two `eventStyleGetter` files have a TODO to merge them.
