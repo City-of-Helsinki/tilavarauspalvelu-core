@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import uuid
+from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
@@ -18,10 +20,15 @@ from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
 from tests.factories import (
     PaymentAccountingFactory,
     PaymentMerchantFactory,
+    PaymentProductFactory,
     ReservationUnitFactory,
-    ReservationUnitPricingFactory,
+    SalesItemFactory,
+    TaxLevelFactory,
 )
 from tests.helpers import patch_method
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import SalesItem
 
 # Applied to all tests
 pytestmark = [
@@ -29,6 +36,11 @@ pytestmark = [
 ]
 
 product_id = uuid.uuid4()
+
+
+def create_sales_item(*, vat_code: str) -> SalesItem:
+    tax_level = TaxLevelFactory.create(rates__vat_code=vat_code)
+    return SalesItemFactory.create(tax_level=tax_level)
 
 
 def mock_create_product():
@@ -44,8 +56,13 @@ def mock_create_product():
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
 def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save():
-    reservation_unit = ReservationUnitFactory.create(is_draft=False)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
+    sales_item = create_sales_item(vat_code="48")
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=False,
+        own_price__amount=Decimal(10),
+        own_price__tax_level=sales_item.tax_level,
+        own_price__sales_item=sales_item,
+    )
 
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
     reservation_unit.payment_accounting = PaymentAccountingFactory.create()
@@ -59,7 +76,7 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
     VerkkokauppaAPIClient.create_or_update_accounting.assert_called_with(
         product_uuid=reservation_unit.payment_product.id,
         params=CreateOrUpdateAccountingParams(
-            vat_code=reservation_unit.payment_accounting.vat_code,
+            vat_code="48",
             internal_order=reservation_unit.payment_accounting.internal_order,
             project=reservation_unit.payment_accounting.project,
             operation_area=reservation_unit.payment_accounting.operation_area,
@@ -80,8 +97,13 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
 def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_does_not_exist():
-    reservation_unit = ReservationUnitFactory.create(is_draft=False)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
+    sales_item = create_sales_item(vat_code="48")
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=False,
+        own_price__amount=Decimal(10),
+        own_price__tax_level=sales_item.tax_level,
+        own_price__sales_item=sales_item,
+    )
 
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
     reservation_unit.payment_accounting = None
@@ -96,8 +118,7 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_doe
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
 def test_refresh_reservation_unit_accounting__api_not_called_when_product_mapping_is_not_needed():
-    reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
+    reservation_unit = ReservationUnitFactory.create(is_draft=True, own_price__amount=Decimal(10))
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
     reservation_unit.payment_accounting = PaymentAccountingFactory.create()
     reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
@@ -105,6 +126,46 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is None
     assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
+
+
+@patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+def test_refresh_reservation_unit_accounting__api_not_called_when_price_today_has_no_sales_item():
+    reservation_unit = ReservationUnitFactory.create(
+        payment_product=PaymentProductFactory.create(),
+        payment_accounting=PaymentAccountingFactory.create(),
+        own_price__amount=Decimal(10),
+        own_price__sales_item=None,
+    )
+
+    refresh_reservation_unit_accounting_task(reservation_unit.pk)
+
+    assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
+
+
+@patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+@patch_method(SentryLogger.log_message)
+def test_refresh_reservation_unit_accounting__api_not_called_when_tax_rate_has_no_vat_code():
+    sales_item = create_sales_item(vat_code="")
+    reservation_unit = ReservationUnitFactory.create(
+        payment_product=PaymentProductFactory.create(),
+        payment_accounting=PaymentAccountingFactory.create(),
+        own_price__amount=Decimal(10),
+        own_price__tax_level=sales_item.tax_level,
+        own_price__sales_item=sales_item,
+    )
+
+    refresh_reservation_unit_accounting_task(reservation_unit.pk)
+
+    assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
+    SentryLogger.log_message.assert_called_once_with(
+        "Reservation unit accounting not sent, because the tax rate of its sales item has no VAT code",
+        details={
+            "reservation_unit_id": reservation_unit.pk,
+            "sales_item_id": sales_item.pk,
+            "tax_level_id": sales_item.tax_level_id,
+        },
+        level="error",
+    )
 
 
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
@@ -124,8 +185,13 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting, side_effect=CreateOrUpdateAccountingError("test"))
 @patch_method(SentryLogger.log_exception)
 def test_refresh_reservation_unit_accounting__capture_error__api_errors():
-    reservation_unit = ReservationUnitFactory.create(is_draft=False)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
+    sales_item = create_sales_item(vat_code="48")
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=False,
+        own_price__amount=Decimal(10),
+        own_price__tax_level=sales_item.tax_level,
+        own_price__sales_item=sales_item,
+    )
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
     reservation_unit.payment_accounting = PaymentAccountingFactory.create()
     reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task

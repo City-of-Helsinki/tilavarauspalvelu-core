@@ -9,7 +9,12 @@ from django.conf import settings
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, ReservationStartInterval
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ApplicationRoundStatusChoice,
+    PriceComponentKind,
+    ReservationStartInterval,
+)
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
@@ -21,7 +26,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
     ProductInvoicingParams,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, Reservation, ReservationUnit
+from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, PriceComponent, Reservation, ReservationUnit
 from tilavarauspalvelu.tasks import (
     create_statistics_for_reservations_task,
     notify_reservation_on_access_type_change_task,
@@ -44,12 +49,7 @@ if TYPE_CHECKING:
     from collections.abc import Collection
 
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
-    from tilavarauspalvelu.models import (
-        PaymentAccounting,
-        PaymentMerchant,
-        ReservationUnitAccessType,
-        ReservationUnitPricing,
-    )
+    from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant, ReservationUnitAccessType, SalesItem
     from tilavarauspalvelu.typing import TimeSpan
 
 
@@ -348,9 +348,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # so we can just check start interval from the beginning of the day.
         return begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0
 
-    def get_active_pricing(self, by_date: datetime.date | None = None) -> ReservationUnitPricing | None:
-        return self.reservation_unit.pricings.active(from_date=by_date).first()
-
     def get_merchant(self) -> PaymentMerchant | None:
         if self.reservation_unit.payment_merchant is not None:
             return self.reservation_unit.payment_merchant
@@ -368,11 +365,48 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if self.reservation_unit.is_draft or self.reservation_unit.is_archived:
             return False
 
-        # Has PAID active or future pricings
-        active_pricing = self.reservation_unit.actions.get_active_pricing()
-        if active_pricing is not None and active_pricing.highest_price > 0:
-            return True
-        return self.reservation_unit.pricings.filter(highest_price__gt=0, begins__gt=local_date()).exists()
+        today = local_date()
+        rows = list(self.reservation_unit.reservation_unit_pricing_groups.order_by("begins"))
+        past_or_active_rows = [row for row in rows if row.begins <= today]
+        current_rows = past_or_active_rows[-1:] + [row for row in rows if row.begins > today]
+        pricing_group_pks = {row.pricing_group_id for row in current_rows}
+
+        return PriceComponent.objects.filter(
+            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+            pricing_group__in=pricing_group_pks,
+            kind=PriceComponentKind.BASE,
+            amount__gt=0,
+        ).exists()
+
+    def get_sales_item_today(self) -> SalesItem | None:
+        """
+        The sales item of the base price that is in effect today.
+        If many base prices are in effect, such as one for each price option, the highest price is used.
+        """
+        today = local_date()
+        pricing_group_row = (
+            self.reservation_unit.reservation_unit_pricing_groups.filter(begins__lte=today).order_by("-begins").first()
+        )
+        if pricing_group_row is None:
+            return None
+
+        component = (
+            PriceComponent.objects
+            .filter(
+                models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+                pricing_group=pricing_group_row.pricing_group_id,
+                kind=PriceComponentKind.BASE,
+                valid_from__lte=today,
+                sales_item__isnull=False,
+            )
+            .select_related("sales_item__tax_level")
+            .order_by("-amount")
+            .first()
+        )
+        if component is None:
+            return None
+
+        return component.sales_item
 
     def get_accounting(self) -> PaymentAccounting | None:
         if self.reservation_unit.payment_accounting is not None:
@@ -534,8 +568,28 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if not accounting:
             return
 
+        # Without a sales item, the reservation unit sells nothing online today.
+        sales_item = self.get_sales_item_today()
+        if sales_item is None:
+            return
+
+        today = local_date()
+        rate = sales_item.tax_level.rates.effective_on(on_date=today).first()
+        vat_code = rate.vat_code if rate is not None else ""
+        if not vat_code:
+            SentryLogger.log_message(
+                "Reservation unit accounting not sent, because the tax rate of its sales item has no VAT code",
+                details={
+                    "reservation_unit_id": self.reservation_unit.pk,
+                    "sales_item_id": sales_item.pk,
+                    "tax_level_id": sales_item.tax_level_id,
+                },
+                level="error",
+            )
+            return
+
         params = CreateOrUpdateAccountingParams(
-            vat_code=accounting.vat_code,
+            vat_code=vat_code,
             internal_order=accounting.internal_order,
             project=accounting.project,
             operation_area=accounting.operation_area,
