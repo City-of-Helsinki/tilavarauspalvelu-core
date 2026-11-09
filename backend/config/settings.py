@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 import zoneinfo
 from pathlib import Path
 from typing import Any
@@ -564,6 +565,7 @@ class Common(Environment):
     SENTRY_DSN: str = values.StringValue(default="")
     SENTRY_ENVIRONMENT: str = values.StringValue(default="local")
     SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)
+    SENTRY_PROJECT: str = values.StringValue(default="tilavarauspalvelu-core")
     SENTRY_RELEASE: str | None = values.StringValue(default=None)
     SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)
     SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(
@@ -680,11 +682,16 @@ class Common(Environment):
 
         from config.sentry import init_sentry
 
+        # Sentry reads the release as semver only without the "v" of the git tag.
+        # The frontend builds its release names with the same rule.
+        release_version = re.sub(r"^v(?=\d)", "", cls.APP_VERSION).replace("/", "-")
+        default_release = f"{cls.SENTRY_PROJECT}@{release_version}"
+
         init_sentry(
             dsn=cls.SENTRY_DSN,
             environment=cls.SENTRY_ENVIRONMENT,
             # Without a release, the Sentry SDK takes the full commit hash from 'SOURCE_VERSION'.
-            release=cls.SENTRY_RELEASE or cls.APP_VERSION,
+            release=cls.SENTRY_RELEASE or default_release,
             profile_session_sample_rate=cls.SENTRY_PROFILE_SESSION_SAMPLE_RATE,
         )
 
