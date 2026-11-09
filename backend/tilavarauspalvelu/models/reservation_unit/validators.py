@@ -186,6 +186,11 @@ class ReservationUnitValidator:
             msg = "Reservation unit is in an open application round."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_IN_OPEN_ROUND)
 
+    def validate_has_payment_type(self) -> None:
+        if self.reservation_unit.payment_type is None:
+            msg = "Reservation unit has no payment type."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_TYPE)
+
     def validate_has_payment_product(self) -> None:
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             return
@@ -207,17 +212,6 @@ class ReservationUnitValidator:
         if now > last_cancellable_moment:
             msg = "Reservation time cannot be changed because the cancellation period has expired."
             raise ValidationError(msg, code=error_codes.CANCELLATION_TIME_PAST)
-
-    def validate_not_rescheduled_to_paid_date(self, begin: datetime.datetime) -> None:
-        pricing = self.reservation_unit.actions.get_active_pricing(by_date=begin.date())
-
-        if pricing is None:
-            msg = "Reservation cannot be rescheduled since it has no active pricing."
-            raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
-
-        if pricing.highest_price > 0:
-            msg = "Reservation cannot be rescheduled to a point where it would become paid."
-            raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
     def validate_can_create_reservation_type(self, reservation_type: ReservationTypeChoice) -> None:
         if reservation_type not in ReservationTypeChoice.types_that_staff_can_create:

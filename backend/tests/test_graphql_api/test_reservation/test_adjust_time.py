@@ -7,11 +7,11 @@ import freezegun
 import pytest
 from django.test import override_settings
 
-from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, PriceUnit, ReservationStartInterval, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
-from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from tilavarauspalvelu.models import PriceComponent, Reservation, ReservationPriceLine, ReservationUnitHierarchy
 from tilavarauspalvelu.models.reservation.actions import ReservationActions
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_start_of_day
 
@@ -21,7 +21,6 @@ from tests.factories import (
     ReservableTimeSpanFactory,
     ReservationFactory,
     ReservationUnitFactory,
-    ReservationUnitPricingFactory,
     SpaceFactory,
     UserFactory,
 )
@@ -51,6 +50,30 @@ def test_reservation__adjust_time__success(graphql):
     assert reservation.ends_at != reservation_end
 
     assert EmailService.send_reservation_rescheduled_email.called is True
+
+
+@patch_method(EmailService.send_reservation_rescheduled_email)
+def test_reservation__adjust_time__replaces_price_lines(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        reservation_unit__own_price__price_unit=PriceUnit.PER_HOUR,
+        price_lines__quantity=Decimal(5),
+    )
+    old_line_pk = reservation.price_lines.get().pk
+    component = PriceComponent.objects.get(
+        pricing_group__reservation_unit_pricing_groups__reservation_unit=reservation.reservation_unit,
+    )
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    price_lines = ReservationPriceLine.objects.filter(reservation=reservation)
+    assert list(price_lines.values_list("price_component", "quantity", "amount")) == [
+        (component.pk, Decimal(1), Decimal(0)),
+    ]
+    assert old_line_pk not in {line.pk for line in price_lines}
 
 
 def test_reservation__adjust_time__wrong_state(graphql):
@@ -145,11 +168,7 @@ def test_reservation__adjust_time__reservation_has_price_to_be_paid(graphql):
 
 
 def test_reservation__adjust_time__change_would_make_unit_reservation_unit_paid(graphql):
-    reservation = ReservationFactory.create_for_time_adjustment()
-    ReservationUnitPricingFactory.create(
-        begins=local_date(),
-        reservation_unit=reservation.reservation_unit,
-    )
+    reservation = ReservationFactory.create_for_time_adjustment(reservation_unit__own_price__amount=Decimal(10))
 
     data = get_adjust_data(reservation)
 
@@ -162,7 +181,7 @@ def test_reservation__adjust_time__change_would_make_unit_reservation_unit_paid(
     ]
 
 
-def test_reservation__adjust_time__no_active_pricing_in_new_time(graphql):
+def test_reservation__adjust_time__no_price_in_new_time(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         reservation_unit__own_price__begins=local_date() + datetime.timedelta(days=365),
     )
@@ -175,7 +194,7 @@ def test_reservation__adjust_time__no_active_pricing_in_new_time(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Reservation cannot be rescheduled since it has no active pricing.",
+        "Reservation cannot be rescheduled since it has no price at the new time.",
     ]
 
     reservation.refresh_from_db()

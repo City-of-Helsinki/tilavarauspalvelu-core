@@ -22,6 +22,7 @@ from tests.factories import (
     ReservationPriceLineFactory,
     ReservationSeriesFactory,
     ReservationUnitFactory,
+    TaxLevelFactory,
     TaxLevelRateFactory,
 )
 from tests.helpers import ResponseMock, patch_method
@@ -94,6 +95,7 @@ def test_reservation__approve__paid__in_webshop(graphql):
         begins_at=local_datetime(2024, 1, 10, 12),
         ends_at=local_datetime(2024, 1, 10, 13),
         tax_percentage_value=Decimal("24.0"),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     graphql.login_with_superuser()
@@ -137,10 +139,9 @@ def test_reservation__approve__paid__in_webshop(graphql):
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__paid__in_webshop__uses_tax_rate_of_approval_date(graphql):
-    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
-
-    tax_level = reservation_unit.pricings.first().tax_level
+    tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2024, 1, 10), percentage=Decimal(27))
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop(own_price__tax_level=tax_level)
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
@@ -148,6 +149,7 @@ def test_reservation__approve__paid__in_webshop__uses_tax_rate_of_approval_date(
         begins_at=local_datetime(2024, 1, 10, 12),
         ends_at=local_datetime(2024, 1, 10, 13),
         tax_percentage_value=Decimal("24.0"),
+        price_lines__tax_level=tax_level,
     )
 
     graphql.login_with_superuser()
@@ -173,6 +175,7 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     graphql.login_with_superuser()
@@ -203,6 +206,7 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date__over_dayli
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2026, 3, 29, 4),
         ends_at=local_datetime(2026, 3, 29, 5),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     graphql.login_with_superuser()
@@ -229,6 +233,7 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
         begins_at=local_datetime(2024, 1, 1, 13),
         ends_at=local_datetime(2024, 1, 1, 14),
         tax_percentage_value=Decimal("24.0"),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     graphql.login_with_superuser()
@@ -267,6 +272,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
         tax_percentage_value=Decimal("24.0"),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     payment_order = PaymentOrderFactory.create(
@@ -307,6 +313,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__refun
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     PaymentOrderFactory.create(
@@ -340,6 +347,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__diffe
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     PaymentOrderFactory.create(
@@ -369,6 +377,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     old_payment_order = PaymentOrderFactory.create(
@@ -417,6 +426,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__p
         reservation_unit=reservation_unit,
         begins_at=local_datetime(2024, 1, 5, 12),
         ends_at=local_datetime(2024, 1, 5, 13),
+        price_lines__tax_level__rates__percentage=Decimal("25.5"),
     )
 
     PaymentOrderFactory.create(
@@ -540,8 +550,8 @@ def test_reservation__approve__pindora_api__series__access_code_not_generated(gr
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__no_pricing(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+def test_reservation__approve__no_payment_type(graphql):
+    reservation_unit = ReservationUnitFactory.create(payment_type=None)
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
@@ -555,7 +565,7 @@ def test_reservation__approve__no_pricing(graphql):
     response = graphql(APPROVE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["No pricing found for reservation's begin date."]
+    assert response.field_error_messages() == ["Reservation unit has no payment type."]
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))

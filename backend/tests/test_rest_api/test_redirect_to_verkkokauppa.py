@@ -338,11 +338,11 @@ def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__e
     assert response.url == "https://checkout.url/paymentmethod"
 
 
-def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_has_no_price_lines(api_client, settings):
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
-    reservation.reservation_unit.pricings.all().delete()
+    reservation.price_lines.all().delete()
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
     url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
@@ -354,8 +354,8 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_cl
 
     assert response.status_code == 302
     assert query_params == {
-        "error_message": "Reservation unit has no active pricing information",
-        "error_code": "RESERVATION_UNIT_NO_ACTIVE_PRICING",
+        "error_message": "Reservation has no price lines",
+        "error_code": "RESERVATION_NO_PRICE_LINES",
     }
 
 
@@ -365,7 +365,7 @@ def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client, setti
 
     reservation = ReservationFactory.create_with_pending_payment(tax_percentage_value=Decimal("25.5"))
 
-    tax_level = reservation.reservation_unit.pricings.first().tax_level
+    tax_level = reservation.price_lines.get().tax_level
     tax_level.rates.update(begins=local_date(2024, 1, 2))
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
@@ -378,7 +378,7 @@ def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client, setti
 
     assert response.status_code == 302
     assert query_params == {
-        "error_message": "Reservation unit pricing has no tax rate in effect today",
+        "error_message": "The tax level of the reservation has no tax rate in effect today",
         "error_code": "TAX_LEVEL_HAS_NO_RATE",
     }
 

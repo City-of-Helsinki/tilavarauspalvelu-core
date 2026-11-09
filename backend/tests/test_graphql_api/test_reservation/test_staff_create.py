@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 
 import freezegun
 import pytest
@@ -9,6 +10,7 @@ from tilavarauspalvelu.enums import (
     AccessType,
     ADLoginAMR,
     MunicipalityChoice,
+    PriceUnit,
     ProfileLoginAMR,
     ReservationStateChoice,
     ReservationTypeChoice,
@@ -17,8 +19,9 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from tilavarauspalvelu.models import PriceComponent, Reservation, ReservationPriceLine, ReservationUnitHierarchy
 from tilavarauspalvelu.models.reservation.actions import ReservationActions
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, next_hour
 
 from tests.factories import (
@@ -45,6 +48,7 @@ pytestmark = [
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__staff_create__reservation_block_whole_day(graphql):
     reservation_unit = ReservationUnitFactory.create(
+        own_price__amount=Decimal(10),
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
@@ -81,6 +85,7 @@ def test_reservation__staff_create__reservation_block_whole_day(graphql):
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__staff_create__reservation_block_whole_day__ignore_given_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
+        own_price__amount=Decimal(10),
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
@@ -117,7 +122,7 @@ def test_reservation__staff_create__reservation_block_whole_day__ignore_given_bu
 
 
 def test_reservation__staff_create__general_admin_can_create(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
@@ -131,8 +136,50 @@ def test_reservation__staff_create__general_admin_can_create(graphql):
     assert reservation.type == ReservationTypeChoice.STAFF
 
 
-def test_reservation__staff_create__unit_admin_can_create(graphql):
+@pytest.mark.parametrize(
+    "reservation_type",
+    [ReservationTypeChoice.STAFF, ReservationTypeChoice.BEHALF, ReservationTypeChoice.BLOCKED],
+)
+def test_reservation__staff_create__price_lines_are_free(graphql, reservation_type):
+    reservation_unit = ReservationUnitFactory.create(
+        own_price__amount=Decimal(10),
+        own_price__price_unit=PriceUnit.PER_HOUR,
+        own_price__tax_level__rates__percentage=Decimal("25.5"),
+    )
+    component = PriceComponent.objects.get(
+        pricing_group__reservation_unit_pricing_groups__reservation_unit=reservation_unit,
+    )
+
+    graphql.login_with_superuser()
+    data = get_staff_create_data(reservation_unit, type=reservation_type.value)
+    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.price == Decimal(0)
+    assert reservation.non_subsidised_price == Decimal(10)
+    assert reservation.tax_percentage_value == Decimal("25.5")
+
+    price_lines = ReservationPriceLine.objects.filter(reservation=reservation)
+    assert list(price_lines.values_list("price_component", "quantity", "amount", "override_amount")) == [
+        (component.pk, Decimal(1), Decimal(10), Decimal(0)),
+    ]
+
+
+def test_reservation__staff_create__no_pricing_group(graphql):
     reservation_unit = ReservationUnitFactory.create()
+
+    graphql.login_with_superuser()
+    data = get_staff_create_data(reservation_unit)
+    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+
+    assert response.field_error_codes() == [error_codes.PRICE_CALCULATION_FAILED]
+    assert Reservation.objects.exists() is False
+
+
+def test_reservation__staff_create__unit_admin_can_create(graphql):
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(admin)
@@ -147,7 +194,7 @@ def test_reservation__staff_create__unit_admin_can_create(graphql):
 
 
 def test_reservation__staff_create__regular_user_cannot_create(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     graphql.login_with_regular_user()
 
@@ -160,7 +207,7 @@ def test_reservation__staff_create__regular_user_cannot_create(graphql):
 
 @pytest.mark.parametrize("field", ["type", "beginsAt", "endsAt"])
 def test_reservation__staff_create__missing_fields(graphql, field):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
@@ -171,7 +218,7 @@ def test_reservation__staff_create__missing_fields(graphql, field):
 
 
 def test_reservation__staff_create__end_before_begin(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
@@ -185,7 +232,7 @@ def test_reservation__staff_create__end_before_begin(graphql):
 # The clocks move from 04:00 back to 03:00 at 01:00 UTC on 2030-10-27, so the hour from 03:00 to 04:00 occurs twice.
 # Not frozen with freezegun, since its datetimes lose `fold` when converted between time zones.
 def test_reservation__staff_create__end_in_the_repeated_hour(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     begins_at = datetime.datetime.fromisoformat("2030-10-27T03:30:00+03:00")
     ends_at = datetime.datetime.fromisoformat("2030-10-27T03:15:00+02:00")
@@ -202,7 +249,7 @@ def test_reservation__staff_create__end_in_the_repeated_hour(graphql):
 
 
 def test_reservation__staff_create__end_same_as_begin(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
@@ -215,7 +262,7 @@ def test_reservation__staff_create__end_same_as_begin(graphql):
 
 
 def test_reservation__staff_create__begin_date_in_the_past(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
@@ -236,7 +283,7 @@ def test_reservation__staff_create__begin_date_in_the_past__today(graphql):
     #
     # Allow staff members to create reservations to an earlier time today.
     #
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
@@ -260,7 +307,7 @@ def test_reservation__staff_create__begin_date_in_the_past__move_to_yesterday_on
     #
     # We allow booking the reservation for the previous day if it's the first hour of the day.
     #
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
@@ -280,7 +327,7 @@ def test_reservation__staff_create__begin_date_in_the_past__move_to_yesterday_on
 
 
 def test_reservation__staff_create__optional_fields(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
     purpose = ReservationPurposeFactory.create(name="purpose")
     age_group = AgeGroupFactory.create(minimum=18, maximum=30)
 
@@ -338,7 +385,7 @@ def test_reservation__staff_create__optional_fields(graphql):
 
 def test_reservation__staff_create__reservation_overlapping_fails(graphql):
     space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(spaces=[space])
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10), spaces=[space])
 
     begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
@@ -363,7 +410,7 @@ def test_reservation__staff_create__reservation_overlapping_fails(graphql):
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
     space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(spaces=[space])
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10), spaces=[space])
 
     begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
@@ -389,7 +436,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer_time_before(graphql):
     space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(spaces=[space])
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10), spaces=[space])
 
     begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
@@ -419,7 +466,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer_time_after(graphql):
     space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(spaces=[space])
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10), spaces=[space])
 
     begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
@@ -448,7 +495,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
 
 
 def test_reservation__staff_create__interval_not_respected_fails(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     begin = next_hour(plus_hours=1, plus_minutes=1)
     end = begin + datetime.timedelta(hours=1)
@@ -464,7 +511,7 @@ def test_reservation__staff_create__interval_not_respected_fails(graphql):
 
 
 def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, type=ReservationTypeChoice.NORMAL)
@@ -475,7 +522,7 @@ def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql
 
 
 def test_reservation__staff_create__reservation_type_behalf_accepted(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, type=ReservationTypeChoice.BEHALF)
@@ -510,7 +557,9 @@ def test_reservation__staff_create__reservee_used_ad_login(graphql, amr, expecte
 
 @patch_method(PindoraService.create_access_code)
 def test_reservation__staff_create__access_type__access_code(graphql):
-    reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
+    reservation_unit = ReservationUnitFactory.create(
+        own_price__amount=Decimal(10), access_types__access_type=AccessType.ACCESS_CODE
+    )
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
@@ -528,6 +577,7 @@ def test_reservation__staff_create__access_type__access_code(graphql):
 @patch_method(PindoraService.create_access_code)
 def test_reservation__staff_create__access_type__changed_to_access_code_in_the_future(graphql):
     reservation_unit = ReservationUnitFactory.create(
+        own_price__amount=Decimal(10),
         access_types__access_type=AccessType.ACCESS_CODE,
         access_types__begin_date=next_hour(plus_days=2),
     )
@@ -548,7 +598,7 @@ def test_reservation__staff_create__access_type__changed_to_access_code_in_the_f
 def test_reservation__staff_create__access_type__access_code_has_ended(graphql):
     today = local_date()
 
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
         access_type=AccessType.ACCESS_CODE,
@@ -575,6 +625,7 @@ def test_reservation__staff_create__access_type__access_code_has_ended(graphql):
 @patch_method(PindoraService.create_access_code)
 def test_reservation__staff_create__access_type__access_code__blocked(graphql):
     reservation_unit = ReservationUnitFactory.create(
+        own_price__amount=Decimal(10),
         access_types__access_type=AccessType.ACCESS_CODE,
     )
 
@@ -595,6 +646,7 @@ def test_reservation__staff_create__access_type__access_code__blocked(graphql):
 @patch_method(SentryLogger.log_exception)
 def test_reservation__staff_create__access_type__access_code__pindora_failure(graphql):
     reservation_unit = ReservationUnitFactory.create(
+        own_price__amount=Decimal(10),
         access_types__access_type=AccessType.ACCESS_CODE,
     )
 
@@ -617,7 +669,7 @@ def test_reservation__staff_create__access_type__access_code__pindora_failure(gr
 
 
 def test_reservation__staff_create__two_overlapping_reservation_created_at_the_same_time(graphql):
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     data = get_staff_create_data(reservation_unit)
     graphql.login_with_superuser()
