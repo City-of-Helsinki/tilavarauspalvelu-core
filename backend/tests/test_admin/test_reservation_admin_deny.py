@@ -37,7 +37,7 @@ def create_invoiced_reservation(*, begins_at: datetime.datetime) -> Reservation:
         state=ReservationStateChoice.CONFIRMED,
         begins_at=begins_at,
         ends_at=begins_at + datetime.timedelta(hours=1),
-        price=Decimal("10.00"),
+        price_lines__amount=Decimal("10.00"),
     )
     PaymentOrderFactory.create(
         reservation=reservation,

@@ -70,9 +70,9 @@ class PaymentOrderBuilder(ModelFactoryBuilder[PaymentOrder]):
 
         return self.set(
             reservation=reservation,
-            price_net=reservation.price_net,
-            price_vat=reservation.price_vat_amount,
-            price_total=reservation.price,
+            price_net=reservation.total_price_net,
+            price_vat=reservation.total_vat_amount,
+            price_total=reservation.total_price,
         )
 
     def for_mock_order(self, reservation: Reservation) -> Self:
