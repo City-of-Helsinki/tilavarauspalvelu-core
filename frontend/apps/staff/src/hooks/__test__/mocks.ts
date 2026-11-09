@@ -69,7 +69,7 @@ function createReservation({
   return {
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
-    price: null,
+    totalPrice: null,
     paymentOrder: null,
     reservationUnit: {
       id: createNodeId("ReservationUnitNode", 1),
