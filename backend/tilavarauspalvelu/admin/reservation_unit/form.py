@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import models, transaction
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.urls import reverse
@@ -250,7 +250,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "authentication": _("Authentication"),
             "reservation_kind": _("Reservation kind"),
             "reservation_block_whole_day": _("Reservation block whole day"),
-            "can_apply_free_of_charge": _("Can apply free of charge"),
             "is_archived": _("Is archived"),
             "rank": _("Order number"),
             "payment_type": _("Payment type"),
@@ -329,7 +328,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "authentication": _("Authentication required for reserving this reservation unit."),
             "reservation_kind": _("What kind of reservations are to be booked with this reservation unit."),
             "reservation_block_whole_day": _("Reservation block whole day"),
-            "can_apply_free_of_charge": _("Can reservations to this reservation unit be able to apply free of charge."),
             "is_archived": _("Is reservation unit archived."),
             "rank": _("Order number to be use in api sorting."),
             "payment_merchant": _("Merchant used for payments"),
@@ -390,9 +388,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 raise ValidationError({"service_specific_terms": msg})
 
             pricing_terms = cleaned_data.get("pricing_terms")
-            can_apply_free_of_charge = cleaned_data.get("can_apply_free_of_charge")
-
-            if can_apply_free_of_charge and not pricing_terms:
+            if not pricing_terms and self._can_apply_for_discount():
                 msg = _("Pricing terms are required for direct booking if the reservee can apply for free of charge")
                 raise ValidationError({"pricing_terms": msg})
 
@@ -400,6 +396,18 @@ class ReservationUnitAdminForm(forms.ModelForm):
             if not payment_terms and self._has_paid_price():
                 msg = _("Payment terms are required for direct booking of paid reservation units")
                 raise ValidationError({"payment_terms": msg})
+
+    def _can_apply_for_discount(self) -> bool:
+        """A price that is in effect today or in the future allows the reservee to apply for a discount."""
+        if self.instance.pk is None:
+            return False
+
+        today = local_date()
+        return PriceComponent.objects.filter(
+            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+            pricing_group__reservation_unit_pricing_groups__reservation_unit=self.instance,
+            can_apply_for_discount=True,
+        ).exists()
 
     def _has_paid_price(self) -> bool:
         """
