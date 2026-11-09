@@ -32,12 +32,15 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      # Must match the name from build-ui-docker.yml.
       - name: "Create release name"
         id: release
-        run: >-
-          echo "release=tilavarauspalvelu-customer-ui@$(
-            echo ${{ github.ref_name || github.sha }} | tr '/' '-'
-          )" >> $GITHUB_OUTPUT
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          version="$REF_NAME"
+          if [[ "$version" =~ ^v[0-9] ]]; then version="${version#v}"; fi
+          echo "release=tilavarauspalvelu-customer-ui@${version//\//-}" >> "$GITHUB_OUTPUT"
       - name: Print release
         run: echo ${{ steps.release.outputs.release }}
       - name: Create Sentry release
@@ -61,13 +64,15 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-        # release name can't contain slashes e.g. merge/PR_number
+      # Must match the name from build-ui-docker.yml.
       - name: "Create release name"
         id: release
-        run: >-
-          echo "release=tilavarauspalvelu-staff-ui@$(
-            echo ${{ github.ref_name || github.sha }} | tr '/' '-'
-          )" >> $GITHUB_OUTPUT
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          version="$REF_NAME"
+          if [[ "$version" =~ ^v[0-9] ]]; then version="${version#v}"; fi
+          echo "release=tilavarauspalvelu-staff-ui@${version//\//-}" >> "$GITHUB_OUTPUT"
       - name: Print release
         run: echo ${{ steps.release.outputs.release }}
       - name: Create Sentry release
