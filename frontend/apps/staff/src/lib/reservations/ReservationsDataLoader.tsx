@@ -65,8 +65,8 @@ function mapFilterParams(searchParams: ReadonlyURLSearchParams): ReservationList
     state: reservationStatusFilter,
     orderStatus: orderStatusFilter,
     textSearch,
-    priceGte: minPriceFilter?.toString(),
-    priceLte: maxPriceFilter?.toString(),
+    totalPriceGte: minPriceFilter?.toString(),
+    totalPriceLte: maxPriceFilter?.toString(),
     beginDate,
     endDate,
     createdAtGte,
@@ -191,8 +191,8 @@ export const RESERVATION_LIST_QUERY = gql`
     $state: [ReservationStateChoice]
     $orderStatus: [OrderStatusWithFree]
     $textSearch: String
-    $priceLte: Decimal
-    $priceGte: Decimal
+    $totalPriceLte: Decimal
+    $totalPriceGte: Decimal
     $beginDate: Date
     $endDate: Date
     $createdAtGte: Date
@@ -211,8 +211,8 @@ export const RESERVATION_LIST_QUERY = gql`
       state: $state
       orderStatus: $orderStatus
       textSearch: $textSearch
-      priceLte: $priceLte
-      priceGte: $priceGte
+      totalPriceLte: $totalPriceLte
+      totalPriceGte: $totalPriceGte
       beginDate: $beginDate
       endDate: $endDate
       createdAtGte: $createdAtGte

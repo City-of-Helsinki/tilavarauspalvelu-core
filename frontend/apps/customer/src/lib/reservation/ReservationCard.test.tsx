@@ -30,8 +30,7 @@ function createMockReservation(overrides: Partial<ReservationCardFragment> = {})
     accessType: AccessType.Unrestricted,
     applyingForFreeOfCharge: false,
     id: "reservation-1",
-    price: "20.00",
-    taxPercentageValue: "25.5",
+    totalPrice: "20.00",
     priceLines: [
       {
         id: "line-1",

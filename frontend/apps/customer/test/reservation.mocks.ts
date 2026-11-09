@@ -165,7 +165,7 @@ export function createMockReservation(
     paymentOrder: paymentOrder,
     pindoraInfo: null,
     pk: pk,
-    price: price,
+    totalPrice: price,
     priceLines: [
       {
         id: createNodeId("ReservationPriceLineNode", 1),
@@ -250,7 +250,6 @@ export function createMockReservation(
     reserveePhone: "0401234567",
     reserveeType: ReserveeType.Individual,
     state: state,
-    taxPercentageValue: "24.5",
     type: type,
   } as const;
 }

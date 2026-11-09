@@ -189,15 +189,15 @@ function isReservationConfirmed(reservation: { state?: Maybe<ReservationStateCho
   return reservation.state === ReservationStateChoice.Confirmed;
 }
 
-function isReservationFreeOfCharge(reservation: Pick<ReservationNode, "price">): boolean {
-  return !(Number(reservation.price) > 0);
+function isReservationFreeOfCharge(reservation: Pick<ReservationNode, "totalPrice">): boolean {
+  return !(Number(reservation.totalPrice) > 0);
 }
 
 export const CAN_RESERVATION_BE_CHANGED_FRAGMENT = gql`
   fragment CanReservationBeChanged on ReservationNode {
     endsAt
     isHandled
-    price
+    totalPrice
     ...CanUserCancelReservation
   }
 `;

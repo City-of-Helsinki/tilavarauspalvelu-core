@@ -55,12 +55,12 @@ function isPriceReturnable(x: {
 }
 
 function convertToReturnState(
-  reservation: Pick<DenyDialogFieldsFragment, "price" | "paymentOrder" | "beginsAt">
+  reservation: Pick<DenyDialogFieldsFragment, "totalPrice" | "paymentOrder" | "beginsAt">
 ): ReturnAllowedState {
-  const { price, paymentOrder, beginsAt } = reservation;
+  const { totalPrice, paymentOrder, beginsAt } = reservation;
 
   const paid = {
-    price: toNumber(price) ?? 0,
+    price: toNumber(totalPrice) ?? 0,
     orderStatus: paymentOrder?.status ?? null,
     orderUuid: paymentOrder?.orderUuid ?? null,
     refundUuid: paymentOrder?.refundUuid ?? null,
@@ -317,7 +317,7 @@ export function DenyDialog({
         onClose={onClose}
         disabled={returnState === "not-decided"}
       >
-        <ReturnMoney state={returnState} onChange={setReturnState} price={toNumber(reservation.price) ?? 0} />
+        <ReturnMoney state={returnState} onChange={setReturnState} price={toNumber(reservation.totalPrice) ?? 0} />
       </DialogContent>
     </DenyDialogWrapper>
   );
@@ -387,7 +387,7 @@ export const DENY_DIALOG_FRAGMENT = gql`
     pk
     beginsAt
     handlingDetails
-    price
+    totalPrice
     paymentOrder {
       id
       orderUuid
