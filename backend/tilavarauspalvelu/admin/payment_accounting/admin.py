@@ -34,7 +34,7 @@ class PaymentAccountingForm(forms.ModelForm):
             "name": "Name for this accounting in Varaamo. It is not sent to SAP.",
             "company_code": "SAP company code of the city division.",
             "main_ledger_account": (
-                "Revenue account where the income is booked. Varaamo usually uses 340025 (Tilojen muut vuokratuotot)."
+                "Not used. The main ledger account comes from the sales item of the price. This field will be removed."
             ),
             "vat_code": (
                 "SAP VAT code. It must match the VAT percentage of the prices that use this accounting. "
@@ -64,8 +64,7 @@ class PaymentAccountingForm(forms.ModelForm):
             "product_invoicing_sales_org": "SAP sales organisation of the city division.",
             "product_invoicing_sales_office": "Sales office of the service.",
             "product_invoicing_material": (
-                "Identifies the product or service that is invoiced. It is bound to a VAT category. "
-                "It does not usually change when the VAT percentage changes."
+                "Not used. The material comes from the sales item of the price. This field will be removed."
             ),
             "product_invoicing_order_type": "Type of invoice in the Talpa web shop. ZTY1 is a normal sales invoice.",
         }

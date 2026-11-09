@@ -30,6 +30,7 @@ from tests.factories import (
     OrderFactory,
     PaymentOrderFactory,
     ReservationFactory,
+    SalesItemFactory,
     TaxLevelFactory,
     TaxLevelRateFactory,
     UserFactory,
@@ -438,10 +439,13 @@ def test_reservation__confirm__default_payment_type__online(graphql):
 
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
+    sales_item = SalesItemFactory.create(material="12345678")
     reservation = ReservationFactory.create_for_confirmation(
         # Required params for invoicing to work
         reservee_type=ReserveeType.COMPANY,
         reservation_unit__payment_type=PaymentType.ONLINE_OR_INVOICE,
+        reservation_unit__own_price__tax_level=sales_item.tax_level,
+        reservation_unit__own_price__sales_item=sales_item,
         reservation_unit__payment_accounting__product_invoicing_sales_org="2900",
         reservation_unit__payment_accounting__product_invoicing_sales_office="2911",
         reservation_unit__payment_accounting__product_invoicing_material="12345678",
@@ -470,11 +474,14 @@ def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
 @freeze_time(local_datetime(2030, 1, 1, 12))
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__invoicing_date_is_local_begin_date(graphql):
+    sales_item = SalesItemFactory.create(material="12345678")
     reservation = ReservationFactory.create_for_confirmation(
         begins_at=local_datetime(2030, 1, 10, 1),
         ends_at=local_datetime(2030, 1, 10, 2),
         reservee_type=ReserveeType.COMPANY,
         reservation_unit__payment_type=PaymentType.ONLINE_OR_INVOICE,
+        reservation_unit__own_price__tax_level=sales_item.tax_level,
+        reservation_unit__own_price__sales_item=sales_item,
         reservation_unit__payment_accounting__product_invoicing_sales_org="2900",
         reservation_unit__payment_accounting__product_invoicing_sales_office="2911",
         reservation_unit__payment_accounting__product_invoicing_material="12345678",
@@ -545,6 +552,32 @@ def test_reservation__confirm__no_invoicing__payment_type_online(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservee_type=ReserveeType.COMPANY,
         reservation_unit__payment_type=PaymentType.ONLINE,
+        reservation_unit__payment_accounting__product_invoicing_sales_org="2900",
+        reservation_unit__payment_accounting__product_invoicing_sales_office="2911",
+        reservation_unit__payment_accounting__product_invoicing_material="12345678",
+        reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
+    )
+
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    assert order_params.items[0].invoicing_date is None
+
+
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__no_invoicing__sales_item_without_material(graphql):
+    sales_item = SalesItemFactory.create(material="")
+    reservation = ReservationFactory.create_for_confirmation(
+        reservee_type=ReserveeType.COMPANY,
+        reservation_unit__payment_type=PaymentType.ONLINE_OR_INVOICE,
+        reservation_unit__own_price__tax_level=sales_item.tax_level,
+        reservation_unit__own_price__sales_item=sales_item,
         reservation_unit__payment_accounting__product_invoicing_sales_org="2900",
         reservation_unit__payment_accounting__product_invoicing_sales_office="2911",
         reservation_unit__payment_accounting__product_invoicing_material="12345678",
