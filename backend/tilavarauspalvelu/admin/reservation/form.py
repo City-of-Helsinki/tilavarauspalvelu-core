@@ -57,12 +57,9 @@ class ReservationAdminForm(forms.ModelForm):
             "access_code_should_be_active": _("Door code should be active"),
             "access_code_generated_at": _("Door code generated at"),
             #
-            "price": _("Price"),
-            "price_net": _("Price net"),
-            "non_subsidised_price": _("Non-subsidised price"),
-            "non_subsidised_price_net": _("Non-subsidised net price"),
-            "unit_price": _("Unit price"),
-            "tax_percentage_value": _("Tax percentage value"),
+            "total_price": _("Total price"),
+            "total_price_net": _("Total net price"),
+            "total_price_without_overrides": _("Total price without overrides"),
             #
             "applying_for_free_of_charge": _("Applying free of charge"),
             "free_of_charge_reason": _("Free of charge reason"),
@@ -110,12 +107,11 @@ class ReservationAdminForm(forms.ModelForm):
             "access_code_should_be_active": _("Door code should be active"),
             "access_code_generated_at": _("Door code generated at"),
             #
-            "price": _("The price of this particular reservation including VAT"),
-            "price_net": _("The price of this particular reservation excluding VAT"),
-            "non_subsidised_price": _("The non subsidised price of this reservation including VAT"),
-            "non_subsidised_price_net": _("The non subsidised price of this reservation excluding VAT"),
-            "unit_price": _("The unit price of this particular reservation"),
-            "tax_percentage_value": _("The value of the tax percentage for this particular reservation"),
+            "total_price": _("The sum of the final amounts of the price lines, including VAT"),
+            "total_price_net": _("The sum of the final amounts of the price lines, excluding VAT"),
+            "total_price_without_overrides": _(
+                "The sum of the amounts of the price lines without the overrides of the handler, including VAT"
+            ),
             #
             "applying_for_free_of_charge": _("Reservee is applying for a free-of-charge reservation"),
             "free_of_charge_reason": _("Reason for applying for a free-of-charge reservation"),

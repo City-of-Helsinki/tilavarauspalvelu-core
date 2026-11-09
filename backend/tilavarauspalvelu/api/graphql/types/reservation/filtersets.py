@@ -17,6 +17,8 @@ from utils.fields.filters import TimezoneAwareDateFilter
 from utils.utils import log_text_search
 
 if TYPE_CHECKING:
+    from decimal import Decimal
+
     from django.db.models import QuerySet
 
     from tilavarauspalvelu.typing import AnyUser
@@ -50,8 +52,8 @@ class ReservationFilterSet(ModelFilterSet):
     created_at_gte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="gte", use_end_of_day=False)
     created_at_lte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="lte", use_end_of_day=True)
 
-    price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
-    price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
+    total_price_gte = django_filters.NumberFilter(method="filter_by_total_price_gte")
+    total_price_lte = django_filters.NumberFilter(method="filter_by_total_price_lte")
 
     applying_for_free_of_charge = django_filters.BooleanFilter(field_name="applying_for_free_of_charge")
     is_recurring = django_filters.BooleanFilter(field_name="reservation_series", lookup_expr="isnull", exclude=True)
@@ -74,7 +76,7 @@ class ReservationFilterSet(ModelFilterSet):
             "ends_at",
             "created_at",
             "state",
-            "price",
+            "total_price",
             ("reservation_unit__name_fi", "reservation_unit_name_fi"),
             ("reservation_unit__name_en", "reservation_unit_name_en"),
             ("reservation_unit__name_sv", "reservation_unit_name_sv"),
@@ -153,6 +155,14 @@ class ReservationFilterSet(ModelFilterSet):
         return qs.exclude(query)
 
     @staticmethod
+    def filter_by_total_price_gte(qs: QuerySet, name: str, value: Decimal) -> QuerySet:
+        return qs.filter(L(total_price__gte=value))
+
+    @staticmethod
+    def filter_by_total_price_lte(qs: QuerySet, name: str, value: Decimal) -> QuerySet:
+        return qs.filter(L(total_price__lte=value))
+
+    @staticmethod
     def filter_by_reservation_unit_name(qs: QuerySet, name: str, value: str) -> QuerySet:
         language = name[-2:]
         qs = qs.annotate(**{
@@ -216,3 +226,7 @@ class ReservationFilterSet(ModelFilterSet):
     @staticmethod
     def order_by_reservee_name(qs: QuerySet, desc: bool) -> QuerySet:
         return qs.order_by(L("reservee_name").order_by(descending=desc))
+
+    @staticmethod
+    def order_by_total_price(qs: QuerySet, desc: bool) -> QuerySet:
+        return qs.order_by(L("total_price").order_by(descending=desc))

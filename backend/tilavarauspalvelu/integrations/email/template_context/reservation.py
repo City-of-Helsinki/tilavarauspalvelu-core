@@ -152,7 +152,7 @@ def get_context_for_reservation_confirmed(
 ) -> Annotated[EmailContext, EmailType.RESERVATION_CONFIRMED]:
     if reservation is not None:
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
-        data["non_subsidised_price"] = reservation.non_subsidised_price
+        data["non_subsidised_price"] = reservation.total_price_without_overrides
         data["instructions_confirmed"] = reservation.actions.get_instructions(kind="confirmed", language=language)
 
         data |= params_for_base_info(reservation=reservation, language=language)

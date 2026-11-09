@@ -140,7 +140,7 @@ def test_reservation_price__same_as_reservation_price_lines(graphql):
         {"quantity": str(line.quantity), "amount": str(line.amount)} for line in reservation.price_lines.all()
     ]
     assert len(saved_lines) == 2
-    assert response.first_query_object == {"lines": saved_lines, "total": str(reservation.price)}
+    assert response.first_query_object == {"lines": saved_lines, "total": str(reservation.total_price)}
 
 
 # ── Price option ──
