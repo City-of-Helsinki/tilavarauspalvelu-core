@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
@@ -10,10 +11,9 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import MunicipalityChoice, ReservationCancelReasonChoice, ReserveeType
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
+from utils.decimal_utils import round_decimal
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import Reservation
@@ -166,12 +166,18 @@ class ReservationStatistic(models.Model):
         statistic.end = end
         statistic.is_applied = allocated_time_slot is not None
         statistic.is_recurring = reservation_series is not None
-        statistic.is_subsidised = reservation.price < reservation.non_subsidised_price
-        statistic.non_subsidised_price = reservation.non_subsidised_price
-        statistic.non_subsidised_price_net = reservation.non_subsidised_price_net
+        # TODO: The statistic keeps the columns of the reservation's old price fields, so that the export stays the
+        #  same. Rename them to match the totals, and replace the one tax percentage with the price lines (TILA-4594).
+        price_lines = sorted(reservation.price_lines.all(), key=lambda line: line.pk)
+        statistic.is_subsidised = reservation.total_price < reservation.total_price_without_overrides
+        statistic.non_subsidised_price = reservation.total_price_without_overrides
+        statistic.non_subsidised_price_net = sum(
+            (round_decimal(line.amount / (1 + line.tax_percentage / Decimal(100)), 2) for line in price_lines),
+            start=Decimal(0),
+        )
         statistic.num_persons = reservation.num_persons
-        statistic.price = reservation.price
-        statistic.price_net = reservation.price_net
+        statistic.price = reservation.total_price
+        statistic.price_net = reservation.total_price_net
         statistic.purpose = getattr(purpose, "id", None)
         statistic.purpose_name = getattr(purpose, "name", "")
         statistic.recurrence_begin_date = getattr(reservation_series, "begin_date", None)
@@ -192,7 +198,7 @@ class ReservationStatistic(models.Model):
         statistic.reservee_used_ad_login = reservation.reservee_used_ad_login
         statistic.reservee_uuid = str(getattr(user, "tvp_uuid", ""))
         statistic.state = reservation.state
-        statistic.tax_percentage_value = reservation.tax_percentage_value
+        statistic.tax_percentage_value = price_lines[0].tax_percentage if price_lines else Decimal(0)
 
         if reservation.municipality is not None:
             municipality = MunicipalityChoice(reservation.municipality)

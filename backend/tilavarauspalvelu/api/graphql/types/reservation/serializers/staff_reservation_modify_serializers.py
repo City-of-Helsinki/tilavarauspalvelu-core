@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
-from rest_framework.fields import IntegerField
+from rest_framework.fields import DecimalField, IntegerField
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -54,6 +54,10 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         read_only=True,
     )
 
+    total_price = DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    total_price_without_overrides = DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    total_price_net = DecimalField(max_digits=10, decimal_places=2, read_only=True)
+
     class Meta:
         model = Reservation
         fields = [
@@ -95,12 +99,9 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "buffer_time_after",
             "buffer_time_before",
             # Price info
-            "price",
-            "price_net",
-            "non_subsidised_price",
-            "non_subsidised_price_net",
-            "tax_percentage_value",
-            "unit_price",
+            "total_price",
+            "total_price_without_overrides",
+            "total_price_net",
         ]
         extra_kwargs = {
             "confirmed_at": {"read_only": True},
@@ -109,13 +110,6 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "ends_at": {"read_only": True},
             "buffer_time_after": {"read_only": True},
             "buffer_time_before": {"read_only": True},
-            # Price info
-            "price": {"read_only": True},
-            "price_net": {"read_only": True},
-            "non_subsidised_price": {"read_only": True},
-            "non_subsidised_price_net": {"read_only": True},
-            "tax_percentage_value": {"read_only": True},
-            "unit_price": {"read_only": True},
         }
 
     def validate(self, data: StaffReservationData) -> StaffReservationData:

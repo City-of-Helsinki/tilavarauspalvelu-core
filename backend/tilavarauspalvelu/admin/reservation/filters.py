@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from django.contrib import admin
 from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
+from lookup_property import L
 from more_admin_filters.filters import MultiSelectFilter, MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter
 
 from tilavarauspalvelu.models import Reservation, ReservationUnit, Unit
@@ -55,9 +56,9 @@ class PaidReservationListFilter(admin.SimpleListFilter):
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]) -> QuerySet[Reservation]:
         if self.value() == "1":
-            return queryset.filter(price__gt=0)
+            return queryset.filter(L(total_price__gt=0))
         if self.value() == "0":
-            return queryset.filter(price=0)
+            return queryset.filter(L(total_price=0))
         return queryset
 
 

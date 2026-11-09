@@ -1,25 +1,21 @@
 from __future__ import annotations
 
 import datetime
-from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import graphene
-from django.db import models
-from django.db.models.functions import Coalesce
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
 from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.api.graphql.types.price_option.types import PriceOptionNode
-from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, ReservationStateChoice, Weekday
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     ApplicationSection,
     PriceOption,
-    Reservation,
     ReservationSeries,
     ReservationUnitOption,
 )
@@ -29,6 +25,8 @@ from .filtersets import ReservationSeriesFilterSet
 from .permissions import ReservationSeriesPermission
 
 if TYPE_CHECKING:
+    from django.db import models
+
     from tilavarauspalvelu.typing import GQLInfo, PindoraSeriesInfoData
 
 __all__ = [
@@ -82,22 +80,10 @@ class ReservationSeriesNode(DjangoNode):
         required=True,
     )
 
-    price = AnnotatedField(
+    total_price = AnnotatedField(
         graphene.Decimal,
-        expression=Coalesce(
-            models.Subquery(
-                Reservation.objects
-                .filter(
-                    reservation_series=models.OuterRef("pk"),
-                    state__in=ReservationStateChoice.states_going_to_occur,
-                )
-                .values("reservation_series")
-                .annotate(total=models.Sum("price"))
-                .values("total")[:1]
-            ),
-            models.Value(Decimal("0.00")),
-        ),
-        description="Sum of the prices of the reservations in the series that are going to occur.",
+        expression=L("total_price"),
+        description="Sum of the total prices of the reservations in the series that are going to occur.",
     )
     price_option = ManuallyOptimizedField(
         PriceOptionNode,
@@ -136,7 +122,7 @@ class ReservationSeriesNode(DjangoNode):
             "should_have_active_access_code",
             "access_type",
             "pindora_info",
-            "price",
+            "total_price",
             "price_option",
         ]
         restricted_fields = {
@@ -146,7 +132,7 @@ class ReservationSeriesNode(DjangoNode):
             "allocated_time_slot": lambda user, res: user.permissions.can_view_reservation_series(res),
             "should_have_active_access_code": lambda user, res: user.permissions.can_view_reservation_series(res),
             "pindora_info": lambda user, res: user.permissions.can_view_reservation_series(res),
-            "price": lambda user, res: user.permissions.can_view_reservation_series(res),
+            "total_price": lambda user, res: user.permissions.can_view_reservation_series(res),
             "price_option": lambda user, res: user.permissions.can_view_reservation_series(res),
         }
         filterset_class = ReservationSeriesFilterSet
