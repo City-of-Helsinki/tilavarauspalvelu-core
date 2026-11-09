@@ -2020,10 +2020,6 @@ msgid "Reservation block whole day"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Can apply free of charge"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Is archived"
 msgstr ""
 
@@ -2180,11 +2176,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "What kind of reservations are to be booked with this reservation unit."
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Can reservations to this reservation unit be able to apply free of charge."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
