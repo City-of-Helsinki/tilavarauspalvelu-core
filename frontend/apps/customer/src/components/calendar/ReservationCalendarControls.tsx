@@ -110,9 +110,11 @@ function TogglerLabelContent({
   return (
     <>
       <TogglerDate>{togglerLabel}</TogglerDate>
-      <div>
-        {t("common:price")}: <LoadingPrice price={price} isLoading={isPriceLoading} />
-      </div>
+      {(price != null || isPriceLoading) && (
+        <div>
+          {t("common:price")}: <LoadingPrice price={price} isLoading={isPriceLoading} />
+        </div>
+      )}
     </>
   );
 }
