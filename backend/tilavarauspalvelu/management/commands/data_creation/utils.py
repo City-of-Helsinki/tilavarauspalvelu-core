@@ -270,10 +270,9 @@ class PaymentTypeInfo:
 @dataclasses.dataclass(slots=True, frozen=True)
 class PriceInfo:
     name: str
-    highest_price: Decimal
-    lowest_price: Decimal
+    amount: Decimal
     price_unit: PriceUnit
-    can_apply_free_of_charge: bool
+    can_apply_for_discount: bool
 
 
 @dataclasses.dataclass(slots=True, frozen=True)

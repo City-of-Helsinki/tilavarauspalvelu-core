@@ -32,7 +32,7 @@ from tilavarauspalvelu.enums import (
     UserRoleChoice,
     Weekday,
 )
-from tilavarauspalvelu.management.commands.data_creation.create_pricing_groups import create_own_pricing_groups
+from tilavarauspalvelu.management.commands.data_creation.create_pricing_groups import OwnPrice, create_own_prices
 from tilavarauspalvelu.management.commands.data_creation.utils import get_image_path, turn_off_signal_updates
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
@@ -58,7 +58,6 @@ from tilavarauspalvelu.models import (
     ReservationUnitHierarchy,
     ReservationUnitImage,
     ReservationUnitOption,
-    ReservationUnitPricing,
     ReservationUnitType,
     Space,
     TaxLevel,
@@ -101,7 +100,6 @@ def create_robot_test_data() -> None:
         remove_existing_data()
         create_users()
         create_reservation_units()
-        create_own_pricing_groups(ReservationUnit.objects.filter(unit__tprek_id="71677"))
         create_application_rounds()
         create_past_reservations()
         create_permissions()
@@ -1131,7 +1129,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=False,
+        payment_type=None,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -1172,15 +1170,16 @@ def create_reservation_units() -> None:
     _maksuton_mankeli.equipments.set([
         click_share_laite,
     ])
-    _maksuton_mankeli_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_maksuton_mankeli,
-        begins=local_date(2023, 9, 25),
-        price_unit=PriceUnit.PER_15_MINS,
-        payment_type=None,
-        lowest_price=0,
-        highest_price=0,
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_maksuton_mankeli,
+            begins=local_date(2023, 9, 25),
+            price_unit=PriceUnit.PER_15_MINS,
+            amount=Decimal(0),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=False,
+        ),
+    ])
     _maksuton_mankeli_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_maksuton_mankeli,
         begin_date=local_date(2025, 6, 6),
@@ -1314,7 +1313,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=False,
+        payment_type=PaymentType.ONLINE,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -1361,15 +1360,16 @@ def create_reservation_units() -> None:
         biljardi_laite,
         liikuntavaline_laite,
     ])
-    _aina_maksullinen_aitio_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_aina_maksullinen_aitio,
-        begins=local_date(2024, 9, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
-        lowest_price=0,
-        highest_price=40,
-        tax_level=yleinen_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_aina_maksullinen_aitio,
+            begins=local_date(2024, 9, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(40),
+            tax_level=yleinen_verotaso,
+            can_apply_for_discount=False,
+        ),
+    ])
     _aina_maksullinen_aitio_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_aina_maksullinen_aitio,
         begin_date=local_date(2025, 6, 6),
@@ -1496,7 +1496,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=True,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=True,
+        payment_type=PaymentType.ONLINE_OR_INVOICE,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -1546,15 +1546,16 @@ def create_reservation_units() -> None:
         naytto_laite,
         jatkojohto_laite,
     ])
-    _aina_kasiteltava_kellarikerros_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_aina_kasiteltava_kellarikerros,
-        begins=local_date(2024, 8, 23),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE_OR_INVOICE,
-        lowest_price=0,
-        highest_price=40,
-        tax_level=yleinen_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_aina_kasiteltava_kellarikerros,
+            begins=local_date(2024, 8, 23),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(40),
+            tax_level=yleinen_verotaso,
+            can_apply_for_discount=True,
+        ),
+    ])
     _aina_kasiteltava_kellarikerros_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_aina_kasiteltava_kellarikerros,
         begin_date=local_date(2025, 5, 28),
@@ -1681,7 +1682,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=True,
+        payment_type=PaymentType.ONLINE,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -1726,15 +1727,16 @@ def create_reservation_units() -> None:
         scart_laite,
         studio_laite,
     ])
-    _alennuskelpoinen_aula_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_alennuskelpoinen_aula,
-        begins=local_date(2024, 9, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
-        lowest_price=0,
-        highest_price=30,
-        tax_level=yleinen_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_alennuskelpoinen_aula,
+            begins=local_date(2024, 9, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(30),
+            tax_level=yleinen_verotaso,
+            can_apply_for_discount=True,
+        ),
+    ])
     _alennuskelpoinen_aula_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_alennuskelpoinen_aula,
         begin_date=local_date(2025, 7, 15),
@@ -1791,7 +1793,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=True,
+        payment_type=None,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -1830,15 +1832,16 @@ def create_reservation_units() -> None:
         pida_kokous_tarkoitus,
     ])
     _perumiskelvoton_parveke.equipments.set([])
-    _perumiskelvoton_parveke_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_perumiskelvoton_parveke,
-        begins=local_date(2024, 3, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=None,
-        lowest_price=0,
-        highest_price=0,
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_perumiskelvoton_parveke,
+            begins=local_date(2024, 3, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(0),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=True,
+        ),
+    ])
     _perumiskelvoton_parveke_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_perumiskelvoton_parveke,
         begin_date=local_date(2025, 7, 15),
@@ -1895,7 +1898,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=False,
+        payment_type=None,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -1936,15 +1939,16 @@ def create_reservation_units() -> None:
     _aina_varattu_yksikko.equipments.set([
         rummut_laite,
     ])
-    _aina_varattu_yksikko_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_aina_varattu_yksikko,
-        begins=local_date(2024, 3, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
-        lowest_price=0,
-        highest_price=0,
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_aina_varattu_yksikko,
+            begins=local_date(2024, 3, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(0),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=False,
+        ),
+    ])
     _aina_varattu_yksikko_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_aina_varattu_yksikko,
         begin_date=local_date(2025, 7, 15),
@@ -2117,7 +2121,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=False,
+        payment_type=None,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -2156,15 +2160,16 @@ def create_reservation_units() -> None:
         loyda_juhlatila_tarkoitus,
     ])
     _ovikoodi_maksuton_kasiteltava_yksikko.equipments.set([])
-    _ovikoodi_maksuton_kasiteltava_yksikko_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_ovikoodi_maksuton_kasiteltava_yksikko,
-        begins=local_date(2024, 3, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
-        lowest_price=0,
-        highest_price=0,
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_ovikoodi_maksuton_kasiteltava_yksikko,
+            begins=local_date(2024, 3, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(0),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=False,
+        ),
+    ])
     _ovikoodi_maksuton_kasiteltava_yksikko_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_ovikoodi_maksuton_kasiteltava_yksikko,
         begin_date=local_date(2025, 7, 15),
@@ -2221,7 +2226,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=False,
+        payment_type=None,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -2262,15 +2267,16 @@ def create_reservation_units() -> None:
     _tuplabuukattu_tupla.equipments.set([
         rummut_laite,
     ])
-    _tuplabuukattu_tupla_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_tuplabuukattu_tupla,
-        begins=local_date(2024, 3, 1),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
-        lowest_price=0,
-        highest_price=0,
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_tuplabuukattu_tupla,
+            begins=local_date(2024, 3, 1),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(0),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=False,
+        ),
+    ])
     _tuplabuukattu_tupla_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_tuplabuukattu_tupla,
         begin_date=local_date(2025, 7, 15),
@@ -2331,7 +2337,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=False,
+        payment_type=None,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -2376,15 +2382,16 @@ def create_reservation_units() -> None:
         piano_laite,
         rummut_laite,
     ])
-    _kausivarausyksikko_malmi_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_kausivarausyksikko_malmi,
-        begins=local_date(2025, 6, 12),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=None,
-        lowest_price=0,
-        highest_price=0,
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_kausivarausyksikko_malmi,
+            begins=local_date(2025, 6, 12),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(0),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=False,
+        ),
+    ])
     _kausivarausyksikko_malmi_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_malmi,
         begin_date=local_date(2025, 6, 12),
@@ -2448,7 +2455,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=False,
+        payment_type=None,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -2494,15 +2501,16 @@ def create_reservation_units() -> None:
         piano_laite,
         rummut_laite,
     ])
-    _kausivarausyksikko_keskusta_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_kausivarausyksikko_keskusta,
-        begins=local_date(2025, 6, 12),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=None,
-        lowest_price=0,
-        highest_price=0,
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_kausivarausyksikko_keskusta,
+            begins=local_date(2025, 6, 12),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(0),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=False,
+        ),
+    ])
     _kausivarausyksikko_keskusta_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_keskusta,
         begin_date=local_date(2025, 6, 12),
@@ -2566,7 +2574,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=True,
+        payment_type=PaymentType.ONLINE,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -2612,15 +2620,16 @@ def create_reservation_units() -> None:
         peiliseina_laite,
         liikuntavaline_laite,
     ])
-    _kausivarausyksikko_yrjo_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_kausivarausyksikko_yrjo,
-        begins=local_date(2024, 8, 27),
-        price_unit=PriceUnit.FIXED,
-        payment_type=PaymentType.ONLINE,
-        lowest_price=Decimal("12.40"),
-        highest_price=Decimal("50.00"),
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_kausivarausyksikko_yrjo,
+            begins=local_date(2024, 8, 27),
+            price_unit=PriceUnit.FIXED,
+            amount=Decimal(Decimal("50.00")),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=True,
+        ),
+    ])
     _kausivarausyksikko_yrjo_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_yrjo,
         begin_date=local_date(2025, 8, 1),
@@ -2719,7 +2728,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=True,
+        payment_type=PaymentType.ONLINE,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -2770,15 +2779,16 @@ def create_reservation_units() -> None:
         studio_laite,
         naytto_laite,
     ])
-    _kausivarausyksikko_kalevi_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_kausivarausyksikko_kalevi,
-        begins=local_date(2024, 8, 27),
-        price_unit=PriceUnit.PER_15_MINS,
-        payment_type=PaymentType.ONLINE,
-        lowest_price=Decimal("24.80"),
-        highest_price=Decimal("60.00"),
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_kausivarausyksikko_kalevi,
+            begins=local_date(2024, 8, 27),
+            price_unit=PriceUnit.PER_15_MINS,
+            amount=Decimal(Decimal("60.00")),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=True,
+        ),
+    ])
     _kausivarausyksikko_kalevi_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
         begin_date=local_date(2025, 8, 1),
@@ -2871,7 +2881,7 @@ def create_reservation_units() -> None:
         require_adult_reservee=False,
         require_reservation_handling=False,
         reservation_block_whole_day=False,
-        can_apply_free_of_charge=True,
+        payment_type=PaymentType.ONLINE,
         #
         # Enums
         authentication=AuthenticationType.WEAK,
@@ -2924,15 +2934,16 @@ def create_reservation_units() -> None:
         vedenkeitin_laite,
         astianpesukone_laite,
     ])
-    _kausivarausyksikko_piitu_pricing = ReservationUnitPricing.objects.create(
-        reservation_unit=_kausivarausyksikko_piitu,
-        begins=local_date(2024, 2, 23),
-        price_unit=PriceUnit.PER_HOUR,
-        payment_type=PaymentType.ONLINE,
-        lowest_price=Decimal("30.00"),
-        highest_price=Decimal("80.00"),
-        tax_level=veroton_verotaso,
-    )
+    create_own_prices([
+        OwnPrice(
+            reservation_unit=_kausivarausyksikko_piitu,
+            begins=local_date(2024, 2, 23),
+            price_unit=PriceUnit.PER_HOUR,
+            amount=Decimal(Decimal("80.00")),
+            tax_level=veroton_verotaso,
+            can_apply_for_discount=True,
+        ),
+    ])
     _kausivarausyksikko_piitu_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,
         begin_date=local_date(2025, 8, 1),
@@ -3035,12 +3046,27 @@ def copy_reservation_unit(original: ReservationUnit, *, kind: Literal["android",
 
     android_version.spaces.set(new_spaces)
 
-    for pricing in original.pricings.all():
-        pricing._state.adding = True  # noqa: SLF001
-        pricing.id = None
+    # An own pricing group belongs to one reservation unit, so the copy gets a copy of the group.
+    for pricing_group_row in original.reservation_unit_pricing_groups.select_related("pricing_group"):
+        pricing_group = pricing_group_row.pricing_group
+        components = list(pricing_group.components.all())
 
-        pricing.reservation_unit = android_version
-        pricing.save()
+        pricing_group._state.adding = True  # noqa: SLF001
+        pricing_group.id = None
+        pricing_group.name += f" ({kind})"
+        pricing_group.save()
+
+        for component in components:
+            component._state.adding = True  # noqa: SLF001
+            component.id = None
+            component.pricing_group = pricing_group
+            component.save()
+
+        pricing_group_row._state.adding = True  # noqa: SLF001
+        pricing_group_row.id = None
+        pricing_group_row.reservation_unit = android_version
+        pricing_group_row.pricing_group = pricing_group
+        pricing_group_row.save()
 
     for access_type in original.access_types.all():
         access_type._state.adding = True  # noqa: SLF001
