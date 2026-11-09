@@ -40,7 +40,7 @@ function createReservation(overrides: Partial<DenyDialogFieldsFragment> = {}): D
     pk: 1,
     beginsAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
     handlingDetails: "",
-    price: "0",
+    totalPrice: "0",
     paymentOrder: null,
     ...overrides,
   };
@@ -89,7 +89,7 @@ describe("DenyDialog", () => {
 
     render(
       <MockedProvider mocks={mocks}>
-        <DenyDialog reservation={createReservation({ price: "0" })} onClose={vi.fn()} onReject={onReject} />
+        <DenyDialog reservation={createReservation({ totalPrice: "0" })} onClose={vi.fn()} onReject={onReject} />
       </MockedProvider>
     );
 
@@ -106,7 +106,7 @@ describe("DenyDialog", () => {
   it("shows the refund radio group and refunds when 'refund' is selected", async () => {
     const onReject = vi.fn();
     const reservation = createReservation({
-      price: "10",
+      totalPrice: "10",
       paymentOrder: { id: "o1", orderUuid: "uuid-1", status: OrderStatus.Paid, refundUuid: null },
     });
     const mocks = [
@@ -150,7 +150,7 @@ describe("DenyDialog", () => {
       <MockedProvider mocks={[]}>
         <DenyDialog
           reservation={createReservation({
-            price: "10",
+            totalPrice: "10",
             paymentOrder: { id: "o1", orderUuid: null, status: OrderStatus.Draft, refundUuid: null },
           })}
           onClose={vi.fn()}
@@ -166,7 +166,7 @@ describe("DenyDialog", () => {
       <MockedProvider mocks={[]}>
         <DenyDialog
           reservation={createReservation({
-            price: "10",
+            totalPrice: "10",
             paymentOrder: { id: "o1", orderUuid: "uuid-1", status: OrderStatus.Paid, refundUuid: "refund-1" },
           })}
           onClose={vi.fn()}
@@ -191,7 +191,7 @@ describe("DenyDialog", () => {
 
     render(
       <MockedProvider mocks={mocks}>
-        <DenyDialog reservation={createReservation({ price: "0" })} onClose={vi.fn()} onReject={onReject} />
+        <DenyDialog reservation={createReservation({ totalPrice: "0" })} onClose={vi.fn()} onReject={onReject} />
       </MockedProvider>
     );
 
