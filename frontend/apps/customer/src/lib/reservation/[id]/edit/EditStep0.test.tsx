@@ -168,6 +168,21 @@ describe("EditStep0", () => {
     expect(nextStep).not.toHaveBeenCalled();
   });
 
+  it("does not call nextStep when the price of the new time does not load", async () => {
+    const nextStep = vi.fn();
+    const { request } = createPriceMock("0.00");
+    customRender({ nextStep, mocks: [{ request, error: new Error("Network error") }] });
+
+    const form = screen.getByTestId("reservation__button--continue").closest("form");
+    form?.requestSubmit();
+
+    await waitFor(() =>
+      expect(mockErrorToast).toHaveBeenCalledWith({ text: "reservationCalendar:errors.unavailable" })
+    );
+    expect(mockIsRangeReservable).not.toHaveBeenCalled();
+    expect(nextStep).not.toHaveBeenCalled();
+  });
+
   it("does not call nextStep when the computed slot is not reservable", async () => {
     mockConvertFormToFocustimeSlot.mockReturnValue({ isReservable: false });
     const nextStep = vi.fn();
