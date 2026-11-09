@@ -49,12 +49,12 @@ def test_admin_autocomplete__reservation_units__labels_include_unit_without_extr
     api_client.force_login(user)
 
     ReservationUnitFactory.create(name="Sauna", unit__name="Uimahalli")
-    result = autocomplete(api_client, model_name="reservationunitpricing", field_name="reservation_unit")
+    result = autocomplete(api_client, model_name="reservationunitimage", field_name="reservation_unit")
 
     assert result.labels == ["Sauna, Uimahalli"]
 
     ReservationUnitFactory.create_batch(3)
-    more_result = autocomplete(api_client, model_name="reservationunitpricing", field_name="reservation_unit")
+    more_result = autocomplete(api_client, model_name="reservationunitimage", field_name="reservation_unit")
 
     assert len(more_result.labels) == 4
     assert more_result.query_count == result.query_count

@@ -2222,10 +2222,6 @@ msgid ""
 "name or email"
 msgstr ""
 
-#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
-msgid "This tax level has no rate in effect today."
-msgstr "Skattenivån har ingen skattesats som gäller i dag."
-
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
 msgstr ""
