@@ -141,6 +141,12 @@ def _create_normal_reservations(
     payment_orders: list[PaymentOrder] = []
     price_lines: list[ReservationPriceLine] = []
 
+    reservation_unit_pks_with_discount = set(
+        PriceComponent.objects.filter(
+            pricing_group__reservation_unit_pricing_groups__reservation_unit__in=reservation_units,
+            can_apply_for_discount=True,
+        ).values_list("pricing_group__reservation_unit_pricing_groups__reservation_unit", flat=True)
+    )
     pricing_data = load_pricing_data(
         reservation_unit_pks=[reservation_unit.pk for reservation_unit in reservation_units]
     )
@@ -165,10 +171,7 @@ def _create_normal_reservations(
         min_interval_hours = max(int(max_buffer.total_seconds() / 3600), 1 if busy else 5)
         max_interval_hours = max(min_interval_hours + 1, 3 if busy else 10)
 
-        can_apply_for_discount = PriceComponent.objects.filter(
-            pricing_group__reservation_unit_pricing_groups__reservation_unit=reservation_unit,
-            can_apply_for_discount=True,
-        ).exists()
+        can_apply_for_discount = reservation_unit.pk in reservation_unit_pks_with_discount
 
         reservation_state: ReservationStateChoice = ReservationStateChoice.CONFIRMED
         handled_at: datetime.datetime | None = None
