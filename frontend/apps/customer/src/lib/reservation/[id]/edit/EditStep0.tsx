@@ -144,11 +144,12 @@ function EditStep0({
       return;
     }
     const { start, end } = slot;
-    const { data: priceData } = await fetchReservationPrice({
+    const { data: priceData, error: priceError } = await fetchReservationPrice({
       variables: { reservationUnit: reservationUnit.pk ?? 0, beginsAt: start.toISOString(), endsAt: end.toISOString() },
     });
-    const isFree = priceData?.reservationPrice == null || Number(priceData.reservationPrice.total) === 0;
-    // Only a free of charge reservation can be changed
+    // Only a free of charge reservation can be changed. A price that did not load is not free.
+    const isFree =
+      priceError == null && (priceData?.reservationPrice == null || Number(priceData.reservationPrice.total) === 0);
     if (!isFree) {
       errorToast({ text: t("reservationCalendar:errors.unavailable") });
       return;
