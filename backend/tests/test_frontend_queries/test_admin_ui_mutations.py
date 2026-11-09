@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from copy import deepcopy
+from decimal import Decimal
 from inspect import isfunction
 from typing import TYPE_CHECKING, Any
 from unittest.mock import MagicMock
@@ -472,7 +473,7 @@ def test_frontend_queries__admin_ui__CreateStaffReservation(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(own_price__amount=Decimal(10))
 
     begin = next_hour()
     end = begin + datetime.timedelta(hours=1)
