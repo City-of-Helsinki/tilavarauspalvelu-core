@@ -35,7 +35,6 @@ def create_series_with_price_option(*, name: str):
     for _ in range(2):
         reservation = ReservationFactory.create(
             reservation_series=series,
-            price=Decimal(10),
             state=ReservationStateChoice.CONFIRMED,
         )
         ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
@@ -47,32 +46,38 @@ def create_series_with_price_option(*, name: str):
 
 def test_reservation_series__query__price_sums_reservations_that_are_going_to_occur(graphql):
     series = ReservationSeriesFactory.create()
-    ReservationFactory.create(reservation_series=series, price=Decimal(10), state=ReservationStateChoice.CONFIRMED)
+    ReservationFactory.create(
+        reservation_series=series, price_lines__amount=Decimal(10), state=ReservationStateChoice.CONFIRMED
+    )
     ReservationFactory.create(
         reservation_series=series,
-        price=Decimal(20),
+        price_lines__amount=Decimal(20),
         state=ReservationStateChoice.REQUIRES_HANDLING,
     )
-    ReservationFactory.create(reservation_series=series, price=Decimal(100), state=ReservationStateChoice.CANCELLED)
-    ReservationFactory.create(reservation_series=series, price=Decimal(100), state=ReservationStateChoice.DENIED)
+    ReservationFactory.create(
+        reservation_series=series, price_lines__amount=Decimal(100), state=ReservationStateChoice.CANCELLED
+    )
+    ReservationFactory.create(
+        reservation_series=series, price_lines__amount=Decimal(100), state=ReservationStateChoice.DENIED
+    )
 
     graphql.login_with_superuser()
-    query = reservation_series_single_query(fields="price", id=to_global_id("ReservationSeriesNode", series.pk))
+    query = reservation_series_single_query(fields="totalPrice", id=to_global_id("ReservationSeriesNode", series.pk))
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert response.first_query_object == {"price": "30.00"}
+    assert response.first_query_object == {"totalPrice": "30.00"}
 
 
 def test_reservation_series__query__price_without_reservations(graphql):
     series = ReservationSeriesFactory.create()
 
     graphql.login_with_superuser()
-    query = reservation_series_single_query(fields="price", id=to_global_id("ReservationSeriesNode", series.pk))
+    query = reservation_series_single_query(fields="totalPrice", id=to_global_id("ReservationSeriesNode", series.pk))
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert response.first_query_object == {"price": "0.00"}
+    assert response.first_query_object == {"totalPrice": "0.00"}
 
 
 # ── Price option ──
@@ -108,7 +113,7 @@ def test_reservation_series__query__price_option_without_allocated_time_slot(gra
 
 def test_reservation_series__query__prices_of_many_series_do_not_grow_queries(graphql):
     graphql.login_with_superuser()
-    fields = "pk price priceOption { nameFi } reservations { price priceLines { amount } }"
+    fields = "pk totalPrice priceOption { nameFi } reservations { totalPrice priceLines { amount } }"
 
     create_series_with_price_option(name="Aikuiset")
     response = graphql(reservation_series_many_query(fields=fields))
@@ -126,7 +131,7 @@ def test_reservation_series__query__prices_of_many_series_do_not_grow_queries(gr
         "Juniorit",
         "Seniorit",
     ]
-    assert all(response.node(index)["price"] == "20.00" for index in range(3))
+    assert all(response.node(index)["totalPrice"] == "20.00" for index in range(3))
     response.assert_query_count(7)
 
 
@@ -140,11 +145,11 @@ def test_reservation_series__query__prices_for_staff_without_permission_to_the_s
 
     graphql.force_login(user)
     query = reservation_series_single_query(
-        fields="pk price priceOption { nameFi }",
+        fields="pk totalPrice priceOption { nameFi }",
         id=to_global_id("ReservationSeriesNode", series.pk),
     )
     response = graphql(query)
 
-    assert response.error_message("price") == "No permission to access field."
+    assert response.error_message("totalPrice") == "No permission to access field."
     assert response.error_message("priceOption") == "No permission to access field."
-    assert response.first_query_object == {"pk": series.pk, "price": None, "priceOption": None}
+    assert response.first_query_object == {"pk": series.pk, "totalPrice": None, "priceOption": None}

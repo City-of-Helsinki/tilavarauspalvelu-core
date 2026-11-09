@@ -242,21 +242,21 @@ def params_for_base_info(*, reservation: Reservation, language: Lang) -> dict[st
 
 def params_for_price_info(*, reservation: Reservation) -> dict[str, Any]:
     return {
-        "price": reservation.price,
-        "tax_percentage": reservation.tax_percentage_value,
+        "price": reservation.total_price,
+        "tax_percentage": _first_line_tax_percentage(reservation=reservation),
         "reservation_id": reservation.id,
     }
 
 
 def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
     # A handler can lower the price of a reservation that can apply for a discount, down to zero.
-    subsidised_price = Decimal(0) if reservation.actions.can_apply_for_discount() else reservation.price
+    subsidised_price = Decimal(0) if reservation.actions.can_apply_for_discount() else reservation.total_price
 
     return {
-        "price": reservation.price,
+        "price": reservation.total_price,
         "subsidised_price": subsidised_price,
         "applying_for_free_of_charge": reservation.applying_for_free_of_charge,
-        "tax_percentage": reservation.tax_percentage_value,
+        "tax_percentage": _first_line_tax_percentage(reservation=reservation),
         "reservation_id": reservation.id,
     }
 
@@ -580,3 +580,9 @@ def _compile_allocations_map(allocations_map: AllocationsMap) -> list[dict[str, 
         for weekday_map in allocations_map.values()
         for weekday, allocation in weekday_map.items()
     ]
+
+
+def _first_line_tax_percentage(*, reservation: Reservation) -> Decimal:
+    """The emails show one tax percentage, from the first price line, until they show each line (TILA-4594)."""
+    first_line = reservation.price_lines.order_by("pk").first()
+    return first_line.tax_percentage if first_line is not None else Decimal(0)

@@ -119,10 +119,9 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         numPersons
         ageGroup { minimum, maximum }
         purpose { nameFi }
-        unitPrice
-        price
-        priceNet
-        taxPercentageValue
+        totalPrice
+        totalPriceNet
+        totalPriceWithoutOverrides
         isHandled
         accessType
         accessCodeGeneratedAt
@@ -147,8 +146,8 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "isHandled": None,
         "name": None,
         "numPersons": None,
-        "price": None,
-        "priceNet": None,
+        "totalPrice": None,
+        "totalPriceNet": None,
         "purpose": None,
         "reserveeAddressZip": None,
         "reserveeEmail": None,
@@ -159,8 +158,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "reserveeOrganisationName": None,
         "reserveePhone": None,
         "reserveeType": None,
-        "taxPercentageValue": None,
-        "unitPrice": None,
+        "totalPriceWithoutOverrides": None,
         "user": None,
         "accessCodeShouldBeActive": None,
         "isAccessCodeIsActiveCorrect": None,
@@ -240,7 +238,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         municipality=MunicipalityChoice.HELSINKI,
         name="foo",
         num_persons=1,
-        price=123,
+        price_lines__amount=123,
         purpose=ReservationPurposeFactory.create(),
         reservee_address_zip="123",
         reservee_email="foo@email.com",
@@ -251,9 +249,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         reservee_phone="123",
         reservee_type=ReserveeType.COMPANY,
         state=ReservationStateChoice.CREATED,
-        tax_percentage_value=24,
         type=ReservationTypeChoice.STAFF,
-        unit_price=100,
         user=UserFactory.create(),
     )
 
@@ -273,8 +269,8 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         name
         numPersons
         paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl refundUuid expiresInMinutes reservation {pk}}
-        price
-        priceNet
+        totalPrice
+        totalPriceNet
         purpose { nameFi }
         reserveeAddressZip
         reserveeEmail
@@ -285,9 +281,8 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         reserveeOrganisationName
         reserveePhone
         reserveeType
-        taxPercentageValue
+        totalPriceWithoutOverrides
         type
-        unitPrice
         user { email }
     """
 
@@ -307,8 +302,8 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["name"] is not None, "field not found"
     assert response.node(0)["numPersons"] is not None, "field not found"
     assert response.node(0)["paymentOrder"] is not None, "field not found"
-    assert response.node(0)["price"] is not None, "field not found"
-    assert response.node(0)["priceNet"] is not None, "field not found"
+    assert response.node(0)["totalPrice"] is not None, "field not found"
+    assert response.node(0)["totalPriceNet"] is not None, "field not found"
     assert response.node(0)["purpose"] is not None, "field not found"
     assert response.node(0)["reserveeAddressZip"] is not None, "field not found"
     assert response.node(0)["reserveeEmail"] is not None, "field not found"
@@ -319,7 +314,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["reserveeOrganisationName"] is not None, "field not found"
     assert response.node(0)["reserveePhone"] is not None, "field not found"
     assert response.node(0)["reserveeType"] is not None, "field not found"
-    assert response.node(0)["taxPercentageValue"] is not None, "field not found"
+    assert response.node(0)["totalPriceWithoutOverrides"] is not None, "field not found"
     assert response.node(0)["type"] is not None, "field not found"
-    assert response.node(0)["unitPrice"] is not None, "field not found"
     assert response.node(0)["user"] is not None, "field not found"
