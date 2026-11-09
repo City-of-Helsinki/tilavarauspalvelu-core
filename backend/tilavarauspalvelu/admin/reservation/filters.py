@@ -55,7 +55,7 @@ class PaidReservationListFilter(admin.SimpleListFilter):
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]) -> QuerySet[Reservation]:
         if self.value() == "1":
-            return queryset.filter(price__gt=0)
+            return queryset.filter(total_price__gt=0)
         if self.value() == "0":
             return queryset.filter(price=0)
         return queryset

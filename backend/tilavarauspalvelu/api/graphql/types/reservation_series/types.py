@@ -82,7 +82,7 @@ class ReservationSeriesNode(DjangoNode):
         required=True,
     )
 
-    price = AnnotatedField(
+    total_price = AnnotatedField(
         graphene.Decimal,
         expression=Coalesce(
             models.Subquery(
@@ -92,12 +92,12 @@ class ReservationSeriesNode(DjangoNode):
                     state__in=ReservationStateChoice.states_going_to_occur,
                 )
                 .values("reservation_series")
-                .annotate(total=models.Sum("price"))
+                .annotate(total=models.Sum("total_price"))
                 .values("total")[:1]
             ),
             models.Value(Decimal("0.00")),
         ),
-        description="Sum of the prices of the reservations in the series that are going to occur.",
+        description="Sum of the total prices of the reservations in the series that are going to occur.",
     )
     price_option = ManuallyOptimizedField(
         PriceOptionNode,
@@ -136,7 +136,7 @@ class ReservationSeriesNode(DjangoNode):
             "should_have_active_access_code",
             "access_type",
             "pindora_info",
-            "price",
+            "total_price",
             "price_option",
         ]
         restricted_fields = {
@@ -146,7 +146,7 @@ class ReservationSeriesNode(DjangoNode):
             "allocated_time_slot": lambda user, res: user.permissions.can_view_reservation_series(res),
             "should_have_active_access_code": lambda user, res: user.permissions.can_view_reservation_series(res),
             "pindora_info": lambda user, res: user.permissions.can_view_reservation_series(res),
-            "price": lambda user, res: user.permissions.can_view_reservation_series(res),
+            "total_price": lambda user, res: user.permissions.can_view_reservation_series(res),
             "price_option": lambda user, res: user.permissions.can_view_reservation_series(res),
         }
         filterset_class = ReservationSeriesFilterSet

@@ -65,9 +65,10 @@ def email_reservation() -> Reservation:
         begins_at=local_datetime(2024, 1, 1, 12, 0),
         ends_at=local_datetime(2024, 1, 1, 15, 0),
         reservation_series=reservation_series,
-        price=Decimal("12.30"),
-        non_subsidised_price=Decimal("12.30"),
-        tax_percentage_value=Decimal("25.5"),
+        total_price=Decimal("12.30"),
+        total_price_without_overrides=Decimal("12.30"),
+        price_lines__amount=Decimal("12.30"),
+        price_lines__tax_percentage=Decimal("25.5"),
     )
 
     reservation_series_2 = ReservationSeriesFactory.create(

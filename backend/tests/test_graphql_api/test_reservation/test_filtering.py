@@ -416,12 +416,12 @@ def test_reservation__filter__by_unit__multiple(graphql):
     assert response.node(1) == {"pk": reservation_2.pk}
 
 
-def test_reservation__filter__by_price_lte(graphql):
-    reservation = ReservationFactory.create(price=30)
-    ReservationFactory.create(price=50)
+def test_reservation__filter__by_total_price_lte(graphql):
+    reservation = ReservationFactory.create(total_price=30)
+    ReservationFactory.create(total_price=50)
 
     graphql.login_with_superuser()
-    query = reservations_query(price_lte=30)
+    query = reservations_query(total_price_lte=30)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -429,12 +429,12 @@ def test_reservation__filter__by_price_lte(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
-def test_reservation__filter__by_price_gte(graphql):
-    reservation = ReservationFactory.create(price=50)
-    ReservationFactory.create(price=20)
+def test_reservation__filter__by_total_price_gte(graphql):
+    reservation = ReservationFactory.create(total_price=50)
+    ReservationFactory.create(total_price=20)
 
     graphql.login_with_superuser()
-    query = reservations_query(price_gte=30)
+    query = reservations_query(total_price_gte=30)
     response = graphql(query)
 
     assert response.has_errors is False, response

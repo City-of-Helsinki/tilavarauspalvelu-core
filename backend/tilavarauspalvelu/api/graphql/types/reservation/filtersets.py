@@ -50,8 +50,8 @@ class ReservationFilterSet(ModelFilterSet):
     created_at_gte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="gte", use_end_of_day=False)
     created_at_lte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="lte", use_end_of_day=True)
 
-    price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
-    price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
+    total_price_gte = django_filters.NumberFilter(field_name="total_price", lookup_expr="gte")
+    total_price_lte = django_filters.NumberFilter(field_name="total_price", lookup_expr="lte")
 
     applying_for_free_of_charge = django_filters.BooleanFilter(field_name="applying_for_free_of_charge")
     is_recurring = django_filters.BooleanFilter(field_name="reservation_series", lookup_expr="isnull", exclude=True)
@@ -74,7 +74,7 @@ class ReservationFilterSet(ModelFilterSet):
             "ends_at",
             "created_at",
             "state",
-            "price",
+            "total_price",
             ("reservation_unit__name_fi", "reservation_unit_name_fi"),
             ("reservation_unit__name_en", "reservation_unit_name_en"),
             ("reservation_unit__name_sv", "reservation_unit_name_sv"),

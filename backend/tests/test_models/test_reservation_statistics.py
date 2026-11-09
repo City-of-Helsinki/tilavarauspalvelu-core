@@ -46,8 +46,8 @@ def test_statistics__create__reservation_creation_creates_statistics(settings, d
             free_of_charge_reason="This is some reason.",
             municipality=MunicipalityChoice.HELSINKI,
             name="movies",
-            non_subsidised_price=Decimal("11.00"),
-            price=10,
+            total_price_without_overrides=Decimal("11.00"),
+            total_price=10,
             purpose=ReservationPurposeFactory(name="PurpleChoice"),
             reservation_series=reservation_series,
             reservation_unit=reservation_unit,
@@ -56,8 +56,8 @@ def test_statistics__create__reservation_creation_creates_statistics(settings, d
             reservee_organisation_name="Test organisation",
             reservee_type=ReserveeType.INDIVIDUAL,
             state=ReservationStateChoice.CREATED.value,
-            tax_percentage_value=24,
-            unit_price=10,
+            price_lines__amount=Decimal("11.00"),
+            price_lines__tax_percentage=24,
             working_memo="its like that",
             user__preferred_language="fi",
         )
@@ -86,11 +86,11 @@ def test_statistics__create__reservation_creation_creates_statistics(settings, d
     assert stat.is_applied is True
     assert stat.is_recurring is True
     assert stat.is_subsidised is True
-    assert stat.non_subsidised_price == reservation.non_subsidised_price
-    assert stat.non_subsidised_price_net == reservation.non_subsidised_price_net
+    assert stat.non_subsidised_price == reservation.total_price_without_overrides
+    assert stat.non_subsidised_price_net == Decimal("8.87")
     assert stat.num_persons == reservation.num_persons
-    assert stat.price == reservation.price
-    assert stat.price_net == reservation.price_net
+    assert stat.price == reservation.total_price
+    assert stat.price_net == reservation.total_price_net
     assert stat.primary_reservation_unit == reservation_unit.id
     assert stat.primary_reservation_unit_name == reservation_unit.name
     assert stat.primary_unit_name == reservation_unit.unit.name
@@ -113,7 +113,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings, d
     assert stat.reservee_type == reservation.reservee_type
     assert stat.reservee_uuid == str(reservation.user.tvp_uuid)
     assert stat.state == reservation.state
-    assert stat.tax_percentage_value == reservation.tax_percentage_value
+    assert stat.tax_percentage_value == Decimal(24)
 
 
 def test_statistics__create__after_commit(settings, django_capture_on_commit_callbacks):

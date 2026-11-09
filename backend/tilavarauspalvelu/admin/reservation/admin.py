@@ -34,8 +34,6 @@ from .filters import (
 from .form import PaymentOrderInline, ReservationAdminForm, ReservationPriceLineInline
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-
     from django.db.models import QuerySet
 
     from tilavarauspalvelu.models import PaymentOrder
@@ -131,13 +129,10 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             _("Price"),
             {
                 "fields": [
-                    "price",
-                    "price_net",
+                    "total_price",
+                    "total_price_net",
+                    "total_price_without_overrides",
                     "price_option",
-                    "non_subsidised_price",
-                    "non_subsidised_price_net",
-                    "unit_price",
-                    "tax_percentage_value",
                     "applying_for_free_of_charge",
                     "free_of_charge_reason",
                 ],
@@ -191,8 +186,9 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "handled_at",
         "confirmed_at",
         "created_at",
-        "price_net",
-        "non_subsidised_price_net",
+        "total_price",
+        "total_price_net",
+        "total_price_without_overrides",
         "price_option",
         "access_code_is_active",
         "access_code_should_be_active",
@@ -230,12 +226,6 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
 
         return queryset, may_have_duplicates
 
-    def price_net(self, obj: Reservation) -> Decimal:
-        return obj.price_net
-
-    def non_subsidised_price_net(self, obj: Reservation) -> Decimal:
-        return obj.non_subsidised_price_net
-
     def _deny_reservations_action_confirmation_page(
         self,
         request: WSGIRequest,
@@ -252,17 +242,17 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
 
         queryset = queryset.filter(ends_at__gte=local_datetime())
         queryset_unpaid_reservation_count = queryset.filter(price=0).count()
-        queryset_paid_reservation_count = queryset.filter(price__gt=0).count()
+        queryset_paid_reservation_count = queryset.filter(total_price__gt=0).count()
 
         queryset_refundable_reservation_count = queryset.filter(
-            price__gt=0,
+            total_price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID,
             payment_order__refund_id__isnull=True,
         ).count()
 
         queryset_cancellable_reservation_count = queryset.filter(
-            price__gt=0,
+            total_price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID_BY_INVOICE,
             begins_at__date__gte=local_date(),
@@ -350,7 +340,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         # Refund paid reservations
         refund_queryset = queryset.filter(
             state=ReservationStateChoice.DENIED,
-            price__gt=0,
+            total_price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID,
             payment_order__refund_id__isnull=True,
@@ -362,7 +352,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         # Cancel invoiced reservations
         cancel_queryset = queryset.filter(
             state=ReservationStateChoice.DENIED,
-            price__gt=0,
+            total_price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID_BY_INVOICE,
             begins_at__date__gte=local_date(),

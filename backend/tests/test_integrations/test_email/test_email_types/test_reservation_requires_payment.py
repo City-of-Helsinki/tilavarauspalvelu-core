@@ -273,7 +273,7 @@ def test_reservation_requires_payment__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        price=1,
+        total_price=1,
         handled_at=local_datetime(),
         payment_order__handled_payment_due_by=local_datetime(),
     )
@@ -294,7 +294,7 @@ def test_reservation_requires_payment__send_email__no_recipients(outbox):
         reservee_email="",
         user__email="",
         reservation_unit__name="foo",
-        price=1,
+        total_price=1,
         handled_at=local_datetime(),
         payment_order__handled_payment_due_by=local_datetime(),
     )
@@ -314,7 +314,7 @@ def test_reservation_requires_payment__send_email__price_zero(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        price=0,
+        total_price=0,
         handled_at=local_datetime(),
         payment_order__handled_payment_due_by=local_datetime(),
     )
@@ -331,7 +331,7 @@ def test_reservation_requires_payment__send_email__not_handled(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        price=1,
+        total_price=1,
         handled_at=None,
         payment_order__handled_payment_due_by=local_datetime(),
     )
@@ -348,7 +348,7 @@ def test_reservation_requires_payment__send_email__no_payment_order(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        price=1,
+        total_price=1,
         handled_at=local_datetime(),
         payment_order=None,
     )
@@ -365,7 +365,7 @@ def test_reservation_requires_payment__send_email__payment_order_not_handled_pay
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        price=1,
+        total_price=1,
         handled_at=local_datetime(),
         payment_order__handled_payment_due_by=None,
     )

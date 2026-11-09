@@ -430,8 +430,8 @@ type Query {
     endDate: Date
     createdAtGte: Date
     createdAtLte: Date
-    priceGte: Decimal
-    priceLte: Decimal
+    totalPriceGte: Decimal
+    totalPriceLte: Decimal
     applyingForFreeOfCharge: Boolean
     isRecurring: Boolean
     requested: Boolean
@@ -471,8 +471,8 @@ type Query {
     endDate: Date
     createdAtGte: Date
     createdAtLte: Date
-    priceGte: Decimal
-    priceLte: Decimal
+    totalPriceGte: Decimal
+    totalPriceLte: Decimal
     applyingForFreeOfCharge: Boolean
     isRecurring: Boolean
     requested: Boolean
@@ -890,8 +890,8 @@ type ReservationUnitNode implements Node {
     endDate: Date
     createdAtGte: Date
     createdAtLte: Date
-    priceGte: Decimal
-    priceLte: Decimal
+    totalPriceGte: Decimal
+    totalPriceLte: Decimal
     applyingForFreeOfCharge: Boolean
     isRecurring: Boolean
     requested: Boolean
@@ -1512,9 +1512,9 @@ type ReservationNode implements Node {
   accessType: AccessType
   accessCodeGeneratedAt: DateTime
   accessCodeIsActive: Boolean
-  price: Decimal
-  unitPrice: Decimal
-  taxPercentageValue: Decimal
+  totalPrice: Decimal
+  totalPriceWithoutOverrides: Decimal
+  totalPriceNet: Decimal
   applyingForFreeOfCharge: Boolean
   freeOfChargeReason: String
   reserveeIdentifier: String
@@ -1554,7 +1554,6 @@ type ReservationNode implements Node {
   Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized.
   """
   pindoraInfo: PindoraReservationInfoType
-  priceNet: Decimal
   pk: Int
 }
 
@@ -1772,8 +1771,8 @@ type ReservationSeriesNode implements Node {
     endDate: Date
     createdAtGte: Date
     createdAtLte: Date
-    priceGte: Decimal
-    priceLte: Decimal
+    totalPriceGte: Decimal
+    totalPriceLte: Decimal
     applyingForFreeOfCharge: Boolean
     isRecurring: Boolean
     requested: Boolean
@@ -1796,9 +1795,9 @@ type ReservationSeriesNode implements Node {
   isAccessCodeIsActiveCorrect: Boolean!
 
   """
-  Sum of the prices of the reservations in the series that are going to occur.
+  Sum of the total prices of the reservations in the series that are going to occur.
   """
-  price: Decimal
+  totalPrice: Decimal
 
   """Price option of the application section that the series was made for."""
   priceOption: PriceOptionNode
@@ -2229,8 +2228,8 @@ enum ReservationOrderingChoices {
   createdAtDesc
   stateAsc
   stateDesc
-  priceAsc
-  priceDesc
+  totalPriceAsc
+  totalPriceDesc
   reservationUnitNameFiAsc
   reservationUnitNameFiDesc
   reservationUnitNameEnAsc
@@ -4527,7 +4526,6 @@ input ReservationDeleteTentativeMutationInput {
 
 type ReservationApproveMutationPayload {
   pk: Int
-  price: Decimal
   handlingDetails: String
   handledAt: DateTime
   state: ReservationStateChoice
@@ -4535,8 +4533,7 @@ type ReservationApproveMutationPayload {
 
 input ReservationApproveMutationInput {
   pk: Int!
-  price: Decimal
-  priceLines: [ReservationPriceLineOverrideSerializerInput]
+  priceLines: [ReservationPriceLineOverrideSerializerInput]!
   handlingDetails: String!
 }
 
@@ -4627,12 +4624,9 @@ type ReservationStaffModifyMutationPayload {
   endsAt: DateTime
   bufferTimeAfter: Duration
   bufferTimeBefore: Duration
-  price: Decimal
-  priceNet: String
-  nonSubsidisedPrice: Decimal
-  nonSubsidisedPriceNet: String
-  taxPercentageValue: Decimal
-  unitPrice: Decimal
+  totalPrice: Decimal
+  totalPriceWithoutOverrides: Decimal
+  totalPriceNet: Decimal
 }
 
 input ReservationStaffModifyMutationInput {

@@ -275,7 +275,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
             "age_group",
             "reservation_unit",
             "reservation_unit__unit",
-        )
+        ).prefetch_related("price_lines")
 
         new_statistics: list[ReservationStatistic] = [
             ReservationStatistic.for_reservation(reservation) for reservation in reservations

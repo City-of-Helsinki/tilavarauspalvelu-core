@@ -1307,7 +1307,6 @@ msgid ""
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Price"
 msgstr ""
 
@@ -1432,23 +1431,15 @@ msgid "Door code generated at"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Price net"
+msgid "Total price"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Non-subsidised price"
+msgid "Total net price"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Non-subsidised net price"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Unit price"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Tax percentage value"
+msgid "Total price without overrides"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1570,27 +1561,17 @@ msgid "When this reservation was created"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "The price of this particular reservation including VAT"
+msgid "The sum of the final amounts of the price lines, including VAT"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "The price of this particular reservation excluding VAT"
+msgid "The sum of the final amounts of the price lines, excluding VAT"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "The non subsidised price of this reservation including VAT"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "The non subsidised price of this reservation excluding VAT"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "The unit price of this particular reservation"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "The value of the tax percentage for this particular reservation"
+msgid ""
+"The sum of the amounts of the price lines without the overrides of the "
+"handler, including VAT"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py

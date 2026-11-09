@@ -85,8 +85,8 @@ def test_reservation__query__all_fields(graphql):
         name
         numPersons
         paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl refundUuid expiresInMinutes }
-        price
-        priceNet
+        totalPrice
+        totalPriceNet
         purpose { nameFi }
         reservationSeries { user { email } }
         reservationUnit { nameFi }
@@ -100,9 +100,8 @@ def test_reservation__query__all_fields(graphql):
         reserveePhone
         reserveeType
         state
-        taxPercentageValue
+        totalPriceWithoutOverrides
         type
-        unitPrice
         user { email }
         workingMemo
     """
@@ -139,8 +138,8 @@ def test_reservation__query__all_fields(graphql):
         "name": reservation.name,
         "numPersons": reservation.num_persons,
         "paymentOrder": None,
-        "price": f"{reservation.price:.2f}",
-        "priceNet": f"{reservation.price_net:.2f}",
+        "totalPrice": f"{reservation.total_price:.2f}",
+        "totalPriceNet": f"{reservation.total_price_net:.2f}",
         "purpose": None,
         "reservationSeries": None,
         "reservationUnit": {"nameFi": reservation.reservation_unit.name_fi},
@@ -154,9 +153,8 @@ def test_reservation__query__all_fields(graphql):
         "reserveePhone": reservation.reservee_phone,
         "reserveeType": reservation.reservee_type,
         "state": reservation.state,
-        "taxPercentageValue": f"{reservation.tax_percentage_value:.2f}",
+        "totalPriceWithoutOverrides": f"{reservation.total_price_without_overrides:.2f}",
         "type": reservation.type,
-        "unitPrice": f"{reservation.unit_price:.2f}",
         "user": {"email": reservation.user.email},
         "workingMemo": reservation.working_memo,
     }
