@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
   // and spawns too many workers (OOM in memory limited containers)
   experimental: {
     cpus: numberOfCores,
-    serverSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
+    serverSourceMaps: env.SENTRY_CREATE_RELEASE,
   },
   transpilePackages: ["ui", "hds-core", "hds-react"],
   // create a smaller bundle
@@ -108,7 +108,7 @@ const nextConfig: NextConfig = {
   },
   // Sentry upload options don't fully control all emitted chunk sourcemaps.
   // In this app, sourcemap generation is controlled via Next.js/Turbopack config.
-  productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
+  productionBrowserSourceMaps: env.SENTRY_CREATE_RELEASE,
   compiler: {
     styledComponents: {
       ssr: true,
