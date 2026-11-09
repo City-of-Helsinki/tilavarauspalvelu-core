@@ -89,7 +89,7 @@ def test_reservation_unit__archive__removes_contact_information_and_audit_logs(g
         exclude_fields=[
             "_publishing_state",
             "_reservation_state",
-            "_active_pricing_price",
+            "_highest_price_today",
             "_current_access_type",
         ],
     )

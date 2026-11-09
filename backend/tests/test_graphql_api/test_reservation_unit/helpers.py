@@ -183,19 +183,17 @@ def create_reservation_units_for_reservation_state_filtering() -> ReservationSta
     )
     reservable_paid = ReservationUnitFactory.create(
         payment_product=PaymentProductFactory.create(),
-        pricings__highest_price=20,
+        own_price__amount=20,
     )
     reservable_free = ReservationUnitFactory.create(
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
+        own_price__amount=0,
     )
     scheduled_period = ReservationUnitFactory.create(
         reservation_begins_at=(now + datetime.timedelta(days=1)),
         reservation_ends_at=(now + datetime.timedelta(days=2)),
     )
     scheduled_closing = ReservationUnitFactory.create(
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
+        own_price__amount=0,
         reservation_begins_at=(now - datetime.timedelta(days=1)),
         reservation_ends_at=(now + datetime.timedelta(days=1)),
     )
@@ -205,7 +203,7 @@ def create_reservation_units_for_reservation_state_filtering() -> ReservationSta
     )
     missing_pricing = ReservationUnitFactory.create()
     missing_payment_product = ReservationUnitFactory.create(
-        pricings__highest_price=20,
+        own_price__amount=20,
     )
 
     return ReservationStateFiltering(
