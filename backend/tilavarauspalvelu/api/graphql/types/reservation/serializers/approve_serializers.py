@@ -147,13 +147,10 @@ class ReservationApproveSerializer(NestingModelSerializer):
             return data
 
         reservation_unit = self.instance.reservation_unit
+        reservation_unit.validators.validate_has_payment_type()
+        payment_type = PaymentType(reservation_unit.payment_type)
+
         begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
-
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begin.date())
-        if pricing is None:
-            msg = "No pricing found for reservation's begin date."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
-
         now = local_datetime()
         three_days_from_now = now + datetime.timedelta(days=3)
         one_hour_before_begin = begin.astimezone(datetime.UTC) - datetime.timedelta(hours=1)
@@ -161,20 +158,20 @@ class ReservationApproveSerializer(NestingModelSerializer):
         data["handled_payment_due_by"] = min(three_days_from_now, one_hour_before_begin)
 
         # Use on-site payment if the reservation is going to begin soon,
-        # even if the current pricing payment type is not on-site.
+        # even if the payment type of the reservation unit is not on-site.
         if time_until_begin < datetime.timedelta(hours=2):
             data["payment_type"] = PaymentType.ON_SITE
             return data
 
-        if pricing.payment_type != PaymentType.ON_SITE:
+        if payment_type != PaymentType.ON_SITE:
             reservation_unit.validators.validate_has_payment_product()
 
             # A webshop payment uses the tax rate of the date of sale.
             # Other payments keep the tax rate from the date the reservation was created.
             today = local_date()
-            data["tax_percentage_value"] = pricing.tax_level.actions.get_percentage(on_date=today)
+            data["tax_percentage_value"] = self.instance.actions.get_tax_percentage(on_date=today)
 
-        data["payment_type"] = PaymentType(pricing.payment_type)
+        data["payment_type"] = payment_type
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:

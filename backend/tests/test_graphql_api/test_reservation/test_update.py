@@ -31,7 +31,7 @@ def test_reservation__update(graphql):
 
 
 def test_reservation__update__with_additional_data(graphql):
-    reservation = ReservationFactory.create_for_update(reservation_unit__can_apply_free_of_charge=True)
+    reservation = ReservationFactory.create_for_update(price_lines__price_component__can_apply_for_discount=True)
 
     age_group = AgeGroupFactory.create(minimum=18, maximum=30)
     purpose = ReservationPurposeFactory.create(name="Test purpose")
@@ -237,7 +237,7 @@ def test_reservation__update__already_has_max_reservations_per_user(graphql):
 
 
 def test_reservation__update__require_free_of_charge_reason_if_applying_for_free_of_charge(graphql):
-    reservation = ReservationFactory.create_for_update(reservation_unit__can_apply_free_of_charge=True)
+    reservation = ReservationFactory.create_for_update(price_lines__price_component__can_apply_for_discount=True)
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, applyingForFreeOfCharge=True)
@@ -247,15 +247,17 @@ def test_reservation__update__require_free_of_charge_reason_if_applying_for_free
     assert response.field_error_messages() == ["Free of charge reason is mandatory when applying for free of charge."]
 
 
-def test_reservation__update__applying_for_free_of_charge_not_allowed_for_reservation_unit(graphql):
-    reservation = ReservationFactory.create_for_update(reservation_unit__can_apply_free_of_charge=False)
+def test_reservation__update__applying_for_free_of_charge_not_allowed_by_price(graphql):
+    reservation = ReservationFactory.create_for_update(price_lines__price_component__can_apply_for_discount=False)
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, applyingForFreeOfCharge=True, freeOfChargeReason="foo")
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation unit does not allow applying for free of charge."]
+    assert response.field_error_messages() == [
+        "The price of the reservation does not allow applying for free of charge."
+    ]
 
     reservation.refresh_from_db()
     assert reservation.applying_for_free_of_charge is False
