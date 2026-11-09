@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -39,6 +39,23 @@ function Harness({
     defaultValues.pricings = defaultValues.pricings.map((p) => ({ ...p, taxLevel }));
   }
   const form = useForm<ReservationUnitEditFormValues>({ defaultValues });
+  return (
+    <PricingSection
+      form={form}
+      taxLevelOptions={TAX_LEVEL_OPTIONS}
+      salesItemOptions={SALES_ITEM_OPTIONS}
+      pricingTermsOptions={PRICING_TERMS_OPTIONS}
+    />
+  );
+}
+
+/// Like the editor page, the form gets the saved prices after the first render
+function LateDataHarness({ pricings }: { pricings: ReservationUnitEditFormValues["pricings"] }) {
+  const form = useForm<ReservationUnitEditFormValues>({ defaultValues: convertReservationUnit(undefined) });
+  const { reset } = form;
+  useEffect(() => {
+    reset({ ...convertReservationUnit(undefined), pricings, hasFuturePricing: true });
+  }, [reset, pricings]);
   return (
     <PricingSection
       form={form}
@@ -237,6 +254,19 @@ describe("PricingSection for a reservation unit without saved prices", () => {
 });
 
 describe("PricingSection for a reservation unit with a saved price", () => {
+  it("keeps a saved future price that loads after the first render", async () => {
+    const [current, future] = createReadOnlyPricingList();
+    if (current == null || future == null) {
+      throw new Error("Expected a current and a future price");
+    }
+    const savedFuture = { ...future, pk: 2, isPaid: true, price: 30, priceUnit: PriceUnit.PerHour, taxLevel: 1 };
+    render(<LateDataHarness pricings={[current, savedFuture]} />);
+    await openAccordion();
+
+    const newPricing = await screen.findByRole("group", { name: "label.newPricing" });
+    expect(within(newPricing).getByRole("spinbutton", { name: nameLike("label.price") })).toHaveValue(30);
+  });
+
   it("shows the current price as a summary that can not be changed", async () => {
     render(<Harness overrides={{ pricings: createReadOnlyPricingList(), pricingTerms: "terms-1" }} />);
     await openAccordion();

@@ -195,7 +195,8 @@ function useCopyCurrentPricingToFuture(form: UseFormReturn<ReservationUnitEditFo
     const current = pricingList.find((p) => !p.isFuture);
     const futureIndex = pricingList.findIndex((p) => p.isFuture);
     const future = pricingList[futureIndex];
-    if (current == null || future == null) {
+    // The data of the reservation unit can load after the first render, so check here that the future price is not saved
+    if (current == null || future == null || future.pk > 0) {
       return;
     }
     setValue(
