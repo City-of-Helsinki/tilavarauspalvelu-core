@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import transaction
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.urls import reverse
@@ -402,13 +402,38 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 raise ValidationError({"payment_terms": msg})
 
     def _has_paid_price(self) -> bool:
-        """The reservation unit has a paid price that is in effect today or in the future."""
+        """
+        The reservation unit has a paid price that is in effect today or in the future.
+
+        Only the pricing group in effect today and the future pricing groups count,
+        and each one only for the time that the reservation unit uses it.
+        """
         if self.instance.pk is None:
             return False
 
         today = local_date()
-        return PriceComponent.objects.filter(
-            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
-            pricing_group__reservation_unit_pricing_groups__reservation_unit=self.instance,
-            amount__gt=0,
-        ).exists()
+        rows = list(self.instance.reservation_unit_pricing_groups.order_by("begins"))
+        past_or_active_rows = [row for row in rows if row.begins <= today]
+        current_rows = past_or_active_rows[-1:] + [row for row in rows if row.begins > today]
+
+        paid_components = list(
+            PriceComponent.objects.filter(
+                pricing_group_id__in={row.pricing_group_id for row in current_rows},
+                amount__gt=0,
+            )
+        )
+
+        for index, row in enumerate(current_rows):
+            used_from = max(row.begins, today)
+            next_row = current_rows[index + 1] if index + 1 < len(current_rows) else None
+            used_until = next_row.begins if next_row is not None else None
+
+            for component in paid_components:
+                if component.pricing_group_id != row.pricing_group_id:
+                    continue
+                ends_after_use_begins = component.valid_until is None or component.valid_until > used_from
+                begins_before_use_ends = used_until is None or component.valid_from < used_until
+                if ends_after_use_begins and begins_before_use_ends:
+                    return True
+
+        return False
