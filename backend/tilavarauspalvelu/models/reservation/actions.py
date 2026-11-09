@@ -33,7 +33,7 @@ from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservati
 from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_date_of, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_date_of, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -191,28 +191,6 @@ class ReservationActions:
 
     def get_instructions(self, *, kind: Literal["confirmed", "pending", "cancelled"], language: Lang) -> str:
         return get_attr_by_language(self.reservation.reservation_unit, f"reservation_{kind}_instructions", language)
-
-    def calculate_full_price(
-        self,
-        begin_datetime: datetime.datetime,
-        end_datetime: datetime.datetime,
-        *,
-        subsidised: bool = False,
-    ) -> Decimal:
-        # Currently, there is ever only one reservation unit per reservation
-        reservation_unit: ReservationUnit | None = self.reservation.reservation_unit
-        if reservation_unit is None:
-            msg = "Reservation has no reservation unit"
-            raise ReservationPriceCalculationError(msg)
-
-        begin_date = local_date_of(begin_datetime)
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
-        if pricing is None:
-            msg = "Reservation unit has no pricing information"
-            raise ReservationPriceCalculationError(msg)
-
-        duration = datetime_difference(start_datetime=begin_datetime, end_datetime=end_datetime)
-        return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)
 
     def get_tax_percentage(self, *, on_date: datetime.date) -> Decimal:
         """
