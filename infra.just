@@ -148,7 +148,7 @@ oc-copy-from app env path dest=".": (oc-select env)
 
     oc rsync "${pod#pod/}:{{ path }}" "{{ dest }}"
 
-# Copy a local directory to a running pod of an app for an env
+# Copy a local file or directory to a running pod of an app for an env. A file goes into the directory 'path'.
 oc-copy-to app env src path: (oc-select env)
     #!/usr/bin/env bash
     set -euo pipefail
@@ -162,7 +162,14 @@ oc-copy-to app env src path: (oc-select env)
     fi
     echo "Using pod ${pod#pod/}" >&2
 
-    oc rsync "{{ src }}" "${pod#pod/}:{{ path }}"
+    # 'oc rsync' copies only directories.
+    if [ -f "{{ src }}" ]; then
+        oc cp "{{ src }}" "${pod#pod/}:{{ path }}/$(basename "{{ src }}")"
+        exit 0
+    fi
+
+    # The app user cannot change the permissions of the directories in the pod.
+    oc rsync --no-perms "{{ src }}" "${pod#pod/}:{{ path }}"
 
 # Log in to Azure DevOps in the City of Helsinki tenant
 az-login:
