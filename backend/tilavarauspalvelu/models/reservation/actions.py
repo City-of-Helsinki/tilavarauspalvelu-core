@@ -417,7 +417,12 @@ class ReservationActions:
         if accounting is None:
             return False
 
-        return accounting.actions.supports_invoicing()
+        if not accounting.actions.supports_invoicing():
+            return False
+
+        # The product accounting in Talpa has the material of the sales item of today.
+        sales_item = reservation_unit.actions.get_sales_item_today()
+        return sales_item is not None and bool(sales_item.material)
 
     def get_applying_reservation_unit_access_type(self) -> ReservationUnitAccessType | None:
         """Get the reservation unit access type that is currently being applied to the reservation."""
