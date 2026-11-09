@@ -538,6 +538,12 @@ describe("ReservationUnitEditSchema", () => {
     }
   });
 
+  it("does not validate the placeholder prices of a shared pricing group", () => {
+    const values = createValidFormValues({ isSharedPricingGroup: true });
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: null };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
+  });
+
   it("does not require the choice of paid or free in a draft", () => {
     const values = createValidFormValues({ isDraft: true });
     values.pricings[0] = { ...at(values.pricings, 0), isPaid: null };
