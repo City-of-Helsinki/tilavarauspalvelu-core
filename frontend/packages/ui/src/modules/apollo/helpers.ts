@@ -49,32 +49,48 @@ function isMutation(operation: ApolloLink.Operation): boolean {
   return definition.kind === Kind.OPERATION_DEFINITION && definition.operation === OperationTypeNode.MUTATION;
 }
 
+/// True if the backend can still complete the request after this error.
+/// After a timeout the client stopped waiting. After a 504 the gateway stopped waiting.
+/// In both cases the backend can still run the request.
+function isUncertainOutcome(error: FetchError): boolean {
+  return error.kind === "timeout" || (error.kind === "http" && error.status === 504);
+}
+
+/// The toast that the error link shows for a request error, or null if it shows none
+/// @param lang - the language of the page. The text is not translated with i18n, the error link has no t function.
+export function getFetchErrorToast(
+  error: FetchError,
+  isMutationRequest: boolean,
+  lang: LocalizationLanguages
+): { id: string; text: string } | null {
+  // The admin UI has no middleware that could redirect to the backend when the CSRF token is missing.
+  // In practice this is not a problem, because login sets the CSRF token and the login page is static.
+  if (!isToastedByErrorLink(error)) {
+    return null;
+  }
+  // A mutation can be complete on the backend, so tell the user not to send it again before a refresh.
+  // It has its own toast id, so an open network error toast does not hide it.
+  if (isMutationRequest && isUncertainOutcome(error)) {
+    return { id: "mutation_timeout_error", text: MUTATION_TIMEOUT_TRANSLATIONS[lang] };
+  }
+  const text = NETWORK_ERROR_TRANSLATIONS[lang];
+  return { id: "network_error", text: error.kind === "http" ? `${text}: ${error.status}` : text };
+}
+
 function toastFetchError(error: FetchError, operation: ApolloLink.Operation): void {
   if (!isBrowser) {
     return;
   }
-  // The admin UI has no middleware that could redirect to the backend when the CSRF token is missing.
-  // In practice this is not a problem, because login sets the CSRF token and the login page is static.
-  if (!isToastedByErrorLink(error)) {
-    return;
-  }
-  const isMutationTimeout = error.kind === "timeout" && isMutation(operation);
-  // The mutation timeout has its own toast, so an open network error toast does not hide it
-  const errorToastId = isMutationTimeout ? "mutation_timeout_error" : "network_error";
-  // don't create multiple toasts
-  if (document.querySelector(`#${errorToastId}`)) {
-    return;
-  }
-  // Not translated because of how difficult it is to pass the translation function here
   const lang = getLocalizationLang(document.documentElement.lang);
-  let errorMsg = isMutationTimeout ? MUTATION_TIMEOUT_TRANSLATIONS[lang] : NETWORK_ERROR_TRANSLATIONS[lang];
-  if (error.kind === "http") {
-    errorMsg += `: ${error.status}`;
+  const errorToast = getFetchErrorToast(error, isMutation(operation), lang);
+  // don't create multiple toasts
+  if (errorToast == null || document.querySelector(`#${errorToast.id}`)) {
+    return;
   }
   toast({
-    text: errorMsg,
+    text: errorToast.text,
     type: "error",
-    options: { toastId: errorToastId },
+    options: { toastId: errorToast.id },
   });
 }
 
