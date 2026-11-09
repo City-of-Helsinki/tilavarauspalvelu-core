@@ -3,6 +3,7 @@ import { log } from "../lib/runtime";
 import { test } from "./fixtures";
 import { NOTIFICATION_BANNER_CLEANUP_PATTERN } from "./Resources/texts_FI";
 import {
+  NOTIFICATION_ADMIN_STATE,
   NOTIFICATION_TYPE_ERROR,
   NOTIFICATION_TYPE_NORMAL,
   NOTIFICATION_TYPE_WARNING,
@@ -16,6 +17,9 @@ test.describe(
     annotation: [{ type: "Documentation", description: "Admin notification tests that must run serially" }],
   },
   () => {
+    // The tests start with the admin's login, which the notifications_login project saved before them
+    test.use({ storageState: NOTIFICATION_ADMIN_STATE });
+
     test.beforeEach(async ({ appCommon }) => {
       await appCommon.userOpensDesktopBrowserToLandingPage();
     });
@@ -34,8 +38,7 @@ test.describe(
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
       await popups.closeNotificationBannerIfVisible();
-      await appCommon.adminGoesToLandingPage();
-      await appCommon.adminLogsInWithSuomiFi();
+      await appCommon.adminGoesToLandingPageLoggedIn();
 
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
@@ -96,8 +99,7 @@ test.describe(
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
       await popups.closeNotificationBannerIfVisible();
-      await appCommon.adminGoesToLandingPage();
-      await appCommon.adminLogsInWithSuomiFi();
+      await appCommon.adminGoesToLandingPageLoggedIn();
 
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
@@ -158,8 +160,7 @@ test.describe(
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
       await popups.closeNotificationBannerIfVisible();
-      await appCommon.adminGoesToLandingPage();
-      await appCommon.adminLogsInWithSuomiFi();
+      await appCommon.adminGoesToLandingPageLoggedIn();
 
       await log("Test cleanup");
       // This is for test cleanup if the last run failed
@@ -229,8 +230,7 @@ test.describe(
         await log("Test cleanup");
         // This is for test cleanup if the last run failed
         await popups.closeNotificationBannerIfVisible();
-        await appCommon.adminGoesToLandingPage();
-        await appCommon.adminLogsInWithSuomiFi();
+        await appCommon.adminGoesToLandingPageLoggedIn();
 
         await log("Test cleanup");
         // This is for test cleanup if the last run failed

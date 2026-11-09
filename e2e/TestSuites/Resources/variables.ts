@@ -7,6 +7,9 @@ export const URL_DJANGO_ADMIN = "https://varaamo.test.hel.ninja/admin/login/";
 export const URL_MAIL = "https://www.google.com/intl/fi/gmail/about/";
 export const DOWNLOAD_DIR = `${import.meta.dirname}/downloads`;
 export const EMAIL_FILE_PATH = `${import.meta.dirname}/downloads/cleaned_emails.json`;
+// The admin's login for the notification tests, which TestSuites/notifications_login.setup.ts saves. It's a session,
+// so it's kept in the git-ignored .shared-state/.
+export const NOTIFICATION_ADMIN_STATE = `${import.meta.dirname}/../../.shared-state/notification-admin.json`;
 // Milliseconds, like Playwright's timeouts
 export const BROWSER_TIMEOUT_GLOBAL = 40_000;
 export const CONTENT_WAIT_TIMEOUT = 10_000;
