@@ -13,6 +13,7 @@ from tilavarauspalvelu.enums import (
     AccessType,
     AuthenticationType,
     PaymentType,
+    PriceUnit,
     ReservationKind,
     ReservationStartInterval,
 )
@@ -47,9 +48,9 @@ def test_reservation_unit_export__multiple():
         pricing_terms__name="Pricing terms",
         cancellation_rule__name="Cancellation rule",
         reservation_unit_type__name="Normal",
-        pricings__highest_price=Decimal(20),
-        pricings__payment_type=PaymentType.ONLINE,
-        pricings__material_price_description="Material price description",
+        own_price__amount=Decimal(20),
+        payment_type=PaymentType.ONLINE,
+        own_price__material_price_description="Material price description",
         access_types__access_type=AccessType.UNRESTRICTED,
     )
 
@@ -101,11 +102,11 @@ def test_reservation_unit_export__multiple():
     assert row_2[next(index)] == reservation_unit_1.cancellation_terms.name
     assert row_2[next(index)] == reservation_unit_1.pricing_terms.name
     assert row_2[next(index)] == reservation_unit_1.cancellation_rule.name
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().price_unit
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().lowest_price
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().highest_price
+    assert row_2[next(index)] == PriceUnit.PER_HOUR
+    assert row_2[next(index)] == Decimal(20)
+    assert row_2[next(index)] == Decimal(20)
     assert row_2[next(index)] == "25.50%"
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().material_price_description
+    assert row_2[next(index)] == "Material price description"
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)
     assert row_2[next(index)] == reservation_unit_1.reservation_form
@@ -113,8 +114,8 @@ def test_reservation_unit_export__multiple():
     assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label
     assert row_2[next(index)] == ReservationKind(reservation_unit_1.reservation_kind).label
     assert row_2[next(index)] == AccessType(reservation_unit_1.current_access_type).label
-    assert row_2[next(index)] == PaymentType(reservation_unit_1.pricings.first().payment_type).label
-    assert row_2[next(index)] == reservation_unit_1.can_apply_free_of_charge
+    assert row_2[next(index)] == PaymentType.ONLINE.label
+    assert row_2[next(index)] is False
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_fi
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_sv
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_en
@@ -187,7 +188,7 @@ def test_reservation_unit_export__multiple():
                 column_value_mapping={"Cancellation rule": ""},
             ),
             "Missing Pricing": MissingParams(
-                missing=Missing(deleted=["pricings__highest_price"]),
+                missing=Missing(deleted=["own_price__amount"]),
                 column_value_mapping={
                     "Price unit": "",
                     "Lowest price": "",
@@ -229,7 +230,7 @@ def test_reservation_unit_export__missing_relations(column_value_mapping, missin
         "service_specific_terms__name": "Service specific terms",
         "pricing_terms__name": "Pricing terms",
         "cancellation_rule__name": "Cancellation rule",
-        "pricings__highest_price": Decimal(20),
+        "own_price__amount": Decimal(20),
         "access_types__access_type": AccessType.UNRESTRICTED,
     }
     missing.remove_from_data(data)
@@ -270,7 +271,7 @@ def test_reservation_unit_export__subset():
 
 def test_reservation_unit_export__query_count_does_not_grow_with_reservation_units():
     ReservationUnitFactory.create(
-        pricings__highest_price=Decimal(20),
+        own_price__amount=Decimal(20),
         access_types__access_type=AccessType.UNRESTRICTED,
     )
 
@@ -279,7 +280,7 @@ def test_reservation_unit_export__query_count_does_not_grow_with_reservation_uni
 
     ReservationUnitFactory.create_batch(
         3,
-        pricings__highest_price=Decimal(20),
+        own_price__amount=Decimal(20),
         access_types__access_type=AccessType.UNRESTRICTED,
     )
 
