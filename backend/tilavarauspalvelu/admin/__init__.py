@@ -29,7 +29,6 @@ from .reservation_unit_access_type.admin import ReservationUnitAccessTypeAdmin
 from .reservation_unit_cancellation_rule.admin import ReservationUnitCancellationRuleAdmin
 from .reservation_unit_image.admin import ReservationUnitImageAdmin
 from .reservation_unit_option.admin import ReservationUnitOptionAdmin
-from .reservation_unit_pricing.admin import ReservationUnitPricingAdmin
 from .reservation_unit_type.admin import ReservationUnitTypeAdmin
 from .resource.admin import ResourceAdmin
 from .sales_item.admin import SalesItemAdmin
@@ -71,7 +70,6 @@ __all__ = [
     "ReservationUnitCancellationRuleAdmin",
     "ReservationUnitImageAdmin",
     "ReservationUnitOptionAdmin",
-    "ReservationUnitPricingAdmin",
     "ReservationUnitTypeAdmin",
     "ResourceAdmin",
     "SalesItemAdmin",

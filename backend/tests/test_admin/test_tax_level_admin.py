@@ -7,11 +7,10 @@ from typing import Any
 import pytest
 from django.urls import reverse
 
-from tilavarauspalvelu.enums import PaymentType, PriceUnit
-from tilavarauspalvelu.models import ReservationUnitPricing, TaxLevel, TaxLevelRate
+from tilavarauspalvelu.models import TaxLevel, TaxLevelRate
 from utils.date_utils import local_date
 
-from tests.factories import ReservationUnitFactory, TaxLevelFactory, TaxLevelRateFactory, UserFactory
+from tests.factories import TaxLevelFactory, TaxLevelRateFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
 
 # Applied to all tests
@@ -402,36 +401,3 @@ def test_tax_level_admin__list__no_next_percentage(api_client):
 
 
 # ── Pricings ──
-
-
-def test_tax_level_admin__pricing_admin__tax_level_without_rate_today(api_client):
-    api_client.force_login(UserFactory.create_superuser())
-    tomorrow = local_date() + datetime.timedelta(days=1)
-
-    reservation_unit = ReservationUnitFactory.create()
-    tax_level = TaxLevelFactory.create(rates__begins=tomorrow)
-
-    url = reverse("admin:tilavarauspalvelu_reservationunitpricing_add")
-    data = {
-        "reservation_unit": reservation_unit.pk,
-        "begins": local_date().isoformat(),
-        "lowest_price": "10",
-        "highest_price": "20",
-        "price_unit": PriceUnit.PER_HOUR.value,
-        "payment_type": PaymentType.ONLINE.value,
-        "tax_level": tax_level.pk,
-    }
-
-    errors: list[dict[str, Any]] = []
-    with collect_admin_form_errors(errors):
-        response = api_client.post(path=url, data=data)
-
-    assert response.status_code == 200
-    assert errors == [
-        {
-            "code": "",
-            "message": "This tax level has no rate in effect today.",
-        },
-    ]
-
-    assert ReservationUnitPricing.objects.count() == 0

@@ -40,7 +40,6 @@ ADMIN_APP_GROUPS: list[AdminAppGroup] = [
         name=_("Reservation units"),
         models=[
             "tilavarauspalvelu.ReservationUnit",
-            "tilavarauspalvelu.ReservationUnitPricing",
             "tilavarauspalvelu.PricingGroup",
             "tilavarauspalvelu.PriceOption",
             "tilavarauspalvelu.ReservationUnitAccessType",
