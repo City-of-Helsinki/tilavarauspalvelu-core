@@ -2283,10 +2283,6 @@ msgstr ""
 "Hae varausyksikön, toimipisteen, hakemuksen osan tai käyttäjän etunimen, "
 "sukunimen tai sähköpostiosoitteen perusteella"
 
-#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
-msgid "This tax level has no rate in effect today."
-msgstr "Verotasolla ei ole tänään voimassa olevaa veroprosenttia."
-
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
 msgstr "Etsi nimellä tai toimipisteen nimellä"
