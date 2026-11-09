@@ -116,17 +116,21 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
         msg = f"Cannot move the pricings to pricing groups:\n- {error_texts}"
         raise PricingMigrationError(msg)
 
-    sales_items_by_material = dict(existing_sales_items)
-    for material, sources in sorted(sources_by_material.items()):
-        if material in sales_items_by_material:
-            continue
-
-        sales_items_by_material[material] = SalesItem.objects.create(
+    new_sales_items = [
+        SalesItem(
             name=material,
             material=material,
             main_ledger_account=sources[0].main_ledger_account,
             tax_level_id=sources[0].tax_level_id,
         )
+        for material, sources in sorted(sources_by_material.items())
+        if material not in existing_sales_items
+    ]
+    SalesItem.objects.bulk_create(new_sales_items)
+
+    sales_items_by_material = dict(existing_sales_items)
+    for sales_item in new_sales_items:
+        sales_items_by_material[sales_item.material] = sales_item
 
     free_tax_level = None
     if any(reservation_unit.pk not in pricings_by_unit for reservation_unit in reservation_units):
@@ -135,25 +139,33 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
             msg = f"Tax level '{FREE_PRICE_TAX_LEVEL_NAME}' for the reservation units without pricings does not exist."
             raise PricingMigrationError(msg)
 
+    pricing_groups = {
+        reservation_unit.pk: PricingGroup(
+            name=reservation_unit.name,
+            name_fi=reservation_unit.name_fi,
+            name_en=reservation_unit.name_en,
+            name_sv=reservation_unit.name_sv,
+            unit_group=None,
+        )
+        for reservation_unit in reservation_units
+    }
+    PricingGroup.objects.bulk_create(pricing_groups.values())
+
+    pricing_group_rows: list = []
     components: list = []
     changed_reservation_units: list = []
 
     for reservation_unit in reservation_units:
         unit_pricings = pricings_by_unit.get(reservation_unit.pk, [])
+        pricing_group = pricing_groups[reservation_unit.pk]
 
         if not unit_pricings:
-            pricing_group = PricingGroup.objects.create(
-                name=reservation_unit.name,
-                name_fi=reservation_unit.name_fi,
-                name_en=reservation_unit.name_en,
-                name_sv=reservation_unit.name_sv,
-                unit_group=None,
-            )
-            ReservationUnitPricingGroup.objects.create(
+            pricing_group_row = ReservationUnitPricingGroup(
                 reservation_unit=reservation_unit,
                 pricing_group=pricing_group,
                 begins=FREE_PRICE_BEGINS,
             )
+            pricing_group_rows.append(pricing_group_row)
             component = PriceComponent(
                 pricing_group=pricing_group,
                 kind="BASE",
@@ -173,18 +185,12 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
         if accounting is None and reservation_unit.unit is not None:
             accounting = reservation_unit.unit.payment_accounting
 
-        pricing_group = PricingGroup.objects.create(
-            name=reservation_unit.name,
-            name_fi=reservation_unit.name_fi,
-            name_en=reservation_unit.name_en,
-            name_sv=reservation_unit.name_sv,
-            unit_group=None,
-        )
-        ReservationUnitPricingGroup.objects.create(
+        pricing_group_row = ReservationUnitPricingGroup(
             reservation_unit=reservation_unit,
             pricing_group=pricing_group,
             begins=unit_pricings[0].begins,
         )
+        pricing_group_rows.append(pricing_group_row)
 
         valid_until_dates = [pricing.begins for pricing in unit_pricings[1:]] + [None]
         for pricing, valid_until in zip(unit_pricings, valid_until_dates, strict=True):
@@ -218,6 +224,7 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
             reservation_unit.payment_type = payment_type
             changed_reservation_units.append(reservation_unit)
 
+    ReservationUnitPricingGroup.objects.bulk_create(pricing_group_rows)
     PriceComponent.objects.bulk_create(components)
     ReservationUnit.objects.bulk_update(changed_reservation_units, fields=["payment_type"])
 
