@@ -42,10 +42,10 @@ jobs:
       # required because error pages use build time env vars, not runtime env vars
       # it's the same on every environment
       FEEDBACK_URL: "https://lomake.hel.fi/varaamo-palaute"
-      # Upload source maps and create a Sentry release only for release tags (v*).
-      # Only tagged builds go to production. Other builds (pull requests, main) would create
-      # extra unfinalized releases, for example "tilavarauspalvelu-customer-ui@1234-merge".
-      SENTRY_ENABLE_SOURCE_MAPS: ${{ github.ref_type == 'tag' && startsWith(github.ref_name, 'v') }}
+      # Upload source maps and create a Sentry release for release tags (v*) and for main.
+      # Tagged builds go to test and production. Main builds go to the dev server.
+      # Pull request builds do not deploy, so they do not create releases.
+      SENTRY_ENABLE_SOURCE_MAPS: ${{ (github.ref_type == 'tag' && startsWith(github.ref_name, 'v')) || github.ref == 'refs/heads/main' }}
       SENTRY_URL: "https://city-of-helsinki.sentry.io"
       SENTRY_ORG: "city-of-helsinki"
       SENTRY_PROJECT: ${{ inputs.sentry-project }}
@@ -78,12 +78,19 @@ jobs:
       working-directory: frontend
       run: pnpm codegen
 
+    # The name must match the release that the app reports at runtime.
+    # See getVersion in frontend/packages/ui/src/modules/baseUtils.ts.
+    # Tag builds use the tag name. Main builds use the short commit hash.
     - name: "Create release name"
       id: release
-      run: >-
-        echo "release=${{ inputs.sentry-project }}@$(
-          echo ${{ github.ref_name || github.sha }} | tr '/' '-'
-        )" >> $GITHUB_OUTPUT
+      env:
+        SENTRY_PROJECT_NAME: ${{ inputs.sentry-project }}
+        REF_NAME: ${{ github.ref_name }}
+        SHA: ${{ github.sha }}
+      run: |
+        version="${REF_NAME/main/}"
+        version="${version:-${SHA:0:8}}"
+        echo "release=${SENTRY_PROJECT_NAME}@${version//\//-}" >> "$GITHUB_OUTPUT"
 
     - name: "Set up Docker Buildx"
       uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1

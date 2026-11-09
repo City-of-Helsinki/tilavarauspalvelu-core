@@ -51,11 +51,14 @@ RUN pnpm --filter=$APP... run build
 
 # Only upload sourcemaps so they match the actual build
 # other artifacts like source code refs have to be added elsewhere
+# Finalize the release here. Main builds have no other step that finalizes it.
+# For tags, update_commits_to_sentry.yml adds the commits and the production deploy later.
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
   if [ "$SENTRY_ENABLE_SOURCE_MAPS" = "true" ] ; then \
     sentry-cli sourcemaps inject --ignore "node_modules" /app/apps/$APP/.next/ && \
     sentry-cli sourcemaps upload --ignore "node_modules" --release "$RELEASE_NAME" /app/apps/$APP/.next/ && \
-    sentry-cli releases new "$RELEASE_NAME" ; \
+    sentry-cli releases new "$RELEASE_NAME" && \
+    sentry-cli releases finalize "$RELEASE_NAME" ; \
   fi
 # Builds without source maps have no .map files. The -delete flag does not fail on no matches.
 RUN find /app/apps/$APP/.next/ -name "*.map" -delete
