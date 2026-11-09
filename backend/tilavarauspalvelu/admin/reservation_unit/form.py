@@ -410,9 +410,13 @@ class ReservationUnitAdminForm(forms.ModelForm):
             return False
 
         today = local_date()
+        rows = list(self.instance.reservation_unit_pricing_groups.order_by("begins"))
+        past_or_active_rows = [row for row in rows if row.begins <= today]
+        current_rows = past_or_active_rows[-1:] + [row for row in rows if row.begins > today]
+
         return PriceComponent.objects.filter(
             models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
-            pricing_group__reservation_unit_pricing_groups__reservation_unit=self.instance,
+            pricing_group__in={row.pricing_group_id for row in current_rows},
             can_apply_for_discount=True,
         ).exists()
 
