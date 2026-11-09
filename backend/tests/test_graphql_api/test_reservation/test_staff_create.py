@@ -157,9 +157,9 @@ def test_reservation__staff_create__price_lines_are_free(graphql, reservation_ty
     assert response.has_errors is False, response.errors
 
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.price == Decimal(0)
-    assert reservation.non_subsidised_price == Decimal(10)
-    assert reservation.tax_percentage_value == Decimal("25.5")
+    assert reservation.total_price == Decimal(0)
+    assert reservation.total_price_without_overrides == Decimal(10)
+    assert reservation.total_price_net == Decimal(0)
 
     price_lines = ReservationPriceLine.objects.filter(reservation=reservation)
     assert list(price_lines.values_list("price_component", "quantity", "amount", "override_amount")) == [

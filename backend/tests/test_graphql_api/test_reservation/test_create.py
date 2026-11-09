@@ -75,7 +75,7 @@ def test_reservation__create__cannot_set_reservation_price(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, price=10)
+    data = get_create_data(reservation_unit, total_price=10)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     # This is just a GraphQL schema error, it doesn't really matter what the error is
@@ -686,10 +686,12 @@ def test_reservation__create__price_calculation__free_reservation_unit(graphql):
 
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.price == 0  # Free units should always be 0 €
-    assert reservation.non_subsidised_price == reservation.price  # Non subsidised price be the same as price
-    assert reservation.unit_price == 0
-    assert reservation.tax_percentage_value == 0
+    assert reservation.total_price == 0  # Free units should always be 0 €
+    assert (
+        reservation.total_price_without_overrides == reservation.total_price
+    )  # Non subsidised price be the same as price
+    assert reservation.price_lines.get().unit_amount == 0
+    assert reservation.price_lines.get().tax_percentage == 0
 
 
 def test_reservation__create__pricing_requires_payment_type(graphql):
@@ -728,10 +730,10 @@ def test_reservation__create__price_calculation__fixed_price_reservation_unit(gr
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.price == Decimal(20)
-    assert reservation.non_subsidised_price == Decimal(20)
-    assert reservation.unit_price == Decimal(20)
-    assert reservation.tax_percentage_value == Decimal(10)
+    assert reservation.total_price == Decimal(20)
+    assert reservation.total_price_without_overrides == Decimal(20)
+    assert reservation.price_lines.get().unit_amount == Decimal(20)
+    assert reservation.price_lines.get().tax_percentage == Decimal(10)
 
 
 def test_reservation__create__saves_price_lines(graphql):
@@ -772,10 +774,10 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.price == Decimal(80)
-    assert reservation.non_subsidised_price == Decimal(80)
-    assert reservation.unit_price == Decimal(20)
-    assert reservation.tax_percentage_value == Decimal(10)
+    assert reservation.total_price == Decimal(80)
+    assert reservation.total_price_without_overrides == Decimal(80)
+    assert reservation.price_lines.get().unit_amount == Decimal(20)
+    assert reservation.price_lines.get().tax_percentage == Decimal(10)
 
 
 @freeze_time(local_datetime(2026, 10, 24, 12))
@@ -799,7 +801,7 @@ def test_reservation__create__price_calculation__time_based_price__daylight_savi
     assert response.has_errors is False, response.errors
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.price == Decimal(70)
+    assert reservation.total_price == Decimal(70)
 
 
 def test_reservation__create__price_calculation__future_pricing(graphql):
@@ -831,10 +833,10 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.price == Decimal(10)
-    assert reservation.non_subsidised_price == Decimal(10)
-    assert reservation.unit_price == Decimal(10)
-    assert reservation.tax_percentage_value == Decimal(24)
+    assert reservation.total_price == Decimal(10)
+    assert reservation.total_price_without_overrides == Decimal(10)
+    assert reservation.price_lines.get().unit_amount == Decimal(10)
+    assert reservation.price_lines.get().tax_percentage == Decimal(24)
 
 
 def test_reservation__create__price_calculation__tax_rate_on_creation_date(graphql):
@@ -863,8 +865,8 @@ def test_reservation__create__price_calculation__tax_rate_on_creation_date(graph
     assert response.has_errors is False, response.errors
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.price == Decimal(10)
-    assert reservation.tax_percentage_value == Decimal(24)
+    assert reservation.total_price == Decimal(10)
+    assert reservation.price_lines.get().tax_percentage == Decimal(24)
 
 
 def test_reservation__create__price_calculation__tax_level_has_no_rate_today(graphql):
@@ -910,10 +912,10 @@ def test_reservation__create__price_calculation__on_site_doesnt_require_payment_
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.price == Decimal(20)
-    assert reservation.non_subsidised_price == Decimal(20)
-    assert reservation.unit_price == Decimal(20)
-    assert reservation.tax_percentage_value == Decimal(10)
+    assert reservation.total_price == Decimal(20)
+    assert reservation.total_price_without_overrides == Decimal(20)
+    assert reservation.price_lines.get().unit_amount == Decimal(20)
+    assert reservation.price_lines.get().tax_percentage == Decimal(10)
 
 
 def test_reservation__create__duration_is_not_multiple_of_interval(graphql):

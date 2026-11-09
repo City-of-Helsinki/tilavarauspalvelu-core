@@ -138,7 +138,7 @@ def _create_normal_reservations(
     ]
 
     reservations: list[Reservation] = []
-    payment_orders: list[PaymentOrder] = []
+    handled_payment_due_by_values: list[datetime.datetime | None] = []
     price_lines: list[ReservationPriceLine] = []
 
     reservation_unit_pks_with_discount = set(
@@ -237,6 +237,7 @@ def _create_normal_reservations(
                     break
 
                 reservations.append(reservation)
+                handled_payment_due_by_values.append(handled_payment_due_by)
 
                 reservation_price_lines = build_price_lines_with_data(
                     pricing_data=pricing_data,
@@ -249,25 +250,39 @@ def _create_normal_reservations(
                     line.reservation = reservation
                     price_lines.append(line)
 
-                first_line = reservation_price_lines.lines[0]
-                reservation.price = reservation_price_lines.calculation.total
-                reservation.non_subsidised_price = reservation_price_lines.calculation.total
-                reservation.unit_price = first_line.unit_amount
-                reservation.tax_percentage_value = first_line.tax_percentage
-
-                if reservation.price > 0:
-                    payment_type = PaymentType(reservation_unit.payment_type)
-                    payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
-                    payment_orders.append(payment_order)
-
                 begin_datetime += datetime.timedelta(hours=random.randint(min_interval_hours, max_interval_hours))
 
     ReservationUnit.objects.bulk_update(reservation_units, fields=["name", "name_fi", "name_en", "name_sv"])
     Reservation.objects.bulk_create(reservations)
     ReservationPriceLine.objects.bulk_create(price_lines)
-    PaymentOrder.objects.bulk_create(payment_orders)
+
+    handled_payment_due_by_by_pk = {
+        reservation.pk: handled_payment_due_by
+        for reservation, handled_payment_due_by in zip(reservations, handled_payment_due_by_values, strict=True)
+    }
+    _create_payment_orders(handled_payment_due_by_by_pk=handled_payment_due_by_by_pk)
 
     _deny_and_cancel_normal_reservations()
+
+
+def _create_payment_orders(*, handled_payment_due_by_by_pk: dict[int, datetime.datetime | None]) -> None:
+    """Create payment orders for the given saved reservations that have a price. Their totals come from their lines."""
+    reservations = (
+        Reservation.objects
+        .filter(pk__in=handled_payment_due_by_by_pk)
+        .select_related("user", "reservation_unit")
+        .prefetch_related("price_lines")
+    )
+
+    payment_orders: list[PaymentOrder] = []
+    for reservation in reservations:
+        if reservation.total_price > 0:
+            payment_type = PaymentType(reservation.reservation_unit.payment_type)
+            handled_payment_due_by = handled_payment_due_by_by_pk[reservation.pk]
+            payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
+            payment_orders.append(payment_order)
+
+    PaymentOrder.objects.bulk_create(payment_orders)
 
 
 def _build_payment_order(
@@ -277,9 +292,9 @@ def _build_payment_order(
 ) -> PaymentOrder:
     payment_order_builder = PaymentOrderBuilder().set(
         language=reservation.user.get_preferred_language(),
-        price_net=reservation.price_net,
-        price_vat=reservation.price_vat_amount,
-        price_total=reservation.price,
+        price_net=reservation.total_price_net,
+        price_vat=reservation.total_vat_amount,
+        price_total=reservation.total_price,
         reservation=reservation,
         reservation_user_uuid=reservation.user.uuid,
         payment_type=payment_type,
