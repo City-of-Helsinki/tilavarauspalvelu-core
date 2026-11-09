@@ -50,7 +50,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   };
 
   const priceLine = getOnlyPriceLine(reservation);
-  const initialPrice = priceLine != null ? (priceLine.overrideAmount ?? priceLine.amount) : reservation.price;
+  const initialPrice = priceLine != null ? (priceLine.overrideAmount ?? priceLine.amount) : reservation.totalPrice;
   const [price, setPrice] = useState(toNumber(initialPrice) ?? 0);
   const [handlingDetails, setHandlingDetails] = useState<string>(reservation.handlingDetails ?? "");
   const hasPrice = initialPrice != null && Number(initialPrice) > 0;
@@ -63,7 +63,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
     await approveReservation({
       pk: reservation.pk,
       handlingDetails,
-      ...getPriceInput(reservation, price),
+      priceLines: getPriceLinesInput(reservation, price),
     });
   };
 
@@ -88,30 +88,32 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
                   }
                 }}
               />
-              <div style={{ width: "14em" }}>
-                <NumberInput
-                  type="number"
-                  value={price}
-                  required
-                  min={0}
-                  minusStepButtonAriaLabel={t("common:subtract")}
-                  plusStepButtonAriaLabel={t("common:add")}
-                  step={1}
-                  id="approvalPrice"
-                  label={t("reservation:ApproveDialog.price")}
-                  onChange={(e) => {
-                    if (e.target.value === "") {
-                      setPrice(0);
-                      return;
-                    }
-                    if (Number.isNaN(Number(e.target.value))) {
-                      return;
-                    }
-                    setPrice(Number(e.target.value));
-                  }}
-                  errorText={!priceIsValid ? t("reservation:ApproveDialog.missingPrice") : undefined}
-                />
-              </div>
+              {priceLine != null && (
+                <div style={{ width: "14em" }}>
+                  <NumberInput
+                    type="number"
+                    value={price}
+                    required
+                    min={0}
+                    minusStepButtonAriaLabel={t("common:subtract")}
+                    plusStepButtonAriaLabel={t("common:add")}
+                    step={1}
+                    id="approvalPrice"
+                    label={t("reservation:ApproveDialog.price")}
+                    onChange={(e) => {
+                      if (e.target.value === "") {
+                        setPrice(0);
+                        return;
+                      }
+                      if (Number.isNaN(Number(e.target.value))) {
+                        return;
+                      }
+                      setPrice(Number(e.target.value));
+                    }}
+                    errorText={!priceIsValid ? t("reservation:ApproveDialog.missingPrice") : undefined}
+                  />
+                </div>
+              )}
             </>
           )}
           <TextArea
@@ -143,19 +145,26 @@ function getOnlyPriceLine(reservation: ApprovalDialogFieldsFragment): PriceLine 
 }
 
 /// The handler can only change the price when the reservation applies for a free of charge reservation.
-/// In other cases, keep the current override of the price line.
-/// Reservations made before price lines have no lines. For these, send the price.
-/// The dialog has one price input, so it supports only reservations with one price line.
-function getPriceInput(
+/// In other cases, keep the current overrides of the price lines.
+/// The dialog has one price input. With one price line, the price is the final amount of the line.
+/// With many lines, the handler can only make every line free, until the dialog has an input for each line.
+function getPriceLinesInput(
   reservation: ApprovalDialogFieldsFragment,
   price: number
-): Pick<ReservationApproveMutationInput, "price" | "priceLines"> {
-  const priceLine = getOnlyPriceLine(reservation);
-  if (priceLine?.pk == null) {
-    return { price: price.toString() };
-  }
-  const overrideAmount = reservation.applyingForFreeOfCharge ? price.toString() : (priceLine.overrideAmount ?? null);
-  return { priceLines: [{ pk: priceLine.pk, overrideAmount }] };
+): ReservationApproveMutationInput["priceLines"] {
+  const priceLineList = reservation.priceLines ?? [];
+  return priceLineList.flatMap((line) => {
+    if (line.pk == null) {
+      return [];
+    }
+    if (!reservation.applyingForFreeOfCharge) {
+      return [{ pk: line.pk, overrideAmount: line.overrideAmount ?? null }];
+    }
+    if (priceLineList.length === 1) {
+      return [{ pk: line.pk, overrideAmount: price.toString() }];
+    }
+    return [{ pk: line.pk, overrideAmount: price === 0 ? "0" : (line.overrideAmount ?? null) }];
+  });
 }
 
 export function ApproveDialog({
@@ -190,7 +199,7 @@ export function ApproveDialog({
 export const APPROVAL_DIALOG_FRAGMENT = gql`
   fragment ApprovalDialogFields on ReservationNode {
     pk
-    price
+    totalPrice
     handlingDetails
     applyingForFreeOfCharge
     freeOfChargeReason
