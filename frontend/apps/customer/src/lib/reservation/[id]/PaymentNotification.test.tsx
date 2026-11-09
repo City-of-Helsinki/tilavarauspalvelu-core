@@ -25,7 +25,7 @@ describe("Component: Payment Notification", () => {
   it("should render the payment notification component with correct price details", () => {
     customRender();
     const reservation = createReservationPageMock({});
-    const formattedPrice = reservation.price?.split(".").join(",") + "0";
+    const formattedPrice = reservation.totalPrice?.split(".").join(",") + "0";
     // eslint-disable-next-line no-irregular-whitespace
     const priceText = `common:price: ${formattedPrice} € (common:inclTax {"taxPercentage":"24,5"})`;
     const priceElement = screen.getByTestId("reservation__payment-notification__price");

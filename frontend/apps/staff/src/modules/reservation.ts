@@ -37,7 +37,7 @@ function reservationUnitName(reservationUnit: Maybe<CreateTagStringFragment["res
 }
 
 export function formatReservationPrice(t: TFunction, reservation: ReservationType): string {
-  return getReservationPrice(reservation.price, t("reservation:noPrice"), true);
+  return getReservationPrice(reservation.totalPrice, t("reservation:noPrice"), true);
 }
 
 export function formatReservationPriceLong(t: TFunction, reservation: ReservationType): string {
@@ -56,7 +56,8 @@ export function formatReservationPriceLong(t: TFunction, reservation: Reservatio
 export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
   fragment ReservationPriceDetailsFields on ReservationNode {
     id
-    price
+    totalPrice
+    totalPriceWithoutOverrides
     priceLines {
       id
       pk
@@ -71,22 +72,17 @@ export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
 `;
 
 /// The normal price of the reservation is free. A handler override of a line does not change it.
-/// Reservations made before price lines have no lines. For these, the price of the reservation is used.
 export function isReservationPriceFree(reservation: ReservationPriceDetailsFieldsFragment): boolean {
-  const priceLineList = reservation.priceLines ?? [];
-  if (priceLineList.length === 0) {
-    return (toNumber(reservation.price) ?? 0) === 0;
-  }
-  return priceLineList.every((line) => (toNumber(line.amount) ?? 0) === 0);
+  return (toNumber(reservation.totalPriceWithoutOverrides) ?? 0) === 0;
 }
 
 /// The calculation of the normal price, for the handler.
-/// The text supports one price line. Without exactly one line, it shows only the price of the reservation.
+/// The text supports one price line. Without exactly one line, it shows only the normal total price.
 export function getReservationPriceDetails(reservation: ReservationPriceDetailsFieldsFragment, t: TFunction): string {
   const priceLineList = reservation.priceLines ?? [];
   const line = priceLineList.length === 1 ? priceLineList[0] : undefined;
   if (line == null) {
-    return getReservationPrice(reservation.price, t("reservation:noPrice"), false);
+    return getReservationPrice(reservation.totalPriceWithoutOverrides, t("reservation:noPrice"), false);
   }
   if (line.priceUnit === PriceUnit.Fixed) {
     return getReservationPrice(line.amount, t("reservation:noPrice"), false);

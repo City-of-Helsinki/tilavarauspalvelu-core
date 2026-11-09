@@ -250,7 +250,7 @@ function ReservationPricingDetailsAccordion({
     <Accordion id="reservation__pricing-details" heading={t("reservation:pricingDetails")}>
       <ApplicationDatas>
         <DataWrapper label={t("reservation:price")}>
-          {reservation.price && formatReservationPrice(t, reservation)}
+          {reservation.totalPrice && formatReservationPrice(t, reservation)}
         </DataWrapper>
         <DataWrapper label={t("reservation:paymentState")}>
           {reservation.paymentOrder?.status == null

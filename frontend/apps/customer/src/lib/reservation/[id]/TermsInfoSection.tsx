@@ -15,10 +15,7 @@ export function TermsInfoSection({
   reservation,
   termsOfUse,
 }: Readonly<{
-  reservation: Pick<
-    NodeT,
-    "reservationUnit" | "applyingForFreeOfCharge" | "id" | "price" | "taxPercentageValue" | "priceLines"
-  >;
+  reservation: Pick<NodeT, "reservationUnit" | "applyingForFreeOfCharge" | "id" | "totalPrice" | "priceLines">;
   termsOfUse: PropsNarrowed["termsOfUse"];
 }>) {
   const { t, i18n } = useTranslation();
