@@ -36,7 +36,7 @@ class SalesItemSource:
 
 class Command(BaseCommand):
     help = (
-        "Lists the data that stops the migrations 0191 and 0192 (TILA-4545). Changes nothing. "
+        "Lists the data that stops the migrations 0191 and 0193 (TILA-4545). Changes nothing. "
         "Run it in production before the release that has these migrations. "
         "It reads only the models of the release before them, so it can be copied to a running pod."
     )
@@ -141,7 +141,7 @@ def _pricing_group_errors() -> list[str]:
 
 
 def _price_line_errors() -> list[str]:
-    """The same check as in the migration 0192."""
+    """The same check as in the migration 0193."""
     tax_level_ids_by_percentage: dict[Decimal, set[int]] = {}
     for percentage, tax_level_id in TaxLevelRate.objects.values_list("percentage", "tax_level_id"):
         tax_level_ids_by_percentage.setdefault(percentage, set()).add(tax_level_id)
