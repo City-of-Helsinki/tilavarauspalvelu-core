@@ -26,7 +26,7 @@ export class CommonSetupsTeardowns extends PageObject {
   @step("common_setups_teardowns.Complete Test Setup From Tags")
   async completeTestSetupFromTags() {
     const info = test.info();
-    // Port: the testData fixture (TestSuites/test-data.ts) chose the users and units from the tags before the test
+    // The testData fixture (TestSuites/test-data.ts) chose the users and units from the tags before the test
     // started; this logs them
     await log(`🚀 Test data for: ${info.title}`);
     await log(`🏷️ Tags: ${info.tags.join(", ")}`);
@@ -45,10 +45,10 @@ export class CommonSetupsTeardowns extends PageObject {
   /** Complete teardown with session cleanup */
   @step("common_setups_teardowns.Complete Test Teardown")
   async completeTestTeardown() {
-    // Port: Playwright takes full-page failure screenshots of the open pages when the test fails (the screenshot
-    // option in playwright.config.ts), so there's no Sleep and Take Screenshot here
+    // Playwright takes full-page screenshots of the open pages when the test fails (the screenshot option in
+    // playwright.config.ts)
     // Cleanup process (the testData fixture releases the data set). Closes the contexts and browsers the test opened
-    // itself; Playwright closes its own. An error is ignored, like Run Keyword And Ignore Error.
+    // itself; Playwright closes its own. An error is ignored.
     try {
       await this.pages.session?.close();
     } catch {

@@ -1,4 +1,3 @@
-/** Port of PO/Admin/admin_notifications_create_page.robot */
 import { step, expect } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import {
@@ -8,6 +7,7 @@ import {
   NOTIFICATION_BANNER_TARGET_GROUP_USER,
 } from "../../Resources/texts_FI";
 
+/** The admin's form for a banner notification: creating, editing and deleting it. */
 export class AdminNotificationsCreatePage extends PageObject {
   /**
    * Picks an option of the form's HDS Select by the select's label. The select's button is a combobox whose name
@@ -114,7 +114,7 @@ export class AdminNotificationsCreatePage extends PageObject {
     // Publishing returns to the list page, which has the create link
     await expect(
       this.page.locator('[href="/kasittely/notifications/new"]'),
-      "Notifications list did not open after publishing - notification publish may have failed"
+      "The notification list opens after publishing"
     ).toBeVisible({ timeout: 15_000 });
   }
 

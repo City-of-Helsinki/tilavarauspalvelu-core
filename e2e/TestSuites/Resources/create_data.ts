@@ -34,7 +34,7 @@ const ROBOT_UNIT_QUERY = gql`
 `;
 
 /**
- * Port: the pk of the always free unit, or null when it can't be read. The backend deletes the test data and creates
+ * The pk of the always free unit, or null when it can't be read. The backend deletes the test data and creates
  * it again in one transaction, so a new pk means that all of the new data has been saved.
  */
 async function freeUnitPk(api: APIRequestContext): Promise<number | null> {
@@ -142,7 +142,7 @@ export class CreateData extends PageObject {
     // The unit query and the readiness check need no secret headers, so none are sent with them
     const api = await request.newContext({ baseURL: BASE_URL });
     try {
-      // Port: read before the call, see the wait below
+      // Read before the call, see the wait below
       const old_pk = await freeUnitPk(api);
 
       await log("Creating robot test data");
@@ -171,9 +171,9 @@ export class CreateData extends PageObject {
           await log("Waiting 3 minutes for backend to complete data creation...", { level: "WARN" });
           await setTimeout(180_000); // 3 minutes for backend processing
         } else {
-          // Port: waits until the new data has been saved instead of 3 minutes. The backend creates it in one
-          // transaction that ends by refreshing the reservation units' availability views, and until it commits,
-          // pages that need them hang or fail (502, the "503: Palaamme pian!" page). It can take longer than 3 minutes.
+          // Waits until the new data has been saved. The backend creates it in one transaction that ends by
+          // refreshing the reservation units' availability views, and until it commits, pages that need them hang or
+          // fail (502, the "503: Palaamme pian!" page).
           await log("Waiting for backend to complete data creation...");
           try {
             await expect

@@ -1,7 +1,7 @@
-/** Port of PO/User/reservation_unit_booking_details.robot */
 import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
+/** The booking details on the booking form: name, purpose, participants, age group and description. */
 export class ReservationUnitBookingDetails extends PageObject {
   // BOOKING DETAILS
   @step("reservation_unit_booking_details.Type The Name Of The Booking")

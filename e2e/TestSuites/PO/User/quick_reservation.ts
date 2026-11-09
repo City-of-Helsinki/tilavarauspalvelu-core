@@ -1,5 +1,4 @@
 import type { Response } from "@playwright/test";
-/** Port of PO/User/quick_reservation.robot */
 import { graphqlErrorsIn } from "../../../lib/responses";
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
@@ -10,6 +9,7 @@ export interface PendingResponse {
   response: Promise<Response>;
 }
 
+/** Quick reservation on a unit's page, and the booking's info card. */
 export class QuickReservation extends PageObject {
   /** This keyword selects a random reservation slot from a list of available slots for quick reservations. */
   @step("quick_reservation.Select The Free Slot From Quick Reservation")
@@ -20,7 +20,7 @@ export class QuickReservation extends PageObject {
 
     const slots = this.page.locator('[class*="slide-visible"]').getByTestId("quick-reservation__slot");
     // The carousel can move when its slots change, wait until it shows slots and has stopped
-    await expect(slots.first(), "No free available slots in quick reservation slots").toBeVisible();
+    await expect(slots.first(), "Quick reservation shows free slots").toBeVisible();
     // Locators can't wait for an element to stop moving, its element handle can
     const first_slot = await slots.first().elementHandle({ timeout: 5000 });
     await first_slot?.waitForElementState("stable", { timeout: 5000 });
@@ -29,8 +29,8 @@ export class QuickReservation extends PageObject {
     const total_slots = await slots.count();
     await log(`Total available slots: ${total_slots}`);
 
-    // Port: picks from the slots that start in 30 minutes or later, if there are any. A test can take minutes from
-    // booking to cancelling, and a reservation that has started can't be cancelled (the Robot keyword can pick them).
+    // Picks from the slots that start in 30 minutes or later, if there are any. A test can take minutes from
+    // booking to cancelling, and a reservation that has started can't be cancelled.
     const date_value = await this.getTheValueFromDateInput();
     const [day = 0, month = 0, year = 0] = date_value.split(".").map(Number);
     let later_slots: number[] = [];
@@ -46,7 +46,7 @@ export class QuickReservation extends PageObject {
 
     // Pick one of them at random
     const random_index = later_slots[Math.floor(Math.random() * later_slots.length)] ?? 0;
-    await log(`Randomly selected slot index: ${random_index}`);
+    await log(`Randomly selected slot index: ${random_index}`, { level: "DEBUG" });
     const selected_slot = slots.nth(random_index);
 
     // Get the time of the randomly selected slot
@@ -55,7 +55,7 @@ export class QuickReservation extends PageObject {
     // Click the randomly selected slot
     await selected_slot.focus();
     await selected_slot.click();
-    await expect(selected_slot, "The clicked slot was not selected").toHaveAttribute("aria-pressed", "true");
+    await expect(selected_slot, "The clicked slot is selected").toHaveAttribute("aria-pressed", "true");
 
     this.state.timeOfQuickReservationFreeSlot = time_of_selected_slot;
   }
@@ -72,10 +72,7 @@ export class QuickReservation extends PageObject {
     await submit.waitFor({ state: "visible", timeout: 10_000 });
 
     // Verify the button exists inside quick-reservation before clicking
-    await expect(
-      submit,
-      "Expected exactly 1 submit button inside quick-reservation. Button may have disappeared."
-    ).toHaveCount(1);
+    await expect(submit, "Quick reservation has one submit button").toHaveCount(1);
     await submit.scrollIntoViewIfNeeded();
 
     // Alternative: Basic Browser library click (commented out - less reliable with React re-renders)
@@ -84,18 +81,18 @@ export class QuickReservation extends PageObject {
 
     // The button's mouse events, dispatched to the button itself once it is enabled: a click at its position was
     // less reliable while React re-renders the form
-    await expect(submit, "Button still disabled after 10s").toBeEnabled();
+    await expect(submit, "The submit button is enabled").toBeEnabled();
     await this.page.waitForTimeout(300);
     for (const type of ["mousedown", "mouseup", "click"]) {
       // oxlint-disable-next-line no-await-in-loop -- the events in order
       await submit.dispatchEvent(type);
     }
-    await log("Clicked the submit button");
+    await log("Clicked the submit button", { level: "DEBUG" });
 
     // Wait for the target page element
     await expect(
       this.page.getByTestId("reservation__form--reservee-info"),
-      "ERROR: Reservee info form not visible on booking details page. Check screenshot."
+      "The booking details page shows the reservee form"
     ).toBeVisible({ timeout: 20_000 });
   }
 
@@ -115,7 +112,7 @@ export class QuickReservation extends PageObject {
    */
   @step("quick_reservation.Reload Reservation Unit Page And Wait For Reservations")
   async reloadReservationUnitPageAndWaitForReservations(unit_page_url: string) {
-    // Port: starts waiting once the reload has replaced the page, not before it. The page being replaced can start
+    // Starts waiting once the reload has replaced the page, not before it. The page being replaced can start
     // the same query just before the reload, and that response (whose body never finishes) was taken for the new one.
     // The new page can't send its query before its scripts have loaded.
     if (new URL(this.page.url()).pathname === new URL(unit_page_url).pathname) {
@@ -149,8 +146,8 @@ export class QuickReservation extends PageObject {
   @step("quick_reservation.Wait For Reservations Query")
   async waitForReservationsQuery(reservations_loaded: PendingResponse) {
     const response = await reservations_loaded.response;
-    expect(response.ok(), `Reservations query failed: HTTP ${response.status()}`).toBe(true);
-    expect(await graphqlErrorsIn(response, 20_000), "Reservations query returned errors").toBe(false);
+    expect(response.ok(), `The reservations query succeeds (HTTP ${response.status()})`).toBe(true);
+    expect(await graphqlErrorsIn(response, 20_000), "The reservations query has no errors").toBe(false);
   }
 
   @step("quick_reservation.Select Duration")
@@ -284,16 +281,16 @@ export class QuickReservation extends PageObject {
     const slots = this.page.locator('[class*="slider-list"]').getByTestId("quick-reservation__slot");
     // The free slots are rendered after the reservation form
     await expect(slots.first()).toBeVisible();
-    // Port: instead of Robot's Sleep 2s. The page shows the free slots before its AffectingReservations query returns
-    // and removes the booked ones, so wait until the slot is gone (the query can take over 10 s on the test env). A
-    // slot button's only text is its time.
+    // The page shows the free slots before its AffectingReservations query returns and removes the booked ones, so
+    // this waits until the slot is gone (the query can take over 10 s on the test env). A slot button's only text
+    // is its time.
     await expect(
       slots.and(this.page.getByText(time_to_check, { exact: true })),
-      `Slot '${time_to_check}' is still available`
+      `The free slots don't include ${time_to_check}`
     ).toHaveCount(0, { timeout: 20_000 });
 
     // Fail the test if no slots are shown at all: then the check above had nothing to compare with
-    await expect(slots.first(), `No slots found at all. Cannot verify exclusion of ${time_to_check}`).toBeAttached();
+    await expect(slots.first(), "Quick reservation shows some free slots").toBeAttached();
 
     // The texts of the slots shown now, skipping blanks
     const slot_texts: string[] = (await slots.allInnerTexts()).filter((text) => text !== "");

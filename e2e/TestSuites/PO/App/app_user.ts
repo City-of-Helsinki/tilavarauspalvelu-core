@@ -1,7 +1,6 @@
 import { test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { acquireLock, releaseLock } from "../../../lib/locks";
-/** Port of PO/App/app_user.robot */
 import { retry } from "../../../lib/retry";
 import { step, expect, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
@@ -49,13 +48,12 @@ import {
 } from "../../Resources/texts_FI";
 import {
   QUICK_RESERVATION_DURATION,
-  RECURRING_THU_09_10_PREFERRED,
-  RECURRING_THU_10_11_PREFERRED,
-  RECURRING_THU_22_23_OTHER,
-  RECURRING_THU_23_24_OTHER,
+  RECURRING_THU_09_11_SECONDARY,
+  RECURRING_THU_19_21_PRIMARY,
   RESERVATION_INDIVIDUAL,
 } from "../../Resources/variables";
 
+/** The customer's workflow keywords: finding a unit, booking, paying, My bookings and applications. */
 export class AppUser extends PageObject {
   // Front page
   @step("app_user.User Navigates To Single Booking Page")
@@ -76,14 +74,14 @@ export class AppUser extends PageObject {
   // Payment notification banner
   @step("app_user.User Accepts Payment To Checkout")
   async userAcceptsPaymentToCheckout() {
-    await log("This clicks approve button from notification banner");
+    await log("This clicks approve button from notification banner", { level: "DEBUG" });
     await this.pages.userLandingpage.approveInterruptedPayment();
   }
 
   // Checkout
   @step("app_user.User Checks Info In Paid Checkout And Confirms Booking")
   async userChecksInfoInPaidCheckoutAndConfirmsBooking() {
-    await log("This step gets the reservation number");
+    await log("This step gets the reservation number", { level: "DEBUG" });
     await this.pages.checkout.checkTheInfoInCheckout();
   }
 
@@ -200,7 +198,7 @@ export class AppUser extends PageObject {
     // Checks that "jatka" button has been loaded
     await expect(
       this.page.getByTestId("reservation__button--continue"),
-      "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
+      "The booking details page shows its continue button"
     ).toBeVisible();
     await this.pages.reservationUnitReserverInfo.checkApplicationCannotBeMadeWithoutInfo();
     await this.pages.reservationUnitReserverInfo.enterFirstName(this.testData.user.firstName);
@@ -217,7 +215,7 @@ export class AppUser extends PageObject {
     // Verify we are on the correct booking details page where user info can be given
     await expect(
       this.page.getByTestId("reservation__button--continue"),
-      "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
+      "The booking details page shows its continue button"
     ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
@@ -238,7 +236,7 @@ export class AppUser extends PageObject {
     // Checks that "jatka" button has been loaded
     await expect(
       this.page.getByTestId("reservation__button--continue"),
-      "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
+      "The booking details page shows its continue button"
     ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
@@ -262,7 +260,7 @@ export class AppUser extends PageObject {
     // Checks that "jatka" button has been loaded
     await expect(
       this.page.getByTestId("reservation__button--continue"),
-      "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
+      "The booking details page shows its continue button"
     ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.reservationUnitBookingDetails.typeTheDescriptionOfTheBooking(SINGLEBOOKING_DESCRIPTION);
@@ -280,7 +278,7 @@ export class AppUser extends PageObject {
     // Checks that "jatka" button has been loaded
     await expect(
       this.page.getByTestId("reservation__button--continue"),
-      "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
+      "The booking details page shows its continue button"
     ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
@@ -300,7 +298,7 @@ export class AppUser extends PageObject {
     // Checks that "jatka" button has been loaded
     await expect(
       this.page.getByTestId("reservation__button--continue"),
-      "ERROR: Continue button not found on the booking details page. Check from screenshot that we are on the page where user information should be entered."
+      "The booking details page shows its continue button"
     ).toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
@@ -463,7 +461,7 @@ export class AppUser extends PageObject {
     // The edit page has the same time card, wait for the reservation page itself
     await this.page.getByTestId("reservation__content").waitFor({ state: "visible", timeout: 15_000 });
 
-    await log("This check is done in reservations page");
+    await log("This check is done in reservations page", { level: "DEBUG" });
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservationModified);
   }
 
@@ -504,14 +502,16 @@ export class AppUser extends PageObject {
     await log(this.state.timeOfQuickReservationModified);
     await log(this.state.timeOfQuickReservationMinusTModified);
 
-    await log("If the continue button is not enabled, verify that the reservation time was actually modified");
-    await expect(this.page.getByTestId("reservation__button--continue")).toBeEnabled();
+    await expect(
+      this.page.getByTestId("reservation__button--continue"),
+      "The continue button is enabled: the reservation time has changed"
+    ).toBeEnabled();
     await this.pages.reservationCalendar.clickContinueButton();
   }
 
   @step("app_user.User Checks Cancelled Booking Is Found")
   async userChecksCancelledBookingIsFound(unitname_mybookings: string, time_of_quick_reservation_minusT: string) {
-    await log("This checks the canceled booking is not found in upcoming reservations");
+    await log("This checks the canceled booking is not found in upcoming reservations", { level: "DEBUG" });
 
     await this.pages.mybookings.checkUnitnameAndReservationAreNotFound(
       unitname_mybookings,
@@ -746,25 +746,29 @@ export class AppUser extends PageObject {
     // Extracts the DTSTART and DTEND timestamps from an ICS file's text
     // example --> DTSTART;TZID=Europe/Helsinki:20241003T083000 and DTEND;TZID=Europe/Helsinki:20241003T093000
     await this.pages.customKeywords.extractStartAndEndTimeFromIcsFile(this.state.icsTextFromFile);
-    await log(ICS_TEXT);
+    await log(ICS_TEXT, { level: "DEBUG" });
   }
 
   @step("app_user.User Checks That Calendar File Matches Booking Time")
   async userChecksThatCalendarFileMatchesBookingTime() {
     // Log for verification
-    await log("Checking if ICS times match with booking times...");
-    await log(`ICS Start Time: ${this.state.formattedStartToIcs}`);
-    await log(`ICS End Time: ${this.state.formattedEndToIcs}`);
-    await log(`Extracted Start Time: ${this.state.startTimeFromIcs}`);
-    await log(`Extracted End Time: ${this.state.endTimeFromIcs}`);
+    await log("Checking if ICS times match with booking times...", { level: "DEBUG" });
+    await log(`ICS Start Time: ${this.state.formattedStartToIcs}`, { level: "DEBUG" });
+    await log(`ICS End Time: ${this.state.formattedEndToIcs}`, { level: "DEBUG" });
+    await log(`Extracted Start Time: ${this.state.startTimeFromIcs}`, { level: "DEBUG" });
+    await log(`Extracted End Time: ${this.state.endTimeFromIcs}`, { level: "DEBUG" });
 
     // Comparisons
     // Additional info: Check custom_keywords.Convert booking time to ICS format if the times don't match
     // Assert Start Times
-    expect(this.state.startTimeFromIcs, "The start time in the calendar file").toBe(this.state.formattedStartToIcs);
+    expect(this.state.startTimeFromIcs, "The calendar file has the booking's start time").toBe(
+      this.state.formattedStartToIcs
+    );
 
     // Assert End Times
-    expect(this.state.endTimeFromIcs, "The end time in the calendar file").toBe(this.state.formattedEndToIcs);
+    expect(this.state.endTimeFromIcs, "The calendar file has the booking's end time").toBe(
+      this.state.formattedEndToIcs
+    );
   }
 
   // Recurring
@@ -801,8 +805,9 @@ export class AppUser extends PageObject {
     await this.pages.recurringApplicationsPage2.userClicksAvailableSeasonalBookingTimesFor(
       RECURRING_BOOKING_UNIT_NAME_KESKUSTA
     );
-    await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(RECURRING_THU_22_23_OTHER);
-    await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(RECURRING_THU_23_24_OTHER);
+    await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(
+      ...RECURRING_THU_19_21_PRIMARY
+    );
     await this.pages.recurringApplicationsPage2.userClicksAvailableSeasonalBookingTimesFor(
       RECURRING_BOOKING_UNIT_NAME_MALMI
     );
@@ -810,10 +815,7 @@ export class AppUser extends PageObject {
       RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY
     );
     await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(
-      RECURRING_THU_09_10_PREFERRED
-    );
-    await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(
-      RECURRING_THU_10_11_PREFERRED
+      ...RECURRING_THU_09_11_SECONDARY
     );
     await this.pages.recurringApplicationsPage2.userClicksContinueButton();
   }
@@ -881,7 +883,7 @@ export class AppUser extends PageObject {
       cancel_buttons
         .first()
         .or(this.page.locator("#main").getByText(EMPTY_STATE_MESSAGE_RECURRING_APPLICATIONS, { exact: true })),
-      "The applications page shows neither applications that can be cancelled nor its empty state"
+      "The applications page shows applications to cancel or its empty state"
     ).toBeVisible();
     for (let left = await cancel_buttons.count(); left > 0; left = await cancel_buttons.count()) {
       await log(`Cancelling a leftover application, ${left} left`);
@@ -931,13 +933,13 @@ export class AppUser extends PageObject {
     const image = this.page.locator(`img[alt*="${unit_name}"]`).first();
 
     // Wait for the image element to be attached
-    await expect(image, `Reservation unit picture for ${unit_name} is not present`).toBeAttached({ timeout: 5000 });
+    await expect(image, `The unit page has a picture of ${unit_name}`).toBeAttached({ timeout: 5000 });
 
     // Verify the src attribute is present
-    await expect(image, "Image src attribute is empty").toHaveAttribute("src", /.+/);
+    await expect(image, "The picture has a source").toHaveAttribute("src", /.+/);
 
     // Verify the image has actually loaded (not broken): complete is true, naturalWidth > 0 and naturalHeight > 0.
-    // Port: expect.poll waits for the image to load, instead of checking once.
+    // Waits for the image to load
     await expect
       .poll(
         () =>
@@ -945,7 +947,7 @@ export class AppUser extends PageObject {
             const img = element as HTMLImageElement;
             return img.complete && img.naturalWidth > 0 && img.naturalHeight > 0;
           }),
-        { message: "Image is not loaded: complete is false, or naturalWidth or naturalHeight is 0" }
+        { message: "The picture has loaded, with a width and a height" }
       )
       .toBe(true);
 
@@ -954,6 +956,6 @@ export class AppUser extends PageObject {
       width: (element as HTMLImageElement).naturalWidth,
       height: (element as HTMLImageElement).naturalHeight,
     }));
-    await log(`Image loaded successfully with dimensions: ${width}x${height}`);
+    await log(`Image loaded successfully with dimensions: ${width}x${height}`, { level: "DEBUG" });
   }
 }

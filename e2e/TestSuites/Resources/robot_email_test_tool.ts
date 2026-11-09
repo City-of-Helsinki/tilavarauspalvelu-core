@@ -1,4 +1,4 @@
-/** Port of robot_email_test_tool.py: verifies emails from the backend's robot email cache API. */
+/** Verifies emails from the backend's robot email cache API. */
 import { log } from "../../lib/runtime";
 import { DJANGO_ROBO_MAIL, ROBOT_EMAIL } from "./variables";
 

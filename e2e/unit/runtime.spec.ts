@@ -184,6 +184,18 @@ test.describe("Runtime", () => {
     expect(await dataModification.generateRandomLetterAndNumber()).toMatch(/^[A-Za-z]\d$/);
   });
 
+  test("Get Modified Date And Time gives a new day and hour on each call", async () => {
+    const { dataModification } = new Pages();
+    // 30 of its 75 days and hours, so some draws repeat an earlier one and are drawn again
+    const times = new Set<string>();
+    for (let call = 0; call < 30; call++) {
+      // oxlint-disable-next-line no-await-in-loop -- each call has to see the days and hours of the calls before it
+      const [date, start_hour] = await dataModification.getModifiedDateAndTime();
+      times.add(`${date} ${start_hour}`);
+    }
+    expect(times.size).toBe(30);
+  });
+
   test("Python keywords give the same results as python_keywords.py", () => {
     expect(python_keywords.convert_booking_time_to_ics("Ti 1.10.2024 klo 10:30–11:30")).toEqual([
       "DTSTART;TZID=Europe/Helsinki:20241001T103000",

@@ -1,7 +1,7 @@
-/** Port of PO/User/reservation_lownav.robot */
 import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
+/** The booking form's continue button. */
 export class ReservationLownav extends PageObject {
   @step("reservation_lownav.Click Submit Button Continue")
   async clickSubmitButtonContinue() {

@@ -1,4 +1,3 @@
-/** Port of PO/User/mybookings.robot */
 import type { Locator } from "@playwright/test";
 import { retry } from "../../../lib/retry";
 import { expect, step, log } from "../../../lib/runtime";
@@ -8,6 +7,7 @@ import { MYBOOKINGS_NO_UPCOMING_FI } from "../../Resources/texts_FI";
 import { CONTENT_WAIT_TIMEOUT } from "../../Resources/variables";
 import type { PendingResponse } from "./quick_reservation";
 
+/** My bookings: the booking lists, and a booking's page with cancelling and changing the time. */
 export class Mybookings extends PageObject {
   @step("mybookings.Check My Bookings H1")
   async checkMyBookingsH1(bookingstatus: string) {
@@ -48,7 +48,7 @@ export class Mybookings extends PageObject {
     await expect(this.page.getByTestId("reservation__content")).toBeVisible();
     await expect(
       this.page.getByTestId("reservation-detail__button--cancel"),
-      "Cancel button is still present"
+      "The reservation has no cancel button"
     ).toHaveCount(0, { timeout: 3000 });
   }
 
@@ -174,49 +174,54 @@ export class Mybookings extends PageObject {
   // Tablist
   @step("mybookings.Navigate To Cancelled Bookings")
   async navigateToCancelledBookings() {
-    // Port: the HDS tab list slides when a tab gets focus. On mobile WebKit the slide can move the tab away between
+    // The HDS tab list slides when a tab gets focus. On mobile WebKit the slide can move the tab away between
     // mousedown and mouseup, so the click is lost and the tab is only focused, not selected. Focus first so that
     // the slide happens before the click, check that the tab got selected, and repeat a lost click.
     await retry(3, 500, async () => {
       await this.page.locator("#tab-2-button").focus();
       await this.page.locator("#tab-2-button").click();
-      await expect(
-        this.page.locator("#tab-2-button"),
-        "The cancelled bookings tab is not selected after the click"
-      ).toHaveAttribute("aria-selected", "true", { timeout: 2000 });
+      await expect(this.page.locator("#tab-2-button"), "The cancelled bookings tab is selected").toHaveAttribute(
+        "aria-selected",
+        "true",
+        { timeout: 2000 }
+      );
     });
   }
 
   @step("mybookings.Navigate To Past Bookings")
   async navigateToPastBookings() {
-    // Port: focus before the click and check the selection, see Navigate To Cancelled Bookings
+    // Focus before the click and check the selection, see Navigate To Cancelled Bookings
     await retry(3, 500, async () => {
       await this.page.locator("#tab-1-button").focus();
       await this.page.locator("#tab-1-button").click();
-      await expect(
-        this.page.locator("#tab-1-button"),
-        "The past bookings tab is not selected after the click"
-      ).toHaveAttribute("aria-selected", "true", { timeout: 2000 });
+      await expect(this.page.locator("#tab-1-button"), "The past bookings tab is selected").toHaveAttribute(
+        "aria-selected",
+        "true",
+        { timeout: 2000 }
+      );
     });
   }
 
   @step("mybookings.Navigate To Upcoming Bookings")
   async navigateToUpcomingBookings() {
-    // Port: focus before the click and check the selection, see Navigate To Cancelled Bookings
+    // Focus before the click and check the selection, see Navigate To Cancelled Bookings
     await retry(3, 500, async () => {
       await this.page.locator("#tab-0-button").focus();
       await this.page.locator("#tab-0-button").click();
-      await expect(
-        this.page.locator("#tab-0-button"),
-        "The upcoming bookings tab is not selected after the click"
-      ).toHaveAttribute("aria-selected", "true", { timeout: 2000 });
+      await expect(this.page.locator("#tab-0-button"), "The upcoming bookings tab is selected").toHaveAttribute(
+        "aria-selected",
+        "true",
+        { timeout: 2000 }
+      );
     });
   }
 
   // Additional checks
   @step("mybookings.Validate Reservations Are Not For Today Or Later")
   async validateReservationsAreNotForTodayOrLater() {
-    await log("This step assumes that there are reservations in the list, and waits for the first of them.");
+    await log("This step assumes that there are reservations in the list, and waits for the first of them.", {
+      level: "DEBUG",
+    });
 
     // Wait until the reservation elements are visible on the page (the first one, as there can be many)
     await this.page.getByTestId("reservation-card__time").first().waitFor({ state: "visible" });
@@ -249,7 +254,7 @@ export class Mybookings extends PageObject {
     }
 
     // Log a success message if no invalid reservations are found
-    await log("Validation completed successfully: No reservations found for today or later.");
+    await log("Validation completed successfully: No reservations found for today or later.", { level: "DEBUG" });
   }
 
   /**
@@ -260,7 +265,7 @@ export class Mybookings extends PageObject {
   async waitForReservationCards() {
     await expect(
       this.page.getByTestId("reservation-card__container").first(),
-      "No reservation cards in the list"
+      "The list has reservation cards"
     ).toBeVisible({ timeout: CONTENT_WAIT_TIMEOUT });
   }
 
@@ -280,7 +285,7 @@ export class Mybookings extends PageObject {
   /** Reloads the reservation page until it shows the payment status, which the backend updates afterwards. */
   @step("mybookings.Wait For Payment Status")
   async waitForPaymentStatus(payment_status: string) {
-    // Port: expect(...).toPass reloads every 2 s, instead of Wait Until Keyword Succeeds
+    // Reloads every 2 s until the page shows the status
     await expect(async () => {
       await this.reloadAndCheckPaymentStatus(payment_status);
     }).toPass({ intervals: [2000], timeout: 60_000 });
@@ -320,10 +325,7 @@ export class Mybookings extends PageObject {
   async checkUnitnameAndReservationTimeAndClickShow(unitname: string, reservation_time: string) {
     await this.waitForReservationCards();
     const cards = this.reservationCards(unitname, reservation_time);
-    await expect(
-      cards.last(),
-      `No match found for unit name: ${unitname} and reservation time: ${reservation_time}`
-    ).toBeVisible();
+    await expect(cards.last(), `The list has a booking of ${unitname} at ${reservation_time}`).toBeVisible();
     await log(`Found ${await cards.count()} matching reservation cards, clicking the last one`);
     await this.clickShowButton(cards.last());
   }
@@ -352,13 +354,10 @@ export class Mybookings extends PageObject {
     await this.waitForReservationCards();
     // The first matching card. A card is rendered whole, so its buttons are there or not.
     const card = this.reservationCards(unitname, reservation_time).first();
-    await expect(
-      card,
-      `No match found for unit name: ${unitname} and reservation time: ${reservation_time}`
-    ).toBeVisible();
+    await expect(card, `The list has a booking of ${unitname} at ${reservation_time}`).toBeVisible();
     await expect(
       card.getByTestId("reservation-card__button--cancel-reservation"),
-      `Cancel button is present for unit name: ${unitname} and reservation time: ${reservation_time}`
+      `The booking of ${unitname} at ${reservation_time} has no cancel button`
     ).toHaveCount(0);
   }
 
@@ -366,7 +365,7 @@ export class Mybookings extends PageObject {
   async checkUnitnameAndReservationAreFound(unitname: string, reservation_time: string) {
     await expect(
       this.reservationCards(unitname, reservation_time).first(),
-      `No match found for unit name: ${unitname} and reservation time: ${reservation_time}`
+      `The list has a booking of ${unitname} at ${reservation_time}`
     ).toBeVisible();
   }
 
@@ -375,7 +374,7 @@ export class Mybookings extends PageObject {
     // The callers open the list just before, and Navigate To My Bookings waits until the list has loaded
     await expect(
       this.reservationCards(unitname, reservation_time),
-      `Match found for unit name: ${unitname} and reservation time: ${reservation_time}. Test should not find them.`
+      `The list has no booking of ${unitname} at ${reservation_time}`
     ).toHaveCount(0);
 
     // MOBILE

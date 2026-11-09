@@ -1,4 +1,3 @@
-/** Port of PO/Admin/admin_reservations.robot */
 import type { Locator } from "@playwright/test";
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
@@ -12,19 +11,17 @@ import {
   PREFIX_RESERVATIONS_BY_ADMIN_BEHALF_FI,
 } from "../../Resources/texts_FI";
 
+/** The admin's reservation pages: the search of the requested list, a reservation and its dialogs. */
 export class AdminReservations extends PageObject {
   /** This keyword types the reservation number and there should be only one match in the list */
   @step("admin_reservations.Admin Searches Reservation With Id Number And Clicks It From Name")
   async adminSearchesReservationWithIdNumberAndClicksItFromName(booking_number: string, user_fullname: string) {
-    await expect(
-      this.page.locator("#search"),
-      "Check we are on the page where admin can filter reservations"
-    ).toBeVisible();
+    await expect(this.page.locator("#search"), "The page has the reservation search").toBeVisible();
     await this.page.locator("#search").fill(booking_number);
     await this.page.locator('[type="submit"]').click();
     // Check Elements Text waits until the search results show the reservation
     await this.pages.customKeywords.checkElementsText(this.page.getByTestId("pk-0"), booking_number, {
-      message: "ERROR: Check from screenshot that the search worked and there is only one match in the list.",
+      message: `The search shows reservation ${booking_number} first`,
     });
     await this.page.getByTestId("reservee_name-0").getByRole("link", { name: user_fullname, exact: true }).click();
     // The reservation's page opens
@@ -35,14 +32,11 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Searches Reservation With Id Number And Checks The Status")
   async adminSearchesReservationWithIdNumberAndChecksTheStatus(booking_number: string, reservation_status: string) {
-    await expect(
-      this.page.locator("#search"),
-      "Check we are on the page where admin can filter reservations"
-    ).toBeVisible();
+    await expect(this.page.locator("#search"), "The page has the reservation search").toBeVisible();
     await this.page.locator('[type="submit"]').click();
     // Check Elements Text waits until the search results show the reservation
     await this.pages.customKeywords.checkElementsText(this.page.getByTestId("pk-0"), booking_number, {
-      message: "ERROR: Check from screenshot that the search worked and there is only one match in the list.",
+      message: `The search shows reservation ${booking_number} first`,
     });
     await this.pages.customKeywords.checkElementsText(this.page.getByTestId("state-0"), reservation_status);
   }
@@ -355,10 +349,7 @@ export class AdminReservations extends PageObject {
   @step("admin_reservations.Admin Verifies Reservation Modal Is Closed")
   async adminVerifiesReservationModalIsClosed() {
     // Saving the reservation closes the modal, so this waits for the save too
-    await expect(
-      this.page.locator("#info-dialog"),
-      "Reservation modal did not close correctly: id=info-dialog is still visible"
-    ).toBeHidden({ timeout: 15_000 });
+    await expect(this.page.locator("#info-dialog"), "The reservation dialog closes").toBeHidden({ timeout: 15_000 });
   }
 
   // Reservation calendar
@@ -386,7 +377,9 @@ export class AdminReservations extends PageObject {
     this.state.modifiedStarttimeSubventedReservation = `${start_hour}.00`;
 
     // Changes the reservation time with date and hours and minutes
-    await log("This test uses 00 for minutes. So all the changed times will be 10:00–11:00 -> 15:00–17:00 etc");
+    await log("This test uses 00 for minutes. So all the changed times will be 10:00–11:00 -> 15:00–17:00 etc", {
+      level: "DEBUG",
+    });
 
     await this.page.locator('[id="TimeInput.startTime-hours"]').clear();
     await this.page
@@ -406,7 +399,7 @@ export class AdminReservations extends PageObject {
       .pressSequentially(this.state.modifiedDateSubventedReservation);
     // The edit time dialog's own submit button
     const submit = this.page.locator("#info-dialog").locator('button[type="submit"]');
-    await expect(submit, " Check that the modified time is available?").toBeEnabled();
+    await expect(submit, "The new time can be saved: it is free").toBeEnabled();
     await submit.focus();
     await submit.click();
     // Saving the new time closes the dialog

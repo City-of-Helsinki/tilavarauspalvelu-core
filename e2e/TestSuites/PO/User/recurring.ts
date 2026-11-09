@@ -16,8 +16,7 @@ export class Recurring extends PageObject {
       .locator('a[href*="/recurring/"]:not([href*="/criteria"])')
       .click();
     // The round's page opens, its units are waited for when they are selected
-    // Port: expect retries until the URL has changed, instead of Wait Until Keyword Succeeds with Url Should Have
-    // Changed
+    // expect retries until the URL has changed
     await expect(this.page).toHaveURL((url) => url.href !== url_before, { timeout: 20_000 });
   }
 

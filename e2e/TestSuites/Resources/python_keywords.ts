@@ -1,4 +1,4 @@
-/** Port of python_keywords.py. The functions keep their Python names. */
+/** Date, time and text helpers, with the snake_case names of the Python helpers they replaced. */
 import { log } from "../../lib/runtime";
 
 const FINNISH_DAYS = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"];

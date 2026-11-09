@@ -1,12 +1,12 @@
-/** Port of PO/Admin/admin_landingpage.robot */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { BROWSER_TIMEOUT_GLOBAL } from "../../Resources/variables";
 
+/** The admin UI's landing page. */
 export class AdminLandingpage extends PageObject {
   @step("admin_landingpage.Checks The Admin Landing Page H1")
   async checksTheAdminLandingPageH1(expected_H1_text: string) {
-    // Port: expect retries until the heading has the text, instead of Wait Until Keyword Succeeds
+    // expect retries until the heading has the text
     await expect(this.page.locator("H1")).toContainText(expected_H1_text, {
       timeout: BROWSER_TIMEOUT_GLOBAL,
     });

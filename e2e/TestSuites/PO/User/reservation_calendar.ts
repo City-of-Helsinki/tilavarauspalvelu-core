@@ -1,8 +1,8 @@
-/** Port of PO/User/reservation_calendar.robot */
 import { reachesState } from "../../../lib/locators";
 import { step, expect, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
+/** The calendar for choosing a booking's new time. */
 export class ReservationCalendar extends PageObject {
   @step("reservation_calendar.Select Duration Calendar")
   async selectDurationCalendar(duration: string) {
@@ -20,10 +20,9 @@ export class ReservationCalendar extends PageObject {
   async clickAndStoreFreeReservationTime() {
     await this.page.locator("#calendar-controls__time-main-button").click();
     // The list is open when its options are shown
-    await expect(
-      this.page.locator("#calendar-controls__time-option-0"),
-      "The time selection list did not open"
-    ).toBeVisible({ timeout: 5000 });
+    await expect(this.page.locator("#calendar-controls__time-option-0"), "The time selection list opens").toBeVisible({
+      timeout: 5000,
+    });
 
     // Check if enough time slots are available for the current day
     const time_slot_exists = await reachesState(this.page.locator("#calendar-controls__time-option-2"), "attached");

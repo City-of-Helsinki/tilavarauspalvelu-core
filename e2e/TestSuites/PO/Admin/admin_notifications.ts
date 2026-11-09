@@ -1,7 +1,7 @@
-/** Port of PO/Admin/admin_notifications.robot */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
+/** The admin's list of banner notifications. */
 export class AdminNotifications extends PageObject {
   @step("admin_notifications.Admin Clicks Create Notification Button")
   async adminClicksCreateNotificationButton() {
@@ -21,7 +21,7 @@ export class AdminNotifications extends PageObject {
   async adminVerifiesNotificationIsNotFound(notification_name: string) {
     await expect(
       this.page.locator("tbody").getByRole("link", { name: notification_name, exact: true }),
-      `Notification "${notification_name}" was found but should not be present`
+      `The notification list has no "${notification_name}"`
     ).toHaveCount(0);
   }
 }

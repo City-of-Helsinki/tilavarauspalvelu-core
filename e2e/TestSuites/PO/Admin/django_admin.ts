@@ -1,11 +1,11 @@
-/** Port of PO/Admin/django_admin.robot */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
+/** Django admin's role pages, where the permission tests change an admin's roles. */
 export class DjangoAdmin extends PageObject {
   @step("django_admin.Admin Changes Permissions")
   async adminChangesPermissions(role_value: string) {
-    // Port: Select Options By picks the option of the native select without opening it
+    // selectOption picks the option of the native select without opening it
     await this.page.locator("#id_role").selectOption({ value: role_value });
   }
 
@@ -14,7 +14,7 @@ export class DjangoAdmin extends PageObject {
     // The options of the native select are in the page from the start
     await expect(
       this.page.locator("#id_role").locator(`option[value="${role_value}"]`),
-      `Option with value "${role_value}" should not be present`
+      `The role list has no option "${role_value}"`
     ).toHaveCount(0);
   }
 

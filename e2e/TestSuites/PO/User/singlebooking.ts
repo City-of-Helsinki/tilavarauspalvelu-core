@@ -1,8 +1,8 @@
-/** Port of PO/User/singlebooking.robot */
 import { reachesState } from "../../../lib/locators";
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 
+/** The single booking search page. */
 export class Singlebooking extends PageObject {
   @step("singlebooking.Search Units By Name")
   async searchUnitsByName(search_text: string) {
@@ -17,7 +17,7 @@ export class Singlebooking extends PageObject {
 
   @step("singlebooking.Click Searched Unit")
   async clickSearchedUnit(searched_text: string) {
-    // Port: expect waits until the search results are the searched unit only
+    // expect waits until the search results are the searched unit only
     await expect(this.page.getByTestId("list-with-pagination__list--container").locator("h2")).toHaveText([
       searched_text,
     ]);
@@ -38,7 +38,7 @@ export class Singlebooking extends PageObject {
       await this.page.getByTestId("show-all__toggle-button").click();
       await expect(this.page.locator("#search")).toBeVisible({ timeout: 5000 });
     } else {
-      await log("Search input is visible. No further action required.");
+      await log("Search input is visible. No further action required.", { level: "DEBUG" });
     }
   }
 }

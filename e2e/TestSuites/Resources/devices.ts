@@ -1,4 +1,3 @@
-/** Port of Resources/devices.robot */
 import type { BrowserContextOptions } from "@playwright/test";
 import { readEnv } from "../../lib/env";
 import { step, log } from "../../lib/runtime";
@@ -11,6 +10,7 @@ export const LOCALE = "en-US";
 export const ENABLE_WAF_BYPASS_HEADER: boolean = true;
 export const WAF_BYPASS_HEADER_NAME = "X-Test-Secret";
 
+/** Opens a test's pages in the project's browser and device. */
 export class Devices extends PageObject {
   /** Adds WAF bypass headers to context config when enabled */
   @step("devices.Apply Global Header To Context Config")
@@ -19,7 +19,7 @@ export class Devices extends PageObject {
       const { WAF_BYPASS_SECRET } = readEnv();
       if (WAF_BYPASS_SECRET !== "") {
         context_config.extraHTTPHeaders = { [WAF_BYPASS_HEADER_NAME]: WAF_BYPASS_SECRET };
-        await log("🛡️ Added global WAF bypass header to browser context config");
+        await log("🛡️ Added global WAF bypass header to browser context config", { level: "DEBUG" });
       } else {
         await log("ENABLE_WAF_BYPASS_HEADER is True but WAF_BYPASS_SECRET not found in .env file", { level: "WARN" });
       }
@@ -30,7 +30,7 @@ export class Devices extends PageObject {
   @step("devices.Set Up Chromium Desktop Browser And Open Url")
   // oxlint-disable-next-line eslint/no-unused-vars -- downloads are saved into the test's results folder
   async setUpChromiumDesktopBrowserAndOpenUrl(input_URL: string, DOWNLOAD_DIR: string) {
-    // Port: the browser, context and page come from the project's `use` options in playwright.config.ts
+    // The browser, context and page come from the project's `use` options in playwright.config.ts
     // (Chromium, 1440x900, locale, time zone), so traces, screenshots, video and --headed/--ui work. Playwright
     // starts one browser per worker; the staggered start of each slot's first test is the staggeredStart fixture
     // (TestSuites/fixtures.ts). A second call in a test opens a new context.
@@ -41,7 +41,7 @@ export class Devices extends PageObject {
     await this.page.goto(input_URL);
 
     await this.logCurrentTime();
-    await log("🎉 BROWSER SETUP COMPLETED");
+    await log("🎉 BROWSER SETUP COMPLETED", { level: "DEBUG" });
   }
 
   /** Sets up Firefox browser for permission tests - separate session from Django admin and Admin UI */
@@ -49,7 +49,7 @@ export class Devices extends PageObject {
   // oxlint-disable-next-line eslint/no-unused-vars -- downloads are saved into the test's results folder
   async setUpFirefoxDesktopBrowserAndOpenUrl(input_URL: string, DOWNLOAD_DIR: string) {
     // DEVNOTE: This is used for permission tests
-    // Port: a Firefox context with the project's `use` options in playwright.config.ts, see Set Up Chromium Desktop
+    // A Firefox context with the project's `use` options in playwright.config.ts, see Set Up Chromium Desktop
     // Browser And Open Url. Firefox is closed when the test ends.
     const context_config: BrowserContextOptions = {};
     await this.applyGlobalHeaderToContextConfig(context_config);
@@ -59,16 +59,16 @@ export class Devices extends PageObject {
     });
     // Go To waits for the page to load
     await this.page.goto(input_URL);
-    await log("✅ Page loaded successfully");
+    await log("✅ Page loaded successfully", { level: "DEBUG" });
 
     await this.logCurrentTime();
-    await log("🎉 BROWSER SETUP COMPLETED");
+    await log("🎉 BROWSER SETUP COMPLETED", { level: "DEBUG" });
   }
 
   /** Sets up iPhone 14 simulation */
   @step("devices.Set Up Iphone 14 And Open Url")
   async setUpIphone14AndOpenUrl(input_URL: string) {
-    // Port: WebKit with the iPhone 14 device (390x664) comes from the project's `use` options in
+    // WebKit with the iPhone 14 device (390x664) comes from the project's `use` options in
     // playwright.config.ts, see Set Up Chromium Desktop Browser And Open Url
     const context_config: BrowserContextOptions = {};
     await this.applyGlobalHeaderToContextConfig(context_config);
@@ -77,13 +77,13 @@ export class Devices extends PageObject {
     await this.page.goto(input_URL);
 
     await this.logCurrentTime();
-    await log("🎉 IPHONE 14 SETUP COMPLETED");
+    await log("🎉 IPHONE 14 SETUP COMPLETED", { level: "DEBUG" });
   }
 
   /** Sets up Android Pixel 5 simulation */
   @step("devices.Set Up Android Pixel 5 And Open Url")
   async setUpAndroidPixel5AndOpenUrl(input_URL: string) {
-    // Port: Chromium with the Pixel 5 device (393x727) comes from the project's `use` options in
+    // Chromium with the Pixel 5 device (393x727) comes from the project's `use` options in
     // playwright.config.ts, see Set Up Chromium Desktop Browser And Open Url
     const context_config: BrowserContextOptions = {};
     await this.applyGlobalHeaderToContextConfig(context_config);
@@ -92,7 +92,7 @@ export class Devices extends PageObject {
     await this.page.goto(input_URL);
 
     await this.logCurrentTime();
-    await log("🎉 ANDROID PIXEL 5 SETUP COMPLETED");
+    await log("🎉 ANDROID PIXEL 5 SETUP COMPLETED", { level: "DEBUG" });
   }
 
   @step("devices.Log Current Time")

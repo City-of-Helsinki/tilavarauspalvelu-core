@@ -91,7 +91,7 @@ export class DataModification extends PageObject {
 
     // 5: Look up the index of the Finnish short day
     const idx = fi_days.indexOf(cleaned_shortday);
-    expect(idx, `Unknown Finnish day abbreviation "${cleaned_shortday}"`).toBeGreaterThanOrEqual(0);
+    expect(idx, `"${cleaned_shortday}" is a Finnish day abbreviation`).toBeGreaterThanOrEqual(0);
 
     // 6: Use the same index to fetch the English full name
     const english_day = en_days[idx] ?? "";
@@ -107,15 +107,14 @@ export class DataModification extends PageObject {
   @step("data_modification.Compute Reservation Time Slot")
   async computeReservationTimeSlot(reservation_start_time: string, duration: string) {
     // 1: Validate start time (H:MM or HH:MM with optional leading zeros, minutes 00–59)
-    expect(
-      reservation_start_time,
-      'Start time must be "H:MM" or "HH:MM" (with optional leading zero) and valid minutes (00-59)'
-    ).toMatch(/^(?:[0-1]?[0-9]|2[0-3]):[0-5][0-9]$/);
+    expect(reservation_start_time, 'The start time is "H:MM" or "HH:MM" with minutes 00-59').toMatch(
+      /^(?:[0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+    );
 
     // 2: Validate duration "<digits> min"
     expect(
       duration,
-      "Duration must be like \"60 min\". Durations over 90 min (like '1t 45min') are not supported."
+      "The duration is like \"60 min\": durations over 90 min, like '1t 45min', aren't supported"
     ).toMatch(/^\d+\s*min$/);
 
     // 3: Split the start time into hour and minute components
@@ -139,9 +138,11 @@ export class DataModification extends PageObject {
 
     // 9: Ensure end time didn’t wrap past midnight
     // a) Must not exceed 23
-    expect(end_hour, `End hour ${end_hour} past midnight not supported`).toBeLessThanOrEqual(23);
+    expect(end_hour, `The end hour ${end_hour} is before midnight`).toBeLessThanOrEqual(23);
     // b) Must not be before the start
-    expect(end_hour, `End hour ${end_hour} is before start hour ${start_hour}`).toBeGreaterThanOrEqual(start_hour);
+    expect(end_hour, `The end hour ${end_hour} isn't before the start hour ${start_hour}`).toBeGreaterThanOrEqual(
+      start_hour
+    );
 
     // 10: Combine into final slot (both times without leading zeros)
     const start_time = `${start_hour}:${start_min}`;
@@ -162,18 +163,30 @@ export class DataModification extends PageObject {
     // DEVNOTE to test this manually
     // ${current_date}=  Set Variable  2024-04-29 18:52:45
 
-    // Generate random number for days to add (1-15 days)
-    const number_day = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
+    // A day and hour that this test has got before is drawn again: its reservations are on one unit, which can't have
+    // two reservations at the same time
+    let date_plus_x_days: string;
+    let start_hour: string;
+    let end_hour: string;
+    let draws = 0;
+    do {
+      draws++;
 
-    // Generate random number for the start hour subtraction (1-5 hours)
-    const start_hour_subtraction = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
+      // Generate random number for days to add (1-15 days)
+      const number_day = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
 
-    // Calculate the modified date and times
-    const date_plus_x_days = ddmmyyyy(addToDate(current_date, { days: number_day }));
-    const start_hour = pad2(addToDate(current_date, { hours: -start_hour_subtraction }).getHours());
-    const end_hour = pad2(addToDate(current_date, { hours: -(start_hour_subtraction - 1) }).getHours());
+      // Generate random number for the start hour subtraction (1-5 hours)
+      const start_hour_subtraction = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
 
-    await log(`Modified date and hours: ${date_plus_x_days}, ${start_hour}–${end_hour}`);
+      // Calculate the modified date and times
+      date_plus_x_days = ddmmyyyy(addToDate(current_date, { days: number_day }));
+      start_hour = pad2(addToDate(current_date, { hours: -start_hour_subtraction }).getHours());
+      end_hour = pad2(addToDate(current_date, { hours: -(start_hour_subtraction - 1) }).getHours());
+    } while (this.state.modifiedDateAndHours.includes(`${date_plus_x_days} ${start_hour}`));
+    this.state.modifiedDateAndHours.push(`${date_plus_x_days} ${start_hour}`);
+
+    const drawn_again = draws > 1 ? ` (drawn ${draws} times, as this test had got the earlier ones)` : "";
+    await log(`Modified date and hours: ${date_plus_x_days}, ${start_hour}–${end_hour}${drawn_again}`);
 
     return [date_plus_x_days, start_hour, end_hour];
   }
@@ -190,7 +203,7 @@ export class DataModification extends PageObject {
     // This uses en dash (–)
 
     // Validate the format of the original time string --> "Pe 1.11.2024 klo 11:00–12:00"
-    // Port: the result isn't checked, like in the Robot keyword
+    // Its result isn't used: a time in another format makes the email checks fail instead
     python_keywords.validate_timeformat(time_of_the_reservation);
 
     // Extract the weekday, date, and time range

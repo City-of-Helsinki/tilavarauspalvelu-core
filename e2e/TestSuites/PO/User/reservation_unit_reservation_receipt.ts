@@ -1,4 +1,3 @@
-/** Port of PO/User/reservation_unit_reservation_receipt.robot */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import {
@@ -9,6 +8,7 @@ import {
   SINGLEBOOKING_NUMBER_OF_PERSONS,
 } from "../../Resources/texts_FI";
 
+/** The booking's summary page: its details, the reserver's info, the terms and the status message. */
 export class ReservationUnitReservationReceipt extends PageObject {
   /** Validates the reservation details of the user. */
   @step("reservation_unit_reservation_receipt.Check Reservation User Info")
