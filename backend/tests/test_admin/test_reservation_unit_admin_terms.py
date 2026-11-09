@@ -385,6 +385,29 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     ]
 
 
+def test_reservation_unit_admin__terms_validation__no_terms_needed_for_paid_group_that_the_unit_no_longer_uses():
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
+    old_pricing_group = reservation_unit.reservation_unit_pricing_groups.get().pricing_group
+    old_pricing_group.components.update(can_apply_for_discount=True)
+
+    free_pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=free_pricing_group,
+        begins=local_date() - datetime.timedelta(days=1),
+    )
+    PriceComponentFactory.create(
+        pricing_group=free_pricing_group,
+        valid_from=local_date() - datetime.timedelta(days=1),
+        amount=Decimal(0),
+    )
+    reservation_unit.pricing_terms = None
+
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
+
+    assert form.is_valid(), form.errors
+
+
 # ── Pricing groups ──
 
 
