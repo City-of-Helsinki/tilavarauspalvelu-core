@@ -9,6 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import Subquery
+from django.db.models.functions import TruncDate
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
@@ -18,6 +19,7 @@ from tilavarauspalvelu.enums import (
     AccessType,
     AuthenticationType,
     PaymentType,
+    PriceComponentKind,
     ReservationFormType,
     ReservationKind,
     ReservationStartInterval,
@@ -26,6 +28,7 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
 )
 from utils.auditlog_util import AuditLogger
+from utils.date_utils import DEFAULT_TIMEZONE, local_date
 from utils.db import Now
 from utils.fields.model import TextChoicesField
 
@@ -354,23 +357,52 @@ class ReservationUnit(models.Model):
         return f"{self.name}, {getattr(self.unit, 'name', '')}"
 
     @lookup_property
-    def active_pricing_price() -> Decimal | None:
-        """Get the pricing type from the currently active pricing."""
-        from tilavarauspalvelu.models import ReservationUnitPricing
+    def highest_price_today() -> Decimal | None:
+        """The highest base price that is in effect today, or None if the reservation unit has no price today."""
+        from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup
 
+        # Lookup properties build this expression once per process, so the date must come from the database.
+        today = TruncDate(Now(), tzinfo=DEFAULT_TIMEZONE)
+
+        active_pricing_group = models.Subquery(
+            queryset=(
+                ReservationUnitPricingGroup.objects
+                .filter(reservation_unit=models.OuterRef(models.OuterRef("pk")), begins__lte=today)
+                .order_by("-begins")
+                .values("pricing_group")[:1]
+            ),
+        )
         return models.Subquery(  # type: ignore[return-value]
             queryset=(
-                ReservationUnitPricing.objects
-                .filter(reservation_unit=models.OuterRef("pk"))
-                .active()
-                .values("highest_price")[:1]
+                PriceComponent.objects
+                .filter(
+                    models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+                    pricing_group=active_pricing_group,
+                    kind=PriceComponentKind.BASE,
+                    valid_from__lte=today,
+                )
+                .order_by("-amount")
+                .values("amount")[:1]
             ),
-            output_field=models.CharField(null=True),
+            output_field=models.DecimalField(max_digits=10, decimal_places=2, null=True),
         )
 
-    @active_pricing_price.override
+    @highest_price_today.override
     def _(self) -> Decimal | None:
-        return self.pricings.active().values_list("highest_price", flat=True).first()
+        from tilavarauspalvelu.models import PriceComponent
+
+        today = local_date()
+        pricing_group_row = self.reservation_unit_pricing_groups.filter(begins__lte=today).order_by("-begins").first()
+        if pricing_group_row is None:
+            return None
+
+        components = PriceComponent.objects.filter(
+            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+            pricing_group=pricing_group_row.pricing_group_id,
+            kind=PriceComponentKind.BASE,
+            valid_from__lte=today,
+        )
+        return components.order_by("-amount").values_list("amount", flat=True).first()
 
     @lookup_property
     def publishing_state() -> ReservationUnitPublishingState:
@@ -498,17 +530,17 @@ class ReservationUnit(models.Model):
                 ),
                 then=models.Value(ReservationUnitReservationState.SCHEDULED_PERIOD.value),
             ),
-            # Reservation Unit doesn't have an active pricing,
-            #  OR it has a paid pricing with no payment product,
+            # Reservation Unit doesn't have a price today,
+            #  OR it has a paid price with no payment product,
             #  OR it was reservable in the past (but not anymore),
             #  OR reservation period is zero-length.
             models.When(
                 (
-                    # No active pricing.
-                    L(active_pricing_price=None)
+                    # No price today.
+                    L(highest_price_today=None)
                     | (
-                        # Paid pricing with no payment product.
-                        L(active_pricing_price__gt=0) & models.Q(payment_product__isnull=True)
+                        # Paid price with no payment product.
+                        L(highest_price_today__gt=0) & models.Q(payment_product__isnull=True)
                         # When using Mock Verkkokauppa API, pricing is valid even if there is no payment product.
                         if not settings.MOCK_VERKKOKAUPPA_API_ENABLED
                         else ~models.Q()  # Evaluates to False
@@ -631,7 +663,7 @@ AuditLogger.register(
     ReservationUnit,
     # Exclude lookup properties, since they are calculated values.
     exclude_fields=[
-        "_active_pricing_price",
+        "_highest_price_today",
         "_publishing_state",
         "_reservation_state",
         "_current_access_type",
