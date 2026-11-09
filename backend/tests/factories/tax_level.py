@@ -31,7 +31,6 @@ class TaxLevelFactory(GenericDjangoModelFactory[TaxLevel]):
     name_en = FakerEN("word", unique=True)
     name_sv = FakerSV("word", unique=True)
 
-    reservation_unit_pricings = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingFactory")
     price_components = ReverseForeignKeyFactory("tests.factories.PriceComponentFactory")
     reservation_price_lines = ReverseForeignKeyFactory("tests.factories.ReservationPriceLineFactory")
     sales_items = ReverseForeignKeyFactory("tests.factories.SalesItemFactory")

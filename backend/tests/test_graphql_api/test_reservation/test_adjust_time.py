@@ -164,7 +164,7 @@ def test_reservation__adjust_time__change_would_make_unit_reservation_unit_paid(
 
 def test_reservation__adjust_time__no_active_pricing_in_new_time(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
-        reservation_unit__pricings__begins=local_date() + datetime.timedelta(days=365),
+        reservation_unit__own_price__begins=local_date() + datetime.timedelta(days=365),
     )
     reservation_begin = reservation.begins_at
 
@@ -351,9 +351,8 @@ def test_reservation__adjust_time__reservation_unit_in_open_application_round(gr
         origin_hauki_resource__id="987",
         spaces=[space],
         unit=space.unit,
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
-        pricings__tax_level__rates__percentage=0,
+        own_price__amount=0,
+        own_price__tax_level__rates__percentage=0,
         cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
 
@@ -502,8 +501,7 @@ def test_reservation__adjust_time__needs_handling_after_time_change(graphql, out
 def test_reservation__adjust_time__reservation_block_whole_day__ignore_given_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
+        own_price__amount=0,
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
         cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=0),
@@ -545,8 +543,7 @@ def test_reservation__adjust_time__reservation_block_whole_day__ignore_given_buf
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__adjust_time__update_reservation_buffer_on_adjust(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
+        own_price__amount=0,
         buffer_time_before=datetime.timedelta(hours=1),
         buffer_time_after=datetime.timedelta(hours=1),
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),

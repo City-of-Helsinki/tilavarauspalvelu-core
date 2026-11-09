@@ -693,11 +693,10 @@ def test_reservation__create__price_calculation__free_reservation_unit(graphql):
 
 def test_reservation__create__pricing_requires_payment_type(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(20),
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=None,
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=None,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -712,11 +711,10 @@ def test_reservation__create__pricing_requires_payment_type(graphql):
 
 def test_reservation__create__price_calculation__fixed_price_reservation_unit(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(20),
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -737,11 +735,10 @@ def test_reservation__create__price_calculation__fixed_price_reservation_unit(gr
 
 def test_reservation__create__price_calculation__time_based_price(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(20),
-        pricings__price_unit=PriceUnit.PER_15_MINS,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.PER_15_MINS,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -760,11 +757,10 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
 @freeze_time(local_datetime(2026, 10, 24, 12))
 def test_reservation__create__price_calculation__time_based_price__daylight_saving_time_ends(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(10),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__amount=Decimal(10),
+        own_price__price_unit=PriceUnit.PER_HOUR,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -788,12 +784,11 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         payment_product__id=uuid.uuid4(),
         # Current pricing
-        pricings__begins=now,
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(6),
-        pricings__tax_level__rates__percentage=Decimal(24),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__begins=now,
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__amount=Decimal(6),
+        own_price__tax_level__rates__percentage=Decimal(24),
+        payment_type=PaymentType.ONLINE,
     )
     # Future pricing
     ReservationUnitPricingFactory.create(
@@ -824,12 +819,11 @@ def test_reservation__create__price_calculation__tax_rate_on_creation_date(graph
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         payment_product__id=uuid.uuid4(),
-        pricings__begins=now,
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(10),
-        pricings__tax_level__rates__percentage=Decimal(24),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__begins=now,
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__amount=Decimal(10),
+        own_price__tax_level__rates__percentage=Decimal(24),
+        payment_type=PaymentType.ONLINE,
     )
 
     tax_level = reservation_unit.pricings.first().tax_level
@@ -856,13 +850,12 @@ def test_reservation__create__price_calculation__tax_level_has_no_rate_today(gra
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         payment_product__id=uuid.uuid4(),
-        pricings__begins=now,
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(10),
-        pricings__tax_level__name="Yleinen",
-        pricings__tax_level__rates__begins=tomorrow,
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__begins=now,
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__amount=Decimal(10),
+        own_price__tax_level__name="Yleinen",
+        own_price__tax_level__rates__begins=tomorrow,
+        payment_type=PaymentType.ONLINE,
     )
 
     graphql.login_with_superuser()
@@ -878,11 +871,10 @@ def test_reservation__create__price_calculation__tax_level_has_no_rate_today(gra
 
 def test_reservation__create__price_calculation__on_site_doesnt_require_payment_product(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(20),
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=PaymentType.ON_SITE,
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ON_SITE,
         payment_product=None,
     )
 

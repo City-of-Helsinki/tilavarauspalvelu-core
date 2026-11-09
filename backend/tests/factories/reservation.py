@@ -19,15 +19,7 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
 )
 from tilavarauspalvelu.models import Reservation
-from utils.date_utils import (
-    datetime_difference,
-    local_date,
-    local_datetime,
-    local_start_of_day,
-    next_hour,
-    utc_datetime,
-)
-from utils.decimal_utils import round_decimal
+from utils.date_utils import local_datetime, local_start_of_day, next_hour, utc_datetime
 
 from ._base import (
     FakerFI,
@@ -39,7 +31,7 @@ from ._base import (
 )
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing, User
+    from tilavarauspalvelu.models import ReservationUnit, User
 
 __all__ = [
     "ReservationBuilder",
@@ -148,8 +140,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs.setdefault("cancellation_rule__can_be_cancelled_time_before", datetime.timedelta(0))
         sub_kwargs.setdefault("spaces", [space])
         sub_kwargs.setdefault("unit", unit)
-        sub_kwargs.setdefault("pricings__lowest_price", 0)
-        sub_kwargs.setdefault("pricings__highest_price", 0)
+        sub_kwargs.setdefault("own_price__amount", Decimal(0))
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
         day_start = local_start_of_day()
@@ -196,8 +187,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs.setdefault("origin_hauki_resource__id", "987")
         sub_kwargs.setdefault("payment_product", PaymentProductFactory.create())
         sub_kwargs.setdefault("payment_accounting", PaymentAccountingFactory.create())
-        sub_kwargs.setdefault("pricings__highest_price", 20)
-        sub_kwargs.setdefault("pricings__payment_type", PaymentType.ON_SITE)
+        sub_kwargs.setdefault("own_price__amount", Decimal(20))
+        sub_kwargs.setdefault("payment_type", PaymentType.ON_SITE)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
         day_start = local_start_of_day()
@@ -214,6 +205,9 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("price", Decimal("12.4"))
         kwargs.setdefault("tax_percentage_value", Decimal("25.5"))
         kwargs.setdefault("reservation_unit", reservation_unit)
+        kwargs.setdefault("price_lines__amount", kwargs["price"])
+        kwargs.setdefault("price_lines__tax_percentage", kwargs["tax_percentage_value"])
+        kwargs.setdefault("price_lines__tax_level__rates__percentage", kwargs["tax_percentage_value"])
         return cls.create(**kwargs)
 
     @classmethod
@@ -309,16 +303,10 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     def create_for_requires_handling(cls, **kwargs: Any) -> Reservation:
         """Create a Reservation for a single ReservationUnit in the necessary state for setting handling required."""
         from .reservation_unit import ReservationUnitFactory
-        from .reservation_unit_pricing import ReservationUnitPricingFactory
 
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
+        sub_kwargs.setdefault("own_price__amount", Decimal(0))
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
-
-        ReservationUnitPricingFactory.create(
-            reservation_unit=reservation_unit,
-            lowest_price=Decimal("0.00"),
-            highest_price=Decimal("0.00"),
-        )
 
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
@@ -334,10 +322,9 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         sub_kwargs.setdefault("payment_product__id", uuid.uuid4())
-        sub_kwargs.setdefault("pricings__lowest_price", Decimal(0))
-        sub_kwargs.setdefault("pricings__highest_price", Decimal(20))
-        sub_kwargs.setdefault("pricings__tax_level__rates__percentage", Decimal("25.5"))
-        sub_kwargs.setdefault("pricings__payment_type", PaymentType.ONLINE)
+        sub_kwargs.setdefault("own_price__amount", Decimal(20))
+        sub_kwargs.setdefault("own_price__tax_level__rates__percentage", Decimal("25.5"))
+        sub_kwargs.setdefault("payment_type", PaymentType.ONLINE)
 
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
@@ -358,6 +345,9 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("payment_order__price_vat", Decimal("2.4"))
         kwargs.setdefault("payment_order__price_total", Decimal("12.4"))
         kwargs.setdefault("payment_order__handled_payment_due_by", due_by)
+        kwargs.setdefault("price_lines__amount", kwargs["price"])
+        kwargs.setdefault("price_lines__tax_percentage", kwargs["tax_percentage_value"])
+        kwargs.setdefault("price_lines__tax_level__rates__percentage", Decimal("25.5"))
 
         return cls.create(**kwargs)
 
@@ -455,8 +445,6 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         reservation_unit: ReservationUnit,
         *,
         allow_overnight: bool = False,
-        subsidised: bool = False,
-        pricing: ReservationUnitPricing | None = None,
     ) -> Self:
         """Add begin datetime and end datetime based on given reservation unit's allowed durations."""
         min_hours = math.ceil(reservation_unit.min_reservation_duration.total_seconds() / 3600)
@@ -480,42 +468,4 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
             buffer_time_after=reservation_unit.actions.get_actual_after_buffer(ends_at),
         )
 
-        if pricing is not None:
-            duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
-            today = local_date()
-            self.set(
-                price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
-                non_subsidised_price=pricing.highest_price,
-                unit_price=pricing.lowest_price if subsidised else pricing.highest_price,
-                tax_percentage_value=pricing.tax_level.actions.get_percentage(on_date=today),
-            )
-
-        return self
-
-    def use_reservation_unit_price(self) -> Self:
-        begins_at: datetime.datetime | None = self.kwargs.get("begins_at")
-        ends_at: datetime.datetime | None = self.kwargs.get("ends_at")
-
-        if begins_at is None or ends_at is None:
-            msg = "begin and end times must be set before using reservation unit pricing"
-            raise ValueError(msg)
-
-        reservation_unit: ReservationUnit | None = self.kwargs.get("reservation_unit")
-        if reservation_unit is None:
-            msg = "reservation unit must be set before using reservation unit pricing"
-            raise ValueError(msg)
-
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begins_at)
-        if pricing is None:
-            msg = "reservation unit must have active pricing for the given date"
-            raise ValueError(msg)
-
-        duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
-        today = local_date()
-        self.set(
-            price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
-            non_subsidised_price=pricing.highest_price,
-            unit_price=pricing.lowest_price,
-            tax_percentage_value=pricing.tax_level.actions.get_percentage(on_date=today),
-        )
         return self
