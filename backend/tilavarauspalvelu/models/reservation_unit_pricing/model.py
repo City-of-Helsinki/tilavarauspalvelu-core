@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
@@ -8,7 +7,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
-from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from utils.auditlog_util import AuditLogger
@@ -16,6 +14,7 @@ from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
     import datetime
+    from decimal import Decimal
 
     from lazy_managers import LazyAttribute
 
@@ -105,36 +104,6 @@ class ReservationUnitPricing(models.Model):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.pk} ({self!s})>"
-
-    @lookup_property
-    def lowest_price_net() -> Decimal | None:
-        """The lowest price without the tax of the rate that is in effect today."""
-        return models.ExpressionWrapper(  # type: ignore[return-value]
-            models.F("lowest_price") / (Decimal(1) + L("tax_level__current_percentage") / Decimal(100)),
-            output_field=models.DecimalField(),
-        )
-
-    @lowest_price_net.override
-    def _(self) -> Decimal | None:
-        tax_percentage = self.tax_level.current_percentage
-        if tax_percentage is None:
-            return None
-        return self.lowest_price / (1 + tax_percentage / Decimal(100))
-
-    @lookup_property
-    def highest_price_net() -> Decimal | None:
-        """The highest price without the tax of the rate that is in effect today."""
-        return models.ExpressionWrapper(  # type: ignore[return-value]
-            models.F("highest_price") / (Decimal(1) + L("tax_level__current_percentage") / Decimal(100)),
-            output_field=models.DecimalField(),
-        )
-
-    @highest_price_net.override
-    def _(self) -> Decimal | None:
-        tax_percentage = self.tax_level.current_percentage
-        if tax_percentage is None:
-            return None
-        return self.highest_price / (1 + tax_percentage / Decimal(100))
 
 
 AuditLogger.register(ReservationUnitPricing)

@@ -165,7 +165,6 @@ def calculate_price_with_data(
         if component.price_option_id is None or component.price_option_id == price_option_pk
     ]
 
-    # Same rounding as in the old pricing model (`ReservationUnitPricingActions.calculate_reservation_price`).
     duration_minutes = math.ceil((end - begin).total_seconds() / 60 / 15) * 15
     end = begin + datetime.timedelta(minutes=duration_minutes)
 

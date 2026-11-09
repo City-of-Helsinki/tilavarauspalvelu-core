@@ -1,16 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
-
-from django.db import models
-from django.db.models.functions import RowNumber
-
 from tilavarauspalvelu.models import ReservationUnitPricing
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
-from utils.date_utils import local_date
-
-if TYPE_CHECKING:
-    import datetime
 
 __all__ = [
     "ReservationUnitPricingManager",
@@ -18,28 +9,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
-    def past_or_active(self, from_date: datetime.date | models.F | None = None) -> Self:
-        """Get only past or active pricings, ordered from most recent to oldest."""
-        if from_date is None:
-            from_date = local_date()
-
-        return self.filter(begins__lte=from_date).order_by("-begins")
-
-    def active(self, from_date: datetime.date | models.F | None = None) -> Self:
-        """Get only active pricings for each reservation unit."""
-        return (
-            self
-            .past_or_active(from_date=from_date)
-            .alias(
-                row_number=models.Window(
-                    expression=RowNumber(),
-                    partition_by=[models.F("reservation_unit_id")],
-                    order_by="-begins",
-                ),
-            )
-            .filter(row_number=1)
-        )
+class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]): ...
 
 
 class ReservationUnitPricingManager(ModelManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]): ...
