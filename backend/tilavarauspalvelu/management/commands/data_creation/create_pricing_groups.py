@@ -187,18 +187,7 @@ def _create_reservation_price_lines() -> None:
                 line.override_amount = Decimal(0)
             price_lines.append(line)
 
-        first_line = reservation_price_lines.lines[0]
-        reservation.non_subsidised_price = reservation_price_lines.calculation.total
-        reservation.price = Decimal(0) if is_free else reservation_price_lines.calculation.total
-        reservation.unit_price = first_line.unit_amount
-        reservation.tax_percentage_value = first_line.tax_percentage
-
     ReservationPriceLine.objects.bulk_create(price_lines, batch_size=1000)
-    Reservation.objects.bulk_update(
-        reservations,
-        fields=["price", "non_subsidised_price", "unit_price", "tax_percentage_value"],
-        batch_size=1000,
-    )
 
 
 # Internals
