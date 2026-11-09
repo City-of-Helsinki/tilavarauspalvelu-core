@@ -28,8 +28,8 @@ ENV SKIP_ENV_VALIDATION=true
 ARG SENTRY_PROJECT
 ENV SENTRY_PROJECT=$SENTRY_PROJECT
 ARG RELEASE_NAME
-ARG SENTRY_ENABLE_SOURCE_MAPS
-ENV SENTRY_ENABLE_SOURCE_MAPS=$SENTRY_ENABLE_SOURCE_MAPS
+ARG SENTRY_CREATE_RELEASE
+ENV SENTRY_CREATE_RELEASE=$SENTRY_CREATE_RELEASE
 # Allow failure because we rather have builds without sourcemaps than no builds
 ENV SENTRY_ALLOW_FAILURE=true
 ARG SENTRY_URL
@@ -54,7 +54,7 @@ RUN pnpm --filter=$APP... run build
 # Finalize the release here. Main builds have no other step that finalizes it.
 # For tags, update_commits_to_sentry.yml adds the commits and the production deploy later.
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
-  if [ "$SENTRY_ENABLE_SOURCE_MAPS" = "true" ] ; then \
+  if [ "$SENTRY_CREATE_RELEASE" = "true" ] ; then \
     sentry-cli sourcemaps inject --ignore "node_modules" /app/apps/$APP/.next/ && \
     sentry-cli sourcemaps upload --ignore "node_modules" --release "$RELEASE_NAME" /app/apps/$APP/.next/ && \
     sentry-cli releases new "$RELEASE_NAME" && \

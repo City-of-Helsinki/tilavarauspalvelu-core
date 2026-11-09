@@ -45,7 +45,7 @@ jobs:
       # Upload source maps and create a Sentry release for release tags (v*) and for main.
       # Tagged builds go to test and production. Main builds go to the dev server.
       # Pull request builds do not deploy, so they do not create releases.
-      SENTRY_ENABLE_SOURCE_MAPS: ${{ (github.ref_type == 'tag' && startsWith(github.ref_name, 'v')) || github.ref == 'refs/heads/main' }}
+      SENTRY_CREATE_RELEASE: ${{ (github.ref_type == 'tag' && startsWith(github.ref_name, 'v')) || github.ref == 'refs/heads/main' }}
       SENTRY_URL: "https://city-of-helsinki.sentry.io"
       SENTRY_ORG: "city-of-helsinki"
       SENTRY_PROJECT: ${{ inputs.sentry-project }}
@@ -139,7 +139,7 @@ jobs:
           NEXT_PUBLIC_SOURCE_VERSION=${{ github.sha }}
           NEXT_PUBLIC_SOURCE_BRANCH_NAME=${{ github.ref_name }}
           CI=true
-          SENTRY_ENABLE_SOURCE_MAPS=${{ env.SENTRY_ENABLE_SOURCE_MAPS }}
+          SENTRY_CREATE_RELEASE=${{ env.SENTRY_CREATE_RELEASE }}
           RELEASE_NAME=${{ steps.release.outputs.release }}
           SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
           SENTRY_URL=${{ env.SENTRY_URL }}

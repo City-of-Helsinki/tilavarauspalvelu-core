@@ -20,7 +20,8 @@ const ServerSchema = z.object({
   ENABLE_ERROR_TRIGGER: coerceBoolean,
   FEEDBACK_URL: optionalUrl,
   SENTRY_AUTH_TOKEN: z.string().optional(),
-  SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,
+  // Builds source maps and creates a Sentry release from them. Set in CI for tags and main.
+  SENTRY_CREATE_RELEASE: coerceBoolean,
   SENTRY_ORG: z.string().optional(),
   SKIP_ENV_VALIDATION: coerceBoolean,
   RESERVATION_UNIT_PREVIEW_URL_PREFIX: optionalUrl,

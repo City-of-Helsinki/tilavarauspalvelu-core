@@ -21,7 +21,8 @@ const ServerSchema = z.object({
   FEEDBACK_URL: optionalUrl,
   // Uploading sourcemaps to Sentry requires an auth token - Required on CI
   SENTRY_AUTH_TOKEN: z.string().optional(),
-  SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,
+  // Builds source maps and creates a Sentry release from them. Set in CI for tags and main.
+  SENTRY_CREATE_RELEASE: coerceBoolean,
   SENTRY_ORG: z.string().optional(),
   SKIP_ENV_VALIDATION: coerceBoolean,
   HOTJAR_ENABLED: coerceBoolean,
