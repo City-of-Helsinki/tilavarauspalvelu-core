@@ -23,7 +23,6 @@ from import_export.formats.base_formats import JSON
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
-from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
@@ -443,18 +442,16 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     if is_valid_url(payment_order.checkout_url) and payment_order.expires_at > cutoff:
         return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url, request))
 
-    # The tax rate can change between the approval and the payment.
-    today = local_date()
-    try:
-        tax_percentage = reservation.actions.get_tax_percentage(on_date=today)
-    except ReservationPriceCalculationError as error:
+    if not reservation.price_lines.exists():
         msg = "Reservation has no price lines"
-        raise ValidationError(msg, code="RESERVATION_NO_PRICE_LINES") from error
+        raise ValidationError(msg, code="RESERVATION_NO_PRICE_LINES")
+
+    # The tax rate can change between the approval and the payment.
+    try:
+        reservation.actions.set_taxes_of_sale(on_date=local_date())
     except DRFValidationError as error:
         msg = "The tax level of the reservation has no tax rate in effect today"
         raise ValidationError(msg, code="TAX_LEVEL_HAS_NO_RATE") from error
-
-    reservation.actions.update_tax_percentage(tax_percentage=tax_percentage)
 
     try:
         verkkokauppa_order = reservation.actions.create_order_in_verkkokauppa()

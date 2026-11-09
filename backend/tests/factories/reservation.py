@@ -70,12 +70,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     access_code_generated_at = None
     access_code_is_active = False
 
-    # Pricing details
-    price = Decimal(0)
-    non_subsidised_price = Decimal(0)
-    unit_price = Decimal(0)
-    tax_percentage_value = Decimal(0)
-
     # Free of charge information
     applying_for_free_of_charge = False
     free_of_charge_reason = None
@@ -202,12 +196,10 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("state", ReservationStateChoice.CREATED)
         kwargs.setdefault("begins_at", begin)
         kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
-        kwargs.setdefault("price", Decimal("12.4"))
-        kwargs.setdefault("tax_percentage_value", Decimal("25.5"))
         kwargs.setdefault("reservation_unit", reservation_unit)
-        kwargs.setdefault("price_lines__amount", kwargs["price"])
-        kwargs.setdefault("price_lines__tax_percentage", kwargs["tax_percentage_value"])
-        kwargs.setdefault("price_lines__tax_level__rates__percentage", kwargs["tax_percentage_value"])
+        kwargs.setdefault("price_lines__amount", Decimal("12.4"))
+        kwargs.setdefault("price_lines__tax_percentage", Decimal("25.5"))
+        kwargs.setdefault("price_lines__tax_level__rates__percentage", Decimal("25.5"))
         return cls.create(**kwargs)
 
     @classmethod
@@ -290,8 +282,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("state", ReservationStateChoice.DENIED)
         kwargs.setdefault("begins_at", begin - datetime.timedelta(hours=2))
         kwargs.setdefault("ends_at", begin - datetime.timedelta(hours=1))
-        kwargs.setdefault("price", Decimal("12.4"))
-        kwargs.setdefault("tax_percentage_value", Decimal("24.0"))
+        kwargs.setdefault("price_lines__amount", Decimal("12.4"))
+        kwargs.setdefault("price_lines__tax_percentage", Decimal("24.0"))
         kwargs.setdefault("payment_order__status", OrderStatus.PAID)
         kwargs.setdefault("payment_order__price_net", Decimal("10.0"))
         kwargs.setdefault("payment_order__price_vat", Decimal("2.4"))
@@ -335,8 +327,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
         kwargs.setdefault("begins_at", begin)
         kwargs.setdefault("ends_at", begin + datetime.timedelta(hours=1))
-        kwargs.setdefault("price", Decimal("12.4"))
-        kwargs.setdefault("tax_percentage_value", Decimal("24.0"))
         kwargs.setdefault("reservation_unit", reservation_unit)
 
         kwargs.setdefault("payment_order__status", OrderStatus.PENDING)
@@ -345,8 +335,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("payment_order__price_vat", Decimal("2.4"))
         kwargs.setdefault("payment_order__price_total", Decimal("12.4"))
         kwargs.setdefault("payment_order__handled_payment_due_by", due_by)
-        kwargs.setdefault("price_lines__amount", kwargs["price"])
-        kwargs.setdefault("price_lines__tax_percentage", kwargs["tax_percentage_value"])
+        kwargs.setdefault("price_lines__amount", Decimal("12.4"))
+        kwargs.setdefault("price_lines__tax_percentage", Decimal("24.0"))
         kwargs.setdefault("price_lines__tax_level__rates__percentage", Decimal("25.5"))
 
         return cls.create(**kwargs)

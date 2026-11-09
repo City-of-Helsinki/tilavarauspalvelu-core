@@ -11,6 +11,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
@@ -51,7 +52,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         data["confirmed_at"] = local_datetime()
 
         # If no payment is required, we can skip the rest of the validation.
-        if self.instance.price_net == 0:
+        if self.instance.total_price_net == 0:
             data["payment_type"] = None
             data["state"] = self.instance.actions.get_state_on_reservation_confirmed(payment_type=None)
             return data
@@ -64,10 +65,6 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         if data["payment_type"] != PaymentType.ON_SITE:
             reservation_unit.validators.validate_has_payment_product()
 
-            # A webshop payment uses the tax rate of the date of sale.
-            today = local_date()
-            data["tax_percentage_value"] = self.instance.actions.get_tax_percentage(on_date=today)
-
         data["state"] = self.instance.actions.get_state_on_reservation_confirmed(payment_type=data["payment_type"])
 
         return data
@@ -75,12 +72,12 @@ class ReservationConfirmSerializer(NestingModelSerializer):
     def update(self, instance: Reservation, validated_data: ReservationConfirmData) -> Reservation:
         state = validated_data["state"]
 
-        # Set the tax rate on the instance early so that the payment order gets the right tax amounts.
-        tax_percentage_value = validated_data.get("tax_percentage_value")
-        if tax_percentage_value is not None:
-            self.instance.tax_percentage_value = tax_percentage_value
+        # A webshop payment uses the tax rates of the date of sale.
+        # Set them before the payment order, so that it gets the right tax amounts.
+        if validated_data["payment_type"] in PaymentType.requires_verkkokauppa:
+            set_price_line_taxes(reservation=self.instance, on_date=local_date())
 
-        if self.instance.price_net > 0 and state.should_create_payment_order:
+        if self.instance.total_price_net > 0 and state.should_create_payment_order:
             self.instance.actions.create_payment_order_paid_immediately(payment_type=validated_data["payment_type"])
 
         instance = super().update(instance=instance, validated_data=validated_data)
