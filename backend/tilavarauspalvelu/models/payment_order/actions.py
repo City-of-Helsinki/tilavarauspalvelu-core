@@ -229,7 +229,7 @@ class PaymentOrderActions:
         return (
             # Is a paid reservation
             self.payment_order.reservation is not None
-            and self.payment_order.reservation.price_net > 0
+            and self.payment_order.reservation.total_price_net > 0
             # Has been paid in webshop using online payment
             and self.payment_order.status == OrderStatus.PAID
             # Has not been refunded already
@@ -240,7 +240,7 @@ class PaymentOrderActions:
         return (
             # Is a paid reservation
             self.payment_order.reservation is not None
-            and self.payment_order.reservation.price_net > 0
+            and self.payment_order.reservation.total_price_net > 0
             # Reservation start date is not in the past
             and local_date() <= self.payment_order.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
             # Has been paid in webshop using invoice

@@ -192,20 +192,20 @@ class ReservationActions:
     def get_instructions(self, *, kind: Literal["confirmed", "pending", "cancelled"], language: Lang) -> str:
         return get_attr_by_language(self.reservation.reservation_unit, f"reservation_{kind}_instructions", language)
 
-    def get_tax_percentage(self, *, on_date: datetime.date) -> Decimal:
+    def get_vat_percentage(self) -> Decimal:
         """
-        The tax percentage of the reservation on the given date.
-        It comes from the first price line, because a webshop order has one row (TILA-4594).
+        The tax percentage of the price lines of the reservation.
+        A webshop order has one row with one tax percentage until it has one row for each line (TILA-4594).
 
-        :raises ReservationPriceCalculationError: If the reservation has no price lines.
-        :raises ValidationError: If the tax level of the line has no rate on the date.
+        :raises ReservationPriceCalculationError: If the reservation has no price lines,
+                                                  or they have more than one tax percentage.
         """
-        first_line = self.reservation.price_lines.select_related("tax_level").order_by("pk").first()
-        if first_line is None:
-            msg = "Reservation has no price lines"
+        tax_percentages = set(self.reservation.price_lines.values_list("tax_percentage", flat=True))
+        if len(tax_percentages) != 1:
+            msg = "Reservation must have price lines with exactly one tax percentage."
             raise ReservationPriceCalculationError(msg)
 
-        return first_line.tax_level.actions.get_percentage(on_date=on_date)
+        return tax_percentages.pop()
 
     def can_apply_for_discount(self) -> bool:
         """The customer can apply for a discount, if a price component of the reservation allows it."""
@@ -220,7 +220,7 @@ class ReservationActions:
         if self.reservation.requires_handling:
             return ReservationStateChoice.REQUIRES_HANDLING
 
-        if self.reservation.price_net > 0 and payment_type != PaymentType.ON_SITE:
+        if self.reservation.total_price_net > 0 and payment_type != PaymentType.ON_SITE:
             return ReservationStateChoice.WAITING_FOR_PAYMENT
 
         return ReservationStateChoice.CONFIRMED
@@ -307,9 +307,9 @@ class ReservationActions:
             payment_type=payment_type,
             status=OrderStatus.DRAFT,
             language=self.reservation.user.get_preferred_language(),
-            price_net=self.reservation.price_net,
-            price_vat=self.reservation.price_vat_amount,
-            price_total=self.reservation.price,
+            price_net=self.reservation.total_price_net,
+            price_vat=self.reservation.total_vat_amount,
+            price_total=self.reservation.total_price,
             reservation=self.reservation,
             reservation_user_uuid=self.reservation.user.uuid,
             remote_id=verkkokauppa_order.order_id,
@@ -322,9 +322,9 @@ class ReservationActions:
             payment_type=PaymentType.ON_SITE,
             status=OrderStatus.PAID_MANUALLY,
             language=self.reservation.user.get_preferred_language(),
-            price_net=self.reservation.price_net,
-            price_vat=self.reservation.price_vat_amount,
-            price_total=self.reservation.price,
+            price_net=self.reservation.total_price_net,
+            price_vat=self.reservation.total_vat_amount,
+            price_total=self.reservation.total_price,
             reservation=self.reservation,
         )
 
@@ -341,24 +341,28 @@ class ReservationActions:
             payment_type=payment_type,
             status=OrderStatus.PENDING,
             language=self.reservation.user.get_preferred_language(),
-            price_net=self.reservation.price_net,
-            price_vat=self.reservation.price_vat_amount,
-            price_total=self.reservation.price,
+            price_net=self.reservation.total_price_net,
+            price_vat=self.reservation.total_vat_amount,
+            price_total=self.reservation.total_price,
             reservation=self.reservation,
             reservation_user_uuid=self.reservation.user.uuid,
             handled_payment_due_by=handled_payment_due_by,
         )
 
-    def update_tax_percentage(self, *, tax_percentage: Decimal) -> None:
-        """Update the tax percentage of the reservation and the tax amounts of its payment order."""
+    def set_taxes_of_sale(self, *, on_date: datetime.date) -> None:
+        """
+        Set the tax percentages of the price lines from the rates on the date of sale,
+        and the tax amounts of the payment order from them.
+
+        :raises ValidationError: If a tax level of a price line has no rate on the date.
+        """
         payment_order = self.reservation.payment_order
 
-        self.reservation.tax_percentage_value = tax_percentage
-        payment_order.price_net = self.reservation.price_net
-        payment_order.price_vat = self.reservation.price_vat_amount
-
         with transaction.atomic():
-            self.reservation.save(update_fields=["tax_percentage_value"])
+            set_price_line_taxes(reservation=self.reservation, on_date=on_date)
+
+            payment_order.price_net = self.reservation.total_price_net
+            payment_order.price_vat = self.reservation.total_vat_amount
             payment_order.save(update_fields=["price_net", "price_vat"])
 
     def create_order_in_verkkokauppa(self) -> Order:
@@ -372,7 +376,17 @@ class ReservationActions:
         if self.should_offer_invoicing():
             invoicing_date = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
 
-        order_params = get_verkkokauppa_order_params(self.reservation, invoicing_date=invoicing_date)
+        try:
+            vat_percentage = self.get_vat_percentage()
+        except ReservationPriceCalculationError as error:
+            msg = "The price lines of the reservation must have exactly one tax percentage."
+            raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_LINES_HAVE_MANY_TAX_PERCENTAGES) from error
+
+        order_params = get_verkkokauppa_order_params(
+            self.reservation,
+            vat_percentage=vat_percentage,
+            invoicing_date=invoicing_date,
+        )
 
         try:
             return VerkkokauppaAPIClient.create_order(order_params=order_params)

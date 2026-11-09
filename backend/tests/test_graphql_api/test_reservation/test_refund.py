@@ -97,7 +97,7 @@ def test_reservation__refund__invalid_state(graphql):
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__reservation_price_is_zero(graphql):
-    reservation = ReservationFactory.create_for_refund(price=Decimal(0))
+    reservation = ReservationFactory.create_for_refund(total_price=Decimal(0))
     payment_order = reservation.payment_order
 
     graphql.login_with_superuser()

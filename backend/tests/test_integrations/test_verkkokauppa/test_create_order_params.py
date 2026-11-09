@@ -33,8 +33,8 @@ def test_get_verkkokauppa_order_params__to_json():
     reservation = ReservationFactory.create(
         reservation_unit=reservation_unit,
         user=user,
-        price=Decimal("12.55"),
-        tax_percentage_value=Decimal(24),
+        total_price=Decimal("12.55"),
+        total_price_net=Decimal("10.12"),
         reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="Firstname",
         reservee_last_name="Lastname",
@@ -42,7 +42,7 @@ def test_get_verkkokauppa_order_params__to_json():
         reservee_phone="+358 50 123 4567",
     )
 
-    order_params = get_verkkokauppa_order_params(reservation)
+    order_params = get_verkkokauppa_order_params(reservation, vat_percentage=Decimal(24))
     json = order_params.to_json()
 
     assert json["namespace"] == settings.VERKKOKAUPPA_NAMESPACE
@@ -101,8 +101,8 @@ def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
     reservation = ReservationFactory.create(
         reservation_unit=reservation_unit,
         user=user,
-        price=Decimal("12.5488"),
-        tax_percentage_value=Decimal(24),
+        total_price=Decimal("12.55"),
+        total_price_net=Decimal("10.12"),
         reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="Firstname",
         reservee_last_name="Lastname",
@@ -110,7 +110,7 @@ def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
         reservee_phone="+358 50 123 4567",
     )
 
-    order_params = get_verkkokauppa_order_params(reservation)
+    order_params = get_verkkokauppa_order_params(reservation, vat_percentage=Decimal(24))
     json = order_params.to_json()
 
     assert len(json["items"][0]["meta"]) == 3

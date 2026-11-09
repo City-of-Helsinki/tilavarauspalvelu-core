@@ -72,6 +72,7 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
 def get_verkkokauppa_order_params(
     reservation: Reservation,
     *,
+    vat_percentage: Decimal,
     invoicing_date: datetime.date | None = None,
 ) -> CreateOrderParams:
     reservation_unit: ReservationUnit = reservation.reservation_unit
@@ -82,21 +83,20 @@ def get_verkkokauppa_order_params(
     order_expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
     last_valid_purchase_datetime = (utc_datetime() + order_expiration).astimezone(DEFAULT_TIMEZONE)
 
-    # One row with the reservation's VAT, also for a reservation with price lines.
-    # TILA-4594 makes one row per price line with the tax of the line.
+    # One row with the tax percentage of the price lines. TILA-4594 makes one row for each price line.
     items = [
         OrderItemParams(
             product_id=reservation_unit.payment_product.id,
             product_name=f"{reservation_unit_name}, {unit_name}",
             quantity=1,  # Currently, we don't support quantities larger than 1
             unit="pcs",
-            row_price_net=reservation.price_net,
-            row_price_vat=reservation.price_vat_amount,
-            row_price_total=reservation.price,
-            price_net=reservation.price_net,
-            price_vat=reservation.price_vat_amount,
-            price_gross=reservation.price,
-            vat_percentage=reservation.tax_percentage_value,
+            row_price_net=reservation.total_price_net,
+            row_price_vat=reservation.total_vat_amount,
+            row_price_total=reservation.total_price,
+            price_net=reservation.total_price_net,
+            price_vat=reservation.total_vat_amount,
+            price_gross=reservation.total_price,
+            vat_percentage=vat_percentage,
             invoicing_date=invoicing_date,
             meta=[
                 OrderItemMetaParams(
@@ -168,9 +168,9 @@ def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
         user="test-user",
         created_at=local_datetime(),
         items=[],
-        price_net=reservation.price_net,
-        price_vat=reservation.price_vat_amount,
-        price_total=reservation.price,
+        price_net=reservation.total_price_net,
+        price_vat=reservation.total_vat_amount,
+        price_total=reservation.total_price,
         customer=OrderCustomer(
             first_name=reservation.user.first_name,
             last_name=reservation.user.last_name,

@@ -352,9 +352,9 @@ def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_da
 
     reservation = ReservationFactory.create_for_confirmation(
         created_at=local_datetime(2023, 12, 31, 23, 55),
-        tax_percentage_value=Decimal(24),
         reservation_unit__payment_type=PaymentType.ONLINE,
         price_lines__tax_level=tax_level,
+        price_lines__tax_percentage=Decimal(24),
     )
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
@@ -366,7 +366,7 @@ def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_da
     assert response.has_errors is False, response.errors
 
     reservation.refresh_from_db()
-    assert reservation.tax_percentage_value == Decimal("25.5")
+    assert reservation.price_lines.get().tax_percentage == Decimal("25.5")
 
     payment_order = reservation.payment_order
     assert payment_order.price_net == Decimal("9.88")
@@ -598,7 +598,7 @@ def test_reservation__confirm__cannot_confirm_if_order_exists(graphql):
 
 
 def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
-    reservation = ReservationFactory.create_for_confirmation(price=Decimal(0))
+    reservation = ReservationFactory.create_for_confirmation(total_price=Decimal(0))
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -669,7 +669,7 @@ def test_reservation__confirm__without_price_and_with_free_pricing_does_not_requ
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_product=None,
         reservation_unit__own_price__amount=0,
-        price=Decimal(0),
+        total_price=Decimal(0),
     )
 
     graphql.login_with_superuser()

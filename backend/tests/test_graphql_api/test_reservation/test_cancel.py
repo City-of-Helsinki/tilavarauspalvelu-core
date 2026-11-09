@@ -84,7 +84,7 @@ def test_reservation__cancel__fails_type_wrong(graphql, reservation_type):
 
 
 def test_reservation__cancel__fails_when_type_is_seasonal_and_reservation_is_paid(graphql):
-    reservation = ReservationFactory.create_for_cancellation(type=ReservationTypeChoice.SEASONAL, price=10)
+    reservation = ReservationFactory.create_for_cancellation(type=ReservationTypeChoice.SEASONAL, total_price=10)
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
@@ -258,7 +258,7 @@ def test_reservation__cancel__sends_email_notification(graphql, outbox):
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
 def test_reservation__cancel__refund_for_paid_reservation(graphql):
-    reservation = ReservationFactory.create_for_cancellation(price=1)
+    reservation = ReservationFactory.create_for_cancellation(total_price=1)
 
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
@@ -289,7 +289,7 @@ def test_reservation__cancel__refund_for_paid_reservation(graphql):
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
 def test_reservation__cancel__cancel_invoiced_reservation(graphql):
-    reservation = ReservationFactory.create_for_cancellation(price=1)
+    reservation = ReservationFactory.create_for_cancellation(total_price=1)
 
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
@@ -322,7 +322,7 @@ def test_reservation__cancel__cancel_invoiced_reservation(graphql):
 
 
 def test_reservation__cancel__cancel_unpaid_reservation(graphql):
-    reservation = ReservationFactory.create_for_cancellation(price=1)
+    reservation = ReservationFactory.create_for_cancellation(total_price=1)
 
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
@@ -348,7 +348,7 @@ def test_reservation__cancel__cancel_unpaid_reservation(graphql):
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
 def test_reservation__cancel__cancel_unpaid_reservation__also_cancel_verkkokauppa_order(graphql):
-    reservation = ReservationFactory.create_for_cancellation(price=1)
+    reservation = ReservationFactory.create_for_cancellation(total_price=1)
 
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
