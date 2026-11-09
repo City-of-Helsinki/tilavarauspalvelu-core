@@ -583,7 +583,8 @@ export const ReservationUnitEditSchema = z
     const isOnlinePayment = v.paymentType === PaymentType.Online || v.paymentType === PaymentType.OnlineOrInvoice;
     for (let i = 0; i < v.pricings.length; i++) {
       const pricing = v.pricings[i];
-      if (pricing == null || (pricing.isFuture && !v.hasFuturePricing)) {
+      // The prices of a shared pricing group are not edited or sent, so the form has only placeholders for them
+      if (pricing == null || v.isSharedPricingGroup || (pricing.isFuture && !v.hasFuturePricing)) {
         continue;
       }
       validatePricing(pricing, ctx, `pricings.${i}`);
