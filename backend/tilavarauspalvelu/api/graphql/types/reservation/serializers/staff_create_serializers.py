@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
@@ -15,15 +16,18 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReserveeType,
 )
+from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationUnit
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines, save_reservation_price_lines
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.services.pricing.price_lines import PriceLines
     from tilavarauspalvelu.typing import StaffCreateReservationData
 
 
@@ -31,6 +35,7 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
     """Create a reservation as a staff user."""
 
     instance: None
+    price_lines: PriceLines
 
     pk = IntegerField(read_only=True)
     reservation_unit = IntegerPrimaryKeyField(queryset=ReservationUnit.objects, required=True, write_only=True)
@@ -142,6 +147,20 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             new_buffer_time_after=buffer_time_after,
         )
 
+        try:
+            self.price_lines = build_price_lines(
+                reservation_unit=reservation_unit,
+                price_option=None,
+                begin=begins_at,
+                end=ends_at,
+            )
+        except PriceCalculationError as error:
+            raise ValidationError(str(error), code=error_codes.PRICE_CALCULATION_FAILED) from error
+
+        # Staff reservations are free. The lines keep the normal price, so that the value of the free use is known.
+        for line in self.price_lines.lines:
+            line.override_amount = Decimal(0)
+
         now = local_datetime()
         id_token = user.id_token
 
@@ -156,6 +175,7 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
 
     def create(self, validated_data: StaffCreateReservationData) -> Reservation:
         reservation: Reservation = super().create(validated_data)
+        save_reservation_price_lines(reservation=reservation, price_lines=self.price_lines)
 
         # After creating the reservation, check again if there are any overlapping reservations.
         # This can fail if two reservations are created for reservation units in the same
