@@ -23,6 +23,7 @@ __all__ = [
     "PriceLines",
     "build_price_lines",
     "build_price_lines_with_data",
+    "save_reservation_price_lines",
     "set_price_line_taxes",
     "set_reservation_price_lines",
 ]
@@ -123,7 +124,14 @@ def set_reservation_price_lines(*, reservation: Reservation, price_option: Price
         begin=reservation.begins_at,
         end=reservation.ends_at,
     )
+    save_reservation_price_lines(reservation=reservation, price_lines=price_lines)
 
+
+def save_reservation_price_lines(*, reservation: Reservation, price_lines: PriceLines) -> None:
+    """
+    Replace the price lines of the reservation with the given unsaved lines.
+    Set the price, the price before subsidy, the unit price and the tax percentage of the reservation from them.
+    """
     for line in price_lines.lines:
         line.reservation = reservation
 
@@ -133,13 +141,19 @@ def set_reservation_price_lines(*, reservation: Reservation, price_option: Price
         price += line.amount if line.override_amount is None else line.override_amount
         non_subsidised_price += line.amount
 
+    # A reservation has one unit price and tax percentage. They come from the first line until the
+    # webshop order has one row for each line (TILA-4594).
+    first_line = price_lines.lines[0]
+
     reservation.price = price
     reservation.non_subsidised_price = non_subsidised_price
+    reservation.unit_price = first_line.unit_amount
+    reservation.tax_percentage_value = first_line.tax_percentage
 
     with transaction.atomic():
         reservation.price_lines.all().delete()
         ReservationPriceLine.objects.bulk_create(price_lines.lines)
-        reservation.save(update_fields=["price", "non_subsidised_price"])
+        reservation.save(update_fields=["price", "non_subsidised_price", "unit_price", "tax_percentage_value"])
 
 
 def set_price_line_taxes(*, reservation: Reservation, on_date: datetime.date) -> None:
