@@ -405,8 +405,7 @@ def test_reservation_requires_handling__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
@@ -428,8 +427,7 @@ def test_reservation_requires_handling__send_email__wrong_state(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
@@ -449,8 +447,7 @@ def test_reservation_requires_handling__send_email__behalf_reservation(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
@@ -470,8 +467,7 @@ def test_reservation_requires_handling__send_email__no_recipients(outbox):
         reservee_email="",
         user__email="",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
@@ -493,8 +489,7 @@ def test_reservation_requires_handling__send_email__reservation_in_the_past(outb
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
