@@ -33,21 +33,17 @@ test.describe(
       await appCommon.userOpensAndroidChromeToLandingPage();
     });
 
-    test(
-      "User logs in and out with suomi_fi mobile",
-      { tag: ["@mobile-android-data-set-0"] },
-      async ({ appCommon }) => {
-        await log("User logs in with Suomi.fi");
-        await appCommon.userLogsInWithSuomiFiMobile();
+    test("User logs in and out with suomi_fi", { tag: ["@mobile-android-data-set-0"] }, async ({ appCommon }) => {
+      await log("User logs in with Suomi.fi");
+      await appCommon.userLogsInWithSuomiFiMobile();
 
-        await log("User logs out");
-        await appCommon.userLogsOutMobile();
-        await appCommon.userConfirmsLogOutMobile();
-      }
-    );
+      await log("User logs out");
+      await appCommon.userLogsOutMobile();
+      await appCommon.userConfirmsLogOutMobile();
+    });
 
     test(
-      "User can make a free single booking and modifies it mobile",
+      "User can make free single booking and modifies it",
       { tag: ["@mobile-android-data-set-1"] },
       async ({ appCommon, appUser, reservationLownav, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
@@ -86,9 +82,9 @@ test.describe(
     );
 
     test(
-      "User can make paid single booking mobile",
+      "User can make paid single booking",
       { tag: ["@mobile-android-data-set-2"] },
-      async ({ appCommon, appUser, popups, state, testData, topnav }) => {
+      async ({ appCommon, appUser, mybookings, popups, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
         await log("User creates paid reservation");
@@ -119,6 +115,7 @@ test.describe(
 
         await log("User cancels paid booking");
         await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+        await mybookings.waitForPaymentStatus(MYBOOKINGS_STATUS_REFUNDED);
 
         await log("User verifies cancellation and refund status");
         await topnav.navigateToMyBookingsMobile();
@@ -137,7 +134,7 @@ test.describe(
     );
 
     test(
-      "User can make paid single booking with interrupted checkout mobile",
+      "User can make paid single booking with interrupted checkout",
       { tag: ["@mobile-android-data-set-3"] },
       async ({ appCommon, appUser, popups, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
@@ -183,7 +180,7 @@ test.describe(
     );
 
     test(
-      "User can make single booking that requires handling mobile",
+      "User can make booking that requires handling",
       { tag: ["@mobile-android-data-set-4"] },
       async ({ appCommon, appUser, reservationLownav, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
@@ -212,7 +209,7 @@ test.describe(
     );
 
     test(
-      "User can make subvented single booking that requires handling mobile",
+      "User can make subvented single booking that requires handling",
       { tag: ["@mobile-android-data-set-5"] },
       async ({ appCommon, appUser, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();

@@ -80,8 +80,10 @@ inspector, e.g. `pnpm exec playwright test --project Tests_user_desktop_FI --hea
 | `Tests_users_with_admin_desktop`   | 3     | A customer books, an admin handles the booking, the customer checks the result        |
 | `Tests_admin_notifications_serial` | 4     | Banner notifications, run serially (tag `@serialonly`)                                |
 
-Two more projects: `create_data` (`TestSuites/create_data.setup.ts`) creates the test data, and `unit` runs the unit
-tests in `unit/`, which need no test environment.
+Three more projects: `create_data` (`TestSuites/create_data.setup.ts`) creates the test data,
+`notifications_login` (`TestSuites/notifications_login.setup.ts`) logs the notification suite's admin in once and
+saves the login that the suite's tests start with, and `unit` runs the unit tests in `unit/`, which need no test
+environment.
 
 ## Layout
 

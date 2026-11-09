@@ -1,9 +1,35 @@
 /** Port of PO/Common/login.robot */
 import { readEnv } from "../../../lib/env";
+import { acquireLock, releaseLock } from "../../../lib/locks";
 import { step, expect, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import { URL_TEST } from "../../Resources/variables";
+
+// Tunnistus asks for an email ("Sähköpostiosoitteesi") instead of returning to Varaamo when two Suomi.fi logins finish
+// at the same moment, so the workers finish their logins one at a time
+const LOGIN_LOCK = "SUOMI_FI_LOGIN";
 
 export class Login extends PageObject {
+  /**
+   * Clicks Suomi.fi's continue button and waits until the page is back on Varaamo, one login at a time across the
+   * workers. A wait for another worker's login shows in the report.
+   */
+  @step("login.Click Continue One Login At A Time")
+  async clickContinueOneLoginAtATime() {
+    const started = Date.now();
+    await acquireLock(LOGIN_LOCK);
+    const waited_ms = Date.now() - started;
+    // The lock is checked every 100 ms, so a shorter time means it was free
+    if (waited_ms >= 100) {
+      await log(`Waited ${(waited_ms / 1000).toFixed(1)} s for another worker's Suomi.fi login to finish`);
+    }
+    try {
+      await this.pages.customKeywords.clickAndWaitForPage("#continue-button", URL_TEST, /* timeout= */ 15_000);
+    } finally {
+      await releaseLock(LOGIN_LOCK);
+    }
+  }
+
   @step("login.Login Suomi Fi")
   async loginSuomiFi(input_hetu: string) {
     // Wait for Suomi.fi login button
@@ -39,7 +65,7 @@ export class Login extends PageObject {
     );
 
     // Click continue to complete login
-    await this.pages.customKeywords.clickAndWaitForPage("#continue-button", undefined, /* timeout= */ 15_000);
+    await this.clickContinueOneLoginAtATime();
   }
 
   /** The input_password argument is kept for backward compatibility but is not used */
@@ -115,6 +141,6 @@ export class Login extends PageObject {
     );
 
     // Click continue to complete login
-    await this.pages.customKeywords.clickAndWaitForPage("#continue-button", undefined, /* timeout= */ 15_000);
+    await this.clickContinueOneLoginAtATime();
   }
 }

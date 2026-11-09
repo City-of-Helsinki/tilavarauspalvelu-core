@@ -346,7 +346,7 @@ ADMIN_DJANGO_USERNAME=u-5l6cnmgeandejout7uktzsqgim
 
 [mobile-android-data-set-0]
 tags=mobile-android-data-set-0
-# TEST: "User logs in and out with suomi_fi mobile"
+# TEST: "User logs in and out with suomi_fi"
 # DESCRIPTION: Mobile Android login test
 # Old email: CURRENT_USER_EMAIL=qfaksi+anna@gmail.com
 CURRENT_USER_EMAIL=django_email_robot@mailiposti.com
@@ -360,7 +360,7 @@ DJANGO_USERNAME=u-ie2b7oqmcvdhjd456rcm7x7tuy
 
 [mobile-android-data-set-1]
 tags=mobile-android-data-set-1
-# TEST: "User can make a free single booking and modifies it mobile"
+# TEST: "User can make free single booking and modifies it"
 # DESCRIPTION: Mobile Android free booking
 # Old email: CURRENT_USER_EMAIL=qfaksi+mari@gmail.com
 CURRENT_USER_EMAIL=django_email_robot@mailiposti.com
@@ -374,7 +374,7 @@ DJANGO_USERNAME=u-ggoljyfcwbf27i53qwzjq55rya
 
 [mobile-android-data-set-2]
 tags=mobile-android-data-set-2
-# TEST: "User can make paid single booking mobile"
+# TEST: "User can make paid single booking"
 # DESCRIPTION: Mobile Android paid booking
 # Old email: CURRENT_USER_EMAIL=qfaksi+elina@gmail.com
 CURRENT_USER_EMAIL=django_email_robot@mailiposti.com
@@ -388,7 +388,7 @@ DJANGO_USERNAME=u-3ubdbnexc5cotcl623jagjbzni
 
 [mobile-android-data-set-3]
 tags=mobile-android-data-set-3
-# TEST: "User can make paid single booking with interrupted checkout mobile"
+# TEST: "User can make paid single booking with interrupted checkout"
 # DESCRIPTION: Mobile Android interrupted checkout
 # Old email: CURRENT_USER_EMAIL=qfaksi+kaisa@gmail.com
 CURRENT_USER_EMAIL=django_email_robot@mailiposti.com
@@ -402,7 +402,7 @@ DJANGO_USERNAME=u-xabra2s6gbgf5nh7ss46gbsblq
 
 [mobile-android-data-set-4]
 tags=mobile-android-data-set-4
-# TEST: "User can make single booking that requires handling mobile"
+# TEST: "User can make booking that requires handling"
 # DESCRIPTION: Mobile Android booking requiring handling
 # Old email: CURRENT_USER_EMAIL=qfaksi+ulla@gmail.com
 CURRENT_USER_EMAIL=django_email_robot@mailiposti.com
@@ -416,7 +416,7 @@ DJANGO_USERNAME=u-fxwut2vtubfuxpnmbqdjpqmwou
 
 [mobile-android-data-set-5]
 tags=mobile-android-data-set-5
-# TEST: "User can make subvented single booking that requires handling mobile"
+# TEST: "User can make subvented single booking that requires handling"
 # DESCRIPTION: Mobile Android subvented booking
 # Old email: CURRENT_USER_EMAIL=qfaksi+riitta@gmail.com
 CURRENT_USER_EMAIL=django_email_robot@mailiposti.com

@@ -83,7 +83,7 @@ test.describe(
     test(
       "User can make paid single booking",
       { tag: ["@mobile-iphone-data-set-2"] },
-      async ({ appCommon, appUser, state, testData, topnav }) => {
+      async ({ appCommon, appUser, mybookings, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
         await log("User creates paid reservation");
@@ -113,6 +113,7 @@ test.describe(
 
         await log("User cancels paid booking");
         await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+        await mybookings.waitForPaymentStatus(MYBOOKINGS_STATUS_REFUNDED);
 
         await log("User verifies cancellation and refund status");
         await topnav.navigateToMyBookingsMobile();

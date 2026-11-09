@@ -2,7 +2,8 @@
  * Playwright config for the Varaamo e2e suite.
  *
  * One project per suite file, with the same name. The suites depend on the `create_data` project, which creates
- * the test data once per run. The notification suite has no data setup and runs separately with one worker:
+ * the test data once per run. The notification suite has no data setup: it depends on `notifications_login`, which
+ * logs its admin in once, and runs separately with one worker:
  *   playwright test --grep-invert @serialonly                                     # parallel run
  *   playwright test --project Tests_admin_notifications_serial --workers 1        # serial run
  * Sequential mode with shared users:
@@ -104,6 +105,8 @@ export default defineConfig({
     suite("Tests_user_mobile_android_FI", { use: { ...devices["Pixel 5"] } }),
     // Set Up Iphone 14 And Open Url
     suite("Tests_user_mobile_iphone_FI", { use: { ...devices["iPhone 14"] } }),
-    suite("Tests_admin_notifications_serial", { dependencies: [], fullyParallel: false }),
+    // Logs the notification suite's admin in once and saves the login, which the suite's tests start with
+    { name: "notifications_login", testMatch: "notifications_login.setup.ts", use: desktop },
+    suite("Tests_admin_notifications_serial", { dependencies: ["notifications_login"], fullyParallel: false }),
   ],
 });

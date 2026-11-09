@@ -166,6 +166,14 @@ export class AppCommon extends PageObject {
     await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN);
   }
 
+  /** For a test that starts with a saved admin login, like the notification tests (notifications_login.setup.ts). */
+  @step("app_common.Admin Goes To Landing Page Logged In")
+  async adminGoesToLandingPageLoggedIn() {
+    // Go To waits for the page to load
+    await this.page.goto(URL_ADMIN);
+    await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN_WITH_USER_INFO);
+  }
+
   @step("app_common.Admin Logs In With Suomi Fi")
   async adminLogsInWithSuomiFi() {
     await this.pages.topnav.clickLoginAdminSide();
