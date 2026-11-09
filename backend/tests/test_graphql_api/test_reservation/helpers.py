@@ -68,11 +68,13 @@ def get_adjust_data(reservation: Reservation, **overrides: Any) -> dict[str, Any
     }
 
 
-def get_approve_data(reservation: Reservation, **overrides: Any) -> dict[str, Any]:
+def get_approve_data(reservation: Reservation, *, price: str = "0", **overrides: Any) -> dict[str, Any]:
+    """Approve the reservation with the given final amount for each of its price lines."""
+    line_pks = list(reservation.price_lines.order_by("pk").values_list("pk", flat=True))
     return {
         "pk": reservation.pk,
         "handlingDetails": "You're welcome.",
-        "price": "0",
+        "priceLines": [{"pk": line_pk, "overrideAmount": price} for line_pk in line_pks],
         **overrides,
     }
 

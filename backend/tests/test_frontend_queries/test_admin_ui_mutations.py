@@ -123,12 +123,13 @@ def test_frontend_queries__admin_ui__ApproveReservation(graphql):
 
     factory_args = deepcopy(query_info.factory_args)
     factory_args.pop("state")  # set by the factory
-    reservation = ReservationFactory.create_for_approve(**factory_args)
+    reservation = ReservationFactory.create_for_approve(**factory_args, price_lines__amount=Decimal(0))
+    price_line = reservation.price_lines.get()
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation.pk,
-        "price": str(reservation.price),
+        "priceLines": [{"pk": price_line.pk, "overrideAmount": None}],
         "handlingDetails": "Handling details",
     }
     assert_no_undefined_variables(variables)
