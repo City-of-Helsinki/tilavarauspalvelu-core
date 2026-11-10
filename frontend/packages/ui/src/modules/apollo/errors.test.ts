@@ -1,3 +1,4 @@
+import { inspect } from "node:util";
 import { ApolloClient, ApolloLink, InMemoryCache, gql } from "@apollo/client";
 import { CombinedGraphQLErrors, ServerError, ServerParseError } from "@apollo/client/errors";
 import { throwError } from "rxjs";
@@ -11,6 +12,7 @@ import {
   getValidationErrors,
   hasErrorLinkToast,
   isNotFoundError,
+  setNodeLogFormat,
 } from "./errors";
 
 function graphQLErrors(...errors: GraphQLFormattedError[]): CombinedGraphQLErrors {
@@ -40,14 +42,15 @@ describe("classifyError", () => {
       { kind: "connection", code: "BROWSER_FETCH_FAILED" },
     ],
     ["a failed fetch in Safari", new TypeError("Load failed"), { kind: "connection", code: "BROWSER_FETCH_FAILED" }],
-    ["an invalid query", serverError(400, '{"errors":[]}'), { kind: "invalid_query", body: '{"errors":[]}' }],
+    ["an invalid query", serverError(400, '{"errors":[]}'), { kind: "invalid_query", body: { errors: [] } }],
     ["a CSRF failure", serverError(403, '{"code":"CSRF_FAILURE"}'), { kind: "csrf" }],
+    ["a 403 that is not a CSRF failure", serverError(403, "Forbidden"), { kind: "http", status: 403, body: null }],
+    ["a gateway error", serverError(502, "<html>Bad Gateway</html>"), { kind: "http", status: 502, body: null }],
     [
-      "a 403 that is not a CSRF failure",
-      serverError(403, "Forbidden"),
-      { kind: "http", status: 403, body: "Forbidden" },
+      "a server error with a JSON body",
+      serverError(500, '{"detail":"error"}'),
+      { kind: "http", status: 500, body: { detail: "error" } },
     ],
-    ["a gateway error", serverError(502, "Bad Gateway"), { kind: "http", status: 502, body: "Bad Gateway" }],
   ])("%s", (_name, error, expected) => {
     expect(classifyError(error)).toEqual(expected);
   });
@@ -57,7 +60,7 @@ describe("classifyError", () => {
       response: new Response("<html>", { status: 504 }),
       bodyText: "<html>",
     });
-    expect(classifyError(error)).toEqual({ kind: "http", status: 504, body: "<html>" });
+    expect(classifyError(error)).toEqual({ kind: "http", status: 504, body: null });
   });
 
   test("an aborted request is not a timeout", () => {
@@ -191,5 +194,35 @@ describe("hasErrorLinkToast", () => {
 
   test("is false for an error that did not come from a request", () => {
     expect(hasErrorLinkToast(new Error("a bug in the form"))).toBe(false);
+  });
+});
+
+describe("setNodeLogFormat", () => {
+  test("prints the status and the operation of a gateway error, but not its HTML body", () => {
+    const error = serverError(503, "<html><title>Sivustolla on häiriö</title></html>");
+    setNodeLogFormat(error, "ReservationUnitPage");
+    expect(inspect(error)).toBe("ServerError: status 503, operation ReservationUnitPage");
+  });
+
+  test("prints a JSON body on one line", () => {
+    const error = serverError(500, '{\n  "detail": "error"\n}');
+    setNodeLogFormat(error, "ReservationUnitPage");
+    expect(inspect(error)).toBe('ServerError: status 500, operation ReservationUnitPage, body {"detail":"error"}');
+  });
+
+  test("prints the status of a response that is not JSON", () => {
+    const error = new ServerParseError(new SyntaxError("Unexpected token '<'"), {
+      response: new Response("<html>", { status: 200 }),
+      bodyText: "<html>",
+    });
+    setNodeLogFormat(error, "ReservationUnitPage");
+    expect(inspect(error)).toBe("ServerParseError: status 200, operation ReservationUnitPage");
+  });
+
+  test("does not change other errors", () => {
+    const error = graphQLErrors({ message: "Not found" });
+    const before = inspect(error);
+    setNodeLogFormat(error, "ReservationUnitPage");
+    expect(inspect(error)).toBe(before);
   });
 });

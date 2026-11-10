@@ -2,7 +2,7 @@ import { OperationTypeNode } from "graphql";
 import type { NextRequest } from "next/server";
 import { MIDDLEWARE_FETCH_TIMEOUT_MS } from "./modules/const";
 import { GraphQLFetchError } from "./modules/errors";
-import { fetchWithTimeout, getConnectionErrorCode, getOperationType } from "./modules/fetch";
+import { fetchWithTimeout, getConnectionErrorCode, getOperationType, parseJsonBody } from "./modules/fetch";
 import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 
 /// Check if the request is a page request
@@ -70,15 +70,6 @@ export type GqlQuery = {
   variables?: Record<string, unknown>;
 };
 
-/// The value of a JSON text, or the text itself if it is not JSON
-function parseJsonOrText(text: string): unknown {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
-}
-
 /// Fetch a query from the backend
 /// @param req - NextRequest used to read cookies and the referer
 /// @param query - Query object with query and variables
@@ -143,7 +134,8 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   if (!res.ok) {
     const { status, statusText } = res;
     // A gateway error, for example a 502, can have an HTML body. The error must keep the status.
-    throw new GraphQLFetchError(status, statusText, query, parseJsonOrText(await res.text()));
+    // Keep only a JSON body, so the log does not show the HTML page.
+    throw new GraphQLFetchError(status, statusText, query, parseJsonBody(await res.text()));
   }
   const data: unknown = await res.json();
   return data;
