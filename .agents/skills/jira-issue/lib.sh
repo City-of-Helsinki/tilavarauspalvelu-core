@@ -60,14 +60,25 @@ make_link() {
     '{type: {name: $t}, inwardIssue: {key: $s}, outwardIssue: {key: $d}}')"
 }
 
-# Read the credentials from 1Password. Call this after the arguments are validated.
+# Read the credentials from the secret files, or from 1Password if the files do not exist.
+# Call this after the arguments are validated.
 load_credentials() {
-  : "${JIRA_ISSUE_OP_ACCOUNT:?Set JIRA_ISSUE_OP_ACCOUNT to your 1Password account, e.g. vincit.1password.eu}"
-  : "${JIRA_ISSUE_OP_VAULT:?Set JIRA_ISSUE_OP_VAULT to the 1Password vault that has the item, e.g. Private}"
-  : "${JIRA_ISSUE_OP_ITEM:?Set JIRA_ISSUE_OP_ITEM to the name of the 1Password item, e.g. Jira API key}"
-  local ref="op://$JIRA_ISSUE_OP_VAULT/$JIRA_ISSUE_OP_ITEM" user token
-  user="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/username")"
-  token="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/credential")"
+  local secret_dir="/run/secrets/jira" user token
+  if [[ -f "$secret_dir/username" && -f "$secret_dir/token" ]]; then
+    user="$(<"$secret_dir/username")"
+    token="$(<"$secret_dir/token")"
+    if [[ -z "${user//[[:space:]]/}" || -z "${token//[[:space:]]/}" ]]; then
+      echo "A credential file in $secret_dir is empty." >&2
+      exit 1
+    fi
+  else
+    : "${JIRA_ISSUE_OP_ACCOUNT:?Set JIRA_ISSUE_OP_ACCOUNT to your 1Password account, e.g. vincit.1password.eu}"
+    : "${JIRA_ISSUE_OP_VAULT:?Set JIRA_ISSUE_OP_VAULT to the 1Password vault that has the item, e.g. Private}"
+    : "${JIRA_ISSUE_OP_ITEM:?Set JIRA_ISSUE_OP_ITEM to the name of the 1Password item, e.g. Jira API key}"
+    local ref="op://$JIRA_ISSUE_OP_VAULT/$JIRA_ISSUE_OP_ITEM"
+    user="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/username")"
+    token="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/credential")"
+  fi
 
   # Escape backslashes and double quotes for the quoted value in the curl config.
   credentials="$user:$token"
