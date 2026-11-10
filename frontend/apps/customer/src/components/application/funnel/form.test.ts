@@ -269,6 +269,40 @@ describe("page 2 conversions", () => {
       priority: Priority.Primary,
     });
   });
+
+  const page2WithRanges = (appliedReservationsPerWeek: number, days: Weekday[]) => ({
+    pk: 1,
+    applicationSections: [
+      {
+        pk: 1,
+        name: "foobar",
+        minDuration: 3600,
+        reservationUnitPk: 1,
+        priority: Priority.Primary,
+        appliedReservationsPerWeek,
+        suitableTimeRanges: days.map((dayOfTheWeek, i) => ({
+          beginTime: `${String(8 + i * 3).padStart(2, "0")}:00`,
+          endTime: `${String(10 + i * 3).padStart(2, "0")}:00`,
+          dayOfTheWeek,
+          priority: Priority.Primary,
+        })),
+      },
+    ],
+  });
+
+  test("page 2 validation counts several time ranges on the same day", () => {
+    const values = page2WithRanges(3, [Weekday.Monday, Weekday.Monday, Weekday.Monday]);
+    expect(ApplicationPage2Schema.safeParse(values).success).toBe(true);
+  });
+
+  test("page 2 validation fails with fewer time ranges than applied reservations per week", () => {
+    const values = page2WithRanges(3, [Weekday.Monday, Weekday.Tuesday]);
+    const result = ApplicationPage2Schema.safeParse(values);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((i) => i.message)).toContain(
+      "At least as many suitable time ranges as applied reservations per week"
+    );
+  });
 });
 
 describe("page 3 conversions", () => {

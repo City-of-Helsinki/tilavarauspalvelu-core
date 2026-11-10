@@ -43,7 +43,7 @@ const ApplicationSectionPage1Schema = z
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
-    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }).max(7, { error: "lte_7" }),
+    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
     begin: z.string().min(1, { message: "Required" }),
     end: z.string().min(1, { message: "Required" }),
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
@@ -99,7 +99,7 @@ const ApplicationSectionPage2Schema = z
     reservationUnitPk: z.number(),
     priority: z.enum(Priority),
     // NOTE: not sent or modified here, but required for validation
-    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }).max(7, { error: "lte_7" }),
+    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
   })
   .superRefine((s, ctx) => {
     const isValid =
@@ -115,14 +115,8 @@ const ApplicationSectionPage2Schema = z
     }
   })
   .superRefine((s, ctx) => {
-    const rangesPerWeek: typeof s.suitableTimeRanges = [];
-    for (const tr of s.suitableTimeRanges) {
-      if (!rangesPerWeek.some((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
-        rangesPerWeek.push(tr);
-      }
-    }
-
-    const isValid = rangesPerWeek.length >= s.appliedReservationsPerWeek;
+    // Every time range counts, including several ranges on the same day
+    const isValid = s.suitableTimeRanges.length >= s.appliedReservationsPerWeek;
 
     if (!isValid) {
       ctx.addIssue({
