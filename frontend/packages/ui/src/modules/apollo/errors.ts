@@ -1,7 +1,7 @@
 import { CombinedGraphQLErrors, LinkError, ServerError, ServerParseError } from "@apollo/client/errors";
 import { z } from "zod";
 import type { GraphQLFormattedError } from "graphql";
-import { getConnectionErrorCode, isTimeoutError } from "../fetch";
+import { getConnectionErrorCode, isTimeoutError, parseJsonBody } from "../fetch";
 
 /// An error code from the backend (in the GraphQL error extensions)
 export interface ApiError {
@@ -103,15 +103,17 @@ export function isNotFoundError(error: unknown): boolean {
 export type FetchError =
   /// The backend returned errors in the GraphQL response
   | { kind: "graphql"; errors: ApiError[]; graphQLErrors: ReadonlyArray<GraphQLFormattedError> }
-  /// The backend did not accept the query (a bug in the frontend)
-  | { kind: "invalid_query"; body: string }
+  /// The backend did not accept the query (a bug in the frontend).
+  /// The body is the parsed JSON body, or null if the body is not JSON.
+  | { kind: "invalid_query"; body: unknown }
   | { kind: "csrf" }
   /// No response in time (see fetchWithTimeout)
   | { kind: "timeout" }
   /// No connection to the backend, for example the backend is down or restarts
   | { kind: "connection"; code: string }
-  /// A response that is not a GraphQL response, for example a 502 from the gateway
-  | { kind: "http"; status: number; body: string }
+  /// A response that is not a GraphQL response, for example a 502 from the gateway.
+  /// The body is the parsed JSON body, or null if the body is not JSON, for example the HTML page of the gateway.
+  | { kind: "http"; status: number; body: unknown }
   | { kind: "unknown"; message: string };
 
 // Browsers give no reason when fetch fails, only one of these messages
@@ -125,12 +127,8 @@ function isCsrfFailure(error: ServerError): boolean {
   if (error.statusCode !== 403) {
     return false;
   }
-  try {
-    const body: unknown = JSON.parse(error.bodyText);
-    return typeof body === "object" && body != null && "code" in body && body.code === "CSRF_FAILURE";
-  } catch {
-    return false;
-  }
+  const body = parseJsonBody(error.bodyText);
+  return typeof body === "object" && body != null && "code" in body && body.code === "CSRF_FAILURE";
 }
 
 /// Find out what went wrong in a backend request
@@ -142,15 +140,15 @@ export function classifyError(error: unknown): FetchError {
   if (ServerError.is(error)) {
     // graphene-django returns 400 only when the query is not valid, errors in the resolvers return 200
     if (error.statusCode === 400) {
-      return { kind: "invalid_query", body: error.bodyText };
+      return { kind: "invalid_query", body: parseJsonBody(error.bodyText) };
     }
     if (isCsrfFailure(error)) {
       return { kind: "csrf" };
     }
-    return { kind: "http", status: error.statusCode, body: error.bodyText };
+    return { kind: "http", status: error.statusCode, body: parseJsonBody(error.bodyText) };
   }
   if (ServerParseError.is(error)) {
-    return { kind: "http", status: error.statusCode, body: error.bodyText };
+    return { kind: "http", status: error.statusCode, body: null };
   }
   if (isTimeoutError(error)) {
     return { kind: "timeout" };
@@ -185,4 +183,20 @@ export function isToastedByErrorLink(error: FetchError): boolean {
 /// @param error - an error that a query or a mutation threw
 export function hasErrorLinkToast(error: unknown): boolean {
   return isRequestError(error) && isToastedByErrorLink(classifyError(error));
+}
+
+const NODE_INSPECT = Symbol.for("nodejs.util.inspect.custom");
+
+/// Make Node.js print an error response as one line, with the status, the operation and a JSON body.
+/// Next.js prints an uncaught error of a server side render with util.inspect.
+/// Without this, the log shows the whole Response object and the body, which is a long HTML page for a gateway error.
+/// @param error - an error from Apollo Client. Other errors do not change.
+export function setNodeLogFormat(error: unknown, operationName: string): void {
+  if (!ServerError.is(error) && !ServerParseError.is(error)) {
+    return;
+  }
+  const body = ServerError.is(error) ? parseJsonBody(error.bodyText) : null;
+  const bodyText = body != null ? `, body ${JSON.stringify(body)}` : "";
+  const line = `${error.name}: status ${error.statusCode}, operation ${operationName}${bodyText}`;
+  Object.defineProperty(error, NODE_INSPECT, { value: () => line });
 }

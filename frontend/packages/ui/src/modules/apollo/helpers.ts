@@ -20,13 +20,14 @@ import { fetchWithTimeout, getOperationType } from "../fetch";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import { getClientOrigin } from "../urlBuilder";
 import type { LocalizationLanguages } from "../urlBuilder";
-import { classifyError, isPermissionErrorCode, isToastedByErrorLink } from "./errors";
+import { classifyError, isPermissionErrorCode, isToastedByErrorLink, setNodeLogFormat } from "./errors";
 import type { ApiError, FetchError } from "./errors";
 
 /// Log all errors of the backend requests to Sentry, and toast the errors that the UI can not handle.
 /// This is the only place that logs these errors, so the callers don't have to.
 export const errorLink = new ErrorLink(({ error, operation }) => {
   const fetchError = classifyError(error);
+  setNodeLogFormat(error, operation.operationName ?? "");
   toastFetchError(fetchError, operation);
   logFetchError(fetchError, operation);
 });

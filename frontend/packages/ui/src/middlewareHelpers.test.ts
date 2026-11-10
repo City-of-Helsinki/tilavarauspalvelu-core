@@ -143,7 +143,7 @@ describe("gqlQueryFetch", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  test("keeps the status of an error response that is not JSON", async () => {
+  test("keeps the status but not the body of an error response that is not JSON", async () => {
     const gatewayError = new Response("<html><body>502 Bad Gateway</body></html>", {
       status: 502,
       statusText: "Bad Gateway",
@@ -157,7 +157,7 @@ describe("gqlQueryFetch", () => {
     );
     await expect(request).rejects.toBeInstanceOf(GraphQLFetchError);
     await expect(request).rejects.toThrow("GraphQLFetchError 502 Bad Gateway");
-    await expect(request).rejects.toMatchObject({ data: "<html><body>502 Bad Gateway</body></html>" });
+    await expect(request).rejects.toMatchObject({ data: null });
   });
 
   test("keeps the JSON body of an error response", async () => {
