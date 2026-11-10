@@ -6,43 +6,60 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.clickjacking import xframe_options_deny
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_http_methods, require_POST
 
 from utils.utils import update_query_params
 
 if TYPE_CHECKING:
+    from django.http import HttpResponse
+
     from tilavarauspalvelu.typing import WSGIRequest
 
 
-@require_GET
-@csrf_exempt  # NOSONAR
+@require_http_methods(["GET", "POST"])
+@xframe_options_deny
 @never_cache
-def login_view(request: WSGIRequest) -> HttpResponseRedirect:
+def login_view(request: WSGIRequest) -> HttpResponse:
     # We make sure the user is logged out first, because otherwise
     # PSA will enter the connect flow where a new social authentication
     # method is connected to an existing user account.
     logout(request)
 
-    url = reverse("social:begin", kwargs={"backend": "tunnistamo"})
+    begin_url = reverse("social:begin", kwargs={"backend": "tunnistamo"})
+
+    # The 'Helsinki Login' button on the admin login page posts here with a CSRF token.
+    # A 307 redirect makes the browser send the same POST to PSA.
+    if request.method == "POST":
+        return redirect(begin_url, preserve_request=True)
+
+    params: dict[str, str] = {}
 
     redirect_to: str | None = request.GET.get("next")
     if redirect_to:
-        url = update_query_params(url, next=redirect_to)
+        params["next"] = redirect_to
 
     lang: str | None = request.GET.get("lang")
     if lang:
-        url = update_query_params(url, ui_locales=lang)
+        params["ui_locales"] = lang
 
     login_method_hint: str | None = request.GET.get("ui")
     if login_method_hint == "customer":
         # For `kc_idp_hint`, see: https://www.keycloak.org/docs/latest/server_admin/#_client_suggested_idp
-        url = update_query_params(url, kc_idp_hint="suomi_fi")
+        params["kc_idp_hint"] = "suomi_fi"
 
-    return HttpResponseRedirect(url)
+    # PSA starts a login only from a POST with a CSRF token, but the frontends link here with a GET.
+    # This page sends that POST from the browser.
+    context = {
+        "action_url": begin_url,
+        "params": params,
+    }
+    return render(request, "helauth/login.html", context)
 
 
 @require_POST

@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from social_django.strategy import DjangoStrategy
 
     from tilavarauspalvelu.models import User
-    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "OIDCResponse",
@@ -66,9 +65,6 @@ class OIDCResponse(TypedDict):
 class PipelineArgs(TypedDict):
     backend: TunnistamoOIDCAuth
     """OAuth2 backend"""
-
-    request: WSGIRequest
-    """Login request"""
 
     response: OIDCResponse
     """Response from Helsinki Tunnistus"""
