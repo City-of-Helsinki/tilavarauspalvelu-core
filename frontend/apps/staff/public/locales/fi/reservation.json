@@ -8,7 +8,7 @@
     "CONFIRMED": "Hyväksytty",
     "DENIED": "Hylätty",
     "CANCELLED": "Peruttu",
-    "CREATED": "Luonnos",
+    "CREATED": "Alustava",
     "WAITING_FOR_PAYMENT": "Odottaa maksua"
   },
   "orderStatus": {
