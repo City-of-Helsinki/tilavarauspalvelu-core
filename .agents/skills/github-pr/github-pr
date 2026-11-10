@@ -3,6 +3,14 @@
 # Usage: github-pr <number or URL>, e.g. github-pr 99
 set -euo pipefail
 
+# Use the token in the secret file if it exists, for example in a container where gh is not logged in.
+# Without the file, gh uses its own login.
+gh_token_file="/run/secrets/gh/token"
+if [[ -z "${GH_TOKEN:-}" && -f "$gh_token_file" ]]; then
+  GH_TOKEN="$(<"$gh_token_file")"
+  export GH_TOKEN
+fi
+
 usage() {
   echo "Usage: github-pr <number or URL>, e.g. github-pr 99" >&2
   exit 2

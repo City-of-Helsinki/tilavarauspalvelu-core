@@ -9,13 +9,18 @@ How to fetch a GitHub Actions job or run to diagnose a failure or check status.
 
 ## 1. Authentication
 
-Use `gh` CLI. Check auth once, before anything else:
+Use `gh` CLI. If `gh` is not installed, stop and ask the user to install it.
+
+If the file `/run/secrets/gh/token` exists, the script gives `gh` the token from it.
+Use this in a container. Then `gh auth status` says that `gh` is not logged in. This is fine.
+Never print the token or read the file yourself. Use only the script.
+
+If the file does not exist, check auth once, before anything else:
 
 ```bash
 gh auth status
 ```
 
-If not installed, stop and ask the user to install `gh`.
 If not logged in, stop and ask the user to run `gh auth login`.
 
 ## 2. Fetch the run or job

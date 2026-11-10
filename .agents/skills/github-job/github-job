@@ -6,6 +6,14 @@
 #   github-job info <job id or URL>  Print the metadata of the job.
 set -euo pipefail
 
+# Use the token in the secret file if it exists, for example in a container where gh is not logged in.
+# Without the file, gh uses its own login.
+gh_token_file="/run/secrets/gh/token"
+if [[ -z "${GH_TOKEN:-}" && -f "$gh_token_file" ]]; then
+  GH_TOKEN="$(<"$gh_token_file")"
+  export GH_TOKEN
+fi
+
 usage() {
   echo "Usage: github-job run <run id or URL> | log <job id or URL> | info <job id or URL>" >&2
   exit 2
