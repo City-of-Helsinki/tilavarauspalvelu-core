@@ -26,7 +26,6 @@ import {
 } from "@/components/application/funnel/form";
 import type { ApplicationPage3FormValues } from "@/components/application/funnel/form";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 import { FormSubHeading } from "@/styled/application";
 
@@ -161,8 +160,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
   const { data } = await apolloClient.query<ApplicationPage3Query, ApplicationPage3QueryVariables>({
     query: ApplicationPage3Document,
     variables: { id: createNodeId("ApplicationNode", pk) },

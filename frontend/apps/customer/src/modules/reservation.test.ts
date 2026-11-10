@@ -1,5 +1,5 @@
 import { addDays, addHours, addMinutes, format, setHours, startOfDay, startOfToday } from "date-fns";
-import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
+import { vi, describe, test, expect, beforeAll, afterAll, afterEach } from "vitest";
 import type { TFunction } from "i18next";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
@@ -596,33 +596,44 @@ describe("getPaymentUrl", () => {
     };
   }
 
-  test("returns webstore checkout url for direct payments", () => {
-    expect(getPaymentUrl(createPaymentReservation(), "fi", "https://api.example")).toBe(
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  test("returns webstore checkout url for direct payments, also without the page origin", () => {
+    expect(getPaymentUrl(createPaymentReservation(), "fi", null)).toBe(
       "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=fi"
     );
   });
 
-  test("returns handled payment redirect url when payment is pending", () => {
-    const origin = window.location.origin;
-    expect(
-      getPaymentUrl(
-        createPaymentReservation({
-          state: ReservationStateChoice.Confirmed,
-          paymentOrder: {
-            id: "PaymentOrderNode:1",
-            status: OrderStatus.Pending,
-            handledPaymentDueBy: addDays(new Date(), 1).toISOString(),
-            checkoutUrl: null,
-          },
-        }),
-        "sv",
-        "https://api.example"
-      )
-    ).toBe(
-      `https://api.example/v1/pay_pending_reservation/1/?lang=sv&redirect_on_error=${encodeURIComponent(
-        `${origin}/sv/reservations/1`
-      )}`
+  function createPendingHandledPayment(): ReservationPaymentUrlFragment {
+    return createPaymentReservation({
+      state: ReservationStateChoice.Confirmed,
+      paymentOrder: {
+        id: "PaymentOrderNode:1",
+        status: OrderStatus.Pending,
+        handledPaymentDueBy: addDays(new Date(), 1).toISOString(),
+        checkoutUrl: null,
+      },
+    });
+  }
+
+  test("returns handled payment redirect url with the page origin when payment is pending", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
+    const origin = "https://varaamo.example";
+    expect(getPaymentUrl(createPendingHandledPayment(), "sv", origin)).toBe(
+      `/v1/pay_pending_reservation/1/?lang=sv&redirect_on_error=${encodeURIComponent(`${origin}/sv/reservations/1`)}`
     );
+  });
+
+  test("returns undefined for a pending handled payment without the page origin", () => {
+    expect(getPaymentUrl(createPendingHandledPayment(), "fi", null)).toBeUndefined();
+  });
+
+  test("keeps the path of NEXT_PUBLIC_LOCAL_API_URL in the handled payment redirect url", () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://host/api");
+    const url = getPaymentUrl(createPendingHandledPayment(), "fi", "http://localhost:3000");
+    expect(url?.startsWith("http://host/api/v1/pay_pending_reservation/1/?lang=fi&")).toBe(true);
   });
 
   test("returns undefined for expired not-paid reservations", () => {
@@ -633,7 +644,7 @@ describe("getPaymentUrl", () => {
           cancelReason: ReservationCancelReasonChoice.NotPaid,
         }),
         "fi",
-        "https://api.example"
+        "https://varaamo.example"
       )
     ).toBeUndefined();
   });

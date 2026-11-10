@@ -35,6 +35,8 @@ const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string(),
   NEXT_PUBLIC_SOURCE_BRANCH_NAME: z.string().optional(),
   NEXT_PUBLIC_SOURCE_VERSION: z.string().optional(),
+  // Local development only, where the customer UI runs on another port. Keep it empty on the server environments.
+  NEXT_PUBLIC_LOCAL_CUSTOMER_URL: optionalUrl,
 });
 
 // Public settings that are read at runtime, so the same image runs in all environments.
@@ -79,6 +81,7 @@ function createEnv() {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_SOURCE_BRANCH_NAME: process.env.NEXT_PUBLIC_SOURCE_BRANCH_NAME,
     NEXT_PUBLIC_SOURCE_VERSION: process.env.NEXT_PUBLIC_SOURCE_VERSION,
+    NEXT_PUBLIC_LOCAL_CUSTOMER_URL: process.env.NEXT_PUBLIC_LOCAL_CUSTOMER_URL,
   });
 
   if (!clientConfig.success) {

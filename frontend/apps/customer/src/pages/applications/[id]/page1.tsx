@@ -22,7 +22,6 @@ import type { ApplicationPage1FormValues } from "@/components/application/funnel
 import { useReservationUnitList } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions } from "@/modules/search";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 
 function Page1({
@@ -103,8 +102,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const client = createApolloClient(apiBaseUrl, ctx);
+  const client = createApolloClient(ctx);
   const { data } = await client.query<ApplicationPage1Query, ApplicationPage1QueryVariables>({
     query: ApplicationPage1Document,
     variables: {

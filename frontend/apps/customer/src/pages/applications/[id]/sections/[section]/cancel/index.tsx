@@ -28,7 +28,6 @@ import { CancellationForm } from "@/components/CancellationForm";
 import type { CancelFormValues } from "@/components/CancellationForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isReservationCancellable } from "@/modules/reservation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/styled/reservation";
 
@@ -216,8 +215,7 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
 
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const client = createApolloClient(apiBaseUrl, ctx);
+  const client = createApolloClient(ctx);
 
   const pk = toNumber(ignoreMaybeArray(params?.section));
   if (Number.isFinite(Number(pk))) {

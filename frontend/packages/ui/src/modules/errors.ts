@@ -41,6 +41,17 @@ export class CsrfTokenNotFound extends Error {
   }
 }
 
+export class InvalidEnvError extends Error {
+  constructor(message: string = "") {
+    super(message);
+    this.name = "Invalid environment variable";
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, InvalidEnvError);
+    }
+  }
+}
+
 export class NotBrowserError extends Error {
   constructor(message: string = "") {
     super(message);

@@ -10,7 +10,8 @@ import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";
 import { ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationCardFragment } from "@gql/gql-types";
-import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
+import { usePaymentUrl } from "@/hooks/usePaymentUrl";
+import { getNormalizedReservationOrderStatus, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
 
@@ -19,10 +20,9 @@ type CardType = "upcoming" | "past" | "cancelled";
 interface PropsT {
   reservation: ReservationCardFragment;
   type?: CardType;
-  apiBaseUrl: string;
 }
 
-export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<PropsT>): React.ReactElement | null {
+export function ReservationCard({ reservation, type }: Readonly<PropsT>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnit;
@@ -35,6 +35,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
 
   const lang = getLocalizationLang(i18n.language);
   const price = getPrice(t, reservation, lang);
+  const paymentUrl = usePaymentUrl(reservation, lang);
 
   if (!reservationUnit) {
     return null;
@@ -93,7 +94,6 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
     </ButtonLikeLink>
   );
 
-  const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
   if (paymentUrl) {
     buttons.push(
       <ButtonLikeLink

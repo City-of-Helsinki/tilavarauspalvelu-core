@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { createApolloClient } from "./apolloClient";
 
 const QUERY = gql`
@@ -49,9 +49,39 @@ function readPks(cache: ReturnType<typeof createApolloClient>["cache"], textSear
   return data?.reservationUnits.edges.map((edge) => edge.node.pk) ?? null;
 }
 
+describe("createApolloClient", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  async function getBrowserQueryUrl(): Promise<unknown> {
+    const fetchMock = vi.fn((_url: RequestInfo | URL, _init?: RequestInit) =>
+      Promise.resolve(Response.json({ data: createPage(0, 1, false) }))
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createApolloClient();
+    await client.query({ query: QUERY, variables: { textSearch: "a", first: 2 }, fetchPolicy: "network-only" });
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    return fetchMock.mock.calls[0]?.[0];
+  }
+
+  test("sends the browser queries to a path on the same origin without NEXT_PUBLIC_LOCAL_API_URL", async () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "");
+    expect(await getBrowserQueryUrl()).toBe("/graphql/");
+  });
+
+  test("sends the browser queries to NEXT_PUBLIC_LOCAL_API_URL", async () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_API_URL", "http://localhost:8000");
+    expect(await getBrowserQueryUrl()).toBe("http://localhost:8000/graphql/");
+  });
+});
+
 describe("reservationUnits cache policy", () => {
   test("keeps a separate list for each filter", () => {
-    const { cache } = createApolloClient("http://localhost");
+    const { cache } = createApolloClient();
     cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
 
     expect(readPks(cache, "b")).toBeNull();
@@ -63,7 +93,7 @@ describe("reservationUnits cache policy", () => {
   });
 
   test("adds the next page to the same list", () => {
-    const { cache } = createApolloClient("http://localhost");
+    const { cache } = createApolloClient();
     cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
     cache.writeQuery({
       query: QUERY,
@@ -75,7 +105,7 @@ describe("reservationUnits cache policy", () => {
   });
 
   test("sets hasNextPage to false when fetchMore returns no edges", () => {
-    const { cache } = createApolloClient("http://localhost");
+    const { cache } = createApolloClient();
     cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
     cache.writeQuery({
       query: QUERY,
@@ -89,7 +119,7 @@ describe("reservationUnits cache policy", () => {
   });
 
   test("ignores the backend hasNextPage", () => {
-    const { cache } = createApolloClient("http://localhost");
+    const { cache } = createApolloClient();
     cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, false) });
 
     const full = cache.readQuery<QueryData>({ query: QUERY, variables: { textSearch: "a", first: 2 } });
@@ -106,7 +136,7 @@ describe("reservationUnits cache policy", () => {
   });
 
   test("keeps the loaded pages when the same first page is fetched again", () => {
-    const { cache } = createApolloClient("http://localhost");
+    const { cache } = createApolloClient();
     cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
     cache.writeQuery({
       query: QUERY,
@@ -124,7 +154,7 @@ describe("reservationUnits cache policy", () => {
   });
 
   test("shows only the new first page when it is the end of the list", () => {
-    const { cache } = createApolloClient("http://localhost");
+    const { cache } = createApolloClient();
     cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 3 }, data: createPage(0, 3, true) });
     cache.writeQuery({
       query: QUERY,
@@ -141,7 +171,7 @@ describe("reservationUnits cache policy", () => {
   });
 
   test("shows only the new first page when the first page has changed", () => {
-    const { cache } = createApolloClient("http://localhost");
+    const { cache } = createApolloClient();
     cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
     cache.writeQuery({
       query: QUERY,

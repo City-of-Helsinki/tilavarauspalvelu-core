@@ -21,7 +21,6 @@ import { ReservationStep0, ReservationStep1 } from "@/lib/reservation-unit/[...p
 import { createApolloClient } from "@/modules/apolloClient";
 import { queryOptions } from "@/modules/queryOptions";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   getReservationInProgressPath,
   getReservationPath,
@@ -212,8 +211,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const [reservationUnitPkStr, path, reservationPkStr] = params?.params ?? [];
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const reservationPk = toNumber(reservationPkStr);
   const reservationUnitPk = toNumber(reservationUnitPkStr);

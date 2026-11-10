@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
-import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
+import { buildGraphQLUrl, getBrowserApiBaseUrl, getClientOrigin } from "./modules/urlBuilder";
 
 /// Check if the request is a page request
 /// @param url - URL
@@ -36,10 +36,10 @@ export function getClientUrl(req: NextRequest): URL {
 
 /// check if csrftoken is missing and construct redirect url for it
 /// if we should redirect then construct the backend url with (original) req url as the return address
+/// The backend is at getBrowserApiBaseUrl. When it is empty, the backend is on the same origin as the client.
 /// @param req The request processed in the middleware
-/// @param apiBaseUrl Host url for backend
 /// @return redirect url or undefined if we should not redirect
-export function redirectCsrfToken(req: NextRequest, apiBaseUrl: string): URL | undefined {
+export function redirectCsrfToken(req: NextRequest): URL | undefined {
   const { cookies } = req;
   const hasCsrfToken = cookies.has("csrftoken");
   if (hasCsrfToken) {
@@ -47,16 +47,13 @@ export function redirectCsrfToken(req: NextRequest, apiBaseUrl: string): URL | u
   }
 
   const requestUrl = getClientUrl(req);
-  const csrfUrl = `${apiBaseUrl}/csrf/`;
-  const redirectUrl = new URL(csrfUrl);
+  const apiBaseUrl = getBrowserApiBaseUrl();
+  const redirectUrl = new URL(`${apiBaseUrl}/csrf/`, requestUrl.origin);
 
-  // On server envs everything is in the same domain and 80/443 ports, so ignore the host part of the url.
-  // More robust solution (supporting separate domains) would need to take into account us being behind
-  // a gateway so the public url doesn't match the internal url.
-  const origin = requestUrl.origin;
-  const hostPart = origin.includes("localhost") ? origin : "";
+  // On the same origin, a path is enough. A backend on another origin needs the full url to redirect back.
   // Keep the query string. Pages like /search store their filters in it.
-  const next = `${hostPart}${requestUrl.pathname}${requestUrl.search}`;
+  const path = `${requestUrl.pathname}${requestUrl.search}`;
+  const next = apiBaseUrl === "" ? path : `${requestUrl.origin}${path}`;
   redirectUrl.searchParams.set("redirect_to", next);
 
   return redirectUrl;

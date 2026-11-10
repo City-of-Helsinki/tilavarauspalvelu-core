@@ -8,7 +8,6 @@ import { IntendedUseOrderingChoices, UnitOrderingChoices, FrontPageDocument } fr
 import type { FrontPageQuery, FrontPageQueryVariables } from "@gql/gql-types";
 import { Head, IntendedUses, SearchGuides, Units } from "@/lib/index";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 function Home({ intendedUses, units }: Props): React.ReactElement {
   const { t } = useTranslation(["home", "common"]);
@@ -27,8 +26,7 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const { data } = await apolloClient.query<FrontPageQuery, FrontPageQueryVariables>({
     query: FrontPageDocument,

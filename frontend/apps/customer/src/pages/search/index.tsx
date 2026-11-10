@@ -17,12 +17,10 @@ import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SingleSearchCard, SingleSearchForm } from "@/lib/search";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
   const opts = await getSearchOptions(apolloClient, "direct", locale ?? "");
 
   return {

@@ -45,16 +45,16 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { LabelValuePair } from "@/components/LabelValuePair";
 import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { useEnvContext } from "@/context/EnvContext";
+import { usePaymentUrl } from "@/hooks/usePaymentUrl";
 import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
 import { createApolloClient } from "@/modules/apolloClient";
 import { queryOptions } from "@/modules/queryOptions";
 import {
   getNormalizedReservationOrderStatus,
-  getPaymentUrl,
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
-import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { getGenericTerms } from "@/modules/serverUtils";
 import {
   getApplicationPath,
   getFeedbackUrl,
@@ -157,7 +157,7 @@ function convertNotify(str: string | null): ReservationNotifications | null {
   return null;
 }
 
-function Reservation({
+export default function Reservation({
   termsOfUse,
   reservation,
   options,
@@ -223,7 +223,7 @@ function Reservation({
   const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
-  const paymentUrl = getPaymentUrl(reservation, lang, env.apiBaseUrl);
+  const paymentUrl = usePaymentUrl(reservation, lang);
   const hasCheckoutUrl = paymentUrl != null;
   const isWaitingForPayment = reservation.state === ReservationStateChoice.WaitingForPayment;
 
@@ -357,7 +357,6 @@ function Reservation({
               reservation={reservation}
               paymentOrder={reservation.paymentOrder}
               appliedPricing={reservation.appliedPricing}
-              apiBaseUrl={env.apiBaseUrl}
             />
           )}
           <Instructions reservation={reservation} />
@@ -412,8 +411,7 @@ function AccessCodeInfo({ pindoraInfo, feedbackUrl }: Readonly<AccessCodeInfoPro
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
-  const { apiBaseUrl } = getCommonServerSideProps();
-  const apolloClient = createApolloClient(apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(ctx);
 
   const notFound = {
     notFound: true,
@@ -479,8 +477,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return notFound;
 }
-
-export default Reservation;
 
 export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   query ApplicationReservationSeries($id: ID!) {

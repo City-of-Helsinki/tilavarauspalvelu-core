@@ -22,7 +22,6 @@ import {
 } from "@/modules/urls";
 
 type HeaderProps = {
-  apiBaseUrl: string;
   profileLink: string;
 };
 
@@ -220,7 +219,7 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
   );
 }
 
-function ActionBar({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
+function ActionBar({ profileLink }: Readonly<HeaderProps>) {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, user } = useSession();
   const { firstName, lastName } = user ?? {};
@@ -249,7 +248,7 @@ function ActionBar({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
               <IconLinkExternal />
             </a>
           )}
-          <button type="button" aria-label={t("common:logout")} onClick={() => signOut(apiBaseUrl)}>
+          <button type="button" aria-label={t("common:logout")} onClick={() => signOut()}>
             {t("common:logout")}
             <IconSignout />
           </button>
@@ -261,7 +260,6 @@ function ActionBar({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
           onClick={(e) => {
             e.preventDefault();
             signIn({
-              apiBaseUrl,
               language: getLocalizationLang(i18n.language),
               returnUrl: window.location.href,
               client: "customer",
@@ -275,7 +273,7 @@ function ActionBar({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
   );
 }
 
-export function Navigation({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
+export function Navigation({ profileLink }: Readonly<HeaderProps>) {
   const { t, i18n } = useTranslation();
   const { user } = useSession();
   const router = useRouter();
@@ -294,7 +292,7 @@ export function Navigation({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
   return (
     <Wrapper>
       <Header onDidChangeLanguage={languageChangeHandler} defaultLanguage={router.locale} languages={languageOptions}>
-        <ActionBar apiBaseUrl={apiBaseUrl} profileLink={profileLink} />
+        <ActionBar profileLink={profileLink} />
         <NavigationMenu user={user ?? null} />
       </Header>
     </Wrapper>

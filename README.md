@@ -207,6 +207,20 @@ In the development setup, the frontends read `apps/<app>/.env.local` from the so
 `just stack env` runs `just setup`, which makes these files from the examples if they do not exist.
 A variable in the container environment has priority over the same variable in a `.env` file.
 
+The frontends use two backend URLs:
+
+| Variable | Used by | Server environments | Local development |
+|----------|---------|---------------------|-------------------|
+| `TILAVARAUS_API_URL` | The server side rendering and the proxy, for their own requests to the backend | The backend URL | `http://localhost:8000` |
+| `NEXT_PUBLIC_LOCAL_API_URL` | The browser, and the redirects that the browser follows | Empty | `http://localhost:8000` |
+
+When `NEXT_PUBLIC_LOCAL_API_URL` is empty, the browser sends its backend requests to paths on its own origin, for example `/graphql/`.
+On the servers, the gateway sends these paths to the backend. Next.js writes the value into the build, so a change needs a restart of `next dev`.
+Do not set it in an image build. If your `.env.local` is older than this variable, add it from `.env.example`.
+
+The staff UI links to some pages of the customer UI. `NEXT_PUBLIC_LOCAL_CUSTOMER_URL` works in the same way.
+It is empty on the server environments, where the customer UI is on the same origin. In local development it is `http://localhost:3000`.
+
 ### Development setup
 
 The development setup has three profiles. Without a profile, only the database and Redis start.
@@ -256,8 +270,12 @@ To add test data, run `just stack manage create_test_data`.
 
 #### Network
 
-The frontends use one backend URL for the server side rendering and for the browser.
+The frontends use two backend URLs. See [Frontend settings](#frontend-settings).
+The server side rendering uses `TILAVARAUS_API_URL` in the frontend containers.
+The browser uses `NEXT_PUBLIC_LOCAL_API_URL` on the host.
+Both are `http://localhost:8000` in `apps/<app>/.env.local`, and the containers and the host use the same file.
 So `http://localhost:8000` must be the backend both on the host and in the frontend containers.
+On the host, the backend container publishes port 8000.
 The frontends share the network namespace of the `frontend-net` service. That service publishes the frontend ports
 and forwards `localhost:8000` to the backend container.
 

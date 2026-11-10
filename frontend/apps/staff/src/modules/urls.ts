@@ -1,5 +1,6 @@
-import { logError } from "@ui/modules/errors";
+import { getBrowserApiBaseUrl, removeTrailingSlash } from "@ui/modules/urlBuilder";
 import type { Maybe } from "@gql/gql-types";
+import { env } from "@/env.mjs";
 import { isBrowser, PUBLIC_URL } from "./const";
 
 export const APPLICATIONS_URL_PREFIX = "/applications";
@@ -10,7 +11,6 @@ export const MY_UNITS_URL_PREFIX = "/my-units";
 export const UNITS_URL_PREFIX = "/units";
 export const BANNER_NOTIFICATIONS_URL_PREFIX = "/notifications";
 export const REQUESTED_RESERVATIONS_URL_PREFIX = "/reservations/requested";
-const LOCAL_CLIENT_BASE_URL = "http://localhost:3000";
 
 type ApplicationRoundPages = "criteria" | "";
 export function getApplicationRoundUrl(
@@ -120,23 +120,21 @@ export function getNotificationUrl(pk: Maybe<number> | undefined): string {
   return `${BANNER_NOTIFICATIONS_URL_PREFIX}/${pk}`;
 }
 
+/// On the server environments, the customer UI is on the same origin.
+/// Local development sets NEXT_PUBLIC_LOCAL_CUSTOMER_URL, because the customer UI runs on another port.
 function getCustomerUrl(): string {
   if (!isBrowser) {
     return "";
   }
-  // Return the localhost client side base URL if in dev environment, to ease with development & testing
-  return process.env.NODE_ENV === "development" ? LOCAL_CLIENT_BASE_URL : window.location.origin;
+  return removeTrailingSlash(env.NEXT_PUBLIC_LOCAL_CUSTOMER_URL ?? window.location.origin);
 }
 
 export function getAccessibilityTermsUrl(): string {
   return `${getCustomerUrl()}/terms/accessibility-admin`;
 }
 
-export function getOpeningHoursUrl(
-  apiBaseUrl: string,
-  reservationUnitPk: number | number[] | null,
-  errorUrl?: string
-): string {
+/// Returns the backend url that opens the opening hours editor. It starts with getBrowserApiBaseUrl.
+export function getOpeningHoursUrl(reservationUnitPk: number | number[] | null, errorUrl?: string): string {
   let reservationUnitsParam = "";
   if (Array.isArray(reservationUnitPk)) {
     const validPks = reservationUnitPk.filter((pk) => pk > 0);
@@ -149,16 +147,9 @@ export function getOpeningHoursUrl(
   } else {
     reservationUnitsParam = reservationUnitPk.toString();
   }
-  try {
-    const url = new URL(`/v1/edit_opening_hours/`, apiBaseUrl);
-    const { searchParams } = url;
-    searchParams.set("reservation_units", reservationUnitsParam);
-    if (errorUrl) {
-      searchParams.set("redirect_on_error", errorUrl);
-    }
-    return url.toString();
-  } catch (err) {
-    logError(err);
+  const searchParams = new URLSearchParams({ reservation_units: reservationUnitsParam });
+  if (errorUrl) {
+    searchParams.set("redirect_on_error", errorUrl);
   }
-  return "";
+  return `${getBrowserApiBaseUrl()}/v1/edit_opening_hours/?${searchParams.toString()}`;
 }

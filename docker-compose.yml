@@ -158,8 +158,8 @@ services:
     entrypoint: ["bash", "/tvp/docker/scheduler.sh"]
 
   # The frontends share the network namespace of this container. It publishes the frontend ports
-  # and forwards "localhost:8000" to the backend container. The frontends use one backend URL
-  # for the server side rendering and for the browser, so "localhost:8000" must work in both places.
+  # and forwards "localhost:8000" to the backend container. In apps/<app>/.env.local, the backend URL of the
+  # server side rendering and the backend URL of the browser are both "localhost:8000", so it must work in both places.
   frontend-net:
     <<: *frontend
     profiles: [frontend, frontend-release]

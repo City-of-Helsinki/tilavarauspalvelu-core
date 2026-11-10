@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
 import { addMinutes, addSeconds, isAfter, roundToNearestMinutes, differenceInMinutes, set } from "date-fns";
 import type { TFunction } from "i18next";
-import { logError, NotBrowserError } from "@ui/modules/errors";
+import { logError } from "@ui/modules/errors";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
+import { getBrowserApiBaseUrl } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { ReservationStateChoice, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type {
@@ -22,7 +23,6 @@ import type {
   ReservationStartInterval,
 } from "@gql/gql-types";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { isBrowser } from "./const";
 import { isRangeReservable } from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";
 
@@ -434,12 +434,14 @@ export const RESERVATION_PAYMENT_URL_FRAGMENT = gql`
 
 /// Get the payment url for a reservation
 /// unified interface for both handled and direct payments
+/// In components, use usePaymentUrl. It gives the page origin only in the browser.
+/// @param pageOrigin - origin of the page, for example window.location.origin. null on the server.
 /// @return the payment url or undefined if the reservation is not waiting for payment
 /// undefined is safe to assign to html a link href and disables the link
 export function getPaymentUrl(
   reservation: ReservationPaymentUrlFragment,
   lang: LocalizationLanguages,
-  apiBaseUrl: string
+  pageOrigin: string | null
 ): string | undefined {
   const isExpired =
     reservation.state === ReservationStateChoice.Cancelled &&
@@ -457,7 +459,8 @@ export function getPaymentUrl(
     reservation.paymentOrder.status === OrderStatus.Pending &&
     reservation.paymentOrder.handledPaymentDueBy
   ) {
-    return getCheckoutRedirectUrl(reservation.pk, lang, apiBaseUrl);
+    // The backend needs a full url to redirect back to the page, so wait for the page origin
+    return pageOrigin != null ? getCheckoutRedirectUrl(reservation.pk, lang, pageOrigin) : undefined;
   }
 
   // webstore checkout url for direct payments
@@ -473,23 +476,15 @@ export function getPaymentUrl(
 }
 
 /// Get the pending payment url for a reservation (handled reservations)
-/// browser only
-function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBaseUrl: string): string {
-  if (!isBrowser) {
-    throw new NotBrowserError("getCheckoutRedirectUrlrequires window.location.origin");
-  }
+/// The url starts with getBrowserApiBaseUrl, like the other backend urls.
+/// The backend needs a full url in redirect_on_error, so it uses the page origin.
+function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, pageOrigin: string): string {
   const langPrefix = lang !== "fi" ? `/${lang}` : "";
-  const errorUrl = new URL(`${langPrefix}/reservations/${pk}`, window.location.origin);
-  try {
-    const url = new URL(`/v1/pay_pending_reservation/${pk}/`, apiBaseUrl);
-    const { searchParams } = url;
-    searchParams.set("lang", lang);
-    searchParams.set("redirect_on_error", errorUrl.toString());
-    return url.toString();
-  } catch (err) {
-    logError(err);
-  }
-  return "";
+  const searchParams = new URLSearchParams({
+    lang,
+    redirect_on_error: `${pageOrigin}${langPrefix}/reservations/${pk}`,
+  });
+  return `${getBrowserApiBaseUrl()}/v1/pay_pending_reservation/${pk}/?${searchParams.toString()}`;
 }
 
 /// Get the direct payment (webstore) url for a reservation
