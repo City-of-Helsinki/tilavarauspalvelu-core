@@ -10,6 +10,10 @@ describe("getReleaseVersion", () => {
     expect(getReleaseVersion("main", "0123456789abcdef")).toBe("01234567");
   });
 
+  it("keeps main inside a tag", () => {
+    expect(getReleaseVersion("v1.2.3-maintenance.1", "0123456789abcdef")).toBe("1.2.3-maintenance.1");
+  });
+
   it("keeps a branch name that starts with v", () => {
     expect(getReleaseVersion("validation-fix", "0123456789abcdef")).toBe("validation-fix");
   });
