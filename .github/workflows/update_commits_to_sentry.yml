@@ -23,6 +23,8 @@ env:
 jobs:
   upload-customer-sentry-sourcemaps:
     name: "Upload customer ui sentry sourcemaps"
+    # The jobs record a production deploy. Only tagged builds go to production.
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,6 +57,7 @@ jobs:
 
   upload-staff-sentry-sourcemaps:
     name: "Upload staff ui sentry sourcemaps"
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       contents: read
