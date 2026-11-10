@@ -211,6 +211,18 @@ async function handleControl(req, res) {
 for (const [name, port] of Object.entries(CHANNEL_PORTS)) {
   http.createServer((req, res) => void handleRequest(name, req, res)).listen(port);
 }
-http.createServer((req, res) => void handleControl(req, res)).listen(CONTROL_PORT);
+http
+  .createServer((req, res) => {
+    // Do not let an unexpected error, for example a client that goes away during the body, stop the proxy
+    handleControl(req, res).catch((error) => {
+      console.error("chaos proxy: control request failed", error);
+      if (res.headersSent) {
+        res.destroy();
+      } else {
+        sendJson(res, 500, { error: "Internal error" });
+      }
+    });
+  })
+  .listen(CONTROL_PORT);
 
 console.log(`chaos proxy: ssr on ${CHANNEL_PORTS.ssr}, client on ${CHANNEL_PORTS.client}, control on ${CONTROL_PORT}`);

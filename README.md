@@ -304,7 +304,7 @@ just stack up-chaos                                          # Start the setup. 
 just stack chaos ssr '{"delayMs": 1000, "jitterMs": 2000}'   # 1 to 3 s delay for the server side rendering
 just stack chaos client '{"path": "/graphql/", "dropEvery": 5}'  # Close every 5th GraphQL connection of the browser
 just stack chaos both '{"errorRate": 0.2, "errorStatus": 502}'   # 502 for 20 % of the requests
-just stack chaos both '{"errorForSeconds": 30}'              # 503 for all requests for 30 seconds
+just stack chaos both '{"errorForSeconds": 30, "errorStatus": 503}'  # 503 for all requests for 30 seconds
 just stack chaos-status                                      # Show the faults and the request counts
 just stack chaos-reset                                       # Remove all faults. Add ssr or client for one channel.
 just stack down-chaos                                        # Remove the containers before you go back to "just stack up"

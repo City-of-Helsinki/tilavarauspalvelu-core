@@ -57,7 +57,7 @@ down-chaos *args:
 
 # Change faults of the chaos proxy. Channel is ssr, client or both. Example: just stack chaos both '{"delayMs": 1000}'
 chaos channel config:
-    @curl --silent --show-error -X PUT "{{ chaos_url }}/{{ channel }}" -H "Content-Type: application/json" -d '{{ config }}'
+    @curl --silent --show-error --fail-with-body -X PUT "{{ chaos_url }}/{{ channel }}" -H "Content-Type: application/json" -d '{{ config }}'
 
 # Show the faults and request counts of the chaos proxy
 chaos-status:
@@ -65,7 +65,7 @@ chaos-status:
 
 # Remove the faults of the chaos proxy. Channel is ssr, client or both.
 chaos-reset channel="both":
-    @curl --silent --show-error -X DELETE "{{ chaos_url }}/{{ channel }}"
+    @curl --silent --show-error --fail-with-body -X DELETE "{{ chaos_url }}/{{ channel }}"
 
 # Start only the database and Redis. Run the backend on the host.
 services:
