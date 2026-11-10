@@ -9,7 +9,14 @@ import {
   COOKIETEXT,
   USER_LANDING_PAGE_H1_TEXT,
 } from "../../Resources/texts_FI";
-import { DOWNLOAD_DIR, URL_ADMIN, URL_DJANGO_ADMIN, URL_MAIL, URL_TEST } from "../../Resources/variables";
+import {
+  DOWNLOAD_DIR,
+  TEXT_CHECK_TIMEOUT,
+  URL_ADMIN,
+  URL_DJANGO_ADMIN,
+  URL_MAIL,
+  URL_TEST,
+} from "../../Resources/variables";
 
 /** Workflow keywords of both sides: opening the browsers, logging in and out, banners and pages. */
 export class AppCommon extends PageObject {
@@ -98,7 +105,7 @@ export class AppCommon extends PageObject {
       .and(this.page.locator(notification_type));
     await banner.waitFor({ state: "visible", timeout: 10_000 });
 
-    await this.pages.customKeywords.checkElementsText(banner, notification_banner_message);
+    await expect(banner).toHaveText(notification_banner_message, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
   }
 
   /** Fails if a notification banner is shown. Use after the banners have loaded. */
@@ -155,6 +162,18 @@ export class AppCommon extends PageObject {
   async adminOpensDesktopBrowserToLandingPage() {
     // Default is chrome
     // create_data.Create robot test data
+    await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(URL_ADMIN, DOWNLOAD_DIR);
+    await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN);
+  }
+
+  /**
+   * Opens the admin UI in a browser session of its own, like the admin's own computer, while the user stays logged in
+   * on theirs. The user's page is kept in `state.pageUserSide`, and `session.switchTo` goes back to it.
+   */
+  @step("app_common.Admin Opens Own Browser To Landing Page")
+  async adminOpensOwnBrowserToLandingPage() {
+    this.state.pageUserSide = this.page;
+    // The test's second Set Up … And Open Url opens a new context
     await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(URL_ADMIN, DOWNLOAD_DIR);
     await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN);
   }

@@ -1,6 +1,7 @@
 /** A resource file with top navigation keywords. */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
+import { TEXT_CHECK_TIMEOUT } from "../../Resources/variables";
 
 export class Recurring extends PageObject {
   @step("recurring.User Selects A Recurring Booking Round")
@@ -33,7 +34,10 @@ export class Recurring extends PageObject {
 
   @step("recurring.User Checks The Count Of Selected Units")
   async userChecksTheCountOfSelectedUnits(expected_text: string) {
-    await this.pages.customKeywords.checkElementsText("#reservationUnitCount", expected_text);
+    await expect(this.page.locator("#reservationUnitCount")).toHaveText(expected_text, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("recurring.User Clicks Continue Button")

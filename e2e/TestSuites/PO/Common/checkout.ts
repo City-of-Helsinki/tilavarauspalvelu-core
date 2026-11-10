@@ -2,7 +2,7 @@ import { errors } from "@playwright/test";
 import { step, expect, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { SINGLEBOOKING_PAID_PRICE_CHECKOUT } from "../../Resources/texts_FI";
-import { URL_TEST } from "../../Resources/variables";
+import { TEXT_CHECK_TIMEOUT, URL_TEST } from "../../Resources/variables";
 
 /** The external payment page. */
 export class Checkout extends PageObject {
@@ -55,9 +55,9 @@ export class Checkout extends PageObject {
 
   @step("checkout.Check Product List Has All The Info")
   async checkProductListHasAllTheInfo() {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.locator(".product-summary").locator("span.cart-total.padded"),
-      SINGLEBOOKING_PAID_PRICE_CHECKOUT
+    await expect(this.page.locator(".product-summary").locator("span.cart-total.padded")).toHaveText(
+      SINGLEBOOKING_PAID_PRICE_CHECKOUT,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
     );
   }
 
@@ -94,6 +94,13 @@ export class Checkout extends PageObject {
     await this.clickSubmit();
     // Submitting the summary goes through the payment back to Varaamo
     await this.page.waitForURL((url) => url.href.startsWith(URL_TEST), { timeout: 50_000 });
+    // Varaamo's payment success page waits up to 30 s for the webshop to confirm the payment, then opens the
+    // reservation; expect retries until the URL has left it. Without a confirmation the page gives up and opens the
+    // reservation with notify=polling_timeout, which this check doesn't accept.
+    await expect(this.page, "Varaamo confirms the payment and opens the reservation").toHaveURL(
+      (url) => !url.pathname.includes("/callbacks/webstore/") && url.searchParams.get("notify") !== "polling_timeout",
+      { timeout: 35_000 }
+    );
   }
 
   @step("checkout.Interrupted Checkout")

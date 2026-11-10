@@ -1,5 +1,4 @@
 /** Desktop browser tests */
-import { log } from "../lib/runtime";
 import { test } from "./fixtures";
 import {
   JUSTIFICATION_FOR_SUBVENTION,
@@ -37,59 +36,59 @@ test.describe(
         appCommon,
         appUser,
         dataModification,
+        session,
         state,
         testData,
-        topnav,
       }) => {
         await appCommon.userLogsInWithSuomiFi();
 
-        await log("User creates subvented reservation");
-        await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnitSubvented);
-        await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(JUSTIFICATION_FOR_SUBVENTION);
-        await appUser.userChecksTheSubventedReservationInfoIsRightAndSubmits();
-        await appUser.userChecksTheSubventedReservationInfoIsRightAfterSubmitting();
-        await topnav.navigateToMyBookings();
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.alwaysPaidUnitSubventedWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksBookingInfoInReservationsWithAllReservationInfo(
-          MYBOOKINGS_STATUS_PROCESSED,
-          SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-          state.timeOfQuickReservation
-        );
+        await test.step("User creates subvented reservation", async () => {
+          await appUser.userFindsTheUnit(testData.units.alwaysPaidUnitSubvented);
+          await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(JUSTIFICATION_FOR_SUBVENTION);
+          await appUser.userChecksTheSubventedReservationInfoIsRightAndSubmits();
+          await appUser.userChecksTheSubventedReservationInfoIsRightAfterSubmitting();
+          await appUser.userOpensTheBookingInMyBookings(
+            testData.units.alwaysPaidUnitSubventedWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksBookingInfoInReservationsWithAllReservationInfo(
+            MYBOOKINGS_STATUS_PROCESSED,
+            SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+            state.timeOfQuickReservation
+          );
+        });
 
-        await log("Formats info of subvented reservation to admin side");
-        await dataModification.formatsReservationNumberAndNameForAdminSide();
-        await dataModification.formatsTaglineForAdminSide(
-          state.timeOfQuickReservation,
-          testData.units.alwaysPaidUnitSubventedWithLocation
-        );
-        await appCommon.userLogsOut();
+        await test.step("Formats info of subvented reservation to admin side", async () => {
+          await dataModification.formatsReservationNumberAndNameForAdminSide();
+          await dataModification.formatsTaglineForAdminSide(
+            state.timeOfQuickReservation,
+            testData.units.alwaysPaidUnitSubventedWithLocation
+          );
+        });
 
-        await log("Admin logs in and approves reservation");
-        await appCommon.adminGoesToLandingPage();
-        await appCommon.adminLogsInWithSuomiFi();
-        await adminNavigationMenu.adminNavigatesToRequestedReservations();
-        await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-          state.bookingNumOnly,
-          testData.user.fullName
-        );
-        await appAdmin.adminChecksTheInfoAndSetsReservationFreeAndApprovesIt();
-        await appAdmin.adminEditsReservationTime();
-        await appCommon.adminLogsOut();
+        await test.step("Admin logs in and approves reservation", async () => {
+          await appCommon.adminOpensOwnBrowserToLandingPage();
+          await appCommon.adminLogsInWithSuomiFi();
+          await adminNavigationMenu.adminNavigatesToRequestedReservations();
+          await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
+            state.bookingNumOnly,
+            testData.user.fullName
+          );
+          await appAdmin.adminChecksTheInfoAndSetsReservationFreeAndApprovesIt();
+          await appAdmin.adminEditsReservationTime();
+        });
 
-        await log("User logs in and verifies approved reservation");
-        await appCommon.userGoesToLandingPage();
-        await appCommon.userLogsInWithSuomiFi();
-        await topnav.navigateToMyBookings();
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.alwaysPaidUnitSubventedWithLocation,
-          state.adminModifiesTimeOfInfoCardMinusT
-        );
-        await appUser.userVerifiesDetailsOfSubventedReservationAfterAdminApprovalWithoutPayment();
+        await test.step("User verifies approved reservation", async () => {
+          await session.switchTo(state.pageUserSide);
+          // A full page load, so the lists are fetched again
+          await appCommon.userGoesToLandingPage();
+          await appUser.userOpensTheBookingInMyBookings(
+            testData.units.alwaysPaidUnitSubventedWithLocation,
+            state.adminModifiesTimeOfInfoCardMinusT
+          );
+          await appUser.userVerifiesDetailsOfSubventedReservationAfterAdminApprovalWithoutPayment();
+        });
       }
     );
 
@@ -104,61 +103,61 @@ test.describe(
         appUser,
         dataModification,
         reservationLownav,
+        session,
         state,
         testData,
-        topnav,
       }) => {
         await appCommon.userLogsInWithSuomiFi();
 
-        await log("User creates reservation that requires handling");
-        await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(testData.units.unitRequiresAlwaysHandling);
-        await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits();
-        await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightBeforeSubmit();
-        await reservationLownav.clickSubmitButtonContinue();
-        await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit();
-        await topnav.navigateToMyBookings();
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.unitRequiresAlwaysHandlingWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksBookingInfoInReservationsWithNumberOfParticipantsAndDescriptionAndPurpose(
-          MYBOOKINGS_STATUS_PROCESSED,
-          SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-          state.timeOfQuickReservation
-        );
+        await test.step("User creates reservation that requires handling", async () => {
+          await appUser.userFindsTheUnit(testData.units.unitRequiresAlwaysHandling);
+          await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits();
+          await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightBeforeSubmit();
+          await reservationLownav.clickSubmitButtonContinue();
+          await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit();
+          await appUser.userOpensTheBookingInMyBookings(
+            testData.units.unitRequiresAlwaysHandlingWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksBookingInfoInReservationsWithNumberOfParticipantsAndDescriptionAndPurpose(
+            MYBOOKINGS_STATUS_PROCESSED,
+            SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+            state.timeOfQuickReservation
+          );
+        });
 
-        await log("Formats info of subvented reservation to admin side");
-        await dataModification.formatsReservationNumberAndNameForAdminSide();
-        await dataModification.formatsTaglineForAdminSide(
-          state.timeOfQuickReservation,
-          testData.units.unitRequiresAlwaysHandlingWithLocation
-        );
-        await appCommon.userLogsOut();
+        await test.step("Formats info of reservation to admin side", async () => {
+          await dataModification.formatsReservationNumberAndNameForAdminSide();
+          await dataModification.formatsTaglineForAdminSide(
+            state.timeOfQuickReservation,
+            testData.units.unitRequiresAlwaysHandlingWithLocation
+          );
+        });
 
-        await log("Admin logs in and rejects reservation");
-        await appCommon.adminGoesToLandingPage();
-        await appCommon.adminLogsInWithSuomiFi();
-        await adminNavigationMenu.adminNavigatesToRequestedReservations();
-        await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-          state.bookingNumOnly,
-          testData.user.fullName
-        );
-        await appAdmin.adminChecksTheInfoAndCancelsReservation();
-        await appAdmin.adminReturnsReservationToHandlingStateFromRejectedState();
-        await appAdmin.adminRejectsReservationAndChecksTheStatus();
-        await appCommon.adminLogsOut();
+        await test.step("Admin logs in and rejects reservation", async () => {
+          await appCommon.adminOpensOwnBrowserToLandingPage();
+          await appCommon.adminLogsInWithSuomiFi();
+          await adminNavigationMenu.adminNavigatesToRequestedReservations();
+          await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
+            state.bookingNumOnly,
+            testData.user.fullName
+          );
+          await appAdmin.adminChecksTheInfoAndCancelsReservation();
+          await appAdmin.adminReturnsReservationToHandlingStateFromRejectedState();
+          await appAdmin.adminRejectsReservationAndChecksTheStatus();
+        });
 
-        await log("User logs in and verifies rejected reservation");
-        await appCommon.userGoesToLandingPage();
-        await appCommon.userLogsInWithSuomiFi();
-        await topnav.navigateToMyBookings();
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.unitRequiresAlwaysHandlingWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksTheRejectedReservationInfoIsRightAfterAdminHandling();
+        await test.step("User verifies rejected reservation", async () => {
+          await session.switchTo(state.pageUserSide);
+          // A full page load, so the lists are fetched again
+          await appCommon.userGoesToLandingPage();
+          await appUser.userOpensTheBookingInMyBookings(
+            testData.units.unitRequiresAlwaysHandlingWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksTheRejectedReservationInfoIsRightAfterAdminHandling();
+        });
       }
     );
 
@@ -172,53 +171,54 @@ test.describe(
         appCommon,
         appUser,
         reservationLownav,
+        session,
         state,
         testData,
-        topnav,
       }) => {
         await appCommon.userLogsInWithSuomiFi();
 
-        await log("User creates reservation");
-        await appUser.userNavigatesToSingleBookingPage();
-        await appUser.userUsesSearchToFindRightUnit(testData.units.unitWithAccessCode);
-        await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsBookingDetailsAsIndividualForReservationWithAccessCodeAndSubmits();
-        await appUser.userChecksTheReservationInfoIsRightBeforeSubmitWithAccessCode();
-        await reservationLownav.clickSubmitButtonContinue();
-        await appUser.userChecksTheReservationInfoIsRightAfterSubmitWithAccessCode();
-        await appCommon.userLogsOut();
+        await test.step("User creates reservation", async () => {
+          await appUser.userFindsTheUnit(testData.units.unitWithAccessCode);
+          await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsBookingDetailsAsIndividualForReservationWithAccessCodeAndSubmits();
+          await appUser.userChecksTheReservationInfoIsRightBeforeSubmitWithAccessCode();
+          await reservationLownav.clickSubmitButtonContinue();
+          await appUser.userChecksTheReservationInfoIsRightAfterSubmitWithAccessCode();
+        });
 
-        await log("Admin logs in and changes access code");
-        await appCommon.adminGoesToLandingPage();
-        await appCommon.adminLogsInWithSuomiFi();
-        await adminNavigationMenu.adminNavigatesToRequestedReservations();
-        await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-          state.bookingNumOnly,
-          testData.user.fullName
-        );
+        await test.step("Admin logs in and changes access code", async () => {
+          await appCommon.adminOpensOwnBrowserToLandingPage();
+          await appCommon.adminLogsInWithSuomiFi();
+          await adminNavigationMenu.adminNavigatesToRequestedReservations();
+          await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
+            state.bookingNumOnly,
+            testData.user.fullName
+          );
+        });
 
-        await log("Changing access code");
-        await appAdmin.adminOpensAccessCodeModal();
-        await appAdmin.adminChecksAccessCodeMatches(state.accessCode);
-        await appAdmin.adminChangesAccessCode();
-        await appAdmin.adminChecksAccessCodeDoesNotMatch(state.accessCode);
-        await appAdmin.adminSavesAccessCode();
-        await appCommon.adminLogsOut();
+        await test.step("Changing access code", async () => {
+          await appAdmin.adminOpensAccessCodeModal();
+          await appAdmin.adminChecksAccessCodeMatches(state.accessCode);
+          await appAdmin.adminChangesAccessCode();
+          await appAdmin.adminChecksAccessCodeDoesNotMatch(state.accessCode);
+          await appAdmin.adminSavesAccessCode();
+        });
 
-        await log("User logs in and checks access code was changed");
-        await appCommon.userGoesToLandingPage();
-        await appCommon.userLogsInWithSuomiFi();
-        await topnav.navigateToMyBookings();
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.unitWithAccessCodeWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksBookingInfoInReservationsWithAccessCode(
-          MYBOOKINGS_STATUS_CONFIRMED,
-          SINGLEBOOKING_NO_PAYMENT,
-          state.timeOfQuickReservation,
-          state.accessCodeAdminside
-        );
+        await test.step("User checks access code was changed", async () => {
+          await session.switchTo(state.pageUserSide);
+          // A full page load, so the lists are fetched again
+          await appCommon.userGoesToLandingPage();
+          await appUser.userOpensTheBookingInMyBookings(
+            testData.units.unitWithAccessCodeWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksBookingInfoInReservationsWithAccessCode(
+            MYBOOKINGS_STATUS_CONFIRMED,
+            SINGLEBOOKING_NO_PAYMENT,
+            state.timeOfQuickReservation,
+            state.accessCodeAdminside
+          );
+        });
       }
     );
   }

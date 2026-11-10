@@ -5,9 +5,10 @@
  * title, so the Playwright report shows the tree of keywords a test ran.
  */
 import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { test as base, errors } from "@playwright/test";
 import { readFile, writeFile } from "node:fs/promises";
-import type { Locator, TestInfo } from "@playwright/test";
+import type { Locator, Location, TestInfo } from "@playwright/test";
 import { LOG_LEVELS, SECRET_NAMES, readEnv } from "./env";
 
 /** Hides secrets from step titles and logs. */
@@ -112,15 +113,35 @@ async function redactingErrors<T>(body: () => T | Promise<T>): Promise<T> {
   }
 }
 
+const RUNTIME_FILE = fileURLToPath(import.meta.url);
+
+/** The line that called a keyword: the first frame of the call stack outside this file. */
+function callerLocation(): Location | undefined {
+  // The suite's files are ES modules, so their frames have file:// URLs, unlike those of Node and Playwright
+  for (const frame of (new Error("Keyword called").stack ?? "").split("\n")) {
+    const parsed = /(?<url>file:\/\/\S+?):(?<line>\d+):(?<column>\d+)\)?$/.exec(frame)?.groups;
+    if (parsed?.url != null && fileURLToPath(parsed.url) !== RUNTIME_FILE) {
+      return { file: fileURLToPath(parsed.url), line: Number(parsed.line), column: Number(parsed.column) };
+    }
+  }
+  return undefined;
+}
+
 /**
  * Runs `body` as a report step. Outside a test (e.g. while listing tests) it just runs the body.
  * Secrets are hidden in the error the step fails with, so they don't reach the report.
+ * The step is boxed: a failure is reported at the spec line that called the keyword, and the failing step inside
+ * still shows in the report's step tree. Each step's location is the line that called it.
  */
-export function runStep<T>(title: string, body: () => T | Promise<T>): Promise<T> {
+export async function runStep<T>(title: string, body: () => T | Promise<T>): Promise<T> {
   if (currentTestInfo == null) {
     return redactingErrors(body);
   }
-  return base.step(title, () => redactingErrors(body));
+  // Playwright takes a boxed step's stack after an await, so it holds only the functions awaiting the step, and it
+  // drops the first of them as the helper that called test.step. Awaiting here makes that helper this function,
+  // so the stack starts at the keyword's caller.
+  const result = await base.step(title, () => redactingErrors(body), { box: true, location: callerLocation() });
+  return result;
 }
 
 /**

@@ -10,19 +10,51 @@ import {
   JUSTIFICATION_FOR_SUBVENTION,
   PREFIX_RESERVATIONS_BY_ADMIN_BEHALF_FI,
 } from "../../Resources/texts_FI";
+import { TEXT_CHECK_TIMEOUT } from "../../Resources/variables";
 
 /** The admin's reservation pages: the search of the requested list, a reservation and its dialogs. */
 export class AdminReservations extends PageObject {
+  /** The reservation's info dialog */
+  private get infoDialog() {
+    return this.page.locator("#info-dialog");
+  }
+
+  /** The reservation's state, under its title */
+  private get reservationState() {
+    return this.page.getByTestId("reservation_title_section__reservation_state");
+  }
+
+  /** The start time's hours */
+  private get startHoursInput() {
+    return this.page.locator('[id="TimeInput.startTime-hours"]');
+  }
+
+  /** The start time's minutes */
+  private get startMinutesInput() {
+    return this.page.locator('[id="TimeInput.startTime-minutes"]');
+  }
+
+  /** The end time's hours */
+  private get endHoursInput() {
+    return this.page.locator('[id="TimeInput.endTime-hours"]');
+  }
+
+  /** The end time's minutes */
+  private get endMinutesInput() {
+    return this.page.locator('[id="TimeInput.endTime-minutes"]');
+  }
+
   /** This keyword types the reservation number and there should be only one match in the list */
   @step("admin_reservations.Admin Searches Reservation With Id Number And Clicks It From Name")
   async adminSearchesReservationWithIdNumberAndClicksItFromName(booking_number: string, user_fullname: string) {
     await expect(this.page.locator("#search"), "The page has the reservation search").toBeVisible();
     await this.page.locator("#search").fill(booking_number);
     await this.page.locator('[type="submit"]').click();
-    // Check Elements Text waits until the search results show the reservation
-    await this.pages.customKeywords.checkElementsText(this.page.getByTestId("pk-0"), booking_number, {
-      message: `The search shows reservation ${booking_number} first`,
-    });
+    // The check waits until the search results show the reservation
+    await expect(this.page.getByTestId("pk-0"), `The search shows reservation ${booking_number} first`).toHaveText(
+      booking_number,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
+    );
     await this.page.getByTestId("reservee_name-0").getByRole("link", { name: user_fullname, exact: true }).click();
     // The reservation's page opens
     await this.page.waitForURL((url) => url.pathname.endsWith(`/reservations/${booking_number}`), {
@@ -34,62 +66,66 @@ export class AdminReservations extends PageObject {
   async adminSearchesReservationWithIdNumberAndChecksTheStatus(booking_number: string, reservation_status: string) {
     await expect(this.page.locator("#search"), "The page has the reservation search").toBeVisible();
     await this.page.locator('[type="submit"]').click();
-    // Check Elements Text waits until the search results show the reservation
-    await this.pages.customKeywords.checkElementsText(this.page.getByTestId("pk-0"), booking_number, {
-      message: `The search shows reservation ${booking_number} first`,
-    });
-    await this.pages.customKeywords.checkElementsText(this.page.getByTestId("state-0"), reservation_status);
+    // The check waits until the search results show the reservation
+    await expect(this.page.getByTestId("pk-0"), `The search shows reservation ${booking_number} first`).toHaveText(
+      booking_number,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
+    );
+    await expect(this.page.getByTestId("state-0"), `The search shows the state ${reservation_status}`).toHaveText(
+      reservation_status,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
+    );
   }
 
   @step("admin_reservations.Admin Checks Reservation H1")
   async adminChecksReservationH1(h1_reservationnumber_firstname_lastname: string) {
-    await expect(this.page.getByTestId("reservation_title_section__reservation_state")).toBeVisible();
-    await this.pages.customKeywords.checkElementsText("h1", h1_reservationnumber_firstname_lastname);
+    await expect(this.reservationState).toBeVisible();
+    await expect(this.page.locator("h1")).toHaveText(h1_reservationnumber_firstname_lastname, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("admin_reservations.Admin Checks Reservation Title Tagline")
   async adminChecksReservationTitleTagline(reservation_tagline: string) {
     // ${RESERVATION_TAGLINE} is set with keyword Formats tagline for admin side
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation_title_section__tagline"),
-      reservation_tagline
-    );
+    await expect(this.page.getByTestId("reservation_title_section__tagline")).toHaveText(reservation_tagline, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("admin_reservations.Admin Checks Reservation Info Dialog Time Tagline")
   async adminChecksReservationInfoDialogTimeTagline(reservation_tagline: string) {
     // DEVNOTE: Not in use for now
     // The time boxes of the edit time dialog are paragraphs with the time in bold
-    await this.pages.customKeywords.findTextFromElementsOrFail(
-      this.page.locator("#info-dialog").locator("p > b"),
-      reservation_tagline
-    );
+    await this.pages.customKeywords.findTextFromElementsOrFail(this.infoDialog.locator("p > b"), reservation_tagline);
   }
 
   @step("admin_reservations.Admin Checks Reservation User Info")
   async adminChecksReservationUserInfo() {
     await this.pages.customKeywords.findAndClickElementWithText(".label", "Tilan käyttäjän tiedot");
-    await this.pages.customKeywords.checkElementsText(
+    await expect(
       this.page.getByTestId("reservation__info--Sukunimi"),
-      this.state.adminBehalfLastnameFi
-    );
-    await this.pages.customKeywords.checkElementsText(
+      `The reserver's last name is ${this.state.adminBehalfLastnameFi}`
+    ).toHaveText(this.state.adminBehalfLastnameFi, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
+    await expect(
       this.page.getByTestId("reservation__info--Etunimi"),
-      ADMIN_BEHALF_FIRSTNAME_FI
-    );
+      `The reserver's first name is ${ADMIN_BEHALF_FIRSTNAME_FI}`
+    ).toHaveText(ADMIN_BEHALF_FIRSTNAME_FI, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
   }
 
   @step("admin_reservations.Admin Checks Reservation Maker Info")
   async adminChecksReservationMakerInfo() {
     await this.pages.customKeywords.findAndClickElementWithText(".label", "Varauksen tekijä");
-    await this.pages.customKeywords.checkElementsText(
+    await expect(
       this.page.getByTestId("reservation__info--Varauksen tekijä"),
-      BASIC_ADMIN_MALE.fullName
-    );
-    await this.pages.customKeywords.checkElementsText(
+      `The reservation was made by ${BASIC_ADMIN_MALE.fullName}`
+    ).toHaveText(BASIC_ADMIN_MALE.fullName, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
+    await expect(
       this.page.getByTestId("reservation__info--Sähköposti"),
-      BASIC_ADMIN_MALE.email
-    );
+      `The reservation maker's email is ${BASIC_ADMIN_MALE.email}`
+    ).toHaveText(BASIC_ADMIN_MALE.email, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
   }
 
   @step("admin_reservations.Admin Checks Reservation Info After Handling")
@@ -112,50 +148,50 @@ export class AdminReservations extends PageObject {
 
     // Check status if provided
     if (singlebooking_status !== "None") {
-      await this.pages.customKeywords.checkElementsText(
-        this.page.getByTestId("reservation_title_section__reservation_state"),
-        singlebooking_status
+      await expect(this.reservationState, `The reservation's state is ${singlebooking_status}`).toHaveText(
+        singlebooking_status,
+        { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
       );
     }
 
     // Check purpose if provided
     if (purpose_of_the_booking !== "None") {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Käyttötarkoitus"),
-        purpose_of_the_booking
-      );
+        `The purpose of use is ${purpose_of_the_booking}`
+      ).toHaveText(purpose_of_the_booking, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check description if provided
     if (singlebooking_description !== "None") {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Kuvaus"),
-        singlebooking_description
-      );
+        `The description is ${singlebooking_description}`
+      ).toHaveText(singlebooking_description, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check number of participants if provided
     if (singlebooking_number_of_participants !== "None") {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Osallistujamäärä"),
-        singlebooking_number_of_participants
-      );
+        `The number of participants is ${singlebooking_number_of_participants}`
+      ).toHaveText(singlebooking_number_of_participants, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check age group if provided
     if (singlebooking_age_group != null) {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Ikäryhmä"),
-        singlebooking_age_group
-      );
+        `The age group is ${singlebooking_age_group}`
+      ).toHaveText(singlebooking_age_group, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check reason of rejection if provided
     if (reason_of_rejection != null) {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Hylkäyksen syy"),
-        reason_of_rejection
-      );
+        `The reason for rejection is ${reason_of_rejection}`
+      ).toHaveText(reason_of_rejection, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
   }
 
@@ -178,52 +214,52 @@ export class AdminReservations extends PageObject {
 
     // Check status if provided
     if (singlebooking_status !== "None") {
-      await this.pages.customKeywords.checkElementsText(
-        this.page.getByTestId("reservation_title_section__reservation_state"),
-        singlebooking_status
+      await expect(this.reservationState, `The reservation's state is ${singlebooking_status}`).toHaveText(
+        singlebooking_status,
+        { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
       );
     }
 
     // Check purpose if provided
     if (purpose_of_the_booking !== "None") {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Käyttötarkoitus"),
-        purpose_of_the_booking
-      );
+        `The purpose of use is ${purpose_of_the_booking}`
+      ).toHaveText(purpose_of_the_booking, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check description if provided
     if (singlebooking_description !== "None") {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Kuvaus"),
-        singlebooking_description
-      );
+        `The description is ${singlebooking_description}`
+      ).toHaveText(singlebooking_description, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check number of participants if provided
     if (singlebooking_number_of_participants !== "None") {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Osallistujamäärä"),
-        singlebooking_number_of_participants
-      );
+        `The number of participants is ${singlebooking_number_of_participants}`
+      ).toHaveText(singlebooking_number_of_participants, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check age group if provided
     if (singlebooking_age_group != null) {
-      await this.pages.customKeywords.checkElementsText(
+      await expect(
         this.page.getByTestId("reservation__summary--Ikäryhmä"),
-        singlebooking_age_group
-      );
+        `The age group is ${singlebooking_age_group}`
+      ).toHaveText(singlebooking_age_group, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
   }
 
   @step("admin_reservations.Admin Checks Reservation Status")
   async adminChecksReservationStatus(status: string) {
-    // Check Elements Text waits until the page shows the status
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation_title_section__reservation_state"),
-      status
-    );
+    // The check waits until the page shows the status
+    await expect(this.reservationState).toHaveText(status, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("admin_reservations.Admin Saves Reservation Number")
@@ -272,7 +308,7 @@ export class AdminReservations extends PageObject {
   @step("admin_reservations.Admin Checks Reason For Subvention In Dialog")
   async adminChecksReasonForSubventionInDialog() {
     await this.pages.customKeywords.findTextFromElementsOrFail(
-      this.page.locator("#info-dialog").locator("p"),
+      this.infoDialog.locator("p"),
       JUSTIFICATION_FOR_SUBVENTION
     );
   }
@@ -316,17 +352,17 @@ export class AdminReservations extends PageObject {
   ) {
     // Click  ${type_of_reservation}
     // Type Text  id=ReservationDialog.startTime-hours  ${startTime-hours}
-    await this.page.locator('[id="TimeInput.startTime-hours"]').clear();
-    await this.page.locator('[id="TimeInput.startTime-hours"]').pressSequentially(startTime_hours);
+    await this.startHoursInput.clear();
+    await this.startHoursInput.pressSequentially(startTime_hours);
     // Type Text  id=ReservationDialog.startTime-minutes  00
-    await this.page.locator('[id="TimeInput.startTime-minutes"]').clear();
-    await this.page.locator('[id="TimeInput.startTime-minutes"]').pressSequentially("00");
+    await this.startMinutesInput.clear();
+    await this.startMinutesInput.pressSequentially("00");
     // Type Text  id=ReservationDialog.endTime-hours  ${endTime-hours}
-    await this.page.locator('[id="TimeInput.endTime-hours"]').clear();
-    await this.page.locator('[id="TimeInput.endTime-hours"]').pressSequentially(endTime_hours);
+    await this.endHoursInput.clear();
+    await this.endHoursInput.pressSequentially(endTime_hours);
     // Type Text  id=ReservationDialog.endTime-minutes  00
-    await this.page.locator('[id="TimeInput.endTime-minutes"]').clear();
-    await this.page.locator('[id="TimeInput.endTime-minutes"]').pressSequentially("00");
+    await this.endMinutesInput.clear();
+    await this.endMinutesInput.pressSequentially("00");
     await this.page.locator("#controlled-date-input__date").clear();
     await this.page.locator("#controlled-date-input__date").pressSequentially(date);
 
@@ -340,16 +376,16 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Closes Dialog Modal")
   async adminClosesDialogModal() {
-    await this.page.locator("#info-dialog").getByTestId("CreateReservationModal__cancel-reservation").click();
+    await this.infoDialog.getByTestId("CreateReservationModal__cancel-reservation").click();
     // waiting for the dialog to close
-    await expect(this.page.locator("#info-dialog")).toBeHidden();
+    await expect(this.infoDialog).toBeHidden();
   }
 
   /** Fails if the reservation modal stays open after submit/cancel. */
   @step("admin_reservations.Admin Verifies Reservation Modal Is Closed")
   async adminVerifiesReservationModalIsClosed() {
     // Saving the reservation closes the modal, so this waits for the save too
-    await expect(this.page.locator("#info-dialog"), "The reservation dialog closes").toBeHidden({ timeout: 15_000 });
+    await expect(this.infoDialog, "The reservation dialog closes").toBeHidden({ timeout: 15_000 });
   }
 
   // Reservation calendar
@@ -381,29 +417,25 @@ export class AdminReservations extends PageObject {
       level: "DEBUG",
     });
 
-    await this.page.locator('[id="TimeInput.startTime-hours"]').clear();
-    await this.page
-      .locator('[id="TimeInput.startTime-hours"]')
-      .pressSequentially(this.state.modifiedHourStarttimeSubventedReservation);
-    await this.page.locator('[id="TimeInput.startTime-minutes"]').clear();
-    await this.page.locator('[id="TimeInput.startTime-minutes"]').pressSequentially("00");
-    await this.page.locator('[id="TimeInput.endTime-hours"]').clear();
-    await this.page
-      .locator('[id="TimeInput.endTime-hours"]')
-      .pressSequentially(this.state.modifiedHourEndtimeSubventedReservation);
-    await this.page.locator('[id="TimeInput.endTime-minutes"]').clear();
-    await this.page.locator('[id="TimeInput.endTime-minutes"]').pressSequentially("00");
+    await this.startHoursInput.clear();
+    await this.startHoursInput.pressSequentially(this.state.modifiedHourStarttimeSubventedReservation);
+    await this.startMinutesInput.clear();
+    await this.startMinutesInput.pressSequentially("00");
+    await this.endHoursInput.clear();
+    await this.endHoursInput.pressSequentially(this.state.modifiedHourEndtimeSubventedReservation);
+    await this.endMinutesInput.clear();
+    await this.endMinutesInput.pressSequentially("00");
     await this.page.locator("#controlled-date-input__date").clear();
     await this.page
       .locator("#controlled-date-input__date")
       .pressSequentially(this.state.modifiedDateSubventedReservation);
     // The edit time dialog's own submit button
-    const submit = this.page.locator("#info-dialog").locator('button[type="submit"]');
+    const submit = this.infoDialog.locator('button[type="submit"]');
     await expect(submit, "The new time can be saved: it is free").toBeEnabled();
     await submit.focus();
     await submit.click();
     // Saving the new time closes the dialog
-    await expect(this.page.locator("#info-dialog")).toBeHidden({ timeout: 15_000 });
+    await expect(this.infoDialog).toBeHidden({ timeout: 15_000 });
     await this.pages.popups.checkAndCloseTheToast(ADMIN_TOAST_NEW_TIME_SAVED);
 
     // Not currently in use

@@ -55,10 +55,22 @@ import {
 
 /** The customer's workflow keywords: finding a unit, booking, paying, My bookings and applications. */
 export class AppUser extends PageObject {
+  /** The booking form's continue button */
+  private get continueButton() {
+    return this.page.getByTestId("reservation__button--continue");
+  }
+
   // Front page
   @step("app_user.User Navigates To Single Booking Page")
   async userNavigatesToSingleBookingPage() {
     await this.pages.topnav.navigateToSingleBookingPage();
+  }
+
+  /** Goes to single booking and searches for the unit */
+  @step("app_user.User Finds The Unit")
+  async userFindsTheUnit(nameoftheunit: string) {
+    await this.userNavigatesToSingleBookingPage();
+    await this.userUsesSearchToFindRightUnit(nameoftheunit);
   }
 
   @step("app_user.User Navigates To My Bookings")
@@ -193,18 +205,21 @@ export class AppUser extends PageObject {
     await this.pages.customKeywords.verifyReservationSlotExists(this.state.calendarTimeslot, this.state.englishDay);
   }
 
-  @step("app_user.User Fills The Reservation Info For Always Free Unit And Submits")
-  async userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits() {
-    // Checks that "jatka" button has been loaded
-    await expect(
-      this.page.getByTestId("reservation__button--continue"),
-      "The booking details page shows its continue button"
-    ).toBeVisible();
-    await this.pages.reservationUnitReserverInfo.checkApplicationCannotBeMadeWithoutInfo();
+  /** The reserver's contact info on the booking details page: the user's first and last name, email and phone */
+  @step("app_user.User Fills The Reserver Contact Info")
+  async userFillsTheReserverContactInfo() {
     await this.pages.reservationUnitReserverInfo.enterFirstName(this.testData.user.firstName);
     await this.pages.reservationUnitReserverInfo.enterLastName(this.testData.user.lastName);
     await this.pages.reservationUnitReserverInfo.enterEmail(this.testData.user.email);
     await this.pages.reservationUnitReserverInfo.enterPhoneNumber(this.testData.user.phone);
+  }
+
+  @step("app_user.User Fills The Reservation Info For Always Free Unit And Submits")
+  async userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits() {
+    // Checks that "jatka" button has been loaded
+    await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
+    await this.pages.reservationUnitReserverInfo.checkApplicationCannotBeMadeWithoutInfo();
+    await this.userFillsTheReserverContactInfo();
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
@@ -213,19 +228,13 @@ export class AppUser extends PageObject {
   async userFillsTheReservationInfoForUnitWithPaymentAndSubmits() {
     // Checks that "jatka" button has been loaded
     // Verify we are on the correct booking details page where user info can be given
-    await expect(
-      this.page.getByTestId("reservation__button--continue"),
-      "The booking details page shows its continue button"
-    ).toBeVisible();
+    await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.reservationUnitBookingDetails.typeTheDescriptionOfTheBooking(SINGLEBOOKING_DESCRIPTION);
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
-    await this.pages.reservationUnitReserverInfo.enterFirstName(this.testData.user.firstName);
-    await this.pages.reservationUnitReserverInfo.enterLastName(this.testData.user.lastName);
-    await this.pages.reservationUnitReserverInfo.enterEmail(this.testData.user.email);
-    await this.pages.reservationUnitReserverInfo.enterPhoneNumber(this.testData.user.phone);
+    await this.userFillsTheReserverContactInfo();
     await this.pages.reservationUnitReserverInfo.selectHomeCity(HOME_CITY);
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
@@ -234,10 +243,7 @@ export class AppUser extends PageObject {
   @step("app_user.User Fills Subvented Booking Details As Individual And Submits")
   async userFillsSubventedBookingDetailsAsIndividualAndSubmits(justification_for_not_paying: string) {
     // Checks that "jatka" button has been loaded
-    await expect(
-      this.page.getByTestId("reservation__button--continue"),
-      "The booking details page shows its continue button"
-    ).toBeVisible();
+    await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
@@ -246,10 +252,7 @@ export class AppUser extends PageObject {
     await this.pages.reservationUnitBookingDetails.clickToApplyForAFreeBooking();
     await this.pages.reservationUnitBookingDetails.typeJustificationForFreeOfCharge(justification_for_not_paying);
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
-    await this.pages.reservationUnitReserverInfo.enterFirstName(this.testData.user.firstName);
-    await this.pages.reservationUnitReserverInfo.enterLastName(this.testData.user.lastName);
-    await this.pages.reservationUnitReserverInfo.enterEmail(this.testData.user.email);
-    await this.pages.reservationUnitReserverInfo.enterPhoneNumber(this.testData.user.phone);
+    await this.userFillsTheReserverContactInfo();
     await this.pages.reservationUnitReserverInfo.selectHomeCity(HOME_CITY);
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
@@ -258,17 +261,11 @@ export class AppUser extends PageObject {
   @step("app_user.User Fills Noncancelable Booking Details As Individual And Submits")
   async userFillsNoncancelableBookingDetailsAsIndividualAndSubmits() {
     // Checks that "jatka" button has been loaded
-    await expect(
-      this.page.getByTestId("reservation__button--continue"),
-      "The booking details page shows its continue button"
-    ).toBeVisible();
+    await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.reservationUnitBookingDetails.typeTheDescriptionOfTheBooking(SINGLEBOOKING_DESCRIPTION);
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
-    await this.pages.reservationUnitReserverInfo.enterFirstName(this.testData.user.firstName);
-    await this.pages.reservationUnitReserverInfo.enterLastName(this.testData.user.lastName);
-    await this.pages.reservationUnitReserverInfo.enterEmail(this.testData.user.email);
-    await this.pages.reservationUnitReserverInfo.enterPhoneNumber(this.testData.user.phone);
+    await this.userFillsTheReserverContactInfo();
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
@@ -276,19 +273,13 @@ export class AppUser extends PageObject {
   @step("app_user.User Fills Info For Unit That Is Always Handled As Individual And Submits")
   async userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits() {
     // Checks that "jatka" button has been loaded
-    await expect(
-      this.page.getByTestId("reservation__button--continue"),
-      "The booking details page shows its continue button"
-    ).toBeVisible();
+    await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.reservationUnitBookingDetails.typeTheDescriptionOfTheBooking(SINGLEBOOKING_DESCRIPTION);
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
-    await this.pages.reservationUnitReserverInfo.enterFirstName(this.testData.user.firstName);
-    await this.pages.reservationUnitReserverInfo.enterLastName(this.testData.user.lastName);
-    await this.pages.reservationUnitReserverInfo.enterEmail(this.testData.user.email);
-    await this.pages.reservationUnitReserverInfo.enterPhoneNumber(this.testData.user.phone);
+    await this.userFillsTheReserverContactInfo();
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
@@ -296,20 +287,14 @@ export class AppUser extends PageObject {
   @step("app_user.User Fills Booking Details As Individual For Reservation With Access Code And Submits")
   async userFillsBookingDetailsAsIndividualForReservationWithAccessCodeAndSubmits() {
     // Checks that "jatka" button has been loaded
-    await expect(
-      this.page.getByTestId("reservation__button--continue"),
-      "The booking details page shows its continue button"
-    ).toBeVisible();
+    await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
     await this.pages.reservationUnitBookingDetails.selectThePurposeOfTheBooking(PURPOSE_OF_THE_BOOKING);
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.reservationUnitBookingDetails.clickAndSelectAgeGroupButton(AGEGROUP_OF_PERSONS);
     await this.pages.reservationUnitBookingDetails.typeTheDescriptionOfTheBooking(SINGLEBOOKING_DESCRIPTION);
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
-    await this.pages.reservationUnitReserverInfo.enterFirstName(this.testData.user.firstName);
-    await this.pages.reservationUnitReserverInfo.enterLastName(this.testData.user.lastName);
-    await this.pages.reservationUnitReserverInfo.enterEmail(this.testData.user.email);
-    await this.pages.reservationUnitReserverInfo.enterPhoneNumber(this.testData.user.phone);
+    await this.userFillsTheReserverContactInfo();
     await this.pages.reservationUnitReserverInfo.selectHomeCity(HOME_CITY);
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
@@ -502,10 +487,7 @@ export class AppUser extends PageObject {
     await log(this.state.timeOfQuickReservationModified);
     await log(this.state.timeOfQuickReservationMinusTModified);
 
-    await expect(
-      this.page.getByTestId("reservation__button--continue"),
-      "The continue button is enabled: the reservation time has changed"
-    ).toBeEnabled();
+    await expect(this.continueButton, "The continue button is enabled: the reservation time has changed").toBeEnabled();
     await this.pages.reservationCalendar.clickContinueButton();
   }
 
@@ -524,6 +506,20 @@ export class AppUser extends PageObject {
       unitname_mybookings,
       time_of_quick_reservation_minusT
     );
+  }
+
+  /** Goes to My bookings and opens the upcoming booking of the unit at that time */
+  @step("app_user.User Opens The Booking In My Bookings")
+  async userOpensTheBookingInMyBookings(unitname: string, reservationtime: string) {
+    await this.pages.topnav.navigateToMyBookings();
+    await this.userCanSeeUpcomingBookingInListAndClicksIt(unitname, reservationtime);
+  }
+
+  /** Goes to My bookings from the mobile menu and opens the upcoming booking of the unit at that time */
+  @step("app_user.User Opens The Booking In My Bookings Mobile")
+  async userOpensTheBookingInMyBookingsMobile(unitname: string, reservationtime: string) {
+    await this.pages.topnav.navigateToMyBookingsMobile();
+    await this.userCanSeeUpcomingBookingInListAndClicksIt(unitname, reservationtime);
   }
 
   @step("app_user.User Can See Upcoming Booking In List And Clicks It")
@@ -557,6 +553,15 @@ export class AppUser extends PageObject {
   }
 
   // Reservations
+  /** The booker's contact info on the reservation's page: the user's email, first and last name and phone */
+  @step("app_user.User Checks The Booker Info")
+  async userChecksTheBookerInfo() {
+    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
+    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
+    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
+    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
+  }
+
   @step("app_user.User Checks The Paid Reservation Info Is Right In Reservations")
   async userChecksThePaidReservationInfoIsRightInReservations(
     booking_status: string,
@@ -569,10 +574,7 @@ export class AppUser extends PageObject {
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
     await this.pages.mybookings.checkReservationStatus(booking_status);
     await this.pages.mybookings.checkReservationsPaymentStatus(payment_status);
-    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
-    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
-    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
-    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
+    await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkReservationPurpose(PURPOSE_OF_THE_BOOKING);
@@ -591,10 +593,7 @@ export class AppUser extends PageObject {
 
     await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
     await this.pages.mybookings.checkReservationStatus(booking_status);
-    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
-    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
-    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
-    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
+    await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkReservationPurpose(PURPOSE_OF_THE_BOOKING);
@@ -613,10 +612,7 @@ export class AppUser extends PageObject {
 
     await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
     await this.pages.mybookings.checkReservationStatus(booking_status);
-    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
-    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
-    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
-    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
+    await this.userChecksTheBookerInfo();
   }
 
   @step("app_user.User Checks Booking Info In Reservations With Access Code")
@@ -632,10 +628,7 @@ export class AppUser extends PageObject {
 
     await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
     await this.pages.mybookings.checkReservationStatus(booking_status);
-    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
-    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
-    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
-    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
+    await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationAccessCode(access_code);
   }
 
@@ -651,11 +644,7 @@ export class AppUser extends PageObject {
 
     await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
     await this.pages.mybookings.checkReservationStatus(booking_status);
-    await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
-    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
-    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
-    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
-    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
+    await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkReservationPurpose(PURPOSE_OF_THE_BOOKING);
@@ -666,10 +655,7 @@ export class AppUser extends PageObject {
   async userChecksBookingInfoInReservationsForNoncancelableBooking() {
     await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
     await this.pages.mybookings.checkReservationStatus(MYBOOKINGS_STATUS_CONFIRMED);
-    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
-    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
-    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
-    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
+    await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkCancelButtonIsNotFoundInReservations();
@@ -691,10 +677,7 @@ export class AppUser extends PageObject {
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkReservationAgeGroup(AGEGROUP_OF_PERSONS);
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
-    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
-    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
-    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
-    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
+    await this.userChecksTheBookerInfo();
   }
 
   @step("app_user.User Checks The Rejected Reservation Info Is Right After Admin Handling")
@@ -711,10 +694,7 @@ export class AppUser extends PageObject {
     await this.pages.mybookings.checkReservationPurpose(PURPOSE_OF_THE_BOOKING);
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
-    await this.pages.mybookings.checkReservationBookerFirstName(this.testData.user.firstName);
-    await this.pages.mybookings.checkReservationBookerLastName(this.testData.user.lastName);
-    await this.pages.mybookings.checkReservationBookerPhone(this.testData.user.phone);
-    await this.pages.mybookings.checkReservationBookerEmail(this.testData.user.email);
+    await this.userChecksTheBookerInfo();
   }
 
   // Calendar usage
@@ -910,6 +890,13 @@ export class AppUser extends PageObject {
   @step("app_user.User Navigates To Single Booking Page Mobile")
   async userNavigatesToSingleBookingPageMobile() {
     await this.pages.topnav.navigateToSingleBookingPageMobile();
+  }
+
+  /** Goes to single booking from the mobile menu and searches for the unit */
+  @step("app_user.User Finds The Unit Mobile")
+  async userFindsTheUnitMobile(nameoftheunit: string) {
+    await this.userNavigatesToSingleBookingPageMobile();
+    await this.userUsesSearchToFindRightUnit(nameoftheunit);
   }
 
   @step("app_user.User Checks Cancelled Booking Is Found Mobile")

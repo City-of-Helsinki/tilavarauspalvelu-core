@@ -113,6 +113,9 @@ environment.
   shows the tree of keywords a test ran. The tests get the page objects as fixtures, `async ({ appCommon, appUser })
   => { await appCommon.userLogsInWithSuomiFi(); … }`, and a page object calls another one's keywords through
   `this.pages`.
+- A test tells its story in sections, `await test.step("User pays the reservation", async () => { … })`, which the
+  report shows as collapsible steps with the keywords inside. Keyword steps are boxed: a failure points to the line
+  that called the keyword, and the failing step inside it still shows in the report's step tree.
 - Keywords act on `this.page` with Playwright's locators, actions and `expect`. `log()` adds a message to the
   report (a WARN message also to the test's annotations). Timeouts are milliseconds, like Playwright's.
 - Texts, URLs, units and selectors are constants, imported by name: `import { URL_TEST } from

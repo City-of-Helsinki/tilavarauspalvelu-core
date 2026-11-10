@@ -1,13 +1,13 @@
 /** A resource file with keywords. */
 import { test } from "@playwright/test";
 import { appendFile } from "node:fs/promises";
+import { setTimeout } from "node:timers/promises";
 import type { Locator } from "@playwright/test";
 import { elementsOf } from "../../lib/locators";
-import { retry } from "../../lib/retry";
 import { errorMessage, expect, formatValue, rethrowSkip, step, log } from "../../lib/runtime";
 import { PageObject } from "../page-object";
 import { python_keywords } from "../Resources/python_keywords";
-import { BROWSER_TIMEOUT_GLOBAL, CONTENT_WAIT_TIMEOUT } from "./variables";
+import { BROWSER_TIMEOUT_GLOBAL, TEXT_CHECK_TIMEOUT } from "./variables";
 
 /** The options of Check Elements Text and Check Element Contains Text */
 interface CheckTextOptions {
@@ -41,6 +41,8 @@ export class CustomKeywords extends PageObject {
    * Clicks an element and waits for navigation to complete with retry logic.
    * Handles flaky navigation by retrying click if target element doesn't appear.
    * Verifies navigation by checking for a target element on the destination page.
+   * A click that opened another page is not repeated, as the element to click was on the page it left: the keyword
+   * fails at once, and the caller can recover, e.g. by opening the first page again.
    */
   @step("custom_keywords.Click And Wait For Navigation With Retry")
   async clickAndWaitForNavigationWithRetry(
@@ -51,38 +53,41 @@ export class CustomKeywords extends PageObject {
   ) {
     // Get URL before click to detect if navigation happened
     const url_before = this.page.url();
-    let attempt = 0;
 
     // A click whose target element doesn't show is repeated after 2 s, at most max_attempts clicks in all
-    await retry(max_attempts, 2000, async () => {
-      attempt++;
+    for (let attempt = 1; ; attempt++) {
       await log(`Attempt ${attempt} of ${max_attempts}: Clicking ${formatValue(click_selector)}`, { level: "DEBUG" });
-
-      // The click scrolls the element into view and waits until it's stable and enabled
-      await this.locate(click_selector).focus();
-      await this.locate(click_selector).click();
-
-      // Wait for target element to appear (indicates successful navigation)
       try {
+        // The click scrolls the element into view and waits until it's stable and enabled
+        await this.locate(click_selector).focus();
+        await this.locate(click_selector).click();
+
+        // Wait for target element to appear (indicates successful navigation)
         await expect(
           this.locate(target_element_selector),
           `${formatValue(target_element_selector)} shows after the click`
         ).toBeVisible({ timeout: nav_timeout });
+        await log(`✅ Successfully navigated on attempt ${attempt}`, { level: "DEBUG" });
+        return;
       } catch (err) {
-        // Target element not found: log whether the page changed, then retry if there are attempts left
+        // The click or its target element failed: log whether the page changed, then retry if there are attempts left
         const url_after = this.page.url();
         await log(
           url_after === url_before
             ? `⚠️ Navigation did not occur on attempt ${attempt}, URL unchanged`
             : `⚠️ URL changed to ${url_after} but target element not found`
         );
-        if (attempt < max_attempts) {
-          await log("Waiting before retry...");
+        if (attempt >= max_attempts) {
+          throw err;
         }
-        throw err;
+        if (url_after !== url_before && (await this.locate(click_selector).count()) === 0) {
+          await log("The clicked element is not on this page, so the click is not repeated");
+          throw err;
+        }
+        await log("Waiting before retry...");
       }
-      await log(`✅ Successfully navigated on attempt ${attempt}`, { level: "DEBUG" });
-    });
+      await setTimeout(2000);
+    }
   }
 
   /**
@@ -555,12 +560,12 @@ Differences:
         return false;
       }
     }
-    // expect waits for the element and retries until its text matches, for 10 s plus CONTENT_WAIT_TIMEOUT. It
-    // compares the text with its whitespace normalized.
+    // expect waits for the element and retries until its text matches, for TEXT_CHECK_TIMEOUT. It compares the text
+    // with its whitespace normalized.
     await expect(this.locate(Element), message ?? undefined).toHaveText(Expected_text, {
       ignoreCase: ignore_case,
       useInnerText: true,
-      timeout: 10_000 + CONTENT_WAIT_TIMEOUT,
+      timeout: TEXT_CHECK_TIMEOUT,
     });
     return true;
   }
