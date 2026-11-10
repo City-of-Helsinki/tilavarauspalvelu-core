@@ -4,14 +4,22 @@ import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { python_keywords } from "../../Resources/python_keywords";
 import { MYBOOKINGS_NO_UPCOMING_FI } from "../../Resources/texts_FI";
-import { CONTENT_WAIT_TIMEOUT } from "../../Resources/variables";
+import { CONTENT_WAIT_TIMEOUT, TEXT_CHECK_TIMEOUT } from "../../Resources/variables";
 import type { PendingResponse } from "./quick_reservation";
 
 /** My bookings: the booking lists, and a booking's page with cancelling and changing the time. */
 export class Mybookings extends PageObject {
+  /** The reservation page's content */
+  private get reservationContent() {
+    return this.page.getByTestId("reservation__content");
+  }
+
   @step("mybookings.Check My Bookings H1")
   async checkMyBookingsH1(bookingstatus: string) {
-    await this.pages.customKeywords.checkElementsText("h1", bookingstatus);
+    await expect(this.page.locator("h1")).toHaveText(bookingstatus, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   // Cancel
@@ -45,7 +53,7 @@ export class Mybookings extends PageObject {
   @step("mybookings.Check Cancel Button Is Not Found In Reservations")
   async checkCancelButtonIsNotFoundInReservations() {
     // The reservation's content is rendered with its buttons, so the check sees the page
-    await expect(this.page.getByTestId("reservation__content")).toBeVisible();
+    await expect(this.reservationContent).toBeVisible();
     await expect(
       this.page.getByTestId("reservation-detail__button--cancel"),
       "The reservation has no cancel button"
@@ -65,110 +73,112 @@ export class Mybookings extends PageObject {
   @step("mybookings.Check Reservation Status")
   async checkReservationStatus(reservation_status: string) {
     // Kept on purpose: after a cancellation the page loads again, and the status check alone waits only 20 s
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
-    await this.pages.customKeywords.checkElementsText(this.page.getByTestId("reservation__status"), reservation_status);
+    await this.reservationContent.waitFor({ state: "visible" });
+    await expect(this.page.getByTestId("reservation__status")).toHaveText(reservation_status, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("mybookings.Check Reservations Payment Status")
   async checkReservationsPaymentStatus(reservation_payment_status: string) {
-    await this.page.getByTestId("reservation__content").waitFor({ state: "visible" });
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__payment-status"),
-      reservation_payment_status
-    );
+    await this.reservationContent.waitFor({ state: "visible" });
+    await expect(this.page.getByTestId("reservation__payment-status")).toHaveText(reservation_payment_status, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("mybookings.Check Reservation Number From H1 Text")
   async checkReservationNumberFromH1Text(booking_num: string) {
-    await this.pages.customKeywords.checkNumberFromTextIsEqualTo(
-      this.page.getByTestId("reservation__content").locator("h1"),
-      booking_num
-    );
+    await this.pages.customKeywords.checkNumberFromTextIsEqualTo(this.reservationContent.locator("h1"), booking_num);
   }
 
   @step("mybookings.Check Number Of Participants")
   async checkNumberOfParticipants(reservation_number_participants: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__numPersons"),
-      reservation_number_participants
+    await expect(this.page.getByTestId("reservation__summary-fields__numPersons")).toHaveText(
+      reservation_number_participants,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
     );
   }
 
   @step("mybookings.Check Reservation Time")
   async checkReservationTime(reservation_time: string) {
-    await this.pages.customKeywords.checkElementsText(this.page.getByTestId("reservation__time"), reservation_time);
+    await expect(this.page.getByTestId("reservation__time")).toHaveText(reservation_time, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("mybookings.Check Reservation Description")
   async checkReservationDescription(reservation_description: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__description"),
-      reservation_description
+    await expect(this.page.getByTestId("reservation__summary-fields__description")).toHaveText(
+      reservation_description,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
     );
   }
 
   @step("mybookings.Check Reservation Booker Name")
   async checkReservationBookerName(reservation_bookerName: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__reservee-name"),
-      reservation_bookerName
+    await expect(this.page.getByTestId("reservation__summary-fields__reservee-name")).toHaveText(
+      reservation_bookerName,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
     );
   }
 
   @step("mybookings.Check Reservation Booker First Name")
   async checkReservationBookerFirstName(reservation_bookerFirstName: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__reserveeFirstName"),
-      reservation_bookerFirstName
+    await expect(this.page.getByTestId("reservation__summary-fields__reserveeFirstName")).toHaveText(
+      reservation_bookerFirstName,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
     );
   }
 
   @step("mybookings.Check Reservation Booker Last Name")
   async checkReservationBookerLastName(reservation_bookerLastName: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__reserveeLastName"),
-      reservation_bookerLastName
+    await expect(this.page.getByTestId("reservation__summary-fields__reserveeLastName")).toHaveText(
+      reservation_bookerLastName,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
     );
   }
 
   @step("mybookings.Check Reservation Booker Phone")
   async checkReservationBookerPhone(reservation_bookerPhone: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__reserveePhone"),
-      reservation_bookerPhone
+    await expect(this.page.getByTestId("reservation__summary-fields__reserveePhone")).toHaveText(
+      reservation_bookerPhone,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
     );
   }
 
   @step("mybookings.Check Reservation Booker Email")
   async checkReservationBookerEmail(reservation_bookerEmail: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__reserveeEmail"),
-      reservation_bookerEmail
+    await expect(this.page.getByTestId("reservation__summary-fields__reserveeEmail")).toHaveText(
+      reservation_bookerEmail,
+      { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT }
     );
   }
 
   @step("mybookings.Check Reservation Purpose")
   async checkReservationPurpose(reservation_purpose: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__purpose"),
-      reservation_purpose
-    );
+    await expect(this.page.getByTestId("reservation__summary-fields__purpose")).toHaveText(reservation_purpose, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("mybookings.Check Reservation Age Group")
   async checkReservationAgeGroup(age_group: string) {
-    await this.pages.customKeywords.checkElementsText(
-      this.page.getByTestId("reservation__summary-fields__ageGroup"),
-      age_group
-    );
+    await expect(this.page.getByTestId("reservation__summary-fields__ageGroup")).toHaveText(age_group, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("mybookings.Check Reservation Access Code")
   async checkReservationAccessCode(access_code: string) {
-    await this.pages.customKeywords.checkElementContainsText(
-      this.page.getByTestId("reservation__reservation-info-card__accessType"),
-      access_code
-    );
+    await expect(this.page.getByTestId("reservation__reservation-info-card__accessType")).toContainText(access_code, {
+      useInnerText: true,
+    });
   }
 
   // Tablist
@@ -335,7 +345,7 @@ export class Mybookings extends PageObject {
     const button_element = container.getByTestId("reservation-card__button--goto-reservation");
     await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
       button_element,
-      this.page.getByTestId("reservation__content"),
+      this.reservationContent,
       /* max_attempts= */ 2,
       /* nav_timeout= */ 20_000
     );

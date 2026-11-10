@@ -1,5 +1,4 @@
 /** Desktop browser tests for Admin functionality */
-import { log } from "../lib/runtime";
 import { test } from "./fixtures";
 import {
   ADMIN_ROLE_ADMIN,
@@ -69,75 +68,92 @@ test.describe(
 
         await login.loginDjangoAdmin(testData.djangoAdmin.djangoUsername);
 
-        await log("Django admin changes permissions for admin user to notification manager");
-        await djangoAdmin.adminNavigatesToGeneralRolePage();
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_NOTIFICATION_MANAGER);
-        await djangoAdmin.adminSavesChanges();
+        await test.step("Django admin changes permissions for admin user to notification manager", async () => {
+          await djangoAdmin.adminNavigatesToGeneralRolePage();
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_NOTIFICATION_MANAGER);
+          await djangoAdmin.adminSavesChanges();
 
-        // Switch to Chromium browser for app admin checks
-        await session.switchTo(state.browserUserSide);
-        await log("Checking permissions");
-        await appCommon.permissionTargetAdminLogsInWithSuomiFi();
-        await appAdmin.adminChecksTopNavigationForNotificationManager();
+          // Switch to Chromium browser for app admin checks
+          await session.switchTo(state.browserUserSide);
+        });
 
-        await session.switchTo(state.browserAdminSide);
+        await test.step("Checking permissions", async () => {
+          await appCommon.permissionTargetAdminLogsInWithSuomiFi();
+          await appAdmin.adminChecksTopNavigationForNotificationManager();
 
-        await log("Django admin changes permissions to viewer");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_VIEWER);
-        await djangoAdmin.adminSavesChanges();
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForViewer();
-        await appAdmin.adminNavigatesToOwnUnitsAndSelectsUnitGroup(UNIT_LOCATION);
-        await appAdmin.adminChecksThatReservationCannotBeMade();
+          await session.switchTo(state.browserAdminSide);
+        });
 
-        await session.switchTo(state.browserAdminSide);
+        await test.step("Django admin changes permissions to viewer", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_VIEWER);
+          await djangoAdmin.adminSavesChanges();
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
 
-        await log("Django admin changes permissions to reserver");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_RESERVER);
-        await djangoAdmin.adminSavesChanges();
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForViewer();
+          await appAdmin.adminNavigatesToOwnUnitsAndSelectsUnitGroup(UNIT_LOCATION);
+          await appAdmin.adminChecksThatReservationCannotBeMade();
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForReserver();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+          await session.switchTo(state.browserAdminSide);
+        });
 
-        await session.switchTo(state.browserAdminSide);
-        await log("Django admin changes permissions to handler");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_HANDLER);
-        await djangoAdmin.adminSavesChanges();
+        await test.step("Django admin changes permissions to reserver", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_RESERVER);
+          await djangoAdmin.adminSavesChanges();
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForHandler();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
 
-        await session.switchTo(state.browserAdminSide);
-        await log("Django admin changes permissions to admin");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_ADMIN);
-        await djangoAdmin.adminSavesChanges();
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForReserver();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForAdmin();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+          await session.switchTo(state.browserAdminSide);
+        });
+
+        await test.step("Django admin changes permissions to handler", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_HANDLER);
+          await djangoAdmin.adminSavesChanges();
+
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
+
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForHandler();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
+
+          await session.switchTo(state.browserAdminSide);
+        });
+
+        await test.step("Django admin changes permissions to admin", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_ADMIN);
+          await djangoAdmin.adminSavesChanges();
+
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
+
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForAdmin();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
+        });
       }
     );
 
@@ -152,66 +168,80 @@ test.describe(
 
         await login.loginDjangoAdmin(testData.djangoAdmin.djangoUsername);
 
-        await log("Django admin checks that notification manager permission is not present");
-        await djangoAdmin.adminNavigatesToUnitRolePage();
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChecksPermissionIsNotPresent(ADMIN_ROLE_NOTIFICATION_MANAGER);
+        await test.step("Django admin checks that notification manager permission is not present", async () => {
+          await djangoAdmin.adminNavigatesToUnitRolePage();
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChecksPermissionIsNotPresent(ADMIN_ROLE_NOTIFICATION_MANAGER);
+        });
 
-        await log("Django admin changes permissions to viewer");
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_VIEWER);
-        await djangoAdmin.adminSavesChanges();
-        // Switch to Chromium browser for app admin checks
-        await session.switchTo(state.browserUserSide);
+        await test.step("Django admin changes permissions to viewer", async () => {
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_VIEWER);
+          await djangoAdmin.adminSavesChanges();
+          // Switch to Chromium browser for app admin checks
+          await session.switchTo(state.browserUserSide);
+        });
 
-        await log("Checking permissions for viewer");
-        await appCommon.permissionTargetAdminLogsInWithSuomiFi();
-        await appAdmin.adminChecksTopNavigationForViewerWithUnitPermissions();
-        await appAdmin.adminNavigatesToOwnUnitsAndSelectsUnitGroup(UNIT_LOCATION);
-        await appAdmin.adminChecksThatReservationCannotBeMade();
+        await test.step("Checking permissions for viewer", async () => {
+          await appCommon.permissionTargetAdminLogsInWithSuomiFi();
+          await appAdmin.adminChecksTopNavigationForViewerWithUnitPermissions();
+          await appAdmin.adminNavigatesToOwnUnitsAndSelectsUnitGroup(UNIT_LOCATION);
+          await appAdmin.adminChecksThatReservationCannotBeMade();
 
-        await session.switchTo(state.browserAdminSide);
+          await session.switchTo(state.browserAdminSide);
+        });
 
-        await log("Django admin changes permissions to reserver");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_RESERVER);
-        await djangoAdmin.adminSavesChanges();
+        await test.step("Django admin changes permissions to reserver", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_RESERVER);
+          await djangoAdmin.adminSavesChanges();
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForReserverWithUnitPermissions();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
 
-        await session.switchTo(state.browserAdminSide);
-        await log("Django admin changes permissions to handler");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_HANDLER);
-        await djangoAdmin.adminSavesChanges();
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForReserverWithUnitPermissions();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForHandlerWithUnitPermissions();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+          await session.switchTo(state.browserAdminSide);
+        });
 
-        await session.switchTo(state.browserAdminSide);
-        await log("Django admin changes permissions to admin");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_ADMIN);
-        await djangoAdmin.adminSavesChanges();
+        await test.step("Django admin changes permissions to handler", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_HANDLER);
+          await djangoAdmin.adminSavesChanges();
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForAdminWithUnitPermissions();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
+
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForHandlerWithUnitPermissions();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
+
+          await session.switchTo(state.browserAdminSide);
+        });
+
+        await test.step("Django admin changes permissions to admin", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_ADMIN);
+          await djangoAdmin.adminSavesChanges();
+
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
+
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForAdminWithUnitPermissions();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
+        });
       }
     );
 
@@ -226,67 +256,82 @@ test.describe(
 
         await login.loginDjangoAdmin(testData.djangoAdmin.djangoUsername);
 
-        await log("Django admin checks that notification manager permission is not present");
-        await djangoAdmin.adminNavigatesToUnitRolePage();
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChecksPermissionIsNotPresent(ADMIN_ROLE_NOTIFICATION_MANAGER);
+        await test.step("Django admin checks that notification manager permission is not present", async () => {
+          await djangoAdmin.adminNavigatesToUnitRolePage();
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChecksPermissionIsNotPresent(ADMIN_ROLE_NOTIFICATION_MANAGER);
 
-        // Switch to Chromium browser for app admin checks
-        await log("Django admin changes permissions to viewer");
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_VIEWER);
-        await djangoAdmin.adminSavesChanges();
-        // Switch to Chromium browser for app admin checks
-        await session.switchTo(state.browserUserSide);
+          // Switch to Chromium browser for app admin checks
+        });
 
-        await log("Checking permissions for viewer");
-        await appCommon.permissionTargetAdminLogsInWithSuomiFi();
-        await appAdmin.adminChecksTopNavigationForViewerWithGroupUnitPermissions();
-        await appAdmin.adminNavigatesToOwnUnitsAndSelectsUnitGroup(UNIT_LOCATION);
-        await appAdmin.adminChecksThatReservationCannotBeMade();
+        await test.step("Django admin changes permissions to viewer", async () => {
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_VIEWER);
+          await djangoAdmin.adminSavesChanges();
+          // Switch to Chromium browser for app admin checks
+          await session.switchTo(state.browserUserSide);
+        });
 
-        await session.switchTo(state.browserAdminSide);
+        await test.step("Checking permissions for viewer", async () => {
+          await appCommon.permissionTargetAdminLogsInWithSuomiFi();
+          await appAdmin.adminChecksTopNavigationForViewerWithGroupUnitPermissions();
+          await appAdmin.adminNavigatesToOwnUnitsAndSelectsUnitGroup(UNIT_LOCATION);
+          await appAdmin.adminChecksThatReservationCannotBeMade();
 
-        await log("Django admin changes permissions to reserver");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_RESERVER);
-        await djangoAdmin.adminSavesChanges();
+          await session.switchTo(state.browserAdminSide);
+        });
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForReserverWithGroupUnitPermissions();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+        await test.step("Django admin changes permissions to reserver", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_RESERVER);
+          await djangoAdmin.adminSavesChanges();
 
-        await session.switchTo(state.browserAdminSide);
-        await log("Django admin changes permissions to handler");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_HANDLER);
-        await djangoAdmin.adminSavesChanges();
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForHandlerWithGroupUnitPermissions();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForReserverWithGroupUnitPermissions();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
 
-        await session.switchTo(state.browserAdminSide);
-        await log("Django admin changes permissions to admin");
-        await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
-        await djangoAdmin.adminClicksFirstUser();
-        await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_ADMIN);
-        await djangoAdmin.adminSavesChanges();
+          await session.switchTo(state.browserAdminSide);
+        });
 
-        await session.switchTo(state.browserUserSide);
-        await appCommon.reloadPage();
-        await log("Checking permissions");
-        await appAdmin.adminChecksTopNavigationForAdminWithGroupUnitPermissions();
-        await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
-        await adminReservations.adminClosesDialogModal();
+        await test.step("Django admin changes permissions to handler", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_HANDLER);
+          await djangoAdmin.adminSavesChanges();
+
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
+
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForHandlerWithGroupUnitPermissions();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
+
+          await session.switchTo(state.browserAdminSide);
+        });
+
+        await test.step("Django admin changes permissions to admin", async () => {
+          await djangoAdmin.adminSearchesTheUserByEmail(testData.permissionTarget.email);
+          await djangoAdmin.adminClicksFirstUser();
+          await djangoAdmin.adminChangesPermissions(ADMIN_ROLE_ADMIN);
+          await djangoAdmin.adminSavesChanges();
+
+          await session.switchTo(state.browserUserSide);
+          await appCommon.reloadPage();
+        });
+
+        await test.step("Checking permissions", async () => {
+          await appAdmin.adminChecksTopNavigationForAdminWithGroupUnitPermissions();
+          await appAdmin.adminClicksMakeReservationAndChecksDialogOpens();
+          await adminReservations.adminClosesDialogModal();
+        });
       }
     );
   }

@@ -154,6 +154,26 @@ test.describe("Runtime", () => {
     }
   });
 
+  test("A keyword's error is reported at the line that called the keyword", async () => {
+    const failure = new Error("Keyword failed");
+    const marker = new Error("The keyword is called two lines below");
+    try {
+      await new FailingKeywords().failWith(failure);
+    } catch {
+      // The step that the error failed in is checked below
+    }
+    const callLine = Number(/runtime\.spec\.ts:(\d+):/.exec(marker.stack ?? "")?.[1]) + 2;
+    // Playwright keeps the step that an error failed in on the error, under a private symbol. The report shows the
+    // step at its stack's first frame and the error at its boxed stack's first frame. These are Playwright's
+    // internals: if an upgrade changes them, check where a failing keyword shows in a report, then update this test.
+    const failedStep = Object.getOwnPropertySymbols(failure)
+      .map((symbol) => Reflect.get(failure, symbol) as { stack?: unknown[]; boxedStack?: unknown[] } | undefined)
+      .find((step) => step?.boxedStack != null);
+    const callerFrame = { file: expect.stringContaining("runtime.spec.ts"), line: callLine };
+    expect(failedStep?.stack?.[0]).toMatchObject(callerFrame);
+    expect(failedStep?.boxedStack?.[0]).toMatchObject(callerFrame);
+  });
+
   test("Date and time keywords format like the Robot suite", async () => {
     const { dataModification, state } = new Pages();
     const [formatted, minusT] = await dataModification.setInfoCardDurationTimeInfo("11.30", "5.12.2023");
@@ -414,12 +434,13 @@ test.describe("Runtime", () => {
   });
 
   testWithBrowser("Navigation and text helpers wait for the page", async ({ browser, context, page }, info) => {
-    // The list and the URL change 300 ms late, like a page that is still rendering
+    // The list and the URL change 300 ms late, like a page that is still rendering. The push button counts its clicks.
     const server = createServer((request, response) => {
       if (request.url === "/") {
         response.writeHead(200, { "content-type": "text/html" });
         response.end(`
-          <button id="push" onclick="setTimeout(() => history.pushState({}, '', '/pushed'), 300)">Push</button>
+          <button id="push" onclick="this.dataset.clicks = Number(this.dataset.clicks ?? 0) + 1;
+            setTimeout(() => history.pushState({}, '', '/pushed'), 300)">Push</button>
           <a id="next" href="/next">Seuraava</a>
           <ul id="list"><li> Yksi </li><li class="leaving">Poistuva</li></ul>
           <script>
@@ -452,6 +473,17 @@ test.describe("Runtime", () => {
       // A full navigation, whose target element shows up after the page has loaded
       await customKeywords.clickAndWaitForNavigationWithRetry("id=next", "id=target", 2, 5000);
       expect(page.url()).toBe(`http://127.0.0.1:${port}/next`);
+      // A click that opened another page is not repeated, as the element to click was on the page it left
+      await page.goto(`http://127.0.0.1:${port}/`);
+      const started = Date.now();
+      const left = await failureOf(customKeywords.clickAndWaitForNavigationWithRetry("id=next", "id=missing", 3, 1000));
+      expect(errorMessage(left)).toContain("id=missing shows after the click");
+      expect(Date.now() - started).toBeLessThan(5000);
+      // A click that changed the URL but kept the element on the page is repeated
+      await page.goto(`http://127.0.0.1:${port}/`);
+      const kept = await failureOf(customKeywords.clickAndWaitForNavigationWithRetry("id=push", "id=missing", 2, 500));
+      expect(errorMessage(kept)).toContain("id=missing shows after the click");
+      await expect(page.locator("id=push")).toHaveAttribute("data-clicks", "2");
     } finally {
       server.closeAllConnections();
       server.close();

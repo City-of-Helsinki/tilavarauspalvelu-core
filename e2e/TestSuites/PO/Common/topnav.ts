@@ -40,6 +40,11 @@ async function closeMobileMenu(page: Page): Promise<void> {
 }
 
 export class Topnav extends PageObject {
+  /** The page header */
+  private get header() {
+    return this.page.locator("header");
+  }
+
   @step("topnav.Click Login")
   async clickLogin() {
     await this.page.locator("#login").click();
@@ -81,14 +86,14 @@ export class Topnav extends PageObject {
   @step("topnav.Navigate To Single Booking Page")
   async navigateToSingleBookingPage() {
     await this.pages.customKeywords.clickAndWaitForPage(
-      this.page.locator("header").getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
+      this.header.getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
       "/search"
     );
   }
 
   @step("topnav.Navigate To My Bookings")
   async navigateToMyBookings() {
-    await this.page.locator("header").getByRole("link", { name: MYBOOKINGS_FI, exact: true }).click();
+    await this.header.getByRole("link", { name: MYBOOKINGS_FI, exact: true }).click();
 
     // Confirms page is loaded
     await this.pages.mybookings.checkMyBookingsH1(MYBOOKINGS_FI);
@@ -97,13 +102,13 @@ export class Topnav extends PageObject {
 
   @step("topnav.Navigate To Recurring Booking Page")
   async navigateToRecurringBookingPage() {
-    await this.page.locator("header").getByRole("link", { name: RECURRING_BOOKINGS_FI, exact: true }).click();
+    await this.header.getByRole("link", { name: RECURRING_BOOKINGS_FI, exact: true }).click();
     await this.page.waitForURL((url) => url.pathname === "/recurring");
   }
 
   @step("topnav.Navigate To My Applications")
   async navigateToMyApplications() {
-    await this.page.locator("header").getByRole("link", { name: MYAPPLICATIONS_FI, exact: true }).click();
+    await this.header.getByRole("link", { name: MYAPPLICATIONS_FI, exact: true }).click();
     await this.page.waitForURL((url) => url.pathname === "/applications");
   }
 
@@ -154,7 +159,7 @@ export class Topnav extends PageObject {
   async navigateToSingleBookingPageMobile() {
     await this.page.locator("#Menu").click();
     await this.pages.customKeywords.clickAndWaitForPage(
-      this.page.locator("header").getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
+      this.header.getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
       "/search"
     );
     await closeMobileMenu(this.page);

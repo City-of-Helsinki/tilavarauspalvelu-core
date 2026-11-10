@@ -1,5 +1,4 @@
 /** Android chrome tests */
-import { log } from "../lib/runtime";
 import { test } from "./fixtures";
 import {
   COOKIETEXT,
@@ -34,12 +33,14 @@ test.describe(
     });
 
     test("User logs in and out with suomi_fi", { tag: ["@mobile-android-data-set-0"] }, async ({ appCommon }) => {
-      await log("User logs in with Suomi.fi");
-      await appCommon.userLogsInWithSuomiFiMobile();
+      await test.step("User logs in with Suomi.fi", async () => {
+        await appCommon.userLogsInWithSuomiFiMobile();
+      });
 
-      await log("User logs out");
-      await appCommon.userLogsOutMobile();
-      await appCommon.userConfirmsLogOutMobile();
+      await test.step("User logs out", async () => {
+        await appCommon.userLogsOutMobile();
+        await appCommon.userConfirmsLogOutMobile();
+      });
     });
 
     test(
@@ -48,36 +49,37 @@ test.describe(
       async ({ appCommon, appUser, reservationLownav, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
-        await log("User creates reservation");
-        await appUser.userNavigatesToSingleBookingPageMobile();
-        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysFreeUnit);
-        await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits();
-        await appUser.userChecksTheReservationInfoIsRightBeforeSubmit();
-        await reservationLownav.clickSubmitButtonContinue();
-        await appUser.userChecksTheReservationInfoIsRightAfterSubmit();
-        await topnav.navigateToMyBookingsMobile();
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.alwaysFreeUnitWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
+        await test.step("User creates reservation", async () => {
+          await appUser.userFindsTheUnitMobile(testData.units.alwaysFreeUnit);
+          await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits();
+          await appUser.userChecksTheReservationInfoIsRightBeforeSubmit();
+          await reservationLownav.clickSubmitButtonContinue();
+          await appUser.userChecksTheReservationInfoIsRightAfterSubmit();
+          await appUser.userOpensTheBookingInMyBookingsMobile(
+            testData.units.alwaysFreeUnitWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+        });
 
-        await log("User modifies reservation");
-        await appUser.userModifiesBookingAndVerifiesTheChanges();
-        await appUser.userChecksTheModifiedReservationInfoIsRightAndClicksContinue();
+        await test.step("User modifies reservation", async () => {
+          await appUser.userModifiesBookingAndVerifiesTheChanges();
+          await appUser.userChecksTheModifiedReservationInfoIsRightAndClicksContinue();
+        });
 
-        await log("User cancels reservation");
-        await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
-        await topnav.navigateToMyBookingsMobile();
-        await appUser.userChecksCancelledBookingIsFoundMobile(
-          testData.units.alwaysFreeUnitWithLocation,
-          state.timeOfQuickReservationMinusTModified
-        );
-        await appUser.userChecksBookingInfoInReservations(
-          IN_RESERVATIONS_STATUS_CANCELED,
-          SINGLEBOOKING_NO_PAYMENT,
-          state.timeOfQuickReservationModified
-        );
+        await test.step("User cancels reservation", async () => {
+          await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+          await topnav.navigateToMyBookingsMobile();
+          await appUser.userChecksCancelledBookingIsFoundMobile(
+            testData.units.alwaysFreeUnitWithLocation,
+            state.timeOfQuickReservationMinusTModified
+          );
+          await appUser.userChecksBookingInfoInReservations(
+            IN_RESERVATIONS_STATUS_CANCELED,
+            SINGLEBOOKING_NO_PAYMENT,
+            state.timeOfQuickReservationModified
+          );
+        });
       }
     );
 
@@ -87,49 +89,53 @@ test.describe(
       async ({ appCommon, appUser, mybookings, popups, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
-        await log("User creates paid reservation");
-        await appUser.userNavigatesToSingleBookingPageMobile();
-        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnit);
-        await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
-        await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
+        await test.step("User creates paid reservation", async () => {
+          await appUser.userFindsTheUnitMobile(testData.units.alwaysPaidUnit);
+          await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
+          await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
+        });
 
-        await log("User pays the reservation");
-        await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking();
-        await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout();
+        await test.step("User pays the reservation", async () => {
+          await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking();
+          await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout();
+        });
 
-        await log("User verifies paid reservation in my bookings and paid status");
-        await topnav.navigateToMyBookingsMobile();
-        await popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.alwaysPaidUnitWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksThePaidReservationInfoIsRightInReservations(
-          MYBOOKINGS_STATUS_CONFIRMED,
-          MYBOOKINGS_STATUS_PAID_CONFIRMED,
-          SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-          state.timeOfQuickReservation,
-          state.bookingNumOnly
-        );
+        await test.step("User verifies paid reservation in my bookings and paid status", async () => {
+          await topnav.navigateToMyBookingsMobile();
+          await popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
+          await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
+            testData.units.alwaysPaidUnitWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksThePaidReservationInfoIsRightInReservations(
+            MYBOOKINGS_STATUS_CONFIRMED,
+            MYBOOKINGS_STATUS_PAID_CONFIRMED,
+            SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+            state.timeOfQuickReservation,
+            state.bookingNumOnly
+          );
+        });
 
-        await log("User cancels paid booking");
-        await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
-        await mybookings.waitForPaymentStatus(MYBOOKINGS_STATUS_REFUNDED);
+        await test.step("User cancels paid booking", async () => {
+          await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+          await mybookings.waitForPaymentStatus(MYBOOKINGS_STATUS_REFUNDED);
+        });
 
-        await log("User verifies cancellation and refund status");
-        await topnav.navigateToMyBookingsMobile();
-        await appUser.userChecksCancelledBookingIsFoundMobile(
-          testData.units.alwaysPaidUnitWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksThePaidReservationInfoIsRightInReservations(
-          IN_RESERVATIONS_STATUS_CANCELED,
-          MYBOOKINGS_STATUS_REFUNDED,
-          SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-          state.timeOfQuickReservation,
-          state.bookingNumOnly
-        );
+        await test.step("User verifies cancellation and refund status", async () => {
+          await topnav.navigateToMyBookingsMobile();
+          await appUser.userChecksCancelledBookingIsFoundMobile(
+            testData.units.alwaysPaidUnitWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksThePaidReservationInfoIsRightInReservations(
+            IN_RESERVATIONS_STATUS_CANCELED,
+            MYBOOKINGS_STATUS_REFUNDED,
+            SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+            state.timeOfQuickReservation,
+            state.bookingNumOnly
+          );
+        });
       }
     );
 
@@ -139,99 +145,103 @@ test.describe(
       async ({ appCommon, appUser, popups, state, testData, topnav }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
-        await log("User creates reservation");
-        await appUser.userNavigatesToSingleBookingPageMobile();
-        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnit);
-        await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
-        await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
+        await test.step("User creates reservation", async () => {
+          await appUser.userFindsTheUnitMobile(testData.units.alwaysPaidUnit);
+          await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
+          await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
+        });
 
-        await log("User pays the reservation");
-        await appUser.userInterruptsPaidCheckout(URL_TEST);
-        await appUser.userAcceptsPaymentToCheckout();
-        await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking();
-        await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout();
+        await test.step("User pays the reservation", async () => {
+          await appUser.userInterruptsPaidCheckout(URL_TEST);
+          await appUser.userAcceptsPaymentToCheckout();
+          await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking();
+          await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout();
+        });
 
-        await log("User verifies paid reservation in my bookings and paid status");
-        await topnav.navigateToMyBookingsMobile();
-        await popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.alwaysPaidUnitWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksThePaidReservationInfoIsRightInReservations(
-          MYBOOKINGS_STATUS_CONFIRMED,
-          MYBOOKINGS_STATUS_PAID_CONFIRMED,
-          SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-          state.timeOfQuickReservation,
-          state.bookingNumOnly
-        );
+        await test.step("User verifies paid reservation in my bookings and paid status", async () => {
+          await topnav.navigateToMyBookingsMobile();
+          await popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
+          await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
+            testData.units.alwaysPaidUnitWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksThePaidReservationInfoIsRightInReservations(
+            MYBOOKINGS_STATUS_CONFIRMED,
+            MYBOOKINGS_STATUS_PAID_CONFIRMED,
+            SINGLEBOOKING_PAID_PRICE_VAT_INCL,
+            state.timeOfQuickReservation,
+            state.bookingNumOnly
+          );
+        });
 
-        await log("User cancels paid booking");
-        await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+        await test.step("User cancels paid booking", async () => {
+          await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+        });
 
-        await log("User verifies cancelled booking is found");
-        await topnav.navigateToMyBookingsMobile();
-        await appUser.userChecksCancelledBookingIsFoundMobile(
-          testData.units.alwaysPaidUnitWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
+        await test.step("User verifies cancelled booking is found", async () => {
+          await topnav.navigateToMyBookingsMobile();
+          await appUser.userChecksCancelledBookingIsFoundMobile(
+            testData.units.alwaysPaidUnitWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+        });
       }
     );
 
     test(
       "User can make booking that requires handling",
       { tag: ["@mobile-android-data-set-4"] },
-      async ({ appCommon, appUser, reservationLownav, state, testData, topnav }) => {
+      async ({ appCommon, appUser, reservationLownav, state, testData }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
-        await log("User creates reservation that requires handling");
-        await appUser.userNavigatesToSingleBookingPageMobile();
-        await appUser.userUsesSearchToFindRightUnit(testData.units.unitRequiresAlwaysHandling);
-        await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits();
-        await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightBeforeSubmit();
-        await reservationLownav.clickSubmitButtonContinue();
-        await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit();
+        await test.step("User creates reservation that requires handling", async () => {
+          await appUser.userFindsTheUnitMobile(testData.units.unitRequiresAlwaysHandling);
+          await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits();
+          await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightBeforeSubmit();
+          await reservationLownav.clickSubmitButtonContinue();
+          await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit();
+        });
 
-        await log("User verifies reservation in my bookings and reservation status");
-        await topnav.navigateToMyBookingsMobile();
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.unitRequiresAlwaysHandlingWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksBookingInfoInReservationsWithNumberOfParticipantsAndDescriptionAndPurpose(
-          MYBOOKINGS_STATUS_PROCESSED,
-          SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-          state.timeOfQuickReservation
-        );
+        await test.step("User verifies reservation in my bookings and reservation status", async () => {
+          await appUser.userOpensTheBookingInMyBookingsMobile(
+            testData.units.unitRequiresAlwaysHandlingWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksBookingInfoInReservationsWithNumberOfParticipantsAndDescriptionAndPurpose(
+            MYBOOKINGS_STATUS_PROCESSED,
+            SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+            state.timeOfQuickReservation
+          );
+        });
       }
     );
 
     test(
       "User can make subvented single booking that requires handling",
       { tag: ["@mobile-android-data-set-5"] },
-      async ({ appCommon, appUser, state, testData, topnav }) => {
+      async ({ appCommon, appUser, state, testData }) => {
         await appCommon.userLogsInWithSuomiFiMobile();
 
-        await log("User creates subvented reservation");
-        await appUser.userNavigatesToSingleBookingPageMobile();
-        await appUser.userUsesSearchToFindRightUnit(testData.units.alwaysPaidUnitSubvented);
-        await appUser.userReservesAFreeQuickReservationSlot();
-        await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(JUSTIFICATION_FOR_SUBVENTION);
-        await appUser.userChecksThePaidReservationThatRequiresHandlingInfoIsRightAndSubmits();
+        await test.step("User creates subvented reservation", async () => {
+          await appUser.userFindsTheUnitMobile(testData.units.alwaysPaidUnitSubvented);
+          await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(JUSTIFICATION_FOR_SUBVENTION);
+          await appUser.userChecksThePaidReservationThatRequiresHandlingInfoIsRightAndSubmits();
+        });
 
-        await log("User verifies reservation in my bookings and reservation status");
-        await topnav.navigateToMyBookingsMobile();
-        await appUser.userCanSeeUpcomingBookingInListAndClicksIt(
-          testData.units.alwaysPaidUnitSubventedWithLocation,
-          state.timeOfQuickReservationMinusT
-        );
-        await appUser.userChecksBookingInfoInReservationsWithAllReservationInfo(
-          MYBOOKINGS_STATUS_PROCESSED,
-          SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-          state.timeOfQuickReservation
-        );
+        await test.step("User verifies reservation in my bookings and reservation status", async () => {
+          await appUser.userOpensTheBookingInMyBookingsMobile(
+            testData.units.alwaysPaidUnitSubventedWithLocation,
+            state.timeOfQuickReservationMinusT
+          );
+          await appUser.userChecksBookingInfoInReservationsWithAllReservationInfo(
+            MYBOOKINGS_STATUS_PROCESSED,
+            SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
+            state.timeOfQuickReservation
+          );
+        });
       }
     );
   }
