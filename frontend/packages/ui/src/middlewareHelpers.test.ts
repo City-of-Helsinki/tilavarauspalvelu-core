@@ -99,6 +99,10 @@ const PAGE_PATHS = [
   "/search?next=/api/graphql",
   "/search?next=/monitoring",
   "/monitoring-reports",
+  // Catch-all pages accept extra segments. /api/, /_next/ and /monitoring deeper in the path must not match.
+  "/reservation-unit/1/reservation/2/api/x",
+  "/reservation-unit/1/reservation/2/_next/x",
+  "/reservation-unit/1/reservation/2/monitoring",
 ];
 
 describe("NON_PAGE_PATH", () => {
@@ -109,6 +113,7 @@ describe("NON_PAGE_PATH", () => {
     "/kasittely/_next/static/chunks/main.js",
     "/api/graphql",
     "/api/healthcheck",
+    "/kasittely/api/healthcheck",
     "/favicon.svg",
     "/favicon-32x32.ico",
     "/manifest.webmanifest",
