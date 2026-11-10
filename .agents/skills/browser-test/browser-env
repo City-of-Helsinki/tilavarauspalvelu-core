@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+// Finds which development setup runs and prints its URLs as JSON.
+// Usage: browser-env [--gateway URL]
+import { parseArgs } from "node:util";
+import { DEFAULT_GATEWAY, detect } from "./lib.mjs";
+
+const { values } = parseArgs({ options: { gateway: { type: "string", default: DEFAULT_GATEWAY } } });
+const env = await detect({ gateway: values.gateway });
+
+const hints = {
+  gateway: "Ready. One address on localhost:8000.",
+  host: "Ready. The backend and the frontends run on the host.",
+  container:
+    "A gateway runs in the Docker network, but nothing listens on localhost:8000. " +
+    "Start .agents/skills/browser-test/browser-proxy in the background, then run browser-env again.",
+  none:
+    "No setup found. Ask the user to start the stack: \"just stack up-gateway\" for Docker, " +
+    'or the backend and "just fe dev" on the host.',
+};
+console.log(JSON.stringify({ ...env, hint: hints[env.setup] }, null, 2));
+process.exitCode = env.customer ? 0 : 1;
