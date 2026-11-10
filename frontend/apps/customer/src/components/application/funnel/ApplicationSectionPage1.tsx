@@ -170,7 +170,6 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
           name={`applicationSections.${index}.appliedReservationsPerWeek`}
           label={t("application:Page1.eventsPerWeek")}
           min={1}
-          max={7}
           required
           errorText={getTranslatedError("appliedReservationsPerWeek")}
         />
