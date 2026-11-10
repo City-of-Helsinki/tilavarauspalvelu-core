@@ -5,7 +5,8 @@
  * @returns {string} version string
  **/
 export function getVersion(branch?: string, sha?: string) {
-  return branch?.replace("main", "") || sha?.slice(0, 8) || "local";
+  const name = branch === "main" ? "" : branch;
+  return name || sha?.slice(0, 8) || "local";
 }
 
 /**

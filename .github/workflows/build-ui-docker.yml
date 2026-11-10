@@ -88,8 +88,8 @@ jobs:
         REF_NAME: ${{ github.ref_name }}
         SHA: ${{ github.sha }}
       run: |
-        version="${REF_NAME/main/}"
-        version="${version:-${SHA:0:8}}"
+        version="$REF_NAME"
+        if [[ "$version" == "main" ]]; then version="${SHA:0:8}"; fi
         if [[ "$version" =~ ^v[0-9] ]]; then version="${version#v}"; fi
         echo "release=${SENTRY_PROJECT_NAME}@${version//\//-}" >> "$GITHUB_OUTPUT"
 
