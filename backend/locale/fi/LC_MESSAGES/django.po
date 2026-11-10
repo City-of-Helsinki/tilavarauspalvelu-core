@@ -1465,20 +1465,16 @@ msgid "Door code generated at"
 msgstr "Ovikoodi generoitu"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Unit price"
 msgid "Total price"
-msgstr "Yksikköhinta"
+msgstr "Kokonaishinta"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Unit price"
 msgid "Total net price"
-msgstr "Yksikköhinta"
+msgstr "Kokonaishinta ilman ALV:tä"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Total price without overrides"
-msgstr ""
+msgstr "Kokonaishinta ilman käsittelijän muutoksia"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Applying free of charge"
@@ -1600,17 +1596,18 @@ msgstr "Milloin tämä varaus luotiin"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "The sum of the final amounts of the price lines, including VAT"
-msgstr ""
+msgstr "Hintarivien lopullisten hintojen summa, sisältää ALV:n"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "The sum of the final amounts of the price lines, excluding VAT"
-msgstr ""
+msgstr "Hintarivien lopullisten hintojen summa ilman ALV:tä"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid ""
 "The sum of the amounts of the price lines without the overrides of the "
 "handler, including VAT"
 msgstr ""
+"Hintarivien hintojen summa ilman käsittelijän muutoksia, sisältää ALV:n"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee is applying for a free-of-charge reservation"
