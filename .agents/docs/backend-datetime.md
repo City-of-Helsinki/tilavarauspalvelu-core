@@ -14,24 +14,26 @@ and from the 2 or 3 hour difference between UTC and local time:
 ## Helpers
 
 `backend/utils/date_utils.py` has the correct way to do each of these. Use the helper, not a hand-written version.
+The table lists the helpers that prevent a known mistake. The file has more helpers.
 These helpers raise `NaiveDatetimeError` for a naive datetime: `local_date_of()`, `local_add_days()`, `add_elapsed_time()`,
 and `local_start_of_day()`, `local_next_start_of_day()` and `local_end_of_day()` when they get a datetime.
 
-| Need                                                  | Helper                                                                    |
-|-------------------------------------------------------|---------------------------------------------------------------------------|
-| The current time, date or wall clock time             | `local_datetime()`, `local_date()`, `local_time()`, `utc_datetime()`      |
-| A local datetime from parts                           | `local_datetime(year, month, day, hour, minute)`                          |
-| The local date of a datetime                          | `local_date_of(value)`                                                    |
-| A local datetime from a date and a `TimeField` value  | `local_combine(date, time)`                                               |
-| The same wall clock time some days later              | `local_add_days(value, days=...)`                                         |
-| A moment some real time later                         | `add_elapsed_time(value, delta=...)`                                      |
-| The real time between two datetimes                   | `datetime_difference(start_datetime=..., end_datetime=...)`               |
-| The start of a day, and its end in a half-open range  | `local_start_of_day(value)`, `local_next_start_of_day(value)`             |
-| A check for the spring gap                            | `local_datetime_exists(value)`                                            |
-| The length between two `TimeField` values             | `time_difference(begin, end)`, `end_time_as_timedelta(end)`               |
-| An ISO string from an API                             | `from_iso_format(string, timezone=...)`, `local_from_iso_format(string)`  |
-| A string in another format, with no offset            | `parse_naive_datetime(string, string_format=..., timezone=...)`           |
-| Text for users                                        | `local_datetime_string()`, `datetime_range_as_string()`                   |
+| Need                                                 | Helper                                                                                                                            |
+|------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| The current time, date or wall clock time            | `local_datetime()`, `local_date()`, `local_time()`, `utc_datetime()`                                                              |
+| A local datetime from parts                          | `local_datetime(year, month, day, hour, minute)`                                                                                  |
+| The local date of a datetime                         | `local_date_of(value)`                                                                                                            |
+| A local datetime from a date and a `TimeField` value | `local_combine(date, time)`                                                                                                       |
+| The same wall clock time some days later             | `local_add_days(value, days=...)`                                                                                                 |
+| A moment some real time later                        | `add_elapsed_time(value, delta=...)`                                                                                              |
+| The real time between two datetimes                  | `datetime_difference(start_datetime=..., end_datetime=...)`                                                                       |
+| The start of a day, and its end in a half-open range | `local_start_of_day(value)`, `local_next_start_of_day(value)`                                                                     |
+| The last moment of a day, for `<=`                   | `local_end_of_day(value)`                                                                                                         |
+| A check for the spring gap                           | `local_datetime_exists(value)`                                                                                                    |
+| The length between two `TimeField` values            | `time_difference(begin, end)`, `end_time_as_timedelta(end)`                                                                       |
+| An ISO string from an API                            | `from_iso_format(string, timezone=...)`, `local_from_iso_format(string)`                                                          |
+| A string in another format, with no offset           | `parse_naive_datetime(string, string_format=..., timezone=...)`                                                                   |
+| Text for users                                       | `local_datetime_string()`, `local_date_string()`, `local_time_string()`, `local_timedelta_string()`, `datetime_range_as_string()` |
 
 - `datetime.now()`, `date.today()` and `datetime.astimezone()` with no argument use the system time zone.
   Django sets the system time zone to `TIME_ZONE` when the settings load. Code that runs before that gets another zone.
