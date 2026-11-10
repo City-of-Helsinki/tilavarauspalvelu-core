@@ -2,7 +2,7 @@
 # Drive a Seer autofix run of a Sentry issue through the Sentry REST API.
 # This does the same as the buttons in the Seer panel of the Sentry web UI.
 # The pr command opens a pull request on GitHub. Run it only when the user asks for it.
-# The token is read from 1Password.
+# The token is read from the secret file or from 1Password. See lib.sh.
 #
 # Usage: sentry-autofix <command> <issue ID or URL> [arguments]
 #

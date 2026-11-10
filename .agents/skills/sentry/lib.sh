@@ -1,8 +1,9 @@
 # Shared code for the Sentry scripts. Source it, do not run it.
-# The token is read from 1Password.
+# The token is read from the secret file if it exists, else from 1Password.
 
 org="city-of-helsinki"
 base_url="https://sentry.io/api/0/organizations/$org"
+token_file="/run/secrets/sentry/token"
 
 # Parse a Sentry issue ID or URL. Set issue_id, and event_id to the event in the URL or "latest".
 # Return 1 if the argument is not an issue ID or URL.
@@ -21,12 +22,21 @@ parse_issue() {
   fi
 }
 
-# Read the token from 1Password. Call this after the arguments are validated.
+# Read the token from the secret file, or from 1Password if the file does not exist.
+# Call this after the arguments are validated.
 load_token() {
-  : "${SENTRY_ISSUE_OP_ACCOUNT:?Set SENTRY_ISSUE_OP_ACCOUNT to your 1Password account, e.g. vincit.1password.eu}"
-  : "${SENTRY_ISSUE_OP_VAULT:?Set SENTRY_ISSUE_OP_VAULT to the 1Password vault that has the item, e.g. Private}"
-  : "${SENTRY_ISSUE_OP_ITEM:?Set SENTRY_ISSUE_OP_ITEM to the name of the 1Password item, e.g. Sentry API PAT}"
-  token="$(op read --account "$SENTRY_ISSUE_OP_ACCOUNT" "op://$SENTRY_ISSUE_OP_VAULT/$SENTRY_ISSUE_OP_ITEM/credential")"
+  if [[ -f "$token_file" ]]; then
+    token="$(<"$token_file")"
+    if [[ -z "${token//[[:space:]]/}" ]]; then
+      echo "The token file $token_file is empty." >&2
+      exit 1
+    fi
+  else
+    : "${SENTRY_ISSUE_OP_ACCOUNT:?Set SENTRY_ISSUE_OP_ACCOUNT to your 1Password account, e.g. vincit.1password.eu}"
+    : "${SENTRY_ISSUE_OP_VAULT:?Set SENTRY_ISSUE_OP_VAULT to the 1Password vault that has the item, e.g. Private}"
+    : "${SENTRY_ISSUE_OP_ITEM:?Set SENTRY_ISSUE_OP_ITEM to the name of the 1Password item, e.g. Sentry API PAT}"
+    token="$(op read --account "$SENTRY_ISSUE_OP_ACCOUNT" "op://$SENTRY_ISSUE_OP_VAULT/$SENTRY_ISSUE_OP_ITEM/credential")"
+  fi
 
   # Escape backslashes and double quotes for the quoted value in the curl config.
   token="${token//\\/\\\\}"

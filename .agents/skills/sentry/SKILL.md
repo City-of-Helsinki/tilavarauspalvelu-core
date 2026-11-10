@@ -10,16 +10,21 @@ How to fetch a Sentry issue to find the cause of an error, and how to take it th
 
 ## 1. Authentication
 
-The scripts next to this file read the token from 1Password with `op read`.
+The scripts next to this file read the token from the file `/run/secrets/sentry/token` if it exists.
+Use this in a container. Mount the token there as a secret.
+
+If the file does not exist, the scripts read the token from 1Password with `op read`.
 1Password asks the user to unlock. Wait for it.
 
-The scripts need this setup. If a call fails because of it, stop and tell the user which part is missing:
+The token is a personal token from https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/.
+Set "Issue & Event" to Read & Write, "Organization" to Read and "Project" to Read.
+Only `sentry-autofix` needs the write permission.
+
+The 1Password setup is as follows. If a call fails because of it, stop and tell the user which part is missing:
 
 - `op` (1Password CLI) is installed.
 - The 1Password desktop app has Settings → Developer → "Integrate with 1Password CLI" turned on.
-- The 1Password vault has an "API Credential" item. `credential` is a personal token from
-  https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/. Set "Issue & Event" to Read & Write,
-  "Organization" to Read and "Project" to Read. Only `sentry-autofix` needs the write permission.
+- The 1Password vault has an "API Credential" item. `credential` is the token.
 - The user's shell profile sets these variables:
 
 | Variable                  | Meaning                                               |
@@ -28,7 +33,7 @@ The scripts need this setup. If a call fails because of it, stop and tell the us
 | `SENTRY_ISSUE_OP_VAULT`   | Vault that has the item, for example `Private`.       |
 | `SENTRY_ISSUE_OP_ITEM`    | Name of the item, for example `Sentry API PAT`.       |
 
-Never print the token or call `op` for it yourself. Use only the scripts.
+Never print the token, read the token file or call `op` for it yourself. Use only the scripts.
 
 ## 2. Run a script
 
