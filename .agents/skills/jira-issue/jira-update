@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Update the summary, description, labels or links of a Jira issue, or add a comment, through the Jira Cloud REST API.
+# Update the summary, description, labels, links or status of a Jira issue, or add a comment, through the Jira Cloud REST API.
 # Usage: jira-update <key or URL> <options>, e.g. jira-update TILA-123 --add-label backend
 set -euo pipefail
 
@@ -18,6 +18,7 @@ Give at least one change. Options marked with * can be repeated.
   --blocked-by <key>        * Add a link: this issue is blocked by <key>.
   --relates <key>           * Add a link: this issue relates to <key>.
   --remove-link <key>       * Remove every link between this issue and <key>.
+  --transition <status>       Move the issue to this status, e.g. Done. Done last, after the other changes.
   --dry-run                   Print the write requests and change nothing in Jira.
 EOF
   exit 2
@@ -36,6 +37,7 @@ blocks=()
 blocked_by=()
 relates=()
 remove_links=()
+transition=""
 dry_run=false
 
 while [[ $# -gt 0 ]]; do
@@ -64,6 +66,11 @@ while [[ $# -gt 0 ]]; do
       [[ -z "$comment_file" ]] || { echo "Give --comment-file only once." >&2; usage; }
       check_text_file "$value" comment
       comment_file="$value"
+      ;;
+    --transition)
+      [[ -z "$transition" ]] || { echo "Give --transition only once." >&2; usage; }
+      [[ -n "${value//[[:space:]]/}" ]] || { echo "The status is empty." >&2; exit 2; }
+      transition="$value"
       ;;
     --add-label | --remove-label)
       check_label "$value"
@@ -95,7 +102,7 @@ for other in ${remove_links[@]+"${remove_links[@]}"}; do
     || { echo "Link to $other is both added and removed." >&2; exit 2; }
 done
 
-if [[ -z "$new_summary" && -z "$description_file" && -z "$comment_file" ]] \
+if [[ -z "$new_summary" && -z "$description_file" && -z "$comment_file" && -z "$transition" ]] \
   && (( ${#add_labels[@]} + ${#remove_labels[@]} + ${#blocks[@]} + ${#blocked_by[@]} + ${#relates[@]} + ${#remove_links[@]} == 0 )); then
   echo "Nothing to change." >&2
   usage
@@ -104,7 +111,7 @@ fi
 load_credentials
 
 # The current summary, labels and links decide what to skip and which link IDs to remove.
-issue="$(api "rest/api/2/issue/$key?fields=summary,labels,issuelinks")"
+issue="$(api "rest/api/2/issue/$key?fields=summary,labels,issuelinks,status")"
 
 # Each request is "<method><sep><path><sep><body><sep><summary>".
 # The separator is not whitespace, so `read` keeps an empty body as an empty field.
@@ -204,6 +211,30 @@ done
 for other in ${relates[@]+"${relates[@]}"}; do
   add_link --relates "$other" '.outwardIssue.key == $o or .inwardIssue.key == $o'
 done
+
+# Change the status last, so a comment explains the change before the issue closes.
+# The transitions depend on the workflow and the current status. Match the target status by name, without case.
+if [[ -n "$transition" ]]; then
+  current_status="$(jq --raw-output '.fields.status.name' <<<"$issue")"
+  if [[ "$(tr '[:upper:]' '[:lower:]' <<<"$current_status")" == "$(tr '[:upper:]' '[:lower:]' <<<"$transition")" ]]; then
+    skipped+=("The status of $key is already $current_status.")
+  else
+    transitions="$(api "rest/api/2/issue/$key/transitions")"
+    found="$(
+      jq --raw-output --arg s "$transition" '
+        [.transitions[] | select((.to.name | ascii_downcase) == ($s | ascii_downcase))]
+        | first // empty | "\(.id)\t\(.to.name)"' <<<"$transitions"
+    )"
+    if [[ -z "$found" ]]; then
+      echo "Cannot move $key from $current_status to $transition." >&2
+      echo "Allowed statuses: $(jq --raw-output '[.transitions[].to.name] | unique | join(", ")' <<<"$transitions")" >&2
+      exit 2
+    fi
+    IFS=$'\t' read -r transition_id status_name <<<"$found"
+    body="$(jq --null-input --compact-output --arg id "$transition_id" '{transition: {id: $id}}')"
+    requests+=("POST${sep}rest/api/2/issue/$key/transitions$sep$body${sep}Changed the status from $current_status to $status_name.")
+  fi
+fi
 
 if [[ "$dry_run" == true ]]; then
   echo "Dry run for $key. Nothing is changed in Jira."
