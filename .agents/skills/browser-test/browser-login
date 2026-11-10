@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+// Logs in as a test identity, saves the session and prints the user that the backend sees.
+// Usage: browser-login <noaccess | admin | hetu>
+import { parseArgs } from "node:util";
+import { USERS, chromium, currentUser, newSession, urls } from "./lib.mjs";
+
+const { positionals } = parseArgs({ allowPositionals: true });
+if (positionals.length !== 1) {
+  console.error(`Usage: browser-login <${Object.keys(USERS).join(" | ")} | hetu>`);
+  process.exit(2);
+}
+const hetu = USERS[positionals[0]] ?? positionals[0];
+
+const env = await urls();
+const browser = await chromium.launch();
+try {
+  const context = await newSession(browser, env, hetu);
+  console.log(JSON.stringify({ setup: env.setup, hetu, currentUser: await currentUser(context, env) }, null, 2));
+} catch (e) {
+  console.error(e.message);
+  process.exitCode = 1;
+} finally {
+  await browser.close();
+}

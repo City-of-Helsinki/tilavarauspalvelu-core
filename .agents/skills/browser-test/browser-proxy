@@ -1,0 +1,80 @@
+#!/usr/bin/env node
+// Puts one address on localhost:8000 in front of a development stack that runs in other containers.
+// Only for an agent that runs in a container of its own. On the host, use "just stack up-gateway".
+// The browser must use http://localhost:8000, because the backend allows only localhost origins
+// and Tunnistamo allows only the localhost:8000 callback.
+// Usage: browser-proxy [--gateway URL] [--backend URL] [--frontend local]
+//   --gateway   the gateway in the Docker network. Default: tilavarauspalvelu-core-gateway-1:8080.
+//   --backend   send the backend paths here, for example a backend that runs from a worktree.
+//   --frontend local   send the frontend paths to "next dev" in this container on ports 3000 and 3001.
+import http from "node:http";
+import net from "node:net";
+import { parseArgs } from "node:util";
+
+const { values } = parseArgs({
+  options: {
+    gateway: { type: "string", default: "http://tilavarauspalvelu-core-gateway-1:8080" },
+    backend: { type: "string" },
+    frontend: { type: "string", default: "gateway" },
+    port: { type: "string", default: "8000" },
+  },
+});
+if (!["gateway", "local"].includes(values.frontend)) {
+  console.error(`--frontend must be "gateway" or "local", not "${values.frontend}"`);
+  process.exit(2);
+}
+
+const GATEWAY = values.gateway;
+const BACKEND = values.backend ?? GATEWAY;
+const LOCAL = values.frontend === "local";
+const CUSTOMER = LOCAL ? "http://127.0.0.1:3000" : GATEWAY;
+const STAFF = LOCAL ? "http://127.0.0.1:3001" : GATEWAY;
+
+// Keep the list in sync with docker/Caddyfile.
+const BACKEND_PREFIXES = [
+  "/graphql/", "/admin/", "/v1/", "/helauth/", "/pysocial/", "/gdpr/", "/tinymce/",
+  "/csrf/", "/monitoring/", "/mock_verkkokauppa/", "/static/", "/media/",
+];
+
+function target(path) {
+  if (BACKEND_PREFIXES.some((p) => path.startsWith(p))) return new URL(BACKEND);
+  if (path === "/kasittely" || path.startsWith("/kasittely/")) return new URL(STAFF);
+  return new URL(CUSTOMER);
+}
+
+http
+  .createServer((req, res) => {
+    const url = target(req.url);
+    const upstream = http.request(
+      { host: url.hostname, port: url.port || 80, method: req.method, path: req.url, headers: req.headers },
+      (upRes) => {
+        res.writeHead(upRes.statusCode, upRes.headers);
+        upRes.pipe(res);
+      },
+    );
+    upstream.on("error", (err) => {
+      res.writeHead(502, { "content-type": "text/plain" });
+      res.end(`browser-proxy: ${url.origin}${req.url}: ${err.message}\n`);
+    });
+    req.pipe(upstream);
+  })
+  // WebSockets, for the hot reload of "next dev".
+  .on("upgrade", (req, socket, head) => {
+    const url = target(req.url);
+    const upstream = net.connect(Number(url.port || 80), url.hostname, () => {
+      const headers = Object.entries(req.headers).map(([k, v]) => `${k}: ${v}`).join("\r\n");
+      upstream.write(`${req.method} ${req.url} HTTP/1.1\r\n${headers}\r\n\r\n`);
+      upstream.write(head);
+      upstream.pipe(socket);
+      socket.pipe(upstream);
+    });
+    upstream.on("error", () => socket.destroy());
+    socket.on("error", () => upstream.destroy());
+  })
+  .on("error", (err) => {
+    console.error(`browser-proxy: ${err.message}`);
+    process.exit(1);
+  })
+  .listen(Number(values.port), "127.0.0.1", () => {
+    console.log(`browser-proxy on http://localhost:${values.port}. Frontend: ${LOCAL ? "local" : GATEWAY}. Backend: ${BACKEND}`);
+  });
