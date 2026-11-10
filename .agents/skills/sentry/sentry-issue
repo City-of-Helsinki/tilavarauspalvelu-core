@@ -2,7 +2,7 @@
 # Fetch a Sentry issue with one of its events from the Sentry REST API.
 # The event is the one in the URL, or the latest event if the URL has none.
 # Tag keys after the issue add the top values of each tag over all events of the issue.
-# The token is read from 1Password.
+# The token is read from the secret file or from 1Password. See lib.sh.
 # Usage: sentry-issue <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name
 set -euo pipefail
 
