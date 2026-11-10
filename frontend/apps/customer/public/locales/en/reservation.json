@@ -77,7 +77,7 @@
     "CONFIRMED": "Confirmed",
     "DENIED": "Denied",
     "CANCELLED": "Cancelled",
-    "CREATED": "Draft",
+    "CREATED": "Tentative",
     "WAITING_FOR_PAYMENT": "Awaiting payment"
   },
   "paymentBanner": {

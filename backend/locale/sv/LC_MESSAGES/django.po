@@ -2681,7 +2681,7 @@ msgstr ""
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationState"
 msgid "Created"
-msgstr ""
+msgstr "Preliminär"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationState"
