@@ -2,14 +2,18 @@ import type { NextRequest } from "next/server";
 import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
 import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 
-// The regexes below work on a path with or without a query string and with any base path.
+// The regexes below work on a path with or without a query string and with or without a base path.
 // Only the part before the query string can match.
 const FILE_EXTENSIONS = "webmanifest|js|css|png|jpe?g|svg|gif|ico|json|woff2?|ttf|eot|otf|pdf|txt";
 
 /// Matches the paths of requests that are not pages: Next.js files, API routes, the Sentry tunnel and public files.
 /// The proxy skips these requests. The Sentry server configs drop the proxy transactions for them.
 /// The Sentry tunnel is the tunnelRoute in next.config.ts. The SDK does not drop it when the app has a base path.
-export const NON_PAGE_PATH = new RegExp(`^[^?]*(/(_next|api)/|/monitoring/?(\\?|$)|\\.(${FILE_EXTENSIONS})(\\?|$))`);
+/// /_next/, /api/ and /monitoring match only at the root or after the base path, which is one segment, such as /kasittely.
+/// Deeper paths do not match, because catch-all pages accept them, such as /reservation-unit/1/reservation/2/api/x.
+export const NON_PAGE_PATH = new RegExp(
+  `^(/[^/?]+)?(/(_next|api)/|/monitoring/?(\\?|$))|^[^?]*\\.(${FILE_EXTENSIONS})(\\?|$)`
+);
 
 /// Matches the paths of public files, such as /favicon.svg. Paths under /_next/ do not match.
 /// The Sentry server configs drop the transactions for these files.
