@@ -31,6 +31,8 @@ load_token() {
       exit 1
     fi
     token="$(<"$token_file")"
+    # Remove a carriage return that a file with CRLF line endings leaves.
+    token="${token%$'\r'}"
     if [[ -z "${token//[[:space:]]/}" ]]; then
       echo "The token file $token_file is empty." >&2
       exit 1

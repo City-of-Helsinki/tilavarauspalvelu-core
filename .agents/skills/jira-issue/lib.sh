@@ -80,6 +80,9 @@ load_credentials() {
     done
     user="$(<"$secret_dir/username")"
     token="$(<"$secret_dir/token")"
+    # Remove a carriage return that a file with CRLF line endings leaves.
+    user="${user%$'\r'}"
+    token="${token%$'\r'}"
     if [[ -z "${user//[[:space:]]/}" || -z "${token//[[:space:]]/}" ]]; then
       echo "A credential file in $secret_dir is empty." >&2
       exit 1
