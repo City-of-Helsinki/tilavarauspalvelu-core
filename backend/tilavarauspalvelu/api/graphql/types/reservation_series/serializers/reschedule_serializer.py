@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from django.conf import settings
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
@@ -15,7 +14,6 @@ from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateCh
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries, ReservationStatistic
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.typing import ReservationDetails, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
@@ -125,7 +123,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
             instance = super().update(instance, validated_data)
-            reservations = self.recreate_reservations(
+            self.recreate_reservations(
                 instance,
                 buffer_time_before=buffer_time_before,
                 buffer_time_after=buffer_time_after,
@@ -143,11 +141,6 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         #  Refresh still happens on a background task every 2 minutes.
         #  if settings.UPDATE_AFFECTING_TIME_SPANS:
         #      update_affecting_time_spans_task.delay()  # noqa: ERA001
-
-        if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(
-                reservation_pks=[reservation.pk for reservation in reservations],
-            )
 
         if instance.allocated_time_slot is not None:
             EmailService.send_seasonal_booking_rescheduled_series_email(instance)

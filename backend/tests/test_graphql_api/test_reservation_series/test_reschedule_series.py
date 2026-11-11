@@ -679,7 +679,9 @@ def test_reservation_series__reschedule_series__skip_dates(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__create_statistics(graphql, settings):
+def test_reservation_series__reschedule_series__create_statistics(
+    graphql, settings, django_capture_on_commit_callbacks
+):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_series = create_reservation_series()
@@ -694,7 +696,8 @@ def test_reservation_series__reschedule_series__create_statistics(graphql, setti
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -707,7 +710,9 @@ def test_reservation_series__reschedule_series__create_statistics(graphql, setti
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
-def test_reservation_series__reschedule_series__create_statistics__partial(graphql, settings):
+def test_reservation_series__reschedule_series__create_statistics__partial(
+    graphql, settings, django_capture_on_commit_callbacks
+):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_series = create_reservation_series()
@@ -722,7 +727,8 @@ def test_reservation_series__reschedule_series__create_statistics__partial(graph
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 

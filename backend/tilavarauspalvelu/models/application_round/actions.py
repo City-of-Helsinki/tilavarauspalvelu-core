@@ -5,7 +5,6 @@ import datetime
 from contextlib import suppress
 from typing import TYPE_CHECKING
 
-from django.conf import settings
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
@@ -31,10 +30,10 @@ from tilavarauspalvelu.models import (
     ReservationStatistic,
     ReservationUnitOption,
 )
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.translation import translate_for_user
 from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import local_end_of_day, local_start_of_day
+from utils.model_signals import bulk_create_with_signals
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound
@@ -130,10 +129,8 @@ class ApplicationRoundActions:
             for allocation in allocations
         ]
 
-        reservation_pks: set[int] = set()
-
         with transaction.atomic():
-            reservation_series = ReservationSeries.objects.bulk_create(reservation_series)
+            reservation_series = bulk_create_with_signals(reservation_series)
 
             for series in reservation_series:
                 reservation_details = self._get_reservation_series_details(series)
@@ -144,11 +141,10 @@ class ApplicationRoundActions:
                     closed_hours=closed_time_spans.get(hauki_resource_id, []),
                 )
 
-                reservations = series.actions.bulk_create_reservation_for_periods(
+                series.actions.bulk_create_reservation_for_periods(
                     periods=slots.possible,
                     reservation_details=reservation_details,
                 )
-                reservation_pks.update(reservation.pk for reservation in reservations)
 
                 series.actions.bulk_create_rejected_occurrences_for_periods(
                     overlapping=slots.overlapping,
@@ -161,9 +157,6 @@ class ApplicationRoundActions:
         #  Refresh still happens on a background task every 2 minutes.
         #  if settings.UPDATE_AFFECTING_TIME_SPANS:
         #      update_affecting_time_spans_task.delay()  # noqa: ERA001
-
-        if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(reservation_pks=list(reservation_pks))
 
     def _get_series_override_closed_time_spans(
         self, allocations: list[AllocatedTimeSlot]

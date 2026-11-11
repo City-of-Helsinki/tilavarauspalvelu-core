@@ -12,6 +12,7 @@ from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeS
 from tilavarauspalvelu.models import ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import ReservationPeriod
 from utils.date_utils import DEFAULT_TIMEZONE, end_time_as_timedelta, get_periods_between, local_datetime
+from utils.model_signals import bulk_create_with_signals
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -218,7 +219,7 @@ class ReservationSeriesActions:
             )
             reservations.append(reservation)
 
-        return Reservation.objects.bulk_create(reservations)
+        return bulk_create_with_signals(reservations)
 
     def bulk_create_rejected_occurrences_for_periods(
         self,
