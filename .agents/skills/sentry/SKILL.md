@@ -10,10 +10,13 @@ How to fetch a Sentry issue to find the cause of an error, and how to take it th
 
 ## 1. Authentication
 
-The scripts next to this file read the token from the file `/run/secrets/sentry/token` if it exists.
-Use this in a container. Mount the token there as a secret.
+If the directory `/run/secrets/sentry` exists, the scripts next to this file read the token from the file
+`/run/secrets/sentry/token`. Use this in a container. Mount the token there as a secret.
+If the file is missing, the scripts fail.
+Nothing asks the user before the scripts read the file. In the container's Claude settings, add `Read(//run/secrets/**)`
+to `permissions.deny`. The `skill-script-guard` hook blocks shell commands that name `/run/secrets/sentry`.
 
-If the file does not exist, the scripts read the token from 1Password with `op read`.
+If the directory does not exist, the scripts read the token from 1Password with `op read`.
 1Password asks the user to unlock. Wait for it.
 
 The token is a personal token from https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/.
