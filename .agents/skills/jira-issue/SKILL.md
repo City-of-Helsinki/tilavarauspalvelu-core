@@ -3,7 +3,8 @@ name: jira-issue
 description: >-
   Fetch, list, change or create Jira issues through the Jira Cloud REST API.
   Use when the user references a Jira issue or epic with a URL or a key like TILA-123,
-  asks to list the issues of an epic, asks to edit, label or link an issue, or asks to create an issue.
+  asks to list the issues of an epic, asks to edit, label, link, assign or change the status of an issue,
+  or asks to create an issue.
 ---
 
 How to read, list, change and create Jira issues.
@@ -95,16 +96,28 @@ Give the issue first, then one or more options. Each run changes only the parts 
 | `--dry-run`                 | no     | Print the write requests. Change nothing in Jira.      |
 
 The script skips a label, link or assignee that is already as requested and prints a "Skipped" line for it.
+To keep parts of the old description, fetch the issue with `jira-issue` first and edit its text.
 
 `--assignee` takes `me` for the owner of the API token, `none` to remove the assignee,
-or the full display name or email of one active user. Case does not matter. Jira finds an email only if the user shows it.
-The Jira search is fuzzy, so the script accepts only an exact match. Otherwise it prints the users that the search found and changes nothing.
+or the Jira name of a team member from the table below. Case does not matter.
+Find the person from the name, nickname or role that the user gives. Both Tuomases need the role or the last name.
+If the user names a person who is not in the table, stop and tell the user. The script refuses other names.
+
+| Person              | Role                     | Jira name           |
+|---------------------|--------------------------|---------------------|
+| Matti Lamppu        | Backend developer        | `Matti Lamppu`      |
+| Joonatan Kuosa      | Frontend developer       | `Joonatan Kuosa`    |
+| Mats Eriksson, Matu | Frontend developer       | `Mats Eriksson`     |
+| Eemeli Ranta        | Full-stack developer     | `Eemeli Ranta`      |
+| Noora Alikirri      | Product owner (PO), City | `noora.alikirri`    |
+| Jesse Juvonen       | Project lead, City       | `Juvonen Jesse`     |
+| Tuomas Alahäivälä   | UX/UI designer           | `Tuomas Alahäivälä` |
+| Tuomas Haapala      | Technical lead           | `Tuomas Haapala`    |
 
 `--transition` takes the name of the target status. Case does not matter. The script runs it after the other changes,
 so a comment in the same run shows before the status changes. If the workflow does not allow the move,
 the script prints the allowed statuses. Some transitions ask for more fields, such as a resolution. Then Jira refuses the request.
 Change the status in the Jira UI instead.
-To keep parts of the old description, fetch the issue with `jira-issue` first and edit its text.
 
 ### Create an issue
 
