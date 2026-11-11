@@ -72,6 +72,7 @@ To read one child issue with its comments, use `jira-issue`.
 
 ```bash
 .agents/skills/jira-issue/jira-update TILA-123 --add-label backend --blocks TILA-124 --dry-run
+.agents/skills/jira-issue/jira-update TILA-123 --assignee me --dry-run
 .agents/skills/jira-issue/jira-update TILA-123 --comment-file /tmp/close-comment.txt --transition Done --dry-run
 .agents/skills/jira-issue/jira-update 'https://helsinkisolutionoffice.atlassian.net/browse/TILA-123' --relates TILA-124 --dry-run
 ```
@@ -89,10 +90,15 @@ Give the issue first, then one or more options. Each run changes only the parts 
 | `--blocked-by <key>`        | yes    | Add a link: this issue is blocked by `<key>`.          |
 | `--relates <key>`           | yes    | Add a link: this issue relates to `<key>`.             |
 | `--remove-link <key>`       | yes    | Remove every link between this issue and `<key>`.      |
+| `--assignee <user>`         | no     | Assign the issue. See below for the values.            |
 | `--transition <status>`     | no     | Move the issue to this status, for example `Done`.     |
 | `--dry-run`                 | no     | Print the write requests. Change nothing in Jira.      |
 
-The script skips a label or link that is already as requested and prints a "Skipped" line for it.
+The script skips a label, link or assignee that is already as requested and prints a "Skipped" line for it.
+
+`--assignee` takes `me` for the owner of the API token, `none` to remove the assignee,
+or the full display name or email of one active user. Case does not matter. Jira finds an email only if the user shows it.
+The Jira search is fuzzy, so the script accepts only an exact match. Otherwise it prints the users that the search found and changes nothing.
 
 `--transition` takes the name of the target status. Case does not matter. The script runs it after the other changes,
 so a comment in the same run shows before the status changes. If the workflow does not allow the move,
