@@ -105,6 +105,7 @@ class UserActions:
             series.name = ANONYMIZED
             series.description = ANONYMIZED
 
+        # Send no save signals for these writes. The audit log would store the personal data that they remove.
         Reservation.objects.bulk_update(
             reservations,
             [
@@ -137,6 +138,7 @@ class UserActions:
         application_sections = ApplicationSection.objects.filter(application__user=self.user)
         applications = Application.objects.filter(user=self.user)
 
+        # Send no save signals for these writes. The audit log would store the personal data that they remove.
         application_sections.update(
             name=SENSITIVE_APPLICATION,
         )
