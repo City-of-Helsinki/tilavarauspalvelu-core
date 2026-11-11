@@ -1,9 +1,10 @@
 ---
 name: sentry
 description: >-
-  Fetch a Sentry issue and its events, and drive a Seer autofix run up to the code changes,
+  Fetch a Sentry issue and its events, resolve issues, and drive a Seer autofix run up to the code changes,
   and list or delete releases, through the Sentry REST API. Use when the user references a Sentry issue
-  with a URL or an issue ID, asks to run or continue Seer or autofix on an issue, or asks to list or delete releases.
+  with a URL or an issue ID, asks to resolve Sentry issues, asks to run or continue Seer or autofix on an issue,
+  or asks to list or delete releases.
 ---
 
 How to fetch a Sentry issue to find the cause of an error, how to take it through Seer,
@@ -22,7 +23,7 @@ If the directory does not exist, the scripts read the token from 1Password with 
 
 The token is a personal token from https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/.
 Set "Issue & Event" to Read & Write, "Organization" to Read, "Project" to Read and "Release" to Admin.
-Only `sentry-autofix` needs the write permission of "Issue & Event".
+Only `sentry-autofix` and `sentry-resolve` need the write permission of "Issue & Event".
 Only `sentry-releases delete` needs the admin permission of "Release".
 
 The 1Password setup is as follows. If a call fails because of it, stop and tell the user which part is missing:
@@ -70,6 +71,28 @@ The keys are the same as in the event `tags`, for example `browser.name`, `os.na
 ```
 
 The `tags` field then has the top values of each key over all events, with a count for each.
+
+### Resolve issues
+
+```bash
+.agents/skills/sentry/sentry-resolve --dry-run TILAVARAUSPALVELU-STAFF-UI-12 153768154
+.agents/skills/sentry/sentry-resolve --in-next-release --dry-run TILAVARAUSPALVELU-STAFF-UI-12
+```
+
+Give one or more issues. Each can be an issue ID, a URL or a short ID such as `TILAVARAUSPALVELU-STAFF-UI-12`.
+The script looks up all issues before it changes any, so a wrong argument changes nothing.
+It skips an issue that is already resolved and prints a "Skipped" line for it.
+
+- `--in-next-release` resolves the issue when the next release of the project comes in.
+  Use it for a fix that is merged but not deployed. If the error comes back in a later release,
+  Sentry marks the issue as a regression.
+- Without it, the issue is resolved now. Use it for old issues that have stopped, such as test errors.
+
+`sentry-resolve` writes to Sentry. Run it with `--dry-run` first.
+Show the preview to the user. Run the same command without `--dry-run` only after the user approves it.
+
+To resolve an issue from a pull request instead, put `Fixes <short ID>` in the pull request description.
+The GitHub integration of Sentry then links the issue and resolves it when the release comes in.
 
 ### Run Seer autofix
 
