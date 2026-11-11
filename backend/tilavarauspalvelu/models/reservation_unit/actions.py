@@ -476,18 +476,18 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             for access_type in access_types
         ]
 
+        new_access_type = models.Case(
+            *whens,
+            # Use the active access type as the default (even though we should never reach this)
+            default=models.Value(access_types[-1].access_type),
+            output_field=models.CharField(),
+        )
+
         # Update all future or ongoing reservations in the reservation unit to their current access types
         qs = (
             Reservation.objects
             .filter(reservation_unit=self.reservation_unit, ends_at__gt=now)
-            .annotate(
-                new_access_type=models.Case(
-                    *whens,
-                    # Use the active access type as the default (even though we should never reach this)
-                    default=models.Value(access_types[-1].access_type),
-                    output_field=models.CharField(),
-                ),
-            )
+            .annotate(new_access_type=new_access_type)
             # Only update reservations that have changed their access type
             .exclude(access_type=models.F("new_access_type"))
         )
