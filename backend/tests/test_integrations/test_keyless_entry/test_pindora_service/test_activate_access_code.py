@@ -3,11 +3,14 @@ from __future__ import annotations
 import uuid
 
 import pytest
+from auditlog.models import LogEntry
+from auditlog.registry import auditlog
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
+from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -248,6 +251,38 @@ def test_activate_access_code__series(settings):
 
     assert patch.call_args.kwargs["method"] == "put"
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series/activate/{series.ext_uuid}"
+
+
+@pytest.fixture
+def reservation_audit_log():
+    auditlog.register(Reservation)
+    yield
+    auditlog.unregister(Reservation)
+
+
+@pytest.mark.usefixtures("reservation_audit_log")
+def test_activate_access_code__series__logs_access_code_info():
+    series = ReservationSeriesFactory.create()
+    reservation = ReservationFactory.create(
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=False,
+        access_code_generated_at=local_datetime(),
+    )
+    LogEntry.objects.all().delete()
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+        PindoraService.activate_access_code(obj=series)
+
+    log_entries = list(LogEntry.objects.get_for_object(reservation))
+    assert [log_entry.changes for log_entry in log_entries] == [
+        {"access_code_is_active": ["False", "True"]},
+    ]
 
 
 def test_activate_access_code__series__in_seasonal_booking(settings):
