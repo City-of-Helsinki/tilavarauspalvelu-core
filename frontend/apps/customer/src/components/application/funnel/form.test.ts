@@ -295,6 +295,70 @@ describe("page 2 conversions", () => {
     expect(ApplicationPage2Schema.safeParse(values).success).toBe(true);
   });
 
+  const section2 = (
+    appliedReservationsPerWeek: number,
+    ranges: Array<[Weekday, string, string, Priority]>,
+    minDuration = 3600
+  ) => ({
+    pk: 1,
+    applicationSections: [
+      {
+        pk: 1,
+        name: "foobar",
+        minDuration,
+        reservationUnitPk: 1,
+        priority: Priority.Primary,
+        appliedReservationsPerWeek,
+        suitableTimeRanges: ranges.map(([dayOfTheWeek, beginTime, endTime, priority]) => ({
+          beginTime,
+          endTime,
+          dayOfTheWeek,
+          priority,
+        })),
+      },
+    ],
+  });
+
+  test("page 2 validation counts adjacent ranges with different priorities as one", () => {
+    const values = section2(2, [
+      [Weekday.Monday, "08:00", "10:00", Priority.Primary],
+      [Weekday.Monday, "10:00", "12:00", Priority.Secondary],
+    ]);
+    const result = ApplicationPage2Schema.safeParse(values);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((i) => i.message)).toEqual([
+      "At least as many suitable time ranges as applied reservations per week",
+    ]);
+  });
+
+  test("page 2 validation counts ranges with a gap between them separately", () => {
+    const values = section2(2, [
+      [Weekday.Monday, "08:00", "10:00", Priority.Primary],
+      [Weekday.Monday, "11:00", "12:00", Priority.Secondary],
+    ]);
+    expect(ApplicationPage2Schema.safeParse(values).success).toBe(true);
+  });
+
+  test("page 2 validation checks the minimum duration against the joined range", () => {
+    const values = section2(
+      1,
+      [
+        [Weekday.Monday, "08:00", "09:00", Priority.Primary],
+        [Weekday.Monday, "09:00", "10:00", Priority.Secondary],
+      ],
+      2 * 3600
+    );
+    expect(ApplicationPage2Schema.safeParse(values).success).toBe(true);
+  });
+
+  test("page 2 validation does not join ranges on different days", () => {
+    const values = section2(2, [
+      [Weekday.Monday, "22:00", "00:00", Priority.Primary],
+      [Weekday.Tuesday, "00:00", "02:00", Priority.Primary],
+    ]);
+    expect(ApplicationPage2Schema.safeParse(values).success).toBe(true);
+  });
+
   test("page 2 validation fails with fewer time ranges than applied reservations per week", () => {
     const values = page2WithRanges(3, [Weekday.Monday, Weekday.Tuesday]);
     const result = ApplicationPage2Schema.safeParse(values);
