@@ -2,7 +2,7 @@
  * Shared user data. The testData fixture (TestSuites/test-data.ts) uses these users:
  * - in sequential mode (FORCE_SINGLE_USER=True or one worker), where all tests share them
  * - in tests without a data set tag, like the notification tests
- * In parallel runs, the other tests get their own users from parallel_users.dat.
+ * In parallel runs, the other tests get their own users from test_users.ts.
  */
 
 function withFullName<T extends { firstName: string; lastName: string }>(person: T): T & { fullName: string } {

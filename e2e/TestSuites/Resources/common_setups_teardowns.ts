@@ -14,13 +14,12 @@ export class CommonSetupsTeardowns extends PageObject {
    * Tag-based test setup
    * Automatically initializes test data and suite units based on test tags.
    * REQUIRED TAGS on each test:
-   * - Data set tag: desktop-test-data-set-0, admin-test-data-set-2, etc.
-   * - Suite type tag: desktop-suite, admin-suite, combined-suite, android-suite, iphone-suite
+   * - Data set tag: user-data-set-0, admin-test-data-set-2, etc.
+   * - Suite type tag: admin-suite or combined-suite. A customer test has none: its project's platform picks the units.
    * EXAMPLE:
    * Test Case
    * [Tags]
-   * desktop-test-data-set-0
-   * desktop-suite
+   * user-data-set-0
    * smoke
    */
   @step("common_setups_teardowns.Complete Test Setup From Tags")

@@ -1,9 +1,12 @@
 /**
  * Playwright config for the Varaamo e2e suite.
  *
- * One project per suite file, with the same name. The suites depend on the `create_data` project, which creates
- * the test data once per run. The notification suite has no data setup: it depends on `notifications_login`, which
- * logs its admin in once, and runs separately with one worker:
+ * One project per suite, with the same name, and the suite's file is `<name>.spec.ts`. The three customer projects run
+ * the same tests, which `customer-tests.ts` defines, from a small spec file each, so the report lists the tests of
+ * each device in a group of its own. The desktop project runs all of them except the `@phone-only` ones, and the
+ * phone projects run those with the `@also-on-phones` or `@phone-only` tag. The suites depend on the `create_data`
+ * project, which creates the test data once per run. The notification suite has no data setup: it depends on
+ * `notifications_login`, which logs its admin in once, and runs separately with one worker:
  *   playwright test --grep-invert @serialonly                                     # parallel run
  *   playwright test --project Tests_admin_notifications_serial --workers 1        # serial run
  * Sequential mode with shared users:
@@ -15,6 +18,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import type { PlaywrightTestOptions, PlaywrightWorkerOptions } from "@playwright/test";
 import { readEnv } from "./lib/env";
+import type { Platform } from "./TestSuites/Resources/test_users";
 
 // The app shows times only in Helsinki time, so the suite runs in it: TZ for the reservation times that the suite
 // formats in Node's local time, and timezoneId below for the browsers
@@ -26,16 +30,24 @@ const env = readEnv();
 // PW_TRACE=on (or another trace mode) records Playwright traces for local debugging. They aren't recorded in CI.
 const trace = env.CI ? "off" : env.PW_TRACE;
 
-// The desktop browser (devices.Set Up Chromium Desktop Browser And Open Url)
+// The desktop browser (devices.Set Up Browser And Open Url)
 const desktop: Partial<PlaywrightTestOptions & PlaywrightWorkerOptions> = {
   browserName: "chromium",
   viewport: { width: 1440, height: 900 },
   deviceScaleFactor: 1,
 };
 
+// The tests of the phone projects: those that also run on the desktop, and those that run only on phones
+const PHONE_TESTS = /@also-on-phones|@phone-only/;
+
 const suite = (
   name: string,
   options: {
+    /** The tests the project runs, and those it leaves out, by their tags */
+    grep?: RegExp;
+    grepInvert?: RegExp;
+    /** Picks the users and units of the project's tests (TestSuites/test-data.ts) */
+    platform?: Platform;
     dependencies?: string[];
     fullyParallel?: boolean;
     use?: Partial<PlaywrightTestOptions & PlaywrightWorkerOptions>;
@@ -43,6 +55,9 @@ const suite = (
 ) => ({
   name,
   testMatch: `${name}.spec.ts`,
+  grep: options.grep,
+  grepInvert: options.grepInvert,
+  metadata: { platform: options.platform ?? "desktop" },
   dependencies: options.dependencies ?? ["create_data"],
   fullyParallel: options.fullyParallel ?? true,
   use: options.use ?? desktop,
@@ -98,13 +113,13 @@ export default defineConfig({
       timeout: 10 * 60_000,
       retries: 0,
     },
-    suite("Tests_user_desktop_FI"),
+    suite("Tests_user_desktop_FI", { grepInvert: /@phone-only/ }),
     suite("Tests_admin_desktop_FI"),
     suite("Tests_users_with_admin_desktop"),
-    // Set Up Android Pixel 5 And Open Url
-    suite("Tests_user_mobile_android_FI", { use: { ...devices["Pixel 5"] } }),
-    // Set Up Iphone 14 And Open Url
-    suite("Tests_user_mobile_iphone_FI", { use: { ...devices["iPhone 14"] } }),
+    // An Android phone: Chromium with the Pixel 5 device
+    suite("Tests_user_mobile_android_FI", { grep: PHONE_TESTS, platform: "android", use: { ...devices["Pixel 5"] } }),
+    // An iPhone: WebKit with the iPhone 14 device
+    suite("Tests_user_mobile_iphone_FI", { grep: PHONE_TESTS, platform: "iphone", use: { ...devices["iPhone 14"] } }),
     // Logs the notification suite's admin in once and saves the login, which the suite's tests start with
     { name: "notifications_login", testMatch: "notifications_login.setup.ts", use: desktop },
     suite("Tests_admin_notifications_serial", { dependencies: ["notifications_login"], fullyParallel: false }),

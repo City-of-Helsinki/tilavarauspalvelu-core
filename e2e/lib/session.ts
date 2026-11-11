@@ -27,11 +27,19 @@ export class Session {
 
   /** `backendErrors` watches the test's own context and each context the session opens. */
   constructor(
-    private readonly own: { browser: Browser; context: BrowserContext; page: Page },
+    private readonly own: { browser: Browser; context: BrowserContext; page: Page; isMobile?: boolean },
     private readonly info: TestInfo,
     private readonly backendErrors: BackendErrors | null = null
   ) {
     backendErrors?.watch(own.context);
+  }
+
+  /**
+   * True when the test's device is a phone, which has the `isMobile` option: the project's device, or a `test.use` of
+   * the test. The header's links are in a phone's Menu.
+   */
+  get isMobile(): boolean {
+    return this.own.isMobile === true;
   }
 
   /** The page the keywords act on. */

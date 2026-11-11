@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "playwright test --grep-invert @serialonly --project 'Tests_*' --project create_data",
-    "test:smoke": "playwright test --grep @smoke",
+    "test:smoke": "playwright test --grep @smoke --project Tests_user_desktop_FI --project Tests_admin_desktop_FI",
     "test:notifications": "playwright test --project Tests_admin_notifications_serial --workers 1",
     "test:all": "pnpm test; suites=$?; pnpm test:all:notifications; notifications=$?; exit $((suites || notifications))",
     "test:all:notifications": "PLAYWRIGHT_HTML_OUTPUT_DIR=playwright-report/notifications PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/notifications/junit.xml pnpm test:notifications --output test-results/notifications",

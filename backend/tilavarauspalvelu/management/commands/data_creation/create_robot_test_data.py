@@ -3560,7 +3560,7 @@ def create_users() -> None:
         },
     )
 
-    # desktop-test-data-set-7: Sanna Hämäläinen
+    # desktop-test-data-set-7 (Robot), user-data-set-7 on desktop (e2e): Sanna Hämäläinen
     User.objects.update_or_create(
         username="u-eplnxl7s3baungvx4cvjsjb6ge",
         defaults={
@@ -3579,7 +3579,7 @@ def create_users() -> None:
         },
     )
 
-    # desktop-test-data-set-9: Kirsi Heikkinen
+    # desktop-test-data-set-9 (Robot), user-data-set-9 on desktop (e2e): Kirsi Heikkinen
     User.objects.update_or_create(
         username="u-3zqtvhpzhbevrdcej7prbobe2i",
         defaults={
@@ -3598,7 +3598,7 @@ def create_users() -> None:
         },
     )
 
-    # desktop-test-data-set-10: Marja Koskinen
+    # desktop-test-data-set-10 (Robot), user-data-set-10 on desktop (e2e): Marja Koskinen
 
     User.objects.update_or_create(
         username="u-lelgrutpxffxra7r6z7cmc5ksu",
@@ -3618,7 +3618,7 @@ def create_users() -> None:
         },
     )
 
-    # desktop-test-data-set-11: Tiina Järvinen
+    # desktop-test-data-set-11 (Robot), user-data-set-11 on desktop (e2e): Tiina Järvinen
     User.objects.update_or_create(
         username="u-n76joq6monajzlqxzoff4ore4i",
         defaults={
@@ -3734,7 +3734,7 @@ def create_users() -> None:
         },
     )
 
-    # mobile-android-data-set-2: Elina Laine
+    # mobile-android-data-set-2 (Robot), user-data-set-4 on android (e2e): Elina Laine
     User.objects.update_or_create(
         username="u-3ubdbnexc5cotcl623jagjbzni",
         defaults={
@@ -3753,7 +3753,7 @@ def create_users() -> None:
         },
     )
 
-    # mobile-iphone-data-set-1: Merja Kangas
+    # mobile-iphone-data-set-1 (Robot), user-data-set-1 on iphone (e2e): Merja Kangas
     User.objects.update_or_create(
         username="u-d7wshr3wqrfsdjcyprfvklq3lu",
         defaults={

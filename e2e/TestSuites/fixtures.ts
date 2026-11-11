@@ -19,7 +19,7 @@ import { errorMessage, isSequential, log, runStep, test as base } from "../lib/r
 import { Session } from "../lib/session";
 import { Pages } from "./pages";
 import type { TestState } from "./state";
-import { resolveTestData } from "./test-data";
+import { platformOf, resolveTestData } from "./test-data";
 import type { TestData } from "./test-data";
 
 /** The run's first test in parallel slot n waits n times this before it starts */
@@ -65,7 +65,7 @@ export const test = base.extend<
     async ({ testRuntime: _testRuntime }, use, info) => {
       const data = resolveTestData(
         info.tags.map((tag) => tag.replace(/^@/, "")),
-        { sequential: isSequential() }
+        { sequential: isSequential(), platform: platformOf(info.project) }
       );
       // A data set's users are used by one test at a time
       if (data.dataSet != null) {
@@ -89,9 +89,9 @@ export const test = base.extend<
     { auto: true },
   ],
   // The backend errors of the test's pages are added to the test's annotations when it ends (lib/backend-errors.ts)
-  session: async ({ browser, context, page }, use, info) => {
+  session: async ({ browser, context, page, isMobile }, use, info) => {
     const backendErrors = new BackendErrors(info);
-    const session = new Session({ browser, context, page }, info, backendErrors);
+    const session = new Session({ browser, context, page, isMobile }, info, backendErrors);
     await use(session);
     await backendErrors.finish();
     // A failure to close what the test opened isn't the test's result, so it is a warning

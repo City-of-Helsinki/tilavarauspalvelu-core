@@ -26,6 +26,9 @@ async function clickAndWaitForLogout(page: Page, logout_button: Locator): Promis
   await page.waitForURL((url) => url.host === app_host && !url.pathname.endsWith("/auth/logout/"));
 }
 
+/** The button that opens the phone's Menu, and says in `aria-expanded` whether it is open */
+const MOBILE_MENU_BUTTON = '[aria-controls="hds-mobile-menu"]';
+
 /**
  * Closes the HDS mobile menu after a link in it has opened a page. The app opens the page without a reload, so the
  * menu stays open, and while it is open HDS swallows the next click outside it to close the menu. Escape closes the
@@ -33,10 +36,7 @@ async function clickAndWaitForLogout(page: Page, logout_button: Locator): Promis
  */
 async function closeMobileMenu(page: Page): Promise<void> {
   await page.keyboard.press("Escape");
-  await expect(page.locator('[aria-controls="hds-mobile-menu"]'), "The mobile menu is closed").toHaveAttribute(
-    "aria-expanded",
-    "false"
-  );
+  await expect(page.locator(MOBILE_MENU_BUTTON), "The mobile menu is closed").toHaveAttribute("aria-expanded", "false");
 }
 
 export class Topnav extends PageObject {
@@ -45,8 +45,27 @@ export class Topnav extends PageObject {
     return this.page.locator("header");
   }
 
+  /** On a phone, the header's login, user menu and links are in its Menu: opens it, unless it is open already. */
+  private async openMenuOnPhone() {
+    if (!this.isMobile) {
+      return;
+    }
+    // The Menu button is a toggle, so a click on an open Menu would close it
+    if ((await this.page.locator(MOBILE_MENU_BUTTON).getAttribute("aria-expanded")) !== "true") {
+      await this.clickNavigationMenuMobile();
+    }
+  }
+
+  /** On a phone, closes the Menu that a link in it left open. */
+  private async closeMenuOnPhone() {
+    if (this.isMobile) {
+      await closeMobileMenu(this.page);
+    }
+  }
+
   @step("topnav.Click Login")
   async clickLogin() {
+    await this.openMenuOnPhone();
     await this.page.locator("#login").click();
   }
 
@@ -69,6 +88,7 @@ export class Topnav extends PageObject {
 
   @step("topnav.Click User Menu")
   async clickUserMenu() {
+    await this.openMenuOnPhone();
     await this.page.locator("#user-menu").click();
   }
 
@@ -85,31 +105,39 @@ export class Topnav extends PageObject {
 
   @step("topnav.Navigate To Single Booking Page")
   async navigateToSingleBookingPage() {
+    await this.openMenuOnPhone();
     await this.pages.customKeywords.clickAndWaitForPage(
       this.header.getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
       "/search"
     );
+    await this.closeMenuOnPhone();
   }
 
   @step("topnav.Navigate To My Bookings")
   async navigateToMyBookings() {
+    await this.openMenuOnPhone();
     await this.header.getByRole("link", { name: MYBOOKINGS_FI, exact: true }).click();
 
     // Confirms page is loaded
     await this.pages.mybookings.checkMyBookingsH1(MYBOOKINGS_FI);
     await this.pages.mybookings.waitForUpcomingBookingsToLoad();
+    await this.closeMenuOnPhone();
   }
 
   @step("topnav.Navigate To Recurring Booking Page")
   async navigateToRecurringBookingPage() {
+    await this.openMenuOnPhone();
     await this.header.getByRole("link", { name: RECURRING_BOOKINGS_FI, exact: true }).click();
     await this.page.waitForURL((url) => url.pathname === "/recurring");
+    await this.closeMenuOnPhone();
   }
 
   @step("topnav.Navigate To My Applications")
   async navigateToMyApplications() {
+    await this.openMenuOnPhone();
     await this.header.getByRole("link", { name: MYAPPLICATIONS_FI, exact: true }).click();
     await this.page.waitForURL((url) => url.pathname === "/applications");
+    await this.closeMenuOnPhone();
   }
 
   // MOBILE UI
@@ -117,21 +145,6 @@ export class Topnav extends PageObject {
   async clickNavigationMenuMobile() {
     // The clicks in the menu wait until its animation has ended
     await this.page.locator("#Menu").click();
-  }
-
-  @step("topnav.Click User Menu Mobile")
-  async clickUserMenuMobile() {
-    await this.page.locator("#user-menu").click();
-  }
-
-  @step("topnav.Click Login Mobile")
-  async clickLoginMobile() {
-    await this.page.locator("#login").click();
-  }
-
-  @step("topnav.Click Logout Mobile")
-  async clickLogoutMobile() {
-    await clickAndWaitForLogout(this.page, this.page.getByRole("button", { name: "Kirjaudu ulos", exact: true }));
   }
 
   @step("topnav.Click Tablist Scroll Button To Right Mobile")
@@ -153,22 +166,5 @@ export class Topnav extends PageObject {
     // ${Topnav_menu_email_elements}=  Browser.Get Elements  id=hds-mobile-menu >> [data-testid="navigation-user-email"]
     // ${Topnav_menu_email_element_text}=  Get Text  ${Topnav_menu_email_elements}[1]
     // Should Be Equal  ${Topnav_menu_email_element_text}  ${Expected_email}
-  }
-
-  @step("topnav.Navigate To Single Booking Page Mobile")
-  async navigateToSingleBookingPageMobile() {
-    await this.page.locator("#Menu").click();
-    await this.pages.customKeywords.clickAndWaitForPage(
-      this.header.getByRole("link", { name: SINGLEBOOKING_FI, exact: true }),
-      "/search"
-    );
-    await closeMobileMenu(this.page);
-  }
-
-  @step("topnav.Navigate To My Bookings Mobile")
-  async navigateToMyBookingsMobile() {
-    await this.clickNavigationMenuMobile();
-    await this.navigateToMyBookings();
-    await closeMobileMenu(this.page);
   }
 }

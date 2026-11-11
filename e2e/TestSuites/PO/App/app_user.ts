@@ -495,6 +495,11 @@ export class AppUser extends PageObject {
   async userChecksCancelledBookingIsFound(unitname_mybookings: string, time_of_quick_reservation_minusT: string) {
     await log("This checks the canceled booking is not found in upcoming reservations", { level: "DEBUG" });
 
+    if (this.isMobile) {
+      // The phone's tab list scrolls sideways: its button brings the tabs after the first ones into view
+      await this.pages.topnav.clickTablistScrollButtonToRightMobile();
+    }
+
     await this.pages.mybookings.checkUnitnameAndReservationAreNotFound(
       unitname_mybookings,
       time_of_quick_reservation_minusT
@@ -512,13 +517,6 @@ export class AppUser extends PageObject {
   @step("app_user.User Opens The Booking In My Bookings")
   async userOpensTheBookingInMyBookings(unitname: string, reservationtime: string) {
     await this.pages.topnav.navigateToMyBookings();
-    await this.userCanSeeUpcomingBookingInListAndClicksIt(unitname, reservationtime);
-  }
-
-  /** Goes to My bookings from the mobile menu and opens the upcoming booking of the unit at that time */
-  @step("app_user.User Opens The Booking In My Bookings Mobile")
-  async userOpensTheBookingInMyBookingsMobile(unitname: string, reservationtime: string) {
-    await this.pages.topnav.navigateToMyBookingsMobile();
     await this.userCanSeeUpcomingBookingInListAndClicksIt(unitname, reservationtime);
   }
 
@@ -883,33 +881,6 @@ export class AppUser extends PageObject {
   async userVerifiesTheRecurringReservationIsCancelled() {
     await this.pages.customKeywords.verifyCardNotFoundInGroupWithMatchingConditions(
       EMPTY_STATE_MESSAGE_RECURRING_APPLICATIONS
-    );
-  }
-
-  // MOBILE
-  @step("app_user.User Navigates To Single Booking Page Mobile")
-  async userNavigatesToSingleBookingPageMobile() {
-    await this.pages.topnav.navigateToSingleBookingPageMobile();
-  }
-
-  /** Goes to single booking from the mobile menu and searches for the unit */
-  @step("app_user.User Finds The Unit Mobile")
-  async userFindsTheUnitMobile(nameoftheunit: string) {
-    await this.userNavigatesToSingleBookingPageMobile();
-    await this.userUsesSearchToFindRightUnit(nameoftheunit);
-  }
-
-  @step("app_user.User Checks Cancelled Booking Is Found Mobile")
-  async userChecksCancelledBookingIsFoundMobile(unitname_mybookings: string, time_of_quick_reservation_minusT: string) {
-    await this.pages.topnav.clickTablistScrollButtonToRightMobile();
-    await this.pages.mybookings.checkUnitnameAndReservationAreNotFound(
-      unitname_mybookings,
-      time_of_quick_reservation_minusT
-    );
-    await this.pages.mybookings.navigateToCancelledBookings();
-    await this.pages.mybookings.checkUnitnameAndReservationTimeAndClickShow(
-      unitname_mybookings,
-      time_of_quick_reservation_minusT
     );
   }
 

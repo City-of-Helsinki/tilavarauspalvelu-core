@@ -30,8 +30,9 @@ import { Pages } from "../TestSuites/pages";
 import { isConfirmedReservationUrl } from "../TestSuites/PO/Common/checkout";
 import { python_keywords } from "../TestSuites/Resources/python_keywords";
 import { BASIC_PERMISSION_TARGET_ADMIN, BASIC_USER_MALE } from "../TestSuites/Resources/serial_users";
-import { COMBINED_UNITS, DESKTOP_UNITS } from "../TestSuites/Resources/suite_specific_units";
-import { resolveTestData } from "../TestSuites/test-data";
+import { ANDROID_UNITS, COMBINED_UNITS, DESKTOP_UNITS } from "../TestSuites/Resources/suite_specific_units";
+import { PLATFORMS, USER_DATA_SETS } from "../TestSuites/Resources/test_users";
+import { platformOf, resolveTestData } from "../TestSuites/test-data";
 
 const dataPage = (html: string) => `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
 
@@ -256,15 +257,31 @@ test.describe("Runtime", () => {
   test("Tags choose the test data", () => {
     const parallel = { sequential: false };
 
-    // A user test gets its users from its data set, and its units from its suite tag
-    const user = resolveTestData(["desktop-suite", "desktop-test-data-set-0", "smoke"], parallel);
-    expect(user.dataSet).toBe("desktop-test-data-set-0");
+    // A customer test gets the user of its data set for the project's platform, and the platform's units
+    const user = resolveTestData(["user-data-set-0", "smoke"], parallel);
+    expect(user.dataSet).toBe("desktop-user-data-set-0");
+    expect(user.suite).toBe("desktop-suite");
     expect(user.user.hetu).toMatch(/\S/);
     expect(user.units.alwaysFreeUnit).toBe(DESKTOP_UNITS.alwaysFreeUnit);
     expect(user.units.alwaysFreeUnitWithLocation).toBe(DESKTOP_UNITS.alwaysFreeUnitWithLocation);
     expect(user.admin.hetu).toBe("");
     // A unit that the suite doesn't pick fails when it is read
     expect(() => user.units.unitWithAccessCode).toThrow("The desktop-suite tests have no unit unitWithAccessCode");
+    // The same test on a phone gets a user and unit copies of that platform
+    const phone = resolveTestData(["user-data-set-0"], { sequential: false, platform: "android" });
+    expect(phone.dataSet).toBe("android-user-data-set-0");
+    expect(phone.suite).toBe("android-suite");
+    expect(phone.user.hetu).not.toBe(user.user.hetu);
+    expect(phone.units.alwaysFreeUnit).toBe(ANDROID_UNITS.alwaysFreeUnit);
+    expect(phone.units.unitRequiresAlwaysHandling).toBe(ANDROID_UNITS.unitRequiresAlwaysHandling);
+    // A data set that has no user for the platform fails the test, like a test of a platform that skips it
+    expect(() => resolveTestData(["user-data-set-2"], { sequential: false, platform: "iphone" })).toThrow(
+      "The data set user-data-set-2 has no user for iphone"
+    );
+    // A platform's suite tag would give a phone the units of another device, so it fails the test
+    expect(() =>
+      resolveTestData(["user-data-set-0", "desktop-suite"], { sequential: false, platform: "android" })
+    ).toThrow("the project's platform picks the units");
 
     // A permission test gets the Django admin and the admin whose permissions change
     const permissions = resolveTestData(["admin-suite", "admin-test-data-set-2", "general-permissions-test"], parallel);
@@ -281,7 +298,7 @@ test.describe("Runtime", () => {
     expect(combined.units.alwaysPaidUnitSubvented).toBe(COMBINED_UNITS.alwaysPaidUnitSubvented);
 
     // Sequential mode and tests without a data set use the shared users of serial_users
-    const sequential = resolveTestData(["desktop-suite", "desktop-test-data-set-0"], { sequential: true });
+    const sequential = resolveTestData(["user-data-set-0"], { sequential: true });
     expect(sequential.dataSet).toBeNull();
     expect(sequential.user).toEqual(BASIC_USER_MALE);
     const unitPermissions = resolveTestData(["admin-suite", "admin-test-data-set-3", "unit-permissions-test"], {
@@ -290,9 +307,55 @@ test.describe("Runtime", () => {
     expect(unitPermissions.permissionTarget.fullName).toBe("Niko Selänne");
     expect(resolveTestData([], parallel)).toMatchObject({ dataSet: null, suite: "desktop-suite" });
 
-    // A data set that parallel_users.dat doesn't have fails the test instead of falling back to the shared users
-    expect(() => resolveTestData(["desktop-test-data-set-99"], parallel)).toThrow(
-      "No section with tags=desktop-test-data-set-99 in parallel_users.dat"
+    // A data set that test_users.ts doesn't have fails the test instead of falling back to the shared users
+    expect(() => resolveTestData(["user-data-set-99"], parallel)).toThrow(
+      "No data set user-data-set-99 in test_users.ts"
+    );
+    // So does a tag that looks like a data set tag but isn't one, like one of the earlier platform tags
+    expect(() => resolveTestData(["desktop-test-data-set-0"], parallel)).toThrow("is not a data set tag");
+    expect(() => resolveTestData(["mobile-iphone-data-set-1"], { sequential: true })).toThrow("is not a data set tag");
+    // A combined set has no Django admin for a permission test
+    expect(() => resolveTestData(["combined-test-data-set-0", "general-permissions-test"], parallel)).toThrow(
+      "The data set combined-test-data-set-0 has no Django admin"
+    );
+  });
+
+  test("A project's platform picks the data, and its device tells the keywords it is a phone", () => {
+    expect(platformOf({ metadata: {}, use: {} })).toBe("desktop");
+    expect(platformOf({ metadata: { platform: "iphone" }, use: { isMobile: true } })).toBe("iphone");
+    expect(() => platformOf({ metadata: { platform: "tablet" }, use: {} })).toThrow(
+      "not one of desktop, android, iphone"
+    );
+    // A phone device without a phone platform would get the desktop's users and units, and a phone platform without a
+    // phone device would get a phone's users on a desktop page
+    expect(() => platformOf({ metadata: {}, use: { isMobile: true } })).toThrow("device is a phone");
+    expect(() => platformOf({ metadata: { platform: "android" }, use: {} })).toThrow("device is not a phone");
+    // The session follows the isMobile option of the test's own context: the Pixel 5 and iPhone 14 devices have it,
+    // the desktop's doesn't
+    expect(new Session({ isMobile: true } as never, {} as never).isMobile).toBe(true);
+    expect(new Session({ isMobile: false } as never, {} as never).isMobile).toBe(false);
+    expect(new Session({} as never, {} as never).isMobile).toBe(false);
+  });
+
+  test("The customer users of all platforms are different people", () => {
+    // Tests of the platforms run at the same time, so two of them logged in as one person would disturb each other
+    const hetus = new Map<string, string>();
+    let users = 0;
+    for (const [tag, set] of Object.entries(USER_DATA_SETS)) {
+      for (const platform of PLATFORMS) {
+        if (set[platform] == null) {
+          // The data set has no user for this platform: a test of the platform that names it fails
+          continue;
+        }
+        const data = resolveTestData([tag], { sequential: false, platform });
+        const owner = `${platform} ${tag}`;
+        expect(hetus.get(data.user.hetu), `${owner} has the same hetu as ${hetus.get(data.user.hetu)}`).toBeUndefined();
+        hetus.set(data.user.hetu, owner);
+        users++;
+      }
+    }
+    expect(users, "Every user of the customer data sets is checked").toBe(
+      Object.values(USER_DATA_SETS).flatMap((set) => Object.values(set)).length
     );
   });
 

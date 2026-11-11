@@ -23,7 +23,7 @@ test.describe(
   },
   () => {
     test.beforeEach(async ({ appCommon }) => {
-      await appCommon.userOpensDesktopBrowserToLandingPage();
+      await appCommon.userOpensBrowserToLandingPage();
     });
 
     test(
