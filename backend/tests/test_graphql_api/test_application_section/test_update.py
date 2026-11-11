@@ -201,6 +201,22 @@ def test_application_section__update__smaller_max_duration_than_min_duration(gra
     ], response
 
 
+def test_application_section__update__zero_reservations_per_week(graphql):
+    application_section = ApplicationSectionFactory.create_in_status_unallocated(applied_reservations_per_week=2)
+    graphql.login_with_superuser()
+
+    data = get_application_section_update_data(application_section=application_section)
+    data["appliedReservationsPerWeek"] = 0
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.field_error_messages() == [
+        "Must apply for at least 1 reservation per week.",
+    ], response
+
+    application_section.refresh_from_db()
+    assert application_section.applied_reservations_per_week == 2
+
+
 def test_application_section__update__switch_reservation_unit_option_preferred_order(graphql):
     # given:
     # - There is an application section with two reservation unit options
