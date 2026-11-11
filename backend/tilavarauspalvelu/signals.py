@@ -41,6 +41,8 @@ from tilavarauspalvelu.models import (
     Reservation,
     ReservationUnit,
     ReservationUnitImage,
+    ReservationUnitPricingGroup,
+    SalesItem,
     Space,
     Unit,
 )
@@ -163,7 +165,45 @@ def _payment_accounting_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[P
             refresh_reservation_unit_accounting_task.delay(reservation_unit.pk)
 
 
+@receiver(post_save, sender=SalesItem, dispatch_uid="sales_item_post_save")
+def _sales_item_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[SalesItem]]) -> None:
+    instance = kwargs["instance"]
+
+    if settings.UPDATE_ACCOUNTING:
+        reservation_unit_pks = (
+            ReservationUnitPricingGroup.objects
+            .filter(pricing_group__components__sales_item=instance)
+            .order_by("reservation_unit_id")
+            .values_list("reservation_unit_id", flat=True)
+            .distinct()
+        )
+        for reservation_unit_pk in reservation_unit_pks:
+            refresh_reservation_unit_accounting_task.delay_on_commit(reservation_unit_pk)
+
+
+@receiver(post_save, sender=ReservationUnitPricingGroup, dispatch_uid="reservation_unit_pricing_group_post_save")
+def _reservation_unit_pricing_group_post_save(
+    sender: Any,
+    **kwargs: Unpack[PostSaveKwargs[ReservationUnitPricingGroup]],
+) -> None:
+    instance = kwargs["instance"]
+
+    if settings.UPDATE_ACCOUNTING:
+        refresh_reservation_unit_accounting_task.delay_on_commit(instance.reservation_unit_id)
+
+
 # --- Post delete signals -----------------------------------------------------------------------------------------
+
+
+@receiver(post_delete, sender=ReservationUnitPricingGroup, dispatch_uid="reservation_unit_pricing_group_post_delete")
+def _reservation_unit_pricing_group_post_delete(
+    sender: Any,
+    **kwargs: Unpack[PostDeleteKwargs[ReservationUnitPricingGroup]],
+) -> None:
+    instance = kwargs["instance"]
+
+    if settings.UPDATE_ACCOUNTING:
+        refresh_reservation_unit_accounting_task.delay_on_commit(instance.reservation_unit_id)
 
 
 @receiver(post_delete, sender=Space, dispatch_uid="space_post_delete")
