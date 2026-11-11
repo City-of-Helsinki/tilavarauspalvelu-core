@@ -34,7 +34,9 @@ case "$1" in
       usage
     fi
     if [[ "$1" == log ]]; then
-      gh run view --job "$job_id" --repo "$repo" --log
+      # Use the job logs API. `gh run view --job <id> --log` prints the log of the job
+      # with the same name in the latest attempt of the run. After a rerun, that is not this job.
+      gh api --allow-escape-sequences "repos/$repo/actions/jobs/$job_id/logs"
     else
       gh api "repos/$repo/actions/jobs/$job_id" --jq '{id, name, status, conclusion, started_at, completed_at, html_url}'
     fi
