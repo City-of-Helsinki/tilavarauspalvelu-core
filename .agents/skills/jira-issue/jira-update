@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Update the summary, description, labels, links or status of a Jira issue, or add a comment, through the Jira Cloud REST API.
+# Update the summary, description, labels, links, assignee or status of a Jira issue, or add a comment, through the Jira Cloud REST API.
 # Usage: jira-update <key or URL> <options>, e.g. jira-update TILA-123 --add-label backend
 set -euo pipefail
 
@@ -18,6 +18,7 @@ Give at least one change. Options marked with * can be repeated.
   --blocked-by <key>        * Add a link: this issue is blocked by <key>.
   --relates <key>           * Add a link: this issue relates to <key>.
   --remove-link <key>       * Remove every link between this issue and <key>.
+  --assignee <user>           Assign the issue: me, none, or a name or email that matches one user.
   --transition <status>       Move the issue to this status, e.g. Done. Done last, after the other changes.
   --dry-run                   Print the write requests and change nothing in Jira.
 EOF
@@ -38,6 +39,7 @@ blocked_by=()
 relates=()
 remove_links=()
 transition=""
+assignee=""
 dry_run=false
 
 while [[ $# -gt 0 ]]; do
@@ -66,6 +68,11 @@ while [[ $# -gt 0 ]]; do
       [[ -z "$comment_file" ]] || { echo "Give --comment-file only once." >&2; usage; }
       check_text_file "$value" comment
       comment_file="$value"
+      ;;
+    --assignee)
+      [[ -z "$assignee" ]] || { echo "Give --assignee only once." >&2; usage; }
+      [[ -n "${value//[[:space:]]/}" ]] || { echo "The assignee is empty." >&2; exit 2; }
+      assignee="$value"
       ;;
     --transition)
       [[ -z "$transition" ]] || { echo "Give --transition only once." >&2; usage; }
@@ -102,7 +109,7 @@ for other in ${remove_links[@]+"${remove_links[@]}"}; do
     || { echo "Link to $other is both added and removed." >&2; exit 2; }
 done
 
-if [[ -z "$new_summary" && -z "$description_file" && -z "$comment_file" && -z "$transition" ]] \
+if [[ -z "$new_summary" && -z "$description_file" && -z "$comment_file" && -z "$assignee" && -z "$transition" ]] \
   && (( ${#add_labels[@]} + ${#remove_labels[@]} + ${#blocks[@]} + ${#blocked_by[@]} + ${#relates[@]} + ${#remove_links[@]} == 0 )); then
   echo "Nothing to change." >&2
   usage
@@ -111,7 +118,7 @@ fi
 load_credentials
 
 # The current summary, labels and links decide what to skip and which link IDs to remove.
-issue="$(api "rest/api/2/issue/$key?fields=summary,labels,issuelinks,status")"
+issue="$(api "rest/api/2/issue/$key?fields=summary,labels,issuelinks,assignee,status")"
 
 # Each request is "<method><sep><path><sep><body><sep><summary>".
 # The separator is not whitespace, so `read` keeps an empty body as an empty field.
@@ -211,6 +218,49 @@ done
 for other in ${relates[@]+"${relates[@]}"}; do
   add_link --relates "$other" '.outwardIssue.key == $o or .inwardIssue.key == $o'
 done
+
+# Change the assignee before the status, because a workflow can require an assignee for a status.
+# "me" is the owner of the API token. "none" removes the assignee. Any other value must match one active user.
+if [[ -n "$assignee" ]]; then
+  case "$(tr '[:upper:]' '[:lower:]' <<<"$assignee")" in
+    none)
+      account_id=""
+      assignee_name=""
+      ;;
+    me)
+      myself="$(api "rest/api/2/myself")"
+      account_id="$(jq --raw-output '.accountId' <<<"$myself")"
+      assignee_name="$(jq --raw-output '.displayName' <<<"$myself")"
+      ;;
+    *)
+      query="$(jq --null-input --raw-output --arg q "$assignee" '$q | @uri')"
+      # The search is fuzzy. A typo can find someone else, so accept only an exact name or email.
+      found_users="$(api "rest/api/2/user/search?query=$query" | jq '[.[] | select(.active and .accountType == "atlassian")]')"
+      users="$(
+        jq --arg q "$assignee" '($q | ascii_downcase) as $q
+          | [.[] | select((.displayName | ascii_downcase) == $q or ((.emailAddress // "") | ascii_downcase) == $q)]' \
+          <<<"$found_users"
+      )"
+      if [[ "$(jq length <<<"$users")" -ne 1 ]]; then
+        echo "The assignee $assignee must match the name or email of exactly one active user." >&2
+        echo "Users that the search found: $(jq --raw-output '[.[].displayName] | join(", ")' <<<"$found_users")" >&2
+        exit 2
+      fi
+      account_id="$(jq --raw-output '.[0].accountId' <<<"$users")"
+      assignee_name="$(jq --raw-output '.[0].displayName' <<<"$users")"
+      ;;
+  esac
+  if [[ "$(jq --raw-output '.fields.assignee.accountId // ""' <<<"$issue")" == "$account_id" ]]; then
+    skipped+=("The assignee of $key is already ${assignee_name:-nobody}.")
+  else
+    body="$(jq --null-input --compact-output --arg id "$account_id" '{accountId: (if $id == "" then null else $id end)}')"
+    if [[ -n "$account_id" ]]; then
+      requests+=("PUT${sep}rest/api/2/issue/$key/assignee$sep$body${sep}Assigned the issue to $assignee_name.")
+    else
+      requests+=("PUT${sep}rest/api/2/issue/$key/assignee$sep$body${sep}Removed the assignee.")
+    fi
+  fi
+fi
 
 # Change the status last, so a comment explains the change before the issue closes.
 # The transitions depend on the workflow and the current status. Match the target status by name, without case.
