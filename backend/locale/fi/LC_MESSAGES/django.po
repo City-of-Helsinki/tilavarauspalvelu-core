@@ -1239,6 +1239,7 @@ msgid "Refund ID"
 msgstr "Maksun palautuksen tunniste"
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment type"
 msgstr "Maksutyyppi"
 
@@ -3998,10 +3999,6 @@ msgid ""
 "Reservation min duration cannot be greater than reservation max duration."
 msgstr ""
 "Varauksen minimikesto ei voi olla suurempi kuin varauksen maksimikesto."
-
-#: tilavarauspalvelu/models/application_section/model.py
-msgid "Can only apply from 1 to 7 reservations per week."
-msgstr "Voi hakea vain 1-7 varausta viikossa."
 
 #: tilavarauspalvelu/models/application_section/model.py
 msgid ""
