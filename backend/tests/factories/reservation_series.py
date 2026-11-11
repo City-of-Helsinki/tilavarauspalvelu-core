@@ -3,7 +3,8 @@ from __future__ import annotations
 import datetime
 from typing import Any, Literal
 
-from factory import LazyAttribute, fuzzy
+from factory import LazyAttribute, LazyFunction, fuzzy
+from factory.random import randgen
 
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, Weekday
 from tilavarauspalvelu.models import Reservation, ReservationSeries
@@ -22,6 +23,16 @@ __all__ = [
 ]
 
 
+fuzzy_begin = fuzzy.FuzzyDateTime(start_dt=local_datetime(2023, 1, 1))
+
+
+def random_begin() -> datetime.datetime:
+    # Start before 23:00. Then the end time, one hour later, is on the same day,
+    # and `get_periods_between()` accepts the times.
+    begin = fuzzy_begin.fuzz()
+    return begin.replace(hour=randgen.randint(0, 22))
+
+
 class ReservationSeriesFactory(GenericDjangoModelFactory[ReservationSeries]):
     class Meta:
         model = ReservationSeries
@@ -32,7 +43,7 @@ class ReservationSeriesFactory(GenericDjangoModelFactory[ReservationSeries]):
     recurrence_in_days = 7
     weekdays = [Weekday.MONDAY.value]
 
-    begin = fuzzy.FuzzyDateTime(start_dt=local_datetime(2023, 1, 1))
+    begin = LazyFunction(random_begin)
     end = LazyAttribute(lambda r: r.begin + datetime.timedelta(days=30, hours=1))
 
     begin_date = LazyAttribute(lambda r: r.begin.date())
