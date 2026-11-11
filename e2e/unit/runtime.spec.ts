@@ -27,6 +27,7 @@ import {
 } from "../lib/runtime";
 import { Session } from "../lib/session";
 import { Pages } from "../TestSuites/pages";
+import { isConfirmedReservationUrl } from "../TestSuites/PO/Common/checkout";
 import { python_keywords } from "../TestSuites/Resources/python_keywords";
 import { BASIC_PERMISSION_TARGET_ADMIN, BASIC_USER_MALE } from "../TestSuites/Resources/serial_users";
 import { COMBINED_UNITS, DESKTOP_UNITS } from "../TestSuites/Resources/suite_specific_units";
@@ -225,6 +226,31 @@ test.describe("Runtime", () => {
     expect(python_keywords.validate_timeformat("Pe 13.9.2024 11:45")).toBe(false);
     expect(python_keywords.get_finnish_day(new Date(2023, 11, 5))).toBe("Ti");
     expect(python_keywords.format_date_to_ics("5.3.2026")).toBe("20260305");
+  });
+
+  test("The checkout is done when Varaamo opens the confirmed reservation", () => {
+    const site = "https://varaamo.test.hel.ninja";
+    // Where the payment success page waits (a rewrite of /callbacks/webstore/success, so the path stays /success),
+    // where a cancelled or denied order goes, and where the success page gives up
+    for (const path of [
+      "/success?orderId=3f2b7c1e",
+      "/callbacks/webstore/success?orderId=3f2b7c1e",
+      "/reservations?error=order1",
+      "/reservations/59472/?notify=polling_timeout",
+      "/reservations/59472/cancel",
+    ]) {
+      expect(isConfirmedReservationUrl(new URL(path, site)), path).toBe(false);
+    }
+    // The reservation, as the success page opens it for each state, also under a language prefix
+    for (const path of [
+      "/reservations/59472/?notify=confirmed",
+      "/reservations/59472/?notify=paid",
+      "/reservations/59472/?notify=requires_handling",
+      "/reservations/59472",
+      "/en/reservations/59472/?notify=confirmed",
+    ]) {
+      expect(isConfirmedReservationUrl(new URL(path, site)), path).toBe(true);
+    }
   });
 
   test("Tags choose the test data", () => {
