@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TabbedTranslationAdmin
@@ -8,6 +10,10 @@ from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixi
 from tilavarauspalvelu.models import PricingGroup
 
 from .form import PriceComponentInline, ReservationUnitPricingGroupInline
+
+if TYPE_CHECKING:
+    from django.forms import ModelForm
+    from django.http import HttpRequest
 
 __all__ = [
     "PricingGroupAdmin",
@@ -39,3 +45,8 @@ class PricingGroupAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslationAdmin):
         PriceComponentInline,
         ReservationUnitPricingGroupInline,
     ]
+
+    def save_related(self, request: HttpRequest, form: ModelForm, formsets: Any, change: bool) -> None:  # noqa: FBT001
+        super().save_related(request, form, formsets, change)
+        # The inlines save the components without 'save_price_component_changes'.
+        form.instance.actions.refresh_reservation_unit_accounting()

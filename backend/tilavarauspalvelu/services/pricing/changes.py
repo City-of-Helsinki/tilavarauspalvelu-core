@@ -85,6 +85,8 @@ def save_price_component_changes(
         for component in components:
             component.save()
 
+        pricing_group.actions.refresh_reservation_unit_accounting()
+
 
 # Internals
 
