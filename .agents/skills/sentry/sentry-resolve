@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Resolve Sentry issues through the Sentry REST API.
+# The token is read from the secret file or from 1Password. See lib.sh.
+# Usage: sentry-resolve [--in-next-release] [--dry-run] <issue ID, URL or short ID> ...
+#   e.g. sentry-resolve --in-next-release TILAVARAUSPALVELU-STAFF-UI-12 153768154
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: sentry-resolve [--in-next-release] [--dry-run] <issue ID, URL or short ID> ...
+  --in-next-release   Resolve in the next release of the project, not now.
+  --dry-run           Print the issues and the requests. Change nothing in Sentry.
+EOF
+  exit 2
+}
+
+in_next_release=false
+dry_run=false
+args=()
+for arg in "$@"; do
+  case "$arg" in
+    --in-next-release) in_next_release=true ;;
+    --dry-run) dry_run=true ;;
+    --*) echo "Unknown option: $arg" >&2; usage ;;
+    *) args+=("$arg") ;;
+  esac
+done
+(( ${#args[@]} > 0 )) || usage
+
+# Validate all arguments before the first request.
+short_id_pattern='^[A-Z][A-Z0-9-]*-[0-9A-Z]+$'
+for arg in "${args[@]}"; do
+  if ! [[ "$arg" =~ $short_id_pattern ]] && ! parse_issue "$arg" 2>/dev/null; then
+    echo "Not a Sentry issue ID, URL or short ID: $arg" >&2
+    usage
+  fi
+done
+
+load_token
+
+if [[ "$in_next_release" == true ]]; then
+  body='{"status":"resolved","statusDetails":{"inNextRelease":true}}'
+  change="Resolved in the next release"
+else
+  body='{"status":"resolved"}'
+  change="Resolved"
+fi
+
+# Look up each issue first, so a wrong argument stops the run before any change.
+issues=()
+for arg in "${args[@]}"; do
+  if [[ "$arg" =~ $short_id_pattern ]]; then
+    issue_id="$(api "shortids/$arg/" | jq --raw-output '.groupId')"
+  else
+    parse_issue "$arg"
+  fi
+  issues+=("$(api "issues/$issue_id/" | jq --compact-output '{id, shortId, title: (.title | gsub("[\\r\\n]+"; " ")), status, count, lastSeen}')")
+done
+
+if [[ "$dry_run" == true ]]; then
+  echo "Dry run. Nothing is changed in Sentry."
+fi
+for issue in "${issues[@]}"; do
+  id="$(jq --raw-output '.id' <<<"$issue")"
+  label="$(jq --raw-output '"\(.shortId) (\(.count) events, last seen \(.lastSeen[0:10])): \(.title)"' <<<"$issue")"
+  if [[ "$(jq --raw-output '.status' <<<"$issue")" == "resolved" ]]; then
+    echo "Skipped: $label is already resolved."
+    continue
+  fi
+  if [[ "$dry_run" == true ]]; then
+    echo "PUT $base_url/issues/$id/ $body"
+    echo "Change: $change: $label"
+    continue
+  fi
+  # Print each change after its request succeeds, so a failure shows what is already done.
+  api "issues/$id/" --request PUT --header "Content-Type: application/json" --data "$body" >/dev/null
+  echo "- $change: $label"
+done
