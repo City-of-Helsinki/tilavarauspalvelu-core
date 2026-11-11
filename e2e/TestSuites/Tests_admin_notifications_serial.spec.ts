@@ -20,7 +20,7 @@ test.describe(
     test.use({ storageState: NOTIFICATION_ADMIN_STATE });
 
     test.beforeEach(async ({ appCommon }) => {
-      await appCommon.userOpensDesktopBrowserToLandingPage();
+      await appCommon.userOpensBrowserToLandingPage();
     });
 
     test("Admin creates normal notifications for both sides", async ({

@@ -32,22 +32,27 @@ export class Login extends PageObject {
 
   @step("login.Login Suomi Fi")
   async loginSuomiFi(input_hetu: string) {
+    // A phone waits longer for the button and tries each click once more. Its login page has the provider twice: the
+    // one in the nav is the one shown.
+    const attempts = this.isMobile ? 3 : 2;
+    const provider = this.isMobile ? this.page.locator("nav").locator("#li_fakevetuma2") : "#li_fakevetuma2";
+
     // Wait for Suomi.fi login button
-    await this.page.locator("#social-suomi_fi").waitFor({ state: "visible", timeout: 10_000 });
+    await this.page.locator("#social-suomi_fi").waitFor({ state: "visible", timeout: this.isMobile ? 15_000 : 10_000 });
 
     // Click Suomi.fi and wait for authentication provider selection page
     await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
       "#social-suomi_fi",
       "#li_fakevetuma2",
-      /* max_attempts= */ 2,
+      attempts,
       /* nav_timeout= */ 15_000
     );
 
     // Click fakevetuma2 and wait for HETU input page
     await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
-      "#li_fakevetuma2",
+      provider,
       "#hetu_input",
-      /* max_attempts= */ 2,
+      attempts,
       /* nav_timeout= */ 15_000
     );
 
@@ -60,7 +65,7 @@ export class Login extends PageObject {
     await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
       "#tunnistaudu",
       "#continue-button",
-      /* max_attempts= */ 2,
+      attempts,
       /* nav_timeout= */ 15_000
     );
 
@@ -104,43 +109,5 @@ export class Login extends PageObject {
       this.page.locator("#id_password"),
       "Check that login credentials are correct and match the backend data."
     ).toBeHidden({ timeout: 60_000 });
-  }
-
-  @step("login.Login Suomi Fi Mobile")
-  async loginSuomiFiMobile(input_hetu: string) {
-    // Wait for Suomi.fi login button
-    await this.page.locator("#social-suomi_fi").waitFor({ state: "visible", timeout: 15_000 });
-
-    // Click Suomi.fi and wait for authentication provider selection page
-    await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
-      "#social-suomi_fi",
-      "#li_fakevetuma2",
-      /* max_attempts= */ 3,
-      /* nav_timeout= */ 15_000
-    );
-
-    // Click fakevetuma2 (on mobile, the one in the nav) and wait for HETU input page
-    await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
-      this.page.locator("nav").locator("#li_fakevetuma2"),
-      "#hetu_input",
-      /* max_attempts= */ 3,
-      /* nav_timeout= */ 15_000
-    );
-
-    // Enter HETU and submit. Typed key by key: the test identification page enables "Tunnistaudu" from key events,
-    // which fill() doesn't send.
-    await this.page.locator("#hetu_input").clear();
-    await this.page.locator("#hetu_input").pressSequentially(input_hetu);
-
-    // Click authenticate and wait for continue button
-    await this.pages.customKeywords.clickAndWaitForNavigationWithRetry(
-      "#tunnistaudu",
-      "#continue-button",
-      /* max_attempts= */ 3,
-      /* nav_timeout= */ 15_000
-    );
-
-    // Click continue to complete login
-    await this.clickContinueOneLoginAtATime();
   }
 }

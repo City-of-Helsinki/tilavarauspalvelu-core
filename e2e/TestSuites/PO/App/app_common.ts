@@ -27,29 +27,16 @@ export class AppCommon extends PageObject {
   async userOpensDesktopBrowserToDjangoAdmin() {
     // Default is chrome
     // Set Up … And Open Url waits for the page to load
-    await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(URL_DJANGO_ADMIN, DOWNLOAD_DIR);
+    await this.pages.devices.setUpBrowserAndOpenUrl(URL_DJANGO_ADMIN, DOWNLOAD_DIR);
     // Check Text  h1  Ylläpito
     // h1 on Ylläpito
     // admin_landingpage.Checks the admin landing page H1  ${ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN}
   }
 
-  @step("app_common.User Opens Desktop Browser To Landing Page")
-  async userOpensDesktopBrowserToLandingPage() {
-    // Default is chrome
-
-    await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(URL_TEST, DOWNLOAD_DIR);
-    await this.pages.userLandingpage.checkTheUserLandingPageH1(USER_LANDING_PAGE_H1_TEXT);
-  }
-
-  @step("app_common.User Opens Iphone Webkit To Landing Page")
-  async userOpensIphoneWebkitToLandingPage() {
-    await this.pages.devices.setUpIphone14AndOpenUrl(URL_TEST);
-    await this.pages.userLandingpage.checkTheUserLandingPageH1(USER_LANDING_PAGE_H1_TEXT);
-  }
-
-  @step("app_common.User Opens Android Chrome To Landing Page")
-  async userOpensAndroidChromeToLandingPage() {
-    await this.pages.devices.setUpAndroidPixel5AndOpenUrl(URL_TEST);
+  /** Opens the landing page in the project's browser and device: desktop Chromium, the Pixel 5 or the iPhone 14 */
+  @step("app_common.User Opens Browser To Landing Page")
+  async userOpensBrowserToLandingPage() {
+    await this.pages.devices.setUpBrowserAndOpenUrl(URL_TEST, DOWNLOAD_DIR);
     await this.pages.userLandingpage.checkTheUserLandingPageH1(USER_LANDING_PAGE_H1_TEXT);
   }
 
@@ -120,40 +107,9 @@ export class AppCommon extends PageObject {
     ).toHaveCount(0);
   }
 
-  // Mobile
-  @step("app_common.User Logs Out Mobile")
-  async userLogsOutMobile() {
-    await this.pages.topnav.clickNavigationMenuMobile();
-    await this.pages.topnav.clickUserMenuMobile();
-    await this.pages.topnav.clickLogoutMobile();
-  }
-
-  @step("app_common.User Confirms Log Out Mobile")
-  async userConfirmsLogOutMobile() {
-    await this.pages.topnav.clickNavigationMenuMobile();
-    await this.pages.topnav.clickLoginMobile();
-
-    // Confirms the logout was success
-    await this.page.locator("#social-suomi_fi").waitFor({ state: "visible" });
-  }
-
-  @step("app_common.User Logs In With Suomi Fi Mobile")
-  async userLogsInWithSuomiFiMobile() {
-    await this.pages.topnav.clickNavigationMenuMobile();
-    await this.pages.topnav.clickLoginMobile();
-    // login.Login Suomi_fi mobile  ${BASIC_USER_MALE_HETU}
-    await this.pages.login.loginSuomiFiMobile(this.testData.user.hetu);
-
-    // Confirms the login was success
-    await this.pages.userLandingpage.checkTheUserLandingPageH1(USER_LANDING_PAGE_H1_TEXT);
-    await this.pages.popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
-
-    // Sleep  3s
-    // TODO enable these steps when the dropdown has user info again
-    // topnav.Check dropdown menu has user info  ${BASIC_USER_MALE_FULLNAME}
-
-    // END OF USER
-  }
+  // END OF USER
+  // TODO enable these steps in the login when the dropdown has user info again
+  // topnav.Check dropdown menu has user info  ${BASIC_USER_MALE_FULLNAME}
 
   // ADMIN TEST SET UP
   // Desktop for now.
@@ -162,7 +118,7 @@ export class AppCommon extends PageObject {
   async adminOpensDesktopBrowserToLandingPage() {
     // Default is chrome
     // create_data.Create robot test data
-    await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(URL_ADMIN, DOWNLOAD_DIR);
+    await this.pages.devices.setUpBrowserAndOpenUrl(URL_ADMIN, DOWNLOAD_DIR);
     await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN);
   }
 
@@ -174,7 +130,7 @@ export class AppCommon extends PageObject {
   async adminOpensOwnBrowserToLandingPage() {
     this.state.pageUserSide = this.page;
     // The test's second Set Up … And Open Url opens a new context
-    await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(URL_ADMIN, DOWNLOAD_DIR);
+    await this.pages.devices.setUpBrowserAndOpenUrl(URL_ADMIN, DOWNLOAD_DIR);
     await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN);
   }
 
@@ -233,7 +189,7 @@ export class AppCommon extends PageObject {
   async adminOpensDesktopBrowserToDjangoAdmin() {
     // Default is chrome
     // Set Up … And Open Url waits for the page to load
-    await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(URL_DJANGO_ADMIN, DOWNLOAD_DIR);
+    await this.pages.devices.setUpBrowserAndOpenUrl(URL_DJANGO_ADMIN, DOWNLOAD_DIR);
     // Check Text  h1  Ylläpito
     // h1 on Ylläpito
     // admin_landingpage.Checks the admin landing page H1  ${ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN}
@@ -287,7 +243,7 @@ export class AppCommon extends PageObject {
     await log(`Django admin (Firefox) page is ${this.page.url()}`);
 
     // Set up Chromium browser for app admin
-    await this.pages.devices.setUpChromiumDesktopBrowserAndOpenUrl(app_url, DOWNLOAD_DIR);
+    await this.pages.devices.setUpBrowserAndOpenUrl(app_url, DOWNLOAD_DIR);
 
     // Save the Chromium page
     this.state.browserUserSide = this.page;

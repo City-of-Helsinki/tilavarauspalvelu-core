@@ -37,6 +37,11 @@ export class PageObject {
     return this.session.page;
   }
 
+  /** True in the phone projects. The keywords that differ on a phone, like those that open its Menu, check it. */
+  protected get isMobile(): boolean {
+    return this.session.isMobile;
+  }
+
   /** A locator for a selector on the current page, or the given locator itself: some keywords take either. */
   protected locate(selector: string | Locator): Locator {
     return typeof selector === "string" ? this.page.locator(selector) : selector;

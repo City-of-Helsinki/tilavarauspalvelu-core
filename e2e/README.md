@@ -21,7 +21,7 @@ pnpm e2e:install-deps       # Chromium, Firefox and WebKit, with their system pa
 pnpm test:all               # all 35 tests: pnpm test, then pnpm test:all:notifications
 pnpm test                   # all suites in parallel, creates the test data first
 pnpm test:notifications     # the notification suite, serially (it has no data setup)
-pnpm test:smoke             # tests tagged smoke
+pnpm test:smoke             # the desktop tests tagged smoke: customer and admin login
 pnpm test:sequential        # one worker, all tests share the same users
 pnpm report                 # opens the HTML report
 ```
@@ -74,11 +74,16 @@ inspector, e.g. `pnpm exec playwright test --project Tests_user_desktop_FI --hea
 | Project                            | Tests | What it covers                                                                        |
 | ---------------------------------- | ----- | ------------------------------------------------------------------------------------- |
 | `Tests_user_desktop_FI`            | 11    | Customer site on desktop Chromium: login, single, paid and recurring bookings, emails |
-| `Tests_user_mobile_android_FI`     | 6     | Customer site on an emulated Pixel 5 (Chromium)                                       |
-| `Tests_user_mobile_iphone_FI`      | 6     | Customer site on an emulated iPhone 14 (WebKit)                                       |
+| `Tests_user_mobile_android_FI`     | 6     | The `@also-on-phones` customer tests on an emulated Pixel 5 (Chromium)                |
+| `Tests_user_mobile_iphone_FI`      | 6     | The `@also-on-phones` customer tests on an emulated iPhone 14 (WebKit)                |
 | `Tests_admin_desktop_FI`           | 5     | Admin UI: login, reservation types, permissions (with Django admin in Firefox)        |
 | `Tests_users_with_admin_desktop`   | 3     | A customer books, an admin handles the booking, the customer checks the result        |
 | `Tests_admin_notifications_serial` | 4     | Banner notifications, run serially (tag `@serialonly`)                                |
+
+The three customer projects run the same tests, which are written once in `TestSuites/customer-tests.ts`. Each project
+has a small spec file of its own that calls it with the project's title, so the report lists the tests of each device
+in a group of its own. The desktop project runs all the tests except those tagged `@phone-only`. Each phone project
+runs the tests tagged `@also-on-phones` and `@phone-only`.
 
 Three more projects: `create_data` (`TestSuites/create_data.setup.ts`) creates the test data,
 `notifications_login` (`TestSuites/notifications_login.setup.ts`) logs the notification suite's admin in once and
@@ -87,7 +92,8 @@ environment.
 
 ## Layout
 
-- `TestSuites/Tests_*.spec.ts`: the suites, one file per project. They use the `test` of `TestSuites/fixtures.ts`.
+- `TestSuites/Tests_*.spec.ts`: the suites, one file per project. They use the `test` of `TestSuites/fixtures.ts`. The
+  three customer spec files only call `customerTests` of `TestSuites/customer-tests.ts`, which has the tests.
 - `TestSuites/PO/{Admin,App,Common,User}/`: page objects, one class per file (`PageObject` in
   `TestSuites/page-object.ts`). The tests call the workflow keywords in `PO/App/app_user.ts`, `app_admin.ts` and
   `app_common.ts`. `TestSuites/pages.ts` creates a test's page objects together, so they can call each other.
@@ -95,8 +101,8 @@ environment.
   keywords save while a test runs.
 - `TestSuites/Resources/`: shared keywords (`custom_keywords`, `devices` for the browsers and devices,
   `common_setups_teardowns`, `create_data`, `graphql_commands`, `data_modification`, …), constants (`variables` for
-  URLs, units and selectors, `texts_FI`, `suite_specific_units`, `serial_users`), the test users in
-  `parallel_users.dat`, and `.env.example`, which lists the environment variables.
+  URLs, units and selectors, `texts_FI`, `suite_specific_units`, `serial_users`, and `test_users` with the users of the
+  parallel runs), and `.env.example`, which lists the environment variables.
 - `lib/`: the runtime. `runtime.ts` has the `@step` decorator, `log()`, the secret redaction and the `test` fixture.
   `env.ts` reads and checks the environment variables. `session.ts` keeps a test's pages, `backend-errors.ts`
   records their backend errors into the report, `locks.ts` has the locks between the workers, and `locators.ts`,
@@ -126,12 +132,21 @@ environment.
 - A value that a keyword saves for the keywords after it, like the time and number of a booking, is a field of
   `state` (`TestSuites/state.ts`): `state.timeOfQuickReservationMinusT`, `this.state.bookingNumOnly` in a page
   object. Each test gets a new one. Each field says which keywords set it.
-- Tags choose the test data before the test starts. A data set tag like `@desktop-test-data-set-0` picks the users
-  from the section with the same tag in `parallel_users.dat`, and only one test at a time uses a data set. A data set
-  tag that `parallel_users.dat` doesn't have fails the test. A suite tag (`@desktop-suite`, `@admin-suite`,
-  `@combined-suite`, `@android-suite`, `@iphone-suite`) picks the units. In sequential mode, and in tests without a
-  data set tag, the tests use the shared users in `serial_users.ts`. The `testData` fixture logs the users it chose,
-  under the report's "Before Hooks".
+- Tags choose the test data before the test starts. A data set tag picks the users from `Resources/test_users.ts`,
+  and only one test at a time uses a data set: `@user-data-set-N` for a customer test, `@admin-test-data-set-N` and
+  `@combined-test-data-set-N`. A customer data set has a user for each platform that runs the test: the platform of
+  the project (`desktop`, `android` or `iphone`, in its `metadata` in `playwright.config.ts`) picks the user and the
+  copies of the units. A data set that `test_users.ts` doesn't have fails the test, and so does a tag that ends in
+  `-set-N` but isn't a data set tag, so a mistyped tag can't leave a test with the shared users. A suite tag
+  (`@admin-suite`, `@combined-suite`) picks the units. A customer test has none, because its platform picks them,
+  and a platform's own suite tag like `@desktop-suite` fails the test. In
+  sequential mode, and in tests without a data set tag, the tests use the shared users in `serial_users.ts`. The
+  `testData` fixture logs the users it chose, under the report's "Before Hooks".
+- The customer tests run on the desktop and on both phones, so the keywords work on every device: a keyword that
+  differs on a phone, like one that opens the header's Menu, checks `this.isMobile`, which is the `isMobile` option of
+  the test's device. A test tagged `@also-on-phones` also runs in the phone projects, and one tagged
+  `@phone-only` runs only there. A project's platform must agree with its device, so a phone device needs the platform
+  `android` or `iphone`, or the test fails at its start.
 
 ## How it works
 
