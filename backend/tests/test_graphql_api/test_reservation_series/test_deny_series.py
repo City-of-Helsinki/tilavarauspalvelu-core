@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.core.mail import EmailMultiAlternatives
-    from pytest_django import Settings
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
 
     from tilavarauspalvelu.models import Reservation
 
@@ -71,7 +71,9 @@ def test_reservation_series__deny_series(graphql: GraphQLClient) -> None:
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__update_statistics(graphql: GraphQLClient, settings: Settings) -> None:
+def test_reservation_series__deny_series__update_statistics(
+    graphql: GraphQLClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reason = ReservationDenyReasonFactory.create()
@@ -85,7 +87,8 @@ def test_reservation_series__deny_series__update_statistics(graphql: GraphQLClie
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, input_data=data)
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
