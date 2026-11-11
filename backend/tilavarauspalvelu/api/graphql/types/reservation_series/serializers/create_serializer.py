@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from django.conf import settings
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
@@ -20,7 +19,6 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationSeries
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.typing import error_codes
 from utils.external_service.errors import ExternalServiceError
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
@@ -184,7 +182,7 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
             instance: ReservationSeries = super().create(validated_data)
-            reservations = self.create_reservations(
+            self.create_reservations(
                 instance=instance,
                 reservation_details=reservation_details,
                 skip_dates=skip_dates,
@@ -204,11 +202,6 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         #  Refresh still happens on a background task every 2 minutes.
         #  if settings.UPDATE_AFFECTING_TIME_SPANS:
         #      update_affecting_time_spans_task.delay()  # noqa: ERA001
-
-        if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(
-                reservation_pks=[reservation.pk for reservation in reservations],
-            )
 
         return instance
 
