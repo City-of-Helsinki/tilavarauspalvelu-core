@@ -199,15 +199,18 @@ const PriorityRadioButton = styled(RadioButton)`
       border-top: 10px solid var(--color-black);
     }
   }
-  :checked + [class*="hds-radio-button__label"] {
+  :checked + label {
     ${fontBold};
   }
-  [class*="radio-button_hds-radio-button__label"] {
+  label {
     margin-left: 40px;
-    &::before,
-    &::after {
-      left: -40px;
-    }
+  }
+
+  && input + label::before,
+  && input + label::after,
+  && input:focus + label::before,
+  && input:focus + label::after {
+    left: -40px; /* override hds-react default left */
   }
 `;
 

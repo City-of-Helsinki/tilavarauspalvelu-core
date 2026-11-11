@@ -69,7 +69,7 @@ const eventBackground = (appearance: CellAppearance) => css`
     content: "";
     position: absolute;
     z-index: 1;
-    inset: 0 var(--event-gap) -1px; /* The event should be drawn on top of eventual cell bottom-border. */
+    inset: 0 var(--event-gap) -2px; /* The event should be drawn on top of eventual cell bottom-border. */
     padding-inline: 4px;
     ${appearance === "secondary" && "border-inline: 1px solid var(--border-color)"};
     font-size: var(--fontsize-body-s);
@@ -111,8 +111,12 @@ export const WeeklyPatternRoot = styled.div`
   ${gridTableStyles};
 
   position: relative;
-  overflow-x: auto;
-  height: var(--weekly-pattern-height, auto);
+
+  /*
+    The root is not a scroll container itself (the scroller inside it is), so as a grid or flex item it would grow to
+    the table's min-width and widen the whole page on phones. min-width: 0 lets it shrink and the scroller scroll.
+  */
+  min-width: 0;
 
   /*
     The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
@@ -137,7 +141,10 @@ export const WeeklyPatternRoot = styled.div`
     z-index: 3;
   }
 
+  /* The empty corner above the time labels sticks to both edges, so the weekday headers slide under it. */
   thead td {
+    left: 0;
+    z-index: 4;
     border: none;
     padding: 0;
   }
@@ -148,7 +155,7 @@ export const WeeklyPatternRoot = styled.div`
     text-align: center;
     vertical-align: top;
     white-space: nowrap;
-    z-index: 2;
+    z-index: 3;
     border-top: 1px solid var(--color-black-20);
   }
 
@@ -252,8 +259,39 @@ export const WeeklyPatternRoot = styled.div`
   }
 `;
 
+/*
+  A sticky element sticks inside its nearest scroll container. The grid scrolls sideways (overflow-x: auto), which makes
+  it a scroll container in both directions, so a sticky <thead> inside it could never stick to the page. The weekday
+  header is therefore drawn twice: this copy sits outside the scroll area and sticks to the top of the page, and the
+  grid's own <thead> stays in the table for assistive technology, visually hidden. The copy follows the grid's
+  horizontal scroll position (set in JS), and both tables share the same fixed layout, so their columns line up.
+*/
+export const WeeklyPatternStickyHeader = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+`;
+
+export const WeeklyPatternScroller = styled.div`
+  overflow-x: auto;
+  height: var(--weekly-pattern-height, auto);
+  scrollbar-gutter: stable;
+
+  /* The visible header is the sticky copy. This one stays for screen readers but takes no space. */
+  && thead th,
+  && thead td {
+    height: 0;
+    padding: 0;
+    border: 0;
+  }
+`;
+
+/* The legend has to wrap. Long labels on one line set the page's minimum width, which zooms out the page on phones. */
 const LegendList = styled.ul`
   display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-xs);
   margin: 0;
   padding: 0;
@@ -264,7 +302,6 @@ const LegendItemRow = styled.li`
   display: flex;
   align-items: center;
   gap: var(--spacing-2-xs);
-  white-space: nowrap;
   &[aria-current="true"] {
     font-family: var(--font-bold), sans-serif;
   }
@@ -272,6 +309,7 @@ const LegendItemRow = styled.li`
 
 const LegendBox = styled.div<{ $state: LegendState }>`
   position: relative;
+  flex: none; /* Keep the swatch square when the label next to it wraps. */
   box-sizing: border-box;
   width: 30px;
   height: 30px;
