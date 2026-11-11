@@ -16,6 +16,7 @@ from tilavarauspalvelu.typing import (
 )
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
+from utils.model_signals import update_with_signals
 
 from .client import PindoraClient
 from .exceptions import PindoraAPIError, PindoraClientError, PindoraConflictError, PindoraNotFoundError
@@ -160,7 +161,8 @@ class PindoraService:
         match obj:
             case ApplicationSection():
                 response = PindoraClient.create_seasonal_booking(obj, is_active=is_active)
-                obj.actions.get_reservations().requires_active_access_code().update(
+                update_with_signals(
+                    obj.actions.get_reservations().requires_active_access_code(),
                     access_code_generated_at=response["access_code_generated_at"],
                     access_code_is_active=response["access_code_is_active"],
                 )
@@ -168,7 +170,8 @@ class PindoraService:
             case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     response = PindoraClient.create_reservation_series(obj, is_active=is_active)
-                    obj.reservations.requires_active_access_code().update(
+                    update_with_signals(
+                        obj.reservations.requires_active_access_code(),
                         access_code_generated_at=response["access_code_generated_at"],
                         access_code_is_active=response["access_code_is_active"],
                     )
@@ -244,7 +247,8 @@ class PindoraService:
         match obj:
             case ApplicationSection():
                 response = PindoraClient.change_seasonal_booking_access_code(obj)
-                obj.actions.get_reservations().requires_active_access_code().update(
+                update_with_signals(
+                    obj.actions.get_reservations().requires_active_access_code(),
                     access_code_generated_at=response["access_code_generated_at"],
                     access_code_is_active=response["access_code_is_active"],
                 )
@@ -253,7 +257,8 @@ class PindoraService:
             case ReservationSeries():
                 if obj.allocated_time_slot is None:
                     response = PindoraClient.change_reservation_series_access_code(obj)
-                    obj.reservations.requires_active_access_code().update(
+                    update_with_signals(
+                        obj.reservations.requires_active_access_code(),
                         access_code_generated_at=response["access_code_generated_at"],
                         access_code_is_active=response["access_code_is_active"],
                     )
@@ -346,7 +351,8 @@ class PindoraService:
             case ApplicationSection():
                 PindoraClient.delete_seasonal_booking(obj)
 
-                Reservation.objects.for_application_section(obj).update(
+                update_with_signals(
+                    Reservation.objects.for_application_section(obj),
                     access_code_generated_at=None,
                     access_code_is_active=False,
                 )
@@ -355,7 +361,11 @@ class PindoraService:
                 if obj.allocated_time_slot is None:
                     PindoraClient.delete_reservation_series(obj)
 
-                    obj.reservations.update(access_code_generated_at=None, access_code_is_active=False)
+                    update_with_signals(
+                        obj.reservations.all(),
+                        access_code_generated_at=None,
+                        access_code_is_active=False,
+                    )
 
                     return
 
@@ -589,7 +599,11 @@ class PindoraService:
                 # If we think an access code has been generated, but it's not found in Pindora,
                 # set access code as not generated. New access code will be created by a background task.
                 except PindoraNotFoundError:
-                    series.reservations.update(access_code_generated_at=None, access_code_is_active=False)
+                    update_with_signals(
+                        series.reservations.all(),
+                        access_code_generated_at=None,
+                        access_code_is_active=False,
+                    )
 
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Reservation series: {series.pk}")
@@ -621,7 +635,8 @@ class PindoraService:
                 # If we think an access code has been generated, but it's not found in Pindora,
                 # set access code as not generated. New access code will be created by a background task.
                 except PindoraNotFoundError:
-                    Reservation.objects.for_application_section(section).update(
+                    update_with_signals(
+                        Reservation.objects.for_application_section(section),
                         access_code_generated_at=None,
                         access_code_is_active=False,
                     )
