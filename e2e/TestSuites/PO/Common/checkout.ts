@@ -4,6 +4,19 @@ import { PageObject } from "../../page-object";
 import { SINGLEBOOKING_PAID_PRICE_CHECKOUT } from "../../Resources/texts_FI";
 import { TEXT_CHECK_TIMEOUT, URL_TEST } from "../../Resources/variables";
 
+/** Varaamo's reservation page, like /reservations/59472/?notify=confirmed */
+const RESERVATION_PAGE_PATH = /\/reservations\/\d+\/?$/;
+
+/**
+ * Whether the URL is the page that Varaamo's payment success page opens once the webshop has confirmed the payment.
+ * The success page itself isn't: it is a rewrite, so the browser's path stays /success while it polls. Nor are
+ * /reservations?error=order1, where a cancelled or denied order goes, and a reservation page opened with
+ * notify=polling_timeout, where the success page gave up.
+ */
+export function isConfirmedReservationUrl(url: URL): boolean {
+  return RESERVATION_PAGE_PATH.test(url.pathname) && url.searchParams.get("notify") !== "polling_timeout";
+}
+
 /** The external payment page. */
 export class Checkout extends PageObject {
   @step("checkout.Allow All Cookies If Visible")
@@ -94,11 +107,10 @@ export class Checkout extends PageObject {
     await this.clickSubmit();
     // Submitting the summary goes through the payment back to Varaamo
     await this.page.waitForURL((url) => url.href.startsWith(URL_TEST), { timeout: 50_000 });
-    // Varaamo's payment success page waits up to 30 s for the webshop to confirm the payment, then opens the
-    // reservation; expect retries until the URL has left it. Without a confirmation the page gives up and opens the
-    // reservation with notify=polling_timeout, which this check doesn't accept.
+    // Varaamo's payment success page (/success) waits up to 30 s for the webshop to confirm the payment, then opens
+    // the reservation. The URL stays there until then, so expect retries until it is the reservation's.
     await expect(this.page, "Varaamo confirms the payment and opens the reservation").toHaveURL(
-      (url) => !url.pathname.includes("/callbacks/webstore/") && url.searchParams.get("notify") !== "polling_timeout",
+      isConfirmedReservationUrl,
       { timeout: 35_000 }
     );
   }
