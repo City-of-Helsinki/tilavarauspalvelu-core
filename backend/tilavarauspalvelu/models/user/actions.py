@@ -33,6 +33,7 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.typing import UserAnonymizationInfo
 from utils.date_utils import local_date, local_datetime
+from utils.model_signals import bulk_create_with_signals
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -308,7 +309,7 @@ class UserActions:
             UnitRole.objects.filter(id__in=remove_ids).delete()
 
         if roles_to_add:
-            UnitRole.objects.bulk_create(roles_to_add)
+            bulk_create_with_signals(roles_to_add)
 
         if role_units_to_add:
             UnitRoleUnit.objects.bulk_create(role_units_to_add)
