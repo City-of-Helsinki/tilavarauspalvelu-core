@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import pytest
+from auditlog.models import LogEntry
+from auditlog.registry import auditlog
 
 from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.models import UnitRole
 
 from tests.factories import ADGroupFactory, UnitFactory, UnitRoleFactory, UserFactory
 
@@ -169,6 +172,25 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_role():
     assert len(unit_roles) == 1
     assert unit_roles[0].role == UserRoleChoice.HANDLER
     assert unit_roles[0].units.first() == unit
+
+
+@pytest.fixture
+def unit_role_audit_log():
+    auditlog.register(UnitRole)
+    yield
+    auditlog.unregister(UnitRole)
+
+
+@pytest.mark.usefixtures("unit_role_audit_log")
+def test_user_actions__update_unit_roles_from_ad_groups__add_new_role__logs_create():
+    UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
+    user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
+
+    user.actions.update_unit_roles_from_ad_groups()
+
+    unit_role = user.unit_roles.get()
+    log_entries = list(LogEntry.objects.get_for_object(unit_role))
+    assert [log_entry.action for log_entry in log_entries] == [LogEntry.Action.CREATE]
 
 
 def test_user_actions__update_unit_roles_from_ad_groups__remove_old_role():
