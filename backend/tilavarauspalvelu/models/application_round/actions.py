@@ -5,7 +5,7 @@ import datetime
 from contextlib import suppress
 from typing import TYPE_CHECKING
 
-from django.db import transaction
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
@@ -33,7 +33,7 @@ from tilavarauspalvelu.models import (
 from tilavarauspalvelu.translation import translate_for_user
 from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import local_end_of_day, local_start_of_day
-from utils.model_signals import bulk_create_with_signals
+from utils.model_signals import bulk_create_with_signals, update_with_signals
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound
@@ -87,8 +87,13 @@ class ApplicationRoundActions:
 
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 # Reset handling email dates and round sent date
-                Application.objects.filter(application_round=self.application_round).update(
+                applications = Application.objects.filter(application_round=self.application_round)
+
+                # Keep 'updated_at', since users see it as the time they last saved the application.
+                update_with_signals(
+                    applications,
                     results_ready_notification_sent_at=None,
+                    updated_at=models.F("updated_at"),
                 )
 
                 self.application_round.sent_at = None
