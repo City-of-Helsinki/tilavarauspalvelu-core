@@ -22,10 +22,14 @@ parse_issue() {
   fi
 }
 
-# Read the token from the secret file, or from 1Password if the file does not exist.
+# Read the token from the secret file, or from 1Password if the secret directory does not exist.
 # Call this after the arguments are validated.
 load_token() {
-  if [[ -f "$token_file" ]]; then
+  if [[ -d "${token_file%/*}" ]]; then
+    if [[ ! -f "$token_file" ]]; then
+      echo "The token file $token_file is missing." >&2
+      exit 1
+    fi
     token="$(<"$token_file")"
     if [[ -z "${token//[[:space:]]/}" ]]; then
       echo "The token file $token_file is empty." >&2

@@ -4,11 +4,17 @@
 base_url="https://helsinkisolutionoffice.atlassian.net/wiki"
 host='https://helsinkisolutionoffice\.atlassian\.net'
 
-# Read the credentials from the secret files, or from 1Password if the files do not exist.
+# Read the credentials from the secret files, or from 1Password if the secret directory does not exist.
 # Call this after the arguments are validated.
 load_credentials() {
-  local secret_dir="/run/secrets/jira" user token
-  if [[ -f "$secret_dir/username" && -f "$secret_dir/token" ]]; then
+  local secret_dir="/run/secrets/jira" user token name
+  if [[ -d "$secret_dir" ]]; then
+    for name in username token; do
+      if [[ ! -f "$secret_dir/$name" ]]; then
+        echo "The credential file $secret_dir/$name is missing. Mount both username and token." >&2
+        exit 1
+      fi
+    done
     user="$(<"$secret_dir/username")"
     token="$(<"$secret_dir/token")"
     if [[ -z "${user//[[:space:]]/}" || -z "${token//[[:space:]]/}" ]]; then

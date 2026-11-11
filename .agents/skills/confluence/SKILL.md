@@ -10,19 +10,23 @@ How to navigate Confluence, either to show pages or to use them as a source.
 
 ## 1. Authentication
 
-The scripts next to this file read the credentials from the files `/run/secrets/jira/username` and
-`/run/secrets/jira/token` if both exist. Use this in a container. Mount the credentials there as secrets.
-`username` is the Atlassian email. `token` is a classic API token from https://id.atlassian.com/manage-profile/security/api-tokens.
+The credentials are the Atlassian email and a classic API token from https://id.atlassian.com/manage-profile/security/api-tokens.
 Do not use a token with scopes. The scripts call the site URL with basic auth, and a token with scopes works only through `api.atlassian.com`.
 
-If the files do not exist, the scripts read the credentials from 1Password with `op read`.
+If the directory `/run/secrets/jira` exists, the scripts next to this file read the credentials from the files
+`/run/secrets/jira/username` and `/run/secrets/jira/token`. Use this in a container. Mount both files there as secrets.
+`username` is the Atlassian email. `token` is the API token. If one of the files is missing, the scripts fail.
+Nothing asks the user before the scripts read the files. In the container's Claude settings, add `Read(//run/secrets/**)`
+to `permissions.deny`. The `skill-script-guard` hook blocks shell commands that name `/run/secrets/jira`.
+
+If the directory does not exist, the scripts read the credentials from 1Password with `op read`.
 1Password asks the user to unlock. Wait for it.
 
 The 1Password setup is as follows. If a call fails because of it, stop and tell the user which part is missing:
 
 - `op` (1Password CLI) is installed.
 - The 1Password desktop app has Settings → Developer → "Integrate with 1Password CLI" turned on.
-- The 1Password vault has an "API Credential" item. `username` is the Atlassian email. `credential` is an API token from https://id.atlassian.com/manage-profile/security/api-tokens.
+- The 1Password vault has an "API Credential" item. `username` is the Atlassian email. `credential` is the API token.
   The same token works for Jira and Confluence.
 - The user's shell profile sets these variables:
 

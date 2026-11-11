@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# PreToolUse hook for Bash. Blocks calls to skill scripts that the shell could expand.
+# PreToolUse hook for Bash. Blocks calls to skill scripts that the shell could expand,
+# and commands that name the skill secret files.
 # A skill script is an executable file in .agents/skills/<skill>/.
 # A call is allowed only as the script path from the repository root, followed by arguments
 # that are single-quoted without a quote inside, or that use only safe characters.
@@ -7,6 +8,14 @@ set -euo pipefail
 
 command="$(jq -r '.tool_input.command // empty')"
 root="$(git rev-parse --show-toplevel)"
+
+# Block commands that name the skill secret files. Only the skill scripts read them.
+# The gh token is not a skill secret. Other tools in the container use it.
+secret_dir="/run/secrets"
+if [[ "${command//$secret_dir\/gh\//}" == *"$secret_dir"* ]]; then
+  echo "Blocked: do not read the secret files yourself. Use the skill scripts." >&2
+  exit 2
+fi
 
 safe_arg="('[^']*'|[A-Za-z0-9_.:/=-]+)"
 # A call has the script as the first word of a command, maybe after a wrapper such as bash.
