@@ -17,12 +17,14 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import Reservation, ReservationPriceLine
+from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
+from utils.model_signals import bulk_update_with_signals
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationPriceLine
     from tilavarauspalvelu.typing import ReservationApproveData
 
 __all__ = [
@@ -220,7 +222,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         for line in price_lines:
             line.override_amount = price_line_overrides[line.pk]
 
-        ReservationPriceLine.objects.bulk_update(price_lines, fields=["override_amount"])
+        bulk_update_with_signals(price_lines, fields=["override_amount"])
 
     def create_payment_order_if_required(self, validated_data: ReservationApproveData) -> None:
         # Delete any non-paid/refunded payment order

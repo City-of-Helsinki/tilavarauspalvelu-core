@@ -4,6 +4,8 @@ import uuid
 from decimal import Decimal
 
 import pytest
+from auditlog.models import LogEntry
+from auditlog.registry import auditlog
 from freezegun import freeze_time
 from rest_framework.status import HTTP_204_NO_CONTENT
 
@@ -666,6 +668,13 @@ def test_reservation__approve__empty_handling_details(graphql):
 # ── Price lines ──────────────────────────────────────────────────────────────
 
 
+@pytest.fixture
+def price_line_audit_log():
+    auditlog.register(ReservationPriceLine)
+    yield
+    auditlog.unregister(ReservationPriceLine)
+
+
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 def test_reservation__approve__price_lines__one_line_free_and_one_paid(graphql):
@@ -737,6 +746,33 @@ def test_reservation__approve__price_lines__amounts_corrected_up_and_down(graphq
 
     second_line.refresh_from_db()
     assert second_line.override_amount == Decimal("15.25")
+
+
+@pytest.mark.usefixtures("price_line_audit_log")
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+def test_reservation__approve__price_lines__logs_override_amount(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        price=Decimal(10),
+        non_subsidised_price=Decimal(10),
+    )
+    line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+    LogEntry.objects.all().delete()
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data.pop("price")
+    data["priceLines"] = [{"pk": line.pk, "overrideAmount": "0"}]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    log_entries = list(LogEntry.objects.get_for_object(line))
+    assert [log_entry.changes for log_entry in log_entries] == [{"override_amount": ["None", "0.00"]}]
 
 
 @patch_method(EmailService.send_reservation_confirmed_email)
