@@ -28,6 +28,7 @@ import type {
   WeeklyPatternCellInfo,
   WeeklyPatternValue,
 } from "./types";
+import { useLongPressPaint } from "./useLongPressPaint";
 
 export type WeeklyPatternOptions<TData extends CalendarData> = Pick<
   WeeklyPatternCalendarProps<TData>,
@@ -229,13 +230,23 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   );
 
   // A drag can end outside the table, so the listeners live on the window while a gesture is active.
+  // Touch gestures end through `useLongPressPaint` instead. A browser may cancel the touch pointer
+  // when the long press starts, and that must not cancel the paint.
   const gestureActive = gesture != null;
   useEffect(() => {
     if (!gestureActive) {
       return;
     }
-    const finish = () => endGesture(true);
-    const cancel = () => endGesture(false);
+    const finish = (event: globalThis.PointerEvent) => {
+      if (event.pointerType !== "touch") {
+        endGesture(true);
+      }
+    };
+    const cancel = (event: globalThis.PointerEvent) => {
+      if (event.pointerType !== "touch") {
+        endGesture(false);
+      }
+    };
     window.addEventListener("pointerup", finish);
     window.addEventListener("pointercancel", cancel);
     return () => {
@@ -244,14 +255,15 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     };
   }, [gestureActive, endGesture]);
 
-  const startGesture = (weekday: Weekday, index: number) => {
+  const startGesture = (weekday: Weekday, index: number): boolean => {
     const mode = modeAt(weekday, index);
     if (!mode) {
-      return;
+      return false;
     }
     const started: Gesture<TData> = { weekday, anchor: index, current: index, mode };
     gestureRef.current = started;
     setGesture(started);
+    return true;
   };
 
   // Dragging across weekdays is intentionally unsupported: a gesture paints a single-day range.
@@ -264,6 +276,9 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     gestureRef.current = extended;
     setGesture(extended);
   };
+
+  // On touch, a swipe scrolls and a long press followed by a drag paints.
+  const longPress = useLongPressPaint({ start: startGesture, extend: extendGesture, end: endGesture }, interactive);
 
   const toggleCell = (weekday: Weekday, index: number) => {
     const mode = modeAt(weekday, index);
@@ -392,6 +407,9 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     // Stops the browser's native text-selection drag from fighting the paint gesture.
     onMouseDown: (event: MouseEvent<HTMLTableCellElement>) => event.preventDefault(),
     onClick: (event: MouseEvent<HTMLTableCellElement>) => {
+      if (longPress.consumeSuppressedClick()) {
+        return;
+      }
       // detail === 0 is a click synthesized by assistive technology, with no preceding pointer events.
       if (pointerTypeRef.current === "touch" || event.detail === 0) {
         toggleCell(weekday, index);
@@ -400,6 +418,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   });
 
   const tableHandlers = {
+    ref: longPress.tableRef,
     onBlur: (event: FocusEvent<HTMLTableElement>) => {
       // Moving between cells also blurs the old cell. Only leaving the table counts as a blur.
       if (event.currentTarget.contains(event.relatedTarget)) {

@@ -126,6 +126,7 @@ export const WeeklyPatternRoot = styled.div`
   table {
     min-width: calc(30px + 7 * 110px);
     user-select: none;
+    -webkit-touch-callout: none; /* No iOS callout on the long press that starts touch painting. */
     touch-action: manipulation;
 
     --step-height: 12px;
