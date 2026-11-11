@@ -18,8 +18,8 @@ Give at least one change. Options marked with * can be repeated.
   --blocked-by <key>        * Add a link: this issue is blocked by <key>.
   --relates <key>           * Add a link: this issue relates to <key>.
   --remove-link <key>       * Remove every link between this issue and <key>.
-  --assignee <user>           Assign the issue: me, none, or a name or email that matches one user.
-  --transition <status>       Move the issue to this status, e.g. Done. Done last, after the other changes.
+  --assignee <user>           Assign the issue: me, none, or the Jira name of a team member.
+  --transition <status>       Move the issue to this status, e.g. Done. Runs last, after the other changes.
   --dry-run                   Print the write requests and change nothing in Jira.
 EOF
   exit 2
@@ -41,6 +41,20 @@ remove_links=()
 transition=""
 assignee=""
 dry_run=false
+
+# The team members that --assignee accepts, by their Jira display name.
+# The Jira user search finds hundreds of users across the City, so the script accepts only these names.
+# Keep this list the same as the team table in SKILL.md.
+team=(
+  "Matti Lamppu"
+  "Joonatan Kuosa"
+  "Mats Eriksson"
+  "Eemeli Ranta"
+  "noora.alikirri"
+  "Juvonen Jesse"
+  "Tuomas Alahäivälä"
+  "Tuomas Haapala"
+)
 
 while [[ $# -gt 0 ]]; do
   option="$1"
@@ -72,7 +86,20 @@ while [[ $# -gt 0 ]]; do
     --assignee)
       [[ -z "$assignee" ]] || { echo "Give --assignee only once." >&2; usage; }
       [[ -n "${value//[[:space:]]/}" ]] || { echo "The assignee is empty." >&2; exit 2; }
-      assignee="$value"
+      # Keep "me" and "none" in lower case. Change a team member to the Jira name in the team list.
+      lower_value="$(tr '[:upper:]' '[:lower:]' <<<"$value")"
+      if [[ "$lower_value" == me || "$lower_value" == none ]]; then
+        assignee="$lower_value"
+      else
+        for member in "${team[@]}"; do
+          [[ "$(tr '[:upper:]' '[:lower:]' <<<"$member")" != "$lower_value" ]] || assignee="$member"
+        done
+        if [[ -z "$assignee" ]]; then
+          echo "The assignee $value is not in the team list. Give me, none or one of these Jira names:" >&2
+          printf '  %s\n' "${team[@]}" >&2
+          exit 2
+        fi
+      fi
       ;;
     --transition)
       [[ -z "$transition" ]] || { echo "Give --transition only once." >&2; usage; }
@@ -220,9 +247,9 @@ for other in ${relates[@]+"${relates[@]}"}; do
 done
 
 # Change the assignee before the status, because a workflow can require an assignee for a status.
-# "me" is the owner of the API token. "none" removes the assignee. Any other value must match one active user.
+# "me" is the owner of the API token. "none" removes the assignee. Any other value must be a name in the team list.
 if [[ -n "$assignee" ]]; then
-  case "$(tr '[:upper:]' '[:lower:]' <<<"$assignee")" in
+  case "$assignee" in
     none)
       account_id=""
       assignee_name=""
@@ -233,17 +260,16 @@ if [[ -n "$assignee" ]]; then
       assignee_name="$(jq --raw-output '.displayName' <<<"$myself")"
       ;;
     *)
-      query="$(jq --null-input --raw-output --arg q "$assignee" '$q | @uri')"
-      # The search is fuzzy. A typo can find someone else, so accept only an exact name or email.
-      found_users="$(api "rest/api/2/user/search?query=$query" | jq '[.[] | select(.active and .accountType == "atlassian")]')"
+      assignee_name="$assignee"
+      query="$(jq --null-input --raw-output --arg q "$assignee_name" '$q | @uri')"
+      # The search is fuzzy, so keep only the exact display name.
       users="$(
-        jq --arg q "$assignee" '($q | ascii_downcase) as $q
-          | [.[] | select((.displayName | ascii_downcase) == $q or ((.emailAddress // "") | ascii_downcase) == $q)]' \
-          <<<"$found_users"
+        api "rest/api/2/user/assignable/search?issueKey=$key&query=$query" \
+          | jq --arg n "$assignee_name" '[.[] | select(.active and .displayName == $n)]'
       )"
       if [[ "$(jq length <<<"$users")" -ne 1 ]]; then
-        echo "The assignee $assignee must match the name or email of exactly one active user." >&2
-        echo "Users that the search found: $(jq --raw-output '[.[].displayName] | join(", ")' <<<"$found_users")" >&2
+        echo "Jira has no single assignable user for $key with the name $assignee_name." >&2
+        echo "If the name changed in Jira, update the team list in jira-update and SKILL.md." >&2
         exit 2
       fi
       account_id="$(jq --raw-output '.[0].accountId' <<<"$users")"
