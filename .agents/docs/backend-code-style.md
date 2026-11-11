@@ -73,6 +73,13 @@ See `Integrations layer` in the [backend architecture](./backend-architecture.md
 - Avoid shallow modules: large interface with many methods that just pass through to thin implementation.
   When designing, ask: Can I reduce the number of methods? Can I simplify the parameters? Can I hide more complexity inside?
 
+## Bulk writes
+
+- For bulk writes on models with an `AuditLogger`, use the helpers in `utils/model_signals.py`.
+  They send `pre_save` and `post_save`, so the audit log and the receivers in `tilavarauspalvelu/signals.py` see the write.
+- If such a write must send no signals, say why in a comment.
+- See `Bulk writes` in [backend ORM](./backend-orm.md) for what a plain bulk write skips.
+
 ## Error handling
 
 - Never raise built-in or third-party exceptions manually. Always create a custom exception instead.
