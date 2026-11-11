@@ -9,13 +9,16 @@ as this module must hold strong references to the signal functions.
 from __future__ import annotations
 
 import sys
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Unpack
+from weakref import WeakKeyDictionary
 
 from celery.exceptions import TimeLimitExceeded, WorkerLostError
 from celery.signals import task_failure
 from django.conf import settings
 from django.contrib.auth import user_logged_in
 from django.core.signals import got_request_exception
+from django.db import transaction
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_save
 from django.dispatch import receiver
 from easy_thumbnails.files import get_thumbnailer
@@ -57,6 +60,7 @@ from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from celery import Task
+    from django.db.backends.base.base import BaseDatabaseWrapper
 
     from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import M2MChangedKwargs, PostDeleteKwargs, PostSaveKwargs, PreSaveKwargs, WSGIRequest
@@ -108,10 +112,10 @@ def _space_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Space]]) -> No
 @receiver(post_save, sender=Reservation, dispatch_uid="reservation_post_save")
 def _reservation_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Reservation]]) -> None:
     instance = kwargs["instance"]
-    _using = kwargs["using"]
+    using = kwargs["using"]
 
     if settings.SAVE_RESERVATION_STATISTICS:
-        create_statistics_for_reservations_task.delay_on_commit(reservation_pks=[instance.pk])
+        _create_statistics_on_commit(reservation_pk=instance.pk, using=using)
 
     # TODO: Disabled for now, since it might contribute to timeouts in production.
     #  Refresh still happens on a background task every 2 minutes.
@@ -346,3 +350,45 @@ if sentry_disconnected:
 
         _got_request_exception(request, **kwargs)
         return
+
+
+# --- Internals ---------------------------------------------------------------------------------------------------
+
+
+@dataclass
+class _StatisticsBatch:
+    """Reservations that are saved in one transaction. One statistics task starts for all of them on commit."""
+
+    reservation_pks: set[int] = field(default_factory=set)
+    task_started: bool = False
+
+    def start_task(self) -> None:
+        self.task_started = True
+        create_statistics_for_reservations_task.delay(reservation_pks=sorted(self.reservation_pks))
+
+
+# The statistics batch of the current transaction, for each database connection.
+_statistics_batches: WeakKeyDictionary[BaseDatabaseWrapper, _StatisticsBatch] = WeakKeyDictionary()
+
+
+def _create_statistics_on_commit(*, reservation_pk: int, using: str) -> None:
+    """
+    Start one statistics task for all reservations that are saved in the same transaction.
+    Bulk writes send 'post_save' for each reservation, and one task for each would start thousands of tasks.
+    """
+    connection = transaction.get_connection(using)
+    batch = _statistics_batches.get(connection)
+
+    # A rollback removes the callback of the batch from the connection. The next save then starts a new batch.
+    # A save in a rolled back savepoint can stay in the batch of the outer transaction. The task skips its pk.
+    registered_callbacks = [callback for _, callback, _ in connection.run_on_commit]
+    if batch is not None and not batch.task_started and batch.start_task in registered_callbacks:
+        batch.reservation_pks.add(reservation_pk)
+        return
+
+    batch = _StatisticsBatch()
+    batch.reservation_pks.add(reservation_pk)
+    _statistics_batches[connection] = batch
+
+    # Outside a transaction, 'on_commit' runs the callback at once. So add the pk before this.
+    transaction.on_commit(batch.start_task, using=using)
