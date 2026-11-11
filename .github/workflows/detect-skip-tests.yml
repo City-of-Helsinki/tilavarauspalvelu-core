@@ -1,5 +1,5 @@
 # Find out if a pull request changes only files that the backend and frontend tests do not cover.
-# These are the e2e suite and the agent files (AGENTS.md, .agents/, .claude/).
+# These are the e2e suite and the agent files (AGENTS.md and CLAUDE.md in any directory, .agents/, .claude/).
 # The e2e suite is a separate project, and the agent files are not part of the service.
 # Their changes cannot break the backend or the frontend.
 # So the backend and frontend workflows skip their jobs for such a pull request.
@@ -29,13 +29,15 @@ jobs:
       pull-requests: read
 
     # "other" is "false" when no changed file is outside the skip paths.
-    # The API lists at most 3000 files. So "all_count" must also match the file count of the pull request.
+    # The API lists at most 3000 files. A larger pull request can have more files outside the skip paths, so it runs all jobs.
+    # Do not compare the file count of the pull request to the file count of the filter.
+    # The filter counts a renamed file two times, once for the old path and once for the new path.
     outputs:
       skip-tests: >-
         ${{
           github.event_name == 'pull_request'
           && steps.filter.outputs.other == 'false'
-          && steps.filter.outputs.all_count == github.event.pull_request.changed_files
+          && github.event.pull_request.changed_files <= 3000
         }}
 
     steps:
@@ -48,8 +50,6 @@ jobs:
           # A file matches "other" if it matches "**" and none of the negated patterns
           predicate-quantifier: some-with-excludes
           filters: |
-            all:
-              - '**'
             other:
               - '**'
               - '!e2e/**'
@@ -57,5 +57,5 @@ jobs:
               - '!.github/workflows/run-e2e.yml'
               - '!.agents/**'
               - '!.claude/**'
-              - '!AGENTS.md'
-              - '!CLAUDE.md'
+              - '!**/AGENTS.md'
+              - '!**/CLAUDE.md'
