@@ -26,7 +26,6 @@ from tilavarauspalvelu.models import (
     Application,
     ApplicationSection,
     Reservation,
-    ReservationPriceLine,
     ReservationSeries,
     ReservationStatistic,
     ReservationUnitOption,
@@ -41,7 +40,7 @@ from utils.model_signals import bulk_create_with_signals
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from tilavarauspalvelu.models import ApplicationRound
+    from tilavarauspalvelu.models import ApplicationRound, ReservationPriceLine
 
 
 __all__ = [
@@ -200,7 +199,7 @@ class ApplicationRoundActions:
                     invalid_start_interval=slots.invalid_start_interval,
                 )
 
-            ReservationPriceLine.objects.bulk_create(price_lines)
+            bulk_create_with_signals(price_lines)
 
         # Must refresh the materialized view after the reservation is created.
         # TODO: Disabled for now, since it might contribute to timeouts in production.

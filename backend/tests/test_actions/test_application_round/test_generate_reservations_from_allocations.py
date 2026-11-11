@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
+from auditlog.models import LogEntry
+from auditlog.registry import auditlog
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
@@ -778,6 +780,24 @@ def test_generate_reservation_series_from_allocations__prices_from_price_option(
         assert lines[0].description_fi == "Aikuiset"
         assert lines[0].quantity == Decimal(2)
         assert lines[0].amount == Decimal("20.00")
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_generate_reservation_series_from_allocations__price_lines_write_audit_log() -> None:
+    reservation_unit = create_priced_reservation_unit()
+    application_round = create_round_on_mondays(reservation_units=[reservation_unit])
+
+    auditlog.register(ReservationPriceLine)
+    try:
+        application_round.actions.generate_reservations_from_allocations()
+    finally:
+        auditlog.unregister(ReservationPriceLine)
+
+    lines = list(ReservationPriceLine.objects.order_by("pk"))
+    assert len(lines) == 3
+    for line in lines:
+        entries = LogEntry.objects.get_for_object(line)
+        assert list(entries.values_list("action", flat=True)) == [LogEntry.Action.CREATE]
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
