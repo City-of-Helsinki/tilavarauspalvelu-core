@@ -21,9 +21,9 @@ env:
   PYTHON_VERSION: 3.13
 
 jobs:
-  # Skip the jobs when a pull request changes only the e2e suite. See detect-e2e-only.yml.
+  # Skip the jobs when a pull request changes only files that the tests do not cover. See detect-skip-tests.yml.
   changes:
-    uses: ./.github/workflows/detect-e2e-only.yml
+    uses: ./.github/workflows/detect-skip-tests.yml
     permissions:
       contents: read
       pull-requests: read
@@ -31,7 +31,7 @@ jobs:
   ci-image:
     uses: ./.github/workflows/build-ci-image.yml
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.e2e-only != 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
     permissions:
       contents: read
       packages: write
@@ -307,7 +307,7 @@ jobs:
   # Required check for merging. GitHub counts a skipped required check as passed,
   # so a job that needs failed jobs cannot be the required check by itself.
   # This job always runs, and it does not depend on the number of test shards.
-  # A pull request that changes only the e2e suite skips the test jobs. Then this job passes.
+  # A pull request that changes only files that the tests do not cover skips the test jobs. Then this job passes.
   tests-passed:
     needs: [changes, checks, test, sonarcloud]
     if: always()
@@ -318,7 +318,7 @@ jobs:
       - name: "Check that all backend test jobs succeeded"
         if: >-
           ${{
-            needs.changes.outputs.e2e-only != 'true'
+            needs.changes.outputs.skip-tests != 'true'
             && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped'))
           }}
         run: exit 1

@@ -19,9 +19,9 @@ env:
   PNPM_VERSION: 11.3.0
 
 jobs:
-  # Skip the jobs when a pull request changes only the e2e suite. See detect-e2e-only.yml.
+  # Skip the jobs when a pull request changes only files that the tests do not cover. See detect-skip-tests.yml.
   changes:
-    uses: ./.github/workflows/detect-e2e-only.yml
+    uses: ./.github/workflows/detect-skip-tests.yml
     permissions:
       contents: read
       pull-requests: read
@@ -29,7 +29,7 @@ jobs:
   ci-image:
     uses: ./.github/workflows/build-ci-image.yml
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.e2e-only != 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
     permissions:
       contents: read
       packages: write

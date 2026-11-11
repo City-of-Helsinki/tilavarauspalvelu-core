@@ -18,9 +18,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Skip the builds when a pull request changes only the e2e suite. See detect-e2e-only.yml.
+  # Skip the builds when a pull request changes only files that the tests do not cover. See detect-skip-tests.yml.
   changes:
-    uses: ./.github/workflows/detect-e2e-only.yml
+    uses: ./.github/workflows/detect-skip-tests.yml
     permissions:
       contents: read
       pull-requests: read
@@ -40,7 +40,7 @@ jobs:
       app-name: "customer"
       sentry-project: "tilavarauspalvelu-customer-ui"
       base-url: ""
-      skip: ${{ needs.changes.outputs.e2e-only == 'true' }}
+      skip: ${{ needs.changes.outputs.skip-tests == 'true' }}
     secrets: inherit
 
   build-admin-ui-docker:
@@ -55,5 +55,5 @@ jobs:
       app-name: "staff"
       sentry-project: "tilavarauspalvelu-staff-ui"
       base-url: "/kasittely"
-      skip: ${{ needs.changes.outputs.e2e-only == 'true' }}
+      skip: ${{ needs.changes.outputs.skip-tests == 'true' }}
     secrets: inherit
