@@ -1,34 +1,37 @@
-# Find out if a pull request changes only the e2e suite.
-# The e2e suite is a separate project. Its changes cannot break the backend or the frontend.
+# Find out if a pull request changes only files that the backend and frontend tests do not cover.
+# These are the e2e suite and the agent files (AGENTS.md, .agents/, .claude/).
+# The e2e suite is a separate project, and the agent files are not part of the service.
+# Their changes cannot break the backend or the frontend.
 # So the backend and frontend workflows skip their jobs for such a pull request.
+# pre-commit.ci is not a workflow here. It still runs for all pull requests.
 #
 # GitHub counts a skipped required check as passed, but a required check that never starts blocks the merge.
 # This is why the workflows skip their jobs, and do not use "paths-ignore" to skip the whole workflow.
 #
 # Pushes, tags and manual runs always give "false".
 # If this job fails, the output is empty. The callers use "!cancelled()", so they run all their jobs.
-name: "Detect e2e only changes"
+name: "Detect changes that skip tests"
 
 on:
   workflow_call:
     outputs:
-      e2e-only:
-        description: "'true' if the pull request changes only files under e2e/ or the e2e workflows."
-        value: ${{ jobs.detect.outputs.e2e-only }}
+      skip-tests:
+        description: "'true' if the pull request changes only the e2e suite, the e2e workflows or the agent files."
+        value: ${{ jobs.detect.outputs.skip-tests }}
 
 jobs:
   detect:
-    name: "Detect e2e only changes"
+    name: "Detect changes that skip tests"
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     permissions:
       pull-requests: read
 
-    # "other" is "false" when no changed file is outside the e2e paths.
+    # "other" is "false" when no changed file is outside the skip paths.
     # The API lists at most 3000 files. So "all_count" must also match the file count of the pull request.
     outputs:
-      e2e-only: >-
+      skip-tests: >-
         ${{
           github.event_name == 'pull_request'
           && steps.filter.outputs.other == 'false'
@@ -37,7 +40,7 @@ jobs:
 
     steps:
       # For a pull request, the action gets the changed files from the GitHub API. It needs no checkout.
-      - name: "Compare changed files to the e2e paths"
+      - name: "Compare changed files to the skip paths"
         id: filter
         if: github.event_name == 'pull_request'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
@@ -52,3 +55,7 @@ jobs:
               - '!e2e/**'
               - '!.github/workflows/test-e2e.yml'
               - '!.github/workflows/run-e2e.yml'
+              - '!.agents/**'
+              - '!.claude/**'
+              - '!AGENTS.md'
+              - '!CLAUDE.md'
