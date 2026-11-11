@@ -1210,6 +1210,7 @@ msgid "Refund ID"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment type"
 msgstr ""
 
@@ -3930,10 +3931,6 @@ msgstr ""
 #: tilavarauspalvelu/models/application_section/model.py
 msgid ""
 "Reservation min duration cannot be greater than reservation max duration."
-msgstr ""
-
-#: tilavarauspalvelu/models/application_section/model.py
-msgid "Can only apply from 1 to 7 reservations per week."
 msgstr ""
 
 #: tilavarauspalvelu/models/application_section/model.py
