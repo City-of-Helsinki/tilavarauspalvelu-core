@@ -47,8 +47,8 @@ const Fields = styled.div`
 
 const TimeList = styled.ul`
   display: grid;
-  gap: var(--spacing-xs);
-  margin: 0;
+  gap: var(--spacing-3-xs);
+  margin: var(--spacing-xs) 0 0;
   padding: 0;
   list-style: none;
 
@@ -68,6 +68,7 @@ const TimeListItem = styled.li<{ $priority?: "primary" | "secondary" }>`
   justify-content: space-between;
   gap: var(--spacing-s);
   padding-left: var(--spacing-2-xs);
+  border-radius: var(--spacing-3-xs);
   ${({ $priority }) => $priority === "primary" && primaryFill}
   ${({ $priority }) => $priority === "secondary" && secondaryFill}
 `;
@@ -78,10 +79,10 @@ const RemoveButton = styled(Button)`
   justify-content: center;
   min-height: 0;
   line-height: 1;
-  padding: 0;
+  padding: 0 0 2px;
   height: 30px;
   width: 30px;
-  font-size: var(--fontsize-heading-l);
+  font-size: var(--fontsize-heading-s);
   font-family: var(--font-bold), sans-serif;
   background-color: transparent;
   border: 0;
@@ -92,7 +93,7 @@ const RemoveButton = styled(Button)`
   ${fontBold}
   &:hover {
     color: inherit;
-    scale: 1.2;
+    scale: 1.5;
     background-color: transparent;
   }
 `;
