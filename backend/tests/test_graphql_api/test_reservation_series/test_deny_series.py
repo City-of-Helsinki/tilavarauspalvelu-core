@@ -66,7 +66,7 @@ def test_reservation_series__deny_series(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__update_statistics(graphql, settings):
+def test_reservation_series__deny_series__update_statistics(graphql, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reason = ReservationDenyReasonFactory.create()
@@ -80,7 +80,8 @@ def test_reservation_series__deny_series__update_statistics(graphql, settings):
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, input_data=data)
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
