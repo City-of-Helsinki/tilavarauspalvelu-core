@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
+from unittest.mock import patch
 
 import pytest
 from django.urls import reverse
@@ -10,6 +11,7 @@ from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
+from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
 from tilavarauspalvelu.typing import error_codes
 
 from tests.factories import (
@@ -110,6 +112,37 @@ def test_pricing_group_admin__create_with_component_and_reservation_unit(api_cli
     rows = list(ReservationUnitPricingGroup.objects.filter(pricing_group=pricing_group))
     assert len(rows) == 1
     assert rows[0].reservation_unit == reservation_unit
+
+
+def test_pricing_group_admin__new_components_send_accounting_of_reservation_units(api_client, settings):
+    settings.UPDATE_ACCOUNTING = True
+    api_client.force_login(UserFactory.create_superuser())
+    pricing_group = PricingGroupFactory.create(name_fi="Hinnasto", name_en="Prices", name_sv="Priser")
+    reservation_unit = ReservationUnitFactory.create()
+    row = ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=datetime.date(2026, 1, 1),
+    )
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_change", args=[pricing_group.pk])
+    data = {
+        **group_form_data(),
+        **component_form_data(0, valid_from="2026-01-01"),
+        "reservation_unit_pricing_groups-0-id": row.pk,
+        "reservation_unit_pricing_groups-0-pricing_group": pricing_group.pk,
+        "reservation_unit_pricing_groups-0-reservation_unit": reservation_unit.pk,
+        "reservation_unit_pricing_groups-0-begins": "2026-01-01",
+        **management_form_data("components", total_forms=1),
+        **management_form_data("reservation_unit_pricing_groups", total_forms=1, initial_forms=1),
+    }
+
+    with patch.object(refresh_reservation_unit_accounting_task, "delay_on_commit") as mock:
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 302, response.content
+    assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
+    assert [call.args for call in mock.call_args_list] == [(reservation_unit.pk,)]
 
 
 # ── Validation ──
