@@ -39,6 +39,7 @@ from tilavarauspalvelu.services.pricing.sales_items import validate_sales_items_
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
+from utils.model_signals import bulk_create_with_signals, bulk_update_with_signals
 
 if TYPE_CHECKING:
     import datetime
@@ -525,7 +526,9 @@ class ReservationUnitSerializer(NestingModelSerializer):
     @staticmethod
     def handle_access_types(access_types: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
         """Update access types for a reservation unit."""
-        access_type_pks = [access_type.get("pk") for access_type in access_types if "pk" in access_type]
+        access_type_data_by_pk = {
+            int(access_type["pk"]): access_type for access_type in access_types if "pk" in access_type
+        }
         today = local_date()
 
         with transaction.atomic():
@@ -534,17 +537,28 @@ class ReservationUnitSerializer(NestingModelSerializer):
             ReservationUnitAccessType.objects.filter(
                 reservation_unit=reservation_unit,
                 begin_date__gt=today,
-            ).exclude(pk__in=access_type_pks).delete()
+            ).exclude(pk__in=list(access_type_data_by_pk)).delete()
 
-            ReservationUnitAccessType.objects.bulk_create(
-                objs=[
-                    ReservationUnitAccessType(**access_type, reservation_unit=reservation_unit)
-                    for access_type in access_types
-                ],
-                update_conflicts=True,
-                update_fields=["access_type", "begin_date"],
-                unique_fields=["pk"],
+            existing_access_types = list(
+                ReservationUnitAccessType.objects.filter(pk__in=list(access_type_data_by_pk)).select_for_update()
             )
+            for existing_access_type in existing_access_types:
+                access_type_data = access_type_data_by_pk[existing_access_type.pk]
+                existing_access_type.access_type = access_type_data["access_type"]
+                existing_access_type.begin_date = access_type_data["begin_date"]
+
+            bulk_update_with_signals(existing_access_types, fields=["access_type", "begin_date"])
+
+            new_access_types = [
+                ReservationUnitAccessType(
+                    access_type=access_type["access_type"],
+                    begin_date=access_type["begin_date"],
+                    reservation_unit=reservation_unit,
+                )
+                for access_type in access_types
+                if "pk" not in access_type
+            ]
+            bulk_create_with_signals(new_access_types)
 
         reservation_unit.actions.update_access_types_for_reservations()
 

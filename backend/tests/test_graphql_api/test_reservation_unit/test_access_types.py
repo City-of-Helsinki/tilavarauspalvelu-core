@@ -3,11 +3,13 @@ from __future__ import annotations
 import datetime
 
 import pytest
+from auditlog.models import LogEntry
+from auditlog.registry import auditlog
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitAccessTypeFactory, ReservationUnitFactory
@@ -177,6 +179,67 @@ def test_reservation_unit__update__access_types(graphql):
     assert access_type[0].access_type == AccessType.PHYSICAL_KEY
     assert access_type[1].access_type == AccessType.OPENED_BY_STAFF
     assert access_type[2].access_type == AccessType.UNRESTRICTED
+
+
+@pytest.fixture
+def access_type_audit_log():
+    auditlog.register(ReservationUnitAccessType)
+    yield
+    auditlog.unregister(ReservationUnitAccessType)
+
+
+@pytest.mark.usefixtures("access_type_audit_log")
+def test_reservation_unit__update__access_types__audit_log(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+
+    today = local_date()
+    tomorrow = today + datetime.timedelta(days=1)
+
+    unchanged_access_type = ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        begin_date=today - datetime.timedelta(days=1),
+        access_type=AccessType.PHYSICAL_KEY,
+    )
+    changed_access_type = ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        begin_date=tomorrow,
+        access_type=AccessType.UNRESTRICTED,
+    )
+    LogEntry.objects.all().delete()
+
+    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data["accessTypes"] = [
+        {
+            "pk": unchanged_access_type.pk,
+            "beginDate": unchanged_access_type.begin_date.isoformat(),
+            "accessType": AccessType.PHYSICAL_KEY.value,
+        },
+        {
+            "pk": changed_access_type.pk,
+            "beginDate": tomorrow.isoformat(),
+            "accessType": AccessType.OPENED_BY_STAFF.value,
+        },
+        {
+            "beginDate": (today + datetime.timedelta(days=2)).isoformat(),
+            "accessType": AccessType.UNRESTRICTED.value,
+        },
+    ]
+
+    graphql.login_with_superuser()
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    new_access_type = reservation_unit.access_types.get(begin_date=today + datetime.timedelta(days=2))
+
+    assert list(LogEntry.objects.get_for_object(unchanged_access_type)) == []
+
+    changed_log_entries = list(LogEntry.objects.get_for_object(changed_access_type))
+    assert [log_entry.action for log_entry in changed_log_entries] == [LogEntry.Action.UPDATE]
+    assert changed_log_entries[0].changes == {"access_type": ["UNRESTRICTED", "OPENED_BY_STAFF"]}
+
+    new_log_entries = list(LogEntry.objects.get_for_object(new_access_type))
+    assert [log_entry.action for log_entry in new_log_entries] == [LogEntry.Action.CREATE]
 
 
 @pytest.mark.parametrize("started_days_ago", [0, 1])
