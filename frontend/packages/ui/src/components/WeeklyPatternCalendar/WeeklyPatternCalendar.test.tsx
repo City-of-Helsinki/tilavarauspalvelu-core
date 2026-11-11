@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { axe } from "vitest-axe";
 import { Weekday } from "../../../gql/gql-types";
 import type { WeeklyPatternCalendarProps, WeeklyPatternValue } from "./types";
+import { LONG_PRESS_MS } from "./useLongPressPaint";
 import { WeeklyPatternCalendar } from "./WeeklyPatternCalendar";
 
 type Data = { priority: "primary" | "secondary" };
@@ -273,6 +274,170 @@ describe("WeeklyPatternCalendar", () => {
       expect(screen.getByRole("status").textContent?.trim()).toBe(
         "Added: common:weekdayLongEnum.THURSDAY, 08:00–08:30, common:weekdayLongEnum.THURSDAY, 09:00–09:30"
       );
+    });
+  });
+
+  describe("on touch", () => {
+    // jsdom has no layout, so the test decides which cell is under the finger.
+    let under: Element | null = null;
+    beforeEach(() => {
+      vi.useFakeTimers();
+      document.elementFromPoint = () => under;
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+      // @ts-expect-error -- jsdom doesn't implement it, the test added it.
+      delete document.elementFromPoint;
+      under = null;
+    });
+
+    // jsdom's TouchEvent rejects plain objects as touches, so the list is attached afterwards.
+    const touch = (type: string, target: Element, touches: Array<{ clientX: number; clientY: number }>) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "touches", { value: touches });
+      act(() => {
+        target.dispatchEvent(event);
+      });
+      return event;
+    };
+    const at = (clientY: number) => [{ clientX: 100, clientY }];
+    const holdLongEnough = () => {
+      act(() => {
+        vi.advanceTimersByTime(LONG_PRESS_MS);
+      });
+    };
+
+    test("a long press and a drag paints the range, and the drag doesn't scroll", () => {
+      const onChange = vi.fn();
+      render(<Harness onChange={onChange} />);
+      const start = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+      const end = cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/);
+
+      under = start;
+      touch("touchstart", start, at(100));
+      holdLongEnough();
+      under = end;
+      const move = touch("touchmove", start, at(140));
+      touch("touchend", start, []);
+
+      expect(move.defaultPrevented).toBe(true);
+      expect(onChange).toHaveBeenLastCalledWith([
+        { weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 570, data: primary },
+      ]);
+    });
+
+    test("a swipe that moves before the long press completes scrolls instead of painting", () => {
+      const onChange = vi.fn();
+      render(<Harness onChange={onChange} />);
+      const start = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+
+      under = start;
+      touch("touchstart", start, at(100));
+      const move = touch("touchmove", start, at(130));
+      holdLongEnough();
+      touch("touchend", start, []);
+
+      expect(move.defaultPrevented).toBe(false);
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    test("a second finger during painting cancels the gesture and lets the browser zoom", () => {
+      const onChange = vi.fn();
+      render(<Harness onChange={onChange} />);
+      const start = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+      const end = cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/);
+
+      under = start;
+      touch("touchstart", start, at(100));
+      holdLongEnough();
+      under = end;
+      const pinch = touch("touchmove", start, [...at(140), { clientX: 200, clientY: 200 }]);
+      const after = touch("touchmove", start, at(150));
+      touch("touchend", start, []);
+
+      expect(pinch.defaultPrevented).toBe(false);
+      expect(after.defaultPrevented).toBe(false);
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    test("a new touch during painting cancels the earlier gesture", () => {
+      const onChange = vi.fn();
+      render(<Harness onChange={onChange} />);
+      const start = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+      const end = cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/);
+
+      under = start;
+      touch("touchstart", start, at(100));
+      holdLongEnough();
+      under = end;
+      touch("touchmove", start, at(140));
+      expect(end).toHaveAttribute("aria-selected", "true");
+
+      touch("touchstart", start, [...at(140), { clientX: 200, clientY: 200 }]);
+      // The preview of the cancelled gesture is gone, not left on the grid.
+      expect(end).toHaveAttribute("aria-selected", "false");
+
+      touch("touchend", start, []);
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    test("the click after a long press doesn't toggle the painted cell back", () => {
+      const onChange = vi.fn();
+      render(<Harness onChange={onChange} />);
+      const start = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+
+      under = start;
+      touch("touchstart", start, at(100));
+      holdLongEnough();
+      touch("touchend", start, []);
+      fireEvent.click(start);
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenLastCalledWith([
+        { weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 510, data: primary },
+      ]);
+    });
+
+    // fireEvent.click has detail 0, like a click from assistive technology.
+    test("a later assistive technology click after a drag that sent no click still toggles the cell", () => {
+      const onChange = vi.fn();
+      render(<Harness onChange={onChange} />);
+      const start = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+      const end = cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/);
+      const other = cell(/^common:weekdayLongEnum.TUESDAY, 08:00–08:30/);
+
+      under = start;
+      touch("touchstart", start, at(100));
+      holdLongEnough();
+      under = end;
+      touch("touchmove", start, at(140));
+      touch("touchend", start, []);
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      fireEvent.click(other);
+
+      expect(onChange).toHaveBeenCalledTimes(2);
+      expect(onChange).toHaveBeenLastCalledWith(
+        expect.arrayContaining([{ weekday: Weekday.Tuesday, beginMinutes: 480, endMinutes: 510, data: primary }])
+      );
+    });
+
+    test("a cancelled touch doesn't swallow the next click", () => {
+      const onChange = vi.fn();
+      render(<Harness onChange={onChange} />);
+      const start = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+
+      under = start;
+      touch("touchstart", start, at(100));
+      holdLongEnough();
+      touch("touchcancel", start, []);
+      fireEvent.click(start);
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenLastCalledWith([
+        { weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 510, data: primary },
+      ]);
     });
   });
 
