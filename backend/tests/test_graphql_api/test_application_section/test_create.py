@@ -73,6 +73,21 @@ def test_application_section__create__more_than_seven_reservations_per_week(grap
     assert section.applied_reservations_per_week == 10
 
 
+def test_application_section__create__zero_reservations_per_week(graphql):
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    data = get_application_section_create_data(application=application)
+    data["appliedReservationsPerWeek"] = 0
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.field_error_messages() == [
+        "Must apply for at least 1 reservation per week.",
+    ], response
+
+    assert ApplicationSection.objects.filter(application=application).exists() is False
+
+
 def test_application_section__create__resets_application_sent_at(graphql):
     application = ApplicationFactory.create_in_status_received()
     graphql.force_login(application.user)

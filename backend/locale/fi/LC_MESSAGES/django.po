@@ -4001,6 +4001,10 @@ msgstr ""
 "Varauksen minimikesto ei voi olla suurempi kuin varauksen maksimikesto."
 
 #: tilavarauspalvelu/models/application_section/model.py
+msgid "Must apply for at least 1 reservation per week."
+msgstr "Täytyy hakea vähintään 1 varaus viikossa."
+
+#: tilavarauspalvelu/models/application_section/model.py
 msgid ""
 "Reservation min and max durations must be multiples of 15 minutes, up to a "
 "maximum of 24 hours."
