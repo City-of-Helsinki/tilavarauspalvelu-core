@@ -1,9 +1,9 @@
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { CancelReservationDocument, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type { CancelReservationMutationVariables, ReservationCancelPageQuery } from "@gql/gql-types";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
@@ -72,7 +72,7 @@ function customRender({
   mocks = [],
 }: {
   reservation?: ReservationT;
-  mocks?: ReadonlyArray<MockedResponse>;
+  mocks?: ReadonlyArray<MockLink.MockedResponse>;
 } = {}): ReturnType<typeof render> {
   return render(
     <MockedProvider mocks={mocks}>
@@ -87,10 +87,9 @@ function createCancelReservationMock({
 }: {
   onVariables?: (variables: CancelReservationMutationVariables) => void;
   errors?: ReadonlyArray<GraphQLError>;
-} = {}): MockedResponse {
+} = {}): MockLink.MockedResponse {
   return {
-    request: { query: CancelReservationDocument },
-    variableMatcher: () => true,
+    request: { query: CancelReservationDocument, variables: () => true },
     result: (variables: CancelReservationMutationVariables) => {
       onVariables?.(variables);
       if (errors) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
 import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
@@ -89,12 +89,10 @@ export function ReservationUnitsDataReader({ selectedRows, setSelectedRows }: Pr
       publishingState: reservationUnitStateFilter,
       reservationUnitType: reservationUnitTypeFilter,
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
+  useQueryErrorToast(query.error, t("errors:errorFetchingData"));
   const { fetchMore, loading, data, previousData } = query;
 
   const { reservationUnits } = data ?? previousData ?? {};

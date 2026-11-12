@@ -1,4 +1,4 @@
-import { ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
@@ -53,15 +53,11 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
           ageGroup: rest.ageGroup,
           reservationDetails,
         };
-        const res = await recurringMutation({
+        await recurringMutation({
           variables: {
             input,
           },
         });
-
-        if (res.errors != null && res.errors.length > 0) {
-          throw new ApolloError({ graphQLErrors: res.errors });
-        }
         handleSuccess(true);
       } else {
         if (!reservation.pk) {

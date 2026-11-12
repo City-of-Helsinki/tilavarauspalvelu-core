@@ -1,5 +1,5 @@
 import type { GetServerSidePropsContext } from "next";
-import { ApolloClient, from, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { relayStylePagination } from "@apollo/client/utilities";
 import type { FieldPolicy } from "@apollo/client";
@@ -7,6 +7,7 @@ import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { keepLoadedPages, keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
+import { env } from "@/env.mjs";
 
 /* The backend can't tell if a next page exists. It filters by reservability after paging,
  * so hasNextPage and totalCount are not reliable.
@@ -47,21 +48,23 @@ export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsCont
   const httpLink = new HttpLink({
     uri,
     credentials: "include",
-    fetch: enchancedFetch(ctx?.req),
+    fetch: enchancedFetch(ctx?.req, env.CLIENT_FETCH_TIMEOUT_MS),
   });
 
   const sentryLink = new SentryContextLink();
 
   return new ApolloClient({
     ssrMode: isServer,
-    link: from([sentryLink, errorLink, httpLink]),
+    link: ApolloLink.from([sentryLink, errorLink, httpLink]),
     defaultOptions: {
       query: {
         fetchPolicy: isServer ? "no-cache" : "cache-first",
       },
-      // The client lives for the whole session, so fetch on mount to not show old data from an earlier page
       watchQuery: {
+        // The client lives for the whole session, so fetch on mount to not show old data from an earlier page
         fetchPolicy: "cache-and-network",
+        // Apollo Client 4 changed the default to true, keep the Apollo Client 3 behaviour
+        notifyOnNetworkStatusChange: false,
       },
     },
     cache: new InMemoryCache({

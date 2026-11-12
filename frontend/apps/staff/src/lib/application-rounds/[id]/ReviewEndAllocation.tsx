@@ -3,7 +3,6 @@ import { gql } from "@apollo/client";
 import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
-import type { ApolloQueryResult } from "@apollo/client";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { useDisplayError } from "ui/src/hooks";
 import { filterNonNullable } from "ui/src/modules/helpers";
@@ -14,7 +13,7 @@ import {
   UserPermissionChoice,
   useSendResultsMutation,
 } from "@gql/gql-types";
-import type { ApplicationRoundAdminFragment, ApplicationRoundQuery } from "@gql/gql-types";
+import type { ApplicationRoundAdminFragment } from "@gql/gql-types";
 import { useCheckPermission } from "@/hooks";
 import { isApplicationRoundInProgress } from "@/modules/helpers";
 
@@ -28,7 +27,7 @@ export function ReviewEndAllocation({
   refetch,
 }: {
   applicationRound: ApplicationRoundAdminFragment;
-  refetch: () => Promise<ApolloQueryResult<ApplicationRoundQuery>>;
+  refetch: () => Promise<unknown>;
 }): React.ReactElement {
   const [waitingForHandle, setWaitingForHandle] = useState(false);
 

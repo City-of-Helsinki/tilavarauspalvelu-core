@@ -5,7 +5,7 @@ import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import styled from "styled-components";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { createNodeId, toNumber, ignoreMaybeArray } from "ui/src/modules/helpers";
 import { fontBold, H2, CenterSpinner, Flex } from "ui/src/styled";
 import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
@@ -32,16 +32,15 @@ function SpacesResources({ unitPk }: { unitPk: number }): React.ReactElement {
   const newResourceButtonRef = createRef<HTMLButtonElement>();
 
   const {
+    error,
     data,
     refetch,
     loading: isLoading,
   } = useSpacesResourcesQuery({
     variables: { id: createNodeId("UnitNode", unitPk) },
     fetchPolicy: "network-only",
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const { setModalContent } = useModal();
 

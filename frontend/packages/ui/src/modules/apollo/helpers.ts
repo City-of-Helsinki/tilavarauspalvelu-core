@@ -1,16 +1,18 @@
 import type { IncomingMessage, IncomingHttpHeaders } from "node:http";
-import { ApolloError } from "@apollo/client";
-import { onError } from "@apollo/client/link/error";
-import { getOperationName } from "@apollo/client/utilities";
+import { CombinedGraphQLErrors, ServerError, ServerParseError } from "@apollo/client/errors";
+import { ErrorLink } from "@apollo/client/link/error";
+import { getMainDefinition } from "@apollo/client/utilities";
 import * as Sentry from "@sentry/nextjs";
-import { print } from "graphql";
+import { getOperationAST, Kind, OperationTypeNode, print } from "graphql";
 import { Roarr as log } from "roarr";
 import { getCookie } from "typescript-cookie";
-import type { ServerError, ServerParseError, Operation } from "@apollo/client";
+import type { ApolloLink, ErrorLike } from "@apollo/client";
 import type { GraphQLFormattedError, DocumentNode } from "graphql";
 import { RESERVEE_PI_FIELDS } from "@ui/components/reservation-form/utils";
 import { toast } from "../../components/toast";
+import { CLIENT_FETCH_TIMEOUT_MS, CLIENT_UPLOAD_TIMEOUT_MS, SERVER_FETCH_TIMEOUT_MS } from "../const";
 import { CsrfTokenNotFound } from "../errors";
+import { fetchWithTimeout, isTimeoutError } from "../fetch";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import { getClientOrigin } from "../urlBuilder";
 import type { LocalizationLanguages } from "../urlBuilder";
@@ -50,6 +52,10 @@ export type QueryErrorT =
     }
   | {
       type: "CSRF_ERROR";
+      message: string;
+    }
+  | {
+      type: "TIMEOUT";
       message: string;
     }
   | {
@@ -108,8 +114,8 @@ export function getPermissionErrors(error: unknown): ValidationError[] {
     return [];
   }
 
-  if (error instanceof ApolloError) {
-    const { graphQLErrors } = error;
+  if (CombinedGraphQLErrors.is(error)) {
+    const graphQLErrors = error.errors;
     if (graphQLErrors.length > 0) {
       const hasExtension = (e: (typeof graphQLErrors)[0]) => {
         const code = getExtensionCode(e);
@@ -128,8 +134,8 @@ export function getValidationErrors(error: unknown): ValidationError[] {
 
   const MUTATION_ERROR_CODE = "MUTATION_VALIDATION_ERROR";
 
-  if (error instanceof ApolloError) {
-    const { graphQLErrors } = error;
+  if (CombinedGraphQLErrors.is(error)) {
+    const graphQLErrors = error.errors;
     if (graphQLErrors.length > 0) {
       const isMutationError = (e: (typeof graphQLErrors)[0]) => {
         const code = getExtensionCode(e);
@@ -175,8 +181,8 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
   }
   const CODE = "RESERVATION_SERIES_OVERLAPS";
 
-  if (error instanceof ApolloError) {
-    const { graphQLErrors } = error;
+  if (CombinedGraphQLErrors.is(error)) {
+    const graphQLErrors = error.errors;
     if (graphQLErrors.length > 0) {
       const isSpecificError = (e: (typeof graphQLErrors)[0]) => {
         const code = getExtensionCode(e);
@@ -218,8 +224,8 @@ export function getApiErrors(error: unknown): ApiError[] {
     return [];
   }
 
-  if (error instanceof ApolloError) {
-    const { graphQLErrors } = error;
+  if (CombinedGraphQLErrors.is(error)) {
+    const graphQLErrors = error.errors;
     return mapGraphQLErrors(graphQLErrors);
   }
   return [];
@@ -277,13 +283,12 @@ function isExpectedError(error: QueryErrorT): boolean {
 /// Capture all graphql errors as warnings in Sentry
 /// if some errors are properly handled in the UI add filter here
 /// During development log to console
-export const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
-  // graphQLError can also raise 400 network error
-  // don't toast that, but allow 400 errors in case they are not graphql errors
-  if (graphQLErrors == null && networkError != null && isBrowser) {
-    toastNetworkError(networkError);
+export const errorLink = new ErrorLink(({ error, operation }) => {
+  // the backend returns an invalid query as a 400 response, don't toast that
+  if (!CombinedGraphQLErrors.is(error) && !isInvalidQueryError(error) && isBrowser) {
+    toastNetworkError(error, operation);
   }
-  const errors = transformApolloError(new ApolloError({ graphQLErrors, networkError }));
+  const errors = transformQueryError(error);
   if (isExpectedError(errors)) {
     log.info(`expected graphql error in ${operation.operationName}: ${errors.message}`);
     return;
@@ -291,25 +296,24 @@ export const errorLink = onError(({ graphQLErrors, networkError, operation }) =>
   logGraphQLError(errors, operation);
 });
 
+// The backend returns 400 if the query is not valid (graphene-django returns resolver errors with 200)
+function isInvalidQueryError(error: unknown): error is ServerError {
+  return ServerError.is(error) && error.statusCode === 400;
+}
+
 // helper to ignore 403 CSRF errors
 // admin ui has no middleware that could redirect to backend when it's missing
 // in practice this is not a problem because login sets the CSRF token and login page is static
-function isCSRFError(error: Error | ServerParseError | ServerError): boolean {
-  const statusCode = "statusCode" in error ? error.statusCode : null;
-
-  if (
-    statusCode === 403 &&
-    "result" in error &&
-    error.result != null &&
-    typeof error.result === "object" &&
-    "code" in error.result
-  ) {
-    const code = error.result.code;
-    if (code === "CSRF_FAILURE") {
-      return true;
-    }
+function isCSRFError(error: unknown): boolean {
+  if (!ServerError.is(error) || error.statusCode !== 403) {
+    return false;
   }
-  return false;
+  try {
+    const body: unknown = JSON.parse(error.bodyText);
+    return typeof body === "object" && body != null && "code" in body && body.code === "CSRF_FAILURE";
+  } catch {
+    return false;
+  }
 }
 
 const NETWORK_ERROR_TRANSLATIONS: Record<LocalizationLanguages, string> = {
@@ -322,7 +326,19 @@ const NETWORK_ERROR_TRANSLATIONS: Record<LocalizationLanguages, string> = {
 /// Use it for any toast of such an error, so the user sees only one toast for them.
 export const NETWORK_ERROR_TOAST_ID = "network_error";
 
-function toastNetworkError(error: Error | ServerParseError | ServerError): void {
+// A mutation that timed out can still complete on the backend, so don't tell the user to try again
+const MUTATION_TIMEOUT_TRANSLATIONS: Record<LocalizationLanguages, string> = {
+  en: "The service did not respond in time. Your change can still be saved. Refresh the page before you try again.",
+  fi: "Palvelu ei vastannut ajoissa. Muutoksesi voi silti tallentua. Päivitä sivu ennen kuin yrität uudelleen.",
+  sv: "Tjänsten svarade inte i tid. Din ändring kan ändå sparas. Uppdatera sidan innan du försöker igen.",
+};
+
+function isMutation(operation: ApolloLink.Operation): boolean {
+  const definition = getMainDefinition(operation.query);
+  return definition.kind === Kind.OPERATION_DEFINITION && definition.operation === OperationTypeNode.MUTATION;
+}
+
+function toastNetworkError(error: ErrorLike, operation: ApolloLink.Operation): void {
   if (!isBrowser) {
     return;
   }
@@ -331,14 +347,15 @@ function toastNetworkError(error: Error | ServerParseError | ServerError): void 
     return;
   }
   const lang = getLocalizationLang(document.documentElement.lang);
-  let errorMsg = NETWORK_ERROR_TRANSLATIONS[lang];
+  const isMutationTimeout = isTimeoutError(error) && isMutation(operation);
+  let errorMsg = isMutationTimeout ? MUTATION_TIMEOUT_TRANSLATIONS[lang] : NETWORK_ERROR_TRANSLATIONS[lang];
 
   const errorToastId = NETWORK_ERROR_TOAST_ID;
 
   // don't create multiple toasts
   if (!document.querySelector(`#${errorToastId}`)) {
     // Not translated because of how difficult it is to pass the translation function here
-    if ("statusCode" in error) {
+    if (ServerError.is(error) || ServerParseError.is(error)) {
       errorMsg += `: ${error.statusCode}`;
     }
     toast({
@@ -363,7 +380,20 @@ function getServerCookie(headers: IncomingHttpHeaders | undefined, name: string)
   return token;
 }
 
-export function enchancedFetch(req?: IncomingMessage) {
+function getTimeoutMs(isServer: boolean, init: RequestInit | undefined, clientTimeoutMs: number): number {
+  if (isServer) {
+    return SERVER_FETCH_TIMEOUT_MS;
+  }
+  // The upload link sends files as multipart form data
+  if (init?.body instanceof FormData) {
+    return Math.max(clientTimeoutMs, CLIENT_UPLOAD_TIMEOUT_MS);
+  }
+  return clientTimeoutMs;
+}
+
+/// @param req - the incoming request, required on the server
+/// @param clientTimeoutMs - timeout in the browser, the server always uses SERVER_FETCH_TIMEOUT_MS
+export function enchancedFetch(req?: IncomingMessage, clientTimeoutMs: number = CLIENT_FETCH_TIMEOUT_MS) {
   return (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const isServer = typeof window === "undefined";
     const csrfToken = isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
@@ -408,10 +438,7 @@ export function enchancedFetch(req?: IncomingMessage) {
       }
     }
 
-    return fetch(url, {
-      ...init,
-      headers,
-    });
+    return fetchWithTimeout(url, { ...init, headers }, getTimeoutMs(isServer, init, clientTimeoutMs));
   };
 }
 
@@ -425,7 +452,7 @@ function extractErrorCode(error: ApiError): string | string[] {
   return [];
 }
 
-export function logGraphQLError(error: QueryErrorT, operation?: Operation): void {
+export function logGraphQLError(error: QueryErrorT, operation?: ApolloLink.Operation): void {
   type SentryCtx = {
     level: "error";
     fingerprint?: string[];
@@ -451,7 +478,11 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
         context.extra = {
           details: JSON.stringify(error),
         };
-        context.fingerprint = ["graphql_error", ...(operation != null ? [operation?.operationName] : []), ...codes];
+        context.fingerprint = [
+          "graphql_error",
+          ...(operation?.operationName != null ? [operation.operationName] : []),
+          ...codes,
+        ];
         errorName = `GraphQL error: ${operation?.operationName ?? ""} ${codes.join(",")}`;
       }
       break;
@@ -480,6 +511,12 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
     case "CSRF_ERROR":
       log.error(`csrf error: ${error.message}`);
       context.fingerprint = ["csrf_error"];
+      break;
+    case "TIMEOUT":
+      log.error(`timeout: ${error.message}`);
+      context.fingerprint = ["timeout", ...(operation?.operationName != null ? [operation.operationName] : [])];
+      errorName = `TIMEOUT: ${operation?.operationName ?? ""}`;
+      break;
   }
   context.extra = {
     ...context.extra,
@@ -508,14 +545,18 @@ function removePi(dict: Record<string, unknown>): Record<string, unknown> {
   return dict;
 }
 
+function getOperationName(doc: DocumentNode): string {
+  return getOperationAST(doc)?.name?.value ?? "";
+}
+
 export function logGraphQLQuery(
   timeMs: number,
   url: string | undefined,
   documents: DocumentNode | DocumentNode[]
 ): void {
   const operationName = Array.isArray(documents)
-    ? documents.map((doc) => getOperationName(doc)).map((x) => x ?? "")
-    : (getOperationName(documents) ?? "");
+    ? documents.map((doc) => getOperationName(doc))
+    : getOperationName(documents);
   const t = Math.round(timeMs);
   const queryName = Array.isArray(operationName) ? operationName.join(",") : operationName;
   log.info(
@@ -528,22 +569,18 @@ export function logGraphQLQuery(
   );
 }
 
-// This only returns one error from the ApolloError, technically it could include both network and graphql errors
-// but in what case that would happen? a fetch fail + parse error maybe.
-function transformApolloError(error: ApolloError): QueryErrorT {
-  const { graphQLErrors } = error;
-  const ERROR_400_STRING = "Response not successful: Received status code 400";
-  const isUserError = error.message.includes(ERROR_400_STRING);
-  if (isUserError) {
-    return {
-      type: "GRAPHQL_ERROR",
-      message: error.message,
-      details: [{ code: "INVALID_GRAPHQL_QUERY" }],
-      errors: [...graphQLErrors],
-    };
+function getNetworkErrorCode(error: Error): string | null {
+  const { cause } = error;
+  if (typeof cause === "object" && cause != null && "code" in cause && typeof cause.code === "string") {
+    return cause.code;
   }
-  const gqlErrors = getApiErrors(error);
-  if (gqlErrors.length > 0) {
+  return null;
+}
+
+/// Convert an error from Apollo (or any other error) to a QueryErrorT for logging
+export function transformQueryError(error: unknown): QueryErrorT {
+  if (CombinedGraphQLErrors.is(error)) {
+    const gqlErrors = getApiErrors(error);
     const codes = new Set(gqlErrors.map((e) => e.code)).keys().toArray();
     const hasCode = codes.some((x) => x !== "UNKNOWN");
     const message = hasCode ? `Graphql VALIDATION errors: ${codes.join(",")}` : error.message;
@@ -551,100 +588,74 @@ function transformApolloError(error: ApolloError): QueryErrorT {
       type: "GRAPHQL_ERROR",
       message,
       details: hasCode ? gqlErrors : [],
-      errors: [...graphQLErrors],
+      errors: [...error.errors],
     };
   }
-
-  // NOTE have to process GraphQL errors first becasue they might raise 400 user error
-  if (error.networkError != null) {
-    if (isCSRFError(error.networkError)) {
+  if (isInvalidQueryError(error)) {
+    return {
+      type: "GRAPHQL_ERROR",
+      message: error.message,
+      details: [{ code: "INVALID_GRAPHQL_QUERY" }],
+    };
+  }
+  if (isCSRFError(error)) {
+    return {
+      type: "CSRF_ERROR",
+      message: "CSRF verfiication failed.",
+    };
+  }
+  if (isTimeoutError(error)) {
+    return {
+      type: "TIMEOUT",
+      message: error instanceof Error ? error.message : "",
+    };
+  }
+  if (ServerError.is(error) || ServerParseError.is(error)) {
+    return {
+      type: "NETWORK_ERROR",
+      code: String(error.statusCode),
+      message: `${error.statusCode} fetch error ""`,
+      details: error.bodyText,
+    };
+  }
+  if (!(error instanceof Error)) {
+    return {
+      type: "NON_API_ERROR",
+      message: `Unknown fetch error with details "${JSON.stringify(error)}"`,
+    };
+  }
+  const code = getNetworkErrorCode(error);
+  // The backend is down (nodejs version)
+  if (code === "ECONNREFUSED") {
+    return {
+      type: "ECONNREFUSED",
+      message: "Connection refused (backend down).",
+    };
+  }
+  if (code != null) {
+    return {
+      type: "NETWORK_ERROR",
+      code,
+      message: `${code} fetch error`,
+    };
+  }
+  if (error instanceof TypeError) {
+    // Browser errors have zero info why it failed outside of message
+    if (error.message.startsWith("Failed to fetch")) {
       return {
-        type: "CSRF_ERROR",
-        message: "CSRF verfiication failed.",
-      };
-    }
-    const { networkError } = error;
-    const { cause } = error.networkError;
-    if (
-      typeof cause === "object" &&
-      cause != null &&
-      "code" in cause &&
-      cause.code != null &&
-      typeof cause.code === "string"
-    ) {
-      // The backend is down (nodejs version)
-      if (cause.code === "ECONNREFUSED") {
-        return {
-          type: "ECONNREFUSED",
-          message: "Connection refused (backend down).",
-        };
-      }
-      return {
-        type: "NETWORK_ERROR",
-        code: cause.code,
-        message: `${cause.code} fetch error`,
-      };
-    } else if (cause == null) {
-      if (networkError instanceof TypeError) {
-        const terror = networkError;
-        // Browser errors have zero info why it failed outside of message
-        const BROWSER_ECONREFUSED_MSG = "Failed to fetch";
-        if (terror.message.startsWith(BROWSER_ECONREFUSED_MSG)) {
-          return {
-            type: "ECONNREFUSED",
-            message: "Connection refused (backend down).",
-          };
-        }
-        return {
-          type: "NETWORK_ERROR",
-          code: "UNKNOWN",
-          message: `${terror.name} fetch error with message ${terror.message}`,
-        };
-      }
-      if ("statusCode" in networkError) {
-        return {
-          type: "NETWORK_ERROR",
-          code: String(networkError.statusCode),
-          message: `${networkError.statusCode} fetch error ""`,
-          details: JSON.stringify(networkError),
-        };
-      }
-      return {
-        type: "NETWORK_ERROR",
-        code: "UNKNOWN",
-        message: `Unknown fetch error without a cause`,
-        details: JSON.stringify(networkError),
+        type: "ECONNREFUSED",
+        message: "Connection refused (backend down).",
       };
     }
     return {
       type: "NETWORK_ERROR",
       code: "UNKNOWN",
-      message: `Unknown fetch error with cause "${cause.toString()}"`,
-      details: JSON.stringify(networkError),
-    };
-  }
-
-  return {
-    type: "GRAPHQL_ERROR",
-    message: "GraphQL error",
-    details: [],
-    errors: [...graphQLErrors],
-  };
-}
-
-export function transformQueryError(error: unknown): QueryErrorT {
-  if (error instanceof ApolloError) {
-    return transformApolloError(error);
-  }
-  if (typeof error === "object" && error != null && "message" in error && typeof error.message === "string") {
-    return {
-      type: "NON_API_ERROR",
-      message: error.message,
-      details: JSON.stringify(error),
+      message: `${error.name} fetch error with message ${error.message}`,
     };
   }
   return {
     type: "NON_API_ERROR",
-    message: `Unknown fetch error with details "${JSON.stringify(error)}"`,
+    message: error.message,
+    details: JSON.stringify(error),
   };
 }

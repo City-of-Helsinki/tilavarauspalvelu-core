@@ -3,7 +3,6 @@ import { addMinutes, startOfDay } from "date-fns";
 import { IconCross, Select } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
-import type { ApolloQueryResult } from "@apollo/client";
 import type { Option } from "hds-react";
 import type { TFunction } from "next-i18next/pages";
 import { ShowAllContainer } from "ui/src/components";
@@ -13,7 +12,7 @@ import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { fontMedium } from "ui/src/styled";
 import { ApplicationRoundStatusChoice, ApplicationSectionStatusChoice } from "@gql/gql-types";
-import type { ApplicationSectionAllocationsQuery, ReservationUnitNode, Weekday } from "@gql/gql-types";
+import type { ReservationUnitNode, Weekday } from "@gql/gql-types";
 import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
@@ -28,7 +27,7 @@ import type {
 type Props = {
   applicationSections: SectionNodeT[] | null;
   reservationUnit: Pick<ReservationUnitNode, "pk">;
-  refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
+  refetchApplicationEvents: () => Promise<unknown>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
   relatedAllocations: RelatedSlot[][];
 };
