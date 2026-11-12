@@ -74,6 +74,7 @@ export class Checkout extends PageObject {
     );
   }
 
+  /** Reads the reservation number from the order summary's product list and returns it. */
   @step("checkout.In Order Summary Get Booking Number From Product List")
   async inOrderSummaryGetBookingNumberFromProductList() {
     await this.page.locator(".product-list").waitFor({ state: "visible" });
@@ -87,11 +88,11 @@ export class Checkout extends PageObject {
     // Extract the text of the next sibling element
     const reservation_number = await element_next_to_varausnumero.innerText();
 
-    // Save and log the reservation number
-    this.state.bookingNumOnly = reservation_number;
     await log(`Reservation number: ${reservation_number}`);
+    return reservation_number;
   }
 
+  /** Pays in the test checkout and returns the booking number that the order summary shows. */
   @step("checkout.Check The Info In Checkout")
   async checkTheInfoInCheckout() {
     // The checkout opens on its payment method step
@@ -102,7 +103,7 @@ export class Checkout extends PageObject {
     // Submitting the payment method opens the summary step
     await this.pages.customKeywords.waitForUrlToContain("/summary", /* timeout= */ 20_000);
     await this.checkProductListHasAllTheInfo();
-    await this.inOrderSummaryGetBookingNumberFromProductList();
+    const booking_number = await this.inOrderSummaryGetBookingNumberFromProductList();
     await this.clickAcceptTerms();
     await this.clickSubmit();
     // Submitting the summary goes through the payment back to Varaamo
@@ -113,6 +114,7 @@ export class Checkout extends PageObject {
       isConfirmedReservationUrl,
       { timeout: 35_000 }
     );
+    return booking_number;
   }
 
   @step("checkout.Interrupted Checkout")

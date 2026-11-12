@@ -4,7 +4,7 @@
  * - `testData`: the users and units that the test's tags choose (`TestSuites/test-data.ts`), e.g.
  *   `testData.user.hetu` and `testData.units.alwaysFreeUnit`. Only one test at a time uses a data set.
  * - `state`: the values that keywords save while the test runs (`TestSuites/state.ts`), e.g.
- *   `state.timeOfQuickReservationMinusT`.
+ *   `state.accessCode`. A customer's booking is not there: the keyword that reserves it returns a `Booking`.
  * - a staggered start for the first test of each parallel slot (`staggeredStart`).
  *
  * The page objects are fixtures too, by their names in `Pages` (`TestSuites/pages.ts`):

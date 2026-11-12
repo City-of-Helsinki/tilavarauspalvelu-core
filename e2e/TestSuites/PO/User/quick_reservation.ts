@@ -11,7 +11,7 @@ export interface PendingResponse {
 
 /** Quick reservation on a unit's page, and the booking's info card. */
 export class QuickReservation extends PageObject {
-  /** This keyword selects a random reservation slot from a list of available slots for quick reservations. */
+  /** Selects a random reservation slot from the available slots of quick reservation, and returns the slot's time. */
   @step("quick_reservation.Select The Free Slot From Quick Reservation")
   async selectTheFreeSlotFromQuickReservation() {
     // DEVNOTE
@@ -57,7 +57,7 @@ export class QuickReservation extends PageObject {
     await selected_slot.click();
     await expect(selected_slot, "The clicked slot is selected").toHaveAttribute("aria-pressed", "true");
 
-    this.state.timeOfQuickReservationFreeSlot = time_of_selected_slot;
+    return time_of_selected_slot;
   }
 
   /**
@@ -201,13 +201,15 @@ export class QuickReservation extends PageObject {
     expect(normalized_string).toBe(price_with_text);
   }
 
+  /** Reads the booking number from the info card and returns it. */
   @step("quick_reservation.Get Booking Number")
   async getBookingNumber() {
     // The number is shown once the reservation has loaded
     const number_element = this.page.getByTestId("reservation__reservation-info-card__reservationNumber");
     await expect(number_element).toHaveText(/^\d+$/, { useInnerText: true });
-    this.state.bookingNumOnly = await number_element.innerText();
-    await log(this.state.bookingNumOnly);
+    const booking_number = await number_element.innerText();
+    await log(booking_number);
+    return booking_number;
   }
 
   @step("quick_reservation.Check Booking Number")

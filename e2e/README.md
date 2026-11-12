@@ -129,9 +129,12 @@ environment.
 - The users and units of a test are in `testData`: `testData.user.hetu`, `testData.admin.fullName`,
   `testData.units.alwaysFreeUnit`, `testData.units.alwaysFreeUnitWithLocation`. The tests get it as a fixture, the
   page objects as `this.testData`. Reading a unit that the test's suite doesn't pick fails.
-- A value that a keyword saves for the keywords after it, like the time and number of a booking, is a field of
-  `state` (`TestSuites/state.ts`): `state.timeOfQuickReservationMinusT`, `this.state.bookingNumOnly` in a page
-  object. Each test gets a new one. Each field says which keywords set it.
+- A customer's booking is a `Booking` (`TestSuites/booking.ts`). The keyword that reserves the slot returns it, and
+  the test passes it to the keywords that check the booking: `booking.listTime`, `booking.infoCardTime`. The keyword
+  that first shows the booking number saves it in `booking.number`.
+- A value that a keyword saves for the keywords after it, like the access code, is a field of `state`
+  (`TestSuites/state.ts`): `state.accessCode`, `this.state.accessCode` in a page object. Each test gets a new one.
+  Each field says which keywords set it.
 - Tags choose the test data before the test starts. A data set tag picks the users from `Resources/test_users.ts`,
   and only one test at a time uses a data set: `@user-data-set-N` for a customer test, `@admin-test-data-set-N` and
   `@combined-test-data-set-N`. A customer data set has a user for each platform that runs the test: the platform of

@@ -25,8 +25,8 @@ const LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 export class DataModification extends PageObject {
   @step("data_modification.Formats Reservation Number And Name For Admin Side")
   // oxlint-disable-next-line eslint/require-await -- keywords are async, each call is a report step
-  async formatsReservationNumberAndNameForAdminSide() {
-    const bookingNumber_and_NameOfTheBooking = `${this.state.bookingNumOnly}, ${SINGLEBOOKING_NAME}`;
+  async formatsReservationNumberAndNameForAdminSide(booking_number: string) {
+    const bookingNumber_and_NameOfTheBooking = `${booking_number}, ${SINGLEBOOKING_NAME}`;
     this.state.bookingNumOnlyBookingNameSubvented = bookingNumber_and_NameOfTheBooking;
   }
 
