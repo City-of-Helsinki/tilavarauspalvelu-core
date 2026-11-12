@@ -66,7 +66,7 @@
       "unavailable": "Not available in any space on this application",
       "closed": "Not available in this space",
       "primary": "Preferred time slots",
-      "secondary": "Other request",
+      "secondary": "Other suitable time slots",
       "open": "Reservable in this space"
     },
     "skipToForm": "Skip to the form for adding times",

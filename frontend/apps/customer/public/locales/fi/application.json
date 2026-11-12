@@ -66,7 +66,7 @@
       "unavailable": "Ei varattavissa missään hakemukselle valituista tiloista",
       "closed": "Ei varattavissa tässä tilassa",
       "primary": "Ensisijainen toive",
-      "secondary": "Muu toive",
+      "secondary": "Vaihtoehtoinen toive",
       "open": "Varattavissa tässä tilassa"
     },
     "skipToForm": "Siirry lomakkeeseen, jolla voit lisätä aikoja",
