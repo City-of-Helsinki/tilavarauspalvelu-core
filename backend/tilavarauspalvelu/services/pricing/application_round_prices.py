@@ -9,7 +9,8 @@ from tilavarauspalvelu.models import AllocatedTimeSlot
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, get_periods_between, next_date_matching_weekday
 
-from .price_calculation import calculate_price_with_data, load_pricing_data
+from .price_calculation import load_pricing_data
+from .price_lines import build_price_lines_with_data
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -63,7 +64,8 @@ def load_application_round_pricing(*, reservation_units: Collection[ReservationU
 
 def check_application_round_prices(application_round: ApplicationRound) -> list[RoundPriceError]:
     """
-    Check that every reservation that the allocations of the application round give has a price.
+    Check that every reservation that the allocations of the application round give gets price lines.
+    The price lines also need a tax rate for each tax level on the current date.
 
     The reservations are priced on every weekly date of their application section's reservation period.
     Some of these dates get no reservation later, because the reservation unit is closed on them.
@@ -113,7 +115,7 @@ def check_application_round_prices(application_round: ApplicationRound) -> list[
 
         for begin, end in periods:
             try:
-                calculate_price_with_data(
+                build_price_lines_with_data(
                     pricing_data=pricing_data,
                     reservation_unit=reservation_unit,
                     price_option=section.price_option,
@@ -122,7 +124,7 @@ def check_application_round_prices(application_round: ApplicationRound) -> list[
                 )
             except PriceCalculationError as error:
                 msg = (
-                    f"Application section '{section.name}' has no price in reservation unit "
+                    f"Application section '{section.name}' cannot be priced in reservation unit "
                     f"'{reservation_unit.name}' on {begin.date().isoformat()}: {error}"
                 )
                 errors.append(RoundPriceError(code=error_codes.APPLICATION_ROUND_PRICE_MISSING, message=msg))
