@@ -136,11 +136,11 @@ environment.
   and only one test at a time uses a data set: `@user-data-set-N` for a customer test, `@admin-test-data-set-N` and
   `@combined-test-data-set-N`. A customer data set has a user for each platform that runs the test: the platform of
   the project (`desktop`, `android` or `iphone`, in its `metadata` in `playwright.config.ts`) picks the user and the
-  copies of the units. A data set that `test_users.ts` doesn't have fails the test, and so does a tag that ends in
-  `-set-N` but isn't a data set tag, so a mistyped tag can't leave a test with the shared users. A suite tag
-  (`@admin-suite`, `@combined-suite`) picks the units. A customer test has none, because its platform picks them,
-  and a platform's own suite tag like `@desktop-suite` fails the test. In
-  sequential mode, and in tests without a data set tag, the tests use the shared users in `serial_users.ts`. The
+  copies of the units. A data set that `test_users.ts` doesn't have fails the test, and so does a tag that looks like a
+  data set tag but isn't one, like `@user-data-set-X`, so a mistyped tag can't leave a test with the shared users. A
+  suite tag (`@admin-suite`, `@combined-suite`) picks the units. A customer test has none, because its platform picks
+  them. A suite tag on a customer test fails the test, and so does a platform's own suite tag like `@desktop-suite`.
+  In sequential mode, and in tests without a data set tag, the tests use the shared users in `serial_users.ts`. The
   `testData` fixture logs the users it chose, under the report's "Before Hooks".
 - The customer tests run on the desktop and on both phones, so the keywords work on every device: a keyword that
   differs on a phone, like one that opens the header's Menu, checks `this.isMobile`, which is the `isMobile` option of
