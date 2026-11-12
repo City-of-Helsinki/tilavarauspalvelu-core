@@ -63,6 +63,8 @@ export const RECURRING_BOOKING_MIN_LENGTH_TEXT = "30 minuuttia";
 export const RECURRING_BOOKING_MAX_LENGTH_TEXT = "2 tuntia";
 export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY = "Ensisijaiset aikatoiveet";
 export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY = "Vaihtoehtoiset aikatoiveet";
+// The legend of the two radio buttons above, which set the type of the times that are painted next
+export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_GROUP = "Valitse aikatoiveen tyyppi";
 // The application's calendar, where the times are painted
 export const RECURRING_BOOKING_CALENDAR_FI = "Valitse aikatoiveet kalenterista";
 export const RECURRING_BOOKING_UNIT_NAME_KESKUSTA =
