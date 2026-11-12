@@ -30,6 +30,12 @@ export type WeeklyPatternCellInfo<TData extends CalendarData> = WeekdayInterval 
   selected: boolean;
   isRunStart: boolean;
   isRunEnd: boolean;
+  /**
+   * The first (last) painted cell of a block: the cell before (after) it is not painted, whatever the data. Runs of
+   * different data that touch form one block, so only a block's edges are drawn as the ends of a time.
+   */
+  isBlockStart: boolean;
+  isBlockEnd: boolean;
   runBeginMinutes: number;
   runEndMinutes: number;
   /**
@@ -93,6 +99,15 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
   /** Translated state word for a cell, e.g. "Closed", "Free", "Primary". */
   getStateLabel: (cell: WeeklyPatternCellInfo<TData>) => string;
   getCellAppearance?: (data: TData) => CellAppearance | undefined;
+  /**
+   * Why a painted run is invalid, or `null` when it is fine. Called for painted cells, with the run's extent on the
+   * cell and every run painted on that day, in order (including a gesture in progress), for rules that depend on the
+   * neighbouring runs. An invalid run is marked (`data-invalid`), its reason is added to the cells' accessible names,
+   * and it is shown in a tooltip while the run is hovered or holds focus.
+   * The time being painted (a drag until release, a Shift+Arrow sweep until Shift is released), with the runs touching
+   * it, is checked only once the paint ends. Other runs, also on the same day, are checked as usual.
+   */
+  getRunError?: (cell: WeeklyPatternCellInfo<TData>, dayRuns: WeeklyPatternValue<TData>) => string | null;
   getCellProps?: (cell: WeeklyPatternCellInfo<TData>) => WeeklyPatternCellProps;
   /** The equal form for the same task. A skip link to it is shown before the grid. */
   alternative: { id: string; label: string };

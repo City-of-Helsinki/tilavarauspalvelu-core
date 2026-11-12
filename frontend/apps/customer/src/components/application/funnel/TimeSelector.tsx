@@ -12,8 +12,10 @@ import { breakpoints } from "@ui/modules/const";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { ControlledSelect } from "ui/src/components/form";
 import { successToast } from "ui/src/components/toast";
+import { formatDuration } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import {
+  findTooShortReasons,
   fromPattern,
   priorityKey,
   SUITABLE_TIME_STEP_MINUTES,
@@ -80,6 +82,35 @@ export function TimeSelectorForm({
     });
   };
 
+  // Seconds, like the form's own minimum duration check, which uses the same rules (findTooShortRuns), so this flags
+  // exactly the runs that the form validation rejects.
+  const minDuration = useWatch({ name: `applicationSections.${index}.minDuration`, control });
+  // The calendar marks the run, adds the reason to its cells' accessible names, and shows it in a tooltip.
+  const getRunError = (
+    cell: WeeklyPatternCellInfo<SuitableTimeData>,
+    dayRuns: WeeklyPatternValue<SuitableTimeData>
+  ) => {
+    if (minDuration <= 0) {
+      return null;
+    }
+    const runs = dayRuns.map(({ beginMinutes, endMinutes, data }) => ({
+      priority: data.priority,
+      beginMinutes,
+      endMinutes,
+    }));
+    const position = dayRuns.findIndex((run) => run.beginMinutes === cell.runBeginMinutes);
+    const reason = findTooShortReasons(runs, minDuration)[position];
+    if (!reason) {
+      return null;
+    }
+    const duration = formatDuration(t, { seconds: cell.runEndMinutes * 60 - cell.runBeginMinutes * 60 }, false);
+    const minDurationString = formatDuration(t, { seconds: minDuration }, false);
+    // A buffer next to a too short primary time is fixed by lengthening that primary time, so say so.
+    return reason === "nextToShortPrimary"
+      ? t("application:TimeSelector.tooShortNextToPrimary", { minDuration: minDurationString, duration })
+      : t("application:TimeSelector.tooShort", { minDuration: minDurationString, duration });
+  };
+
   const getStateLabel = (cell: WeeklyPatternCellInfo<SuitableTimeData>) =>
     t(`application:TimeSelector.legend.${cell.data ? priorityKey(cell.data.priority) : cell.availability}`);
   return (
@@ -109,6 +140,7 @@ export function TimeSelectorForm({
             visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
             brush={{ priority }}
             getStateLabel={(cell) => getStateLabel(cell)}
+            getRunError={(cell, dayRuns) => getRunError(cell, dayRuns)}
             getCellAppearance={({ priority: cellPriority }) =>
               cellPriority === Priority.Primary ? "primary" : "secondary"
             }
@@ -126,6 +158,7 @@ export function TimeSelectorForm({
           { state: "open", label: t("application:TimeSelector.legend.open") },
           { state: "closed", label: t("application:TimeSelector.legend.closed") },
           { state: "unavailable", label: t("application:TimeSelector.legend.unavailable") },
+          { state: "invalid", label: t("application:TimeSelector.legend.invalid") },
         ]}
       />
 

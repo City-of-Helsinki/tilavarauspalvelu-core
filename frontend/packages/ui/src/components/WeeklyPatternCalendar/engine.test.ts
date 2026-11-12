@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { Weekday } from "../../../gql/gql-types";
 import {
   assertValidStep,
+  cellExtent,
   changedRuns,
   gridToPattern,
   groupAvailability,
@@ -184,5 +185,20 @@ describe("resolveVisibleHours", () => {
 
   test("returns null when there is nothing to show", () => {
     expect(resolveVisibleHours(undefined, groupAvailability([]), [], 15)).toBeNull();
+  });
+});
+
+describe("cellExtent", () => {
+  const cells = [undefined, primary, primary, secondary, undefined, primary];
+
+  test("a run stops where the data changes", () => {
+    const sameAsPrimary = (cell: Data | undefined) => cell !== undefined && shallowEqual(cell, primary);
+    expect(cellExtent(cells, 2, sameAsPrimary)).toEqual({ first: 1, last: 2 });
+  });
+
+  test("a block runs over touching cells of any data, and stops at a gap", () => {
+    const painted = (cell: Data | undefined) => cell !== undefined;
+    expect(cellExtent(cells, 1, painted)).toEqual({ first: 1, last: 3 });
+    expect(cellExtent(cells, 5, painted)).toEqual({ first: 5, last: 5 });
   });
 });
