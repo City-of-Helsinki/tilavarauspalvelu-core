@@ -20,6 +20,7 @@ from tests.factories import (
     ReservationUnitFactory,
     ReservationUnitOptionFactory,
     ReservationUnitPricingGroupFactory,
+    TaxLevelFactory,
     UnitGroupFactory,
     UserFactory,
 )
@@ -339,8 +340,46 @@ def test_application_round__set_handled__price_missing_on_a_date(graphql):
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
         (
-            "Application section 'Sulkapallo' has no price in reservation unit 'Halli' on 2027-05-17: "
+            "Application section 'Sulkapallo' cannot be priced in reservation unit 'Halli' on 2027-05-17: "
             "Reservation unit has no price on 2027-05-17."
+        ),
+    ]
+    assert response.field_error_codes() == ["APPLICATION_ROUND_PRICE_MISSING"]
+
+    application_round.refresh_from_db()
+    assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
+
+
+@freeze_time(local_datetime(2026, 10, 12, 12))
+def test_application_round__set_handled__tax_level_has_no_rate_today(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation()
+    tax_level = TaxLevelFactory.create(name="ALV", rates__begins=datetime.date(2027, 1, 1))
+    pricing_group = PricingGroupFactory.create()
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        tax_level=tax_level,
+        valid_from=JAN_1,
+        amount=Decimal(10),
+    )
+    reservation_unit = ReservationUnitFactory.create(name="Halli")
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1,
+    )
+    create_allocation(application_round=application_round, reservation_unit=reservation_unit, section_name="Sulkapallo")
+
+    graphql.login_with_superuser()
+
+    with disable_reservation_generation() as mock:
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
+
+    assert mock.call_count == 0
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        (
+            "Application section 'Sulkapallo' cannot be priced in reservation unit 'Halli' on 2027-05-03: "
+            "Tax level 'ALV' has no rate on 2026-10-12."
         ),
     ]
     assert response.field_error_codes() == ["APPLICATION_ROUND_PRICE_MISSING"]
