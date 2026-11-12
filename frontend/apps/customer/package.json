@@ -24,7 +24,7 @@
     "@sentry/nextjs": "^10.76.2",
     "date-fns": "^4.4.0",
     "focus-trap-react": "^11.0.6",
-    "graphql": "^16.14.1",
+    "graphql": "^17.1.0",
     "hds-core": "^6.0.7",
     "hds-react": "^6.0.7",
     "i18next": "^26.7.1",
