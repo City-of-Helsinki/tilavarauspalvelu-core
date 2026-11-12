@@ -1,6 +1,9 @@
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
-import { RECURRING_BOOKING_CALENDAR_FI } from "../../Resources/texts_FI";
+import {
+  RECURRING_BOOKING_CALENDAR_FI,
+  RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_GROUP,
+} from "../../Resources/texts_FI";
 
 // The application calendar's cells are 15 minutes long
 const CALENDAR_STEP_MINUTES = 15;
@@ -16,8 +19,15 @@ function cellStartBefore(time: string): string {
 export class RecurringApplicationsPage2 extends PageObject {
   @step("recurring_applications_page2.User Selects Type Of The Booking Request")
   async userSelectsTypeOfTheBookingRequest(type_of_booking_request_txt: string) {
-    // A radio button: the times painted after it get this type
-    await this.page.getByRole("radio", { name: type_of_booking_request_txt, exact: true }).check();
+    // A radio button: the times painted after it get this type. The circle of its label is drawn over the input, so a
+    // click on the input would hit the label. The label is clicked, like a user does. Its text is also the heading of
+    // the times painted with that type, so the click stays in the radio group.
+    const types = this.page.getByRole("group", { name: RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_GROUP, exact: true });
+    await types.getByText(type_of_booking_request_txt, { exact: true }).click();
+    await expect(
+      types.getByRole("radio", { name: type_of_booking_request_txt, exact: true }),
+      "The type of the times is selected"
+    ).toBeChecked();
   }
 
   @step("recurring_applications_page2.User Clicks Available Seasonal Booking Times For")
