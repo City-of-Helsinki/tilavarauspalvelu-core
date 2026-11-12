@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import type { ReservableTimeSlots } from "@ui/modules/suitableTimes";
 import { Priority, Weekday } from "@gql/gql-types";
 import type { SuitableTimeRangeFormValues } from "./form";
-import { addTimeRange, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
+import { addTimeRange, findTooShortListed, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
 
 function range(
   dayOfTheWeek: Weekday,
@@ -62,5 +62,18 @@ describe("listTimeRanges and removeTimeRange", () => {
   test("removes the range at a position in that list", () => {
     expect(removeTimeRange(saved, 0)).toEqual([range(Weekday.Tuesday, "12:00", "13:00")]);
     expect(removeTimeRange(saved, 1)).toEqual([range(Weekday.Monday, "08:00", "10:00")]);
+  });
+});
+
+describe("findTooShortListed", () => {
+  test("marks the listed times the minimum duration rejects, per day", () => {
+    const listed = listTimeRanges([
+      range(Weekday.Tuesday, "10:00", "10:30"),
+      range(Weekday.Monday, "10:00", "11:00"),
+      range(Weekday.Monday, "11:00", "11:30", Priority.Secondary),
+      range(Weekday.Monday, "14:00", "14:30", Priority.Secondary),
+    ]);
+    // Listed by day and time: Monday's long primary, its buffer, a lone short secondary, then Tuesday's short primary.
+    expect(findTooShortListed(listed, 3600)).toEqual([false, false, true, true]);
   });
 });

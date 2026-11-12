@@ -76,6 +76,7 @@
       "erased": "Removed"
     },
     "form": {
+      "tooShort": "too short",
       "legend": "Add times with a form",
       "priorityNote": "New times use the type of booking request selected above.",
       "day": "Day",
