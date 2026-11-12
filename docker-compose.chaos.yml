@@ -1,0 +1,28 @@
+# Error testing setup. Use it on top of docker-compose.yml and docker-compose.gateway.yml with "just stack up-chaos".
+# The chaos proxy sits in front of the backend and can add delays, drop connections and return errors.
+# It has two channels. The server side rendering uses the "ssr" channel and the browser uses the "client" channel.
+# Change the faults with "just stack chaos". See "Error testing" in README.md.
+
+services:
+  chaos:
+    image: "node:24-alpine"
+    profiles: [backend]
+    init: true
+    depends_on:
+      - backend
+    environment:
+      CHAOS_BACKEND: http://backend:8000
+    ports:
+      - "127.0.0.1:8099:8099"
+    volumes:
+      - ./docker/chaos-proxy.mjs:/chaos/chaos-proxy.mjs:ro
+    command: ["node", "/chaos/chaos-proxy.mjs"]
+
+  # The server side rendering uses "localhost:8000" in the frontend containers. Send it to the "ssr" channel.
+  frontend-net:
+    command: !override ["socat", "TCP-LISTEN:8000,fork,reuseaddr", "TCP:chaos:8001"]
+
+  # The browser reaches the backend through the gateway on "localhost:8000". Send it to the "client" channel.
+  gateway:
+    environment:
+      GATEWAY_BACKEND: chaos:8002

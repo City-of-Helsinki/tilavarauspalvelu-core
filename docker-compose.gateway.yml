@@ -1,0 +1,13 @@
+# Single address setup. Use it on top of docker-compose.yml with "just stack up-gateway".
+# The gateway takes "localhost:8000" from the backend, so the browser reaches the frontends and the backend
+# through one address, as on the server. Login works, because Tunnistamo allows the "localhost:8000" callback.
+# Open the customer UI at http://localhost:8000 and the staff UI at http://localhost:8000/kasittely.
+# Needs Docker Compose 2.24.4 or later for "!reset" and "!override".
+
+services:
+  backend:
+    ports: !reset []
+
+  gateway:
+    ports: !override
+      - "127.0.0.1:8000:8080"

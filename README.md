@@ -188,6 +188,7 @@ The commands are in [`stack.just`](stack.just). Run `just stack` to see them.
 | Customer UI | http://localhost:3000 |
 | Staff UI | http://localhost:3001/kasittely |
 | Backend | http://localhost:8000 |
+| Gateway | http://localhost:8080 for the customer UI, http://localhost:8080/kasittely for the staff UI |
 | Database | `127.0.0.1:5555` |
 | Redis | `127.0.0.1:6379` |
 
@@ -260,6 +261,69 @@ The frontends use one backend URL for the server side rendering and for the brow
 So `http://localhost:8000` must be the backend both on the host and in the frontend containers.
 The frontends share the network namespace of the `frontend-net` service. That service publishes the frontend ports
 and forwards `localhost:8000` to the backend container.
+
+The `gateway` service runs [Caddy](https://caddyserver.com/) and puts the backend and the frontends behind one address,
+as on the server. Use it to test code that uses relative URLs, for example the error pages, where the browser
+can send GraphQL requests to `/graphql/`. The routes are in [`docker/Caddyfile`](docker/Caddyfile).
+When you add a backend path to `backend/config/urls.py`, add it to the Caddyfile too.
+The backend must allow `http://localhost:8080` in `CORS_ALLOWED_ORIGINS` and `CSRF_TRUSTED_ORIGINS`.
+`backend/.env.example` has it. If you made `backend/.env.docker` before, add it there.
+
+#### Single address setup
+
+`just stack up-gateway` moves the gateway to `localhost:8000` and stops publishing the backend there.
+The browser then reaches the frontends and the backend through one address, as on the server.
+Login works, because the Tunnistamo test client allows the `localhost:8000` callback.
+The setup adds [`docker-compose.gateway.yml`](docker-compose.gateway.yml) to the development setup.
+It needs Docker Compose 2.24.4 or later. The env files need no changes.
+
+| Service | Address |
+|---------|---------|
+| Customer UI | http://localhost:8000 |
+| Staff UI | http://localhost:8000/kasittely |
+| Django admin | http://localhost:8000/admin/ |
+
+The frontend ports 3000 and 3001 stay open, so links from other settings, for example `MOCK_VERKKOKAUPPA_FRONTEND_URL`, still work.
+Run `just stack down-gateway` before you go back to `just stack up`. Otherwise the gateway keeps port 8000 and the backend cannot start.
+
+#### Error testing
+
+The error testing setup puts a chaos proxy in front of the backend. The proxy can add delays, drop connections
+and return errors. It builds on the [single address setup](#single-address-setup), so open the frontends on `localhost:8000`.
+It adds [`docker-compose.chaos.yml`](docker-compose.chaos.yml). The proxy is [`docker/chaos-proxy.mjs`](docker/chaos-proxy.mjs).
+
+The proxy has two channels with their own faults:
+
+| Channel | Traffic |
+|---------|---------|
+| `ssr` | The server side rendering of the frontend containers |
+| `client` | The browser, through the gateway on `localhost:8000` |
+
+```sh
+just stack up-chaos                                          # Start the setup. Add COMPOSE_PROFILES=backend,frontend-release for the release frontends.
+just stack chaos ssr '{"delayMs": 1000, "jitterMs": 2000}'   # 1 to 3 s delay for the server side rendering
+just stack chaos client '{"path": "/graphql/", "dropEvery": 5}'  # Close every 5th GraphQL connection of the browser
+just stack chaos both '{"errorRate": 0.2, "errorStatus": 502}'   # 502 for 20 % of the requests
+just stack chaos both '{"errorForSeconds": 30, "errorStatus": 503}'  # 503 for all requests for 30 seconds
+just stack chaos-status                                      # Show the faults and the request counts
+just stack chaos-reset                                       # Remove all faults. Add ssr or client for one channel.
+just stack down-chaos                                        # Remove the containers before you go back to "just stack up"
+```
+
+`just stack chaos` changes only the settings that you give. The settings are:
+
+| Setting | Default | Effect |
+|---------|---------|--------|
+| `path` | `/` | Faults apply only to requests whose path starts with this |
+| `delayMs` | `0` | Fixed delay before the request continues |
+| `jitterMs` | `0` | Random extra delay from 0 to this value |
+| `dropEvery` | `0` | Close the connection without a response on every Nth request. The count starts from the change. |
+| `errorRate` | `0` | Share of the requests, from 0 to 1, that get `errorStatus` |
+| `errorStatus` | `503` | Status of the injected errors |
+| `errorForSeconds` | | All requests get `errorStatus` for this time. It is not kept as a setting. |
+
+The delay comes before the drop or the error, so a slow failure is possible too.
+The proxy logs each drop and each injected error. They show in the output of `just stack up-chaos` with the prefix `chaos`.
 
 ## Backend
 

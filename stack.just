@@ -32,6 +32,41 @@ up-release *args: env
 up-backend *args: env
     COMPOSE_PROFILES=backend docker compose up --build --watch {{ args }}
 
+# The single address setup puts the gateway on "localhost:8000". See "Single address setup" in README.md.
+gateway_files := "-f docker-compose.yml -f docker-compose.gateway.yml"
+
+# Start the development setup with the gateway on localhost:8000. Set COMPOSE_PROFILES for the release frontends.
+up-gateway *args: env
+    COMPOSE_PROFILES={{ up_profiles }} docker compose {{ gateway_files }} up --build --watch {{ args }}
+
+# Remove the containers of the single address setup. Run it before you go back to "just stack up".
+down-gateway *args:
+    docker compose {{ gateway_files }} down {{ args }}
+
+# The error testing setup builds on the single address setup. See "Error testing" in README.md.
+chaos_files := gateway_files + " -f docker-compose.chaos.yml"
+chaos_url := "http://127.0.0.1:8099"
+
+# Start the development setup with the chaos proxy in front of the backend. Set COMPOSE_PROFILES for the release frontends.
+up-chaos *args: env
+    COMPOSE_PROFILES={{ up_profiles }} docker compose {{ chaos_files }} up --build --watch {{ args }}
+
+# Remove the containers of the error testing setup. Run it before you go back to "just stack up".
+down-chaos *args:
+    docker compose {{ chaos_files }} down {{ args }}
+
+# Change faults of the chaos proxy. Channel is ssr, client or both. Example: just stack chaos both '{"delayMs": 1000}'
+chaos channel config:
+    @curl --silent --show-error --fail-with-body -X PUT "{{ chaos_url }}/{{ channel }}" -H "Content-Type: application/json" -d '{{ config }}'
+
+# Show the faults and request counts of the chaos proxy
+chaos-status:
+    @curl --silent --show-error "{{ chaos_url }}/"
+
+# Remove the faults of the chaos proxy. Channel is ssr, client or both.
+chaos-reset channel="both":
+    @curl --silent --show-error --fail-with-body -X DELETE "{{ chaos_url }}/{{ channel }}"
+
 # Start only the database and Redis. Run the backend on the host.
 services:
     @docker compose up --detach db redis
