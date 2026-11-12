@@ -1,1 +1,18 @@
-* @City-of-Helsinki/tilavarauspalvelu-team
+# The last matching pattern takes precedence.
+# Owners must have write access to the repository, or GitHub ignores them.
+
+# Fallback for anything not matched below
+*                           @City-of-Helsinki/tilavarauspalvelu-team
+
+/.agents/                   @joonatank @matti-lamppu
+/.github/                   @joonatank @matti-lamppu @tuomas777
+/.pre-commit-config.yaml    @matti-lamppu @ranta
+/AGENTS.md                  @joonatank @matti-lamppu
+/backend/                   @matti-lamppu @ranta @tuomas777
+/docker-compose.yml         @joonatank @matti-lamppu
+/e2e/                       @joonatank @RQbo
+/frontend/                  @joonatank @ranta @vincit-matu
+/infra.just                 @joonatank @matti-lamppu
+/justfile                   @joonatank @matti-lamppu
+/stack.just                 @joonatank @matti-lamppu
+/tilavaraus.graphql         @joonatank @matti-lamppu @ranta @tuomas777
