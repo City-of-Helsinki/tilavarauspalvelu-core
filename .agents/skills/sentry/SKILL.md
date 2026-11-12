@@ -2,11 +2,12 @@
 name: sentry
 description: >-
   Fetch a Sentry issue and its events, and drive a Seer autofix run up to the code changes,
-  through the Sentry REST API. Use when the user references a Sentry issue with a URL or an issue ID,
-  or asks to run or continue Seer or autofix on an issue.
+  and list or delete releases, through the Sentry REST API. Use when the user references a Sentry issue
+  with a URL or an issue ID, asks to run or continue Seer or autofix on an issue, or asks to list or delete releases.
 ---
 
-How to fetch a Sentry issue to find the cause of an error, and how to take it through Seer.
+How to fetch a Sentry issue to find the cause of an error, how to take it through Seer,
+and how to list and delete releases.
 
 ## 1. Authentication
 
@@ -20,8 +21,9 @@ If the directory does not exist, the scripts read the token from 1Password with 
 1Password asks the user to unlock. Wait for it.
 
 The token is a personal token from https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/.
-Set "Issue & Event" to Read & Write, "Organization" to Read and "Project" to Read.
-Only `sentry-autofix` needs the write permission.
+Set "Issue & Event" to Read & Write, "Organization" to Read, "Project" to Read and "Release" to Admin.
+Only `sentry-autofix` needs the write permission of "Issue & Event".
+Only `sentry-releases delete` needs the admin permission of "Release".
 
 The 1Password setup is as follows. If a call fails because of it, stop and tell the user which part is missing:
 
@@ -100,6 +102,23 @@ but it cannot accept a step, rethink a step or open a pull request.
   After it, run `wait`. The link is in `pull_requests`.
 
 Seer runs cost money, so do not start or rethink without a reason.
+
+### List and delete releases
+
+```bash
+.agents/skills/sentry/sentry-releases list '-merge'
+.agents/skills/sentry/sentry-releases delete 'tilavarauspalvelu-staff-ui@2791-merge' 'tilavarauspalvelu-customer-ui@2791-merge'
+```
+
+- `list` shows the open and archived releases of all projects, newest first. With a text, it shows only the versions that contain the text.
+  `count` is the number of releases. `last_event` and `new_issues` tell if events refer to a release.
+- `delete` deletes the releases with the exact versions. Give many versions in one command.
+  Put each version in single quotes, because a version has `@` in it.
+- `delete` cannot be undone. Run `list` first. Show the user the count and some versions.
+  Delete only after the user agrees.
+- Sentry does not delete a release that issues, events or health data refer to. Such a release is in `failed`
+  with the reason. The script then exits with 1, but it still deletes the other releases.
+- A delete can time out with an empty `error`, but Sentry can still delete the release. Run `list` again to check.
 
 ## 3. Seer workflow
 
