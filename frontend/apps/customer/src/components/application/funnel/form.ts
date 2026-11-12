@@ -1,8 +1,9 @@
 import { startOfDay } from "date-fns";
 import { z } from "zod";
-import { parseApiDate, parseUIDate, timeToMinutes, formatApiDate, formatDate } from "ui/src/modules/date-utils";
+import { parseApiDate, parseUIDate, formatApiDate, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatWhitespace } from "ui/src/modules/helpers";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
+import { countFittingReservations, hasTooShortTimes } from "ui/src/modules/suitableTimes";
 import { checkValidDateOnly, emailField, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
 import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
 import type {
@@ -81,37 +82,6 @@ export type ApplicationSectionPage1FormValues = z.infer<typeof ApplicationSectio
 
 export type ApplicationSectionPage2FormValues = z.infer<typeof ApplicationSectionPage2Schema>;
 
-type MergedTimeRange = { dayOfTheWeek: Weekday; beginMinutes: number; endMinutes: number };
-
-/**
- * Joins time ranges on the same day that touch or overlap, regardless of priority.
- * For validation, a primary range followed directly by a secondary range is one time range.
- */
-function mergeAdjacentTimeRanges(ranges: ReadonlyArray<SuitableTimeRangeFormValues>): MergedTimeRange[] {
-  const sorted = ranges
-    .map((tr) => {
-      const end = timeToMinutes(tr.endTime);
-      return {
-        dayOfTheWeek: tr.dayOfTheWeek,
-        beginMinutes: timeToMinutes(tr.beginTime),
-        // "00:00" as an end time means midnight at the end of the day
-        endMinutes: end === 0 ? 24 * 60 : end,
-      };
-    })
-    .toSorted((a, b) => a.dayOfTheWeek.localeCompare(b.dayOfTheWeek) || a.beginMinutes - b.beginMinutes);
-
-  const merged: MergedTimeRange[] = [];
-  for (const tr of sorted) {
-    const last = merged.at(-1);
-    if (last != null && last.dayOfTheWeek === tr.dayOfTheWeek && tr.beginMinutes <= last.endMinutes) {
-      last.endMinutes = Math.max(last.endMinutes, tr.endMinutes);
-    } else {
-      merged.push({ ...tr });
-    }
-  }
-  return merged;
-}
-
 const ApplicationSectionPage2Schema = z
   .object({
     pk: z.number(),
@@ -124,23 +94,24 @@ const ApplicationSectionPage2Schema = z
     appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
   })
   .superRefine((s, ctx) => {
-    const merged = mergeAdjacentTimeRanges(s.suitableTimeRanges);
-
-    const isLongEnough =
-      s.minDuration > 0 &&
-      // No too short time ranges allowed (minDuration is in seconds)
-      merged.every((tr) => (tr.endMinutes - tr.beginMinutes) * 60 >= s.minDuration);
-    if (!isLongEnough) {
+    // No too short times allowed. A primary time must be long enough by itself, a secondary one can be a buffer that
+    // counts together with the times it touches, unless it touches a too short primary time (see findTooShortRuns).
+    // minDuration is in seconds.
+    const isValid = s.minDuration > 0 && !hasTooShortTimes(s.suitableTimeRanges, s.minDuration);
+    if (!isValid) {
       ctx.addIssue({
         code: "custom",
         path: ["suitableTimeRanges"],
         message: "Suitable time range must be at least as long as the minimum duration",
       });
     }
+  })
+  .superRefine((s, ctx) => {
+    // The times must fit the applied reservations per week. They can be on separate days or on the same day, in one
+    // long enough time or in several (see countFittingReservations).
+    const isValid = countFittingReservations(s.suitableTimeRanges, s.minDuration) >= s.appliedReservationsPerWeek;
 
-    // Separate ranges count individually, also several on the same day
-    const hasEnoughRanges = merged.length >= s.appliedReservationsPerWeek;
-    if (!hasEnoughRanges) {
+    if (!isValid) {
       ctx.addIssue({
         code: "custom",
         path: ["suitableTimeRanges"],

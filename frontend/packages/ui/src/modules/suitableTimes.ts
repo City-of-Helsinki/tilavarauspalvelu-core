@@ -1,4 +1,5 @@
-import { MINUTES_PER_DAY } from "@ui/components/WeeklyPatternCalendar/engine";
+import { groupBy } from "lodash-es";
+import { mergeRanges, MINUTES_PER_DAY } from "@ui/components/WeeklyPatternCalendar/engine";
 import type {
   VisibleHours,
   WeeklyPatternAvailability,
@@ -37,6 +38,131 @@ export function endTimeToMinutes(time: string): number {
 // formatApiTimeUnsafe writes the end of the day (24:00) back as 00:00.
 function minutesToTime(minutes: number): string {
   return formatApiTimeUnsafe(Math.floor(minutes / 60), minutes % 60);
+}
+
+/** A run of one priority on one day, in minutes. */
+export type PriorityRun = { priority: Priority; beginMinutes: number; endMinutes: number };
+
+/**
+ * Which of one day's runs are shorter than the minimum duration (in seconds), index for index.
+ * `runs` must be in order, with touching runs of the same priority merged (as the calendar draws them).
+ *
+ * A primary run must be long enough by itself.
+ * A secondary run long enough by itself is always fine.
+ * A shorter secondary run can be a buffer next to primary time, so it counts together with every run it touches (its
+ * block). But a buffer only helps a long enough primary run: touching a too short primary run, it is too short too.
+ * E.g. with a 60 min minimum, 60 min primary + 30 min secondary is fine, in 30 min primary + 30 min secondary both are
+ * too short, and in 30 min primary + 60 min secondary only the primary is.
+ */
+export function findTooShortRuns(runs: ReadonlyArray<PriorityRun>, minDurationSeconds: number): boolean[] {
+  return findTooShortReasons(runs, minDurationSeconds).map((reason) => reason != null);
+}
+
+/**
+ * Why a run is too short, by the rules of `findTooShortRuns`: `tooShort` when it (or the block it buffers) is shorter
+ * than the minimum, `nextToShortPrimary` when it is a secondary buffer that is too short only because the primary run
+ * it touches is. The latter is fixed by lengthening that primary run.
+ */
+export type TooShortReason = "tooShort" | "nextToShortPrimary";
+
+/** Like `findTooShortRuns`, but with the reason for each too short run, and `null` for the fine ones. */
+export function findTooShortReasons(
+  runs: ReadonlyArray<PriorityRun>,
+  minDurationSeconds: number
+): Array<TooShortReason | null> {
+  const isShort = (beginMinutes: number, endMinutes: number) => (endMinutes - beginMinutes) * 60 < minDurationSeconds;
+  const isShortPrimary = (run: PriorityRun | undefined) =>
+    run?.priority === Priority.Primary && isShort(run.beginMinutes, run.endMinutes);
+  const touches = (earlier: PriorityRun | undefined, later: PriorityRun | undefined) =>
+    earlier != null && later != null && earlier.endMinutes === later.beginMinutes;
+
+  return runs.map((run, index) => {
+    if (run.priority === Priority.Primary) {
+      return isShortPrimary(run) ? "tooShort" : null;
+    }
+    if (!isShort(run.beginMinutes, run.endMinutes)) {
+      return null;
+    }
+    const before = runs[index - 1];
+    const after = runs[index + 1];
+    if ((touches(before, run) && isShortPrimary(before)) || (touches(run, after) && isShortPrimary(after))) {
+      return "nextToShortPrimary";
+    }
+    // The block: this run and every run touching it, outwards in both directions.
+    let first = run;
+    for (const candidate of runs.slice(0, index).reverse()) {
+      if (!touches(candidate, first)) {
+        break;
+      }
+      first = candidate;
+    }
+    let last = run;
+    for (const candidate of runs.slice(index + 1)) {
+      if (!touches(last, candidate)) {
+        break;
+      }
+      last = candidate;
+    }
+    return isShort(first.beginMinutes, last.endMinutes) ? "tooShort" : null;
+  });
+}
+
+/** One day's ranges as runs in order, with touching or overlapping ranges of the same priority merged. */
+function toDayRuns(ranges: ReadonlyArray<Pick<SuitableTimeRangeValues, "beginTime" | "endTime" | "priority">>) {
+  const sorted = ranges
+    .map(({ beginTime, endTime, priority }) => ({
+      priority,
+      beginMinutes: timeToMinutes(beginTime),
+      endMinutes: endTimeToMinutes(endTime),
+    }))
+    .sort((a, b) => a.beginMinutes - b.beginMinutes);
+  const runs: PriorityRun[] = [];
+  for (const range of sorted) {
+    const last = runs.at(-1);
+    if (last && last.priority === range.priority && range.beginMinutes <= last.endMinutes) {
+      last.endMinutes = Math.max(last.endMinutes, range.endMinutes);
+    } else {
+      runs.push(range);
+    }
+  }
+  return runs;
+}
+
+/** Whether any time is shorter than the minimum duration (in seconds), by the rules of `findTooShortRuns`. */
+export function hasTooShortTimes(
+  ranges: ReadonlyArray<Pick<SuitableTimeRangeValues, "dayOfTheWeek" | "beginTime" | "endTime" | "priority">>,
+  minDurationSeconds: number
+): boolean {
+  const byDay = groupBy(ranges, (range) => range.dayOfTheWeek);
+  return Object.values(byDay).some((dayRanges) =>
+    findTooShortRuns(toDayRuns(dayRanges), minDurationSeconds).includes(true)
+  );
+}
+
+/**
+ * How many reservations of the minimum duration (in seconds) fit in the times, side by side.
+ * A reservation can be allocated anywhere inside touching times of any priority (as the backend merges them), so each
+ * block of touching times fits as many as its length allows. Several fit on one day, in one block or in separate ones.
+ * E.g. with a 60 min minimum, 10:00-13:00 fits three, and 10:00-11:00 with 12:00-13:00 on the same day fits two.
+ */
+export function countFittingReservations(
+  ranges: ReadonlyArray<Pick<SuitableTimeRangeValues, "dayOfTheWeek" | "beginTime" | "endTime">>,
+  minDurationSeconds: number
+): number {
+  const byDay = groupBy(ranges, (range) => range.dayOfTheWeek);
+  let count = 0;
+  for (const dayRanges of Object.values(byDay)) {
+    const blocks = mergeRanges(
+      dayRanges.map(({ beginTime, endTime }) => ({
+        beginMinutes: timeToMinutes(beginTime),
+        endMinutes: endTimeToMinutes(endTime),
+      }))
+    );
+    for (const { beginMinutes, endMinutes } of blocks) {
+      count += minDurationSeconds > 0 ? Math.floor(((endMinutes - beginMinutes) * 60) / minDurationSeconds) : 1;
+    }
+  }
+  return count;
 }
 
 export function toAvailability(slots: ReservableTimeSlots): WeeklyPatternAvailability {
