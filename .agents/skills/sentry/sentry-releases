@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# List or delete releases of the Sentry organization through the Sentry REST API.
+# The delete command cannot be undone. Run it only when the user asks for it.
+# The token is read from the secret file or from 1Password. See lib.sh.
+#
+# Usage: sentry-releases <command> [arguments]
+#
+# Commands:
+#   list ['<text>']               List the releases. A version must contain the text, if given.
+#   delete '<version>' [...]      Delete the releases with these exact versions.
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  sed -n '/^# Usage:/,/^set -euo/p' "$0" | sed '$d; s/^# \{0,1\}//' >&2
+  exit 2
+}
+[[ $# -ge 1 ]] || usage
+
+command="$1"
+shift
+
+# Sentry release versions cannot contain a slash, a backslash or whitespace.
+valid_text='^[^/\\[:space:]]+$'
+
+case "$command" in
+  list)
+    [[ $# -le 1 ]] || usage
+    text="${1:-}"
+    if [[ -n "$text" && ! "$text" =~ $valid_text ]]; then
+      echo "Not a release version or a part of one: $text" >&2
+      usage
+    fi
+    ;;
+  delete)
+    [[ $# -ge 1 ]] || usage
+    for version in "$@"; do
+      if [[ ! "$version" =~ $valid_text ]]; then
+        echo "Not a release version: $version" >&2
+        usage
+      fi
+    done
+    ;;
+  *)
+    echo "Unknown command: $command" >&2
+    usage
+    ;;
+esac
+
+uri() {
+  jq --raw-input --raw-output '@uri' <<<"$1"
+}
+
+# The list is sorted by creation date, newest first. The search in Sentry matches a part of the version.
+# The script removes matches that do not contain the text exactly, such as matches without the case.
+list_releases() {
+  local cursor="" page next
+  while :; do
+    # An empty status includes the archived releases. Without it, Sentry shows only the open releases.
+    page="$(api "releases/?per_page=100&status=&query=$(uri "$text")&cursor=$(uri "$cursor")" --dump-header "$headers")"
+    printf '%s\n' "$page"
+    # The Link header has rel="next"; results="true" only if there is a next page.
+    next="$(grep -i '^link:' "$headers" | grep -o 'rel="next"; results="true"; cursor="[^"]*"' || true)"
+    [[ -n "$next" ]] || break
+    cursor="${next##*cursor=\"}"
+    cursor="${cursor%\"}"
+  done
+}
+
+delete_releases() {
+  local version body
+  for version in "$@"; do
+    # A release that issues or events refer to cannot be deleted. Sentry then gives the reason.
+    if body="$(api "releases/$(uri "$version")/" --request DELETE)"; then
+      jq --null-input --arg version "$version" '{version: $version, deleted: true}'
+    else
+      jq --null-input --arg version "$version" --arg body "$body" \
+        '{version: $version, deleted: false, error: (($body | fromjson? | .detail) // $body)}'
+    fi
+  done
+}
+
+load_token
+
+headers="$(mktemp)"
+trap 'rm -f "$headers"' EXIT
+
+case "$command" in
+  list)
+    list_releases | jq --slurp --arg text "$text" '[.[][] | select(.version | contains($text)) | {
+      version,
+      projects: [.projects[].slug],
+      created: .dateCreated,
+      released: .dateReleased,
+      first_event: .firstEvent,
+      last_event: .lastEvent,
+      new_issues: .newGroups
+    }] | {count: length, releases: .}'
+    ;;
+  delete)
+    # Exit with 1 if a release was not deleted.
+    delete_releases "$@" | jq --slurp --exit-status '{
+      deleted: [.[] | select(.deleted) | .version],
+      failed: [.[] | select(.deleted | not) | {version, error}]
+    } | ., (.failed == [])' | sed '$d'
+    ;;
+esac
