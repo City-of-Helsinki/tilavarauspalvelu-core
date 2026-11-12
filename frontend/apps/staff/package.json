@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.14.1",
-    "@hookform/resolvers": "6.0.0",
+    "@hookform/resolvers": "7.0.2",
     "@sentry/core": "^10.76.2",
     "@sentry/nextjs": "^10.76.2",
     "apollo-upload-client": "18.0.1",
