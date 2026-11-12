@@ -7,7 +7,9 @@ import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
-import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
+import { isRequestError } from "@ui/modules/apollo/errors";
+import { logGraphQLQuery } from "@ui/modules/apollo/helpers";
+import { logError } from "@ui/modules/errors";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
@@ -213,8 +215,10 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
       },
     };
   } catch (err) {
-    const error = transformQueryError(err);
-    logGraphQLError(error);
+    // the error link already logged the errors of the backend requests
+    if (!isRequestError(err)) {
+      logError(err);
+    }
   }
 
   return NOT_FOUND_SSR_VALUE;

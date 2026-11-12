@@ -7,7 +7,7 @@ import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { isNotFoundError } from "@ui/modules/apollo/helpers";
+import { isNotFoundError } from "@ui/modules/apollo/errors";
 import { NotificationWrapper } from "ui/src/components/NotificationWrapper";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";

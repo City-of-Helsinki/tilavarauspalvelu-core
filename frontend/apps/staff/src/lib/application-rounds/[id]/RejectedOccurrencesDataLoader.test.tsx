@@ -30,7 +30,7 @@ vi.mock("ui/src/components/toast", () => ({
   errorToast: (...args: unknown[]) => mockErrorToast(...args),
 }));
 
-vi.mock("@ui/modules/apollo/helpers", () => ({
+vi.mock("@ui/modules/apollo/errors", () => ({
   getPermissionErrors: () => [],
 }));
 

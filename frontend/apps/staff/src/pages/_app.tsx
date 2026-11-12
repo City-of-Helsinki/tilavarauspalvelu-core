@@ -5,10 +5,13 @@ import { appWithTranslation } from "next-i18next/pages";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import type { Router } from "next/router";
+import { ErrorContainer } from "@ui/components";
 import { ErrorTrigger, triggerServerError } from "@ui/components/ErrorTrigger";
-import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
+import { isRequestError } from "@ui/modules/apollo/errors";
+import { logGraphQLQuery } from "@ui/modules/apollo/helpers";
 import "ui/src/styles/global.scss";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
+import { logError } from "@ui/modules/errors";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
@@ -29,12 +32,13 @@ import { EnvContextProvider } from "@/context/EnvContext";
 import { ModalContextProvider } from "@/context/ModalContext";
 import { getHandlingDataVariables } from "@/hooks/useHandling";
 import { createClient } from "@/modules/apolloClient";
+import { PUBLIC_URL } from "@/modules/const";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import "../styles/global.scss";
 import type { StaffEnvConfig } from "@/modules/serverUtils";
 
 function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
-  const { Component, pageProps, currentUser, handlingData, notificationsData, envConfig } = props;
+  const { Component, pageProps, isBackendError, currentUser, handlingData, notificationsData, envConfig } = props;
   const { apiBaseUrl, isConsoleLoggingEnabled, version } = envConfig;
 
   if (isConsoleLoggingEnabled) {
@@ -82,7 +86,15 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
         <ModalContextProvider>
           <Layout version={version}>
             <PageWrapper>
-              <Component {...pageProps} />
+              {isBackendError ? (
+                <ErrorContainer
+                  statusCode={503}
+                  feedbackUrl={envConfig.feedbackUrl}
+                  imgSrc={`${PUBLIC_URL}/images/503-error.png`}
+                />
+              ) : (
+                <Component {...pageProps} />
+              )}
             </PageWrapper>
             <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} />
           </Layout>
@@ -97,6 +109,8 @@ function formatUrlPath(router: Router): string {
 }
 
 type AppOwnProps = {
+  // True when the server could not get the current user from the backend
+  isBackendError: boolean;
   // undefined when getInitialProps runs in the browser, so the cached user is kept
   currentUser: CurrentUserQuery["currentUser"] | undefined;
   handlingData: HandlingDataQuery | null;
@@ -119,6 +133,7 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     return {
       ...ctx,
       envConfig: window.__NEXT_DATA__.props.envConfig,
+      isBackendError: false,
       currentUser: undefined,
       handlingData: null,
       handlingVariables: null,
@@ -134,6 +149,7 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     return {
       ...ctx,
       envConfig: commonProps,
+      isBackendError: false,
       currentUser: null,
       handlingData: null,
       handlingVariables: null,
@@ -142,59 +158,64 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
   }
 
   const client = createClient(commonProps.apiBaseUrl, context.ctx.req);
+  const startTime = performance.now();
+  const handlingVariables = getHandlingDataVariables();
 
-  try {
-    const startTime = performance.now();
-    const urlPathString = formatUrlPath(context.router);
-    const userPromise = client.query<CurrentUserQuery, CurrentUserQueryVariables>({
+  // The Navigation component needs all of this data, otherwise it flashes.
+  // Only the user is required. If an other query fails, the page shows without that data.
+  const [userResult, handlingResult, notificationsResult] = await Promise.allSettled([
+    client.query<CurrentUserQuery, CurrentUserQueryVariables>({
       query: CurrentUserDocument,
-    });
-
-    // Need to fetch all data required by the Navigation component otherwise it flashes
-    const handlingVariables = getHandlingDataVariables();
-    const handlingPromise = client.query<HandlingDataQuery, HandlingDataQueryVariables>({
+    }),
+    client.query<HandlingDataQuery, HandlingDataQueryVariables>({
       query: HandlingDataDocument,
       variables: handlingVariables,
-    });
-
-    const notificationPromise = client.query<ShowNotificationsListQuery, ShowNotificationsListQueryVariables>({
+    }),
+    client.query<ShowNotificationsListQuery, ShowNotificationsListQueryVariables>({
       query: ShowNotificationsListDocument,
       variables: {
         target: BannerNotificationTarget.Staff,
       },
-    });
+    }),
+  ]);
+  logGraphQLQuery(performance.now() - startTime, formatUrlPath(context.router), [
+    CurrentUserDocument,
+    HandlingDataDocument,
+    ShowNotificationsListDocument,
+  ]);
 
-    const resolved = await Promise.all([userPromise, handlingPromise, notificationPromise]);
-    logGraphQLQuery(performance.now() - startTime, urlPathString, [
-      CurrentUserDocument,
-      HandlingDataDocument,
-      ShowNotificationsListDocument,
-    ]);
+  for (const result of [userResult, handlingResult, notificationsResult]) {
+    // The error link already logged the errors of the backend requests
+    if (result.status === "rejected" && !isRequestError(result.reason)) {
+      logError(result.reason);
+    }
+  }
 
-    const { data: currentUserData } = resolved[0];
-    const { data: handlingData } = resolved[1];
-    const { data: notificationsData } = resolved[2];
-
+  // Without the user the page shows the sign in page, also to a user who is logged in.
+  // So show the error page.
+  if (userResult.status === "rejected") {
+    if (context.ctx.res != null) {
+      context.ctx.res.statusCode = 503;
+    }
     return {
       ...ctx,
       envConfig: commonProps,
-      currentUser: currentUserData?.currentUser ?? null,
-      handlingData: handlingData ?? null,
-      handlingVariables,
-      notificationsData: notificationsData ?? null,
+      isBackendError: true,
+      currentUser: null,
+      handlingData: null,
+      handlingVariables: null,
+      notificationsData: null,
     };
-  } catch (err) {
-    const error = transformQueryError(err);
-    logGraphQLError(error);
   }
 
   return {
     ...ctx,
     envConfig: commonProps,
-    currentUser: null,
-    handlingData: null,
-    notificationsData: null,
-    handlingVariables: null,
+    isBackendError: false,
+    currentUser: userResult.value.data?.currentUser ?? null,
+    handlingData: handlingResult.status === "fulfilled" ? (handlingResult.value.data ?? null) : null,
+    handlingVariables,
+    notificationsData: notificationsResult.status === "fulfilled" ? (notificationsResult.value.data ?? null) : null,
   };
 };
 

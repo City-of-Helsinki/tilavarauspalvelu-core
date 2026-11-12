@@ -1,7 +1,8 @@
+import { OperationTypeNode } from "graphql";
 import type { NextRequest } from "next/server";
-import { SERVER_FETCH_TIMEOUT_MS } from "./modules/const";
-import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
-import { fetchWithTimeout } from "./modules/fetch";
+import { MIDDLEWARE_FETCH_TIMEOUT_MS } from "./modules/const";
+import { GraphQLFetchError } from "./modules/errors";
+import { fetchWithTimeout, getConnectionErrorCode, getOperationType } from "./modules/fetch";
 import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 
 // The regexes below work on a path with or without a query string and with or without a base path.
@@ -85,6 +86,15 @@ export type GqlQuery = {
   variables?: Record<string, unknown>;
 };
 
+/// The value of a JSON text, or the text itself if it is not JSON
+function parseJsonOrText(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
 /// Fetch a query from the backend
 /// @param req - NextRequest used to read cookies and the referer
 /// @param query - Query object with query and variables
@@ -128,34 +138,29 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   // the request returns either a valid user (e.g. pk) or null if user was not found
   const body: string = JSON.stringify(query);
 
-  try {
-    const res = await fetchWithTimeout(
+  const send = () =>
+    fetchWithTimeout(
       buildGraphQLUrl(apiUrl),
-      {
-        method: "POST",
-        headers: newHeaders,
-        body,
-      },
-      SERVER_FETCH_TIMEOUT_MS
+      { method: "POST", headers: newHeaders, body },
+      MIDDLEWARE_FETCH_TIMEOUT_MS
     );
-
-    const data: unknown = await res.json();
-
-    if (!res.ok) {
-      const { status, statusText } = res;
-      throw new GraphQLFetchError(status, statusText, query, data);
-    }
-    return data;
+  let res: Response;
+  try {
+    res = await send();
   } catch (err) {
-    if (
-      err instanceof TypeError &&
-      typeof err.cause === "object" &&
-      err.cause != null &&
-      "code" in err.cause &&
-      err.cause?.code === "ECONNREFUSED"
-    ) {
-      throw new EconnRefusedError(err.message);
+    // Send a query again once if there was no connection, for example a backend pod restarts.
+    // Never send a mutation again, it can have completed on the backend.
+    if (getOperationType(body) !== OperationTypeNode.QUERY || getConnectionErrorCode(err) == null) {
+      throw err;
     }
-    throw err;
+    res = await send();
   }
+
+  if (!res.ok) {
+    const { status, statusText } = res;
+    // A gateway error, for example a 502, can have an HTML body. The error must keep the status.
+    throw new GraphQLFetchError(status, statusText, query, parseJsonOrText(await res.text()));
+  }
+  const data: unknown = await res.json();
+  return data;
 }

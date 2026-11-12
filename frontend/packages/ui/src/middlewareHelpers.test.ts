@@ -1,6 +1,14 @@
-import { describe, expect, it } from "vitest";
-import type { NextRequest } from "next/server";
-import { NON_PAGE_PATH, PUBLIC_FILE_PATH, getClientUrl, isPageRequest, redirectCsrfToken } from "./middlewareHelpers";
+import { NextRequest } from "next/server";
+import { afterEach, describe, expect, it, test, vi } from "vitest";
+import {
+  NON_PAGE_PATH,
+  PUBLIC_FILE_PATH,
+  getClientUrl,
+  gqlQueryFetch,
+  isPageRequest,
+  redirectCsrfToken,
+} from "./middlewareHelpers";
+import { GraphQLFetchError } from "./modules/errors";
 
 function createRequest(
   url: string,
@@ -166,5 +174,100 @@ describe("isPageRequest", () => {
 
   it("is false for the healthcheck under a base path", () => {
     expect(isPageRequest(new URL("http://localhost:3000/kasittely/healthcheck"), "/kasittely")).toBe(false);
+  });
+});
+
+const API_URL = "http://localhost:8000";
+
+function createGqlRequest(): NextRequest {
+  const req = new NextRequest("http://localhost:3000/fi");
+  // NOTE the test environment drops the cookie header (browsers don't allow it), so set the cookie directly
+  req.cookies.set("csrftoken", "token");
+  return req;
+}
+
+/// The error that Node.js fetch throws when it can not connect
+function connectionError(): TypeError {
+  return new TypeError("fetch failed", { cause: Object.assign(new Error("ECONNREFUSED"), { code: "ECONNREFUSED" }) });
+}
+
+function okResponse(): Response {
+  return new Response(JSON.stringify({ data: { currentUser: null } }), { status: 200 });
+}
+
+describe("gqlQueryFetch", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  test("sends a query again once if there was no connection", async () => {
+    const fetchMock = vi.fn().mockRejectedValueOnce(connectionError()).mockResolvedValueOnce(okResponse());
+    vi.stubGlobal("fetch", fetchMock);
+
+    const data = await gqlQueryFetch(
+      createGqlRequest(),
+      { query: "query GetCurrentUser { currentUser { pk } }" },
+      API_URL
+    );
+    expect(data).toEqual({ data: { currentUser: null } });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  test("sends a query only twice", async () => {
+    const fetchMock = vi.fn().mockRejectedValue(connectionError());
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      gqlQueryFetch(createGqlRequest(), { query: "query GetCurrentUser { currentUser { pk } }" }, API_URL)
+    ).rejects.toThrow("fetch failed");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  test("never sends a mutation again", async () => {
+    const fetchMock = vi.fn().mockRejectedValueOnce(connectionError()).mockResolvedValueOnce(okResponse());
+    vi.stubGlobal("fetch", fetchMock);
+
+    const mutation = "mutation SaveUserLanguage { updateStaffUser(input: {}) { pk } }";
+    await expect(gqlQueryFetch(createGqlRequest(), { query: mutation }, API_URL)).rejects.toThrow("fetch failed");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  test("keeps the status of an error response that is not JSON", async () => {
+    const gatewayError = new Response("<html><body>502 Bad Gateway</body></html>", {
+      status: 502,
+      statusText: "Bad Gateway",
+    });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(gatewayError));
+
+    const request = gqlQueryFetch(
+      createGqlRequest(),
+      { query: "query GetCurrentUser { currentUser { pk } }" },
+      API_URL
+    );
+    await expect(request).rejects.toBeInstanceOf(GraphQLFetchError);
+    await expect(request).rejects.toThrow("GraphQLFetchError 502 Bad Gateway");
+    await expect(request).rejects.toMatchObject({ data: "<html><body>502 Bad Gateway</body></html>" });
+  });
+
+  test("keeps the JSON body of an error response", async () => {
+    const errorBody = { errors: [{ message: "Bad request" }] };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(errorBody), { status: 400 })));
+
+    const request = gqlQueryFetch(
+      createGqlRequest(),
+      { query: "query GetCurrentUser { currentUser { pk } }" },
+      API_URL
+    );
+    await expect(request).rejects.toMatchObject({ data: errorBody });
+  });
+
+  test("does not send a query again after other errors", async () => {
+    const fetchMock = vi.fn().mockRejectedValueOnce(new Error("boom")).mockResolvedValueOnce(okResponse());
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      gqlQueryFetch(createGqlRequest(), { query: "query GetCurrentUser { currentUser { pk } }" }, API_URL)
+    ).rejects.toThrow("boom");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
