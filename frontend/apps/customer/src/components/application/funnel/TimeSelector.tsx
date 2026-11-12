@@ -82,8 +82,9 @@ export function TimeSelectorForm({
   const getStateLabel = (cell: WeeklyPatternCellInfo<SuitableTimeData>) =>
     t(`application:TimeSelector.legend.${cell.data ? priorityKey(cell.data.priority) : cell.availability}`);
   return (
-    // NOTE flex inside a grid container breaks overflow-x
-    <Flex style={{ display: "grid" }} $marginTop="m">
+    // minmax(0, 1fr) instead of the implicit auto column: an auto track grows to its widest child's min-content
+    // (e.g. a long reservation unit name in the select), which would push the whole accordion wider than the viewport.
+    <Flex style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)" }} $marginTop="m">
       <Notification label={t("application:Page2.info")} size={NotificationSize.Small} type="info">
         {t("application:Page2.info")}
       </Notification>
@@ -152,7 +153,7 @@ export function TimeSelectorForm({
 }
 
 const RadioGroup = styled.fieldset`
-  width: 100%;
+  min-inline-size: 0; /* fieldsets default to min-content, which would overflow the grid column */
   display: flex;
   flex-direction: row;
   border: none;
