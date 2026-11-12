@@ -57,7 +57,7 @@ function useHasUserAcceptedStatistics() {
   };
 }
 
-function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
+function MyApp<T>(props: AppProps<T> & AppOwnProps & ErrorPageProps): React.ReactElement {
   const { Component, envConfig, pageProps } = props;
   const { isHotjarEnabled, isMatomoEnabled, isConsoleLoggingEnabled, apiBaseUrl } = envConfig;
 
@@ -94,7 +94,7 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
             >
               <Component {...pageProps} />
               <CookieBanner />
-              <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} />
+              <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} isErrorPage={props.err != null} />
             </PageWrapper>
             <ToastContainer />
           </ApolloProvider>
@@ -104,6 +104,11 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
     </CookieConsentContextProvider>
   );
 }
+
+/// Next sets err when it renders the error page after a browser error. AppProps does not type it.
+type ErrorPageProps = {
+  err?: Error;
+};
 
 type AppOwnProps = {
   envConfig: CustomerEnvConfig;
