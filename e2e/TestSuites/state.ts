@@ -1,25 +1,14 @@
 import type { Page } from "@playwright/test";
 
 /**
- * The values that keywords save while a test runs, for the test and the keywords after them: a booking's time and
- * number, a notification's name, the pages of a test with two sessions. Each test gets a new one (the `state`
- * fixture), and the page objects read it as `this.state`. Each field says which keywords set it.
+ * The values that keywords save while a test runs, for the test and the keywords after them: the access code, a
+ * notification's name, the pages of a test with two sessions. A customer's booking is not here: the keyword that
+ * reserves it returns a `Booking` (TestSuites/booking.ts), which the test passes on. Each test gets a new state (the
+ * `state` fixture), and the page objects read it as `this.state`. Each field says which keywords set it.
  */
 export class TestState {
-  // The customer's booking
+  // The customer's booking: the access code, and the time picked in the calendar while the booking is changed
 
-  /** Set by quick_reservation.Select The Free Slot From Quick Reservation */
-  timeOfQuickReservationFreeSlot = "";
-  /** Set by app_user.User Selects The Time With Quick Reservation And Sets Time Variables */
-  timeOfQuickReservation = "";
-  /** Set by app_user.User Selects The Time With Quick Reservation And Sets Time Variables */
-  timeOfQuickReservationMinusT = "";
-  /** Set by app_user.User Modifies Booking And Verifies The Changes */
-  timeOfQuickReservationModified = "";
-  /** Set by app_user.User Modifies Booking And Verifies The Changes */
-  timeOfQuickReservationMinusTModified = "";
-  /** Set by quick_reservation.Get Booking Number and checkout.In Order Summary Get Booking Number From Product List */
-  bookingNumOnly = "";
   /** Set by quick_reservation.Get Access Code */
   accessCode = "";
   /** Set by reservation_calendar.Click And Store Free Reservation Time and reservation_calendar.Changing Time Again */

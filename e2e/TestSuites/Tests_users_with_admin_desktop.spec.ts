@@ -1,4 +1,5 @@
 /** Desktop browser tests */
+import type { Booking } from "./booking";
 import { test } from "./fixtures";
 import {
   JUSTIFICATION_FOR_SUBVENTION,
@@ -42,27 +43,28 @@ test.describe(
       }) => {
         await appCommon.userLogsInWithSuomiFi();
 
+        let booking: Booking;
         await test.step("User creates subvented reservation", async () => {
           await appUser.userFindsTheUnit(testData.units.alwaysPaidUnitSubvented);
-          await appUser.userReservesAFreeQuickReservationSlot();
-          await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(JUSTIFICATION_FOR_SUBVENTION);
-          await appUser.userChecksTheSubventedReservationInfoIsRightAndSubmits();
-          await appUser.userChecksTheSubventedReservationInfoIsRightAfterSubmitting();
+          booking = await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(booking, JUSTIFICATION_FOR_SUBVENTION);
+          await appUser.userChecksTheSubventedReservationInfoIsRightAndSubmits(booking);
+          await appUser.userChecksTheSubventedReservationInfoIsRightAfterSubmitting(booking);
           await appUser.userOpensTheBookingInMyBookings(
             testData.units.alwaysPaidUnitSubventedWithLocation,
-            state.timeOfQuickReservationMinusT
+            booking.listTime
           );
           await appUser.userChecksBookingInfoInReservationsWithAllReservationInfo(
+            booking,
             MYBOOKINGS_STATUS_PROCESSED,
-            SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-            state.timeOfQuickReservation
+            SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
           );
         });
 
         await test.step("Formats info of subvented reservation to admin side", async () => {
-          await dataModification.formatsReservationNumberAndNameForAdminSide();
+          await dataModification.formatsReservationNumberAndNameForAdminSide(booking.number);
           await dataModification.formatsTaglineForAdminSide(
-            state.timeOfQuickReservation,
+            booking.infoCardTime,
             testData.units.alwaysPaidUnitSubventedWithLocation
           );
         });
@@ -72,7 +74,7 @@ test.describe(
           await appCommon.adminLogsInWithSuomiFi();
           await adminNavigationMenu.adminNavigatesToRequestedReservations();
           await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-            state.bookingNumOnly,
+            booking.number,
             testData.user.fullName
           );
           await appAdmin.adminChecksTheInfoAndSetsReservationFreeAndApprovesIt();
@@ -87,7 +89,7 @@ test.describe(
             testData.units.alwaysPaidUnitSubventedWithLocation,
             state.adminModifiesTimeOfInfoCardMinusT
           );
-          await appUser.userVerifiesDetailsOfSubventedReservationAfterAdminApprovalWithoutPayment();
+          await appUser.userVerifiesDetailsOfSubventedReservationAfterAdminApprovalWithoutPayment(booking);
         });
       }
     );
@@ -109,28 +111,29 @@ test.describe(
       }) => {
         await appCommon.userLogsInWithSuomiFi();
 
+        let booking: Booking;
         await test.step("User creates reservation that requires handling", async () => {
           await appUser.userFindsTheUnit(testData.units.unitRequiresAlwaysHandling);
-          await appUser.userReservesAFreeQuickReservationSlot();
-          await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits();
+          booking = await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits(booking);
           await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightBeforeSubmit();
           await reservationLownav.clickSubmitButtonContinue();
-          await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit();
+          await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit(booking);
           await appUser.userOpensTheBookingInMyBookings(
             testData.units.unitRequiresAlwaysHandlingWithLocation,
-            state.timeOfQuickReservationMinusT
+            booking.listTime
           );
           await appUser.userChecksBookingInfoInReservationsWithNumberOfParticipantsAndDescriptionAndPurpose(
+            booking,
             MYBOOKINGS_STATUS_PROCESSED,
-            SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-            state.timeOfQuickReservation
+            SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
           );
         });
 
         await test.step("Formats info of reservation to admin side", async () => {
-          await dataModification.formatsReservationNumberAndNameForAdminSide();
+          await dataModification.formatsReservationNumberAndNameForAdminSide(booking.number);
           await dataModification.formatsTaglineForAdminSide(
-            state.timeOfQuickReservation,
+            booking.infoCardTime,
             testData.units.unitRequiresAlwaysHandlingWithLocation
           );
         });
@@ -140,7 +143,7 @@ test.describe(
           await appCommon.adminLogsInWithSuomiFi();
           await adminNavigationMenu.adminNavigatesToRequestedReservations();
           await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-            state.bookingNumOnly,
+            booking.number,
             testData.user.fullName
           );
           await appAdmin.adminChecksTheInfoAndCancelsReservation();
@@ -154,9 +157,9 @@ test.describe(
           await appCommon.userGoesToLandingPage();
           await appUser.userOpensTheBookingInMyBookings(
             testData.units.unitRequiresAlwaysHandlingWithLocation,
-            state.timeOfQuickReservationMinusT
+            booking.listTime
           );
-          await appUser.userChecksTheRejectedReservationInfoIsRightAfterAdminHandling();
+          await appUser.userChecksTheRejectedReservationInfoIsRightAfterAdminHandling(booking);
         });
       }
     );
@@ -177,13 +180,14 @@ test.describe(
       }) => {
         await appCommon.userLogsInWithSuomiFi();
 
+        let booking: Booking;
         await test.step("User creates reservation", async () => {
           await appUser.userFindsTheUnit(testData.units.unitWithAccessCode);
-          await appUser.userReservesAFreeQuickReservationSlot();
-          await appUser.userFillsBookingDetailsAsIndividualForReservationWithAccessCodeAndSubmits();
+          booking = await appUser.userReservesAFreeQuickReservationSlot();
+          await appUser.userFillsBookingDetailsAsIndividualForReservationWithAccessCodeAndSubmits(booking);
           await appUser.userChecksTheReservationInfoIsRightBeforeSubmitWithAccessCode();
           await reservationLownav.clickSubmitButtonContinue();
-          await appUser.userChecksTheReservationInfoIsRightAfterSubmitWithAccessCode();
+          await appUser.userChecksTheReservationInfoIsRightAfterSubmitWithAccessCode(booking);
         });
 
         await test.step("Admin logs in and changes access code", async () => {
@@ -191,7 +195,7 @@ test.describe(
           await appCommon.adminLogsInWithSuomiFi();
           await adminNavigationMenu.adminNavigatesToRequestedReservations();
           await adminReservations.adminSearchesReservationWithIdNumberAndClicksItFromName(
-            state.bookingNumOnly,
+            booking.number,
             testData.user.fullName
           );
         });
@@ -210,12 +214,12 @@ test.describe(
           await appCommon.userGoesToLandingPage();
           await appUser.userOpensTheBookingInMyBookings(
             testData.units.unitWithAccessCodeWithLocation,
-            state.timeOfQuickReservationMinusT
+            booking.listTime
           );
           await appUser.userChecksBookingInfoInReservationsWithAccessCode(
+            booking,
             MYBOOKINGS_STATUS_CONFIRMED,
             SINGLEBOOKING_NO_PAYMENT,
-            state.timeOfQuickReservation,
             state.accessCodeAdminside
           );
         });

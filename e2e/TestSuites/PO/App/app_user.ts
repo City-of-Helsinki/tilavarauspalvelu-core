@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { acquireLock, releaseLock } from "../../../lib/locks";
 import { retry } from "../../../lib/retry";
 import { step, expect, log } from "../../../lib/runtime";
+import { Booking } from "../../booking";
 import { PageObject } from "../../page-object";
 import {
   AGEGROUP_OF_PERSONS,
@@ -92,9 +93,9 @@ export class AppUser extends PageObject {
 
   // Checkout
   @step("app_user.User Checks Info In Paid Checkout And Confirms Booking")
-  async userChecksInfoInPaidCheckoutAndConfirmsBooking() {
+  async userChecksInfoInPaidCheckoutAndConfirmsBooking(booking: Booking) {
     await log("This step gets the reservation number", { level: "DEBUG" });
-    await this.pages.checkout.checkTheInfoInCheckout();
+    booking.number = await this.pages.checkout.checkTheInfoInCheckout();
   }
 
   @step("app_user.User Interrupts Paid Checkout")
@@ -131,12 +132,9 @@ export class AppUser extends PageObject {
     await this.pages.customKeywords.waitForUrlToContain("/reservation-unit/", /* timeout= */ 8000);
   }
 
-  /**
-   * here is keyword --> data_modification.Set info card duration time info
-   * that sets $TIME_OF_QUICK_RESERVATION and $TIME_OF_QUICK_RESERVATION_MINUS_T
-   */
-  @step("app_user.User Selects The Time With Quick Reservation And Sets Time Variables")
-  async userSelectsTheTimeWithQuickReservationAndSetsTimeVariables() {
+  /** Selects a free slot in quick reservation and returns the booking of that slot, with its info card and list time */
+  @step("app_user.User Selects The Time With Quick Reservation")
+  async userSelectsTheTimeWithQuickReservation() {
     await this.page.locator("#quick-reservation").waitFor({ state: "visible" });
     await this.pages.quickReservation.selectDuration(QUICK_RESERVATION_DURATION);
 
@@ -145,23 +143,20 @@ export class AppUser extends PageObject {
 
     const quick_reservation_current_date_value = await this.pages.quickReservation.getTheValueFromDateInput();
 
-    // This sets ${TIME_OF_QUICK_RESERVATION_FREE_SLOT}
-    await this.pages.quickReservation.selectTheFreeSlotFromQuickReservation();
+    const slot = await this.pages.quickReservation.selectTheFreeSlotFromQuickReservation();
 
     const [formatted_date, formatted_date_minus_t] = await this.pages.dataModification.setInfoCardDurationTimeInfo(
-      this.state.timeOfQuickReservationFreeSlot,
+      slot,
       quick_reservation_current_date_value
     );
 
-    this.state.timeOfQuickReservation = formatted_date;
-    this.state.timeOfQuickReservationMinusT = formatted_date_minus_t;
-
-    await log(this.state.timeOfQuickReservation);
-    await log(this.state.timeOfQuickReservationMinusT);
+    await log(formatted_date);
+    await log(formatted_date_minus_t);
+    return new Booking(slot, formatted_date, formatted_date_minus_t);
   }
 
   /**
-   * Selects a free slot in quick reservation and submits it.
+   * Selects a free slot in quick reservation and submits it, and returns the booking of that slot.
    * A unit lock keeps parallel tests from picking overlapping slots.
    */
   @step("app_user.User Reserves A Free Quick Reservation Slot")
@@ -171,7 +166,7 @@ export class AppUser extends PageObject {
     const unit_page_url = this.page.url();
     await acquireLock(lock_name);
     try {
-      await retry(3, 2000, () => this.userSelectsAndSubmitsQuickReservationOnFreshPage(unit_page_url));
+      return await retry(3, 2000, () => this.userSelectsAndSubmitsQuickReservationOnFreshPage(unit_page_url));
     } finally {
       await releaseLock(lock_name);
     }
@@ -180,8 +175,9 @@ export class AppUser extends PageObject {
   @step("app_user.User Selects And Submits Quick Reservation On Fresh Page")
   async userSelectsAndSubmitsQuickReservationOnFreshPage(unit_page_url: string) {
     await this.pages.quickReservation.reloadReservationUnitPageAndWaitForReservations(unit_page_url);
-    await this.userSelectsTheTimeWithQuickReservationAndSetsTimeVariables();
+    const booking = await this.userSelectsTheTimeWithQuickReservation();
     await this.pages.quickReservation.userClicksSubmitButtonInQuickReservation();
+    return booking;
   }
 
   @step("app_user.User Checks That Quick Reservation Does Not Have Reserved Time")
@@ -194,13 +190,10 @@ export class AppUser extends PageObject {
    * data_modification.Compute reservation timeslot to set variables
    */
   @step("app_user.User Checks That Reservation Calendar Does Not Have Reserved Time Slot Available")
-  async userChecksThatReservationCalendarDoesNotHaveReservedTimeSlotAvailable() {
-    await this.pages.dataModification.convertFinnishShortDayToEnglish(this.state.timeOfQuickReservation);
+  async userChecksThatReservationCalendarDoesNotHaveReservedTimeSlotAvailable(booking: Booking) {
+    await this.pages.dataModification.convertFinnishShortDayToEnglish(booking.infoCardTime);
 
-    await this.pages.dataModification.computeReservationTimeSlot(
-      this.state.timeOfQuickReservationFreeSlot,
-      QUICK_RESERVATION_DURATION
-    );
+    await this.pages.dataModification.computeReservationTimeSlot(booking.slot, QUICK_RESERVATION_DURATION);
 
     await this.pages.customKeywords.verifyReservationSlotExists(this.state.calendarTimeslot, this.state.englishDay);
   }
@@ -215,17 +208,17 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Fills The Reservation Info For Always Free Unit And Submits")
-  async userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits() {
+  async userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits(booking: Booking) {
     // Checks that "jatka" button has been loaded
     await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitReserverInfo.checkApplicationCannotBeMadeWithoutInfo();
     await this.userFillsTheReserverContactInfo();
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
 
   @step("app_user.User Fills The Reservation Info For Unit With Payment And Submits")
-  async userFillsTheReservationInfoForUnitWithPaymentAndSubmits() {
+  async userFillsTheReservationInfoForUnitWithPaymentAndSubmits(booking: Booking) {
     // Checks that "jatka" button has been loaded
     // Verify we are on the correct booking details page where user info can be given
     await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
@@ -236,12 +229,12 @@ export class AppUser extends PageObject {
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
     await this.userFillsTheReserverContactInfo();
     await this.pages.reservationUnitReserverInfo.selectHomeCity(HOME_CITY);
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
 
   @step("app_user.User Fills Subvented Booking Details As Individual And Submits")
-  async userFillsSubventedBookingDetailsAsIndividualAndSubmits(justification_for_not_paying: string) {
+  async userFillsSubventedBookingDetailsAsIndividualAndSubmits(booking: Booking, justification_for_not_paying: string) {
     // Checks that "jatka" button has been loaded
     await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
@@ -254,24 +247,24 @@ export class AppUser extends PageObject {
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
     await this.userFillsTheReserverContactInfo();
     await this.pages.reservationUnitReserverInfo.selectHomeCity(HOME_CITY);
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
 
   @step("app_user.User Fills Noncancelable Booking Details As Individual And Submits")
-  async userFillsNoncancelableBookingDetailsAsIndividualAndSubmits() {
+  async userFillsNoncancelableBookingDetailsAsIndividualAndSubmits(booking: Booking) {
     // Checks that "jatka" button has been loaded
     await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.selectTheNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.reservationUnitBookingDetails.typeTheDescriptionOfTheBooking(SINGLEBOOKING_DESCRIPTION);
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
     await this.userFillsTheReserverContactInfo();
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
 
   @step("app_user.User Fills Info For Unit That Is Always Handled As Individual And Submits")
-  async userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits() {
+  async userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits(booking: Booking) {
     // Checks that "jatka" button has been loaded
     await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
@@ -280,12 +273,12 @@ export class AppUser extends PageObject {
     await this.pages.reservationUnitBookingDetails.typeTheDescriptionOfTheBooking(SINGLEBOOKING_DESCRIPTION);
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
     await this.userFillsTheReserverContactInfo();
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
 
   @step("app_user.User Fills Booking Details As Individual For Reservation With Access Code And Submits")
-  async userFillsBookingDetailsAsIndividualForReservationWithAccessCodeAndSubmits() {
+  async userFillsBookingDetailsAsIndividualForReservationWithAccessCodeAndSubmits(booking: Booking) {
     // Checks that "jatka" button has been loaded
     await expect(this.continueButton, "The booking details page shows its continue button").toBeVisible();
     await this.pages.reservationUnitBookingDetails.typeTheNameOfTheBooking(SINGLEBOOKING_NAME);
@@ -296,7 +289,7 @@ export class AppUser extends PageObject {
     await this.pages.reservationUnitReserverTypes.selectReserverType(RESERVATION_INDIVIDUAL);
     await this.userFillsTheReserverContactInfo();
     await this.pages.reservationUnitReserverInfo.selectHomeCity(HOME_CITY);
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
 
@@ -310,19 +303,19 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Checks Unit That Is Always Handled Details Are Right After Submit")
-  async userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit() {
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+  async userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit(booking: Booking) {
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(
       SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
     );
-    await this.pages.quickReservation.getBookingNumber();
+    booking.number = await this.pages.quickReservation.getBookingNumber();
     await this.pages.reservationUnitReservationReceipt.checkTheReservationStatusMessage(
       RESERVATION_STATUS_REQUIRESHANDLING_MSG_FI
     );
   }
 
   @step("app_user.User Checks The Free Single Booking Details Are Right")
-  async userChecksTheFreeSingleBookingDetailsAreRight() {
+  async userChecksTheFreeSingleBookingDetailsAreRight(booking: Booking) {
     await this.pages.reservationUnitReservationReceipt.checkFreeSingleBookingInfo();
     await this.pages.reservationUnitReservationReceipt.checkReservationUserInfo();
     await this.pages.quickReservation.checkThePriceOfQuickReservation(
@@ -331,31 +324,31 @@ export class AppUser extends PageObject {
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxAcceptedTerms();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxGenericTerms();
     await this.pages.reservationLownav.clickSubmitButtonContinue();
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(
       SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
     );
-    await this.pages.quickReservation.getBookingNumber();
+    booking.number = await this.pages.quickReservation.getBookingNumber();
     await this.pages.reservationUnitReservationReceipt.checkTheReservationStatusMessage(
       RESERVATION_STATUS_REQUIRESHANDLING_MSG_FI
     );
   }
 
   @step("app_user.User Checks The Paid Reservation Info Is Right And Submits")
-  async userChecksThePaidReservationInfoIsRightAndSubmits() {
+  async userChecksThePaidReservationInfoIsRightAndSubmits(booking: Booking) {
     await this.pages.reservationUnitReservationReceipt.checkReservationUserInfo();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxAcceptedTerms();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxGenericTerms();
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
   }
 
   @step("app_user.User Checks The Subvented Reservation Info Is Right And Submits")
-  async userChecksTheSubventedReservationInfoIsRightAndSubmits() {
+  async userChecksTheSubventedReservationInfoIsRightAndSubmits(booking: Booking) {
     await this.pages.reservationUnitReservationReceipt.checkReservationUserInfo();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxAcceptedTerms();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxGenericTerms();
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(
       SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
     );
@@ -363,33 +356,33 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Checks The Subvented Reservation Info Is Right After Submitting")
-  async userChecksTheSubventedReservationInfoIsRightAfterSubmitting() {
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+  async userChecksTheSubventedReservationInfoIsRightAfterSubmitting(booking: Booking) {
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(
       SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
     );
-    await this.pages.quickReservation.getBookingNumber();
+    booking.number = await this.pages.quickReservation.getBookingNumber();
   }
 
   @step("app_user.User Checks The Paid Reservation That Requires Handling Info Is Right And Submits")
-  async userChecksThePaidReservationThatRequiresHandlingInfoIsRightAndSubmits() {
+  async userChecksThePaidReservationThatRequiresHandlingInfoIsRightAndSubmits(booking: Booking) {
     await this.pages.reservationUnitReservationReceipt.checkReservationUserInfo();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxAcceptedTerms();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxGenericTerms();
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationLownav.clickSubmitButtonContinue();
     await this.pages.reservationUnitReservationReceipt.checkTheReservationStatusMessage(
       RESERVATION_STATUS_REQUIRESHANDLING_MSG_FI
     );
-    await this.pages.quickReservation.getBookingNumber();
+    booking.number = await this.pages.quickReservation.getBookingNumber();
   }
 
   @step("app_user.User Checks The Paid Reservation Info Is Right After Checkout")
-  async userChecksThePaidReservationInfoIsRightAfterCheckout() {
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+  async userChecksThePaidReservationInfoIsRightAfterCheckout(booking: Booking) {
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationUnitReservationReceipt.checkTheReservationStatusMessage(RESERVATION_STATUS_MSG_FI);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(SINGLEBOOKING_PAID_PRICE_VAT_INCL);
-    await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
+    await this.pages.quickReservation.checkBookingNumber(booking.number);
   }
 
   @step("app_user.User Checks The Reservation Info Is Right Before Submit")
@@ -400,10 +393,10 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Checks The Reservation Info Is Right After Submit")
-  async userChecksTheReservationInfoIsRightAfterSubmit() {
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+  async userChecksTheReservationInfoIsRightAfterSubmit(booking: Booking) {
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationUnitReservationReceipt.checkTheReservationStatusMessage(RESERVATION_STATUS_MSG_FI);
-    await this.pages.quickReservation.getBookingNumber();
+    booking.number = await this.pages.quickReservation.getBookingNumber();
   }
 
   @step("app_user.User Checks The Reservation Info Is Right Before Submit With Access Code")
@@ -414,10 +407,10 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Checks The Reservation Info Is Right After Submit With Access Code")
-  async userChecksTheReservationInfoIsRightAfterSubmitWithAccessCode() {
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+  async userChecksTheReservationInfoIsRightAfterSubmitWithAccessCode(booking: Booking) {
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationUnitReservationReceipt.checkTheReservationStatusMessage(RESERVATION_STATUS_MSG_FI);
-    await this.pages.quickReservation.getBookingNumber();
+    booking.number = await this.pages.quickReservation.getBookingNumber();
     await this.pages.quickReservation.getAccessCode();
   }
 
@@ -430,39 +423,39 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Checks The Noncancelable Reservation Info Is Right After Submit")
-  async userChecksTheNoncancelableReservationInfoIsRightAfterSubmit() {
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+  async userChecksTheNoncancelableReservationInfoIsRightAfterSubmit(booking: Booking) {
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.reservationUnitReservationReceipt.checkTheReservationStatusMessage(RESERVATION_STATUS_MSG_FI);
-    await this.pages.quickReservation.getBookingNumber();
+    booking.number = await this.pages.quickReservation.getBookingNumber();
   }
 
   @step("app_user.User Checks The Modified Reservation Info Is Right And Clicks Continue")
-  async userChecksTheModifiedReservationInfoIsRightAndClicksContinue() {
+  async userChecksTheModifiedReservationInfoIsRightAndClicksContinue(booking: Booking) {
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxAcceptedTerms();
     await this.pages.reservationUnitReservationReceipt.clickTheCheckboxGenericTerms();
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservationModified);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     // TODO: Separate the submit and the next page check into their own keywords
     await this.pages.reservationLownav.clickSubmitButtonContinue();
     // The edit page has the same time card, wait for the reservation page itself
     await this.page.getByTestId("reservation__content").waitFor({ state: "visible", timeout: 15_000 });
 
     await log("This check is done in reservations page", { level: "DEBUG" });
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservationModified);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
   }
 
   @step("app_user.User Cancel Booking In Reservations And Checks It Got Cancelled")
-  async userCancelBookingInReservationsAndChecksItGotCancelled() {
+  async userCancelBookingInReservationsAndChecksItGotCancelled(booking: Booking) {
     await this.pages.mybookings.userCancelBooking();
     await this.pages.mybookings.clickReasonForCancellation();
     await this.pages.mybookings.selectReasonForCancellation(REASON_FOR_CANCELLATION);
     await this.pages.mybookings.clickCancelButton();
     await this.pages.popups.checkAndCloseTheToast(MYBOOKINGS_STATUS_CANCELED);
     await this.pages.mybookings.checkReservationStatus(IN_RESERVATIONS_STATUS_CANCELED);
-    await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
+    await this.pages.quickReservation.checkBookingNumber(booking.number);
   }
 
   @step("app_user.User Modifies Booking And Verifies The Changes")
-  async userModifiesBookingAndVerifiesTheChanges() {
+  async userModifiesBookingAndVerifiesTheChanges(booking: Booking) {
     await this.pages.mybookings.userClickChangeTime();
     // This opens calendar controls
     await this.pages.reservationCalendar.userClickReservationCalendarToggleButton();
@@ -480,15 +473,21 @@ export class AppUser extends PageObject {
       date_value_from_calendar
     );
 
-    this.state.timeOfQuickReservationModified = formatted_date;
-    this.state.timeOfQuickReservationMinusTModified = formatted_date_minus_t;
+    // The booking after the change: the new slot and times, and the same number
+    const modified = new Booking(
+      this.state.calendarControlTimeOfFreeSlot,
+      formatted_date,
+      formatted_date_minus_t,
+      booking.number
+    );
 
     // Log  ${returned_formatted_values}
-    await log(this.state.timeOfQuickReservationModified);
-    await log(this.state.timeOfQuickReservationMinusTModified);
+    await log(modified.infoCardTime);
+    await log(modified.listTime);
 
     await expect(this.continueButton, "The continue button is enabled: the reservation time has changed").toBeEnabled();
     await this.pages.reservationCalendar.clickContinueButton();
+    return modified;
   }
 
   @step("app_user.User Checks Cancelled Booking Is Found")
@@ -562,13 +561,12 @@ export class AppUser extends PageObject {
 
   @step("app_user.User Checks The Paid Reservation Info Is Right In Reservations")
   async userChecksThePaidReservationInfoIsRightInReservations(
+    booking: Booking,
     booking_status: string,
     payment_status: string,
-    booking_price: string,
-    time_in_quickreservations: string,
-    reservation_number: string
+    booking_price: string
   ) {
-    await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
     await this.pages.mybookings.checkReservationStatus(booking_status);
     await this.pages.mybookings.checkReservationsPaymentStatus(payment_status);
@@ -576,20 +574,20 @@ export class AppUser extends PageObject {
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkReservationPurpose(PURPOSE_OF_THE_BOOKING);
-    await this.pages.mybookings.checkReservationNumberFromH1Text(reservation_number);
+    await this.pages.mybookings.checkReservationNumberFromH1Text(booking.number);
   }
 
   @step("app_user.User Checks Booking Info In Reservations With Number Of Participants And Description And Purpose")
   async userChecksBookingInfoInReservationsWithNumberOfParticipantsAndDescriptionAndPurpose(
+    booking: Booking,
     booking_status: string,
-    booking_price: string,
-    time_in_quickreservations: string
+    booking_price: string
   ) {
-    await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
-    await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
+    await this.pages.quickReservation.checkBookingNumber(booking.number);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
 
-    await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
+    await this.pages.mybookings.checkReservationNumberFromH1Text(booking.number);
     await this.pages.mybookings.checkReservationStatus(booking_status);
     await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
@@ -598,33 +596,29 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Checks Booking Info In Reservations")
-  async userChecksBookingInfoInReservations(
-    booking_status: string,
-    booking_price: string,
-    time_in_quickreservations: string
-  ) {
+  async userChecksBookingInfoInReservations(booking: Booking, booking_status: string, booking_price: string) {
     await this.page.getByTestId("reservation__reservation-info-card__content").waitFor({ state: "visible" });
-    await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
-    await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
+    await this.pages.quickReservation.checkBookingNumber(booking.number);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
 
-    await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
+    await this.pages.mybookings.checkReservationNumberFromH1Text(booking.number);
     await this.pages.mybookings.checkReservationStatus(booking_status);
     await this.userChecksTheBookerInfo();
   }
 
   @step("app_user.User Checks Booking Info In Reservations With Access Code")
   async userChecksBookingInfoInReservationsWithAccessCode(
+    booking: Booking,
     booking_status: string,
     booking_price: string,
-    time_in_quickreservations: string,
     access_code: string
   ) {
-    await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
-    await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
+    await this.pages.quickReservation.checkBookingNumber(booking.number);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
 
-    await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
+    await this.pages.mybookings.checkReservationNumberFromH1Text(booking.number);
     await this.pages.mybookings.checkReservationStatus(booking_status);
     await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationAccessCode(access_code);
@@ -632,15 +626,15 @@ export class AppUser extends PageObject {
 
   @step("app_user.User Checks Booking Info In Reservations With All Reservation Info")
   async userChecksBookingInfoInReservationsWithAllReservationInfo(
+    booking: Booking,
     booking_status: string,
-    booking_price: string,
-    time_in_quickreservations: string
+    booking_price: string
   ) {
-    await this.pages.quickReservation.checkTheQuickReservationTime(time_in_quickreservations);
-    await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
+    await this.pages.quickReservation.checkBookingNumber(booking.number);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(booking_price);
 
-    await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
+    await this.pages.mybookings.checkReservationNumberFromH1Text(booking.number);
     await this.pages.mybookings.checkReservationStatus(booking_status);
     await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
@@ -650,8 +644,8 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Checks Booking Info In Reservations For Noncancelable Booking")
-  async userChecksBookingInfoInReservationsForNoncancelableBooking() {
-    await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
+  async userChecksBookingInfoInReservationsForNoncancelableBooking(booking: Booking) {
+    await this.pages.mybookings.checkReservationNumberFromH1Text(booking.number);
     await this.pages.mybookings.checkReservationStatus(MYBOOKINGS_STATUS_CONFIRMED);
     await this.userChecksTheBookerInfo();
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
@@ -661,16 +655,16 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Verifies Details Of Subvented Reservation After Admin Approval Without Payment")
-  async userVerifiesDetailsOfSubventedReservationAfterAdminApprovalWithoutPayment() {
+  async userVerifiesDetailsOfSubventedReservationAfterAdminApprovalWithoutPayment(booking: Booking) {
     await log(
       "If the booking number comparison fails, verify that there are no duplicate times in the upcoming bookings list."
     );
 
-    await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
+    await this.pages.quickReservation.checkBookingNumber(booking.number);
     await this.pages.quickReservation.checkTheQuickReservationTime(this.state.adminModifiesTimeOfInfoCard);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(SINGLEBOOKING_NO_PAYMENT);
     await this.pages.mybookings.checkReservationStatus(MYBOOKINGS_STATUS_CONFIRMED);
-    await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
+    await this.pages.mybookings.checkReservationNumberFromH1Text(booking.number);
     await this.pages.mybookings.checkReservationPurpose(PURPOSE_OF_THE_BOOKING);
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkReservationAgeGroup(AGEGROUP_OF_PERSONS);
@@ -679,16 +673,16 @@ export class AppUser extends PageObject {
   }
 
   @step("app_user.User Checks The Rejected Reservation Info Is Right After Admin Handling")
-  async userChecksTheRejectedReservationInfoIsRightAfterAdminHandling() {
+  async userChecksTheRejectedReservationInfoIsRightAfterAdminHandling(booking: Booking) {
     await log(
       "If the booking number comparison fails, verify that there are no duplicate times in the upcoming bookings list."
     );
 
-    await this.pages.quickReservation.checkBookingNumber(this.state.bookingNumOnly);
-    await this.pages.quickReservation.checkTheQuickReservationTime(this.state.timeOfQuickReservation);
+    await this.pages.quickReservation.checkBookingNumber(booking.number);
+    await this.pages.quickReservation.checkTheQuickReservationTime(booking.infoCardTime);
     await this.pages.quickReservation.checkThePriceOfQuickReservation(ALWAYS_REQUESTED_UNIT_PAID_PRICE_VAT_INCL);
     await this.pages.mybookings.checkReservationStatus(MYBOOKINGS_STATUS_REJECTED);
-    await this.pages.mybookings.checkReservationNumberFromH1Text(this.state.bookingNumOnly);
+    await this.pages.mybookings.checkReservationNumberFromH1Text(booking.number);
     await this.pages.mybookings.checkReservationPurpose(PURPOSE_OF_THE_BOOKING);
     await this.pages.mybookings.checkNumberOfParticipants(SINGLEBOOKING_NUMBER_OF_PERSONS);
     await this.pages.mybookings.checkReservationDescription(SINGLEBOOKING_DESCRIPTION);
@@ -702,8 +696,8 @@ export class AppUser extends PageObject {
    */
   @step("app_user.User Saves File And Formats Booking Time To ICS")
   // oxlint-disable-next-line eslint/no-unused-vars -- the file is saved into the test's results folder
-  async userSavesFileAndFormatsBookingTimeToIcs(file_path: string) {
-    await this.pages.customKeywords.convertBookingTimeToIcsFormat(this.state.timeOfQuickReservationMinusT);
+  async userSavesFileAndFormatsBookingTimeToIcs(booking: Booking, file_path: string) {
+    await this.pages.customKeywords.convertBookingTimeToIcsFormat(booking.listTime);
 
     // Create a promise that waits for the download
     const download_promise = this.page.waitForEvent("download");

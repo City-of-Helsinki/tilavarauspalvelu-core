@@ -26,6 +26,7 @@ import {
   test as testWithBrowser,
 } from "../lib/runtime";
 import { Session } from "../lib/session";
+import { Booking } from "../TestSuites/booking";
 import { Pages } from "../TestSuites/pages";
 import { isConfirmedReservationUrl } from "../TestSuites/PO/Common/checkout";
 import { python_keywords } from "../TestSuites/Resources/python_keywords";
@@ -88,6 +89,24 @@ test.describe("Runtime", () => {
     // serial_users builds the full names from the first and last names
     expect(BASIC_USER_MALE.fullName).toBe("Ande AutomaatioTesteri");
     expect(BASIC_PERMISSION_TARGET_ADMIN.fullName).toBe("Marika Salminen");
+  });
+
+  test("A booking is printed by its list time and number", () => {
+    const booking = new Booking("12.15", "Ti 5.12.2023 klo 12:15–13:15, 1 t", "Ti 5.12.2023 klo 12:15–13:15");
+    // Until a keyword has read the booking number from the page, only the time shows
+    expect(booking.number).toBe("");
+    expect(formatValue(booking)).toBe('"Ti 5.12.2023 klo 12:15–13:15"');
+    booking.number = "59473";
+    expect(formatValue(booking)).toBe('"Ti 5.12.2023 klo 12:15–13:15, 59473"');
+    // The booking after a change has the new slot and times, and the same number
+    const modified = new Booking(
+      "13.15",
+      "Ti 5.12.2023 klo 13:15–14:15, 1 t",
+      "Ti 5.12.2023 klo 13:15–14:15",
+      booking.number
+    );
+    expect(formatValue(modified)).toBe('"Ti 5.12.2023 klo 13:15–14:15, 59473"');
+    expect(booking.listTime).toBe("Ti 5.12.2023 klo 12:15–13:15");
   });
 
   test("Environment variables are read and checked in one place", () => {

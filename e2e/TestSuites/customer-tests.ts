@@ -5,6 +5,7 @@
  * `@phone-only` tests, and the phone projects run the `@also-on-phones` and `@phone-only` ones. The device picks the
  * user of a `@user-data-set-N` tag and the copies of the units (TestSuites/test-data.ts).
  */
+import type { Booking } from "./booking";
 import { test } from "./fixtures";
 import {
   COOKIETEXT,
@@ -65,7 +66,7 @@ export function customerTests(title: string, device: string): void {
       test(
         "User can make free single booking and modifies it",
         { tag: ["@user-data-set-1", "@also-on-phones"] },
-        async ({ appCommon, appUser, reservationLownav, state, testData, topnav }) => {
+        async ({ appCommon, appUser, reservationLownav, testData, topnav }) => {
           await appCommon.userLogsInWithSuomiFi();
 
           await test.step("User navigates to reservation unit page", async () => {
@@ -76,34 +77,33 @@ export function customerTests(title: string, device: string): void {
             await appUser.userChecksThatReservationUnitPictureIsLoaded(UNIT_NAME_FOR_PICTURE_TEST);
           });
 
+          let booking: Booking;
           await test.step("User creates reservation", async () => {
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits(booking);
             await appUser.userChecksTheReservationInfoIsRightBeforeSubmit();
             await reservationLownav.clickSubmitButtonContinue();
-            await appUser.userChecksTheReservationInfoIsRightAfterSubmit();
-            await appUser.userOpensTheBookingInMyBookings(
-              testData.units.alwaysFreeUnitWithLocation,
-              state.timeOfQuickReservationMinusT
-            );
+            await appUser.userChecksTheReservationInfoIsRightAfterSubmit(booking);
+            await appUser.userOpensTheBookingInMyBookings(testData.units.alwaysFreeUnitWithLocation, booking.listTime);
           });
 
+          let modified: Booking;
           await test.step("User modifies reservation", async () => {
-            await appUser.userModifiesBookingAndVerifiesTheChanges();
-            await appUser.userChecksTheModifiedReservationInfoIsRightAndClicksContinue();
+            modified = await appUser.userModifiesBookingAndVerifiesTheChanges(booking);
+            await appUser.userChecksTheModifiedReservationInfoIsRightAndClicksContinue(modified);
           });
 
           await test.step("User cancels reservation", async () => {
-            await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+            await appUser.userCancelBookingInReservationsAndChecksItGotCancelled(modified);
             await topnav.navigateToMyBookings();
             await appUser.userChecksCancelledBookingIsFound(
               testData.units.alwaysFreeUnitWithLocation,
-              state.timeOfQuickReservationMinusTModified
+              modified.listTime
             );
             await appUser.userChecksBookingInfoInReservations(
+              modified,
               IN_RESERVATIONS_STATUS_CANCELED,
-              SINGLEBOOKING_NO_PAYMENT,
-              state.timeOfQuickReservationModified
+              SINGLEBOOKING_NO_PAYMENT
             );
           });
         }
@@ -112,28 +112,29 @@ export function customerTests(title: string, device: string): void {
       test(
         "User can create non-cancelable booking",
         { tag: ["@user-data-set-2"] },
-        async ({ appUser, login, popups, reservationLownav, state, testData, topnav, userLandingpage }) => {
+        async ({ appUser, login, popups, reservationLownav, testData, topnav, userLandingpage }) => {
           await topnav.clickLogin();
           await login.loginSuomiFi(testData.user.hetu);
           await userLandingpage.checkTheUserLandingPageH1(USER_LANDING_PAGE_H1_TEXT);
           await popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
 
+          let booking: Booking;
           await test.step("User creates reservation", async () => {
             await appUser.userFindsTheUnit(testData.units.freeUnitNoCancel);
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsNoncancelableBookingDetailsAsIndividualAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsNoncancelableBookingDetailsAsIndividualAndSubmits(booking);
             await appUser.userChecksTheNoncancelableReservationInfoIsRightBeforeSubmit();
             await reservationLownav.clickSubmitButtonContinue();
-            await appUser.userChecksTheNoncancelableReservationInfoIsRightAfterSubmit();
+            await appUser.userChecksTheNoncancelableReservationInfoIsRightAfterSubmit(booking);
           });
 
           await test.step("User checks reservation cannot be canceled", async () => {
             await topnav.navigateToMyBookings();
             await appUser.userCanSeeUpcomingNoncancelableBookingInListAndClicksIt(
               testData.units.freeUnitNoCancelWithLocation,
-              state.timeOfQuickReservationMinusT
+              booking.listTime
             );
-            await appUser.userChecksBookingInfoInReservationsForNoncancelableBooking();
+            await appUser.userChecksBookingInfoInReservationsForNoncancelableBooking(booking);
           });
         }
       );
@@ -141,47 +142,44 @@ export function customerTests(title: string, device: string): void {
       test(
         "User can make paid single booking with interrupted checkout",
         { tag: ["@user-data-set-3", "@also-on-phones"] },
-        async ({ appCommon, appUser, popups, state, testData, topnav }) => {
+        async ({ appCommon, appUser, popups, testData, topnav }) => {
           await appCommon.userLogsInWithSuomiFi();
 
+          let booking: Booking;
           await test.step("User creates reservation", async () => {
             await appUser.userFindsTheUnit(testData.units.alwaysPaidUnit);
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
-            await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits(booking);
+            await appUser.userChecksThePaidReservationInfoIsRightAndSubmits(booking);
           });
 
           await test.step("User pays the reservation", async () => {
             await appUser.userInterruptsPaidCheckout(URL_TEST);
             await appUser.userAcceptsPaymentToCheckout();
-            await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking();
-            await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout();
+            await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking(booking);
+            await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout(booking);
           });
 
           await test.step("User checks that paid reservation is found", async () => {
             await popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
-            await appUser.userOpensTheBookingInMyBookings(
-              testData.units.alwaysPaidUnitWithLocation,
-              state.timeOfQuickReservationMinusT
-            );
+            await appUser.userOpensTheBookingInMyBookings(testData.units.alwaysPaidUnitWithLocation, booking.listTime);
             await appUser.userChecksThePaidReservationInfoIsRightInReservations(
+              booking,
               MYBOOKINGS_STATUS_CONFIRMED,
               MYBOOKINGS_STATUS_PAID_CONFIRMED,
-              SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-              state.timeOfQuickReservation,
-              state.bookingNumOnly
+              SINGLEBOOKING_PAID_PRICE_VAT_INCL
             );
           });
 
           await test.step("User cancel booking", async () => {
-            await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+            await appUser.userCancelBookingInReservationsAndChecksItGotCancelled(booking);
           });
 
           await test.step("User verifies cancelled booking is found", async () => {
             await topnav.navigateToMyBookings();
             await appUser.userChecksCancelledBookingIsFound(
               testData.units.alwaysPaidUnitWithLocation,
-              state.timeOfQuickReservationMinusT
+              booking.listTime
             );
           });
         }
@@ -190,38 +188,35 @@ export function customerTests(title: string, device: string): void {
       test(
         "User can make paid single booking",
         { tag: ["@user-data-set-4", "@also-on-phones"] },
-        async ({ appCommon, appUser, mybookings, popups, state, testData, topnav }) => {
+        async ({ appCommon, appUser, mybookings, popups, testData, topnav }) => {
           await appCommon.userLogsInWithSuomiFi();
 
+          let booking: Booking;
           await test.step("User creates paid reservation", async () => {
             await appUser.userFindsTheUnit(testData.units.alwaysPaidUnit);
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
-            await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits(booking);
+            await appUser.userChecksThePaidReservationInfoIsRightAndSubmits(booking);
           });
 
           await test.step("User pays the reservation", async () => {
-            await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking();
-            await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout();
+            await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking(booking);
+            await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout(booking);
           });
 
           await test.step("User verifies paid reservation in my bookings and paid status", async () => {
             await popups.userAcceptsCookiesIfDialogIsVisible(COOKIETEXT);
-            await appUser.userOpensTheBookingInMyBookings(
-              testData.units.alwaysPaidUnitWithLocation,
-              state.timeOfQuickReservationMinusT
-            );
+            await appUser.userOpensTheBookingInMyBookings(testData.units.alwaysPaidUnitWithLocation, booking.listTime);
             await appUser.userChecksThePaidReservationInfoIsRightInReservations(
+              booking,
               MYBOOKINGS_STATUS_CONFIRMED,
               MYBOOKINGS_STATUS_PAID_CONFIRMED,
-              SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-              state.timeOfQuickReservation,
-              state.bookingNumOnly
+              SINGLEBOOKING_PAID_PRICE_VAT_INCL
             );
           });
 
           await test.step("User cancels paid booking", async () => {
-            await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+            await appUser.userCancelBookingInReservationsAndChecksItGotCancelled(booking);
             await mybookings.waitForPaymentStatus(MYBOOKINGS_STATUS_REFUNDED);
           });
 
@@ -229,14 +224,13 @@ export function customerTests(title: string, device: string): void {
             await topnav.navigateToMyBookings();
             await appUser.userChecksCancelledBookingIsFound(
               testData.units.alwaysPaidUnitWithLocation,
-              state.timeOfQuickReservationMinusT
+              booking.listTime
             );
             await appUser.userChecksThePaidReservationInfoIsRightInReservations(
+              booking,
               IN_RESERVATIONS_STATUS_CANCELED,
               MYBOOKINGS_STATUS_REFUNDED,
-              SINGLEBOOKING_PAID_PRICE_VAT_INCL,
-              state.timeOfQuickReservation,
-              state.bookingNumOnly
+              SINGLEBOOKING_PAID_PRICE_VAT_INCL
             );
           });
         }
@@ -245,25 +239,26 @@ export function customerTests(title: string, device: string): void {
       test(
         "User can make subvented single booking that requires handling",
         { tag: ["@user-data-set-5", "@also-on-phones"] },
-        async ({ appCommon, appUser, state, testData }) => {
+        async ({ appCommon, appUser, testData }) => {
           await appCommon.userLogsInWithSuomiFi();
 
+          let booking: Booking;
           await test.step("User creates subvented reservation", async () => {
             await appUser.userFindsTheUnit(testData.units.alwaysPaidUnitSubvented);
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(JUSTIFICATION_FOR_SUBVENTION);
-            await appUser.userChecksThePaidReservationThatRequiresHandlingInfoIsRightAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsSubventedBookingDetailsAsIndividualAndSubmits(booking, JUSTIFICATION_FOR_SUBVENTION);
+            await appUser.userChecksThePaidReservationThatRequiresHandlingInfoIsRightAndSubmits(booking);
           });
 
           await test.step("User verifies reservation requires handling", async () => {
             await appUser.userOpensTheBookingInMyBookings(
               testData.units.alwaysPaidUnitSubventedWithLocation,
-              state.timeOfQuickReservationMinusT
+              booking.listTime
             );
             await appUser.userChecksBookingInfoInReservationsWithAllReservationInfo(
+              booking,
               MYBOOKINGS_STATUS_PROCESSED,
-              SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-              state.timeOfQuickReservation
+              SINGLEBOOKING_SUBVENTED_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
             );
           });
         }
@@ -272,27 +267,28 @@ export function customerTests(title: string, device: string): void {
       test(
         "User can make booking that requires handling",
         { tag: ["@user-data-set-6", "@phone-only"] },
-        async ({ appCommon, appUser, reservationLownav, state, testData }) => {
+        async ({ appCommon, appUser, reservationLownav, testData }) => {
           await appCommon.userLogsInWithSuomiFi();
 
+          let booking: Booking;
           await test.step("User creates reservation that requires handling", async () => {
             await appUser.userFindsTheUnit(testData.units.unitRequiresAlwaysHandling);
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsInfoForUnitThatIsAlwaysHandledAsIndividualAndSubmits(booking);
             await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightBeforeSubmit();
             await reservationLownav.clickSubmitButtonContinue();
-            await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit();
+            await appUser.userChecksUnitThatIsAlwaysHandledDetailsAreRightAfterSubmit(booking);
           });
 
           await test.step("User verifies reservation in my bookings and reservation status", async () => {
             await appUser.userOpensTheBookingInMyBookings(
               testData.units.unitRequiresAlwaysHandlingWithLocation,
-              state.timeOfQuickReservationMinusT
+              booking.listTime
             );
             await appUser.userChecksBookingInfoInReservationsWithNumberOfParticipantsAndDescriptionAndPurpose(
+              booking,
               MYBOOKINGS_STATUS_PROCESSED,
-              SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL,
-              state.timeOfQuickReservation
+              SINGLEBOOKING_PAID_PRICE_NEEDS_TO_BE_HANDLED_VAT_INCL
             );
           });
         }
@@ -301,22 +297,23 @@ export function customerTests(title: string, device: string): void {
       test(
         "User checks that reserved time is not available anymore",
         { tag: ["@user-data-set-7"] },
-        async ({ appCommon, appUser, reservationLownav, state, testData }) => {
+        async ({ appCommon, appUser, reservationLownav, testData }) => {
           await appCommon.userLogsInWithSuomiFi();
 
+          let booking: Booking;
           await test.step("User creates reservation", async () => {
             await appUser.userFindsTheUnit(testData.units.unavailableUnit);
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits(booking);
             await appUser.userChecksTheReservationInfoIsRightBeforeSubmit();
             await reservationLownav.clickSubmitButtonContinue();
-            await appUser.userChecksTheReservationInfoIsRightAfterSubmit();
+            await appUser.userChecksTheReservationInfoIsRightAfterSubmit(booking);
           });
 
           await test.step("User verifies reserved time is no longer available", async () => {
             await appUser.userFindsTheUnit(testData.units.unavailableUnit);
-            await appUser.userChecksThatQuickReservationDoesNotHaveReservedTime(state.timeOfQuickReservationFreeSlot);
-            await appUser.userChecksThatReservationCalendarDoesNotHaveReservedTimeSlotAvailable();
+            await appUser.userChecksThatQuickReservationDoesNotHaveReservedTime(booking.slot);
+            await appUser.userChecksThatReservationCalendarDoesNotHaveReservedTimeSlotAvailable(booking);
           });
         }
       );
@@ -341,17 +338,18 @@ export function customerTests(title: string, device: string): void {
         async ({ appCommon, appUser, reservationLownav, testData }) => {
           await appCommon.userLogsInWithSuomiFi();
 
+          let booking: Booking;
           await test.step("User creates reservation", async () => {
             await appUser.userFindsTheUnit(testData.units.alwaysFreeUnit);
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsTheReservationInfoForAlwaysFreeUnitAndSubmits(booking);
             await appUser.userChecksTheReservationInfoIsRightBeforeSubmit();
             await reservationLownav.clickSubmitButtonContinue();
-            await appUser.userChecksTheReservationInfoIsRightAfterSubmit();
+            await appUser.userChecksTheReservationInfoIsRightAfterSubmit(booking);
           });
 
           await test.step("User downloads and verifies calendar file", async () => {
-            await appUser.userSavesFileAndFormatsBookingTimeToIcs(DOWNLOAD_ICS_FILE);
+            await appUser.userSavesFileAndFormatsBookingTimeToIcs(booking, DOWNLOAD_ICS_FILE);
             await appUser.userChecksThatCalendarFileMatchesBookingTime();
           });
         }
@@ -367,34 +365,32 @@ export function customerTests(title: string, device: string): void {
               "Makes a paid booking, pays it and cancels it, then verifies the reservation confirmation and cancellation\nemails of that booking.",
           },
         },
-        async ({ appCommon, appUser, mail, state, testData }) => {
+        async ({ appCommon, appUser, mail, testData }) => {
           await appCommon.userLogsInWithSuomiFi();
 
+          let booking: Booking;
           await test.step("User creates paid reservation", async () => {
             await appUser.userFindsTheUnit(testData.units.alwaysPaidUnit);
-            await appUser.userReservesAFreeQuickReservationSlot();
-            await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits();
-            await appUser.userChecksThePaidReservationInfoIsRightAndSubmits();
+            booking = await appUser.userReservesAFreeQuickReservationSlot();
+            await appUser.userFillsTheReservationInfoForUnitWithPaymentAndSubmits(booking);
+            await appUser.userChecksThePaidReservationInfoIsRightAndSubmits(booking);
           });
 
           await test.step("User pays the reservation", async () => {
-            await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking();
-            await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout();
+            await appUser.userChecksInfoInPaidCheckoutAndConfirmsBooking(booking);
+            await appUser.userChecksThePaidReservationInfoIsRightAfterCheckout(booking);
           });
 
           await test.step("User cancels paid booking", async () => {
-            await appUser.userOpensTheBookingInMyBookings(
-              testData.units.alwaysPaidUnitWithLocation,
-              state.timeOfQuickReservationMinusT
-            );
-            await appUser.userCancelBookingInReservationsAndChecksItGotCancelled();
+            await appUser.userOpensTheBookingInMyBookings(testData.units.alwaysPaidUnitWithLocation, booking.listTime);
+            await appUser.userCancelBookingInReservationsAndChecksItGotCancelled(booking);
           });
 
           await test.step("Verifying reservation confirmation and cancellation emails", async () => {
             // Format reservation times for email verification
-            await mail.formatReservationTimeForEmailTextsAndReceipts(state.timeOfQuickReservationMinusT);
-            await mail.verifyReservationConfirmationEmail(state.bookingNumOnly);
-            await mail.verifyReservationCancellationEmail(state.bookingNumOnly);
+            await mail.formatReservationTimeForEmailTextsAndReceipts(booking.listTime);
+            await mail.verifyReservationConfirmationEmail(booking.number);
+            await mail.verifyReservationCancellationEmail(booking.number);
           });
         }
       );
