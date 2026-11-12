@@ -23,6 +23,7 @@ const addToDate = (date: Date, { days = 0, hours = 0 }) =>
 const LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class DataModification extends PageObject {
+  /** Saves the booking number and the booking's name for the admin side, e.g. 59923, Yksittäisvaraaja123 */
   @step("data_modification.Formats Reservation Number And Name For Admin Side")
   // oxlint-disable-next-line eslint/require-await -- keywords are async, each call is a report step
   async formatsReservationNumberAndNameForAdminSide(booking_number: string) {
@@ -233,6 +234,8 @@ export class DataModification extends PageObject {
    * Format the Finnish date and time into the desired format
    * HH:MM WITH ":" "–" "Ti 5.12.2023 klo 11:30–12:30".
    * this keyword uses hard coded formatting to assume that reservation duration is 60min
+   * Returns the time with the duration and without it, e.g. for 12:15 and 12.11.2026:
+   * ["To 12.11.2026 klo 12:15–13:15, 1 t", "To 12.11.2026 klo 12:15–13:15"]
    */
   @step("data_modification.Set Info Card Duration Time Info")
   // oxlint-disable-next-line eslint/require-await -- keywords are async, each call is a report step

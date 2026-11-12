@@ -11,7 +11,10 @@ export interface PendingResponse {
 
 /** Quick reservation on a unit's page, and the booking's info card. */
 export class QuickReservation extends PageObject {
-  /** Selects a random reservation slot from the available slots of quick reservation, and returns the slot's time. */
+  /**
+   * Selects a random reservation slot from the available slots of quick reservation, and returns the slot's time,
+   * e.g. 12:15.
+   */
   @step("quick_reservation.Select The Free Slot From Quick Reservation")
   async selectTheFreeSlotFromQuickReservation() {
     // DEVNOTE
@@ -201,7 +204,7 @@ export class QuickReservation extends PageObject {
     expect(normalized_string).toBe(price_with_text);
   }
 
-  /** Reads the booking number from the info card and returns it. */
+  /** Reads the booking number from the info card and returns it, e.g. 59923. */
   @step("quick_reservation.Get Booking Number")
   async getBookingNumber() {
     // The number is shown once the reservation has loaded

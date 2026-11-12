@@ -95,6 +95,7 @@ export class AppUser extends PageObject {
   @step("app_user.User Checks Info In Paid Checkout And Confirms Booking")
   async userChecksInfoInPaidCheckoutAndConfirmsBooking(booking: Booking) {
     await log("This step gets the reservation number", { level: "DEBUG" });
+    // The booking number that the order summary shows, e.g. 59927
     booking.number = await this.pages.checkout.checkTheInfoInCheckout();
   }
 
@@ -132,7 +133,11 @@ export class AppUser extends PageObject {
     await this.pages.customKeywords.waitForUrlToContain("/reservation-unit/", /* timeout= */ 8000);
   }
 
-  /** Selects a free slot in quick reservation and returns the booking of that slot, with its info card and list time */
+  /**
+   * Selects a free slot in quick reservation and returns the booking of that slot, with its info card and list time,
+   * e.g. slot 12:15, info card time "To 12.11.2026 klo 12:15–13:15, 1 t" and
+   * list time "To 12.11.2026 klo 12:15–13:15". The booking has no number yet.
+   */
   @step("app_user.User Selects The Time With Quick Reservation")
   async userSelectsTheTimeWithQuickReservation() {
     await this.page.locator("#quick-reservation").waitFor({ state: "visible" });
@@ -141,10 +146,14 @@ export class AppUser extends PageObject {
     // Checks that calendar opens and has all the buttons inside
     await this.pages.quickReservation.confirmsDatePickerOpensFromQuickReservation();
 
+    // The date of the quick reservation, e.g. 12.11.2026
     const quick_reservation_current_date_value = await this.pages.quickReservation.getTheValueFromDateInput();
 
+    // The time of the picked slot, e.g. 12:15
     const slot = await this.pages.quickReservation.selectTheFreeSlotFromQuickReservation();
 
+    // The info card time and the list time of the slot, e.g. "To 12.11.2026 klo 12:15–13:15, 1 t" and
+    // "To 12.11.2026 klo 12:15–13:15"
     const [formatted_date, formatted_date_minus_t] = await this.pages.dataModification.setInfoCardDurationTimeInfo(
       slot,
       quick_reservation_current_date_value
@@ -157,6 +166,7 @@ export class AppUser extends PageObject {
 
   /**
    * Selects a free slot in quick reservation and submits it, and returns the booking of that slot.
+   * The booking has no number yet. A later keyword reads it from the page.
    * A unit lock keeps parallel tests from picking overlapping slots.
    */
   @step("app_user.User Reserves A Free Quick Reservation Slot")
@@ -454,6 +464,10 @@ export class AppUser extends PageObject {
     await this.pages.quickReservation.checkBookingNumber(booking.number);
   }
 
+  /**
+   * Changes the time of the booking in My bookings and returns the booking after the change: the new slot and times,
+   * and the same number.
+   */
   @step("app_user.User Modifies Booking And Verifies The Changes")
   async userModifiesBookingAndVerifiesTheChanges(booking: Booking) {
     await this.pages.mybookings.userClickChangeTime();
@@ -473,7 +487,8 @@ export class AppUser extends PageObject {
       date_value_from_calendar
     );
 
-    // The booking after the change: the new slot and times, and the same number
+    // The booking after the change, e.g. slot 11:45, times "To 12.11.2026 klo 11:45–12:45, 1 t" and
+    // "To 12.11.2026 klo 11:45–12:45", and the number the booking had before, e.g. 59923
     const modified = new Booking(
       this.state.calendarControlTimeOfFreeSlot,
       formatted_date,
