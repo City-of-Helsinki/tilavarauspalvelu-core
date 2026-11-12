@@ -43,13 +43,13 @@ export class DjangoAdmin extends PageObject {
 
   @step("django_admin.Admin Navigates To General Role Page")
   async adminNavigatesToGeneralRolePage() {
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await this.page.goto("/admin/tilavarauspalvelu/generalrole/");
   }
 
   @step("django_admin.Admin Navigates To Unit Role Page")
   async adminNavigatesToUnitRolePage() {
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await this.page.goto("/admin/tilavarauspalvelu/unitrole/");
   }
 }

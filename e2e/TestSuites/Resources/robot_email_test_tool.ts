@@ -106,7 +106,7 @@ export class RobotEmailTester {
 let emailTester: RobotEmailTester | null = null;
 
 export const robot_email_test_tool = {
-  /** Verifies a reservation email. Creates the tester from ${DJANGO_ROBO_MAIL} and ${ROBOT_EMAIL} on first use. */
+  /** Verifies a reservation email. Creates the tester from DJANGO_ROBO_MAIL and ROBOT_EMAIL on first use. */
   verify_reservation_email: async (
     reservation_number: string,
     expected_terms: string[],

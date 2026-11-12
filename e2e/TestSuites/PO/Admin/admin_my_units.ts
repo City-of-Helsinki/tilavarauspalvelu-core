@@ -19,8 +19,7 @@ export class AdminMyUnits extends PageObject {
 
     await log("If a wrong unit is opened, check that the DOM order has not changed");
 
-    // The row container is the next sibling of the element with the unit's title
-    // The first match, like querySelector
+    // The row container: the first element right after the one with the unit's title
     const row_container = this.page.locator(`div[title="${unit_name}"] + *`).first();
     // A click event on the 26th div, like the DOM's click(): the cell needn't be in view
     await row_container.locator("div").nth(25).dispatchEvent("click");

@@ -88,7 +88,7 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Checks Reservation Title Tagline")
   async adminChecksReservationTitleTagline(reservation_tagline: string) {
-    // ${RESERVATION_TAGLINE} is set with keyword Formats tagline for admin side
+    // reservation_tagline comes from data_modification.Formats Tagline For Admin Side
     await expect(this.page.getByTestId("reservation_title_section__tagline")).toHaveText(reservation_tagline, {
       useInnerText: true,
       timeout: TEXT_CHECK_TIMEOUT,
@@ -321,11 +321,11 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Fills Reservation Details Behalf")
   async adminFillsReservationDetailsBehalf() {
-    // this keyword generates a random letter and number and uses that string as last name
+    // A random letter and number as the last name
     const ADMIN_BEHALF_LASTNAME = await this.pages.dataModification.generateRandomLetterAndNumber();
     this.state.adminBehalfLastnameFi = ADMIN_BEHALF_LASTNAME;
 
-    // this keyword generates the info for checking calendar content
+    // The text of the reservation's calendar event, saved in state (no check reads it yet)
     const Calendar_event_content_name = await this.pages.dataModification.formatsCalendarEventContent(
       ADMIN_BEHALF_FIRSTNAME_FI,
       this.state.adminBehalfLastnameFi,
@@ -339,10 +339,7 @@ export class AdminReservations extends PageObject {
     await this.page.locator('[name="reserveePhone"]').fill(ADMIN_BEHALF_PHONE_FI);
   }
 
-  /**
-   * This keyword changes the time with date and hours and minutes.
-   * This test uses 00 for minutes. So all the changed times will be 10:00–11:00 -> 15:00–17:00 etc.
-   */
+  /** Enters the start and end hours, with 00 as the minutes, and the date, then picks the type of reservation. */
   @step("admin_reservations.Admin Enters Reservation Time And Type Of Reservation")
   async adminEntersReservationTimeAndTypeOfReservation(
     type_of_reservation: string,
@@ -390,8 +387,8 @@ export class AdminReservations extends PageObject {
 
   // Reservation calendar
   /**
-   * This keyword opens the reservation calendar and changes the reservation time.
-   * It uses the keyword 'Admin enters reservation time and type of reservation' to set the new time.
+   * Opens the reservation's calendar and changes the time to a new random date and hours (the minutes are 00), which
+   * it saves in state (modified…SubventedReservation).
    */
   @step("admin_reservations.Admin Opens Calendar And Changes Reservation Time")
   async adminOpensCalendarAndChangesReservationTime() {
@@ -402,14 +399,14 @@ export class AdminReservations extends PageObject {
       .getByText(CALENDAR_CHANGE_TIME_FI, { exact: true })
       .click();
 
-    // Call the keyword and capture the returned values
+    // A new random date, and start and end hours
     const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
     this.state.modifiedDateSubventedReservation = date_plus_x_days;
     this.state.modifiedHourStarttimeSubventedReservation = start_hour;
     this.state.modifiedHourEndtimeSubventedReservation = end_hour;
 
-    // This for the keyword Set and format the reservation finnish time
+    // The start time as "15.00", for data_modification.Set Info Card Duration Time Info
     this.state.modifiedStarttimeSubventedReservation = `${start_hour}.00`;
 
     // Changes the reservation time with date and hours and minutes

@@ -8,10 +8,9 @@ import { TEXT_CHECK_TIMEOUT, URL_TEST } from "../../Resources/variables";
 const RESERVATION_PAGE_PATH = /\/reservations\/\d+\/?$/;
 
 /**
- * Whether the URL is the page that Varaamo's payment success page opens once the webshop has confirmed the payment.
- * The success page itself isn't: it is a rewrite, so the browser's path stays /success while it polls. Nor are
- * /reservations?error=order1, where a cancelled or denied order goes, and a reservation page opened with
- * notify=polling_timeout, where the success page gave up.
+ * Whether the URL is the reservation page that the payment success page opens once the webshop has confirmed the
+ * payment. Not /success itself (a rewrite: the path stays while it polls), /reservations?error=order1 (a cancelled or
+ * denied order) or notify=polling_timeout (the success page gave up).
  */
 export function isConfirmedReservationUrl(url: URL): boolean {
   return RESERVATION_PAGE_PATH.test(url.pathname) && url.searchParams.get("notify") !== "polling_timeout";
@@ -123,7 +122,7 @@ export class Checkout extends PageObject {
     // The checkout opens on its payment method step
     await this.page.locator("#OP").waitFor({ state: "visible", timeout: 30_000 });
     await this.allowAllCookiesIfVisible();
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await this.page.goto(input_URL);
   }
 }

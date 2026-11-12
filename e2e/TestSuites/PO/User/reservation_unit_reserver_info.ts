@@ -38,10 +38,7 @@ export class ReservationUnitReserverInfo extends PageObject {
     await this.pages.customKeywords.closeSelectListIfOpen(main_button);
   }
 
-  /**
-   * Checks for the error notification banner that appears when required
-   * fields are missing.
-   */
+  /** Clicks continue before the required fields are filled, and checks the error box that the form shows. */
   @step("reservation_unit_reserver_info.Check Application Cannot Be Made Without Info")
   async checkApplicationCannotBeMadeWithoutInfo() {
     await this.page.getByTestId("reservation__button--continue").click();
@@ -49,9 +46,8 @@ export class ReservationUnitReserverInfo extends PageObject {
     // same time can lose keys (the first name was saved as "Mar" instead of "Marja").
     await this.page.waitForTimeout(1000);
 
-    // Check that error notification banner is displayed
-    // The form's own error box, by its heading in the page's main content: an error toast (like a 502 from the
-    // backend) has the same style but no heading
+    // The form's own error box, by its heading in the main content: an error toast (like a backend 502) has the same
+    // style but no heading
     await expect(this.page.getByRole("main").getByRole("heading", { name: FORM_ERRORS_TITLE_FI })).toBeVisible();
   }
 }

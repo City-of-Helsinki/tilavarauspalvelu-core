@@ -184,9 +184,8 @@ export class Mybookings extends PageObject {
   // Tablist
   @step("mybookings.Navigate To Cancelled Bookings")
   async navigateToCancelledBookings() {
-    // The HDS tab list slides when a tab gets focus. On mobile WebKit the slide can move the tab away between
-    // mousedown and mouseup, so the click is lost and the tab is only focused, not selected. Focus first so that
-    // the slide happens before the click, check that the tab got selected, and repeat a lost click.
+    // The HDS tab list slides when a tab gets focus, and on mobile WebKit a click during the slide only focuses the
+    // tab. Focusing first makes the slide happen before the click; a click that didn't select the tab is repeated.
     await retry(3, 500, async () => {
       await this.page.locator("#tab-2-button").focus();
       await this.page.locator("#tab-2-button").click();
@@ -325,11 +324,8 @@ export class Mybookings extends PageObject {
   }
 
   /**
-   * This keyword verifies if a reservation card with a specified unit name and reservation time is present in the list,
-   * and clicks the "Show" button on the matching card if found.
-   * If multiple matches exist, selects the last matching card.
-   * This behavior is used to handle double matching canceled reservations
-   * because we cannot clear backend data between test runs.
+   * Clicks "Show" on the card with this unit and time. With several matches it takes the last one: cancelled bookings
+   * of earlier runs stay in the backend.
    */
   @step("mybookings.Check Unitname And Reservation Time And Click Show")
   async checkUnitnameAndReservationTimeAndClickShow(unitname: string, reservation_time: string) {
@@ -351,10 +347,7 @@ export class Mybookings extends PageObject {
     );
   }
 
-  /**
-   * This keyword validates that a reservation card with the specified
-   * unit name and time exists and fails the test if a cancel button is present.
-   */
+  /** Checks that the card with this unit and time is in the list and has no cancel button. */
   @step("mybookings.Check Unitname And Reservation Time And Verify No Cancel Button")
   async checkUnitnameAndReservationTimeAndVerifyNoCancelButton(unitname: string, reservation_time: string) {
     // DEVNOTE for testing

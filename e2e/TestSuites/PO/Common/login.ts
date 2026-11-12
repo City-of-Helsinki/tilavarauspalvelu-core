@@ -1,4 +1,4 @@
-/** Port of PO/Common/login.robot */
+/** Logging in: Suomi.fi with a test HETU, and Django admin with a password. */
 import { readEnv } from "../../../lib/env";
 import { acquireLock, releaseLock } from "../../../lib/locks";
 import { step, expect, log } from "../../../lib/runtime";

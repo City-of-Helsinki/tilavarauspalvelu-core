@@ -24,10 +24,7 @@ export class Singlebooking extends PageObject {
     await this.page.locator("h2").locator(`text="${searched_text}"`).click();
   }
 
-  /**
-   * Ensures the visibility of the search input by clicking the
-   * "Advanced Search" toggle button if the search field is not already visible.
-   */
+  /** Opens the advanced search if the search field isn't visible. */
   @step("singlebooking.Click Advanced Search If Search Not Visible")
   async clickAdvancedSearchIfSearchNotVisible() {
     const search_visible = await reachesState(this.page.locator("#search"), "visible", 5000);

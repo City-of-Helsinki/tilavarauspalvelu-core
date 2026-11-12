@@ -1,4 +1,4 @@
-/** A resource file with keywords. */
+/** Keywords that the page objects share: clicks, waits and retries, text checks, and calendar times. */
 import { test } from "@playwright/test";
 import { appendFile } from "node:fs/promises";
 import { setTimeout } from "node:timers/promises";
@@ -24,9 +24,8 @@ const normalizeTimeLabel = (text: string) => text.replaceAll(/[–—]/g, "-").r
 
 export class CustomKeywords extends PageObject {
   /**
-   * This keyword clicks the first element with exactly the specified text among the elements identified by the given selector.
-   * It waits for such an element to appear, so slowly rendered lists are waited for.
-   * The text has to be inside one element, text split over several child elements is not matched.
+   * Clicks the first of the selector's elements that has exactly this text, waiting for it to appear. The text must be
+   * in one element: text split over child elements doesn't match.
    */
   @step("custom_keywords.Find And Click Element With Text")
   async findAndClickElementWithText(element_with_text: string | Locator, wanted_text: string) {
@@ -38,11 +37,9 @@ export class CustomKeywords extends PageObject {
   }
 
   /**
-   * Clicks an element and waits for navigation to complete with retry logic.
-   * Handles flaky navigation by retrying click if target element doesn't appear.
-   * Verifies navigation by checking for a target element on the destination page.
-   * A click that opened another page is not repeated, as the element to click was on the page it left: the keyword
-   * fails at once, and the caller can recover, e.g. by opening the first page again.
+   * Clicks an element and waits for a target element of the next page, clicking again if the target doesn't show. A
+   * click that left the page isn't repeated, as the element was on the old page: the keyword fails at once, and the
+   * caller can recover, e.g. by opening the first page again.
    */
   @step("custom_keywords.Click And Wait For Navigation With Retry")
   async clickAndWaitForNavigationWithRetry(
@@ -91,8 +88,8 @@ export class CustomKeywords extends PageObject {
   }
 
   /**
-   * Clicks an element and waits until the URL has changed, or contains ${url_part} when given.
-   * Content of the new page is waited for by the keywords that use it.
+   * Clicks an element and waits until the URL has changed, or contains `url_part` when given. The keywords that use the
+   * new page wait for its content.
    */
   @step("custom_keywords.Click And Wait For Page")
   async clickAndWaitForPage(click_selector: string | Locator, url_part = "", timeout = BROWSER_TIMEOUT_GLOBAL) {
@@ -152,7 +149,7 @@ export class CustomKeywords extends PageObject {
     }
   }
 
-  /** This keyword verifies that an element containing the specified text is NOT found within a list of elements identified by the given selector. */
+  /** Fails if one of the selector's elements has this text. */
   @step("custom_keywords.Verify Element With Text Is Not Found")
   async verifyElementWithTextIsNotFound(element_with_text: string | Locator, wanted_text: string) {
     // Reads the elements' texts (stripped, for WebKit) again until none of them is the text
@@ -163,14 +160,14 @@ export class CustomKeywords extends PageObject {
       .not.toContain(wanted_text);
   }
 
-  /** This keyword verifies that an element identified by the given selector is NOT found on the page. */
+  /** Verifies that the page has no element matching the selector. */
   @step("custom_keywords.Verify Element Is Not Found")
   async verifyElementIsNotFound(element_selector: string) {
     // Waits until the element is gone (expect's timeout)
     await expect(this.page.locator(element_selector), `The page has no ${element_selector}`).toHaveCount(0);
   }
 
-  /** This keyword verifies that an element identified by the given selector IS found on the page. */
+  /** Verifies that the page has an element matching the selector. */
   @step("custom_keywords.Verify Element Is Found")
   async verifyElementIsFound(element_selector: string) {
     // Waits until the element is there (expect's timeout)
@@ -227,10 +224,7 @@ export class CustomKeywords extends PageObject {
     await log(`No element with text '${partial_text}' was found to click.`);
   }
 
-  /**
-   * For each element matching ${card_element}, checks if it contains a child
-   * ${text_element} with text ${text}. If so, clicks ${element_to_click} inside that card.
-   */
+  /** Clicks `element_to_click` in the first `card_element` whose `text_element` has exactly the text `text`. */
   @step("custom_keywords.Find And Click Element In Card Element By Text")
   async findAndClickElementInCardElementByText(
     card_element: string,
@@ -262,9 +256,8 @@ export class CustomKeywords extends PageObject {
   }
 
   /**
-   * Finds a group wrapper containing specified text, then searches for card elements
-   * within that group. For each card, checks if the heading and tags elements contain
-   * specified text. If both conditions are met, clicks the specified button.
+   * In the first group that contains `group_text`, clicks the `button_text` button of the last card whose heading and
+   * tags contain `heading_text` and `tags_text`.
    */
   @step("custom_keywords.Find And Click Button In Group With Matching Conditions")
   async findAndClickButtonInGroupWithMatchingConditions(
@@ -361,12 +354,8 @@ export class CustomKeywords extends PageObject {
   }
 
   /**
-   * Verifies that a specific empty state message is displayed in the application.
-   * 0. Before test runs: User data is set so there are NO other applications - everything is empty
-   * 1. The test creates exactly 1 application
-   * 2. The test then cancels that 1 application
-   * 3. After cancellation, there should be NO other applications remaining
-   * 4. An appropriate empty state message should be displayed
+   * Checks that the applications list shows its empty state message. The user has no applications before the test,
+   * which creates one and cancels it, so none should be left.
    */
   @step("custom_keywords.Verify Card Not Found In Group With Matching Conditions")
   async verifyCardNotFoundInGroupWithMatchingConditions(empty_state_message: string) {
@@ -441,10 +430,7 @@ export class CustomKeywords extends PageObject {
     await log(`✓ Numbers are different: ${NUM_FROM_TXT} != ${number_notEqualTo}`);
   }
 
-  /**
-   * Extracts only numeric characters from an element's text and returns the number.
-   * Returns empty string if no numbers are found.
-   */
+  /** Returns the digits of an element's text, or an empty string if it has none. */
   @step("custom_keywords.Get Number From Element Text")
   async getNumberFromElementText(text_element: string | Locator) {
     const element_text = await this.locate(text_element).innerText();
@@ -461,8 +447,8 @@ export class CustomKeywords extends PageObject {
   }
 
   /**
-   * Compares the text content of an element with the expected text
-   * normalizes it, and logs differences if mismatched.
+   * Compares an element's text with the expected text, again without non-breaking spaces if it differs. If it still
+   * does, writes the differences to a file in the test's output folder and fails.
    */
   @step("custom_keywords.Check Text Of Element With Normalization And Logging To File")
   async checkTextOfElementWithNormalizationAndLoggingToFile(Element: string | Locator, Expected_text: string) {
@@ -539,9 +525,8 @@ Differences:
   }
 
   /**
-   * Checks element text with automatic space stripping and flexible comparison options.
-   * Retries until the text matches, so slowly rendered text is waited for.
-   * With return_status the text is checked once and true or false is returned.
+   * Checks an element's text, by default with the spaces stripped, retrying until it matches. With return_status it
+   * checks once and returns true or false.
    */
   @step("custom_keywords.Check Elements Text")
   async checkElementsText(
@@ -591,7 +576,7 @@ Differences:
     expect(text, message ?? undefined).toBe(expected);
   }
 
-  /** Checks if element text contains expected text using Should Contain */
+  /** Checks that the element's text contains the expected text. */
   @step("custom_keywords.Check Element Contains Text")
   async checkElementContainsText(
     Element: string | Locator,
@@ -670,10 +655,7 @@ Differences:
     this.state.endTimeFromIcs = end_match;
   }
 
-  /**
-   * Checks that a given weekday's column in the calendar contains
-   * an event label exactly matching the specified time.
-   */
+  /** Checks that the weekday's column in the calendar has an event labelled exactly with this time. */
   @step("custom_keywords.Verify Reservation Slot Exists")
   async verifyReservationSlotExists(TIME_TO_CHECK: string, DAY_TO_CHECK: string) {
     // normalize search key

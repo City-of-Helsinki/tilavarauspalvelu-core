@@ -63,10 +63,7 @@ export class QuickReservation extends PageObject {
     return time_of_selected_slot;
   }
 
-  /**
-   * Clicks the submit button in quick reservation using JavaScript.
-   * Polls for button to be enabled before clicking with dispatchEvent.
-   */
+  /** Clicks quick reservation's submit button by dispatching its mouse events once it is enabled. */
   @step("quick_reservation.User Clicks Submit Button In Quick Reservation")
   async userClicksSubmitButtonInQuickReservation() {
     const submit = this.page.locator("#quick-reservation").getByTestId("quick-reservation__button--submit");
@@ -109,15 +106,13 @@ export class QuickReservation extends PageObject {
   }
 
   /**
-   * Reloads and waits for the unit's existing reservations (AffectingReservations query),
-   * so that the free slots shown are up to date. If the browser has left the unit page (a submit that went through
-   * opens the booking details page), opens the unit page again instead.
+   * Reloads the unit page and waits for its existing reservations (AffectingReservations query), so the free slots are
+   * up to date. If a submit that went through has left the unit page, opens it again instead.
    */
   @step("quick_reservation.Reload Reservation Unit Page And Wait For Reservations")
   async reloadReservationUnitPageAndWaitForReservations(unit_page_url: string) {
-    // Starts waiting once the reload has replaced the page, not before it. The page being replaced can start
-    // the same query just before the reload, and that response (whose body never finishes) was taken for the new one.
-    // The new page can't send its query before its scripts have loaded.
+    // Starts waiting only after the reload: the old page can send the same query just before it, and that response
+    // (its body never finishes) was taken for the new one. The new page queries only after its scripts load.
     if (new URL(this.page.url()).pathname === new URL(unit_page_url).pathname) {
       await this.page.reload({ waitUntil: "commit" });
     } else {
@@ -183,11 +178,7 @@ export class QuickReservation extends PageObject {
     await expect(reservationtime).toHaveText(time_of_quick_reservation_slot, { useInnerText: true });
   }
 
-  /**
-   * Verifies the price in quick reservation info card.
-   * Note: Price may not render immediately, causing mismatches like
-   * "40,00 €" vs "0 - 40,00 €". Retries until the price is fully rendered.
-   */
+  /** Checks the info card's price. It can render in steps ("0 - 40,00 €" before "40,00 €"), so the check retries. */
   @step("quick_reservation.Check The Price Of Quick Reservation")
   async checkThePriceOfQuickReservation(price_with_text: string) {
     // expect retries until the price matches. It normalizes whitespace, non-breaking spaces included.
@@ -286,9 +277,8 @@ export class QuickReservation extends PageObject {
     const slots = this.page.locator('[class*="slider-list"]').getByTestId("quick-reservation__slot");
     // The free slots are rendered after the reservation form
     await expect(slots.first()).toBeVisible();
-    // The page shows the free slots before its AffectingReservations query returns and removes the booked ones, so
-    // this waits until the slot is gone (the query can take over 10 s on the test env). A slot button's only text
-    // is its time.
+    // The free slots show before the AffectingReservations query (over 10 s on the test env) removes the booked ones,
+    // so wait until the slot is gone. A slot button's only text is its time.
     await expect(
       slots.and(this.page.getByText(time_to_check, { exact: true })),
       `The free slots don't include ${time_to_check}`

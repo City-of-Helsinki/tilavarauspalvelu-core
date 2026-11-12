@@ -6,10 +6,8 @@ import { COOKIE_CONSENT_COOKIE } from "../../Resources/variables";
 /** What can show over any page: the cookie banner, toasts and banner notifications. */
 export class Popups extends PageObject {
   /**
-   * Ensures the visibility of the button with the specified text inside a dialog.
-   * If the dialog with role="dialog" is visible, clicks the button.
-   * Otherwise, continues the test without failing.
-   * Doesn't wait for the dialog when the browser has saved the consent already.
+   * Clicks the cookie banner's button with this text if the banner shows, and goes on if it doesn't. Doesn't wait for
+   * the banner when the consent is already saved.
    */
   @step("popups.User Accepts Cookies If Dialog Is Visible")
   async userAcceptsCookiesIfDialogIsVisible(cookie_text: string) {
@@ -38,9 +36,8 @@ export class Popups extends PageObject {
   }
 
   /**
-   * Checks the toast that an action shows and closes it. Toasts open at the top right and close themselves after 5 s.
-   * Until then they cover the header's buttons there (the menu on phones, the admin's user menu), and a click on one
-   * waits for the toast to go.
+   * Checks the toast that an action shows and closes it. Until it closes itself after 5 s, a toast covers the header's
+   * top-right buttons (the phone's Menu, the admin's user menu), and a click on them waits for it.
    */
   @step("popups.Check And Close The Toast")
   async checkAndCloseTheToast(toast_text: string) {
@@ -57,10 +54,7 @@ export class Popups extends PageObject {
     await expect(toast, `The toast "${toast_text}" is closed`).toBeHidden();
   }
 
-  /**
-   * Closes all notification banners by clicking close button
-   * and refreshing until no notifications are visible
-   */
+  /** Closes the notification banners one at a time, reloading after each, and fails if some still show after 5. */
   @step("popups.Close Notification Banner If Visible")
   async closeNotificationBannerIfVisible() {
     let attempt = 1;

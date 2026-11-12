@@ -51,10 +51,10 @@ export class Session {
   }
 
   /**
-   * Opens the page of a "Set Up … And Open Url" keyword, which becomes the current page. The first one in a test is
-   * Playwright's own page, made with the project's `use` options. Each later one is a new context, a session of its
-   * own: in the test's browser, or in a new browser of type `browserName` (Firefox for Django admin). New contexts get
-   * the project's `use` options too, `contextOptions` (e.g. extraHTTPHeaders) on top.
+   * Opens a page for the devices keywords that open a URL, and makes it the current page. The first one in a test is
+   * Playwright's own page, made with the project's `use` options. Each later one is a new context in the test's
+   * browser, or in a new browser of type `browserName` (Firefox for Django admin), with the `use` options and
+   * `contextOptions` (e.g. extraHTTPHeaders) on top.
    */
   async openPage(options: { browserName?: BrowserName; contextOptions?: BrowserContextOptions } = {}): Promise<Page> {
     const ownBrowser = this.own.browser.browserType().name() as BrowserName;

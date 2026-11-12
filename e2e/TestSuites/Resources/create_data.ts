@@ -1,8 +1,5 @@
 import { randomBytes } from "node:crypto";
-/**
- * Create robot test data for Harakka via API endpoint.
- * This is used for creating the necessary test data for test execution.
- */
+/** Creates the robot test data for Harakka through the backend's endpoint. */
 import { request } from "@playwright/test";
 import { print } from "graphql";
 import { gql } from "graphql-tag";
@@ -124,9 +121,8 @@ async function waitUntilTheSiteAnswers(api: APIRequestContext): Promise<void> {
 
 export class CreateData extends PageObject {
   /**
-   * Calls the endpoint to Create robot test data.
-   * Backend returns 204 immediately and processes data asynchronously.
-   * Waits until the new data has been saved, and then until the site answers normally.
+   * Calls the endpoint that creates the robot test data. The backend answers 204 and creates the data in the
+   * background, so this waits until the new data is saved and then until the site answers normally.
    */
   @step("create_data.Create Robot Test Data")
   async createRobotTestData() {
@@ -171,9 +167,8 @@ export class CreateData extends PageObject {
           await log("Waiting 3 minutes for backend to complete data creation...", { level: "WARN" });
           await setTimeout(180_000); // 3 minutes for backend processing
         } else {
-          // Waits until the new data has been saved. The backend creates it in one transaction that ends by
-          // refreshing the reservation units' availability views, and until it commits, pages that need them hang or
-          // fail (502, the "503: Palaamme pian!" page).
+          // Waits until the new data is saved. Until the backend's transaction commits (it ends by refreshing the
+          // units' availability views), pages that need the data hang or fail (502, the "503: Palaamme pian!" page).
           await log("Waiting for backend to complete data creation...");
           try {
             await expect

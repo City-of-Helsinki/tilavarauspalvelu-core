@@ -30,14 +30,10 @@ export class TestState {
   englishDay = "";
   /** e.g. 17:30-18:30. Set by data_modification.Compute Reservation Time Slot */
   calendarTimeslot = "";
-  /**
-   * Alkamisaika: ${day}.${month}.${year} klo ${start_time}. Set by data_modification.Formats Reservation Time To
-   * Start And End Time
-   */
+  /** e.g. Alkamisaika: 1.11.2024 klo 11:00. Set by data_modification.Formats Reservation Time To Start And End Time */
   formattedStarttimeEmail = "";
   /**
-   * Päättymisaika: ${day}.${month}.${year} klo ${end_time}. Set by data_modification.Formats Reservation Time To
-   * Start And End Time
+   * e.g. Päättymisaika: 1.11.2024 klo 12:00. Set by data_modification.Formats Reservation Time To Start And End Time
    */
   formattedEndtimeEmail = "";
 

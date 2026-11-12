@@ -1,4 +1,4 @@
-/** Desktop browser tests */
+/** Desktop tests where a customer books and an admin handles the booking. */
 import type { Booking } from "./booking";
 import { test } from "./fixtures";
 import {
