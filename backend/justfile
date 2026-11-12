@@ -1,5 +1,13 @@
 import? 'local.just'
 
+# Use backend/.venv when no virtualenv is active, so recipes work without "source .venv/bin/activate".
+# The Docker image sets VIRTUAL_ENV, so its own venv is used there.
+# Do not export PATH or VIRTUAL_ENV again in local.just. Just does not allow two definitions.
+venv := source_directory() / ".venv"
+use_venv := if env("VIRTUAL_ENV", "") == "" { if path_exists(venv) == "true" { "true" } else { "" } } else { "" }
+export VIRTUAL_ENV := if use_venv == "true" { venv } else { env("VIRTUAL_ENV", "") }
+export PATH := if use_venv == "true" { venv / "bin" + ":" + env("PATH") } else { env("PATH") }
+
 # List all available commands
 help:
     @just --list
