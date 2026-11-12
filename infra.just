@@ -9,6 +9,10 @@ az_project := "tilavarauspalvelu"
 help:
     @just --list
 
+# Print or check the release of an env (dev, test, staging, production). See "just infra release-check --help".
+release-check *args:
+    @"{{ source_directory() }}/scripts/release-check.sh" {{ args }}
+
 # Log in to OpenShift for an env (dev, test, staging, production)
 oc-login env:
     #!/usr/bin/env bash
