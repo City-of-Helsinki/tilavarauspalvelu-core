@@ -4,6 +4,7 @@ import { ApolloProvider } from "@apollo/client";
 import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import { appWithTranslation, useTranslation } from "next-i18next/pages";
 import App from "next/app";
+import Head from "next/head";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import { ErrorTrigger, triggerServerError } from "@ui/components/ErrorTrigger";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
@@ -76,32 +77,38 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const enableHotjar = isHotjarEnabled && statisticsAccepted;
 
   return (
-    <CookieConsentContextProvider
-      siteSettings={sitesettings}
-      options={{
-        language,
-      }}
-      onChange={recheck}
-    >
-      <TrackingWrapper matomoEnabled={enableMatomo}>
-        <EnvContextProvider env={envConfig}>
-          <ApolloProvider client={client}>
-            <PageWrapper
-              apiBaseUrl={apiBaseUrl}
-              profileLink={envConfig.profileLink}
-              feedbackUrl={envConfig.feedbackUrl}
-              version={envConfig.version}
-            >
-              <Component {...pageProps} />
-              <CookieBanner />
-              <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} />
-            </PageWrapper>
-            <ToastContainer />
-          </ApolloProvider>
-        </EnvContextProvider>
-      </TrackingWrapper>
-      <ExternalScripts enableMatomo={enableMatomo} enableHotjar={enableHotjar} />
-    </CookieConsentContextProvider>
+    <>
+      {/* The cookie consent provider renders nothing on the server, so the head has to be outside it */}
+      <Head>
+        <title>Tilavarauspalvelu</title>
+        <meta name="version" content={envConfig.version} />
+      </Head>
+      <CookieConsentContextProvider
+        siteSettings={sitesettings}
+        options={{
+          language,
+        }}
+        onChange={recheck}
+      >
+        <TrackingWrapper matomoEnabled={enableMatomo}>
+          <EnvContextProvider env={envConfig}>
+            <ApolloProvider client={client}>
+              <PageWrapper
+                apiBaseUrl={apiBaseUrl}
+                profileLink={envConfig.profileLink}
+                feedbackUrl={envConfig.feedbackUrl}
+              >
+                <Component {...pageProps} />
+                <CookieBanner />
+                <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} />
+              </PageWrapper>
+              <ToastContainer />
+            </ApolloProvider>
+          </EnvContextProvider>
+        </TrackingWrapper>
+        <ExternalScripts enableMatomo={enableMatomo} enableHotjar={enableHotjar} />
+      </CookieConsentContextProvider>
+    </>
   );
 }
 
