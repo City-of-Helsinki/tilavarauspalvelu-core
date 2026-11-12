@@ -7,7 +7,7 @@ import type { Page } from "@playwright/test";
  * `state` fixture), and the page objects read it as `this.state`. Each field says which keywords set it.
  */
 export class TestState {
-  // The customer's booking: the access code, and the time picked in the calendar while the booking is changed
+  // Booking values that are not in a `Booking`: the access code, and the time picked in the calendar for a change
 
   /** Set by quick_reservation.Get Access Code */
   accessCode = "";
@@ -47,7 +47,7 @@ export class TestState {
   reservationNumberAdminside = "";
   /** Set by app_admin.Admin Saves Access Code */
   accessCodeAdminside = "";
-  /** Set by data_modification.Formats Reservation Number And Name For Admin Side */
+  /** e.g. 59923, Yksittäisvaraaja123. Set by data_modification.Formats Reservation Number And Name For Admin Side */
   bookingNumOnlyBookingNameSubvented = "";
   /**
    * e.g. Ke 10.4.2024 klo 17:15-18:15, 1 t Alennuskelpoinen aula, Caisa. Set by data_modification.Formats Tagline For

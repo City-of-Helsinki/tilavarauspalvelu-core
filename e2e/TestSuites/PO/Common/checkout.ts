@@ -74,7 +74,7 @@ export class Checkout extends PageObject {
     );
   }
 
-  /** Reads the reservation number from the order summary's product list and returns it. */
+  /** Reads the reservation number from the order summary's product list and returns it, e.g. 59927. */
   @step("checkout.In Order Summary Get Booking Number From Product List")
   async inOrderSummaryGetBookingNumberFromProductList() {
     await this.page.locator(".product-list").waitFor({ state: "visible" });
@@ -92,7 +92,7 @@ export class Checkout extends PageObject {
     return reservation_number;
   }
 
-  /** Pays in the test checkout and returns the booking number that the order summary shows. */
+  /** Pays in the test checkout and returns the booking number that the order summary shows, e.g. 59927. */
   @step("checkout.Check The Info In Checkout")
   async checkTheInfoInCheckout() {
     // The checkout opens on its payment method step
@@ -103,6 +103,7 @@ export class Checkout extends PageObject {
     // Submitting the payment method opens the summary step
     await this.pages.customKeywords.waitForUrlToContain("/summary", /* timeout= */ 20_000);
     await this.checkProductListHasAllTheInfo();
+    // The booking number of the order summary, e.g. 59927
     const booking_number = await this.inOrderSummaryGetBookingNumberFromProductList();
     await this.clickAcceptTerms();
     await this.clickSubmit();

@@ -92,7 +92,7 @@ test.describe("Runtime", () => {
   });
 
   test("A booking is printed by its list time and number", () => {
-    const booking = new Booking("12.15", "Ti 5.12.2023 klo 12:15–13:15, 1 t", "Ti 5.12.2023 klo 12:15–13:15");
+    const booking = new Booking("12:15", "Ti 5.12.2023 klo 12:15–13:15, 1 t", "Ti 5.12.2023 klo 12:15–13:15");
     // Until a keyword has read the booking number from the page, only the time shows
     expect(booking.number).toBe("");
     expect(formatValue(booking)).toBe('"Ti 5.12.2023 klo 12:15–13:15"');
@@ -100,7 +100,7 @@ test.describe("Runtime", () => {
     expect(formatValue(booking)).toBe('"Ti 5.12.2023 klo 12:15–13:15, 59473"');
     // The booking after a change has the new slot and times, and the same number
     const modified = new Booking(
-      "13.15",
+      "13:15",
       "Ti 5.12.2023 klo 13:15–14:15, 1 t",
       "Ti 5.12.2023 klo 13:15–14:15",
       booking.number
