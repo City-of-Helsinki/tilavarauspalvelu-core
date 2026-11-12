@@ -160,7 +160,7 @@ const RadioGroup = styled.fieldset`
   border: none;
   padding: 0;
   margin: 0;
-  gap: var(--spacing-l);
+  gap: var(--spacing-xl);
   legend {
     width: 100%;
     margin-bottom: var(--spacing-xs);
@@ -172,63 +172,53 @@ const RadioGroup = styled.fieldset`
 `;
 
 const PriorityRadioButton = styled(RadioButton)`
-  position: relative;
   text-align: center;
   color: var(--color-white);
-  && label {
-    opacity: 0.5;
-    background-color: var(--color-engel);
-    border: 1px solid var(--color-black);
-    margin-left: 40px;
-    padding: var(--spacing-2-xs) var(--spacing-m);
+  &:before {
+    box-sizing: border-box;
+    position: absolute;
+    top: -3px;
+    left: 35px;
+    display: block;
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: var(--color-bus);
+    color: var(--color-white);
   }
   &:after {
     ${arrow};
-    opacity: 0.5;
     left: 45px;
     right: auto;
-    top: 3px;
-    border-top: 10px solid var(--color-black);
+    top: 0;
+    border-top: 10px solid var(--color-white);
   }
-  &:first-of-type {
-    label {
-      background-color: var(--color-bus);
-      color: var(--color-white);
-      border: none;
-    }
-    &:after {
-      border-top: none;
-      border-bottom: 10px solid var(--color-white);
-    }
-  }
-  &:last-of-type {
+
+  &:not(:first-of-type) {
     margin-top: 0; /* override hds-react default margin-top */
   }
-  &:has(:checked) {
+
+  &:last-of-type {
+    margin-top: 0; /* override hds-react default margin-top */
+    &:before {
+      background-color: var(--color-engel);
+      border: 1px solid var(--color-black);
+    }
     &:after {
-      opacity: 1;
+      border-bottom: none;
+      border-top: 10px solid var(--color-black);
     }
   }
-  :checked {
-    :after {
-      opacity: 1;
-    }
-    + label {
-      box-shadow: var(--color-focus-outline) 0 0 3px 3px;
-      opacity: 1;
-    }
+
+  label {
+    margin-left: 40px;
   }
-  &&& input {
-    top: 50%;
-    transform: translateY(-50%);
-    + label::before,
-    + label::after,
-    &:focus + label::before,
-    &:focus + label::after {
-      top: 50%;
-      transform: translateY(-50%);
-      left: -40px; /* override hds-react default left */
-    }
+
+  && input + label::before,
+  && input + label::after,
+  && input:focus + label::before,
+  && input:focus + label::after {
+    left: -40px; /* override hds-react default left */
   }
 `;
 
