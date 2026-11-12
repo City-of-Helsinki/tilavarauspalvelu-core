@@ -423,12 +423,13 @@ const LegendBox = styled.div<{ $state: LegendState }>`
   ${({ $state }) => $state === "closed" && `background-color: var(--color-black-10); background-image: ${unavailableBackgroundSVG}; background-size: auto 10px; background-repeat: repeat;`}
   ${({ $state }) =>
     $state === "invalid" &&
-    `background: linear-gradient(to right, rgb(from var(--color-error) r g b / .7) 0 50%, rgb(from var(--color-error) r g b / .3) 50% 100%);
+    `width: 45px;
+    background: linear-gradient(105deg, rgb(from var(--color-error) r g b / .7) 0 50%, rgb(from var(--color-error) r g b / .3) 50% 100%);
     &:before {
       content: "";
       position: absolute;
       z-index: 1;
-      left: 1px;
+      left: 4px;
       top: 3px;
       width: 0;
       height: 0;
@@ -441,7 +442,7 @@ const LegendBox = styled.div<{ $state: LegendState }>`
       position: absolute;
       z-index: 1;
       left: auto;
-      right: 1px;
+      right: 4px;
       top: 3px;
       width: 0;
       height: 0;
