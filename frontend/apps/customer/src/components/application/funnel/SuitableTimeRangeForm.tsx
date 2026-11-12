@@ -13,6 +13,7 @@ import type { ApplicationPage2FormValues, SuitableTimeRangeFormValues } from "./
 import { addTimeRange, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
 
 const Fieldset = styled.fieldset`
+  min-inline-size: 0; /* fieldsets default to min-content, which would overflow the grid column */
   display: grid;
   gap: var(--spacing-s);
   margin: 0;
