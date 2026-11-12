@@ -84,6 +84,7 @@
       "RESERVATION_STATE_CHANGE_NOT_ALLOWED": "Varausta ei voi muuttaa käsiteltäväksi",
       "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Aloitusaika ei ole sallittu",
       "RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS": "Varausyksiköllä on tulevia varauksia",
+      "RESERVATION_UNIT_IN_PENDING_APPLICATION_ROUND": "Varausyksikkö on hakukierroksella, jonka varauksia ei ole vielä tehty. Varausyksikköä ei voi arkistoida, tallentaa luonnoksena tai muuttaa vain suoraan varattavaksi ennen kuin se poistetaan hakukierrokselta.",
       "RESERVATION_UNIT_MIN_RESERVATION_DURATION_INVALID": "Varausyksikön minimivarauksen kesto on virheellinen",
       "RESERVATION_UNIT_MISSING_RESERVATION_UNIT_TYPE": "Varausyksiköllä ei ole varausyksikkötyyppiä",
       "RESERVATION_UNIT_MISSING_SPACES_OR_RESOURCES": "Varausyksiköllä ei ole tiloja tai resursseja",
