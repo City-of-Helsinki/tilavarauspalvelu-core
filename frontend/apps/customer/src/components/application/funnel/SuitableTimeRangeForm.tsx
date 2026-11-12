@@ -10,7 +10,7 @@ import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
 import { priorityKey, SUITABLE_TIME_STEP_MINUTES, SUITABLE_TIME_VISIBLE_HOURS } from "ui/src/modules/suitableTimes";
 import { Weekday } from "@gql/gql-types";
 import type { ApplicationPage2FormValues, SuitableTimeRangeFormValues } from "./form";
-import { addTimeRange, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
+import { addTimeRange, findTooShortListed, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
 
 const Fieldset = styled.fieldset`
   min-inline-size: 0; /* fieldsets default to min-content, which would overflow the grid column */
@@ -72,6 +72,14 @@ const TimeListItem = styled.li<{ $priority?: "primary" | "secondary" }>`
   border-radius: var(--spacing-3-xs);
   ${({ $priority }) => $priority === "primary" && primaryFill}
   ${({ $priority }) => $priority === "secondary" && secondaryFill}
+
+  /* A too short time, drawn as in the calendar: primary in solid error red with white text, secondary in light error
+     red with an error red outline and black text. */
+  &[data-invalid] {
+    background: ${({ $priority }) => ($priority === "secondary" ? "var(--color-error-light)" : "rgb(from var(--color-error) r g b / .7)")};
+    color: ${({ $priority }) => ($priority === "secondary" ? "var(--color-black)" : "var(--color-white)")};
+    ${({ $priority }) => $priority === "secondary" && "box-shadow: inset 0 0 0 1px var(--color-error);"}
+  }
 `;
 
 const RemoveButton = styled(Button)`
@@ -136,6 +144,8 @@ export function SuitableTimeRangeForm({
   const ranges = watch(fieldName) ?? [];
   const priority = watch(`applicationSections.${index}.priority`);
   const listed = listTimeRanges(ranges);
+  const minDuration = watch(`applicationSections.${index}.minDuration`);
+  const tooShort = findTooShortListed(listed, minDuration);
 
   const weekdayName = (day: Weekday) => t(`common:weekdayLongEnum.${day}`);
   const describe = (day: Weekday, begin: number, end: number) =>
@@ -222,10 +232,15 @@ export function SuitableTimeRangeForm({
         ) : (
           <TimeList aria-labelledby={`${id}-list-label`}>
             {listed.map(({ weekday: day, beginMinutes, endMinutes, data }, position) => (
-              <TimeListItem key={`${day}-${beginMinutes}`} $priority={priorityKey(data.priority)}>
+              <TimeListItem
+                key={`${day}-${beginMinutes}`}
+                $priority={priorityKey(data.priority)}
+                data-invalid={tooShort[position] ? "" : undefined}
+              >
                 <span>
                   {describe(day, beginMinutes, endMinutes)},{" "}
                   {t(`application:TimeSelector.legend.${priorityKey(data.priority)}`)}
+                  {tooShort[position] && ` - (${t("application:TimeSelector.form.tooShort")}!)`}
                 </span>
                 <RemoveButton
                   type="button"

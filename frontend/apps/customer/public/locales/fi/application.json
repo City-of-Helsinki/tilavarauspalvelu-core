@@ -76,6 +76,7 @@
       "erased": "Poistettu"
     },
     "form": {
+      "tooShort": "liian lyhyt",
       "legend": "Lisää aikoja lomakkeella",
       "priorityNote": "Uudet ajat saavat yllä valitun toiveen tyypin.",
       "day": "Päivä",

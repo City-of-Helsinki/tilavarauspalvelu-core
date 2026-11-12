@@ -76,6 +76,7 @@
       "erased": "Borttagen"
     },
     "form": {
+      "tooShort": "för kort",
       "legend": "Lägg till tider med ett formulär",
       "priorityNote": "Nya tider får den typ av önskemål som valts ovan.",
       "day": "Dag",

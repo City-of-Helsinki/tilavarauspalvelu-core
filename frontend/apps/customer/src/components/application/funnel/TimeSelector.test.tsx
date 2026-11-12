@@ -849,6 +849,23 @@ describe("TimeSelector with several reservation units", () => {
     expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.outsideReservable");
   });
 
+  test("a too short time is marked in the list too", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
+
+    const items = within(view.getByTestId("time-selector__form-0")).getAllByRole("listitem");
+    const item = (day: Weekday) =>
+      items.find((li) => li.textContent?.startsWith(`common:weekdayLongEnum.${day}`)) ?? null;
+    expect(item(Weekday.Tuesday)).toHaveTextContent(
+      "application:TimeSelector.legend.primary - (application:TimeSelector.form.tooShort)"
+    );
+    expect(item(Weekday.Tuesday)).toHaveAttribute("data-invalid");
+    // Wednesday's 8 h primary time is long enough.
+    expect(item(Weekday.Wednesday)).not.toHaveTextContent("application:TimeSelector.form.tooShort");
+    expect(item(Weekday.Wednesday)).not.toHaveAttribute("data-invalid");
+  });
+
   test("the legend explains closed and unavailable times apart", () => {
     const view = customRender({ reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
     const legend = view.getByTestId("weekly-pattern__legend");
