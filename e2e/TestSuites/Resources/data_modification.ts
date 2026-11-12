@@ -1,4 +1,4 @@
-/** A resource file with keywords. */
+/** Keywords that make and format the test's dates, times and texts. */
 import { step, log, expect } from "../../lib/runtime";
 import { PageObject } from "../page-object";
 import { python_keywords } from "../Resources/python_keywords";
@@ -155,7 +155,7 @@ export class DataModification extends PageObject {
     this.state.calendarTimeslot = full_slot;
   }
 
-  /** Advances the current date by 1–15 days and adjusts start/end hours by random offsets between 1 and 5. */
+  /** Returns a random date 1–15 days ahead, a start hour 1–5 hours before the current one, and the hour after it. */
   @step("data_modification.Get Modified Date And Time")
   async getModifiedDateAndTime(): Promise<[string, string, string]> {
     // Get the current date and time
@@ -193,9 +193,8 @@ export class DataModification extends PageObject {
   }
 
   /**
-   * Sets format "Pe 1.11.2024 klo 11:00–12:00"
-   * to "Alkamisaika: 1.11.2024 klo 11:00" and "Päättymisaika: 1.11.2024 klo 12:00"
-   * It adds "Alkamisaika:" and "Päättymisaika:"
+   * Saves the start and end of a time like "Pe 1.11.2024 klo 11:00–12:00" in state for the email checks:
+   * "Alkamisaika: 1.11.2024 klo 11:00" and "Päättymisaika: 1.11.2024 klo 12:00".
    */
   @step("data_modification.Formats Reservation Time To Start And End Time")
   async formatsReservationTimeToStartAndEndTime(time_of_the_reservation: string) {
@@ -231,11 +230,9 @@ export class DataModification extends PageObject {
   }
 
   /**
-   * Format the Finnish date and time into the desired format
-   * HH:MM WITH ":" "–" "Ti 5.12.2023 klo 11:30–12:30".
-   * this keyword uses hard coded formatting to assume that reservation duration is 60min
-   * Returns the time with the duration and without it, e.g. for 12:15 and 12.11.2026:
-   * ["To 12.11.2026 klo 12:15–13:15, 1 t", "To 12.11.2026 klo 12:15–13:15"]
+   * Formats a start time and a date, e.g. 12:15 and 12.11.2026, as the time with the duration and without it:
+   * ["To 12.11.2026 klo 12:15–13:15, 1 t", "To 12.11.2026 klo 12:15–13:15"]. The end is an hour after the start: the
+   * tests book 60 minutes.
    */
   @step("data_modification.Set Info Card Duration Time Info")
   // oxlint-disable-next-line eslint/require-await -- keywords are async, each call is a report step
@@ -279,9 +276,7 @@ export class DataModification extends PageObject {
     // Get the Finnish day name from the datetime object using the Python function
     const finnish_day = python_keywords.get_finnish_day(date_time);
 
-    // Format the Finnish date and time into the desired format
-    // HH:MM WITH ":" "–" "Ti 5.12.2023 klo 11:30–12:30"
-    // 1t comes from duration of the reservation that is set in this test to 1h / 60min
+    // Like "Ti 5.12.2023 klo 11:30–12:30, 1 t", and the same without the duration
     const finnish_date = `${day}.${month}.${year}`;
     formatted_date = `${finnish_day} ${finnish_date} klo ${hour}:${minute}–${end_hour}:${minute}, 1 t`;
     const formatted_date_minus_t = `${finnish_day} ${finnish_date} klo ${hour}:${minute}–${end_hour}:${minute}`;

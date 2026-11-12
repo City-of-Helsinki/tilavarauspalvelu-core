@@ -1,4 +1,4 @@
-/** A resource file with top navigation keywords. */
+/** The seasonal application's preview page: the terms, and sending the application. */
 import { retry } from "../../../lib/retry";
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";

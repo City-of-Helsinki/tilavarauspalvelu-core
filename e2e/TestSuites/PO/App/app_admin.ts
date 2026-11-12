@@ -128,7 +128,7 @@ export class AppAdmin extends PageObject {
   async adminEditsReservationTime() {
     await log("Reservation needs to be approved first in order to do this step", { level: "DEBUG" });
 
-    // This sets the variables for ${MODIFIED_HOUR_STARTTIME_SUBVENTED_RESERVATION}, ${MODIFIED_HOUR_ENDTIME_SUBVENTED_RESERVATION}, ${MODIFIED_DATE_SUBVENTED_RESERVATION}, ${MODIFIED_STARTTIME_SUBVENTED_RESERVATION}
+    // Saves the new date and times in state (modified…SubventedReservation)
     await this.pages.adminReservations.adminOpensCalendarAndChangesReservationTime();
     await this.pages.dataModification.setInfoCardDurationTimeInfo(
       this.state.modifiedStarttimeSubventedReservation,
@@ -143,7 +143,7 @@ export class AppAdmin extends PageObject {
     this.state.adminModifiesTimeOfInfoCard = admin_modified_formatted_date;
     this.state.adminModifiesTimeOfInfoCardMinusT = admin_modified_formatted_date_minus_t;
 
-    // This sets ${RESERVATION_TAGLINE} back to client side.
+    // Updates state.reservationTagline to the new time
     await this.pages.dataModification.formatsTaglineForAdminSide(
       this.state.adminModifiesTimeOfInfoCard,
       ALWAYS_PAID_UNIT_SUBVENTED_WITH_UNIT_LOCATION
@@ -210,9 +210,8 @@ export class AppAdmin extends PageObject {
   }
 
   /**
-   * Checks the top navigation's links. The ones that should show come first: they wait for the navigation, so the
-   * hidden ones are checked once it has rendered. A wrong link doesn't stop the checks, so the report lists every
-   * wrong link, and the test fails at the end.
+   * Checks the top navigation's links: first the shown ones, which wait for the navigation to render, then the hidden
+   * ones. The checks are soft, so the report lists every wrong link and the test fails at the end.
    */
   private async checkTopNavigation(shown: AdminLink[], hidden: AdminLink[]) {
     for (const link of shown) {
@@ -386,7 +385,7 @@ export class AppAdmin extends PageObject {
       { level: "DEBUG" }
     );
 
-    // Call the keyword and capture the returned values
+    // A new random date, and start and end hours
     const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
     this.state.unavailableReservationDate = date_plus_x_days;
@@ -399,14 +398,14 @@ export class AppAdmin extends PageObject {
       this.state.unavailableReservationHourEndtime,
       this.state.unavailableReservationDate
     );
-    await this.pages.adminReservations.adminFillsReservationDetailsBehalf(); // this keyword generates the info for checking calendar content
+    await this.pages.adminReservations.adminFillsReservationDetailsBehalf(); // also saves the calendar event's text
     await this.pages.adminReservations.adminClicksButtonInReservationPage(this.acceptReservationButton);
     await this.pages.adminReservations.adminVerifiesReservationModalIsClosed();
   }
 
   @step("app_admin.Admin Makes Reservation For Closed And Clicks Submit")
   async adminMakesReservationForClosedAndClicksSubmit() {
-    // Call the keyword and capture the returned values
+    // A new random date, and start and end hours
     const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
     this.state.unavailableReservationDate = date_plus_x_days;
@@ -425,7 +424,7 @@ export class AppAdmin extends PageObject {
 
   @step("app_admin.Admin Makes Reservation For Staff And Clicks Submit")
   async adminMakesReservationForStaffAndClicksSubmit() {
-    // Call the keyword and capture the returned values
+    // A new random date, and start and end hours
     const [date_plus_x_days, start_hour, end_hour] = await this.pages.dataModification.getModifiedDateAndTime();
 
     this.state.unavailableReservationDate = date_plus_x_days;
@@ -470,7 +469,7 @@ export class AppAdmin extends PageObject {
     await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(
       this.state.notificationActiveUntil
     );
-    // if the notification name exist already we cannot publish the notification
+    // A random name: a notification can't be published under a name that exists already
     let randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     this.state.notificationBannerMessageName = `${NOTIFICATION_BANNER_MESSAGE_NORMAL} ${randomvalue}`;
     await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(this.state.notificationBannerMessageName);
@@ -494,7 +493,7 @@ export class AppAdmin extends PageObject {
     await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(
       this.state.notificationActiveUntil
     );
-    // if the notification name exist already we cannot publish the notification
+    // A random name: a notification can't be published under a name that exists already
     let randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     this.state.notificationBannerMessageNameWarning = `${NOTIFICATION_BANNER_MESSAGE_WARNING} ${randomvalue}`;
     await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(
@@ -519,7 +518,7 @@ export class AppAdmin extends PageObject {
     await this.pages.adminNotificationsCreatePage.adminSelectsNotificationActiveUntil(
       this.state.notificationActiveUntil
     );
-    // if the notification name exist already we cannot publish the notification
+    // A random name: a notification can't be published under a name that exists already
     let randomvalue = await this.pages.dataModification.generateRandomLetterAndNumber();
     this.state.notificationBannerMessageNameError = `${NOTIFICATION_BANNER_MESSAGE_ERROR} ${randomvalue}`;
     await this.pages.adminNotificationsCreatePage.adminFillsNotificationName(

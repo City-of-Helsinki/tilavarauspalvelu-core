@@ -26,7 +26,7 @@ export class AppCommon extends PageObject {
   @step("app_common.User Opens Desktop Browser To Django Admin")
   async userOpensDesktopBrowserToDjangoAdmin() {
     // Default is chrome
-    // Set Up … And Open Url waits for the page to load
+    // setUpBrowserAndOpenUrl waits for the page to load
     await this.pages.devices.setUpBrowserAndOpenUrl(URL_DJANGO_ADMIN, DOWNLOAD_DIR);
     // Check Text  h1  Ylläpito
     // h1 on Ylläpito
@@ -98,8 +98,8 @@ export class AppCommon extends PageObject {
   /** Fails if a notification banner is shown. Use after the banners have loaded. */
   @step("app_common.Verify Notification Banner Message Is Not Visible")
   async verifyNotificationBannerMessageIsNotVisible() {
-    // Kept on purpose: the banners' query has returned, and when no banner should show there is nothing to wait
-    // for, so a banner that renders a moment late gets a second before the count.
+    // Kept on purpose: a count of 0 passes at once, but a banner can render a moment after the banners' query has
+    // returned, so it gets a second first
     await this.page.waitForTimeout(1000);
     await expect(
       this.page.getByTestId("BannerNotificationList__Notification"),
@@ -129,14 +129,14 @@ export class AppCommon extends PageObject {
   @step("app_common.Admin Opens Own Browser To Landing Page")
   async adminOpensOwnBrowserToLandingPage() {
     this.state.pageUserSide = this.page;
-    // The test's second Set Up … And Open Url opens a new context
+    // A second setUpBrowserAndOpenUrl in a test opens a new context
     await this.pages.devices.setUpBrowserAndOpenUrl(URL_ADMIN, DOWNLOAD_DIR);
     await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN);
   }
 
   @step("app_common.Admin Goes To Landing Page")
   async adminGoesToLandingPage() {
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await this.page.goto(URL_ADMIN);
     await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_NOT_LOGGED_IN);
   }
@@ -144,7 +144,7 @@ export class AppCommon extends PageObject {
   /** For a test that starts with a saved admin login, like the notification tests (notifications_login.setup.ts). */
   @step("app_common.Admin Goes To Landing Page Logged In")
   async adminGoesToLandingPageLoggedIn() {
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await this.page.goto(URL_ADMIN);
     await this.pages.adminLandingpage.checksTheAdminLandingPageH1(ADMIN_LANDING_PAGE_H1_TEXT_LOGGED_IN_WITH_USER_INFO);
   }
@@ -188,7 +188,7 @@ export class AppCommon extends PageObject {
   @step("app_common.Admin Opens Desktop Browser To Django Admin")
   async adminOpensDesktopBrowserToDjangoAdmin() {
     // Default is chrome
-    // Set Up … And Open Url waits for the page to load
+    // setUpBrowserAndOpenUrl waits for the page to load
     await this.pages.devices.setUpBrowserAndOpenUrl(URL_DJANGO_ADMIN, DOWNLOAD_DIR);
     // Check Text  h1  Ylläpito
     // h1 on Ylläpito
@@ -198,7 +198,7 @@ export class AppCommon extends PageObject {
   @step("app_common.Admin Navigates To Django Admin")
   async adminNavigatesToDjangoAdmin() {
     // Default is chrome
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await this.page.goto(URL_DJANGO_ADMIN);
 
     // END OF ADMIN TEST SET UP
@@ -222,7 +222,7 @@ export class AppCommon extends PageObject {
 
     // Open the user side page in a brand new tab
     const user_page: Page = await this.session.newPage();
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await user_page.goto(url);
     // Finish loading the user side first, switching back too early logged the admin out
     await this.reloadPageAndWaitForBannerNotifications();

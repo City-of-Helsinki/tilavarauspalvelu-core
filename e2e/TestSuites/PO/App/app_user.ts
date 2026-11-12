@@ -108,7 +108,7 @@ export class AppUser extends PageObject {
   // Singlebooking
   @step("app_user.User Uses Search To Find Right Unit")
   async userUsesSearchToFindRightUnit(nameoftheunit: string) {
-    // This checks if the search element is visible; if it isn’t, it clicks the "advanced search" toggle button to make it visible.
+    // Opens the advanced search if the search field is hidden
     await this.pages.singlebooking.clickAdvancedSearchIfSearchNotVisible();
     await this.pages.singlebooking.searchUnitsByName(nameoftheunit);
 
@@ -196,8 +196,8 @@ export class AppUser extends PageObject {
   }
 
   /**
-   * This keyword uses data_modification.Convert finnish short day to english and
-   * data_modification.Compute reservation timeslot to set variables
+   * Checks that the booked time shows as a reservation in the calendar. The weekday and the slot come from
+   * data_modification.Convert Finnish Short Day To English and Compute Reservation Time Slot.
    */
   @step("app_user.User Checks That Reservation Calendar Does Not Have Reserved Time Slot Available")
   async userChecksThatReservationCalendarDoesNotHaveReservedTimeSlotAvailable(booking: Booking) {
@@ -476,12 +476,12 @@ export class AppUser extends PageObject {
 
     await this.pages.reservationCalendar.selectDurationCalendar(QUICK_RESERVATION_DURATION);
 
-    // This sets ${CALENDAR_CONTROL_TIME_OF_FREE_SLOT}
+    // Sets state.calendarControlTimeOfFreeSlot
     await this.pages.reservationCalendar.clickAndStoreFreeReservationTime();
 
     const date_value_from_calendar = await this.pages.reservationCalendar.getCurrentDateFromDatepicker();
 
-    // Formats modified date from variables like 15.30 and 15.6.2024. formatting uses 1h duration
+    // Formats the new time and date, e.g. 11:45 and 12.11.2026, as a 1 h booking
     const [formatted_date, formatted_date_minus_t] = await this.pages.dataModification.setInfoCardDurationTimeInfo(
       this.state.calendarControlTimeOfFreeSlot,
       date_value_from_calendar
@@ -746,7 +746,7 @@ export class AppUser extends PageObject {
     await log(`Extracted End Time: ${this.state.endTimeFromIcs}`, { level: "DEBUG" });
 
     // Comparisons
-    // Additional info: Check custom_keywords.Convert booking time to ICS format if the times don't match
+    // If the times don't match, check custom_keywords.Convert Booking Time To ICS Format
     // Assert Start Times
     expect(this.state.startTimeFromIcs, "The calendar file has the booking's start time").toBe(
       this.state.formattedStartToIcs
@@ -834,9 +834,8 @@ export class AppUser extends PageObject {
   }
 
   /**
-   * This is a workaround to cancel the recurring reservation with given name in
-   * [data-testid="card__heading"]
-   * it cancels the last reservation in the list so they won't pile up
+   * Cancels the last sent application of the robot round (its card's heading is the round's name), so applications
+   * don't pile up.
    */
   @step("app_user.User Checks The Recurring Reservation Is Sent State And Cancels It")
   async userChecksTheRecurringReservationIsSentStateAndCancelsIt() {
@@ -882,10 +881,7 @@ export class AppUser extends PageObject {
     }
   }
 
-  /**
-   * Verifies that the recurring reservation with the given name is no longer found
-   * in the applications list. Fails if the reservation is still present.
-   */
+  /** Checks that the user has no applications left: the list shows its empty state. */
   @step("app_user.User Verifies The Recurring Reservation Is Cancelled")
   async userVerifiesTheRecurringReservationIsCancelled() {
     await this.pages.customKeywords.verifyCardNotFoundInGroupWithMatchingConditions(

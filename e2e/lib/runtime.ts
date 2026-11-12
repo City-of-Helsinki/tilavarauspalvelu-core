@@ -128,10 +128,9 @@ function callerLocation(): Location | undefined {
 }
 
 /**
- * Runs `body` as a report step. Outside a test (e.g. while listing tests) it just runs the body.
- * Secrets are hidden in the error the step fails with, so they don't reach the report.
- * The step is boxed: a failure is reported at the spec line that called the keyword, and the failing step inside
- * still shows in the report's step tree. Each step's location is the line that called it.
+ * Runs `body` as a boxed report step at the line that called it; outside a test (e.g. while listing tests) it just runs
+ * the body. A failure is reported at the spec line that called the keyword, the failing step inside still shows in the
+ * step tree, and secrets are hidden in the error.
  */
 export async function runStep<T>(title: string, body: () => T | Promise<T>): Promise<T> {
   if (currentTestInfo == null) {

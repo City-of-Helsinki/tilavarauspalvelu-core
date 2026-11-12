@@ -1,13 +1,11 @@
-/**
- * Fails the run when a test was skipped at runtime: a skipped test checked nothing.
- */
+/** Fails the run when a test was skipped at runtime: a skipped test checked nothing. */
 import type { FullResult, Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 
 class SkipsFailRunReporter implements Reporter {
   private readonly skipped = new Map<string, TestCase>();
 
   onTestEnd(test: TestCase, result: TestResult): void {
-    // A test filtered out with --grep never ends, so only runtime skips (test.skip(), Skip) count
+    // A test filtered out with --grep never ends, so only runtime skips (test.skip()) count
     if (result.status === "skipped") {
       this.skipped.set(test.id, test);
     } else {

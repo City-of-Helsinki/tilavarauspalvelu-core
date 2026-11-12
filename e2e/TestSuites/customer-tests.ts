@@ -1,9 +1,8 @@
 /**
- * The customer tests, written once for the desktop, Android and iPhone projects. Each project has a small spec file of
- * its own that calls `customerTests` with its own title, so the report lists the tests of each device in a group of
- * its own. playwright.config.ts chooses the tests of a project by their tags: the desktop project runs all but the
- * `@phone-only` tests, and the phone projects run the `@also-on-phones` and `@phone-only` ones. The device picks the
- * user of a `@user-data-set-N` tag and the copies of the units (TestSuites/test-data.ts).
+ * The customer tests, written once for the desktop, Android and iPhone projects. Each project's small spec file calls
+ * `customerTests` with its own title, so the report groups the tests by device. playwright.config.ts picks a project's
+ * tests by tag: the desktop runs all but `@phone-only`, the phones run `@also-on-phones` and `@phone-only`. The
+ * project's platform picks the user of a `@user-data-set-N` tag and the unit copies (TestSuites/test-data.ts).
  */
 import type { Booking } from "./booking";
 import { test } from "./fixtures";

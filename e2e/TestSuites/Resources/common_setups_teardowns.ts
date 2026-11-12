@@ -1,6 +1,6 @@
 /**
- * Unified setup and teardown keywords for all test suites
- * Simple approach: One setup does everything, one teardown cleans everything
+ * Setup and teardown keywords: logging the test data that the tags chose, and closing what the test opened. The
+ * fixtures do both for every test (TestSuites/fixtures.ts).
  */
 import { test } from "@playwright/test";
 import { step, log } from "../../lib/runtime";
@@ -11,16 +11,10 @@ export class CommonSetupsTeardowns extends PageObject {
   // TAG-BASED UNIFIED TEST SETUP
   // =============================================================================
   /**
-   * Tag-based test setup
-   * Automatically initializes test data and suite units based on test tags.
-   * REQUIRED TAGS on each test:
-   * - Data set tag: user-data-set-0, admin-test-data-set-2, etc.
-   * - Suite type tag: admin-suite or combined-suite. A customer test has none: its project's platform picks the units.
-   * EXAMPLE:
-   * Test Case
-   * [Tags]
-   * user-data-set-0
-   * smoke
+   * Logs the test data that the test's tags chose: a data set tag (user-data-set-0, admin-test-data-set-2, …) picks
+   * the users, and admin-suite or combined-suite the units of an admin or combined test. A customer test's units come
+   * from its project's platform.
+   * EXAMPLE: { tag: ["@user-data-set-0", "@smoke"] }
    */
   @step("common_setups_teardowns.Complete Test Setup From Tags")
   async completeTestSetupFromTags() {
@@ -44,10 +38,9 @@ export class CommonSetupsTeardowns extends PageObject {
   /** Complete teardown with session cleanup */
   @step("common_setups_teardowns.Complete Test Teardown")
   async completeTestTeardown() {
-    // Playwright takes full-page screenshots of the open pages when the test fails (the screenshot option in
-    // playwright.config.ts)
-    // Cleanup process (the testData fixture releases the data set). Closes the contexts and browsers the test opened
-    // itself; Playwright closes its own. An error is ignored.
+    // Playwright takes full-page screenshots of open pages when a test fails (screenshot in playwright.config.ts)
+    // This closes the contexts and browsers the test opened itself and ignores errors. Playwright closes its own, and
+    // the testData fixture releases the data set.
     try {
       await this.pages.session?.close();
     } catch {

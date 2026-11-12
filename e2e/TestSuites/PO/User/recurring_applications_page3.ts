@@ -1,4 +1,4 @@
-/** A resource file with top navigation keywords. */
+/** Page 3 of the seasonal application: who it is for, their contact info and additional information. */
 import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 

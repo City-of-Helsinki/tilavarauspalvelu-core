@@ -1,9 +1,7 @@
 /**
- * The test users of the parallel runs, one set for each test that needs its own users. A test's data set tag chooses
- * its set (TestSuites/test-data.ts), and only one test at a time uses a set. The tests use the shared users of
- * serial_users.ts instead:
- * - in sequential mode (FORCE_SINGLE_USER=True or one worker)
- * - in tests without a data set tag, like the notification tests
+ * The test users of the parallel runs. A test's data set tag picks its set (TestSuites/test-data.ts), and one test at a
+ * time uses a set. In sequential mode (FORCE_SINGLE_USER=True or one worker, like the notification suite's run) and in
+ * tests without a data set tag, the tests use the shared users of serial_users.ts instead.
  */
 import { ROBOT_EMAIL } from "./variables";
 
@@ -387,12 +385,11 @@ export const ADMIN_DATA_SETS: Record<string, AdminDataSet> = {
       password: "Virtanen",
     },
   },
-  // TEST: "Admin checks permissions" (Tests_admin_desktop_FI.robot)
+  // TEST: "Admin checks permissions" (Tests_admin_desktop_FI.spec.ts)
   // DESCRIPTION: Django admin modifies admin user's permissions to notification manager role
-  // Permission target admin - the admin whose permissions are being modified
-  // Django admin who performs the permission changes
-  // NOTE: Password is read from DJANGO_ADMIN_PASSWORD environment variable
   "admin-test-data-set-2": {
+    // Django admin who performs the permission changes
+    // NOTE: Password is read from DJANGO_ADMIN_PASSWORD environment variable
     djangoAdmin: {
       // Old email: qfaksi+kari@gmail.com
       email: ROBOT_EMAIL,
@@ -402,6 +399,7 @@ export const ADMIN_DATA_SETS: Record<string, AdminDataSet> = {
       fullName: "Kari Kekkonen",
       djangoUsername: "u-synoynteknhu5f4oky5komlxz4",
     },
+    // Permission target admin - the admin whose permissions are being modified
     permissionTarget: {
       email: "qfaksi+marika@gmail.com",
       hetu: "140785-932R",
@@ -411,13 +409,11 @@ export const ADMIN_DATA_SETS: Record<string, AdminDataSet> = {
       djangoUsername: "u-ftm3qi35knfdxoysmn24qpz3ce",
     },
   },
-  // TEST: "Admin checks unit permissions" (Tests_admin_desktop_FI.robot)
+  // TEST: "Admin checks unit permissions" (Tests_admin_desktop_FI.spec.ts)
   // DESCRIPTION: Django admin modifies admin user's unit permissions
-  // Permission target admin - the admin whose permissions are being modified
-  // NOTE: This user must have unit permissions set by default (set in data setup phase)
-  // Django admin who performs the permission changes
-  // NOTE: Password is read from DJANGO_ADMIN_PASSWORD environment variable
   "admin-test-data-set-3": {
+    // Django admin who performs the permission changes
+    // NOTE: Password is read from DJANGO_ADMIN_PASSWORD environment variable
     djangoAdmin: {
       // Old email: qfaksi+ari@gmail.com
       email: ROBOT_EMAIL,
@@ -427,6 +423,8 @@ export const ADMIN_DATA_SETS: Record<string, AdminDataSet> = {
       fullName: "Ari Laine",
       djangoUsername: "u-6gyudis5vrex7eoyoofsyg7e7m",
     },
+    // Permission target admin - the admin whose permissions are being modified
+    // NOTE: This user must have unit permissions set by default (set in data setup phase)
     permissionTarget: {
       email: "qfaksi+niko@gmail.com",
       hetu: "150785-907H",
@@ -436,13 +434,11 @@ export const ADMIN_DATA_SETS: Record<string, AdminDataSet> = {
       djangoUsername: "u-hzt64qcjsbb2lnmk7li7tqc4ve",
     },
   },
-  // TEST: "Admin checks unit group permissions" (Tests_admin_desktop_FI.robot)
+  // TEST: "Admin checks group unit permissions" (Tests_admin_desktop_FI.spec.ts)
   // DESCRIPTION: Django admin modifies admin user's unit group permissions
-  // Permission target admin - the admin whose permissions are being modified
-  // NOTE: This user must have unit permissions set by default (set in data setup phase)
-  // Django admin who performs the permission changes
-  // NOTE: Password is read from DJANGO_ADMIN_PASSWORD environment variable
   "admin-test-data-set-4": {
+    // Django admin who performs the permission changes
+    // NOTE: Password is read from DJANGO_ADMIN_PASSWORD environment variable
     djangoAdmin: {
       // Old email: qfaksi+nieminen@gmail.com
       email: ROBOT_EMAIL,
@@ -452,6 +448,8 @@ export const ADMIN_DATA_SETS: Record<string, AdminDataSet> = {
       fullName: "Timo Nieminen",
       djangoUsername: "u-ztjwmkfnabdghga73muxgh7bua",
     },
+    // Permission target admin - the admin whose permissions are being modified
+    // NOTE: This user must have unit permissions set by default (set in data setup phase)
     permissionTarget: {
       email: "qfaksi+mikko@gmail.com",
       hetu: "200685-907K",

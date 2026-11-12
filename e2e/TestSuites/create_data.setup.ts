@@ -1,6 +1,6 @@
 /**
- * Robot's `Suite Setup    Run Only Once    create_data.Create Robot Test Data`: the suites depend on this
- * project, so the test data is created once per run before any of them start.
+ * Creates the test data once per run. The suites' projects, all but the notification suite's, depend on this one, so
+ * it runs before them.
  */
 import { testWithoutBrowser as test } from "../lib/runtime";
 import { Pages } from "./pages";

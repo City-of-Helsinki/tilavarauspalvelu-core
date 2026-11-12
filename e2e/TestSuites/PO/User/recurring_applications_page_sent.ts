@@ -1,4 +1,4 @@
-/** A resource file with top navigation keywords. */
+/** The page that shows after the seasonal application is sent. */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { TEXT_CHECK_TIMEOUT } from "../../Resources/variables";

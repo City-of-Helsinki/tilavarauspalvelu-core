@@ -94,10 +94,7 @@ export class GraphqlCommands extends PageObject {
     return fetch(`${URL_TEST}graphql/`, { method: "POST", body, headers });
   }
 
-  /**
-   * Retrieves all banner notifications regardless of state
-   * Returns all notifications (DRAFT, ACTIVE, SCHEDULED, etc.)
-   */
+  /** Gets all banner notifications, in any state (draft, active, scheduled, …). */
   @step("graphql_commands.Get All Banner Notifications")
   async getAllBannerNotifications() {
     // The backend answers at most 100 notifications at a time, so the pages are read until the last one
@@ -118,10 +115,7 @@ export class GraphqlCommands extends PageObject {
     return edges;
   }
 
-  /**
-   * Retrieves banner notifications filtered by state
-   * Queries all notifications and filters them here
-   */
+  /** Gets the banner notifications in the given states: all are fetched and filtered here. */
   @step("graphql_commands.Get Filtered Banner Notifications")
   async getFilteredBannerNotifications(...states: BannerNotificationState[]) {
     const all_notifications = (await this.getAllBannerNotifications())
@@ -132,10 +126,7 @@ export class GraphqlCommands extends PageObject {
     return all_notifications.filter((node) => states.includes(node.state));
   }
 
-  /**
-   * Sets ALL banner notifications to DRAFT state
-   * Requires user to be logged in as admin
-   */
+  /** Sets all banner notifications to draft. Needs an admin login. */
   @step("graphql_commands.Draft All Banner Notifications")
   async draftAllBannerNotifications() {
     await log("Drafting all banner notifications...", { console: true });
@@ -171,10 +162,8 @@ export class GraphqlCommands extends PageObject {
   }
 
   /**
-   * Deletes all banner notifications that contain the specified pattern in their name or message
-   * Checks name, messageFi, messageEn, and messageSv fields
-   * Includes both DRAFT and ACTIVE notifications in the deletion
-   * Requires user to be logged in as admin
+   * Deletes the draft and active notifications whose name or message (fi, en, sv) contains the pattern, in any case.
+   * Needs an admin login.
    */
   @step("graphql_commands.Delete Notifications By Name Pattern")
   async deleteNotificationsByNamePattern(name_pattern: string) {

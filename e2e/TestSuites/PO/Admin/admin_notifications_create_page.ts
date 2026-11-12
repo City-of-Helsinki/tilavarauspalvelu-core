@@ -10,9 +10,8 @@ import {
 /** The admin's form for a banner notification: creating, editing and deleting it. */
 export class AdminNotificationsCreatePage extends PageObject {
   /**
-   * Picks an option of the form's HDS Select by the select's label. The select's button is a combobox whose name
-   * starts with the label, and the options are `option`s named by their text. The button shows the picked option;
-   * the list can stay open.
+   * Picks an option of the form's HDS Select. Its button is a combobox whose name starts with the select's label, and
+   * the options are named by their text. The button then shows the picked option; the list can stay open.
    */
   private async selectOption(label: string, option: string) {
     const select = this.page.getByRole("combobox", { name: label });

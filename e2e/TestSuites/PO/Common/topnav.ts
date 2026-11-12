@@ -30,9 +30,8 @@ async function clickAndWaitForLogout(page: Page, logout_button: Locator): Promis
 const MOBILE_MENU_BUTTON = '[aria-controls="hds-mobile-menu"]';
 
 /**
- * Closes the HDS mobile menu after a link in it has opened a page. The app opens the page without a reload, so the
- * menu stays open, and while it is open HDS swallows the next click outside it to close the menu. Escape closes the
- * menu only if it is open.
+ * Closes the HDS mobile menu after one of its links has opened a page. The page opens without a reload, so the menu
+ * stays open, and an open menu swallows the next click outside it. Escape closes the menu only if it is open.
  */
 async function closeMobileMenu(page: Page): Promise<void> {
   await page.keyboard.press("Escape");

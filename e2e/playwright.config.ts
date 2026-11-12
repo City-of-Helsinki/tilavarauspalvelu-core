@@ -1,19 +1,18 @@
 /**
  * Playwright config for the Varaamo e2e suite.
  *
- * One project per suite, with the same name, and the suite's file is `<name>.spec.ts`. The three customer projects run
- * the same tests, which `customer-tests.ts` defines, from a small spec file each, so the report lists the tests of
- * each device in a group of its own. The desktop project runs all of them except the `@phone-only` ones, and the
- * phone projects run those with the `@also-on-phones` or `@phone-only` tag. The suites depend on the `create_data`
- * project, which creates the test data once per run. The notification suite has no data setup: it depends on
+ * One project per suite, with the same name; the suite's file is `<name>.spec.ts`. The three customer projects run the
+ * tests of `customer-tests.ts`, each from a small spec file, so the report groups the tests by device: the desktop runs
+ * all but the `@phone-only` ones, the phones those tagged `@also-on-phones` or `@phone-only`. The suites depend on the
+ * `create_data` project, which creates the test data once per run. The notification suite depends instead on
  * `notifications_login`, which logs its admin in once, and runs separately with one worker:
  *   playwright test --grep-invert @serialonly                                     # parallel run
  *   playwright test --project Tests_admin_notifications_serial --workers 1        # serial run
  * Sequential mode with shared users:
  *   FORCE_SINGLE_USER=True playwright test --workers 1
  *
- * Each project's browser and device are in its `use` options: the "Set Up … And Open Url" keywords of `devices`
- * open the test's page, which Playwright makes from them.
+ * Each project's browser and device are in its `use` options, from which Playwright makes the page that
+ * devices.setUpBrowserAndOpenUrl opens.
  */
 import { defineConfig, devices } from "@playwright/test";
 import type { PlaywrightTestOptions, PlaywrightWorkerOptions } from "@playwright/test";
@@ -107,9 +106,8 @@ export default defineConfig({
     {
       name: "create_data",
       testMatch: "create_data.setup.ts",
-      // 10 minutes (Playwright counts in milliseconds), and only an upper limit: the data setup polls until the new
-      // data has been saved (at most 5 minutes) and then until the site answers normally (at most 2 minutes), and
-      // goes on as soon as each is ready. The other 3 minutes leave room for requests still running when a wait ends.
+      // 10 minutes, an upper limit only: the data setup waits at most 5 minutes for the new data and 2 for the site,
+      // going on as soon as each is ready. The rest leaves room for requests still running when a wait ends.
       timeout: 10 * 60_000,
       retries: 0,
     },

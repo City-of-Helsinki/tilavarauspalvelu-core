@@ -1,4 +1,4 @@
-/** A resource file with top navigation keywords. */
+/** The seasonal booking's first steps: picking the application round and its units. */
 import { expect, step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { TEXT_CHECK_TIMEOUT } from "../../Resources/variables";

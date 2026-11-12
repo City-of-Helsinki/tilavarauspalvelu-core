@@ -1,4 +1,4 @@
-/** A resource file with top navigation keywords. */
+/** Page 1 of the seasonal application: the name, people, age group, purpose, period, lengths and times per week. */
 import { step } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 

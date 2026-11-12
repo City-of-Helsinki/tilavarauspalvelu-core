@@ -1,10 +1,9 @@
 /**
- * Records what went wrong between the browser and the test environment while a test runs, as "backend error"
- * annotations of the test attempt: 5xx responses, scripts that didn't load (a 4xx too), failed requests, requests
- * that took 10 s or more, GraphQL errors, the apps' error pages ("503: Palaamme pian!" is served with status 200), and
- * uncaught errors in the pages. When a test fails, also the requests still unanswered and the open pages that show an
- * error page (the customer app can render one in the browser) or nothing at all (a page whose scripts didn't load or
- * run). A flaky test's report then shows whether the backend failed, and when.
+ * Records what went wrong between the browser and the test environment as "backend error" annotations of the test
+ * attempt: 5xx responses, scripts that didn't load (a 4xx too), failed or slow (10 s+) requests, GraphQL errors, the
+ * apps' error pages ("503: Palaamme pian!" comes with status 200) and uncaught page errors. When a test fails, also the
+ * requests still unanswered and the open pages that show an error page or nothing at all. A flaky test's report then
+ * shows whether the backend failed, and when.
  *
  * Only page loads, scripts and API calls (document, script, fetch, xhr) to the test environment's services are
  * watched: the pages also call production and city APIs (the service map, Linked Events) and Sentry, which the browser
@@ -197,9 +196,9 @@ export class BackendErrors {
   }
 
   /**
-   * Records the open pages that show one of the apps' error pages or no text at all, if the test has failed. The
-   * customer app can render its error page in the browser, without an error response, and a page whose scripts didn't
-   * load or run stays blank. Called before contexts close.
+   * Records the open pages that show one of the apps' error pages or no text at all, if the test has failed: the
+   * customer app can render its error page without an error response, and a page whose scripts didn't run stays blank.
+   * Called before contexts close.
    */
   async noteErrorPages(): Promise<void> {
     if (this.info.status === this.info.expectedStatus) {
@@ -265,9 +264,9 @@ export class BackendErrors {
   }
 
   /**
-   * A frame's new document ends the requests that its old document sent, and the browser doesn't always report them as
-   * failed, so they would look unanswered (Playwright's own network idle wait forgets them too). They are forgotten
-   * when the new document's response comes, and the ones that had already waited `pendingMs` are kept for the report.
+   * Forgets the requests of a frame's old document when its new document's response comes. The browser doesn't always
+   * report them as failed, so they would look unanswered (Playwright's network idle wait forgets them too). The ones
+   * that had waited `pendingMs` are kept for the report.
    */
   private forgetReplacedRequests(response: Response): void {
     const navigation = response.request();

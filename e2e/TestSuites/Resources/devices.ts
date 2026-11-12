@@ -30,14 +30,13 @@ export class Devices extends PageObject {
   @step("devices.Set Up Browser And Open Url")
   // oxlint-disable-next-line eslint/no-unused-vars -- downloads are saved into the test's results folder
   async setUpBrowserAndOpenUrl(input_URL: string, DOWNLOAD_DIR: string) {
-    // The browser, context and page come from the project's `use` options in playwright.config.ts (the browser and
-    // device, locale, time zone), so traces, screenshots, video and --headed/--ui work. Playwright starts one
-    // browser per worker; the staggered start of each slot's first test is the staggeredStart fixture
-    // (TestSuites/fixtures.ts). A second call in a test opens a new context.
+    // The browser, context and page come from the project's `use` options in playwright.config.ts (browser, device,
+    // locale, time zone), so traces, screenshots, video and --headed/--ui work. A second call in a test opens a new
+    // context. Each slot's first test starts later than the one before (the staggeredStart fixture in fixtures.ts).
     const context_config: BrowserContextOptions = {};
     await this.applyGlobalHeaderToContextConfig(context_config);
     await this.session.openPage({ contextOptions: context_config });
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await this.page.goto(input_URL);
 
     await this.logCurrentTime();
@@ -49,15 +48,14 @@ export class Devices extends PageObject {
   // oxlint-disable-next-line eslint/no-unused-vars -- downloads are saved into the test's results folder
   async setUpFirefoxDesktopBrowserAndOpenUrl(input_URL: string, DOWNLOAD_DIR: string) {
     // DEVNOTE: This is used for permission tests
-    // A Firefox context with the project's `use` options in playwright.config.ts, see Set Up Browser And Open Url.
-    // Firefox is closed when the test ends.
+    // A Firefox context with the project's `use` options, see setUpBrowserAndOpenUrl. The test's end closes Firefox.
     const context_config: BrowserContextOptions = {};
     await this.applyGlobalHeaderToContextConfig(context_config);
     await this.session.openPage({
       browserName: BROWSER_FOR_MAIL,
       contextOptions: context_config,
     });
-    // Go To waits for the page to load
+    // goto waits for the page to load
     await this.page.goto(input_URL);
     await log("✅ Page loaded successfully", { level: "DEBUG" });
 
