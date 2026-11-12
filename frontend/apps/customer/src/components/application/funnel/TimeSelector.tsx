@@ -22,7 +22,7 @@ import {
   toPattern,
 } from "ui/src/modules/suitableTimes";
 import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
-import { Flex, fontBold } from "ui/src/styled";
+import { Flex } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
 import { TimePreview } from "@/components/application/funnel/TimePreview";
@@ -160,63 +160,75 @@ const RadioGroup = styled.fieldset`
   border: none;
   padding: 0;
   margin: 0;
-  gap: 80px;
-  @media (max-width: ${breakpoints.s}) {
+  gap: var(--spacing-l);
+  legend {
+    width: 100%;
+    margin-bottom: var(--spacing-xs);
+  }
+  @media (max-width: ${breakpoints.m}) {
     flex-direction: column;
-    gap: 16px;
+    gap: var(--spacing-m);
   }
 `;
 
 const PriorityRadioButton = styled(RadioButton)`
   position: relative;
-  width: 50%;
-  && {
-    margin-top: 0;
-  }
-  &:before {
-    box-sizing: border-box;
-    position: absolute;
-    top: -3px;
-    left: 35px;
-    display: block;
-    content: "";
-    width: 30px;
-    height: 30px;
-    background-color: var(--color-bus);
-    color: var(--color-white);
+  text-align: center;
+  color: var(--color-white);
+  && label {
+    opacity: 0.5;
+    background-color: var(--color-engel);
+    border: 1px solid var(--color-black);
+    margin-left: 40px;
+    padding: var(--spacing-2-xs) var(--spacing-m);
   }
   &:after {
     ${arrow};
+    opacity: 0.5;
     left: 45px;
     right: auto;
-    top: 0;
-    border-bottom: 10px solid var(--color-white);
+    top: 3px;
+    border-top: 10px solid var(--color-black);
   }
-  &:not(:first-of-type) {
-    margin-top: 0;
-  } /* override hds-react default margin-top */
-  &:last-of-type {
-    &:before {
-      background-color: var(--color-engel);
-      border: 1px solid var(--color-black);
+  &:first-of-type {
+    label {
+      background-color: var(--color-bus);
+      color: var(--color-white);
+      border: none;
     }
     &:after {
-      border-bottom: none;
-      border-top: 10px solid var(--color-black);
+      border-top: none;
+      border-bottom: 10px solid var(--color-white);
     }
   }
-  :checked + label {
-    ${fontBold};
+  &:last-of-type {
+    margin-top: 0; /* override hds-react default margin-top */
   }
-  label {
-    margin-left: 40px;
+  &:has(:checked) {
+    &:after {
+      opacity: 1;
+    }
   }
-
-  && input + label::before,
-  && input + label::after,
-  && input:focus + label::before,
-  && input:focus + label::after {
-    left: -40px; /* override hds-react default left */
+  :checked {
+    :after {
+      opacity: 1;
+    }
+    + label {
+      box-shadow: var(--color-focus-outline) 0 0 3px 3px;
+      opacity: 1;
+    }
+  }
+  &&& input {
+    top: 50%;
+    transform: translateY(-50%);
+    + label::before,
+    + label::after,
+    &:focus + label::before,
+    &:focus + label::after {
+      top: 50%;
+      transform: translateY(-50%);
+      left: -40px; /* override hds-react default left */
+    }
   }
 `;
 
@@ -232,7 +244,7 @@ function PrioritySelector({
   }));
   return (
     <RadioGroup>
-      <legend style={{ marginBottom: "var(--spacing-2-xs)" }}>{t("application:Page2.prioritySelectLabel")}</legend>
+      <legend>{t("application:Page2.prioritySelectLabel")}</legend>
       {priorityOptions.map((opt) => (
         <PriorityRadioButton
           id={`applicationSections.${index}.priority.${opt.value}`}
