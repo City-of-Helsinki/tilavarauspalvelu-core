@@ -123,12 +123,24 @@ def test_check_pricing_migration_conflicts__lists_all_conflicts():
 def test_check_pricing_migration_conflicts__material_with_existing_sales_item_of_other_tax_level():
     general = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     reduced = TaxLevelFactory.create(rates__percentage=Decimal("13.5"))
-    accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350080")
-    reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
-    create_pricing(reservation_unit=reservation_unit, tax_level=general, begins=local_date())
+    accounting = PaymentAccountingFactory.create(
+        name="Tili",
+        product_invoicing_material="10000116",
+        main_ledger_account="350080",
+    )
+    reservation_unit = ReservationUnitFactory.create(name="Sali", payment_accounting=accounting)
+    pricing = create_pricing(reservation_unit=reservation_unit, tax_level=general, begins=local_date())
     SalesItemFactory.create(material="10000116", main_ledger_account="350080", tax_level=reduced)
 
-    with pytest.raises(CommandError, match="Material 10000116 has more than one tax level or main ledger account"):
+    msg = (
+        "The pricing migrations would stop:\n"
+        "- Material 10000116 has more than one tax level or main ledger account: "
+        f"tax level {general.pk} with main ledger account 350080, "
+        f"tax level {reduced.pk} with main ledger account 350080. Used by:\n"
+        f"    Reservation unit {reservation_unit.pk} 'Sali', pricing {pricing.pk}, "
+        f"payment accounting {accounting.pk} 'Tili'"
+    )
+    with pytest.raises(CommandError, match=exact(msg)):
         run_command()
 
 
