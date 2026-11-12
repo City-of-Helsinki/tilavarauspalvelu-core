@@ -189,7 +189,7 @@ def terms_of_use_pdf(request: WSGIRequest) -> FileResponse | JsonResponse:
 @require_GET
 @csrf_exempt  # NOSONAR
 def liveness_check(request: WSGIRequest) -> JsonResponse:
-    return JsonResponse({"status": "RUNNING"}, status=200)
+    return JsonResponse({"status": "RUNNING", "version": settings.APP_VERSION}, status=200)
 
 
 @require_GET
@@ -200,9 +200,12 @@ def readiness_check(request: WSGIRequest) -> JsonResponse:
         apps.check_apps_ready()
         apps.check_models_ready()
     except Exception as error:  # noqa: BLE001
-        return JsonResponse({"status": "NOT_READY", "error": str(error)}, status=503)
+        return JsonResponse(
+            {"status": "NOT_READY", "version": settings.APP_VERSION, "error": str(error)},
+            status=503,
+        )
 
-    return JsonResponse({"status": "READY"}, status=200)
+    return JsonResponse({"status": "READY", "version": settings.APP_VERSION}, status=200)
 
 
 @require_GET
