@@ -314,6 +314,18 @@ test.describe("Runtime", () => {
     // So does a tag that looks like a data set tag but isn't one, like one of the earlier platform tags
     expect(() => resolveTestData(["desktop-test-data-set-0"], parallel)).toThrow("is not a data set tag");
     expect(() => resolveTestData(["mobile-iphone-data-set-1"], { sequential: true })).toThrow("is not a data set tag");
+    // The same goes for a tag with a letter or no number at the end, and for a typo
+    for (const tag of ["user-data-set-X", "user-data-set-", "user-data-set-1a", "user-dat-set-1"]) {
+      expect(() => resolveTestData([tag], parallel), tag).toThrow("is not a data set tag");
+    }
+    expect(() => resolveTestData(["user-data-set-X"], { sequential: true })).toThrow("is not a data set tag");
+    // A customer test has no suite tag, so one would give it the units of an admin or combined test
+    expect(() =>
+      resolveTestData(["user-data-set-1", "combined-suite"], { sequential: false, platform: "iphone" })
+    ).toThrow("is not used in a customer test");
+    expect(() => resolveTestData(["user-data-set-1", "admin-suite"], { sequential: true })).toThrow(
+      "is not used in a customer test"
+    );
     // A combined set has no Django admin for a permission test
     expect(() => resolveTestData(["combined-test-data-set-0", "general-permissions-test"], parallel)).toThrow(
       "The data set combined-test-data-set-0 has no Django admin"

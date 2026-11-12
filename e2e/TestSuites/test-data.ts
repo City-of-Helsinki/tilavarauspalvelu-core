@@ -1,14 +1,13 @@
 /**
- * The test data that each test's tags choose, which the `testData` fixture (TestSuites/fixtures.ts) gives to the
- * test and its page objects (`this.testData`):
+ * The test data that each test's tags choose. The `testData` fixture (TestSuites/fixtures.ts) gives it to the test and
+ * its page objects (`this.testData`):
  *
- * - A data set tag picks the test's users from `Resources/test_users.ts`: `@user-data-set-N` for a customer test (the
- *   project's platform picks the user of the set), `@admin-test-data-set-N` and `@combined-test-data-set-N`. Only one
- *   test at a time uses a data set.
- * - A suite tag (`@admin-suite`, `@combined-suite`) picks the test's units from `Resources/suite_specific_units`. A
- *   customer test has none: the project's platform picks its units (`desktop-suite`, `android-suite`, `iphone-suite`),
- *   and a test that names one of these suites fails.
- * - In sequential mode (FORCE_SINGLE_USER=True or one worker), and in tests without a data set tag, the tests use the
+ * - A data set tag picks the users from `Resources/test_users.ts`: `@user-data-set-N` (the project's platform picks
+ *   the set's user), `@admin-test-data-set-N` or `@combined-test-data-set-N`. One test at a time uses a data set.
+ * - A suite tag (`@admin-suite`, `@combined-suite`) picks the units from `Resources/suite_specific_units`. A customer
+ *   test has none: its platform picks the units (`desktop-suite`, `android-suite`, `iphone-suite`). A customer test
+ *   that names a suite fails, and so does any test that names one of the platform suites.
+ * - In sequential mode (FORCE_SINGLE_USER=True or one worker) and in tests without a data set tag, the tests use the
  *   shared users of `Resources/serial_users`.
  */
 import {
@@ -22,6 +21,9 @@ import { ADMIN_DATA_SETS, COMBINED_DATA_SETS, PLATFORMS, USER_DATA_SETS } from "
 import type { Admin, DjangoUser, Person, Platform, User } from "./Resources/test_users";
 
 const DATA_SET_TAG = /^(user-data|admin-test-data|combined-test-data)-set-\d+$/;
+
+/** A tag that looks like a data set tag, valid or not: a letter for the number, a typo or an old name */
+const LOOKS_LIKE_DATA_SET_TAG = /data-set|-set-/;
 
 /**
  * The platform of a project, its `metadata.platform` in playwright.config.ts: `desktop` when it has none. The platform
@@ -183,7 +185,7 @@ function dataSetOf<T>(sets: Record<string, T>, tag: string): T {
 export function resolveTestData(tags: string[], options: { sequential: boolean; platform?: Platform }): TestData {
   const platform = options.platform ?? "desktop";
   // A tag that looks like a data set tag but isn't one would leave the test with the shared users without a word
-  const stale = tags.find((tag) => /-set-\d+$/.test(tag) && !DATA_SET_TAG.test(tag));
+  const stale = tags.find((tag) => LOOKS_LIKE_DATA_SET_TAG.test(tag) && !DATA_SET_TAG.test(tag));
   if (stale != null) {
     throw new Error(
       `The tag ${stale} is not a data set tag: use user-data-set-N, admin-test-data-set-N or combined-test-data-set-N`
@@ -195,11 +197,17 @@ export function resolveTestData(tags: string[], options: { sequential: boolean; 
     throw new Error(`The tag ${platformSuite} is not used: the project's platform picks the units of a customer test`);
   }
   const tagged = tags.find((tag) => DATA_SET_TAG.test(tag)) ?? null;
+  const customer = tagged?.startsWith("user-data") ?? false;
   const combined = tagged?.startsWith("combined-test-data") ?? false;
   const admin = (tagged?.startsWith("admin-test-data") ?? false) || combined;
   const user = !admin || combined;
   const permissionTest = tags.find((tag) => tag.endsWith("permissions-test")) ?? null;
-  const suite = SUITE_TAGS.find((name) => tags.includes(name)) ?? PLATFORM_SUITE[platform];
+  const suiteTag = SUITE_TAGS.find((name) => tags.includes(name));
+  // A suite tag would give a customer test the units of an admin or combined test
+  if (customer && suiteTag != null) {
+    throw new Error(`The tag ${suiteTag} is not used in a customer test: its project's platform picks the units`);
+  }
+  const suite = suiteTag ?? PLATFORM_SUITE[platform];
 
   // The kinds of users a test doesn't have are empty
   const data: TestData = {
@@ -214,7 +222,7 @@ export function resolveTestData(tags: string[], options: { sequential: boolean; 
 
   const dataSet = options.sequential ? null : tagged;
   if (dataSet != null) {
-    if (dataSet.startsWith("user-data")) {
+    if (customer) {
       const customerSet = dataSetOf(USER_DATA_SETS, dataSet);
       data.dataSet = `${platform}-${dataSet}`;
       data.user = { ...required(customerSet[platform], dataSet, `user for ${platform}`) };
