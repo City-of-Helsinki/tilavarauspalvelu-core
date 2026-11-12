@@ -85,6 +85,7 @@ Give the issue first, then one or more options. Each run changes only the parts 
 | `--summary <text>`          | no     | Replace the summary (the title). One line.             |
 | `--description-file <path>` | no     | Replace the description with the contents of the file. |
 | `--comment-file <path>`     | no     | Add a comment with the contents of the file.           |
+| `--parent <key>`            | no     | Move the issue under this parent, usually an epic.     |
 | `--add-label <label>`       | yes    | Add a label. The other labels stay.                    |
 | `--remove-label <label>`    | yes    | Remove a label. The other labels stay.                 |
 | `--blocks <key>`            | yes    | Add a link: this issue blocks `<key>`.                 |
@@ -95,7 +96,7 @@ Give the issue first, then one or more options. Each run changes only the parts 
 | `--transition <status>`     | no     | Move the issue to this status, for example `Done`.     |
 | `--dry-run`                 | no     | Print the write requests. Change nothing in Jira.      |
 
-The script skips a label, link or assignee that is already as requested and prints a "Skipped" line for it.
+The script skips a parent, label, link or assignee that is already as requested and prints a "Skipped" line for it.
 To keep parts of the old description, fetch the issue with `jira-issue` first and edit its text.
 
 `--assignee` takes `me` for the owner of the API token, `none` to remove the assignee,

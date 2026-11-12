@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Update the summary, description, labels, links, assignee or status of a Jira issue, or add a comment, through the Jira Cloud REST API.
+# Update the summary, description, parent, labels, links, assignee or status of a Jira issue, or add a comment, through the Jira Cloud REST API.
 # Usage: jira-update <key or URL> <options>, e.g. jira-update TILA-123 --add-label backend
 set -euo pipefail
 
@@ -12,6 +12,7 @@ Give at least one change. Options marked with * can be repeated.
   --summary <text>            Replace the summary (the title). One line.
   --description-file <path>   Replace the description with the file contents (Jira wiki markup).
   --comment-file <path>       Add a comment with the file contents (Jira wiki markup).
+  --parent <key>              Move the issue under this parent, usually an epic.
   --add-label <label>       * Add a label: backend, frontend, operations, infra or design.
   --remove-label <label>    * Remove a label.
   --blocks <key>            * Add a link: this issue blocks <key>.
@@ -32,6 +33,7 @@ shift
 new_summary=""
 description_file=""
 comment_file=""
+parent=""
 add_labels=()
 remove_labels=()
 blocks=()
@@ -82,6 +84,11 @@ while [[ $# -gt 0 ]]; do
       [[ -z "$comment_file" ]] || { echo "Give --comment-file only once." >&2; usage; }
       check_text_file "$value" comment
       comment_file="$value"
+      ;;
+    --parent)
+      [[ -z "$parent" ]] || { echo "Give --parent only once." >&2; usage; }
+      parent="$(parse_key "$value")"
+      [[ "$parent" != "$key" ]] || { echo "Cannot make $key its own parent." >&2; exit 2; }
       ;;
     --assignee)
       [[ -z "$assignee" ]] || { echo "Give --assignee only once." >&2; usage; }
@@ -136,7 +143,7 @@ for other in ${remove_links[@]+"${remove_links[@]}"}; do
     || { echo "Link to $other is both added and removed." >&2; exit 2; }
 done
 
-if [[ -z "$new_summary" && -z "$description_file" && -z "$comment_file" && -z "$assignee" && -z "$transition" ]] \
+if [[ -z "$new_summary" && -z "$description_file" && -z "$comment_file" && -z "$parent" && -z "$assignee" && -z "$transition" ]] \
   && (( ${#add_labels[@]} + ${#remove_labels[@]} + ${#blocks[@]} + ${#blocked_by[@]} + ${#relates[@]} + ${#remove_links[@]} == 0 )); then
   echo "Nothing to change." >&2
   usage
@@ -144,8 +151,8 @@ fi
 
 load_credentials
 
-# The current summary, labels and links decide what to skip and which link IDs to remove.
-issue="$(api "rest/api/2/issue/$key?fields=summary,labels,issuelinks,assignee,status")"
+# The current summary, parent, labels and links decide what to skip and which link IDs to remove.
+issue="$(api "rest/api/2/issue/$key?fields=summary,parent,labels,issuelinks,assignee,status")"
 
 # Each request is "<method><sep><path><sep><body><sep><summary>".
 # The separator is not whitespace, so `read` keeps an empty body as an empty field.
@@ -153,11 +160,20 @@ sep=$'\x1f'
 requests=()
 skipped=()
 
-# Summary, description and labels go in one edit request. The REST API v2 stores the description as wiki markup.
+# Summary, description, parent and labels go in one edit request. The REST API v2 stores the description as wiki markup.
 edit_summary=()
 if [[ -n "$new_summary" ]] && [[ "$(jq --raw-output '.fields.summary' <<<"$issue")" == "$new_summary" ]]; then
   skipped+=("The summary of $key is already as requested.")
   new_summary=""
+fi
+if [[ -n "$parent" ]]; then
+  old_parent="$(jq --raw-output '.fields.parent.key // ""' <<<"$issue")"
+  if [[ "$old_parent" == "$parent" ]]; then
+    skipped+=("The parent of $key is already $parent.")
+    parent=""
+  else
+    edit_summary+=("Changed the parent from ${old_parent:-none} to $parent.")
+  fi
 fi
 labels_to_add=()
 labels_to_remove=()
@@ -184,6 +200,7 @@ if (( ${#edit_summary[@]} > 0 )); then
   body="$(
     jq --null-input --compact-output \
       --arg summary "$new_summary" \
+      --arg parent "$parent" \
       --arg has_description "$([[ -n "$description_file" ]] && echo true || echo false)" \
       --rawfile description "${description_file:-/dev/null}" \
       --argjson add "$(jq --null-input --compact-output '$ARGS.positional' --args ${labels_to_add[@]+"${labels_to_add[@]}"})" \
@@ -191,6 +208,7 @@ if (( ${#edit_summary[@]} > 0 )); then
       '{}
       | if $summary != "" then .fields.summary = $summary else . end
       | if $has_description == "true" then .fields.description = $description else . end
+      | if $parent != "" then .fields.parent = {key: $parent} else . end
       | ([$add[] | {add: .}] + [$remove[] | {remove: .}]) as $ops
       | if ($ops | length) > 0 then .update.labels = $ops else . end'
   )"
