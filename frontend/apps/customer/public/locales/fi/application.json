@@ -64,6 +64,7 @@
     "calendarLabel": "Valitse aikatoiveet kalenterista",
     "legend": {
       "unavailable": "Ei varattavissa missään hakemukselle valituista tiloista",
+      "invalid": "Liian lyhyt aikatoive",
       "closed": "Ei varattavissa tässä tilassa",
       "primary": "Ensisijainen toive",
       "secondary": "Vaihtoehtoinen toive",
@@ -89,7 +90,9 @@
         "endAfterStart": "Päättymisajan täytyy olla alkamisajan jälkeen.",
         "outsideReservable": "Aika ei ole varattavissa missään hakemukselle valitussa tilassa."
       }
-    }
+    },
+    "tooShort": "Aikatoive ({{duration}}) on lyhyempi kuin varauksen vähimmäiskesto ({{minDuration}}). Pidennä aikatoivetta tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
+    "tooShortNextToPrimary": "Viereinen ensisijainen toive ({{duration}}) on lyhyempi kuin varauksen vähimmäiskesto ({{minDuration}}). Pidennä ensisijaista toivetta."
   },
   "Page2": {
     "subHeading": "Valitse hakemuksen aikatoiveet",

@@ -5,7 +5,7 @@
 // (or test tool) derives them from a table that has been given the grid role.
 // oxlint-disable jsx-a11y/no-noninteractive-element-to-interactive-role, jsx-a11y/no-redundant-roles, jsx-a11y/no-interactive-element-to-noninteractive-role
 
-import React, { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import type { ForwardedRef, ReactElement, Ref } from "react";
 import { useTranslation } from "next-i18next/pages";
 import type { TFunction } from "i18next";
@@ -13,6 +13,7 @@ import { WEEKDAYS_SORTED } from "@ui/modules/const";
 import { formatTimeRange, minutesToHoursString } from "@ui/modules/date-utils";
 import type { Weekday } from "../../../gql/gql-types";
 import { HiddenText, LiveRegion, SkipLink } from "../CalendarGrid/styles";
+import { RunErrorTooltip } from "./RunErrorTooltip";
 import { WeeklyPatternRoot, WeeklyPatternScroller, WeeklyPatternStickyHeader } from "./styles";
 import type {
   CalendarData,
@@ -27,6 +28,23 @@ const NOOP = () => {};
 const NO_ANNOUNCEMENTS = { painted: "", erased: "" };
 
 const pad = (value: number) => value.toString().padStart(2, "0");
+
+// How long the tooltip stays after the pointer leaves the grid, so the pointer can move onto it (WCAG 1.4.13).
+const TOOLTIP_HIDE_DELAY_MS = 200;
+
+type CellPosition = { weekday: Weekday; index: number };
+
+function cellFromTarget(target: EventTarget | null): CellPosition | null {
+  const cell = target instanceof Element ? target.closest<HTMLElement>("td[data-weekday]") : null;
+  return cell ? { weekday: cell.dataset.weekday as Weekday, index: Number(cell.dataset.index) } : null;
+}
+
+const runCellSelector = (weekday: Weekday, beginMinutes: number) =>
+  `td[data-weekday="${weekday}"][data-begin-minutes="${beginMinutes}"]`;
+
+// Keeps the previous object when the cell is the same, so React skips the re-render.
+const keepIfSame = (next: CellPosition | null) => (previous: CellPosition | null) =>
+  previous?.weekday === next?.weekday && previous?.index === next?.index ? previous : next;
 
 /** 24 hour clock text. The end of the day reads as 24:00. */
 function formatClock(minutes: number): string {
@@ -69,6 +87,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     getStateLabel,
     getCellAppearance,
     getCellProps,
+    getRunError,
     alternative,
     className,
     style,
@@ -114,6 +133,44 @@ function WeeklyPatternTable<TData extends CalendarData>(
     </colgroup>
   );
 
+  // The time being painted isn't validated until the paint ends, so a run on its way to a valid length isn't flagged
+  // at its first cell. Every other run, also on the same day, keeps its error.
+  const runErrorOf = (cell: WeeklyPatternCellInfo<TData>) =>
+    cell.selected && !grid.isPaintPending(cell.weekday, cell.beginMinutes / step)
+      ? (getRunError?.(cell, grid.dayRuns(cell.weekday)) ?? null)
+      : null;
+
+  // The run error tooltip follows the hovered cell, or else the cell focused from the keyboard. Only the cell position is
+  // kept in state, and the run is looked up again on render, so the tooltip follows the run as it is painted longer or
+  // shorter.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState<CellPosition | null>(null);
+  const [focused, setFocused] = useState<CellPosition | null>(null);
+  // A click focuses the cell too (the grid keeps one cell focusable). That focus must not open the tooltip, or it would
+  // show once the pointer leaves the calendar. Only keyboard use does, like :focus-visible, which jsdom can't tell.
+  const isPointerFocus = useRef(false);
+  const [dismissedRun, setDismissedRun] = useState<string | null>(null);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const cancelHide = useCallback(() => clearTimeout(hideTimer.current), []);
+  const hideHover = useCallback(() => {
+    clearTimeout(hideTimer.current);
+    setHovered(null);
+  }, []);
+  useEffect(() => () => clearTimeout(hideTimer.current), []);
+
+  const activeCell = hovered ?? focused;
+  const activeInfo = activeCell ? grid.cellInfo(activeCell.weekday, activeCell.index) : null;
+  const activeError = activeInfo ? runErrorOf(activeInfo) : null;
+  const activeRun = activeInfo && activeError ? `${activeInfo.weekday}:${activeInfo.runBeginMinutes}` : null;
+  const dismissTooltip = useCallback(() => setDismissedRun(activeRun), [activeRun]);
+  // Escape hides the tooltip of that run only. Another run, or coming back later, shows it again.
+  // Reset while rendering when the run changes (React's "adjusting state on a prop change" pattern), not in an effect.
+  const [previousActiveRun, setPreviousActiveRun] = useState(activeRun);
+  if (activeRun !== previousActiveRun) {
+    setPreviousActiveRun(activeRun);
+    setDismissedRun(null);
+  }
+
   // A closed cell can still be painted when `paintable` reaches it. An unavailable cell never can.
   const isDisabledCell = (availability: CellAvailability) =>
     availability === "unavailable" || (availability === "closed" && !paintable);
@@ -123,14 +180,26 @@ function WeeklyPatternTable<TData extends CalendarData>(
     const [begin, end] = cell.isRunStart
       ? [cell.runBeginMinutes, cell.runEndMinutes]
       : [cell.beginMinutes, cell.endMinutes];
-    return `${longNames[cell.weekday]}, ${formatRange(begin, end)}, ${getStateLabel(cell)}`;
+    const label = `${longNames[cell.weekday]}, ${formatRange(begin, end)}, ${getStateLabel(cell)}`;
+    const error = runErrorOf(cell);
+    return error ? `${label}, ${error}` : label;
   };
 
   // A run's first cell shows where it starts, its last where it ends, the rest a connector.
   // A run of two cells or fewer shows the whole range once, on its last cell.
-  const getCellContent = (cell: WeeklyPatternCellInfo<TData>): string | null => {
+  const getCellContent = (cell: WeeklyPatternCellInfo<TData>): React.ReactNode => {
     if (!cell.selected) {
       return minutesToHoursString(cell.beginMinutes, true);
+    }
+    // The visible label of a run. A real element rather than generated content, so the end time can be styled on its
+    // own (e.g. red when the run is too short). Hidden from assistive technology: the cell's aria-label says it all.
+    if (cell.isRunStart && cell.data && getCellAppearance?.(cell.data)) {
+      return (
+        <span data-run-time aria-hidden>
+          {minutesToHoursString(cell.runBeginMinutes, true)}–
+          <span data-run-end-time>{minutesToHoursString(cell.runEndMinutes, true)}</span>
+        </span>
+      );
     }
     if (cell.runEndMinutes - cell.runBeginMinutes <= 2 * step) {
       return cell.isRunEnd ? formatTimeRange(cell.runBeginMinutes, cell.runEndMinutes) : null;
@@ -144,7 +213,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
   return (
     <>
       <SkipLink href={`#${alternative.id}`}>{alternative.label}</SkipLink>
-      <WeeklyPatternRoot className={className} style={style}>
+      <WeeklyPatternRoot ref={rootRef} className={className} style={style}>
         {/* A visual copy of the weekday header that stays at the top of the page. See WeeklyPatternStickyHeader. */}
         <WeeklyPatternStickyHeader ref={stickyHeaderRef} aria-hidden="true" data-testid="weekly-pattern__sticky-header">
           <table role="presentation">
@@ -165,6 +234,37 @@ function WeeklyPatternTable<TData extends CalendarData>(
           <table
             {...tableAttributes}
             {...grid.tableHandlers}
+            onPointerOver={(event) => {
+              cancelHide();
+              // Touch has no hover, and a held button means a paint gesture, which the tooltip would only cover.
+              const isHover = event.pointerType !== "touch" && event.buttons === 0;
+              setHovered(keepIfSame(isHover ? cellFromTarget(event.target) : null));
+            }}
+            onPointerLeave={() => {
+              cancelHide();
+              hideTimer.current = setTimeout(() => setHovered(null), TOOLTIP_HIDE_DELAY_MS);
+            }}
+            // Capture, so these run before the cells' own handlers (which may move focus) and leave theirs in place.
+            onPointerDownCapture={() => {
+              isPointerFocus.current = true;
+              setFocused(null);
+            }}
+            onKeyDownCapture={(event) => {
+              isPointerFocus.current = false;
+              // Escape dismisses the tooltip, and must not bring up the focused cell's in place of the hovered one's.
+              if (event.key !== "Escape") {
+                setFocused(keepIfSame(cellFromTarget(event.target)));
+              }
+            }}
+            onFocus={(event) => setFocused(isPointerFocus.current ? null : keepIfSame(cellFromTarget(event.target)))}
+            onBlur={(event) => {
+              grid.tableHandlers.onBlur(event);
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                setFocused(null);
+                // Coming back, e.g. with Tab, is keyboard focus again.
+                isPointerFocus.current = false;
+              }
+            }}
             role="grid"
             aria-multiselectable="true"
             aria-readonly={readOnly || undefined}
@@ -223,6 +323,9 @@ function WeeklyPatternTable<TData extends CalendarData>(
                         data-runtime-end={minutesToHoursString(cell.runEndMinutes, true)}
                         data-run-start={cell.isRunStart ? "" : undefined}
                         data-run-end={cell.isRunEnd ? "" : undefined}
+                        data-block-start={cell.isBlockStart ? "" : undefined}
+                        data-block-end={cell.isBlockEnd ? "" : undefined}
+                        data-invalid={runErrorOf(cell) ? "" : undefined}
                       >
                         {getCellContent(cell)}
                       </td>
@@ -236,6 +339,17 @@ function WeeklyPatternTable<TData extends CalendarData>(
         <LiveRegion role="status" aria-live="polite" aria-atomic="true">
           {grid.liveMessage}
         </LiveRegion>
+        {activeInfo && activeError && activeRun !== dismissedRun && (
+          <RunErrorTooltip
+            root={rootRef}
+            startSelector={runCellSelector(activeInfo.weekday, activeInfo.runBeginMinutes)}
+            endSelector={runCellSelector(activeInfo.weekday, activeInfo.runEndMinutes - step)}
+            text={activeError}
+            onDismiss={dismissTooltip}
+            onPointerEnter={cancelHide}
+            onPointerLeave={hideHover}
+          />
+        )}
       </WeeklyPatternRoot>
     </>
   );

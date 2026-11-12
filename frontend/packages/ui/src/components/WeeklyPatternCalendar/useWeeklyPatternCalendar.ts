@@ -8,7 +8,9 @@ import { useGridNavigation } from "../CalendarGrid/useGridNavigation";
 import type { GridAddress } from "../CalendarGrid/useGridNavigation";
 import {
   assertValidStep,
+  cellExtent,
   changedRuns,
+  dayToSpans,
   groupAvailability,
   gridToPattern,
   isEditableFor,
@@ -52,6 +54,8 @@ export type WeeklyPatternOptions<TData extends CalendarData> = Pick<
 
 // A pointer drag: the cell it started on, the cell the pointer is over now, and whether it paints or erases.
 type Gesture<TData> = { weekday: Weekday; anchor: number; current: number; mode: PaintMode<TData> };
+// The cells a paint in progress covers on one weekday, as inclusive indexes.
+type PaintRange = { weekday: Weekday; first: number; last: number };
 // A Shift+Arrow keyboard sweep on one weekday. The mode and the grid before the sweep are fixed when it starts.
 type Sweep<TData> = { weekday: Weekday; anchor: number; mode: PaintMode<TData>; origin: CellGrid<TData> };
 
@@ -108,6 +112,12 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   const [message, setMessage] = useState({ text: "", count: 0 });
   const gestureRef = useRef<Gesture<TData> | null>(null);
   const sweepRef = useRef<Sweep<TData> | null>(null);
+  // The ref drives the sweep. This state only re-renders, so the cells it covers can be shown as still being painted.
+  const [sweepRange, setSweepRange] = useState<PaintRange | null>(null);
+  const endSweep = () => {
+    sweepRef.current = null;
+    setSweepRange(null);
+  };
   const pointerTypeRef = useRef("mouse");
 
   // Live-region text. Alternating a trailing no-break space makes a repeated message announce again.
@@ -301,6 +311,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       sweepRef.current = running;
     }
     commit(weekday, from, to, running.mode, running);
+    setSweepRange({ weekday, first: Math.min(running.anchor, to), last: Math.max(running.anchor, to) });
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTableCellElement>, weekday: Weekday, index: number) => {
@@ -310,7 +321,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
 
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault();
-      sweepRef.current = null;
+      endSweep();
       toggleCell(weekday, index);
       return;
     }
@@ -324,7 +335,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     if (event.shiftKey && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
       sweep(weekday, index, target.index);
     } else {
-      sweepRef.current = null;
+      endSweep();
     }
     navigation.focusCell(target);
   };
@@ -360,28 +371,11 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     const isRunStart = data !== undefined && (previous === undefined || !isDataEqual(previous, data));
     const isRunEnd = data !== undefined && (next === undefined || !isDataEqual(next, data));
 
-    let runBeginMinutes = index * step;
-    let runEndMinutes = (index + 1) * step;
-    if (data !== undefined) {
-      let start = index;
-      while (start > 0) {
-        const before = dayCells?.[start - 1];
-        if (before === undefined || !isDataEqual(before, data)) {
-          break;
-        }
-        start -= 1;
-      }
-      let end = index;
-      while (dayCells && end + 1 < dayCells.length) {
-        const after = dayCells[end + 1];
-        if (after === undefined || !isDataEqual(after, data)) {
-          break;
-        }
-        end += 1;
-      }
-      runBeginMinutes = start * step;
-      runEndMinutes = (end + 1) * step;
-    }
+    // A run is the touching cells with equal data.
+    const run =
+      data === undefined
+        ? { first: index, last: index }
+        : cellExtent(dayCells ?? [], index, (cell) => cell !== undefined && isDataEqual(cell, data));
 
     return {
       weekday,
@@ -391,10 +385,24 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       selected: data !== undefined,
       isRunStart,
       isRunEnd,
-      runBeginMinutes,
-      runEndMinutes,
+      isBlockStart: data !== undefined && previous === undefined,
+      isBlockEnd: data !== undefined && next === undefined,
+      runBeginMinutes: run.first * step,
+      runEndMinutes: (run.last + 1) * step,
       availability: cellAvailability(weekday, index),
     };
+  };
+
+  // The runs painted on a day, in order, from the grid being shown (so a gesture in progress is included).
+  // Built once per day per render, because every cell of a run may ask for its day.
+  const dayRunsCache = new Map<Weekday, WeeklyPatternValue<TData>>();
+  const dayRuns = (weekday: Weekday): WeeklyPatternValue<TData> => {
+    let runs = dayRunsCache.get(weekday);
+    if (!runs) {
+      runs = dayToSpans(grid[weekday] ?? [], weekday, step, isDataEqual);
+      dayRunsCache.set(weekday, runs);
+    }
+    return runs;
   };
 
   const cellBehaviour = (weekday: Weekday, index: number) => ({
@@ -424,17 +432,49 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       if (event.currentTarget.contains(event.relatedTarget)) {
         return;
       }
-      sweepRef.current = null;
+      endSweep();
       onBlur?.();
     },
     onKeyUp: (event: KeyboardEvent<HTMLTableElement>) => {
       if (event.key === "Shift") {
-        sweepRef.current = null;
+        endSweep();
       }
     },
   };
 
   const liveMessage = message.count % 2 === 0 ? message.text : `${message.text} `;
 
-  return { days, rows, cellInfo, cellBehaviour, tableHandlers, focus: navigation.focus, liveMessage };
+  // The cells a paint action still in progress covers: a pointer drag (a click is a short one) until the button is
+  // released, or a Shift+Arrow sweep until Shift is.
+  const pendingRange: PaintRange | null = gesture
+    ? {
+        weekday: gesture.weekday,
+        first: Math.min(gesture.anchor, gesture.current),
+        last: Math.max(gesture.anchor, gesture.current),
+      }
+    : sweepRange;
+
+  // Whether a cell belongs to the time being painted: its block (the painted cells around it, of any data) overlaps
+  // or touches the paint in progress. Validation waits for the paint to end there, so a run isn't shown as invalid on
+  // its way to a valid length. Every other run, also on the same day, is validated as usual.
+  const isPaintPending = (weekday: Weekday, index: number): boolean => {
+    const cells = grid[weekday];
+    if (!pendingRange || pendingRange.weekday !== weekday || !cells || cells[index] === undefined) {
+      return false;
+    }
+    const block = cellExtent(cells, index, (cell) => cell !== undefined);
+    return block.first <= pendingRange.last + 1 && block.last >= pendingRange.first - 1;
+  };
+
+  return {
+    days,
+    rows,
+    cellInfo,
+    dayRuns,
+    isPaintPending,
+    cellBehaviour,
+    tableHandlers,
+    focus: navigation.focus,
+    liveMessage,
+  };
 }

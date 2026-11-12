@@ -5,7 +5,12 @@ import { fontBold } from "@ui/styled";
 import { gridTableStyles } from "../CalendarGrid/styles";
 import type { CellAppearance } from "./types";
 
-export type LegendState = CellAppearance | "open" | "closed" | "unavailable";
+/**
+ * `invalid` are runs that getRunError rejects, drawn as in the calendar: primary in 75% opaque error red
+ * with a white arrow, secondary in 30% opaque error red with an error red outline and a black arrow. Both are shown
+ * with a split legend swatch, so the user can see that the run is invalid but still distinguish its priority by shape.
+ */
+export type LegendState = CellAppearance | "open" | "closed" | "unavailable" | "invalid";
 export type LegendItem = { state: LegendState; label: string; current?: boolean };
 
 export const arrow = css`
@@ -80,14 +85,22 @@ const eventBackground = (appearance: CellAppearance) => css`
 
   &[data-run-start] {
     z-index: 2;
-    &::before {
+
+    /* The run's time label, laid over the box ::before draws, in the same place the box's own text used to be. */
+    & > [data-run-time] {
+      position: absolute;
+      z-index: 2;
+      inset: 0 var(--event-gap) auto;
       padding-top: 2px;
-      content: attr(data-runtime-start) "–" attr(data-runtime-end);
-      border-top-left-radius: var(--event-border-radius);
-      border-top-right-radius: var(--event-border-radius);
+      padding-inline: 4px;
+      ${appearance === "secondary" && "border-inline: 1px solid transparent"};
+      font-size: var(--fontsize-body-s);
+      text-align: right;
+      color: ${appearance === "primary" ? "var(--color-white)" : "var(--color-black)"};
+      pointer-events: none;
     }
     &[data-run-end] {
-      &::before {
+      & > [data-run-time] {
         padding-top: 0;
         margin-top: -1px /* Make the time text fit inside the box */;
       }
@@ -97,12 +110,24 @@ const eventBackground = (appearance: CellAppearance) => css`
     }
   }
 
-  &[data-run-end] {
-    &::before {
-      bottom: 0;
-      border-bottom-left-radius: var(--event-border-radius);
-      border-bottom-right-radius: var(--event-border-radius);
-    }
+  /*
+    Only the ends of a block are rounded. Where runs of different data touch, they join square and without a gap, so
+    the time reads as one: the earlier run's box keeps reaching over the cell border (the -2px above), and the later
+    run's box covers its own top border, which its z-index would otherwise draw over the earlier box.
+  */
+  &[data-block-start]::before {
+    border-top-left-radius: var(--event-border-radius);
+    border-top-right-radius: var(--event-border-radius);
+  }
+
+  &[data-run-start]:not([data-block-start])::before {
+    top: -1px;
+  }
+
+  &[data-block-end]::before {
+    bottom: 0;
+    border-bottom-left-radius: var(--event-border-radius);
+    border-bottom-right-radius: var(--event-border-radius);
   }
 `;
 
@@ -186,15 +211,16 @@ export const WeeklyPatternRoot = styled.div`
       ${eventBackground("secondary")};
       border-inline: 1px solid var(--border-color);
 
-      &[data-run-start]::before {
+      /* The outline closes only at the block's ends. Next to a primary run, the change of colour shows the seam. */
+      &[data-block-start]::before {
         box-shadow: inset 0 1px 0 var(--color-black-50);
       }
 
-      &[data-run-end]::before {
+      &[data-block-end]::before {
         box-shadow: inset 0 -1px 0 var(--color-black-50);
       }
 
-      &[data-run-start][data-run-end]::before {
+      &[data-block-start][data-block-end]::before {
         box-shadow:
           inset 0 1px 0 var(--color-black-50),
           inset 0 -1px 0 var(--color-black-50);
@@ -243,6 +269,59 @@ export const WeeklyPatternRoot = styled.div`
     &[data-appearance="secondary"][data-run-start] {
       ${secondaryIndicator};
     }
+
+    /*
+      A run that getRunError rejects (data-invalid), e.g. one shorter than a minimum duration.
+      It is drawn in error red with white text (about 7:1), whatever its priority. The priority arrow stays, so the run
+      still shows its priority by shape, but turns white like the text.
+      The selectors repeat [data-appearance] and [data-run-start] to outweigh the appearance, closed and arrow rules.
+    */
+    &[data-invalid][data-appearance]::before {
+      background-color: rgb(from var(--color-error) r g b / 0.7);
+      border-color: var(--color-error);
+      box-shadow: none;
+    }
+    &[data-invalid][data-appearance][data-run-start] {
+      /* The arrow is a border triangle: primary draws the bottom border, secondary the top. Only the drawn one shows. */
+      &::after {
+        border-top-color: var(--color-white);
+        border-bottom-color: var(--color-white);
+      }
+      & > [data-run-time] {
+        color: var(--color-white);
+      }
+    }
+
+    /*
+      An invalid secondary run is drawn light, so it differs from an invalid primary one by colour too: a light error
+      fill with black text and arrow, outlined in error red where a valid secondary run has its dark outline (the sides,
+      and the top and bottom at the block's ends). Placed after the rules above, so it wins at equal specificity.
+    */
+    &[data-invalid][data-appearance="secondary"] {
+      &::before {
+        background-color: rgb(from var(--color-error) r g b / 0.3);
+        border-color: var(--color-error);
+      }
+      &[data-block-start]::before {
+        box-shadow: inset 0 1px 0 var(--color-error);
+      }
+      &[data-block-end]::before {
+        box-shadow: inset 0 -1px 0 var(--color-error);
+      }
+      &[data-block-start][data-block-end]::before {
+        box-shadow:
+          inset 0 1px 0 var(--color-error),
+          inset 0 -1px 0 var(--color-error);
+      }
+      &[data-run-start] {
+        &::after {
+          border-top-color: var(--color-black);
+        }
+        & > [data-run-time] {
+          color: var(--color-black);
+        }
+      }
+    }
   }
 
   [data-readonly] td,
@@ -289,6 +368,22 @@ export const WeeklyPatternScroller = styled.div`
   }
 `;
 
+/* Placed by RunErrorTooltip with a transform, so it starts at the window's top-left corner. */
+export const WeeklyPatternTooltip = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--tilavaraus-stack-popup-menu);
+  max-width: min(260px, calc(100vw - 12px));
+  padding: var(--spacing-2-xs) var(--spacing-xs);
+  border-radius: 4px;
+  background: var(--color-black-90);
+  color: var(--color-white);
+  font-size: var(--fontsize-body-s);
+  line-height: var(--lineheight-m);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+`;
+
 /* The legend has to wrap. Long labels on one line set the page's minimum width, which zooms out the page on phones. */
 const LegendList = styled.ul`
   display: flex;
@@ -315,6 +410,9 @@ const LegendBox = styled.div<{ $state: LegendState }>`
   width: 30px;
   height: 30px;
   border: 1px solid var(--color-black-50);
+
+  --primary-error: rgb(from var(--color-error) r g b / 0.7);
+  --secondary-error: rgb(from var(--color-error) r g b / 0.3);
   background-color: ${({ $state }) =>
     $state === "unavailable"
       ? "var(--color-black-30)"
@@ -323,6 +421,35 @@ const LegendBox = styled.div<{ $state: LegendState }>`
         : "var(--color-white)"};
   ${({ $state }) => ($state === "primary" ? primaryFragment : $state === "secondary" ? secondaryFragment : "")}
   ${({ $state }) => $state === "closed" && `background-color: var(--color-black-10); background-image: ${unavailableBackgroundSVG}; background-size: auto 10px; background-repeat: repeat;`}
+  ${({ $state }) =>
+    $state === "invalid" &&
+    `background: linear-gradient(to right, rgb(from var(--color-error) r g b / .7) 0 50%, rgb(from var(--color-error) r g b / .3) 50% 100%);
+    &:before {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      left: 1px;
+      top: 3px;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 8px solid var(--color-white);
+    }
+    &:after {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      left: auto;
+      right: 1px;
+      top: 3px;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 8px solid var(--color-black);
+      border-top: none;
+    }`}
   [aria-current="true"] > & {
     box-shadow: 0 0 0 2px var(--color-focus-outline);
   }

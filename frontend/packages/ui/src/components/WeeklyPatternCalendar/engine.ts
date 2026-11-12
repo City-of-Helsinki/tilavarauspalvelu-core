@@ -134,30 +134,36 @@ export function patternToGrid<TData extends CalendarData>(
   return grid;
 }
 
+// One day of gridToPattern: consecutive cells with equal data collapse into one span, in order.
+export function dayToSpans<TData extends CalendarData>(
+  cells: DayCells<TData>,
+  weekday: Weekday,
+  step: number,
+  isDataEqual: (a: TData, b: TData) => boolean
+): Array<WeeklyPatternSpan<TData>> {
+  const spans: Array<WeeklyPatternSpan<TData>> = [];
+  let run: { start: number; data: TData } | null = null;
+
+  for (let index = 0; index <= cells.length; index++) {
+    const data = cells[index];
+    if (run && data !== undefined && isDataEqual(run.data, data)) {
+      continue;
+    }
+    if (run) {
+      spans.push({ weekday, beginMinutes: run.start * step, endMinutes: index * step, data: run.data });
+    }
+    run = data !== undefined ? { start: index, data } : null;
+  }
+  return spans;
+}
+
 // The inverse of patternToGrid: consecutive cells with equal data collapse into one span.
 export function gridToPattern<TData extends CalendarData>(
   grid: CellGrid<TData>,
   step: number,
   isDataEqual: (a: TData, b: TData) => boolean
 ): WeeklyPatternValue<TData> {
-  const spans: Array<WeeklyPatternSpan<TData>> = [];
-
-  for (const weekday of WEEKDAYS_SORTED) {
-    const cells = grid[weekday];
-    let run: { start: number; data: TData } | null = null;
-
-    for (let index = 0; index <= cells.length; index++) {
-      const data = cells[index];
-      if (run && data !== undefined && isDataEqual(run.data, data)) {
-        continue;
-      }
-      if (run) {
-        spans.push({ weekday, beginMinutes: run.start * step, endMinutes: index * step, data: run.data });
-      }
-      run = data !== undefined ? { start: index, data } : null;
-    }
-  }
-  return spans;
+  return WEEKDAYS_SORTED.flatMap((weekday) => dayToSpans(grid[weekday], weekday, step, isDataEqual));
 }
 
 /**
@@ -217,6 +223,26 @@ export function paintRange<TData>(
 
 /** An inclusive range of cell indexes. */
 export type CellRun = { first: number; last: number };
+
+/**
+ * The cells around `index` that `belongs` accepts, without a gap, `index` included.
+ * E.g. a run (painted with equal data) or a block (painted with any data).
+ */
+export function cellExtent<TData>(
+  cells: DayCells<TData>,
+  index: number,
+  belongs: (cell: TData | undefined) => boolean
+): CellRun {
+  let first = index;
+  while (first > 0 && belongs(cells[first - 1])) {
+    first -= 1;
+  }
+  let last = index;
+  while (last + 1 < cells.length && belongs(cells[last + 1])) {
+    last += 1;
+  }
+  return { first, last };
+}
 
 /**
  * The contiguous runs of cells between `first` and `last` that differ between `before` and `after`.

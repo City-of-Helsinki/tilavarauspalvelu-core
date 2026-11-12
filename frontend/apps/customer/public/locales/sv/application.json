@@ -64,6 +64,7 @@
     "calendarLabel": "Välj önskade tider",
     "legend": {
       "unavailable": "Kan inte bokas i någon av ansökningens lokaler",
+      "invalid": "För kort önskemål",
       "closed": "Kan inte bokas i denna lokal",
       "primary": "Prioriterat önskemål",
       "secondary": "Alternativt önskemål",
@@ -89,7 +90,9 @@
         "endAfterStart": "Sluttiden måste vara efter starttiden.",
         "outsideReservable": "Tiden kan inte bokas i någon av ansökningens lokaler."
       }
-    }
+    },
+    "tooShort": "Tidsönskemålet ({{duration}}) är kortare än bokningens minsta varaktighet ({{minDuration}}). Förläng önskemålet eller minska på den minsta varaktigheten som valdes i ansökans föregående steg.",
+    "tooShortNextToPrimary": "Det intilliggande prioriterade önskemålet är kortare än bokningens minsta varaktighet ({{minDuration}}). Förläng det prioriterade önskemålet."
   },
   "Page2": {
     "subHeading": "Välj bokningens tidpunkt",

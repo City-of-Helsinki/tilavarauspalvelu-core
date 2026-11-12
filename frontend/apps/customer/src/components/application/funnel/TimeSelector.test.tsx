@@ -1,5 +1,5 @@
 import { FormProvider, useForm } from "react-hook-form";
-import { render, within } from "@testing-library/react";
+import { render, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
@@ -117,13 +117,22 @@ function weekdayLabel(day: Weekday): string {
 }
 
 // The first cell of a painted run is named after the whole run, so pass its end.
+// A run shorter than the section's minimum duration (2 h in the mocks) is also named as too short.
 function cellName(
   state: "open" | "closed" | "unavailable" | "primary" | "secondary",
   day: Weekday,
   start: number,
-  end: number = start + STEP
-): string {
-  return `${weekdayLabel(day)}, ${hhmm(start)}–${hhmm(end)}, application:TimeSelector.legend.${state}`;
+  end: number = start + STEP,
+  { tooShort = false }: { tooShort?: boolean | "nextToPrimary" } = {}
+): string | RegExp {
+  const name = `${weekdayLabel(day)}, ${hhmm(start)}–${hhmm(end)}, application:TimeSelector.legend.${state}`;
+  if (!tooShort) {
+    return name;
+  }
+  // The mocked t() appends its options (the formatted minimum duration), so match the reason up to them.
+  const key = tooShort === "nextToPrimary" ? "tooShortNextToPrimary" : "tooShort";
+  const escaped = `${name}, application:TimeSelector.${key}`.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+  return new RegExp(`^${escaped}(?![A-Za-z])`);
 }
 
 function getGrid(view: ReturnType<typeof render>) {
@@ -185,6 +194,7 @@ describe("TimeSelector render single section", () => {
     expect(open).toBeInTheDocument();
     const unavailable = within(legend).getByText("application:TimeSelector.legend.unavailable");
     expect(unavailable).toBeInTheDocument();
+    expect(within(legend).getByText("application:TimeSelector.legend.invalid")).toBeInTheDocument();
     // The priority radio buttons show what Primary and Secondary look like, so the legend leaves them out.
     expect(within(legend).queryByText("application:TimeSelector.legend.secondary")).not.toBeInTheDocument();
     expect(within(legend).queryByText("application:TimeSelector.legend.primary")).not.toBeInTheDocument();
@@ -304,15 +314,59 @@ describe("TimeSelector time slot selecting", () => {
     expect(onSubmit).toHaveBeenCalledWith(vals);
   });
 
-  test("all time slots should be empty for new application", async () => {
+  test("a run being dragged shows as valid until the mouse button is released", async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    const view = customRender({ onSubmit });
-    const btn = view.getByRole("button", { name: "submit" });
-    await user.click(btn);
-    expect(onSubmit).toHaveBeenCalledOnce();
-    const vals = createMockSubmitValues([]);
-    expect(onSubmit).toHaveBeenCalledWith(vals);
+    const view = customRender({ page: "page2" });
+    const calendar = getGrid(view);
+    // A finished click leaves too short runs on Monday and on Tuesday morning.
+    await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Monday, 9 * 60)));
+    await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 9 * 60)));
+    const shortRun = (day: Weekday) =>
+      within(calendar).getByLabelText(cellName("primary", day, 9 * 60, undefined, { tooShort: true }));
+    expect(shortRun(Weekday.Monday)).toHaveAttribute("data-invalid");
+    expect(shortRun(Weekday.Tuesday)).toHaveAttribute("data-invalid");
+
+    // Holding the button down paints Tuesday's cells, but the run isn't checked yet.
+    await user.pointer({
+      keys: "[MouseLeft>]",
+      target: within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)),
+    });
+    await user.pointer({ target: within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60 + STEP)) });
+    expect(
+      within(calendar).getByLabelText(cellName("primary", Weekday.Tuesday, 14 * 60, 14 * 60 + 2 * STEP))
+    ).not.toHaveAttribute("data-invalid");
+    // Only the time being painted waits. The other runs keep showing as invalid, also the one on the same day.
+    expect(shortRun(Weekday.Monday)).toHaveAttribute("data-invalid");
+    expect(shortRun(Weekday.Tuesday)).toHaveAttribute("data-invalid");
+
+    // Released at 30 min, shorter than the 2 h minimum.
+    await user.pointer({ keys: "[/MouseLeft]" });
+    expect(
+      within(calendar).getByLabelText(
+        cellName("primary", Weekday.Tuesday, 14 * 60, 14 * 60 + 2 * STEP, { tooShort: true })
+      )
+    ).toHaveAttribute("data-invalid");
+  });
+
+  test("a Shift+Arrow sweep is checked when Shift is released", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    const calendar = getGrid(view);
+
+    within(calendar)
+      .getByLabelText(cellName("open", Weekday.Monday, 9 * 60))
+      .focus();
+    await user.keyboard("{Shift>}{ArrowDown}{ArrowDown}");
+    expect(
+      within(calendar).getByLabelText(cellName("primary", Weekday.Monday, 9 * 60, 9 * 60 + 3 * STEP))
+    ).not.toHaveAttribute("data-invalid");
+
+    await user.keyboard("{/Shift}");
+    expect(
+      within(calendar).getByLabelText(
+        cellName("primary", Weekday.Monday, 9 * 60, 9 * 60 + 3 * STEP, { tooShort: true })
+      )
+    ).toHaveAttribute("data-invalid");
   });
 
   test("time slots can be deselected", async () => {
@@ -320,18 +374,22 @@ describe("TimeSelector time slot selecting", () => {
     const onSubmit = vi.fn();
     const view = customRender({ onSubmit });
     const calendar = getGrid(view);
-    // tuesday 14:00 - 14:15
+    const submittedRanges = () => onSubmit.mock.lastCall?.[0]?.applicationSections[0]?.suitableTimeRanges;
+    // A secondary time covers only the clicked cell, so the same click removes all of it.
+    await user.click(view.getByRole("radio", { name: "application:Page2.priorityLabels.secondary" }));
     await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
     const btn = view.getByRole("button", { name: "submit" });
     await user.click(btn);
-    expect(onSubmit).toHaveBeenCalledOnce();
-    const vals = createMockSubmitValues([{ day: Weekday.Tuesday, start: 14 * 60, end: 14 * 60 + STEP }]);
-    expect(onSubmit).toHaveBeenLastCalledWith(vals);
-    await user.click(within(calendar).getByLabelText(cellName("primary", Weekday.Tuesday, 14 * 60)));
+    expect(submittedRanges()).toEqual([
+      { dayOfTheWeek: Weekday.Tuesday, beginTime: "14:00", endTime: "14:15", priority: Priority.Secondary },
+    ]);
+
+    await user.click(
+      within(calendar).getByLabelText(cellName("secondary", Weekday.Tuesday, 14 * 60, undefined, { tooShort: true }))
+    );
     await user.click(btn);
     expect(onSubmit).toHaveBeenCalledTimes(2);
-    const vals2 = createMockSubmitValues([]);
-    expect(onSubmit).toHaveBeenLastCalledWith(vals2);
+    expect(submittedRanges()).toEqual([]);
   });
 
   test("all time slots should match the existing application section", async () => {
@@ -343,6 +401,143 @@ describe("TimeSelector time slot selecting", () => {
     expect(onSubmit).toHaveBeenCalledOnce();
     const vals = createMockSubmitValues([{ pk: 1, day: Weekday.Wednesday, start: 8 * 60, end: 16 * 60 }]);
     expect(onSubmit).toHaveBeenLastCalledWith(vals);
+  });
+
+  test("a run shorter than the minimum duration is marked invalid, a long enough one is not", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    const calendar = getGrid(view);
+
+    // The existing Wednesday 08:00-16:00 run is longer than the 2 h minimum.
+    expect(
+      within(calendar).getByLabelText(cellName("primary", Weekday.Wednesday, 8 * 60, 16 * 60))
+    ).not.toHaveAttribute("data-invalid");
+
+    // A secondary time is not lengthened, so a single cell of it is too short.
+    await user.click(view.getByRole("radio", { name: "application:Page2.priorityLabels.secondary" }));
+    await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
+    const shortRun = within(calendar).getByLabelText(
+      cellName("secondary", Weekday.Tuesday, 14 * 60, undefined, { tooShort: true })
+    );
+    expect(shortRun).toHaveAttribute("data-invalid");
+    // The end time is its own element, so it can be styled on its own.
+    expect(shortRun.querySelector("[data-run-end-time]")).toHaveTextContent("14:15");
+  });
+
+  test("a secondary buffer next to a too short primary run is too short too", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    const calendar = getGrid(view);
+
+    // 15 min of primary, then secondary right after it up to 16:00: a 2 h block, the minimum in the mocks.
+    await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
+    await user.click(view.getByRole("radio", { name: "application:Page2.priorityLabels.secondary" }));
+    for (let minutes = 14 * 60 + STEP; minutes < 16 * 60; minutes += STEP) {
+      await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, minutes)));
+    }
+
+    // The primary run is too short by itself, so the shorter buffer touching it is too short too.
+    expect(
+      within(calendar).getByLabelText(cellName("primary", Weekday.Tuesday, 14 * 60, undefined, { tooShort: true }))
+    ).toHaveAttribute("data-invalid");
+    expect(
+      within(calendar).getByLabelText(
+        cellName("secondary", Weekday.Tuesday, 14 * 60 + STEP, 16 * 60, { tooShort: "nextToPrimary" })
+      )
+    ).toHaveAttribute("data-invalid");
+  });
+
+  test("a long enough primary run with a short secondary buffer after it is valid", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    const calendar = getGrid(view);
+
+    // 2 h of primary, then 30 min of secondary right after it.
+    for (let minutes = 14 * 60; minutes < 16 * 60; minutes += STEP) {
+      await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, minutes)));
+    }
+    await user.click(view.getByRole("radio", { name: "application:Page2.priorityLabels.secondary" }));
+    for (let minutes = 16 * 60; minutes < 16 * 60 + 30; minutes += STEP) {
+      await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, minutes)));
+    }
+
+    expect(within(calendar).getByLabelText(cellName("primary", Weekday.Tuesday, 14 * 60, 16 * 60))).not.toHaveAttribute(
+      "data-invalid"
+    );
+    expect(
+      within(calendar).getByLabelText(cellName("secondary", Weekday.Tuesday, 16 * 60, 16 * 60 + 30))
+    ).not.toHaveAttribute("data-invalid");
+  });
+
+  test("touching runs of different priorities are drawn as one block, with ends only at its edges", async () => {
+    const user = userEvent.setup();
+    const view = customRender();
+    const calendar = getGrid(view);
+    const cellAt = (minutes: number) =>
+      calendar.querySelector(`td[data-weekday="TUESDAY"][data-begin-minutes="${minutes}"]`);
+
+    // 14:00-14:30 primary, then 14:30-15:00 secondary right after it.
+    for (const minutes of [14 * 60, 14 * 60 + STEP]) {
+      await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, minutes)));
+    }
+    await user.click(view.getByRole("radio", { name: "application:Page2.priorityLabels.secondary" }));
+    for (const minutes of [14 * 60 + 2 * STEP, 14 * 60 + 3 * STEP]) {
+      await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, minutes)));
+    }
+
+    // Each run still starts and ends where its priority changes.
+    expect(cellAt(14 * 60 + STEP)).toHaveAttribute("data-run-end");
+    expect(cellAt(14 * 60 + 2 * STEP)).toHaveAttribute("data-run-start");
+    // But only the first and the last cell are the block's ends, so the seam between the runs isn't drawn as an end.
+    expect(cellAt(14 * 60)).toHaveAttribute("data-block-start");
+    expect(cellAt(14 * 60 + STEP)).not.toHaveAttribute("data-block-end");
+    expect(cellAt(14 * 60 + 2 * STEP)).not.toHaveAttribute("data-block-start");
+    expect(cellAt(14 * 60 + 3 * STEP)).toHaveAttribute("data-block-end");
+  });
+
+  test("hovering a too short run shows why in a tooltip, and Escape hides it", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    const calendar = getGrid(view);
+
+    // A long enough run has no tooltip.
+    await user.hover(within(calendar).getByLabelText(cellName("primary", Weekday.Wednesday, 8 * 60, 16 * 60)));
+    expect(view.queryByTestId("weekly-pattern__run-error")).not.toBeInTheDocument();
+
+    await user.click(view.getByRole("radio", { name: "application:Page2.priorityLabels.secondary" }));
+    await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
+    await user.hover(
+      within(calendar).getByLabelText(cellName("secondary", Weekday.Tuesday, 14 * 60, undefined, { tooShort: true }))
+    );
+    expect(view.getByTestId("weekly-pattern__run-error")).toHaveTextContent("application:TimeSelector.tooShort");
+
+    await user.keyboard("{Escape}");
+    expect(view.queryByTestId("weekly-pattern__run-error")).not.toBeInTheDocument();
+  });
+
+  test("a clicked too short run shows no tooltip once the pointer leaves, but keyboard focus does", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    const calendar = getGrid(view);
+
+    // The click focuses the cell, as the grid keeps one cell focusable.
+    await user.click(within(calendar).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
+    const run = within(calendar).getByLabelText(
+      cellName("primary", Weekday.Tuesday, 14 * 60, undefined, { tooShort: true })
+    );
+    expect(run).toHaveFocus();
+    expect(view.getByTestId("weekly-pattern__run-error")).toBeInTheDocument();
+
+    // Leaving hides it (after a short delay), although the run still holds focus.
+    await user.unhover(run);
+    await waitFor(() => expect(view.queryByTestId("weekly-pattern__run-error")).not.toBeInTheDocument());
+
+    // Moving onto the run from the keyboard shows it.
+    await user.keyboard("{ArrowDown}{ArrowUp}");
+    expect(
+      within(calendar).getByLabelText(cellName("primary", Weekday.Tuesday, 14 * 60, undefined, { tooShort: true }))
+    ).toHaveFocus();
+    expect(view.getByTestId("weekly-pattern__run-error")).toBeInTheDocument();
   });
 
   test("an existing application section is shown as selected", () => {
@@ -647,7 +842,7 @@ describe("TimeSelector with several reservation units", () => {
 
     await add(12 * 60, 13 * 60);
     expect(
-      within(getGrid(view)).getByLabelText(cellName("primary", Weekday.Tuesday, 12 * 60, 13 * 60))
+      within(getGrid(view)).getByLabelText(cellName("primary", Weekday.Tuesday, 12 * 60, 13 * 60, { tooShort: true }))
     ).toBeInTheDocument();
 
     await add(13 * 60, 15 * 60);
