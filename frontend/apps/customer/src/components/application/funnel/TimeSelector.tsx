@@ -8,6 +8,7 @@ import styled from "styled-components";
 import { arrow, WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar/styles";
 import type { WeeklyPatternCellInfo, WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/types";
 import { WeeklyPatternCalendar } from "@ui/components/WeeklyPatternCalendar/WeeklyPatternCalendar";
+import { breakpoints } from "@ui/modules/const";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { ControlledSelect } from "ui/src/components/form";
 import { successToast } from "ui/src/components/toast";
@@ -160,6 +161,10 @@ const RadioGroup = styled.fieldset`
   padding: 0;
   margin: 0;
   gap: 80px;
+  @media (max-width: ${breakpoints.s}) {
+    flex-direction: column;
+    gap: 16px;
+  }
 `;
 
 const PriorityRadioButton = styled(RadioButton)`
