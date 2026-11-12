@@ -33,7 +33,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import "../styles/global.scss";
 import type { StaffEnvConfig } from "@/modules/serverUtils";
 
-function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
+function MyApp<T>(props: AppProps<T> & AppOwnProps & ErrorPageProps): React.ReactElement {
   const { Component, pageProps, currentUser, handlingData, notificationsData, envConfig } = props;
   const { apiBaseUrl, isConsoleLoggingEnabled, version } = envConfig;
 
@@ -84,7 +84,7 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
             <PageWrapper>
               <Component {...pageProps} />
             </PageWrapper>
-            <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} />
+            <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} isErrorPage={props.err != null} />
           </Layout>
         </ModalContextProvider>
       </EnvContextProvider>
@@ -95,6 +95,11 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
 function formatUrlPath(router: Router): string {
   return `${router.basePath}${router.pathname}`;
 }
+
+/// Next sets err when it renders the error page after a browser error. AppProps does not type it.
+type ErrorPageProps = {
+  err?: Error;
+};
 
 type AppOwnProps = {
   // undefined when getInitialProps runs in the browser, so the cached user is kept

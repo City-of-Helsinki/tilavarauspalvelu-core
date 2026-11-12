@@ -54,6 +54,16 @@ describe("triggerServerError", () => {
     });
   });
 
+  test("does nothing on the error page", () => {
+    mockQuery.current = { throw: "render" };
+    const { container } = render(
+      <TestErrorBoundary>
+        <ErrorTrigger enabled isErrorPage />
+      </TestErrorBoundary>
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
   test("does nothing when disabled", () => {
     withoutWindow(() => {
       expect(() => triggerServerError(false, { query: { throw: "ssr" } })).not.toThrow();
@@ -77,17 +87,27 @@ describe("ErrorTrigger", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     render(
       <TestErrorBoundary>
-        <ErrorTrigger enabled />
+        <ErrorTrigger enabled isErrorPage={false} />
       </TestErrorBoundary>
     );
     expect(await screen.findByText("Test error from ?throw=render")).toBeInTheDocument();
+  });
+
+  test("does nothing on the error page", () => {
+    mockQuery.current = { throw: "render" };
+    const { container } = render(
+      <TestErrorBoundary>
+        <ErrorTrigger enabled isErrorPage />
+      </TestErrorBoundary>
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 
   test("does nothing when disabled", () => {
     mockQuery.current = { throw: "render" };
     const { container } = render(
       <TestErrorBoundary>
-        <ErrorTrigger enabled={false} />
+        <ErrorTrigger enabled={false} isErrorPage={false} />
       </TestErrorBoundary>
     );
     expect(container).toBeEmptyDOMElement();

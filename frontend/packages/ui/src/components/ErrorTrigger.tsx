@@ -38,10 +38,17 @@ export function triggerServerError(enabled: boolean, ctx: Pick<NextPageContext, 
   }
 }
 
+type ErrorTriggerProps = Readonly<{
+  enabled: boolean;
+  // Next renders the error page inside _app with the same URL after a browser error.
+  // A second throw there makes Next show its own fallback page instead of ours.
+  isErrorPage: boolean;
+}>;
+
 /// Add this to _app. It throws the browser errors.
-export function ErrorTrigger({ enabled }: { enabled: boolean }): null {
+export function ErrorTrigger({ enabled, isErrorPage }: ErrorTriggerProps): null {
   const router = useRouter();
-  const mode = enabled && router.isReady ? getErrorTriggerMode(router.query) : null;
+  const mode = enabled && !isErrorPage && router.isReady ? getErrorTriggerMode(router.query) : null;
   const [renderError, setRenderError] = useState<Error | null>(null);
 
   useEffect(() => {
