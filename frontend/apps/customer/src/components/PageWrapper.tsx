@@ -1,5 +1,4 @@
 import React from "react";
-import Head from "next/head";
 import styled from "styled-components";
 import { BannerNotificationsList } from "ui/src/components";
 import { mainStyles } from "ui/src/styled";
@@ -13,20 +12,15 @@ interface PageProps {
   overrideBackgroundColor?: string;
   profileLink: string;
   feedbackUrl: string;
-  version: string;
 }
 
 const Main = styled.main`
   ${mainStyles}
 `;
 
-export function PageWrapper({ profileLink, feedbackUrl, children, version }: PageProps): React.ReactElement {
+export function PageWrapper({ profileLink, feedbackUrl, children }: PageProps): React.ReactElement {
   return (
     <>
-      <Head>
-        <title>Tilavarauspalvelu</title>
-        <meta name="version" content={version} />
-      </Head>
       <Navigation profileLink={profileLink} />
       <BannerNotificationsList target={BannerNotificationTarget.User} />
       <InProgressReservationNotification />
