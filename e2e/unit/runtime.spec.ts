@@ -12,7 +12,7 @@ import { mkdir, readdir, readFile, rm, utimes, writeFile } from "node:fs/promise
 import { setTimeout as delay } from "node:timers/promises";
 import { BackendErrors } from "../lib/backend-errors";
 import { readEnv } from "../lib/env";
-import { elementsOf, reachesState } from "../lib/locators";
+import { reachesState } from "../lib/locators";
 import { SHARED_BASE, acquireLock, releaseLock, resetSharedState, sharedDir } from "../lib/locks";
 import { graphqlErrorsIn } from "../lib/responses";
 import { retry } from "../lib/retry";
@@ -469,43 +469,26 @@ test.describe("Runtime", () => {
     }
   });
 
-  testWithBrowser(
-    "Keywords read, wait and click with Playwright's locators",
-    async ({ browser, context, page }, info) => {
-      const session = new Session({ browser, context, page }, info);
-      const { customKeywords } = new Pages(session);
-      await session.openPage();
-      await page.goto(
-        dataPage(`
-        <h1>Otsikko&nbsp;teksti</h1>
+  testWithBrowser("Keywords read and wait with Playwright's locators", async ({ browser, context, page }, info) => {
+    const session = new Session({ browser, context, page }, info);
+    const { customKeywords } = new Pages(session);
+    await session.openPage();
+    await page.goto(
+      dataPage(`
         <p id="number">Varausnumero 123</p>
-        <ul id="list"><li><span>Yksi</span></li><li><span>Kaksi</span></li></ul>
         <button id="later" hidden>Myöhemmin</button>
-        <div class="card"><b>Harakka</b><button onclick="this.textContent = 'Peruttu'">Peru</button></div>
         <script>setTimeout(() => document.getElementById("later").hidden = false, 300)</script>
       `)
-      );
-      expect(await customKeywords.removeNonBreakingSpace(await page.locator("h1").innerText())).toBe("Otsikko teksti");
-      expect(await customKeywords.getNumberFromElementText("#number")).toBe("123");
-      await customKeywords.checkElementsText("#list >> li >> nth=1", "Kaksi");
-      expect(await customKeywords.checkElementsText("#list >> li >> nth=1", "Yksi", { return_status: true })).toBe(
-        false
-      );
-      await customKeywords.findAndClickElementInCardElementByText(".card", "b", "Harakka", "button");
-      await expect(page.locator(".card button")).toHaveText("Peruttu");
-
-      // elementsOf waits for the first match, and gives an empty list when none appear in time
-      expect(await elementsOf(page.locator("#list >> li"))).toHaveLength(2);
-      expect(await elementsOf(page.locator(".missing"), 500)).toEqual([]);
-      // reachesState waits, and answers instead of failing
-      expect(await reachesState(page.locator("id=later"), "visible", 5000)).toBe(true);
-      expect(await reachesState(page.locator(".missing"), "attached", 200)).toBe(false);
-      // A locator prints as Playwright describes it in step titles and logs
-      expect(formatValue(page.locator(".card").first())).toBe("locator('.card').first()");
-      expect(formatValue(page.getByTestId("reservation__status"))).toBe("getByTestId('reservation__status')");
-      await session.close();
-    }
-  );
+    );
+    expect(await customKeywords.getNumberFromElementText("#number")).toBe("123");
+    // reachesState waits, and answers instead of failing
+    expect(await reachesState(page.locator("id=later"), "visible", 5000)).toBe(true);
+    expect(await reachesState(page.locator(".missing"), "attached", 200)).toBe(false);
+    // A locator prints as Playwright describes it in step titles and logs
+    expect(formatValue(page.locator(".card").first())).toBe("locator('.card').first()");
+    expect(formatValue(page.getByTestId("reservation__status"))).toBe("getByTestId('reservation__status')");
+    await session.close();
+  });
 
   testWithBrowser("A GraphQL response's body is read for a limited time", async ({ browser, context, page }, info) => {
     // /hangs sends the headers but never ends the body, like a response from a page that is being reloaded.
@@ -553,8 +536,8 @@ test.describe("Runtime", () => {
     }
   });
 
-  testWithBrowser("Navigation and text helpers wait for the page", async ({ browser, context, page }, info) => {
-    // The list and the URL change 300 ms late, like a page that is still rendering. The push button counts its clicks.
+  testWithBrowser("Navigation keywords wait for the page", async ({ browser, context, page }, info) => {
+    // The URL changes 300 ms late, like a page that is still rendering. The push button counts its clicks.
     const server = createServer((request, response) => {
       if (request.url === "/") {
         response.writeHead(200, { "content-type": "text/html" });
@@ -562,13 +545,6 @@ test.describe("Runtime", () => {
           <button id="push" onclick="this.dataset.clicks = Number(this.dataset.clicks ?? 0) + 1;
             setTimeout(() => history.pushState({}, '', '/pushed'), 300)">Push</button>
           <a id="next" href="/next">Seuraava</a>
-          <ul id="list"><li> Yksi </li><li class="leaving">Poistuva</li></ul>
-          <script>
-            setTimeout(() => {
-              document.querySelector(".leaving").remove();
-              document.getElementById("list").insertAdjacentHTML("beforeend", "<li> Kaksi </li>");
-            }, 300);
-          </script>
         `);
       } else if (request.url === "/next") {
         response.writeHead(200, { "content-type": "text/html" });
@@ -584,12 +560,9 @@ test.describe("Runtime", () => {
       const { customKeywords } = new Pages(session);
       await session.openPage();
       await page.goto(`http://127.0.0.1:${port}/`);
-      await customKeywords.findTextFromElementsOrFail("#list >> li", "Kaksi");
-      await customKeywords.verifyElementWithTextIsNotFound("#list >> li", "Poistuva");
       // A client side navigation (history.pushState) after the click
       await customKeywords.clickAndWaitForPage("id=push");
       expect(page.url()).toBe(`http://127.0.0.1:${port}/pushed`);
-      await customKeywords.waitForUrlToContain("/pushed", 5000);
       // A full navigation, whose target element shows up after the page has loaded
       await customKeywords.clickAndWaitForNavigationWithRetry("id=next", "id=target", 2, 5000);
       expect(page.url()).toBe(`http://127.0.0.1:${port}/next`);

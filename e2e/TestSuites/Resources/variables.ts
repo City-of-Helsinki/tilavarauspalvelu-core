@@ -13,7 +13,7 @@ export const NOTIFICATION_ADMIN_STATE = `${import.meta.dirname}/../../.shared-st
 // Milliseconds, like Playwright's timeouts
 export const BROWSER_TIMEOUT_GLOBAL = 40_000;
 export const CONTENT_WAIT_TIMEOUT = 10_000;
-// How long a text check waits for its element to show the text (Check Elements Text and the page objects' checks)
+// How long a text check waits for its element to show the text (the page objects' checks)
 export const TEXT_CHECK_TIMEOUT = 10_000 + CONTENT_WAIT_TIMEOUT;
 // The cookie in which the customer site's cookie banner saves the consent (the app's sitesettings.json)
 export const COOKIE_CONSENT_COOKIE = "varaamo-cookie-consents";

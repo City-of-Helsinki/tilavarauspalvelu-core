@@ -188,13 +188,6 @@ export class QuickReservation extends PageObject {
     });
   }
 
-  @step("quick_reservation.Info Card Price Should Be")
-  async infoCardPriceShouldBe(price_with_text: string) {
-    const reservation_price = await this.page.getByTestId("reservation__reservation-info-card__price").innerText();
-    const normalized_string = await this.pages.customKeywords.removeNonBreakingSpace(reservation_price);
-    expect(normalized_string).toBe(price_with_text);
-  }
-
   /** Reads the booking number from the info card and returns it, e.g. 59923. */
   @step("quick_reservation.Get Booking Number")
   async getBookingNumber() {
@@ -226,14 +219,6 @@ export class QuickReservation extends PageObject {
     const access_code_with_hash = `${access_code_numbers}#`;
     this.state.accessCode = access_code_with_hash;
     await log(`Saved access code (with #): ${this.state.accessCode}`);
-  }
-
-  @step("quick_reservation.Check Access Code")
-  async checkAccessCode(access_code: string) {
-    await this.pages.customKeywords.checkNumberFromTextIsEqualTo(
-      this.page.getByTestId("reservation__reservation-info-card__accessType"),
-      access_code
-    );
   }
 
   @step("quick_reservation.Confirms Date Picker Opens From Quick Reservation")
