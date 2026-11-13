@@ -1175,14 +1175,14 @@ requests = "*"
 
 [[package]]
 name = "django-import-export"
-version = "4.4.4"
+version = "4.4.5"
 description = "Django application and library for importing and exporting data with included admin integration."
 optional = false
 python-versions = ">=3.9"
 groups = ["admin"]
 files = [
-    {file = "django_import_export-4.4.4-py3-none-any.whl", hash = "sha256:cba85e6fd5fc4b6f09bdcc6144e3f3cdc05b5f3874f7d67137e234675374e763"},
-    {file = "django_import_export-4.4.4.tar.gz", hash = "sha256:632d965c05363d2ee1c829f99b4a5e58cf7bf0d5899d74f53f5a1310dd7ecd45"},
+    {file = "django_import_export-4.4.5-py3-none-any.whl", hash = "sha256:cd3f2a2b56f27de36d1f5e4eb15b9b6fe11be6ec548a23bb8d233cc6983e2bd4"},
+    {file = "django_import_export-4.4.5.tar.gz", hash = "sha256:72f50e72cf3e77179cb0b9fd5f791ec52fefc4bbb8966e8cfe38f7019926d0d2"},
 ]
 
 [package.dependencies]
@@ -1648,14 +1648,14 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "40.44.0"
+version = "40.52.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "faker-40.44.0-py3-none-any.whl", hash = "sha256:db808a3ec33fe9ce5caf40b9fb61f85f46e429a56966f765209272adec83e4c6"},
-    {file = "faker-40.44.0.tar.gz", hash = "sha256:97245a3756dcaf35418b89bea9f03ae6881557db0032bf048744c2aaee2a9108"},
+    {file = "faker-40.52.0-py3-none-any.whl", hash = "sha256:73f3f9c0a82cfc5ca341972ef4282e7ec2fffe340d2fabe018238ae0da062ec1"},
+    {file = "faker-40.52.0.tar.gz", hash = "sha256:a57e48f8e9430917a75d7b53a1568dd10cf4f442058c1fab8a4253c81b2a745a"},
 ]
 
 [package.dependencies]
@@ -4076,4 +4076,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "b5084489a8676be1c38a037813c005ad1adbc32f83c1e1c60fe81958b82d7c5c"
+content-hash = "4540c3d1cad206d93bf916762b04ee56e4872254b14f5ba84b3e9b3581c4cb9e"
