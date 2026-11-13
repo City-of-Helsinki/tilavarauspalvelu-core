@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections import defaultdict
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -17,7 +18,6 @@ from utils.utils import update_query_params
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from decimal import Decimal
 
     from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, ReservationUnit, Unit
     from tilavarauspalvelu.typing import EmailContext, Lang
@@ -249,10 +249,8 @@ def params_for_price_info(*, reservation: Reservation) -> dict[str, Any]:
 
 
 def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
-    begin_datetime = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
-    end_datetime = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
-
-    subsidised_price = reservation.actions.calculate_full_price(begin_datetime, end_datetime, subsidised=True)
+    # A handler can lower the price of a reservation that can apply for a discount, down to zero.
+    subsidised_price = Decimal(0) if reservation.actions.can_apply_for_discount() else reservation.price
 
     return {
         "price": reservation.price,

@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
-from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, PaymentType, ReservationStateChoice
@@ -12,8 +11,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import local_date, local_date_of, local_datetime
+from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -59,23 +57,16 @@ class ReservationConfirmSerializer(NestingModelSerializer):
             return data
 
         reservation_unit = self.instance.reservation_unit
-        begin_date = local_date_of(self.instance.begins_at)
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
+        reservation_unit.validators.validate_has_payment_type()
 
-        if pricing is None:
-            msg = "No pricing found for the given date."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
+        data["payment_type"] = PaymentType(reservation_unit.payment_type)
 
-        pricing.validators.validate_has_payment_type()
-
-        data["payment_type"] = PaymentType(pricing.payment_type)
-
-        if pricing.payment_type != PaymentType.ON_SITE:
+        if data["payment_type"] != PaymentType.ON_SITE:
             reservation_unit.validators.validate_has_payment_product()
 
             # A webshop payment uses the tax rate of the date of sale.
             today = local_date()
-            data["tax_percentage_value"] = pricing.tax_level.actions.get_percentage(on_date=today)
+            data["tax_percentage_value"] = self.instance.actions.get_tax_percentage(on_date=today)
 
         data["state"] = self.instance.actions.get_state_on_reservation_confirmed(payment_type=data["payment_type"])
 

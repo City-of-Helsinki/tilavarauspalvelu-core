@@ -27,17 +27,18 @@ from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPr
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from tilavarauspalvelu.models import PriceComponent, Reservation, ReservationPriceLine, ReservationUnitHierarchy
 from tilavarauspalvelu.models.reservation.actions import ReservationActions
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_start_of_day, next_hour
 
 from tests.factories import (
     ApplicationRoundFactory,
+    PriceComponentFactory,
     ReservationFactory,
     ReservationUnitFactory,
-    ReservationUnitPricingFactory,
     SpaceFactory,
+    TaxLevelFactory,
     TaxLevelRateFactory,
     UserFactory,
 )
@@ -693,11 +694,10 @@ def test_reservation__create__price_calculation__free_reservation_unit(graphql):
 
 def test_reservation__create__pricing_requires_payment_type(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(20),
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=None,
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=None,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -707,16 +707,15 @@ def test_reservation__create__pricing_requires_payment_type(graphql):
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is True, response.errors
-    assert response.field_error_messages() == ["Pricing has no payment type defined"]
+    assert response.field_error_messages() == ["Reservation unit has no payment type."]
 
 
 def test_reservation__create__price_calculation__fixed_price_reservation_unit(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(20),
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -735,13 +734,35 @@ def test_reservation__create__price_calculation__fixed_price_reservation_unit(gr
     assert reservation.tax_percentage_value == Decimal(10)
 
 
+def test_reservation__create__saves_price_lines(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ON_SITE,
+    )
+    component = PriceComponent.objects.get(
+        pricing_group__reservation_unit_pricing_groups__reservation_unit=reservation_unit,
+    )
+
+    graphql.login_with_superuser()
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    price_lines = ReservationPriceLine.objects.filter(reservation=response.first_query_object["pk"])
+    assert list(price_lines.values_list("price_component", "quantity", "unit_amount", "amount", "tax_percentage")) == [
+        (component.pk, Decimal(1), Decimal(20), Decimal(20), Decimal(10)),
+    ]
+
+
 def test_reservation__create__price_calculation__time_based_price(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(20),
-        pricings__price_unit=PriceUnit.PER_15_MINS,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.PER_15_MINS,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -760,11 +781,10 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
 @freeze_time(local_datetime(2026, 10, 24, 12))
 def test_reservation__create__price_calculation__time_based_price__daylight_saving_time_ends(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(10),
-        pricings__price_unit=PriceUnit.PER_HOUR,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__amount=Decimal(10),
+        own_price__price_unit=PriceUnit.PER_HOUR,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ONLINE,
         payment_product__id=uuid.uuid4(),
     )
 
@@ -788,21 +808,19 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         payment_product__id=uuid.uuid4(),
         # Current pricing
-        pricings__begins=now,
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(6),
-        pricings__tax_level__rates__percentage=Decimal(24),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__begins=now,
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__amount=Decimal(6),
+        own_price__tax_level__rates__percentage=Decimal(24),
+        own_price__valid_until=now.date() + datetime.timedelta(days=1),
+        payment_type=PaymentType.ONLINE,
     )
-    # Future pricing
-    ReservationUnitPricingFactory.create(
-        begins=now + datetime.timedelta(days=1),
+    PriceComponentFactory.create(
+        pricing_group=reservation_unit.reservation_unit_pricing_groups.get().pricing_group,
+        valid_from=now.date() + datetime.timedelta(days=1),
         price_unit=PriceUnit.FIXED,
-        lowest_price=Decimal(5),
-        highest_price=Decimal(10),
+        amount=Decimal(10),
         tax_level__rates__percentage=Decimal(24),
-        reservation_unit=reservation_unit,
     )
 
     graphql.login_with_superuser()
@@ -822,17 +840,16 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
 def test_reservation__create__price_calculation__tax_rate_on_creation_date(graphql):
     now = local_start_of_day()
 
+    tax_level = TaxLevelFactory.create(rates__percentage=Decimal(24))
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         payment_product__id=uuid.uuid4(),
-        pricings__begins=now,
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(10),
-        pricings__tax_level__rates__percentage=Decimal(24),
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__begins=now,
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__amount=Decimal(10),
+        own_price__tax_level=tax_level,
+        payment_type=PaymentType.ONLINE,
     )
 
-    tax_level = reservation_unit.pricings.first().tax_level
     TaxLevelRateFactory.create(
         tax_level=tax_level,
         begins=now.date() + datetime.timedelta(days=1),
@@ -856,13 +873,12 @@ def test_reservation__create__price_calculation__tax_level_has_no_rate_today(gra
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         payment_product__id=uuid.uuid4(),
-        pricings__begins=now,
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(10),
-        pricings__tax_level__name="Yleinen",
-        pricings__tax_level__rates__begins=tomorrow,
-        pricings__payment_type=PaymentType.ONLINE,
+        own_price__begins=now,
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__amount=Decimal(10),
+        own_price__tax_level__name="Yleinen",
+        own_price__tax_level__rates__begins=tomorrow,
+        payment_type=PaymentType.ONLINE,
     )
 
     graphql.login_with_superuser()
@@ -870,19 +886,18 @@ def test_reservation__create__price_calculation__tax_level_has_no_rate_today(gra
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is True, response
-    assert response.field_error_messages() == [f"Tax level 'Yleinen' has no rate on {now.date().isoformat()}"]
-    assert response.field_error_codes() == [error_codes.TAX_LEVEL_HAS_NO_RATE]
+    assert response.field_error_messages() == [f"Tax level 'Yleinen' has no rate on {now.date().isoformat()}."]
+    assert response.field_error_codes() == [error_codes.PRICE_CALCULATION_FAILED]
 
     assert Reservation.objects.count() == 0
 
 
 def test_reservation__create__price_calculation__on_site_doesnt_require_payment_product(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        pricings__lowest_price=Decimal(10),
-        pricings__highest_price=Decimal(20),
-        pricings__price_unit=PriceUnit.FIXED,
-        pricings__tax_level__rates__percentage=Decimal(10),
-        pricings__payment_type=PaymentType.ON_SITE,
+        own_price__amount=Decimal(20),
+        own_price__price_unit=PriceUnit.FIXED,
+        own_price__tax_level__rates__percentage=Decimal(10),
+        payment_type=PaymentType.ON_SITE,
         payment_product=None,
     )
 

@@ -1,23 +1,31 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
+from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines, save_reservation_price_lines
 from tilavarauspalvelu.typing import ReservationAdjustTimeData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.services.pricing.price_lines import PriceLines
 
 
 class ReservationAdjustTimeSerializer(NestingModelSerializer):
     """Adjust the time of a reservation."""
 
     instance: Reservation
+    price_lines: PriceLines
 
     pk = IntegerField(required=True)
 
@@ -64,13 +72,27 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         reservation_unit.validators.validate_duration_is_allowed(duration=duration)
         reservation_unit.validators.validate_reservation_days_before(begin=begins_at)
         reservation_unit.validators.validate_reservation_unit_is_open(begin=begins_at, end=ends_at)
-        reservation_unit.validators.validate_not_rescheduled_to_paid_date(begin=begins_at)
         reservation_unit.validators.validate_cancellation_rule(begin=current_begin)
         reservation_unit.validators.validate_not_in_open_application_round(begin=begins_at.date(), end=ends_at.date())
         reservation_unit.validators.validate_reservation_begin_time(begin=begins_at)
         reservation_unit.validators.validate_no_overlapping_reservations(
             begins_at=begins_at, ends_at=ends_at, ignore_ids=[self.instance.pk]
         )
+
+        try:
+            self.price_lines = build_price_lines(
+                reservation_unit=reservation_unit,
+                price_option=self.instance.price_option,
+                begin=begins_at,
+                end=ends_at,
+            )
+        except PriceCalculationError as error:
+            msg = "Reservation cannot be rescheduled since it has no price at the new time."
+            raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED) from error
+
+        if self.price_lines.calculation.total > 0:
+            msg = "Reservation cannot be rescheduled to a point where it would become paid."
+            raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         if self.instance.requires_handling:
             data["state"] = ReservationStateChoice.REQUIRES_HANDLING
@@ -111,6 +133,8 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
                 # Rollback the changes
                 super().update(instance=instance, validated_data=previous_data)
                 raise ValidationError(str(error), code=error_codes.PINDORA_ERROR) from error
+
+        save_reservation_price_lines(reservation=instance, price_lines=self.price_lines)
 
         EmailService.send_reservation_rescheduled_email(reservation=instance)
 

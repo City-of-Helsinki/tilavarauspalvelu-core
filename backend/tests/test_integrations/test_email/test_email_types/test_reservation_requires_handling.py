@@ -17,10 +17,9 @@ from tilavarauspalvelu.integrations.email.rendering import render_html, render_t
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_requires_handling
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import ReservationUnitPricing
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory
+from tests.factories import ReservationFactory, ReservationPriceLineFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
@@ -173,13 +172,17 @@ def test_reservation_requires_handling__get_context__get_mock_data__not_subsidis
 def test_reservation_requires_handling__get_context__instance__subsidised(email_reservation):
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()
+    ReservationPriceLineFactory.create(
+        reservation=email_reservation,
+        price_component__can_apply_for_discount=True,
+    )
 
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
         "price_can_be_subsidised": True,
         "price": Decimal("12.30"),
-        "subsidised_price": Decimal("10.00"),
+        "subsidised_price": Decimal(0),
     }
 
     with TranslationsFromPOFiles():
@@ -193,10 +196,9 @@ def test_reservation_requires_handling__get_context__instance__subsidised(email_
 def test_reservation_requires_handling__get_context__instance__not_subsidised(email_reservation):
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()
-
-    ReservationUnitPricing.objects.update(
-        lowest_price=Decimal("12.30"),
-        highest_price=Decimal("12.30"),
+    ReservationPriceLineFactory.create(
+        reservation=email_reservation,
+        price_component__can_apply_for_discount=False,
     )
 
     expected = {
@@ -405,8 +407,7 @@ def test_reservation_requires_handling__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
@@ -428,8 +429,7 @@ def test_reservation_requires_handling__send_email__wrong_state(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
@@ -449,8 +449,7 @@ def test_reservation_requires_handling__send_email__behalf_reservation(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
@@ -470,8 +469,7 @@ def test_reservation_requires_handling__send_email__no_recipients(outbox):
         reservee_email="",
         user__email="",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
@@ -493,8 +491,7 @@ def test_reservation_requires_handling__send_email__reservation_in_the_past(outb
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_unit__own_price__amount=0,
         begins_at=local_datetime(2024, 1, 1, 20, 0),
         ends_at=local_datetime(2024, 1, 1, 22, 0),
     )

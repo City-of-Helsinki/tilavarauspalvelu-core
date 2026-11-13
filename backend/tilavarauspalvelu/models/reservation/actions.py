@@ -33,7 +33,7 @@ from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservati
 from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_date_of, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_date_of, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -192,27 +192,24 @@ class ReservationActions:
     def get_instructions(self, *, kind: Literal["confirmed", "pending", "cancelled"], language: Lang) -> str:
         return get_attr_by_language(self.reservation.reservation_unit, f"reservation_{kind}_instructions", language)
 
-    def calculate_full_price(
-        self,
-        begin_datetime: datetime.datetime,
-        end_datetime: datetime.datetime,
-        *,
-        subsidised: bool = False,
-    ) -> Decimal:
-        # Currently, there is ever only one reservation unit per reservation
-        reservation_unit: ReservationUnit | None = self.reservation.reservation_unit
-        if reservation_unit is None:
-            msg = "Reservation has no reservation unit"
+    def get_tax_percentage(self, *, on_date: datetime.date) -> Decimal:
+        """
+        The tax percentage of the reservation on the given date.
+        It comes from the first price line, because a webshop order has one row (TILA-4594).
+
+        :raises ReservationPriceCalculationError: If the reservation has no price lines.
+        :raises ValidationError: If the tax level of the line has no rate on the date.
+        """
+        first_line = self.reservation.price_lines.select_related("tax_level").order_by("pk").first()
+        if first_line is None:
+            msg = "Reservation has no price lines"
             raise ReservationPriceCalculationError(msg)
 
-        begin_date = local_date_of(begin_datetime)
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
-        if pricing is None:
-            msg = "Reservation unit has no pricing information"
-            raise ReservationPriceCalculationError(msg)
+        return first_line.tax_level.actions.get_percentage(on_date=on_date)
 
-        duration = datetime_difference(start_datetime=begin_datetime, end_datetime=end_datetime)
-        return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)
+    def can_apply_for_discount(self) -> bool:
+        """The customer can apply for a discount, if a price component of the reservation allows it."""
+        return self.reservation.price_lines.filter(price_component__can_apply_for_discount=True).exists()
 
     def get_application_section(self) -> ApplicationSection | None:
         return ApplicationSection.objects.filter(
@@ -413,13 +410,7 @@ class ReservationActions:
             return False
 
         reservation_unit: ReservationUnit = self.reservation.reservation_unit
-
-        begin_date = local_date_of(self.reservation.begins_at)
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
-        if pricing is None:
-            return False
-
-        if pricing.payment_type != PaymentType.ONLINE_OR_INVOICE:
+        if reservation_unit.payment_type != PaymentType.ONLINE_OR_INVOICE:
             return False
 
         accounting = reservation_unit.actions.get_accounting()

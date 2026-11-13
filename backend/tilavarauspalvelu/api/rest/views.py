@@ -23,12 +23,13 @@ from import_export.formats.base_formats import JSON
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from tilavarauspalvelu.tasks import create_robot_test_data_task
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_date_of, local_datetime, utc_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, utc_datetime
 from utils.db import advisory_lock_is_held
 from utils.utils import comma_sep_str, ical_hmac_signature, update_query_params
 
@@ -401,7 +402,7 @@ def append_payment_method_to_checkout_url(checkout_url: str, request: WSGIReques
 
 @require_GET
 @redirect_back_on_error
-def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:  # noqa: PLR0915
+def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:
     """Redirect user to verkkokauppa for paying pending reservations."""
     reservation: Reservation | None = Reservation.objects.filter(pk=pk).first()
     if reservation is None:
@@ -442,20 +443,15 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     if is_valid_url(payment_order.checkout_url) and payment_order.expires_at > cutoff:
         return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url, request))
 
-    begin_date = local_date_of(reservation.begins_at)
-    reservation_unit: ReservationUnit = reservation.reservation_unit
-    pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
-
-    if pricing is None:
-        msg = "Reservation unit has no active pricing information"
-        raise ValidationError(msg, code="RESERVATION_UNIT_NO_ACTIVE_PRICING")
-
     # The tax rate can change between the approval and the payment.
     today = local_date()
     try:
-        tax_percentage = pricing.tax_level.actions.get_percentage(on_date=today)
+        tax_percentage = reservation.actions.get_tax_percentage(on_date=today)
+    except ReservationPriceCalculationError as error:
+        msg = "Reservation has no price lines"
+        raise ValidationError(msg, code="RESERVATION_NO_PRICE_LINES") from error
     except DRFValidationError as error:
-        msg = "Reservation unit pricing has no tax rate in effect today"
+        msg = "The tax level of the reservation has no tax rate in effect today"
         raise ValidationError(msg, code="TAX_LEVEL_HAS_NO_RATE") from error
 
     reservation.actions.update_tax_percentage(tax_percentage=tax_percentage)
