@@ -59,10 +59,13 @@ export class Checkout extends PageObject {
 
   @step("checkout.Check User Details In Checkout")
   async checkUserDetailsInCheckout() {
-    await this.pages.customKeywords.findTextFromElementsOrFail(
-      this.page.locator(".customer-details-information").locator("td"),
-      this.testData.user.email
-    );
+    await expect(
+      this.page
+        .locator(".customer-details-information")
+        .locator("td")
+        .getByText(this.testData.user.email, { exact: true })
+        .first()
+    ).toBeVisible();
   }
 
   @step("checkout.Check Product List Has All The Info")
@@ -100,7 +103,10 @@ export class Checkout extends PageObject {
     await this.selectPaymentMethodOp();
     await this.clickSubmit();
     // Submitting the payment method opens the summary step
-    await this.pages.customKeywords.waitForUrlToContain("/summary", /* timeout= */ 20_000);
+    // A function is checked at each navigation. A RegExp would be polled, every 500 ms after the first 0.3 s.
+    await expect(this.page, "The checkout shows its summary step").toHaveURL((url) => url.href.includes("/summary"), {
+      timeout: 20_000,
+    });
     await this.checkProductListHasAllTheInfo();
     // The booking number of the order summary, e.g. 59927
     const booking_number = await this.inOrderSummaryGetBookingNumberFromProductList();

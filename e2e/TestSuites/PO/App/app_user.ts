@@ -130,7 +130,10 @@ export class AppUser extends PageObject {
       .getByRole("heading", { name: nameoftheunit, exact: true })
       .first()
       .click();
-    await this.pages.customKeywords.waitForUrlToContain("/reservation-unit/", /* timeout= */ 8000);
+    // A function is checked at each navigation. A RegExp would be polled, every 500 ms after the first 0.3 s.
+    await expect(this.page, "The unit's page opens").toHaveURL((url) => url.href.includes("/reservation-unit/"), {
+      timeout: 8000,
+    });
   }
 
   /**
@@ -884,9 +887,11 @@ export class AppUser extends PageObject {
   /** Checks that the user has no applications left: the list shows its empty state. */
   @step("app_user.User Verifies The Recurring Reservation Is Cancelled")
   async userVerifiesTheRecurringReservationIsCancelled() {
-    await this.pages.customKeywords.verifyCardNotFoundInGroupWithMatchingConditions(
-      EMPTY_STATE_MESSAGE_RECURRING_APPLICATIONS
-    );
+    // The empty state is a span with only the message
+    await expect(
+      this.page.locator("#main").getByText(EMPTY_STATE_MESSAGE_RECURRING_APPLICATIONS, { exact: true }),
+      "The applications page shows its empty state: no applications are left"
+    ).toBeVisible();
   }
 
   // Misc

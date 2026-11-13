@@ -185,7 +185,7 @@ export class AppAdmin extends PageObject {
     await expect(this.accessCodeInfo).toBeVisible();
   }
 
-  /** Verifies that the access code matches the expected value (extracts numbers only). */
+  /** Verifies that the access code matches the expected value. */
   @step("app_admin.Admin Checks Access Code Matches")
   async adminChecksAccessCodeMatches(access_code: string) {
     await expect(this.accessCodeInfo).toHaveText(access_code, {
@@ -194,10 +194,14 @@ export class AppAdmin extends PageObject {
     });
   }
 
-  /** Verifies that the access code does NOT match the expected value (extracts numbers only). */
+  /** Verifies that the access code does NOT match the expected value. */
   @step("app_admin.Admin Checks Access Code Does Not Match")
   async adminChecksAccessCodeDoesNotMatch(access_code: string) {
-    await this.pages.customKeywords.verifyElementWithTextIsNotFound(this.accessCodeInfo, access_code);
+    // Waits until the row shows another code. A missing row fails the check.
+    await expect(this.accessCodeInfo, "The access code has changed").not.toHaveText(access_code, {
+      useInnerText: true,
+      timeout: TEXT_CHECK_TIMEOUT,
+    });
   }
 
   @step("app_admin.Admin Saves Access Code")
