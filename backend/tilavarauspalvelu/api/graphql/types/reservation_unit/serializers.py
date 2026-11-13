@@ -320,6 +320,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
             msg = "Reservation unit can have only one pricing per date."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_DUPLICATE_DATE)
 
+        self._validate_only_first_pricing_begins_in_past(pricings=pricings, today=today)
+
         for pricing in pricings:
             # Reservations use the tax rate of the date they are created or paid, even for future pricings.
             tax_level = pricing.get("tax_level")
@@ -342,6 +344,27 @@ class ReservationUnitSerializer(NestingModelSerializer):
             if pricing.get("payment_type") is None:
                 msg = "Pricing has no payment type defined"
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICING_NO_PAYMENT_TYPE)
+
+    def _validate_only_first_pricing_begins_in_past(
+        self,
+        *,
+        pricings: list[dict[str, Any]],
+        today: datetime.date,
+    ) -> None:
+        # Saved pricings are sent again on every save, so their unchanged begin dates are allowed.
+        saved_begins_by_pk: dict[int, datetime.date] = {}
+        if self.instance is not None:
+            saved_begins_by_pk = dict(self.instance.pricings.values_list("pk", "begins"))
+
+        new_past_pricings = [
+            pricing
+            for pricing in pricings
+            if pricing["begins"] < today and saved_begins_by_pk.get(pricing.get("pk")) != pricing["begins"]
+        ]
+        is_first_pricing = not saved_begins_by_pk and len(new_past_pricings) <= 1
+        if new_past_pricings and not is_first_pricing:
+            msg = "Only the first pricing can begin in the past."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_BEGINS_IN_PAST)
 
     def _validate_access_types(self, *, access_types: list[dict[str, Any]], is_draft: bool) -> None:  # noqa: PLR0912
         editing = getattr(self.instance, "pk", None) is not None
