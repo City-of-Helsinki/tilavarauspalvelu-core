@@ -245,8 +245,8 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
 
 def test_reservation__requires_handling__cancel_order_if_not_paid_yet(graphql):
     reservation = ReservationFactory.create_for_requires_handling(
-        price=Decimal("12.4"),
-        tax_percentage_value=Decimal("25.5"),
+        price_lines__amount=Decimal("12.4"),
+        price_lines__tax_percentage=Decimal("25.5"),
         payment_order__remote_id=None,
         payment_order__status=OrderStatus.PENDING,
         payment_order__handled_payment_due_by=local_datetime(),
@@ -270,8 +270,8 @@ def test_reservation__requires_handling__cancel_order_if_not_paid_yet(graphql):
 
 def test_reservation__requires_handling__leave_order_paid(graphql):
     reservation = ReservationFactory.create_for_requires_handling(
-        price=Decimal("12.4"),
-        tax_percentage_value=Decimal("25.5"),
+        price_lines__amount=Decimal("12.4"),
+        price_lines__tax_percentage=Decimal("25.5"),
         payment_order__remote_id=uuid.uuid4(),
         payment_order__status=OrderStatus.PAID,
         payment_order__handled_payment_due_by=local_datetime(),

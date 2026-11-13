@@ -19,7 +19,7 @@ from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory, ReservationPriceLineFactory
+from tests.factories import PriceComponentFactory, ReservationFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
@@ -172,10 +172,8 @@ def test_reservation_requires_handling__get_context__get_mock_data__not_subsidis
 def test_reservation_requires_handling__get_context__instance__subsidised(email_reservation):
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()
-    ReservationPriceLineFactory.create(
-        reservation=email_reservation,
-        price_component__can_apply_for_discount=True,
-    )
+    price_component = PriceComponentFactory.create(can_apply_for_discount=True)
+    email_reservation.price_lines.update(price_component=price_component)
 
     expected = {
         **LANGUAGE_CONTEXT["en"],
@@ -196,10 +194,8 @@ def test_reservation_requires_handling__get_context__instance__subsidised(email_
 def test_reservation_requires_handling__get_context__instance__not_subsidised(email_reservation):
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()
-    ReservationPriceLineFactory.create(
-        reservation=email_reservation,
-        price_component__can_apply_for_discount=False,
-    )
+    price_component = PriceComponentFactory.create(can_apply_for_discount=False)
+    email_reservation.price_lines.update(price_component=price_component)
 
     expected = {
         **LANGUAGE_CONTEXT["en"],

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Any, NamedTuple
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
+from lookup_property import L
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import (
@@ -14,9 +16,10 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReserveeType,
 )
+from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory
+from tests.factories import ReservationFactory, ReservationPriceLineFactory
 
 
 class Params(NamedTuple):
@@ -354,6 +357,64 @@ def test_reservation__email_reservee_name__organisation(reservee_type):
         reservee_organisation_name="Org",
     )
     assert reservation.actions.get_email_reservee_name() == "Org"
+
+
+# ── Totals ──
+
+
+@pytest.mark.django_db
+def test_reservation__totals__from_price_lines():
+    reservation = ReservationFactory.create()
+    ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal("25.10"),
+        override_amount=None,
+        tax_percentage=Decimal("25.50"),
+    )
+    ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal("11.35"),
+        override_amount=Decimal("5.00"),
+        tax_percentage=Decimal("13.50"),
+    )
+
+    # Net amounts: 25.10 / 1.255 = 20.00 and 5.00 / 1.135 = 4.41.
+    expected = (Decimal("30.10"), Decimal("36.45"), Decimal("24.41"))
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert (reservation.total_price, reservation.total_price_without_overrides, reservation.total_price_net) == expected
+
+    reservations = Reservation.objects.filter(pk=reservation.pk).annotate(
+        total=L("total_price"),
+        total_without_overrides=L("total_price_without_overrides"),
+        total_net=L("total_price_net"),
+    )
+    assert list(reservations.values_list("total", "total_without_overrides", "total_net")) == [expected]
+
+
+@pytest.mark.django_db
+def test_reservation__totals__no_price_lines():
+    reservation = ReservationFactory.create()
+
+    expected = (Decimal("0.00"), Decimal("0.00"), Decimal("0.00"))
+
+    assert (reservation.total_price, reservation.total_price_without_overrides, reservation.total_price_net) == expected
+
+    reservations = Reservation.objects.filter(pk=reservation.pk).annotate(
+        total=L("total_price"),
+        total_without_overrides=L("total_price_without_overrides"),
+        total_net=L("total_price_net"),
+    )
+    assert list(reservations.values_list("total", "total_without_overrides", "total_net")) == [expected]
+
+
+@pytest.mark.django_db
+def test_reservation__totals__filter():
+    reservation = ReservationFactory.create(price_lines__amount=Decimal(10), price_lines__override_amount=Decimal(0))
+    ReservationFactory.create(price_lines__amount=Decimal(10))
+
+    reservations = Reservation.objects.filter(L(total_price=0), L(total_price_without_overrides=10))
+    assert list(reservations) == [reservation]
 
 
 # ── Payment order creation ──

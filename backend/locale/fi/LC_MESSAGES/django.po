@@ -1341,7 +1341,6 @@ msgstr ""
 "hakemuksen osan ulkoisella tunnisteella"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Price"
 msgstr "Hinta"
 
@@ -1466,24 +1465,16 @@ msgid "Door code generated at"
 msgstr "Ovikoodi generoitu"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Price net"
-msgstr "Nettohinta"
+msgid "Total price"
+msgstr "Kokonaishinta"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Non-subsidised price"
-msgstr "Subventoimaton hinta"
+msgid "Total net price"
+msgstr "Kokonaishinta ilman ALV:tä"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Non-subsidised net price"
-msgstr "Subventoimaton nettohinta"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Unit price"
-msgstr "Yksikköhinta"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Tax percentage value"
-msgstr "Veroprosentti"
+msgid "Total price without overrides"
+msgstr "Kokonaishinta ilman käsittelijän muutoksia"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Applying free of charge"
@@ -1604,28 +1595,19 @@ msgid "When this reservation was created"
 msgstr "Milloin tämä varaus luotiin"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "The price of this particular reservation including VAT"
-msgstr "Varauksen hinta ALV:n kanssa"
+msgid "The sum of the final amounts of the price lines, including VAT"
+msgstr "Hintarivien lopullisten hintojen summa, sisältää ALV:n"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "The price of this particular reservation excluding VAT"
-msgstr "Varauksen hinta ilman ALV:ta"
+msgid "The sum of the final amounts of the price lines, excluding VAT"
+msgstr "Hintarivien lopullisten hintojen summa ilman ALV:tä"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "The non subsidised price of this reservation including VAT"
-msgstr "Subventoimaton hinta ALV:n kanssa"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "The non subsidised price of this reservation excluding VAT"
-msgstr "Subventoimaton hinta ilman ALV:ta"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "The unit price of this particular reservation"
-msgstr "Varauksen yksikköhinta"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "The value of the tax percentage for this particular reservation"
-msgstr "ALV:n prosenttiosuus tässä varauksessa"
+msgid ""
+"The sum of the amounts of the price lines without the overrides of the "
+"handler, including VAT"
+msgstr ""
+"Hintarivien hintojen summa ilman käsittelijän muutoksia, sisältää ALV:n"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee is applying for a free-of-charge reservation"

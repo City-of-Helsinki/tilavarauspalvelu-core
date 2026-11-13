@@ -108,7 +108,6 @@ export function getReservationPriceDisplay(
 }
 
 /// The price of a reservation from its price lines. The override of the handler replaces the amount of a line.
-/// Reservations made before price lines have no lines. For these, use the price of the reservation.
 /// The price lines have no material price description, so it comes from the reservation unit as it is today.
 export function getReservationPriceDisplayFromLines(
   reservation: ReservationPriceLinesFieldsFragment,
@@ -116,21 +115,12 @@ export function getReservationPriceDisplayFromLines(
   hasMaterialPrice: boolean
 ): ReservationPriceDisplay {
   const priceLineList = reservation.priceLines ?? [];
-  if (priceLineList.length === 0) {
-    const taxPercentage = toNumber(reservation.taxPercentageValue);
-    return {
-      total: toNumber(reservation.price) ?? 0,
-      lineList: [],
-      taxPercentage: taxPercentage != null && taxPercentage > 0 ? taxPercentage : null,
-      hasMaterialPrice,
-    };
-  }
   const lineList = priceLineList.map((line) => ({
     description: getTranslation(line, "description", lang),
     amount: toNumber(line.overrideAmount ?? line.amount) ?? 0,
   }));
   return {
-    total: lineList.reduce((sum, line) => sum + line.amount, 0),
+    total: toNumber(reservation.totalPrice) ?? 0,
     lineList,
     taxPercentage: getCommonTaxPercentage(priceLineList.map((line) => toNumber(line.taxPercentage) ?? 0)),
     hasMaterialPrice,
@@ -188,8 +178,7 @@ export const RESERVATION_PRICE_CALCULATION_FRAGMENT = gql`
 export const RESERVATION_PRICE_LINES_FRAGMENT = gql`
   fragment ReservationPriceLinesFields on ReservationNode {
     id
-    price
-    taxPercentageValue
+    totalPrice
     priceLines {
       id
       descriptionFi

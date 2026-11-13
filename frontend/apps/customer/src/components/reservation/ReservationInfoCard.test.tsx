@@ -84,9 +84,9 @@ describe("Component: ReservationInfoCard", () => {
   });
 
   describe("with the price lines of the reservation", () => {
-    it("shows the override amount of the handler instead of the amount", () => {
+    it("shows the total price, which has the override amount of the handler instead of the amount", () => {
       customRender({
-        reservation: createMockReservationInfoCard("10", {
+        reservation: createMockReservationInfoCard("4.00", {
           priceLines: [createPriceLine({ amount: "10.00", overrideAmount: "4.00" })],
         }),
       });
@@ -101,13 +101,6 @@ describe("Component: ReservationInfoCard", () => {
         }),
       });
       expect(getPriceText()).toBe('common:price: 0 - 10,00 € (common:inclTax {"taxPercentage":"25,5"})');
-    });
-
-    it("uses the price of the reservation when the reservation has no price lines", () => {
-      customRender({
-        reservation: createMockReservationInfoCard("12", { priceLines: [], taxPercentageValue: "24" }),
-      });
-      expect(getPriceText()).toBe('common:price: 12,00 € (common:inclTax {"taxPercentage":"24"})');
     });
 
     it("adds the material price of the reservation unit as it is today", () => {
@@ -236,8 +229,7 @@ function createMockReservationInfoCard(
       accessCode: "1234",
     },
     pk: 1,
-    price: price ?? "10",
-    taxPercentageValue: "25.5",
+    totalPrice: price ?? "10",
     priceLines: [createPriceLine({ amount: price ?? "10.00" })],
     reservationUnit: {
       id: createNodeId("ReservationUnitNode", 2),

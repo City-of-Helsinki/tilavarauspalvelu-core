@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from decimal import Decimal
+
 import pytest
 from lookup_property import L
 
@@ -213,3 +215,43 @@ def test_reservation_series__access_code_is_active_correct__inactive_when_should
     )
 
     assert series.is_access_code_is_active_correct is False
+
+
+def test_reservation_series__total_price__reservations_going_to_occur():
+    series = ReservationSeriesFactory.create()
+    ReservationFactory.create(
+        reservation_series=series,
+        state=ReservationStateChoice.CONFIRMED,
+        price_lines__amount=Decimal(10),
+    )
+    ReservationFactory.create(
+        reservation_series=series,
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        price_lines__amount=Decimal(30),
+        price_lines__override_amount=Decimal(20),
+    )
+    ReservationFactory.create(
+        reservation_series=series,
+        state=ReservationStateChoice.CANCELLED,
+        price_lines__amount=Decimal(100),
+    )
+
+    # Test non-ORM code
+    assert series.total_price == Decimal("30.00")
+
+    series = ReservationSeries.objects.annotate(total_price=L("total_price")).first()
+
+    # Test ORM code
+    assert series.total_price == Decimal("30.00")
+
+
+def test_reservation_series__total_price__no_reservations():
+    series = ReservationSeriesFactory.create()
+
+    # Test non-ORM code
+    assert series.total_price == Decimal("0.00")
+
+    series = ReservationSeries.objects.annotate(total_price=L("total_price")).first()
+
+    # Test ORM code
+    assert series.total_price == Decimal("0.00")

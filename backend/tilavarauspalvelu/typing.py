@@ -174,10 +174,6 @@ class ReservationCreateData(TypedDict):
     buffer_time_after: NotRequired[datetime.timedelta]
     user: NotRequired[User]
     reservee_used_ad_login: NotRequired[bool]
-    price: NotRequired[Decimal]
-    unit_price: NotRequired[Decimal]
-    tax_percentage_value: NotRequired[Decimal]
-    non_subsidised_price: NotRequired[Decimal]
     access_type: NotRequired[AccessType]
 
     # From prefill
@@ -221,7 +217,6 @@ class ReservationConfirmData(TypedDict):
     confirmed_at: NotRequired[datetime.datetime]
     payment_type: NotRequired[PaymentType | None]
     state: NotRequired[ReservationStateChoice]
-    tax_percentage_value: NotRequired[Decimal]
 
 
 class ReservationAdjustTimeData(TypedDict):
@@ -237,8 +232,7 @@ class ReservationAdjustTimeData(TypedDict):
 
 class ReservationApproveData(TypedDict):
     pk: int
-    price: NotRequired[Decimal]
-    price_lines: NotRequired[list[ReservationPriceLineOverrideData]]
+    price_lines: list[ReservationPriceLineOverrideData]
     handling_details: str
 
     state: NotRequired[ReservationStateChoice]
@@ -247,9 +241,9 @@ class ReservationApproveData(TypedDict):
     access_code_is_active: NotRequired[bool]
     payment_type: NotRequired[PaymentType]
     handled_payment_due_by: NotRequired[datetime.datetime]
-    tax_percentage_value: NotRequired[Decimal]
     should_delete_previous_payment_order: NotRequired[bool]
     price_line_overrides: NotRequired[dict[int, Decimal | None]]
+    new_total_price: NotRequired[Decimal]
 
 
 class ReservationPriceLineOverrideData(TypedDict):
@@ -607,13 +601,12 @@ class error_codes(StrEnum):  # noqa: N801
     RESERVATION_MODIFICATION_NOT_ALLOWED = auto()
     RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE = auto()
     RESERVATION_NO_PAYMENT_ORDER = auto()
-    RESERVATION_PRICE_AND_PRICE_LINES_GIVEN = auto()
     RESERVATION_PRICE_CANNOT_BE_CHANGED = auto()
     RESERVATION_PRICE_INTERVAL_TOO_LONG = auto()
+    RESERVATION_PRICE_LINES_HAVE_MANY_TAX_PERCENTAGES = auto()
     RESERVATION_PRICE_LINES_MISMATCH = auto()
     RESERVATION_PRICE_LINE_AMOUNT_NEGATIVE = auto()
     RESERVATION_PRICE_LINE_QUANTITY_NOT_POSITIVE = auto()
-    RESERVATION_PRICE_REQUIRED = auto()
     RESERVATION_SERIES_ALREADY_STARTED = auto()
     RESERVATION_SERIES_HAS_ENDED = auto()
     RESERVATION_SERIES_INVALID_RECURRENCE_IN_DAYS = auto()

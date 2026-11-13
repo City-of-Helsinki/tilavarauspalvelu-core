@@ -133,10 +133,13 @@ class ReservationNode(DjangoNode):
     handled_at = graphene.DateTime()
     created_at = graphene.DateTime()
     #
-    price = graphene.Decimal()
-    price_net = graphene.Decimal()
-    unit_price = graphene.Decimal()
-    tax_percentage_value = graphene.Decimal()
+    total_price = AnnotatedField(graphene.Decimal, expression=L("total_price"), required=False)
+    total_price_without_overrides = AnnotatedField(
+        graphene.Decimal,
+        expression=L("total_price_without_overrides"),
+        required=False,
+    )
+    total_price_net = AnnotatedField(graphene.Decimal, expression=L("total_price_net"), required=False)
     #
     access_type = graphene.Field(graphene.Enum.from_enum(AccessType))
     access_code_generated_at = graphene.DateTime()
@@ -180,10 +183,9 @@ class ReservationNode(DjangoNode):
             "handled_at",
             "created_at",
             #
-            "price",
-            "price_net",
-            "unit_price",
-            "tax_percentage_value",
+            "total_price",
+            "total_price_without_overrides",
+            "total_price_net",
             "price_lines",
             "price_option",
             #

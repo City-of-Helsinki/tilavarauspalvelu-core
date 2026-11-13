@@ -18,6 +18,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationPriceLine
+from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
@@ -50,7 +51,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
 
     pk = IntegerField(required=True)
 
-    price_lines = ReservationPriceLineOverrideSerializer(many=True, required=False, write_only=True)
+    price_lines = ReservationPriceLineOverrideSerializer(many=True, required=True, write_only=True)
 
     state = EnumFriendlyChoiceField(
         choices=ReservationStateChoice.choices,
@@ -62,14 +63,12 @@ class ReservationApproveSerializer(NestingModelSerializer):
         model = Reservation
         fields = [
             "pk",
-            "price",
             "price_lines",
             "handling_details",
             "handled_at",
             "state",
         ]
         extra_kwargs = {
-            "price": {"required": False},
             "handling_details": {"required": True},
             "handled_at": {"read_only": True},
         }
@@ -79,19 +78,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         data["state"] = ReservationStateChoice.CONFIRMED
         data["handled_at"] = local_datetime()
 
-        has_price = "price" in data
-        has_price_lines = "price_lines" in data
-
-        if not has_price and not has_price_lines:
-            msg = "Either price or price lines must be given."
-            raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_REQUIRED)
-
-        if has_price and has_price_lines:
-            msg = "Price and price lines cannot both be given."
-            raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_AND_PRICE_LINES_GIVEN)
-
-        if has_price_lines:
-            data = self.validate_price_line_overrides(data)
+        data = self.validate_price_line_overrides(data)
 
         if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
             return self.validate_payment_order(data)
@@ -111,12 +98,12 @@ class ReservationApproveSerializer(NestingModelSerializer):
 
         price_line_overrides = {override["pk"]: override["override_amount"] for override in overrides}
 
-        price = Decimal(0)
+        new_total_price = Decimal(0)
         for line in price_lines:
             override_amount = price_line_overrides[line.pk]
-            price += line.amount if override_amount is None else override_amount
+            new_total_price += line.amount if override_amount is None else override_amount
 
-        data["price"] = price
+        data["new_total_price"] = new_total_price
         data["price_line_overrides"] = price_line_overrides
         return data
 
@@ -136,14 +123,14 @@ class ReservationApproveSerializer(NestingModelSerializer):
                     msg = "Reservation has a payment order with a refund in progress."
                     raise ValidationError(msg, code=error_codes.ORDER_REFUND_IN_PROGRESS)
 
-                if payment_order.price_total != data["price"]:
+                if payment_order.price_total != data["new_total_price"]:
                     msg = "Reservation already has a paid payment order with a different price."
                     raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_CANNOT_BE_CHANGED)
 
                 # If price hasn't changed, we can just use the existing payment order.
                 return data
 
-        if data["price"] == 0:
+        if data["new_total_price"] == 0:
             return data
 
         reservation_unit = self.instance.reservation_unit
@@ -166,23 +153,24 @@ class ReservationApproveSerializer(NestingModelSerializer):
         if payment_type != PaymentType.ON_SITE:
             reservation_unit.validators.validate_has_payment_product()
 
-            # A webshop payment uses the tax rate of the date of sale.
-            # Other payments keep the tax rate from the date the reservation was created.
-            today = local_date()
-            data["tax_percentage_value"] = self.instance.actions.get_tax_percentage(on_date=today)
-
         data["payment_type"] = payment_type
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:
-        price_line_overrides = validated_data.pop("price_line_overrides", None)
+        price_line_overrides = validated_data.pop("price_line_overrides")
+        validated_data.pop("new_total_price")
 
         with transaction.atomic():
+            # The payment order gets its amounts from the totals that the overrides set.
+            self.save_price_line_overrides(price_line_overrides)
+
+            # A webshop payment uses the tax rates of the date of sale.
+            # Other payments keep the tax rates from the date the reservation was created.
+            if validated_data.get("payment_type") in PaymentType.requires_verkkokauppa:
+                set_price_line_taxes(reservation=self.instance, on_date=local_date())
+
             if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
                 self.create_payment_order_if_required(validated_data)
-
-            if price_line_overrides is not None:
-                self.save_price_line_overrides(price_line_overrides)
 
             instance = super().update(instance=instance, validated_data=validated_data)
 
@@ -225,19 +213,12 @@ class ReservationApproveSerializer(NestingModelSerializer):
             self.instance.payment_order.delete()
             self.instance.refresh_from_db()
 
-        if validated_data["price"] == 0:
+        if self.instance.total_price == 0:
             return
 
         # If a payment order still exists, it should be paid and have the same price, so don't create a new one.
         if hasattr(self.instance, "payment_order"):
             return
-
-        # Set price info on instance early so that payment order data is calculated correctly
-        self.instance.price = validated_data["price"]
-
-        tax_percentage_value = validated_data.get("tax_percentage_value")
-        if tax_percentage_value is not None:
-            self.instance.tax_percentage_value = tax_percentage_value
 
         if validated_data["state"].should_create_payment_order:
             self.instance.actions.create_payment_order_paid_after_handling(

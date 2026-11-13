@@ -615,8 +615,8 @@ def test_generate_reservation_series_from_allocations__prices_from_price_option(
     assert len(reservations) == 3
     for reservation in reservations:
         assert reservation.price_option == adults
-        assert reservation.price == Decimal("20.00")
-        assert reservation.non_subsidised_price == Decimal("20.00")
+        assert reservation.total_price == Decimal("20.00")
+        assert reservation.total_price_without_overrides == Decimal("20.00")
 
         lines = list(reservation.price_lines.all())
         assert len(lines) == 1
@@ -656,7 +656,7 @@ def test_generate_reservation_series_from_allocations__component_with_and_withou
     application_round.actions.generate_reservations_from_allocations()
 
     reservations = list(Reservation.objects.order_by("begins_at"))
-    assert [reservation.price for reservation in reservations] == [Decimal("20.00"), Decimal("30.00")]
+    assert [reservation.total_price for reservation in reservations] == [Decimal("20.00"), Decimal("30.00")]
     assert [reservation.price_lines.get().description_fi for reservation in reservations] == ["", "Aikuiset"]
 
 
@@ -680,7 +680,7 @@ def test_generate_reservation_series_from_allocations__pricing_group_changes_dur
     application_round.actions.generate_reservations_from_allocations()
 
     reservations = list(Reservation.objects.order_by("begins_at"))
-    assert [reservation.price for reservation in reservations] == [
+    assert [reservation.total_price for reservation in reservations] == [
         Decimal("20.00"),
         Decimal("60.00"),
         Decimal("60.00"),
@@ -700,7 +700,7 @@ def test_generate_reservation_series_from_allocations__no_pricing_groups():
     reservations = list(Reservation.objects.order_by("begins_at"))
     assert len(reservations) == 3
     for reservation in reservations:
-        assert reservation.price == Decimal(0)
+        assert reservation.total_price == Decimal(0)
         assert reservation.price_option is None
     assert ReservationPriceLine.objects.count() == 0
 

@@ -187,9 +187,6 @@ class ApplicationRoundActions:
                             line.reservation = reservation
                             price_lines.append(line)
 
-                        reservation.price = reservation_price_lines.calculation.total
-                        reservation.non_subsidised_price = reservation_price_lines.calculation.total
-
                 reservations = Reservation.objects.bulk_create(reservations)
                 reservation_pks.update(reservation.pk for reservation in reservations)
 

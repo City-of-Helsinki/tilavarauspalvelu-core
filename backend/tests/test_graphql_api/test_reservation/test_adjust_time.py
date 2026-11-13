@@ -57,6 +57,7 @@ def test_reservation__adjust_time__replaces_price_lines(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         reservation_unit__own_price__price_unit=PriceUnit.PER_HOUR,
         price_lines__quantity=Decimal(5),
+        price_lines__amount=Decimal(0),
     )
     old_line_pk = reservation.price_lines.get().pk
     component = PriceComponent.objects.get(
@@ -157,7 +158,7 @@ def test_reservation__adjust_time__reservation_is_already_handled(graphql):
 
 
 def test_reservation__adjust_time__reservation_has_price_to_be_paid(graphql):
-    reservation = ReservationFactory.create_for_time_adjustment(price=Decimal(1))
+    reservation = ReservationFactory.create_for_time_adjustment(price_lines__amount=Decimal(1))
 
     graphql.login_with_superuser()
     data = get_adjust_data(reservation)

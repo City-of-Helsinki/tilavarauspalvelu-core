@@ -105,7 +105,7 @@ function createMockReservation({
   return {
     id: "123f4w90",
     state: state ?? ReservationStateChoice.Confirmed,
-    price: price ?? "0",
+    totalPrice: price ?? "0",
     beginsAt: start.toISOString(),
     endsAt: end.toISOString(),
     reservationUnit: resUnit,

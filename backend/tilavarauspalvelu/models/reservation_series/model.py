@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -12,9 +13,9 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
-from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, ReservationStateChoice, Weekday
 from utils.auditlog_util import AuditLogger
-from utils.db import SubqueryArray
+from utils.db import SubqueryArray, SubquerySum
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
@@ -200,6 +201,47 @@ class ReservationSeries(models.Model):
         if len(access_types) == 1:
             return AccessTypeWithMultivalued(access_types[0])
         return AccessTypeWithMultivalued.MULTIVALUED
+
+    @lookup_property
+    def total_price() -> Decimal:
+        """The sum of the total prices of the reservations in this reservation series that are going to occur."""
+        from tilavarauspalvelu.models import ReservationPriceLine
+
+        price_lines = (
+            ReservationPriceLine.objects
+            .filter(
+                reservation__reservation_series=models.OuterRef("pk"),
+                reservation__state__in=ReservationStateChoice.states_going_to_occur,
+            )
+            .annotate(final_amount=Coalesce("override_amount", "amount"))
+            .values("final_amount")
+        )
+        return Coalesce(  # type: ignore[return-value]
+            SubquerySum(
+                queryset=price_lines,
+                aggregate_field="final_amount",
+                output_field=models.DecimalField(max_digits=10, decimal_places=2),
+            ),
+            models.Value(Decimal("0.00")),
+            output_field=models.DecimalField(max_digits=10, decimal_places=2),
+        )
+
+    @total_price.override
+    def _(self) -> Decimal:
+        from tilavarauspalvelu.models import ReservationPriceLine
+
+        price_lines = ReservationPriceLine.objects.filter(
+            reservation__reservation_series=self,
+            reservation__state__in=ReservationStateChoice.states_going_to_occur,
+        )
+        result = price_lines.aggregate(
+            total=Coalesce(
+                models.Sum(Coalesce("override_amount", "amount")),
+                models.Value(Decimal("0.00")),
+                output_field=models.DecimalField(max_digits=10, decimal_places=2),
+            ),
+        )
+        return result["total"]
 
 
 AuditLogger.register(ReservationSeries)

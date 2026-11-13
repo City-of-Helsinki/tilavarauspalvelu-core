@@ -41,7 +41,8 @@ function createPriceDetails(
 ): ReservationPriceDetailsFieldsFragment {
   return {
     id: createNodeId("ReservationNode", 1),
-    price: "20.00",
+    totalPrice: "20.00",
+    totalPriceWithoutOverrides: "20.00",
     priceLines: [createPriceLine()],
     ...overrides,
   };
@@ -87,18 +88,20 @@ describe("isReservationPriceFree", () => {
   });
 
   test("is not free when the handler made the price free", () => {
-    const reservation = createPriceDetails({ price: "0", priceLines: [createPriceLine({ overrideAmount: "0" })] });
+    const reservation = createPriceDetails({
+      totalPrice: "0",
+      priceLines: [createPriceLine({ overrideAmount: "0" })],
+    });
     expect(isReservationPriceFree(reservation)).toBe(false);
   });
 
   test("is free when the price lines have no amount", () => {
-    const reservation = createPriceDetails({ price: "0", priceLines: [createPriceLine({ amount: "0" })] });
+    const reservation = createPriceDetails({
+      totalPrice: "0",
+      totalPriceWithoutOverrides: "0",
+      priceLines: [createPriceLine({ amount: "0" })],
+    });
     expect(isReservationPriceFree(reservation)).toBe(true);
-  });
-
-  test("uses the price when the reservation has no price lines", () => {
-    expect(isReservationPriceFree(createPriceDetails({ priceLines: [] }))).toBe(false);
-    expect(isReservationPriceFree(createPriceDetails({ price: "0", priceLines: [] }))).toBe(true);
   });
 });
 
@@ -112,10 +115,12 @@ describe("getReservationPriceDetails", () => {
     expect(getReservationPriceDetails(reservation, mockT)).toMatch(/^20\s€$/);
   });
 
-  test("shows only the price of the reservation without exactly one price line", () => {
-    expect(getReservationPriceDetails(createPriceDetails({ price: "12.00", priceLines: [] }), mockT)).toMatch(
-      /^12\s€$/
-    );
+  test("shows only the normal total price without exactly one price line", () => {
+    const reservation = createPriceDetails({
+      totalPriceWithoutOverrides: "12.00",
+      priceLines: [createPriceLine(), createPriceLine()],
+    });
+    expect(getReservationPriceDetails(reservation, mockT)).toMatch(/^12\s€$/);
   });
 });
 
@@ -151,7 +156,7 @@ describe("createTag", () => {
 describe("formatReservationPrice", () => {
   test("formats paid reservation price", () => {
     const mockReservation = {
-      price: "100.00",
+      totalPrice: "100.00",
     } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPrice(mockT, mockReservation);
@@ -160,7 +165,7 @@ describe("formatReservationPrice", () => {
 
   test("formats free reservation price with fallback text", () => {
     const mockReservation = {
-      price: "0.00",
+      totalPrice: "0.00",
     } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPrice(mockT, mockReservation);
@@ -169,7 +174,7 @@ describe("formatReservationPrice", () => {
 
   test("handles null price with fallback text", () => {
     const mockReservation = {
-      price: null,
+      totalPrice: null,
     } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPrice(mockT, mockReservation);
@@ -180,7 +185,7 @@ describe("formatReservationPrice", () => {
 describe("formatReservationPriceLong", () => {
   test("formats price without subvention when not applicable", () => {
     const mockReservation = {
-      price: "100.00",
+      totalPrice: "100.00",
       paymentOrder: null,
       applyingForFreeOfCharge: false,
     } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
@@ -192,7 +197,7 @@ describe("formatReservationPriceLong", () => {
 
   test("includes subvention text when applicable", () => {
     const mockReservation = {
-      price: "100.00",
+      totalPrice: "100.00",
       paymentOrder: null,
       applyingForFreeOfCharge: true,
     } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
@@ -204,7 +209,7 @@ describe("formatReservationPriceLong", () => {
 
   test("includes due date when payment order exists", () => {
     const mockReservation = {
-      price: "100.00",
+      totalPrice: "100.00",
       paymentOrder: {
         handledPaymentDueBy: "2024-12-31T23:59:59Z",
       },
@@ -219,7 +224,7 @@ describe("formatReservationPriceLong", () => {
 
   test("includes both due date and subvention when both applicable", () => {
     const mockReservation = {
-      price: "100.00",
+      totalPrice: "100.00",
       paymentOrder: {
         handledPaymentDueBy: "2024-12-31T23:59:59Z",
       },
