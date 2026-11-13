@@ -263,16 +263,21 @@ class ReservationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
         )
 
     def upsert_statistics(self: ReservationQuerySet) -> None:
-        reservations = self.select_related(
-            "user",
-            "reservation_series",
-            "reservation_series__allocated_time_slot",
-            "deny_reason",
-            "purpose",
-            "age_group",
-            "reservation_unit",
-            "reservation_unit__unit",
-        ).prefetch_related("price_lines")
+        reservations = (
+            self
+            .select_related(
+                "user",
+                "reservation_series",
+                "reservation_series__allocated_time_slot",
+                "deny_reason",
+                "purpose",
+                "age_group",
+                "reservation_unit",
+                "reservation_unit__unit",
+            )
+            .prefetch_related("price_lines")
+            .order_by("pk")
+        )
 
         new_statistics: list[ReservationStatistic] = [
             ReservationStatistic.for_reservation(reservation) for reservation in reservations
