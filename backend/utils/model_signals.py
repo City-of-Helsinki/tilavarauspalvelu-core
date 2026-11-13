@@ -67,6 +67,9 @@ def bulk_update_with_signals(instances: Sequence[models.Model], *, fields: Seque
     Update the fields of the instances like 'QuerySet.bulk_update()',
     but send 'pre_save' and 'post_save' for each instance.
     The audit log and the receivers in 'tilavarauspalvelu/signals.py' work through these signals.
+
+    'auto_now' fields get the current time, like in 'Model.save()'.
+    An 'auto_now' field in 'fields' keeps the value that is set on the instance.
     """
     if not instances:
         return
@@ -117,6 +120,9 @@ def update_with_signals(queryset: models.QuerySet, /, **values: Any) -> int:
     Update the rows in the queryset like 'QuerySet.update()', but send 'pre_save' and 'post_save' for each row.
     Values can be plain values, model instances or expressions.
     Expressions cannot refer to annotations of the queryset, since the rows are read with a new queryset.
+
+    'auto_now' fields that are not in the values get the current time on every matched row,
+    also on rows where no other value changes.
     """
     # Same as 'QuerySet.update()', which writes nothing when no values are given.
     if not values:
@@ -147,6 +153,7 @@ def update_with_signals(queryset: models.QuerySet, /, **values: Any) -> int:
         matching_queryset = model._default_manager.filter(pk__in=matching_pks).order_by("pk")  # noqa: SLF001
         instances = list(matching_queryset.annotate(**expressions))
 
+        # The field names come from the caller, so this generic helper must use 'getattr' and 'setattr'.
         for instance in instances:
             for field, value in zip(fields, values.values(), strict=True):
                 annotation_name = _annotation_name(field)
