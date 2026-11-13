@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.contrib.admin import AdminSite
 from django.test import RequestFactory
+from django.urls import reverse
 
 from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitAdmin
 from tilavarauspalvelu.enums import (
@@ -15,10 +18,20 @@ from tilavarauspalvelu.enums import (
     ReservationStartInterval,
     TermsOfUseTypeChoices,
 )
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnit
+from utils.date_utils import local_date
 
-from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory, TermsOfUseFactory, UserFactory
-from tests.test_admin.helpers import management_form_data
+from tests.factories import (
+    PriceComponentFactory,
+    PricingGroupFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingGroupFactory,
+    TermsOfUseFactory,
+    UserFactory,
+)
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import TermsOfUse
 
 # Applied to all tests
 pytestmark = [
@@ -301,54 +314,134 @@ def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_b
 
 
 def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid():
-    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
-    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
-    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
-    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
 
-    reservation_unit = ReservationUnitFactory.create(
-        payment_terms=payment_terms,
-        cancellation_terms=cancellation_terms,
-        service_specific_terms=service_specific_terms,
-        pricing_terms=pricing_terms,
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
+
+    assert not form.is_valid()
+    assert form.errors["payment_terms"] == [
+        "Payment terms are required for direct booking of paid reservation units",
+    ]
+
+
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_free():
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(0))
+
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
+
+    assert form.is_valid(), form.errors
+
+
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid_price_has_ended():
+    reservation_unit = create_reservation_unit_with_price(
+        amount=Decimal(10),
+        valid_until=local_date() - datetime.timedelta(days=1),
     )
 
-    pricings = ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, highest_price=Decimal(10))
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
 
+    assert form.is_valid(), form.errors
+
+
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_after_change_to_free():
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
+    free_pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=free_pricing_group,
+        begins=local_date() - datetime.timedelta(days=5),
+    )
+    PriceComponentFactory.create(
+        pricing_group=free_pricing_group,
+        valid_from=local_date() - datetime.timedelta(days=5),
+        amount=Decimal(0),
+    )
+
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
+
+    assert form.is_valid(), form.errors
+
+
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid_in_future():
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(0))
+    paid_pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=paid_pricing_group,
+        begins=local_date() + datetime.timedelta(days=5),
+    )
+    PriceComponentFactory.create(
+        pricing_group=paid_pricing_group,
+        valid_from=local_date() + datetime.timedelta(days=5),
+        amount=Decimal(10),
+    )
+
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
+
+    assert not form.is_valid()
+    assert form.errors["payment_terms"] == [
+        "Payment terms are required for direct booking of paid reservation units",
+    ]
+
+
+# ── Pricing groups ──
+
+
+def test_reservation_unit_admin__pricing_groups__link_to_pricing_group(api_client):
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
+    pricing_group_row = reservation_unit.reservation_unit_pricing_groups.get()
+    api_client.force_login(UserFactory.create_superuser())
+
+    url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=[reservation_unit.pk])
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    pricing_group_url = reverse(
+        "admin:tilavarauspalvelu_pricinggroup_change", args=[pricing_group_row.pricing_group_id]
+    )
+    assert f'href="{pricing_group_url}"' in response.content.decode()
+
+
+# ── Helpers ──
+
+
+def create_reservation_unit_with_price(
+    *,
+    amount: Decimal,
+    valid_until: datetime.date | None = None,
+) -> ReservationUnit:
+    reservation_unit = ReservationUnitFactory.create(
+        payment_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT),
+        cancellation_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION),
+        service_specific_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE),
+        pricing_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING),
+    )
+    begins = local_date() - datetime.timedelta(days=30)
+    pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=begins,
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=begins,
+        valid_until=valid_until,
+        amount=amount,
+    )
+    return reservation_unit
+
+
+def create_admin_form(*, reservation_unit: ReservationUnit, payment_terms: TermsOfUse | None):
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
     request.user = UserFactory.create_superuser()
 
     data = get_valid_data(reservation_unit=reservation_unit)
-    data["pricing_terms"] = pricing_terms
-    data["payment_terms"] = None
-    data["cancellation_terms"] = cancellation_terms
-    data["service_specific_terms"] = service_specific_terms
-
-    data |= management_form_data("pricings", total_forms=1, initial_forms=1)
-    data["pricings-0-id"] = pricings.id
-    data["pricings-0-begins"] = pricings.begins.isoformat()
-    data["pricings-0-lowest_price"] = pricings.lowest_price
-    data["pricings-0-highest_price"] = pricings.highest_price
-    data["pricings-0-price_unit"] = pricings.price_unit.value
-    data["pricings-0-payment_type"] = pricings.payment_type.value
-    data["pricings-0-tax_level"] = pricings.tax_level.id
+    data["pricing_terms"] = reservation_unit.pricing_terms
+    data["payment_terms"] = payment_terms
+    data["cancellation_terms"] = reservation_unit.cancellation_terms
+    data["service_specific_terms"] = reservation_unit.service_specific_terms
 
     reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
-
-    inlines = reservation_unit_admin.get_inline_instances(request, obj=reservation_unit)
-    formset = next(
-        (
-            inline.get_formset(request, obj=reservation_unit)
-            for inline in inlines
-            if inline.model == ReservationUnitPricing
-        ),
-        None,
-    )
-    assert formset is not None
-
-    formset = formset(instance=reservation_unit, data=data)
-
-    assert not formset.is_valid()
-    assert formset.non_form_errors() == [
-        "Payment terms are required for direct booking of paid reservation units",
-    ]
+    ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
+    return ReservationUnitModelForm(instance=reservation_unit, data=data)

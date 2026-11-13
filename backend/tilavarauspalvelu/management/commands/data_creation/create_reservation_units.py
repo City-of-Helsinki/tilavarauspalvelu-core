@@ -92,6 +92,30 @@ if TYPE_CHECKING:
     from .utils import TaxLevelKey
 
 
+# A material price with paragraphs, bold and underlined text, a list and a link
+LONG_MATERIAL_PRICE_INFO = MaterialPriceInfo(
+    name="long",
+    fi=(
+        "<p><strong>Materiaalimaksu</strong> peritään jokaisesta varauksesta erikseen.</p>"
+        "<ul><li>Askartelutarvikkeet: <u>5 € henkilöltä</u></li><li>Lisätarvikkeet: 2 € kappaleelta</li></ul>"
+        "<p>Maksu maksetaan paikan päällä kortilla tai käteisellä. "
+        'Lue lisää <a href="https://www.hel.fi/fi" target="_blank" rel="noopener">materiaalimaksuista</a>.</p>'
+    ),
+    en=(
+        "<p>The <strong>material fee</strong> is charged separately for each booking.</p>"
+        "<ul><li>Craft supplies: <u>€5 per person</u></li><li>Extra supplies: €2 per piece</li></ul>"
+        "<p>The fee is paid on site by card or in cash. "
+        'Read more about <a href="https://www.hel.fi/en" target="_blank" rel="noopener">material fees</a>.</p>'
+    ),
+    sv=(
+        "<p><strong>Materialavgiften</strong> tas ut separat för varje bokning.</p>"
+        "<ul><li>Pysselmaterial: <u>5 € per person</u></li><li>Extra material: 2 € per styck</li></ul>"
+        "<p>Avgiften betalas på plats med kort eller kontant. "
+        'Läs mer om <a href="https://www.hel.fi/sv" target="_blank" rel="noopener">materialavgifter</a>.</p>'
+    ),
+)
+
+
 @with_logs
 def _create_reservation_units(
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
@@ -282,6 +306,7 @@ def _create_free_reservation_units(
     )
 
     unit_counter = itertools.count(start=1)
+    material_price_counter = itertools.count(start=1)
 
     for data in get_combinations(
         iterables=[
@@ -385,6 +410,11 @@ def _create_free_reservation_units(
             )
         )
 
+        # Every other reservation unit with a material price has the long one
+        material_price_info = data.material_price_info
+        if material_price_info.name != "none" and next(material_price_counter) % 2 == 0:
+            material_price_info = LONG_MATERIAL_PRICE_INFO
+
         pricing = ReservationUnitPricingFactory.build(
             begins=datetime.date(2021, 1, 1),
             price_unit=PriceUnit.FIXED,
@@ -392,9 +422,9 @@ def _create_free_reservation_units(
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
             tax_level=tax_levels["tax_free"],
-            material_price_description=data.material_price_info.fi,
-            material_price_description_en=data.material_price_info.en,
-            material_price_description_sv=data.material_price_info.sv,
+            material_price_description=material_price_info.fi,
+            material_price_description_en=material_price_info.en,
+            material_price_description_sv=material_price_info.sv,
         )
         pricings.append(pricing)
 
@@ -443,6 +473,8 @@ def _create_paid_reservation_units(
      - Handling requirements
      - Different payment types
      - Different tax percentages
+
+    Every other reservation unit has a material price, so that it is shown together with a paid price.
     """
     reservation_time_choices: list[DurationInfo] = [
         DurationInfo(name="short", minimum=datetime.timedelta(minutes=15), maximum=datetime.timedelta(minutes=60)),
@@ -488,6 +520,15 @@ def _create_paid_reservation_units(
         TaxLevelInfo(key="general"),
         TaxLevelInfo(key="reduced"),
     ]
+    material_price_choices: list[MaterialPriceInfo] = [
+        MaterialPriceInfo(name="none", fi="", en="", sv=""),
+        MaterialPriceInfo(
+            name="per piece",
+            fi="Materiaali maksaa 1€ kappale",
+            en="Material costs 1€ per piece",
+            sv="Materialkostnader 1€ per stycke",
+        ),
+    ]
 
     ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
 
@@ -501,6 +542,7 @@ def _create_paid_reservation_units(
     images: list[ReservationUnitImage] = []
 
     unit_counter = itertools.count(start=1)
+    material_price_counter = itertools.count(start=1)
 
     reservation_unit_type = ReservationUnitTypeFactory.create(
         name="Maksullinen",
@@ -528,6 +570,10 @@ def _create_paid_reservation_units(
         authentication = AuthenticationType.STRONG
         reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
         number = next(unit_counter)
+        material_price_info = material_price_choices[number % 2]
+        # Every other reservation unit with a material price has the long one
+        if material_price_info.name != "none" and next(material_price_counter) % 2 == 0:
+            material_price_info = LONG_MATERIAL_PRICE_INFO
 
         unit = UnitFactory.build(
             name=f"Vessapaikka #{number}",
@@ -596,7 +642,11 @@ def _create_paid_reservation_units(
                 authentication=authentication.value,
                 cancellation_rule=data.cancellation_rule_info.name,
                 handling_required=data.handling_info.name,
-                pricing=data.price_info.name,
+                pricing=(
+                    data.price_info.name
+                    if material_price_info.name == "none"
+                    else f"{data.price_info.name} + {material_price_info.name} material price"
+                ),
                 payment_type=data.payment_type_info.payment_type.name,
                 tax_level=data.tax_level_info.key,
                 access_type="key",
@@ -620,7 +670,9 @@ def _create_paid_reservation_units(
             reservation_unit=reservation_unit,
             tax_level=tax_levels[data.tax_level_info.key],
             payment_type=data.payment_type_info.payment_type,
-            material_price_description="",
+            material_price_description=material_price_info.fi,
+            material_price_description_en=material_price_info.en,
+            material_price_description_sv=material_price_info.sv,
         )
         pricings.append(pricing)
 

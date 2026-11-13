@@ -9,6 +9,7 @@ from tilavarauspalvelu.management.commands.create_test_data import create_test_d
 from tilavarauspalvelu.models import (
     PaymentOrder,
     PersonalInfoViewLog,
+    PriceComponent,
     RejectedOccurrence,
     ReservationSeries,
     ReservationStatistic,
@@ -45,3 +46,9 @@ def test_create_test_data(settings):
         if model in models_that_should_be_empty:
             continue
         assert model.objects.exists(), f"Model {model.__name__} is empty"
+
+    paid_components_with_material_price = PriceComponent.objects.filter(amount__gt=0).exclude(
+        material_price_description_fi=""
+    )
+    assert paid_components_with_material_price.exists()
+    assert paid_components_with_material_price.filter(material_price_description_fi__contains="<ul>").exists()
