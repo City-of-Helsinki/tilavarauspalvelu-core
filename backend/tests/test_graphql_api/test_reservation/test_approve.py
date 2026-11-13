@@ -5,7 +5,6 @@ from decimal import Decimal
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from freezegun import freeze_time
 from rest_framework.status import HTTP_204_NO_CONTENT
 
@@ -26,7 +25,7 @@ from tests.factories import (
     ReservationUnitFactory,
     TaxLevelRateFactory,
 )
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, audit_log_enabled, patch_method
 
 from .helpers import APPROVE_MUTATION, get_approve_data
 
@@ -668,13 +667,6 @@ def test_reservation__approve__empty_handling_details(graphql):
 # ── Price lines ──────────────────────────────────────────────────────────────
 
 
-@pytest.fixture
-def price_line_audit_log():
-    auditlog.register(ReservationPriceLine)
-    yield
-    auditlog.unregister(ReservationPriceLine)
-
-
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 def test_reservation__approve__price_lines__one_line_free_and_one_paid(graphql):
@@ -748,7 +740,6 @@ def test_reservation__approve__price_lines__amounts_corrected_up_and_down(graphq
     assert second_line.override_amount == Decimal("15.25")
 
 
-@pytest.mark.usefixtures("price_line_audit_log")
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 def test_reservation__approve__price_lines__logs_override_amount(graphql):
@@ -761,13 +752,14 @@ def test_reservation__approve__price_lines__logs_override_amount(graphql):
         non_subsidised_price=Decimal(10),
     )
     line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
-    LogEntry.objects.all().delete()
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
     data.pop("price")
     data["priceLines"] = [{"pk": line.pk, "overrideAmount": "0"}]
-    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    with audit_log_enabled(ReservationPriceLine):
+        response = graphql(APPROVE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 

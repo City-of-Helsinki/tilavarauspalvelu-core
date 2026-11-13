@@ -4,7 +4,6 @@ import uuid
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
@@ -20,7 +19,7 @@ from tests.factories import (
     UnitFactory,
     UserFactory,
 )
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, audit_log_enabled, exact, patch_method
 from tests.test_integrations.test_keyless_entry.helpers import (
     default_reservation_response,
     default_reservation_series_response,
@@ -200,14 +199,6 @@ def test_create_access_code__series(settings):
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series"
 
 
-@pytest.fixture
-def reservation_audit_log():
-    auditlog.register(Reservation)
-    yield
-    auditlog.unregister(Reservation)
-
-
-@pytest.mark.usefixtures("reservation_audit_log")
 def test_create_access_code__series__logs_access_code_info():
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
@@ -219,11 +210,13 @@ def test_create_access_code__series__logs_access_code_info():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
-    LogEntry.objects.all().delete()
 
     data = default_reservation_series_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with (
+        patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)),
+        audit_log_enabled(Reservation),
+    ):
         PindoraService.create_access_code(obj=series, is_active=True)
 
     log_entries = list(LogEntry.objects.get_for_object(reservation))

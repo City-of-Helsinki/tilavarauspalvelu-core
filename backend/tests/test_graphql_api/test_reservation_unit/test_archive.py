@@ -2,15 +2,14 @@ from __future__ import annotations
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from django.contrib.contenttypes.models import ContentType
 
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnit
-from utils.auditlog_util import AuditLogger
 from utils.date_utils import next_hour
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
+from tests.helpers import audit_log_enabled
 
 from .helpers import ARCHIVE_MUTATION
 
@@ -82,32 +81,13 @@ def test_reservation_unit__archive__not_blocked_if_reservation_unit_has_future_i
     assert reservation_unit.is_draft is True
 
 
-@pytest.fixture
-def reservation_unit_audit_log(settings):
-    settings.AUDIT_LOGGING_ENABLED = True
-    AuditLogger.register(
-        ReservationUnit,
-        # Exclude lookup properties, since they are calculated values.
-        exclude_fields=[
-            "_publishing_state",
-            "_reservation_state",
-            "_active_pricing_price",
-            "_current_access_type",
-        ],
-    )
-
-    yield
-
-    auditlog.unregister(ReservationUnit)
-
-
-@pytest.mark.usefixtures("reservation_unit_audit_log")
 def test_reservation_unit__archive__removes_contact_information_and_audit_logs(graphql):
     graphql.login_with_superuser()
 
-    reservation_unit = ReservationUnitFactory.create(is_draft=True, contact_information="foo")
-    reservation_unit.contact_information = "bar"
-    reservation_unit.save()
+    with audit_log_enabled(ReservationUnit):
+        reservation_unit = ReservationUnitFactory.create(is_draft=True, contact_information="foo")
+        reservation_unit.contact_information = "bar"
+        reservation_unit.save()
 
     # Two log entries are exist for the reservation unit,
     # one for the creation and one for the contact information update
@@ -121,7 +101,9 @@ def test_reservation_unit__archive__removes_contact_information_and_audit_logs(g
     # Update the reservation unit to be archived
     data = {"pk": reservation_unit.pk}
 
-    response = graphql(ARCHIVE_MUTATION, variables={"input": data})
+    with audit_log_enabled(ReservationUnit):
+        response = graphql(ARCHIVE_MUTATION, variables={"input": data})
+
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()

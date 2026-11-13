@@ -4,7 +4,6 @@ import datetime
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import AccessType
@@ -13,7 +12,7 @@ from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitAccessTypeFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.helpers import audit_log_enabled, patch_method
 
 from .helpers import (
     CREATE_MUTATION,
@@ -181,14 +180,6 @@ def test_reservation_unit__update__access_types(graphql):
     assert access_type[2].access_type == AccessType.UNRESTRICTED
 
 
-@pytest.fixture
-def access_type_audit_log():
-    auditlog.register(ReservationUnitAccessType)
-    yield
-    auditlog.unregister(ReservationUnitAccessType)
-
-
-@pytest.mark.usefixtures("access_type_audit_log")
 def test_reservation_unit__update__access_types__audit_log(graphql):
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
@@ -205,7 +196,6 @@ def test_reservation_unit__update__access_types__audit_log(graphql):
         begin_date=tomorrow,
         access_type=AccessType.UNRESTRICTED,
     )
-    LogEntry.objects.all().delete()
 
     data = get_draft_update_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
@@ -226,7 +216,9 @@ def test_reservation_unit__update__access_types__audit_log(graphql):
     ]
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    with audit_log_enabled(ReservationUnitAccessType):
+        response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 

@@ -6,7 +6,6 @@ from unittest import mock
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from django.test import override_settings
 from freezegun import freeze_time
 
@@ -33,7 +32,7 @@ from tests.factories import (
     TaxLevelRateFactory,
     UnitGroupFactory,
 )
-from tests.helpers import exact
+from tests.helpers import audit_log_enabled, exact
 
 # Applied to all tests
 pytestmark = [
@@ -54,13 +53,6 @@ def create_tax_level_with_rate_change():
     TaxLevelRateFactory.create(tax_level=tax_level, begins=datetime.date(2000, 1, 1), percentage=Decimal(24))
     TaxLevelRateFactory.create(tax_level=tax_level, begins=MAR_1, percentage=Decimal("25.5"))
     return tax_level
-
-
-@pytest.fixture
-def price_line_audit_log():
-    auditlog.register(ReservationPriceLine)
-    yield
-    auditlog.unregister(ReservationPriceLine)
 
 
 # ── Build price lines ──
@@ -275,7 +267,6 @@ def test_set_reservation_price_lines__replaces_old_lines():
     assert lines[0].override_amount is None
 
 
-@pytest.mark.usefixtures("price_line_audit_log")
 def test_set_reservation_price_lines__logs_created_lines():
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -296,7 +287,8 @@ def test_set_reservation_price_lines__logs_created_lines():
         ends_at=local_datetime(2026, 2, 1, 11),
     )
 
-    set_reservation_price_lines(reservation=reservation, price_option=None)
+    with audit_log_enabled(ReservationPriceLine):
+        set_reservation_price_lines(reservation=reservation, price_option=None)
 
     line = reservation.price_lines.get()
     log_entries = list(LogEntry.objects.get_for_object(line))
@@ -344,7 +336,6 @@ def test_set_price_line_taxes__rate_on_the_given_date():
     assert line.amount == Decimal(10)
 
 
-@pytest.mark.usefixtures("price_line_audit_log")
 def test_set_price_line_taxes__logs_tax_percentage():
     tax_level = create_tax_level_with_rate_change()
     reservation = ReservationFactory.create()
@@ -354,9 +345,9 @@ def test_set_price_line_taxes__logs_tax_percentage():
         tax_percentage=Decimal(24),
         amount=Decimal(10),
     )
-    LogEntry.objects.all().delete()
 
-    set_price_line_taxes(reservation=reservation, on_date=MAR_1)
+    with audit_log_enabled(ReservationPriceLine):
+        set_price_line_taxes(reservation=reservation, on_date=MAR_1)
 
     log_entries = list(LogEntry.objects.get_for_object(line))
     assert [log_entry.changes for log_entry in log_entries] == [{"tax_percentage": ["24.00", "25.50"]}]

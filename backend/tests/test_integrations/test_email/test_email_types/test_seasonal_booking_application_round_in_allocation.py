@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from django.test import override_settings
 from freezegun import freeze_time
 
@@ -23,7 +22,7 @@ from tilavarauspalvelu.models import Application
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.helpers import TranslationsFromPOFiles, audit_log_enabled, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -192,23 +191,13 @@ def test_seasonal_booking_application_round_in_allocation__send_email(outbox):
     assert application.in_allocation_notification_sent_at == local_datetime(2024, 1, 1, 12)
 
 
-@pytest.fixture
-def application_audit_log():
-    auditlog.register(Application)
-    yield
-    auditlog.unregister(Application)
-
-
 @pytest.mark.django_db
-@pytest.mark.usefixtures("application_audit_log")
 @override_settings(SEND_EMAILS=True)
 def test_seasonal_booking_application_round_in_allocation__send_email__logs_sent_date_and_keeps_updated_at(outbox):
     with freeze_time(local_datetime(2024, 1, 1, 11)):
         application = ApplicationFactory.create_in_status_in_allocation(in_allocation_notification_sent_at=None)
 
-    LogEntry.objects.all().delete()
-
-    with freeze_time(local_datetime(2024, 1, 1, 12)):
+    with freeze_time(local_datetime(2024, 1, 1, 12)), audit_log_enabled(Application):
         EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
     application.refresh_from_db()

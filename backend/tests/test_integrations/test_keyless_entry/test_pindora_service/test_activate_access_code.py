@@ -4,7 +4,6 @@ import uuid
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
@@ -20,7 +19,7 @@ from tests.factories import (
     UnitFactory,
     UserFactory,
 )
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, audit_log_enabled, exact, patch_method
 
 pytestmark = [
     pytest.mark.django_db,
@@ -253,14 +252,6 @@ def test_activate_access_code__series(settings):
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series/activate/{series.ext_uuid}"
 
 
-@pytest.fixture
-def reservation_audit_log():
-    auditlog.register(Reservation)
-    yield
-    auditlog.unregister(Reservation)
-
-
-@pytest.mark.usefixtures("reservation_audit_log")
 def test_activate_access_code__series__logs_access_code_info():
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
@@ -274,9 +265,11 @@ def test_activate_access_code__series__logs_access_code_info():
         access_code_is_active=False,
         access_code_generated_at=local_datetime(),
     )
-    LogEntry.objects.all().delete()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    with (
+        patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)),
+        audit_log_enabled(Reservation),
+    ):
         PindoraService.activate_access_code(obj=series)
 
     log_entries = list(LogEntry.objects.get_for_object(reservation))
