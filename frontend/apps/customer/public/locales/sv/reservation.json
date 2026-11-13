@@ -76,7 +76,7 @@
     "CONFIRMED": "Godkänd",
     "DENIED": "Avvisad",
     "CANCELLED": "Avbokad",
-    "CREATED": "Utkast",
+    "CREATED": "Preliminär",
     "WAITING_FOR_PAYMENT": "Inväntar betalning"
   },
   "paymentBanner": {

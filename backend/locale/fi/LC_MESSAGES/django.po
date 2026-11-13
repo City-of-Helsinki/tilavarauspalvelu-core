@@ -2748,7 +2748,7 @@ msgstr "Järjestö tai yhdistys"
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationState"
 msgid "Created"
-msgstr "Luotu"
+msgstr "Alustava"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationState"
