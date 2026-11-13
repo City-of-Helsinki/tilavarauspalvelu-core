@@ -1,63 +1,9 @@
-/** Date, time and text helpers, with the snake_case names of the Python helpers they replaced. */
-import { log } from "../../lib/runtime";
-
+/** Date and time helpers, with the snake_case names of the Python helpers they replaced. */
 const FINNISH_DAYS = ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"];
-
-const describeChar = (char: string) => {
-  const code = char === "" ? "N/A" : (char.codePointAt(0) ?? "N/A");
-  return { char, ascii: code, hex: typeof code === "number" ? `0x${code.toString(16)}` : "N/A" };
-};
-
-interface Difference {
-  position: number;
-  [name: string]: number | { char: string; ascii: number | string; hex: string };
-}
 
 export const python_keywords = {
   /** The abbreviated Finnish day name of a date: "Ma", "Ti", ... (fi_FI strftime("%a").capitalize()). */
   get_finnish_day: (date_time: Date): string => FINNISH_DAYS[date_time.getDay()] ?? "",
-
-  /** Compares two texts character by character and logs the differences with their code points. */
-  log_differences: async (
-    elementsText: unknown,
-    expectedText: unknown,
-    verbose = true,
-    name1 = "elementsText",
-    name2 = "expectedText"
-  ): Promise<Difference[]> => {
-    if (typeof elementsText !== "string" || typeof expectedText !== "string") {
-      await log("Both inputs must be strings.", { level: "WARN" });
-      return [];
-    }
-    if (elementsText === "" && expectedText === "") {
-      await log("Both strings are empty. Nothing to compare.", { level: "WARN" });
-      return [];
-    }
-    const differences: Difference[] = [];
-    // Code points, like iterating a Python string
-    // oxlint-disable-next-line typescript/no-misused-spread
-    const first = [...elementsText];
-    // oxlint-disable-next-line typescript/no-misused-spread
-    const second = [...expectedText];
-    for (let position = 0; position < Math.max(first.length, second.length); position++) {
-      const char1 = first[position] ?? "";
-      const char2 = second[position] ?? "";
-      if (char1 !== char2) {
-        const difference: Difference = {
-          position,
-          [name1]: describeChar(char1),
-          [name2]: describeChar(char2),
-        };
-        differences.push(difference);
-        if (verbose) {
-          // oxlint-disable-next-line no-await-in-loop -- log lines in order
-          await log(`Difference found at position ${position}: ${JSON.stringify(difference)}`);
-        }
-      }
-    }
-    await log(differences.length > 0 ? `${differences.length} differences found.` : "No differences found.");
-    return differences;
-  },
 
   /** Validates a time like "Pe 13.9.2024 klo 11:45–12:45" (with an en dash). */
   validate_timeformat: (original_time: string): boolean =>
