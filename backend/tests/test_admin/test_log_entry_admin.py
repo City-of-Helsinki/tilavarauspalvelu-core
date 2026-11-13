@@ -179,3 +179,26 @@ def test_log_entry_admin__search__text_finds_object_name(api_client):
 
     result_list = list(response.context["cl"].result_list)
     assert result_list == [unit_log_entry]
+
+
+# ── Change view ──
+
+
+def test_log_entry_admin__change_view__shows_additional_data(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    log_entry = create_log_entry(UnitFactory.create())
+    log_entry.additional_data = {"source": "backfill_pricing_audit_log"}
+    log_entry.save(update_fields=["additional_data"])
+
+    url = reverse("admin:auditlog_logentry_change", args=[log_entry.pk])
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+
+    admin_form = response.context["adminform"]
+    shown_fields = {
+        field.field["name"]: field.contents() for fieldset in admin_form for line in fieldset for field in line
+    }
+    assert shown_fields["additional_data"] == "{&quot;source&quot;: &quot;backfill_pricing_audit_log&quot;}"

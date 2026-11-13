@@ -177,6 +177,58 @@ def test_add_price_lines_to_reservations__price_above_non_subsidised_price():
     assert list(price_lines.values_list("amount", "override_amount")) == [(Decimal("120.00"), None)]
 
 
+def test_add_price_lines_to_reservations__price_above_non_subsidised_price__audit_log(settings):
+    settings.AUDIT_LOGGING_ENABLED = True
+
+    reservation = ReservationFactory.create(
+        name="Sauna",
+        type="NORMAL",
+        price=Decimal("120.00"),
+        non_subsidised_price=Decimal("10.00"),
+        tax_percentage_value=Decimal("24.00"),
+    )
+    ReservationFactory.create(
+        price=Decimal("50.00"),
+        non_subsidised_price=Decimal("50.00"),
+        tax_percentage_value=Decimal("24.00"),
+    )
+
+    apps = migrate_to(BEFORE_MIGRATION)
+    create_tax_levels(apps)
+
+    apps = migrate_to(AFTER_MIGRATION)
+
+    LogEntry = apps.get_model("auditlog", "LogEntry")
+    log_entries = LogEntry.objects.filter(content_type__model="reservation")
+    assert list(log_entries.values_list("object_id", "object_repr", "action", "changes", "additional_data")) == [
+        (
+            reservation.pk,
+            "reservation Sauna (NORMAL)",
+            1,
+            {"non_subsidised_price": ["10.00", "120.00"]},
+            migration.AUDIT_LOG_ADDITIONAL_DATA,
+        ),
+    ]
+
+
+def test_add_price_lines_to_reservations__price_above_non_subsidised_price__no_audit_log_when_disabled(settings):
+    settings.AUDIT_LOGGING_ENABLED = False
+
+    ReservationFactory.create(
+        price=Decimal("120.00"),
+        non_subsidised_price=Decimal("10.00"),
+        tax_percentage_value=Decimal("24.00"),
+    )
+
+    apps = migrate_to(BEFORE_MIGRATION)
+    create_tax_levels(apps)
+
+    apps = migrate_to(AFTER_MIGRATION)
+
+    LogEntry = apps.get_model("auditlog", "LogEntry")
+    assert LogEntry.objects.filter(content_type__model="reservation").exists() is False
+
+
 def test_add_price_lines_to_reservations__skips_reservation_with_price_lines():
     reservation = ReservationFactory.create(
         price=Decimal("50.00"),

@@ -63,10 +63,11 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         "action",
         "user_url",
         "msg",
+        "additional_data",
     ]
     fieldsets = [
         (None, {"fields": ["created", "user_url", "resource_url"]}),
-        (_("Changes"), {"fields": ["action", "msg"]}),
+        (_("Changes"), {"fields": ["action", "msg", "additional_data"]}),
     ]
 
     @admin.display(description=_("Created"), ordering="timestamp")  # Override to add ordering
