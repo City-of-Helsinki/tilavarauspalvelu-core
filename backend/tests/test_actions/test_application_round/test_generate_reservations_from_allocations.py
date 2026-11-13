@@ -1,38 +1,106 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
 from tilavarauspalvelu.enums import (
     AccessType,
     HaukiResourceState,
+    PriceUnit,
     RejectionReadinessChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
     ReserveeType,
     Weekday,
 )
+from tilavarauspalvelu.exceptions import ApplicationRoundPricingGroupsMixedError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIDatePeriod
-from tilavarauspalvelu.models import RejectedOccurrence, Reservation, ReservationSeries, ReservationUnitHierarchy
+from tilavarauspalvelu.models import (
+    ApplicationSection,
+    RejectedOccurrence,
+    Reservation,
+    ReservationPriceLine,
+    ReservationSeries,
+    ReservationUnitHierarchy,
+)
 from tilavarauspalvelu.typing import Allocation
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_time, next_date_matching_weekday
 
-from tests.factories import ReservationFactory, ReservationUnitAccessTypeFactory, UserFactory
+from tests.factories import (
+    PriceComponentFactory,
+    PriceOptionFactory,
+    PricingGroupFactory,
+    ReservationFactory,
+    ReservationUnitAccessTypeFactory,
+    ReservationUnitPricingGroupFactory,
+    UnitGroupFactory,
+    UserFactory,
+)
 from tests.factories.application_round import ApplicationRoundFactory
 from tests.factories.reservation_unit import ReservationUnitBuilder
 from tests.factories.unit import UnitBuilder
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Application
+    from tilavarauspalvelu.models import Application, ApplicationRound, PriceOption, ReservationUnit
 
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.patch_method.with_args(HaukiAPIClient.get_date_periods, return_value=[]),
 ]
+
+
+# ── Helpers ──
+
+
+JAN_1_2024 = datetime.date(2024, 1, 1)
+JAN_8_2024 = datetime.date(2024, 1, 8)
+
+
+def create_round_on_mondays(*, reservation_units: list[ReservationUnit], weeks: int = 3) -> ApplicationRound:
+    """A handled round with an allocation on Mondays 12-14 for each reservation unit, from January 1st 2024."""
+    return ApplicationRoundFactory.create_with_allocations(
+        allocations=[
+            Allocation(
+                reservation_unit=reservation_unit,
+                day_of_the_week=Weekday.MONDAY,
+                begin_time=local_time(12, 0),
+                end_time=local_time(14, 0),
+            )
+            for reservation_unit in reservation_units
+        ],
+        reservation_period_begin_date=JAN_1_2024,
+        reservation_period_end_date=JAN_1_2024 + datetime.timedelta(weeks=weeks - 1),
+        user=UserFactory.create(),
+    )
+
+
+def create_priced_reservation_unit(*, price_option: PriceOption | None = None) -> ReservationUnit:
+    unit_group = price_option.unit_group if price_option is not None else None
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        price_option=price_option,
+        valid_from=JAN_1_2024,
+        amount=Decimal(10),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    reservation_unit = ReservationUnitBuilder().with_unrestricted_access().create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1_2024,
+    )
+    return reservation_unit
+
+
+# ── Reservation series ──
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -529,3 +597,134 @@ def test_generate_reservation_series_from_allocations__two_reservation_units_wit
     assert reservations[0].access_type == AccessType.ACCESS_CODE
     assert reservations[1].access_type == AccessType.ACCESS_CODE
     assert reservations[2].access_type == AccessType.ACCESS_CODE
+
+
+# ── Prices ──
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_generate_reservation_series_from_allocations__prices_from_price_option():
+    adults = PriceOptionFactory.create(unit_group=UnitGroupFactory.create(), name="Aikuiset")
+    reservation_unit = create_priced_reservation_unit(price_option=adults)
+    application_round = create_round_on_mondays(reservation_units=[reservation_unit])
+    ApplicationSection.objects.update(price_option=adults)
+
+    application_round.actions.generate_reservations_from_allocations()
+
+    reservations = list(Reservation.objects.order_by("begins_at"))
+    assert len(reservations) == 3
+    for reservation in reservations:
+        assert reservation.price_option == adults
+        assert reservation.price == Decimal("20.00")
+        assert reservation.non_subsidised_price == Decimal("20.00")
+
+        lines = list(reservation.price_lines.all())
+        assert len(lines) == 1
+        assert lines[0].description_fi == "Aikuiset"
+        assert lines[0].quantity == Decimal(2)
+        assert lines[0].amount == Decimal("20.00")
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_generate_reservation_series_from_allocations__component_with_and_without_price_option():
+    adults = PriceOptionFactory.create(unit_group=UnitGroupFactory.create(), name="Aikuiset")
+    pricing_group = PricingGroupFactory.create(unit_group=adults.unit_group)
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        price_option=None,
+        valid_from=JAN_1_2024,
+        valid_until=JAN_8_2024,
+        amount=Decimal(10),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        price_option=adults,
+        valid_from=JAN_8_2024,
+        amount=Decimal(15),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    reservation_unit = ReservationUnitBuilder().with_unrestricted_access().create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1_2024,
+    )
+    application_round = create_round_on_mondays(reservation_units=[reservation_unit], weeks=2)
+    ApplicationSection.objects.update(price_option=adults)
+
+    application_round.actions.generate_reservations_from_allocations()
+
+    reservations = list(Reservation.objects.order_by("begins_at"))
+    assert [reservation.price for reservation in reservations] == [Decimal("20.00"), Decimal("30.00")]
+    assert [reservation.price_lines.get().description_fi for reservation in reservations] == ["", "Aikuiset"]
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_generate_reservation_series_from_allocations__pricing_group_changes_during_reservation_period():
+    reservation_unit = create_priced_reservation_unit()
+    second_group = PricingGroupFactory.create()
+    PriceComponentFactory.create(
+        pricing_group=second_group,
+        valid_from=JAN_8_2024,
+        amount=Decimal(30),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=second_group,
+        begins=JAN_8_2024,
+    )
+    application_round = create_round_on_mondays(reservation_units=[reservation_unit])
+
+    application_round.actions.generate_reservations_from_allocations()
+
+    reservations = list(Reservation.objects.order_by("begins_at"))
+    assert [reservation.price for reservation in reservations] == [
+        Decimal("20.00"),
+        Decimal("60.00"),
+        Decimal("60.00"),
+    ]
+    assert all(reservation.price_option is None for reservation in reservations)
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_generate_reservation_series_from_allocations__no_pricing_groups():
+    adults = PriceOptionFactory.create(unit_group=UnitGroupFactory.create())
+    reservation_unit = ReservationUnitBuilder().with_unrestricted_access().create()
+    application_round = create_round_on_mondays(reservation_units=[reservation_unit])
+    ApplicationSection.objects.update(price_option=adults)
+
+    application_round.actions.generate_reservations_from_allocations()
+
+    reservations = list(Reservation.objects.order_by("begins_at"))
+    assert len(reservations) == 3
+    for reservation in reservations:
+        assert reservation.price == Decimal(0)
+        assert reservation.price_option is None
+    assert ReservationPriceLine.objects.count() == 0
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_generate_reservation_series_from_allocations__mixed_pricing_groups():
+    priced_unit = create_priced_reservation_unit()
+    unpriced_unit = ReservationUnitBuilder().with_unrestricted_access().create()
+    application_round = create_round_on_mondays(reservation_units=[priced_unit, unpriced_unit])
+
+    with pytest.raises(ApplicationRoundPricingGroupsMixedError):
+        application_round.actions.generate_reservations_from_allocations()
+
+    assert ReservationSeries.objects.count() == 0
+    assert Reservation.objects.count() == 0
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_generate_reservation_series_from_allocations__price_query_count_does_not_grow_with_reservations():
+    def count_queries(weeks: int) -> int:
+        reservation_unit = create_priced_reservation_unit()
+        application_round = create_round_on_mondays(reservation_units=[reservation_unit], weeks=weeks)
+        with CaptureQueriesContext(connection) as context:
+            application_round.actions.generate_reservations_from_allocations()
+        return len(context.captured_queries)
+
+    assert count_queries(weeks=2) == count_queries(weeks=6)

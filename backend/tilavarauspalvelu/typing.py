@@ -26,7 +26,14 @@ if TYPE_CHECKING:
         ReserveeType,
         Weekday,
     )
-    from tilavarauspalvelu.models import AgeGroup, ReservationDenyReason, ReservationPurpose, ReservationUnit, User
+    from tilavarauspalvelu.models import (
+        AgeGroup,
+        PriceOption,
+        ReservationDenyReason,
+        ReservationPurpose,
+        ReservationUnit,
+        User,
+    )
 
 __all__ = [
     "AffectedTimeSpan",
@@ -444,6 +451,7 @@ class ReservationDetails(TypedDict, total=False):
     user: int | User | None
     purpose: int | ReservationPurpose | None
     age_group: int | AgeGroup | None
+    price_option: int | PriceOption | None
 
 
 class PreSaveKwargs[TModel: models.Model](TypedDict):
@@ -521,8 +529,10 @@ class error_codes(StrEnum):  # noqa: N801
     APPLICATION_ROUND_NOT_HANDLED = auto()
     APPLICATION_ROUND_NOT_IN_ALLOCATION = auto()
     APPLICATION_ROUND_NOT_IN_RESULTS_SENT_STATE = auto()
+    APPLICATION_ROUND_PRICE_MISSING = auto()
     APPLICATION_ROUND_PRICE_OPTIONS_INCONSISTENT = auto()
     APPLICATION_ROUND_PRICE_OPTIONS_REMOVED = auto()
+    APPLICATION_ROUND_PRICING_GROUPS_MIXED = auto()
     APPLICATION_SECTIONS_MAXIMUM_EXCEEDED = auto()
     APPLICATION_SECTIONS_MISSING = auto()
     APPLICATION_SECTION_AGE_GROUP_MISSING = auto()

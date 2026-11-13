@@ -27,10 +27,13 @@ from tilavarauspalvelu.models import (
     Application,
     ApplicationSection,
     Reservation,
+    ReservationPriceLine,
     ReservationSeries,
     ReservationStatistic,
     ReservationUnitOption,
 )
+from tilavarauspalvelu.services.pricing.application_round_prices import load_application_round_pricing
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.translation import translate_for_user
 from tilavarauspalvelu.typing import ReservationDetails
@@ -100,12 +103,29 @@ class ApplicationRoundActions:
                 raise ApplicationRoundResetError(msg)
 
     def generate_reservations_from_allocations(self) -> None:
-        allocations = AllocatedTimeSlot.objects.filter(
-            reservation_unit_option__application_section__application__application_round=self.application_round.pk,
-        ).select_related(
-            "reservation_unit_option__reservation_unit__origin_hauki_resource",
-            "reservation_unit_option__application_section__application__application_round",
+        """
+        Make a reservation series for each allocation of the round.
+
+        If the allocated reservation units have pricing groups, each reservation gets the price option
+        of its application section, price lines, and a price from them.
+
+        :raises PriceCalculationError: If a price cannot be calculated. Nothing is saved then.
+        """
+        allocations = list(
+            AllocatedTimeSlot.objects.filter(
+                reservation_unit_option__application_section__application__application_round=self.application_round.pk,
+            ).select_related(
+                "reservation_unit_option__reservation_unit__origin_hauki_resource",
+                "reservation_unit_option__application_section__application__application_round",
+                "reservation_unit_option__application_section__price_option",
+            )
         )
+
+        reservation_units = {
+            allocation.reservation_unit_option.reservation_unit.pk: allocation.reservation_unit_option.reservation_unit
+            for allocation in allocations
+        }
+        pricing_data = load_application_round_pricing(reservation_units=list(reservation_units.values()))
 
         closed_time_spans: dict[int, list[TimeSpanElement]] = self._get_series_override_closed_time_spans(allocations)
 
@@ -131,6 +151,7 @@ class ApplicationRoundActions:
         ]
 
         reservation_pks: set[int] = set()
+        price_lines: list[ReservationPriceLine] = []
 
         with transaction.atomic():
             reservation_series = ReservationSeries.objects.bulk_create(reservation_series)
@@ -138,16 +159,38 @@ class ApplicationRoundActions:
             for series in reservation_series:
                 reservation_details = self._get_reservation_series_details(series)
 
+                price_option = series.allocated_time_slot.reservation_unit_option.application_section.price_option
+                if pricing_data is not None:
+                    reservation_details["price_option"] = price_option
+
                 hauki_resource_id = getattr(series.reservation_unit.origin_hauki_resource, "id", None)
                 slots = series.actions.pre_calculate_slots(
                     check_start_interval=True,
                     closed_hours=closed_time_spans.get(hauki_resource_id, []),
                 )
 
-                reservations = series.actions.bulk_create_reservation_for_periods(
+                reservations = series.actions.build_reservations_for_periods(
                     periods=slots.possible,
                     reservation_details=reservation_details,
                 )
+
+                if pricing_data is not None:
+                    for reservation in reservations:
+                        reservation_price_lines = build_price_lines_with_data(
+                            pricing_data=pricing_data,
+                            reservation_unit=series.reservation_unit,
+                            price_option=price_option,
+                            begin=reservation.begins_at,
+                            end=reservation.ends_at,
+                        )
+                        for line in reservation_price_lines.lines:
+                            line.reservation = reservation
+                            price_lines.append(line)
+
+                        reservation.price = reservation_price_lines.calculation.total
+                        reservation.non_subsidised_price = reservation_price_lines.calculation.total
+
+                reservations = Reservation.objects.bulk_create(reservations)
                 reservation_pks.update(reservation.pk for reservation in reservations)
 
                 series.actions.bulk_create_rejected_occurrences_for_periods(
@@ -155,6 +198,8 @@ class ApplicationRoundActions:
                     not_reservable=slots.not_reservable,
                     invalid_start_interval=slots.invalid_start_interval,
                 )
+
+            ReservationPriceLine.objects.bulk_create(price_lines)
 
         # Must refresh the materialized view after the reservation is created.
         # TODO: Disabled for now, since it might contribute to timeouts in production.

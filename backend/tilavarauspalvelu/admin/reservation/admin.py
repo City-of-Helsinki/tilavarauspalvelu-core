@@ -133,6 +133,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                 "fields": [
                     "price",
                     "price_net",
+                    "price_option",
                     "non_subsidised_price",
                     "non_subsidised_price_net",
                     "unit_price",
@@ -192,6 +193,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "created_at",
         "price_net",
         "non_subsidised_price_net",
+        "price_option",
         "access_code_is_active",
         "access_code_should_be_active",
         "access_code_generated_at",
