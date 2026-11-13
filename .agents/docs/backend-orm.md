@@ -64,6 +64,7 @@ A lookup property defines a value once as an ORM expression. It works as a Pytho
 - Models with an `AuditLogger` get their audit log from signals. A plain bulk write on these models writes no audit log.
   Treat this as a correctness issue, because these models hold personal data and payments.
   Use `bulk_create_with_signals`, `bulk_update_with_signals` or `update_with_signals` from `utils/model_signals.py`.
+  If such a write must send no signals, say why in a comment.
 - `queryset.update()` does not set `auto_now` fields. Set them in the update. The helpers set them for you.
 - `bulk_create` skips `full_clean()` and model validators. Validate before the write.
 - `queryset.delete()` loads the rows into memory when the model has delete signals or Python-side cascades.
