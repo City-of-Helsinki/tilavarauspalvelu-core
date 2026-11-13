@@ -2,9 +2,20 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import migrations, models
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext
 
 BATCH_SIZE = 5_000
+
+# Marks the audit log entries that this migration writes, so that a reader can tell them apart
+# from changes made in the service.
+AUDIT_LOG_ADDITIONAL_DATA = {
+    "source": "0193_add_price_lines_to_reservations",
+    "reason": "The migration changed the rows with a bulk write, which makes no audit log entry.",
+    "ticket": "TILA-4545",
+}
 
 
 class PriceLineMigrationError(Exception):
@@ -38,7 +49,11 @@ def add_price_lines_to_reservations(apps, schema_editor):
         raise PriceLineMigrationError(msg)
 
     # Some old reservations have no saved price before subsidy. Their price is the price before subsidy.
-    reservations.filter(price__gt=models.F("non_subsidised_price")).update(non_subsidised_price=models.F("price"))
+    reservations_without_non_subsidised_price = reservations.filter(price__gt=models.F("non_subsidised_price"))
+    if settings.AUDIT_LOGGING_ENABLED:
+        write_non_subsidised_price_audit_log(apps, reservations=reservations_without_non_subsidised_price)
+
+    reservations_without_non_subsidised_price.update(non_subsidised_price=models.F("price"))
 
     rows = (
         reservations
@@ -80,9 +95,48 @@ def add_price_lines_to_reservations(apps, schema_editor):
     ReservationPriceLine.objects.bulk_create(price_lines)
 
 
+def write_non_subsidised_price_audit_log(apps, *, reservations):
+    """Write an update entry for each reservation, before its non-subsidised price is set to its price."""
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    LogEntry = apps.get_model("auditlog", "LogEntry")
+
+    content_type, _ = ContentType.objects.get_or_create(app_label="tilavarauspalvelu", model="reservation")
+
+    rows = (
+        reservations
+        .order_by("pk")
+        .values_list("pk", "name", "type", "price", "non_subsidised_price")
+        .iterator(chunk_size=BATCH_SIZE)
+    )
+
+    # Same text as 'Reservation.__str__', which the historical model does not have.
+    reservation_text = gettext("reservation")
+
+    log_entries: list = []
+    for reservation_id, name, reservation_type, price, non_subsidised_price in rows:
+        log_entry = LogEntry(
+            content_type=content_type,
+            object_pk=str(reservation_id),
+            object_id=reservation_id,
+            object_repr=f"{reservation_text} {name} ({reservation_type})",
+            action=1,  # LogEntry.Action.UPDATE
+            additional_data=AUDIT_LOG_ADDITIONAL_DATA,
+            changes={"non_subsidised_price": [smart_str(non_subsidised_price), smart_str(price)]},
+        )
+        log_entries.append(log_entry)
+
+        if len(log_entries) >= BATCH_SIZE:
+            LogEntry.objects.bulk_create(log_entries)
+            log_entries = []
+
+    LogEntry.objects.bulk_create(log_entries)
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("tilavarauspalvelu", "0192_migrate_pricings_to_pricing_groups"),
+        ("auditlog", "0017_add_actor_email"),
+        ("contenttypes", "0002_remove_content_type_name"),
     ]
 
     operations = [
