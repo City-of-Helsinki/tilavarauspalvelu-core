@@ -29,16 +29,18 @@ __all__ = [
 
 class SalesItem(models.Model):
     """
-    The SAP material that a price component sells online, for accounting.
+    What a price component sells online, for accounting.
     The accounting fields that depend on the place come from the payment accounting.
     """
 
     name: str = models.CharField(max_length=255, unique=True)
 
-    # Custom validation comes from requirements in SAP
+    # Custom validation comes from requirements in SAP.
+    # Only invoicing needs the material, so a sales item that is only paid in the web shop can leave it empty.
     material: str = models.CharField(
         max_length=8,
-        unique=True,
+        blank=True,
+        default="",
         validators=[MinLengthValidator(8), is_numeric],
     )
     main_ledger_account: str = models.CharField(max_length=6, validators=[is_numeric])
@@ -62,6 +64,14 @@ class SalesItem(models.Model):
         verbose_name = _("sales item")
         verbose_name_plural = _("sales items")
         ordering = ["pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["material"],
+                condition=~models.Q(material=""),
+                name="sales_item_unique_material",
+                violation_error_message="Another sales item already has this material",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.name
