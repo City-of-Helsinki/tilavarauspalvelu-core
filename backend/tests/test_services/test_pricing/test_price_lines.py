@@ -7,7 +7,6 @@ from unittest import mock
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from django.test import override_settings
 from freezegun import freeze_time
 
@@ -36,12 +35,10 @@ from tests.factories import (
     TaxLevelRateFactory,
     UnitGroupFactory,
 )
-from tests.helpers import exact
+from tests.helpers import audit_log_enabled, exact
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
-
-    from pytest_django import DjangoAssertNumQueries, Settings
+    from pytest_django import DjangoAssertNumQueries
 
     from tilavarauspalvelu.models import TaxLevel
 
@@ -64,17 +61,6 @@ def create_tax_level_with_rate_change() -> TaxLevel:
     TaxLevelRateFactory.create(tax_level=tax_level, begins=datetime.date(2000, 1, 1), percentage=Decimal(24))
     TaxLevelRateFactory.create(tax_level=tax_level, begins=MAR_1, percentage=Decimal("25.5"))
     return tax_level
-
-
-@pytest.fixture
-def price_line_audit_logging(settings: Settings) -> Generator[None]:
-    """Register price lines for audit logging, and unregister them after the test."""
-    settings.AUDIT_LOGGING_ENABLED = True
-    auditlog.register(ReservationPriceLine)
-    try:
-        yield
-    finally:
-        auditlog.unregister(ReservationPriceLine)
 
 
 # ── Build price lines ──
@@ -397,7 +383,6 @@ def test_set_reservation_price_lines__nothing_changes_on_calculation_error() -> 
     assert reservation.total_price_without_overrides == Decimal(30)
 
 
-@pytest.mark.usefixtures("price_line_audit_logging")
 def test_set_reservation_price_lines__writes_audit_log() -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -417,9 +402,9 @@ def test_set_reservation_price_lines__writes_audit_log() -> None:
         begins_at=local_datetime(2026, 2, 1, 10),
         ends_at=local_datetime(2026, 2, 1, 11),
     )
-    old_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(50))
-
-    set_reservation_price_lines(reservation=reservation, price_option=None)
+    with audit_log_enabled(ReservationPriceLine):
+        old_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(50))
+        set_reservation_price_lines(reservation=reservation, price_option=None)
 
     new_line = reservation.price_lines.get()
 
@@ -454,7 +439,6 @@ def test_set_price_line_taxes__rate_on_the_given_date() -> None:
     assert line.amount == Decimal(10)
 
 
-@pytest.mark.usefixtures("price_line_audit_logging")
 def test_set_price_line_taxes__writes_audit_log() -> None:
     tax_level = create_tax_level_with_rate_change()
     reservation = ReservationFactory.create()
@@ -465,7 +449,8 @@ def test_set_price_line_taxes__writes_audit_log() -> None:
         amount=Decimal(10),
     )
 
-    set_price_line_taxes(reservation=reservation, on_date=MAR_1)
+    with audit_log_enabled(ReservationPriceLine):
+        set_price_line_taxes(reservation=reservation, on_date=MAR_1)
 
     entries = LogEntry.objects.get_for_object(line).filter(action=LogEntry.Action.UPDATE)
     assert list(entries.values_list("changes", flat=True)) == [{"tax_percentage": ["24.00", "25.50"]}]

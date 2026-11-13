@@ -5,7 +5,6 @@ from unittest.mock import ANY
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from django.db import connection, models
 from freezegun import freeze_time
 
@@ -20,10 +19,10 @@ from utils.model_signals import (
 )
 
 from tests.factories import UnitFactory, UnitRoleFactory, UserFactory
-from tests.helpers import exact
+from tests.helpers import audit_log_enabled, exact
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable
 
 pytestmark = [
     pytest.mark.django_db,
@@ -31,13 +30,6 @@ pytestmark = [
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
-
-
-@pytest.fixture
-def unit_role_audit_log() -> Iterator[None]:
-    auditlog.register(UnitRole)
-    yield
-    auditlog.unregister(UnitRole)
 
 
 def get_log_entries(unit_role: UnitRole) -> list[LogEntry]:
@@ -48,7 +40,6 @@ def get_log_entries(unit_role: UnitRole) -> list[LogEntry]:
 # ── bulk_create_with_signals ─────────────────────────────────────────────────
 
 
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_bulk_create_with_signals__logs_create() -> None:
     user = UserFactory.create()
     unit_roles = [
@@ -56,7 +47,8 @@ def test_bulk_create_with_signals__logs_create() -> None:
         UnitRole(user=user, role=UserRoleChoice.VIEWER),
     ]
 
-    created_unit_roles = bulk_create_with_signals(unit_roles)
+    with audit_log_enabled(UnitRole):
+        created_unit_roles = bulk_create_with_signals(unit_roles)
 
     assert UnitRole.objects.filter(user=user).count() == 2
 
@@ -72,15 +64,14 @@ def test_bulk_create_with_signals__no_instances() -> None:
 # ── bulk_update_with_signals ─────────────────────────────────────────────────
 
 
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_bulk_update_with_signals__writes_and_logs_given_fields() -> None:
     unit_role = UnitRoleFactory.create(role=UserRoleChoice.ADMIN, is_role_active=True)
-    LogEntry.objects.all().delete()
 
     unit_role.is_role_active = False
     unit_role.role = UserRoleChoice.VIEWER
 
-    bulk_update_with_signals([unit_role], fields=["is_role_active"])
+    with audit_log_enabled(UnitRole):
+        bulk_update_with_signals([unit_role], fields=["is_role_active"])
 
     log_entries = get_log_entries(unit_role)
     assert [log_entry.action for log_entry in log_entries] == [LogEntry.Action.UPDATE]
@@ -107,14 +98,13 @@ def test_bulk_update_with_signals__sets_auto_now_fields() -> None:
 # ── update_with_signals ──────────────────────────────────────────────────────
 
 
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_update_with_signals__plain_value() -> None:
     unit_role = UnitRoleFactory.create(is_role_active=True)
     other_unit_role = UnitRoleFactory.create(is_role_active=True)
-    LogEntry.objects.all().delete()
 
     queryset = UnitRole.objects.filter(pk=unit_role.pk)
-    count = update_with_signals(queryset, is_role_active=False)
+    with audit_log_enabled(UnitRole):
+        count = update_with_signals(queryset, is_role_active=False)
 
     assert count == 1
 
@@ -130,14 +120,13 @@ def test_update_with_signals__plain_value() -> None:
     assert get_log_entries(other_unit_role) == []
 
 
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_update_with_signals__model_instance_value() -> None:
     unit_role = UnitRoleFactory.create(assigner=None)
     assigner = UserFactory.create()
-    LogEntry.objects.all().delete()
 
     queryset = UnitRole.objects.filter(pk=unit_role.pk)
-    update_with_signals(queryset, assigner=assigner)
+    with audit_log_enabled(UnitRole):
+        update_with_signals(queryset, assigner=assigner)
 
     unit_role.refresh_from_db()
     assert unit_role.assigner_id == assigner.pk
@@ -146,14 +135,13 @@ def test_update_with_signals__model_instance_value() -> None:
     assert log_entries[0].changes == {"assigner": ["None", str(assigner.pk)], "updated_at": [ANY, ANY]}
 
 
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_update_with_signals__primary_key_value_for_foreign_key() -> None:
     unit_role = UnitRoleFactory.create(assigner=None)
     assigner = UserFactory.create()
-    LogEntry.objects.all().delete()
 
     queryset = UnitRole.objects.filter(pk=unit_role.pk)
-    update_with_signals(queryset, assigner=assigner.pk)
+    with audit_log_enabled(UnitRole):
+        update_with_signals(queryset, assigner=assigner.pk)
 
     unit_role.refresh_from_db()
     assert unit_role.assigner_id == assigner.pk
@@ -162,11 +150,9 @@ def test_update_with_signals__primary_key_value_for_foreign_key() -> None:
     assert log_entries[0].changes == {"assigner": ["None", str(assigner.pk)], "updated_at": [ANY, ANY]}
 
 
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_update_with_signals__expression_value() -> None:
     admin_role = UnitRoleFactory.create(role=UserRoleChoice.ADMIN, is_role_active=True)
     viewer_role = UnitRoleFactory.create(role=UserRoleChoice.VIEWER, is_role_active=True)
-    LogEntry.objects.all().delete()
 
     is_role_active = models.Case(
         models.When(role=UserRoleChoice.ADMIN, then=models.Value(True)),  # noqa: FBT003
@@ -174,7 +160,8 @@ def test_update_with_signals__expression_value() -> None:
         output_field=models.BooleanField(),
     )
     queryset = UnitRole.objects.all()
-    count = update_with_signals(queryset, is_role_active=is_role_active)
+    with audit_log_enabled(UnitRole):
+        count = update_with_signals(queryset, is_role_active=is_role_active)
 
     assert count == 2
 
@@ -191,13 +178,12 @@ def test_update_with_signals__expression_value() -> None:
     assert viewer_log_entries[0].changes == {"is_role_active": ["True", "False"], "updated_at": [ANY, ANY]}
 
 
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_update_with_signals__foreign_key_expression_value() -> None:
     unit_role = UnitRoleFactory.create(assigner=None)
-    LogEntry.objects.all().delete()
 
     queryset = UnitRole.objects.filter(pk=unit_role.pk)
-    update_with_signals(queryset, assigner=models.F("user"))
+    with audit_log_enabled(UnitRole):
+        update_with_signals(queryset, assigner=models.F("user"))
 
     unit_role.refresh_from_db()
     assert unit_role.assigner_id == unit_role.user_id
@@ -206,13 +192,12 @@ def test_update_with_signals__foreign_key_expression_value() -> None:
     assert log_entries[0].changes == {"assigner": ["None", str(unit_role.user_id)], "updated_at": [ANY, ANY]}
 
 
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_update_with_signals__no_values() -> None:
     unit_role = UnitRoleFactory.create()
-    LogEntry.objects.all().delete()
 
     queryset = UnitRole.objects.filter(pk=unit_role.pk)
-    count = update_with_signals(queryset)
+    with audit_log_enabled(UnitRole):
+        count = update_with_signals(queryset)
 
     assert count == 0
     assert get_log_entries(unit_role) == []

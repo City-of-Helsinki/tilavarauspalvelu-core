@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import (
@@ -25,10 +22,7 @@ from tilavarauspalvelu.models import (
 from utils.date_utils import local_datetime
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
-from tests.helpers import as_mock, patch_method
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
+from tests.helpers import as_mock, audit_log_enabled, patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -168,22 +162,12 @@ def test_reset_application_round_allocation__results_sent() -> None:
     assert application.results_ready_notification_sent_at is None
 
 
-@pytest.fixture
-def application_audit_log() -> Iterator[None]:
-    auditlog.register(Application)
-    yield
-    auditlog.unregister(Application)
-
-
-@pytest.mark.usefixtures("application_audit_log")
 def test_reset_application_round_allocation__results_sent__logs_sent_date_and_keeps_updated_at() -> None:
     with freeze_time(local_datetime(2024, 1, 1, 11)):
         application_round = ApplicationRoundFactory.create_in_status_results_sent()
         application = ApplicationFactory.create_in_status_results_sent(application_round=application_round)
 
-    LogEntry.objects.all().delete()
-
-    with freeze_time(local_datetime(2024, 1, 1, 12)):
+    with freeze_time(local_datetime(2024, 1, 1, 12)), audit_log_enabled(Application):
         application_round.actions.reset_application_round_allocation()
 
     application.refresh_from_db()

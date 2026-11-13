@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
 from unittest.mock import ANY
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 
 from tilavarauspalvelu.enums import MunicipalityChoice, ReservationNotification
 from tilavarauspalvelu.integrations.helauth.pipeline import (
@@ -29,12 +27,9 @@ from tests.factories import (
     UserFactory,
 )
 from tests.factories.helsinki_profile import MyProfileDataFactory
-from tests.helpers import ResponseMock, anonymous_user, as_mock, exact, patch_method
+from tests.helpers import ResponseMock, anonymous_user, as_mock, audit_log_enabled, exact, patch_method
 
 from .helpers import mock_request
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
 
 pytestmark = [
     pytest.mark.django_db(),
@@ -326,19 +321,6 @@ def test_migrate_from_tunnistamo_to_keycloak() -> None:
     assert oldest_user.last_name == "Oldest EXPIRED"
 
 
-@pytest.fixture
-def user_owned_models_audit_log() -> Iterator[None]:
-    user_owned_models = [Application, Reservation, ReservationSeries, GeneralRole, UnitRole]
-    for model in user_owned_models:
-        auditlog.register(model)
-
-    yield
-
-    for model in user_owned_models:
-        auditlog.unregister(model)
-
-
-@pytest.mark.usefixtures("user_owned_models_audit_log")
 def test_migrate_from_tunnistamo_to_keycloak__audit_log() -> None:
     old_user = UserFactory.create(
         email="foo@example.com",
@@ -359,9 +341,9 @@ def test_migrate_from_tunnistamo_to_keycloak__audit_log() -> None:
         is_active=True,
         date_joined=local_datetime(2022, 1, 1),
     )
-    LogEntry.objects.all().delete()
 
-    migrate_from_tunnistamo_to_keycloak(user=new_user, email=new_user.email)
+    with audit_log_enabled(Application, Reservation, ReservationSeries, GeneralRole, UnitRole):
+        migrate_from_tunnistamo_to_keycloak(user=new_user, email=new_user.email)
 
     user_change = [str(old_user.pk), str(new_user.pk)]
 

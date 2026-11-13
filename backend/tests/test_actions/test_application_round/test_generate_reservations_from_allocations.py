@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
@@ -49,7 +48,7 @@ from tests.factories import (
 from tests.factories.application_round import ApplicationRoundFactory
 from tests.factories.reservation_unit import ReservationUnitBuilder
 from tests.factories.unit import UnitBuilder
-from tests.helpers import as_mock
+from tests.helpers import as_mock, audit_log_enabled
 
 if TYPE_CHECKING:
     from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
@@ -787,11 +786,8 @@ def test_generate_reservation_series_from_allocations__price_lines_write_audit_l
     reservation_unit = create_priced_reservation_unit()
     application_round = create_round_on_mondays(reservation_units=[reservation_unit])
 
-    auditlog.register(ReservationPriceLine)
-    try:
+    with audit_log_enabled(ReservationPriceLine):
         application_round.actions.generate_reservations_from_allocations()
-    finally:
-        auditlog.unregister(ReservationPriceLine)
 
     lines = list(ReservationPriceLine.objects.order_by("pk"))
     assert len(lines) == 3

@@ -4,16 +4,14 @@ from typing import TYPE_CHECKING
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 
 from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import UnitRole
 
 from tests.factories import ADGroupFactory, UnitFactory, UnitRoleFactory, UserFactory
+from tests.helpers import audit_log_enabled
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
-
     from pytest_django import Settings
 
 # Applied to all tests
@@ -181,19 +179,12 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_role() -> None:
     assert unit_roles[0].units.first() == unit
 
 
-@pytest.fixture
-def unit_role_audit_log() -> Iterator[None]:
-    auditlog.register(UnitRole)
-    yield
-    auditlog.unregister(UnitRole)
-
-
-@pytest.mark.usefixtures("unit_role_audit_log")
 def test_user_actions__update_unit_roles_from_ad_groups__add_new_role__logs_create() -> None:
     UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
 
-    user.actions.update_unit_roles_from_ad_groups()
+    with audit_log_enabled(UnitRole):
+        user.actions.update_unit_roles_from_ad_groups()
 
     unit_role = user.unit_roles.get()
     log_entries = list(LogEntry.objects.get_for_object(unit_role))

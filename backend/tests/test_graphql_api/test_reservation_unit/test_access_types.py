@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 from auditlog.models import LogEntry
-from auditlog.registry import auditlog
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import AccessType
@@ -14,7 +13,7 @@ from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitAccessTypeFactory, ReservationUnitFactory
-from tests.helpers import as_mock, patch_method
+from tests.helpers import as_mock, audit_log_enabled, patch_method
 
 from .helpers import (
     CREATE_MUTATION,
@@ -25,8 +24,6 @@ from .helpers import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
-
     from tests.helpers import GraphQLClient
 
 # Applied to all tests
@@ -187,14 +184,6 @@ def test_reservation_unit__update__access_types(graphql: GraphQLClient) -> None:
     assert access_types[2].access_type == AccessType.UNRESTRICTED
 
 
-@pytest.fixture
-def access_type_audit_log() -> Iterator[None]:
-    auditlog.register(ReservationUnitAccessType)
-    yield
-    auditlog.unregister(ReservationUnitAccessType)
-
-
-@pytest.mark.usefixtures("access_type_audit_log")
 def test_reservation_unit__update__access_types__audit_log(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
@@ -211,7 +200,6 @@ def test_reservation_unit__update__access_types__audit_log(graphql: GraphQLClien
         begin_date=tomorrow,
         access_type=AccessType.UNRESTRICTED,
     )
-    LogEntry.objects.all().delete()
 
     data = get_draft_update_input_data(reservation_unit=reservation_unit)
     data["accessTypes"] = [
@@ -232,7 +220,9 @@ def test_reservation_unit__update__access_types__audit_log(graphql: GraphQLClien
     ]
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    with audit_log_enabled(ReservationUnitAccessType):
+        response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
