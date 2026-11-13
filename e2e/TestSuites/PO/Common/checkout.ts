@@ -8,9 +8,9 @@ import { TEXT_CHECK_TIMEOUT, URL_TEST } from "../../Resources/variables";
 const RESERVATION_PAGE_PATH = /\/reservations\/\d+\/?$/;
 
 /**
- * Whether the URL is the reservation page that the payment success page opens once the webshop has confirmed the
- * payment. Not /success itself (a rewrite: the path stays while it polls), /reservations?error=order1 (a cancelled or
- * denied order) or notify=polling_timeout (the success page gave up).
+ * Returns true when the URL shows that the payment went through. After a successful payment Varaamo opens the
+ * reservation's page, /reservations/<id>. If Varaamo gave up waiting for the payment, it opens the same page with
+ * ?notify=polling_timeout, which returns false.
  */
 export function isConfirmedReservationUrl(url: URL): boolean {
   return RESERVATION_PAGE_PATH.test(url.pathname) && url.searchParams.get("notify") !== "polling_timeout";
