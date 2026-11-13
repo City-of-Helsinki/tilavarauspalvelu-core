@@ -360,6 +360,9 @@ class _StatisticsBatch:
     """Reservations that are saved in one transaction. One statistics task starts for all of them on commit."""
 
     reservation_pks: set[int] = field(default_factory=set)
+
+    # Test helpers like 'captureOnCommitCallbacks(execute=True)' run the callbacks but leave them in
+    # 'connection.run_on_commit'. Without this flag, a later save in the same test joins a batch that already ran.
     task_started: bool = False
 
     def start_task(self) -> None:
@@ -380,7 +383,9 @@ def _create_statistics_on_commit(*, reservation_pk: int, using: str) -> None:
     batch = _statistics_batches.get(connection)
 
     # A rollback removes the callback of the batch from the connection. The next save then starts a new batch.
-    # A save in a rolled back savepoint can stay in the batch of the outer transaction. The task skips its pk.
+    # A save in a rolled back savepoint can stay in the batch of the outer transaction.
+    # The task skips created rows that no longer exist, and recomputes updated rows from committed data.
+    # 'connection.run_on_commit' is a Django internal. Its tuple shape can change in a Django upgrade.
     registered_callbacks = [callback for _, callback, _ in connection.run_on_commit]
     if batch is not None and not batch.task_started and batch.start_task in registered_callbacks:
         batch.reservation_pks.add(reservation_pk)
