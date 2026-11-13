@@ -1210,6 +1210,7 @@ msgid "Refund ID"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment type"
 msgstr ""
 
@@ -3933,7 +3934,7 @@ msgid ""
 msgstr ""
 
 #: tilavarauspalvelu/models/application_section/model.py
-msgid "Can only apply from 1 to 7 reservations per week."
+msgid "Must apply for at least 1 reservation per week."
 msgstr ""
 
 #: tilavarauspalvelu/models/application_section/model.py

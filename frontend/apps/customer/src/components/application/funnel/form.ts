@@ -43,7 +43,7 @@ const ApplicationSectionPage1Schema = z
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
-    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }).max(7, { error: "lte_7" }),
+    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
     begin: z.string().min(1, { message: "Required" }),
     end: z.string().min(1, { message: "Required" }),
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
@@ -81,13 +81,35 @@ export type ApplicationSectionPage1FormValues = z.infer<typeof ApplicationSectio
 
 export type ApplicationSectionPage2FormValues = z.infer<typeof ApplicationSectionPage2Schema>;
 
-/// @returns time range length in seconds
-function lengthOfTimeRange(timeRange: SuitableTimeRangeFormValues): number {
-  const begin = timeToMinutes(timeRange.beginTime);
-  const end = timeToMinutes(timeRange.endTime);
-  const endChecked = end === 0 ? 24 * 60 : end;
+type MergedTimeRange = { dayOfTheWeek: Weekday; beginMinutes: number; endMinutes: number };
 
-  return (endChecked - begin) * 60;
+/**
+ * Joins time ranges on the same day that touch or overlap, regardless of priority.
+ * For validation, a primary range followed directly by a secondary range is one time range.
+ */
+function mergeAdjacentTimeRanges(ranges: ReadonlyArray<SuitableTimeRangeFormValues>): MergedTimeRange[] {
+  const sorted = ranges
+    .map((tr) => {
+      const end = timeToMinutes(tr.endTime);
+      return {
+        dayOfTheWeek: tr.dayOfTheWeek,
+        beginMinutes: timeToMinutes(tr.beginTime),
+        // "00:00" as an end time means midnight at the end of the day
+        endMinutes: end === 0 ? 24 * 60 : end,
+      };
+    })
+    .toSorted((a, b) => a.dayOfTheWeek.localeCompare(b.dayOfTheWeek) || a.beginMinutes - b.beginMinutes);
+
+  const merged: MergedTimeRange[] = [];
+  for (const tr of sorted) {
+    const last = merged.at(-1);
+    if (last != null && last.dayOfTheWeek === tr.dayOfTheWeek && tr.beginMinutes <= last.endMinutes) {
+      last.endMinutes = Math.max(last.endMinutes, tr.endMinutes);
+    } else {
+      merged.push({ ...tr });
+    }
+  }
+  return merged;
 }
 
 const ApplicationSectionPage2Schema = z
@@ -99,32 +121,26 @@ const ApplicationSectionPage2Schema = z
     reservationUnitPk: z.number(),
     priority: z.enum(Priority),
     // NOTE: not sent or modified here, but required for validation
-    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }).max(7, { error: "lte_7" }),
+    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
   })
   .superRefine((s, ctx) => {
-    const isValid =
+    const merged = mergeAdjacentTimeRanges(s.suitableTimeRanges);
+
+    const isLongEnough =
       s.minDuration > 0 &&
-      // No too short time ranges allowed
-      s.suitableTimeRanges.filter((tr) => lengthOfTimeRange(tr) < s.minDuration).length === 0;
-    if (!isValid) {
+      // No too short time ranges allowed (minDuration is in seconds)
+      merged.every((tr) => (tr.endMinutes - tr.beginMinutes) * 60 >= s.minDuration);
+    if (!isLongEnough) {
       ctx.addIssue({
         code: "custom",
         path: ["suitableTimeRanges"],
         message: "Suitable time range must be at least as long as the minimum duration",
       });
     }
-  })
-  .superRefine((s, ctx) => {
-    const rangesPerWeek: typeof s.suitableTimeRanges = [];
-    for (const tr of s.suitableTimeRanges) {
-      if (!rangesPerWeek.some((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
-        rangesPerWeek.push(tr);
-      }
-    }
 
-    const isValid = rangesPerWeek.length >= s.appliedReservationsPerWeek;
-
-    if (!isValid) {
+    // Separate ranges count individually, also several on the same day
+    const hasEnoughRanges = merged.length >= s.appliedReservationsPerWeek;
+    if (!hasEnoughRanges) {
       ctx.addIssue({
         code: "custom",
         path: ["suitableTimeRanges"],

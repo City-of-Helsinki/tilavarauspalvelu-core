@@ -248,21 +248,6 @@ describe("Page1", () => {
     expect(mockedRouterPush).toHaveBeenCalled();
   }, 20_000);
 
-  test("applied events over 7 should be invalid", async () => {
-    const view = customRender();
-    const user = userEvent.setup();
-
-    const section = view.getByTestId("application__applicationSection_0");
-    expect(section).toBeInTheDocument();
-    const eventsPerWeek = within(section).getByLabelText(/application:Page1.eventsPerWeek/, { selector: "input" });
-    expect(eventsPerWeek).toBeInTheDocument();
-    await user.clear(eventsPerWeek);
-    await user.type(eventsPerWeek, "11");
-    const submitBtn = view.getByRole("button", { name: "common:next" });
-    await user.click(submitBtn);
-    expect(view.queryAllByText("application:validation.lte_7")).toHaveLength(1);
-  });
-
   // requires form context because schema validators are for the full form only
   test("should show an error message for no reservation units", async () => {
     const params = new URLSearchParams();

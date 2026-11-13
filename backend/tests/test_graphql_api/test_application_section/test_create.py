@@ -57,6 +57,37 @@ def test_application_section__create(graphql):
     assert section.status == ApplicationSectionStatusChoice.UNALLOCATED
 
 
+def test_application_section__create__more_than_seven_reservations_per_week(graphql):
+    # Several time spans can be applied for on the same day,
+    # so the number of applied reservations per week is no longer limited to one per weekday.
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    data = get_application_section_create_data(application=application)
+    data["appliedReservationsPerWeek"] = 10
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    section = ApplicationSection.objects.get(application=application)
+    assert section.applied_reservations_per_week == 10
+
+
+def test_application_section__create__zero_reservations_per_week(graphql):
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    data = get_application_section_create_data(application=application)
+    data["appliedReservationsPerWeek"] = 0
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.field_error_messages() == [
+        "Must apply for at least 1 reservation per week.",
+    ], response
+
+    assert ApplicationSection.objects.filter(application=application).exists() is False
+
+
 def test_application_section__create__resets_application_sent_at(graphql):
     application = ApplicationFactory.create_in_status_received()
     graphql.force_login(application.user)

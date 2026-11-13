@@ -113,9 +113,9 @@ class ApplicationSection(SerializableModelMixin, models.Model):
                 violation_error_message=_("Reservation min duration cannot be greater than reservation max duration."),
             ),
             models.CheckConstraint(
-                condition=models.Q(applied_reservations_per_week__gte=1, applied_reservations_per_week__lte=7),
-                name="applied_reservations_per_week_from_1_to_7",
-                violation_error_message=_("Can only apply from 1 to 7 reservations per week."),
+                condition=models.Q(applied_reservations_per_week__gte=1),
+                name="applied_reservations_per_week_at_least_1",
+                violation_error_message=_("Must apply for at least 1 reservation per week."),
             ),
             models.CheckConstraint(
                 condition=models.Q(
