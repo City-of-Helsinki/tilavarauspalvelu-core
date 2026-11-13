@@ -15,6 +15,7 @@ from tilavarauspalvelu.enums import (
     Weekday,
 )
 from tilavarauspalvelu.models import AgeGroup, ReservationStatistic
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
@@ -170,6 +171,30 @@ def test_statistics__create__no_task_for_rolled_back_transaction(
         reservation = ReservationFactory.create()
 
     assert mock_delay.call_args_list == [mock.call(reservation_pks=[reservation.pk])]
+
+
+def test_statistics__create__rolled_back_savepoint_in_committed_transaction(
+    settings, django_capture_on_commit_callbacks
+):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    with (
+        mock.patch(
+            "tilavarauspalvelu.signals.create_statistics_for_reservations_task.delay",
+            wraps=create_statistics_for_reservations_task.delay,
+        ) as mock_delay,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
+        reservation_1 = ReservationFactory.create()
+
+        with transaction.atomic():
+            reservation_2 = ReservationFactory.create()
+            transaction.set_rollback(True)
+
+    assert mock_delay.call_args_list == [mock.call(reservation_pks=[reservation_1.pk, reservation_2.pk])]
+
+    statistic_reservation_pks = list(ReservationStatistic.objects.values_list("reservation_id", flat=True))
+    assert statistic_reservation_pks == [reservation_1.pk]
 
 
 def test_statistics__create__duration_over_daylight_saving_time_change(settings, django_capture_on_commit_callbacks):
