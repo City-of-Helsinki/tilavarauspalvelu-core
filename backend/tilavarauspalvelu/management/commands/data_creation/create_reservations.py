@@ -20,16 +20,18 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import (
     PaymentOrder,
+    PriceComponent,
     RejectedOccurrence,
     Reservation,
     ReservationDenyReason,
+    ReservationPriceLine,
     ReservationUnit,
-    ReservationUnitPricing,
     User,
 )
+from tilavarauspalvelu.services.pricing.price_calculation import load_pricing_data
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
-    datetime_difference,
     get_date_range,
     get_periods_between,
     local_date,
@@ -95,31 +97,25 @@ def _create_normal_reservations(
     - Don't have a limit on number of reservations per user
     - Don't require full day booking
     - Have a hauki resource (=> have reservable time slots)
-    - Have at least one pricing
+    - Have a pricing group
     - Are not in a space or resource hierarchy
     - Are only directly bookable
     - Don't already have a reservations
     """
     reservation_units: list[ReservationUnit] = list(
-        ReservationUnit.objects
-        .filter(
+        ReservationUnit.objects.filter(
             is_archived=False,
             spaces__isnull=False,
             max_reservations_per_user=None,
             reservation_block_whole_day=False,
             origin_hauki_resource__isnull=False,
-            pricings__isnull=False,
+            reservation_unit_pricing_groups__isnull=False,
             spaces__parent__isnull=True,
             spaces__children__isnull=True,
             resources__isnull=True,
             reservation_kind=ReservationKind.DIRECT,
             reservations__isnull=True,
-        )
-        .prefetch_related(
-            # Prefetch only the active pricing for each reservation unit
-            models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
-        )
-        .order_by("pk")
+        ).order_by("pk")
     )
 
     user = User.objects.get(username="tvp")
@@ -143,6 +139,17 @@ def _create_normal_reservations(
 
     reservations: list[Reservation] = []
     payment_orders: list[PaymentOrder] = []
+    price_lines: list[ReservationPriceLine] = []
+
+    reservation_unit_pks_with_discount = set(
+        PriceComponent.objects.filter(
+            pricing_group__reservation_unit_pricing_groups__reservation_unit__in=reservation_units,
+            can_apply_for_discount=True,
+        ).values_list("pricing_group__reservation_unit_pricing_groups__reservation_unit", flat=True)
+    )
+    pricing_data = load_pricing_data(
+        reservation_unit_pks=[reservation_unit.pk for reservation_unit in reservation_units]
+    )
 
     # --- Create reservations -------------------------------------------------------------------------------------
 
@@ -164,10 +171,7 @@ def _create_normal_reservations(
         min_interval_hours = max(int(max_buffer.total_seconds() / 3600), 1 if busy else 5)
         max_interval_hours = max(min_interval_hours + 1, 3 if busy else 10)
 
-        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
-        assert pricing is not None, "Reservation unit must have at least one pricing"
-
-        payment_type = PaymentType(pricing.payment_type)
+        can_apply_for_discount = reservation_unit.pk in reservation_unit_pks_with_discount
 
         reservation_state: ReservationStateChoice = ReservationStateChoice.CONFIRMED
         handled_at: datetime.datetime | None = None
@@ -189,7 +193,7 @@ def _create_normal_reservations(
                 customer_type = weighted_choice(reservee_type_choice, weights=[5, 1, 1])
                 reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
-                if pricing.highest_price != pricing.lowest_price:
+                if can_apply_for_discount:
                     applying_for_free_of_charge = random.choice([True, False])
                     if applying_for_free_of_charge:
                         free_of_charge_reason = "Reason for applying for free of charge"
@@ -206,7 +210,7 @@ def _create_normal_reservations(
                         .for_user(user)
                         .for_reservation_unit(reservation_unit)
                         .for_reservee_type(customer_type)
-                        .starting_at(begin_datetime, reservation_unit, pricing=pricing)
+                        .starting_at(begin_datetime, reservation_unit)
                         .build(
                             reservation_unit=reservation_unit,
                             type=reservation_type,
@@ -234,7 +238,25 @@ def _create_normal_reservations(
 
                 reservations.append(reservation)
 
-                if pricing.highest_price > 0:
+                reservation_price_lines = build_price_lines_with_data(
+                    pricing_data=pricing_data,
+                    reservation_unit=reservation_unit,
+                    price_option=None,
+                    begin=reservation.begins_at,
+                    end=reservation.ends_at,
+                )
+                for line in reservation_price_lines.lines:
+                    line.reservation = reservation
+                    price_lines.append(line)
+
+                first_line = reservation_price_lines.lines[0]
+                reservation.price = reservation_price_lines.calculation.total
+                reservation.non_subsidised_price = reservation_price_lines.calculation.total
+                reservation.unit_price = first_line.unit_amount
+                reservation.tax_percentage_value = first_line.tax_percentage
+
+                if reservation.price > 0:
+                    payment_type = PaymentType(reservation_unit.payment_type)
                     payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)
                     payment_orders.append(payment_order)
 
@@ -242,6 +264,7 @@ def _create_normal_reservations(
 
     ReservationUnit.objects.bulk_update(reservation_units, fields=["name", "name_fi", "name_en", "name_sv"])
     Reservation.objects.bulk_create(reservations)
+    ReservationPriceLine.objects.bulk_create(price_lines)
     PaymentOrder.objects.bulk_create(payment_orders)
 
     _deny_and_cancel_normal_reservations()
@@ -423,25 +446,19 @@ def _create_full_day_reservations(
     Keep all the other restrictions on reservation units the same as in the '_create_normal_reservations' method.
     """
     reservation_units: list[ReservationUnit] = list(
-        ReservationUnit.objects
-        .filter(
+        ReservationUnit.objects.filter(
             is_archived=False,
             spaces__isnull=False,
             max_reservations_per_user=None,
             reservation_block_whole_day=True,  # note this!
             origin_hauki_resource__isnull=False,
-            pricings__isnull=False,
+            reservation_unit_pricing_groups__isnull=False,
             spaces__parent__isnull=True,
             spaces__children__isnull=True,
             resources__isnull=True,
             reservation_kind=ReservationKind.DIRECT,
             reservations__isnull=True,
-        )
-        .prefetch_related(
-            # Prefetch only the active pricing for each reservation unit
-            models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
-        )
-        .order_by("pk")
+        ).order_by("pk")
     )
 
     user = User.objects.get(username="tvp")
@@ -469,9 +486,6 @@ def _create_full_day_reservations(
         if reservation_unit.require_reservation_handling:
             handled_at = local_datetime()
 
-        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
-        assert pricing is not None, "Reservation unit must have at least one pricing"
-
         for reservation_date in get_date_range(start_date, number=14):
             skip_day = weighted_choice([True, False], weights=[1, 5])
             if skip_day:
@@ -488,7 +502,7 @@ def _create_full_day_reservations(
                 .for_user(user)
                 .for_reservation_unit(reservation_unit)
                 .for_reservee_type(customer_type)
-                .starting_at(begin_datetime, reservation_unit, pricing=pricing)
+                .starting_at(begin_datetime, reservation_unit)
                 .build(
                     reservation_unit=reservation_unit,
                     type=reservation_type,
@@ -519,24 +533,16 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
     Create reservations for all reservation units that are in a space or resource hierarchy.
     Keep all the other restrictions on reservation units the same as in the '_create_normal_reservations' method.
     """
-    base_qs = (
-        ReservationUnit.objects
-        .filter(
-            is_archived=False,
-            spaces__isnull=False,
-            max_reservations_per_user=None,
-            reservation_block_whole_day=False,
-            origin_hauki_resource__isnull=False,
-            pricings__isnull=False,
-            reservation_kind=ReservationKind.DIRECT,
-            reservations__isnull=True,
-        )
-        .prefetch_related(
-            # Prefetch only the active pricing for each reservation unit
-            models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
-        )
-        .order_by("pk")
-    )
+    base_qs = ReservationUnit.objects.filter(
+        is_archived=False,
+        spaces__isnull=False,
+        max_reservations_per_user=None,
+        reservation_block_whole_day=False,
+        origin_hauki_resource__isnull=False,
+        reservation_unit_pricing_groups__isnull=False,
+        reservation_kind=ReservationKind.DIRECT,
+        reservations__isnull=True,
+    ).order_by("pk")
 
     space_reservation_units: list[ReservationUnit] = list(
         base_qs.filter(
@@ -581,9 +587,6 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
     reservation_date = local_date()
 
     for reservation_unit in space_reservation_units:
-        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
-        assert pricing is not None, "Reservation unit must have at least one pricing"
-
         begin_time = datetime.time(hour=random.randint(8, 12))
         begin_datetime = datetime.datetime.combine(reservation_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
 
@@ -594,7 +597,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
             .for_user(user)
             .for_reservation_unit(reservation_unit)
             .for_reservee_type(customer_type)
-            .starting_at(begin_datetime, reservation_unit, pricing=pricing)
+            .starting_at(begin_datetime, reservation_unit)
             .build(
                 reservation_unit=reservation_unit,
                 type=ReservationTypeChoice.NORMAL,
@@ -617,9 +620,6 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         reservation_date += datetime.timedelta(days=1)
 
     for reservation_unit in resource_reservation_units:
-        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
-        assert pricing is not None, "Reservation unit must have at least one pricing"
-
         begin_time = datetime.time(hour=random.randint(8, 12))
         begin_datetime = datetime.datetime.combine(reservation_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
 
@@ -630,7 +630,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
             .for_user(user)
             .for_reservation_unit(reservation_unit)
             .for_reservee_type(customer_type)
-            .starting_at(begin_datetime, reservation_unit, pricing=pricing)
+            .starting_at(begin_datetime, reservation_unit)
             .build(
                 reservation_unit=reservation_unit,
                 type=ReservationTypeChoice.NORMAL,
@@ -842,12 +842,7 @@ def _create_reservations_for_series(
     deny_random: int = 0,
     reject_random: int = 0,
 ) -> None:
-    pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
-    assert pricing is not None, "Reservation unit must have at least one pricing"
-
-    today = local_date()
-    tax_percentage = pricing.tax_level.actions.get_percentage(on_date=today)
-
+    # The prices of the reservations come from their price lines, which are made after all reservations.
     weekdays: list[Weekday] = [Weekday(weekday) for weekday in series.weekdays]
 
     reservations: list[Reservation] = []
@@ -868,8 +863,6 @@ def _create_reservations_for_series(
         for begin, end in periods:
             buffer_time_before = series.reservation_unit.actions.get_actual_before_buffer(begin)
             buffer_time_after = series.reservation_unit.actions.get_actual_after_buffer(end)
-            duration = datetime_difference(start_datetime=begin, end_datetime=end)
-            price = pricing.actions.calculate_reservation_price(duration=duration)
 
             reservation = (
                 ReservationBuilder()
@@ -891,11 +884,6 @@ def _create_reservations_for_series(
                     handled_at=None,
                     confirmed_at=local_datetime(),
                     created_at=local_datetime(),
-                    #
-                    price=price,
-                    non_subsidised_price=pricing.highest_price,
-                    unit_price=pricing.highest_price,
-                    tax_percentage_value=tax_percentage,
                     #
                     applying_for_free_of_charge=False,
                     free_of_charge_reason=None,
