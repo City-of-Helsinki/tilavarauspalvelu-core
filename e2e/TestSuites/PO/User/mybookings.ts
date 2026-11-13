@@ -91,7 +91,8 @@ export class Mybookings extends PageObject {
 
   @step("mybookings.Check Reservation Number From H1 Text")
   async checkReservationNumberFromH1Text(booking_num: string) {
-    await this.pages.customKeywords.checkNumberFromTextIsEqualTo(this.reservationContent.locator("h1"), booking_num);
+    // The heading is "Varaus <number>"
+    await expect(this.reservationContent.locator("h1")).toHaveText(`Varaus ${booking_num}`, { useInnerText: true });
   }
 
   @step("mybookings.Check Number Of Participants")

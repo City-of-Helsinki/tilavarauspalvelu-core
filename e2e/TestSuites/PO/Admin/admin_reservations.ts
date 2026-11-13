@@ -99,12 +99,15 @@ export class AdminReservations extends PageObject {
   async adminChecksReservationInfoDialogTimeTagline(reservation_tagline: string) {
     // DEVNOTE: Not in use for now
     // The time boxes of the edit time dialog are paragraphs with the time in bold
-    await this.pages.customKeywords.findTextFromElementsOrFail(this.infoDialog.locator("p > b"), reservation_tagline);
+    await expect(
+      this.infoDialog.locator("p > b").getByText(reservation_tagline, { exact: true }).first()
+    ).toBeVisible();
   }
 
   @step("admin_reservations.Admin Checks Reservation User Info")
   async adminChecksReservationUserInfo() {
-    await this.pages.customKeywords.findAndClickElementWithText(".label", "Tilan käyttäjän tiedot");
+    // text="…" matches an element with a text node of exactly this text, also when the element has other text too
+    await this.page.locator(".label").locator('text="Tilan käyttäjän tiedot"').first().click();
     await expect(
       this.page.getByTestId("reservation__info--Sukunimi"),
       `The reserver's last name is ${this.state.adminBehalfLastnameFi}`
@@ -117,7 +120,8 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Checks Reservation Maker Info")
   async adminChecksReservationMakerInfo() {
-    await this.pages.customKeywords.findAndClickElementWithText(".label", "Varauksen tekijä");
+    // text="…" matches an element with a text node of exactly this text, also when the element has other text too
+    await this.page.locator(".label").locator('text="Varauksen tekijä"').first().click();
     await expect(
       this.page.getByTestId("reservation__info--Varauksen tekijä"),
       `The reservation was made by ${BASIC_ADMIN_MALE.fullName}`
@@ -140,10 +144,11 @@ export class AdminReservations extends PageObject {
   ) {
     // Check price if provided
     if (singlebooking_price !== "None") {
-      await this.pages.customKeywords.checkElementsTextWithRemoveNonBreakingSpace(
+      // toHaveText reads the price's non-breaking spaces as spaces
+      await expect(
         this.page.getByTestId("reservation__summary--Hinta"),
-        singlebooking_price
-      );
+        `The price is ${singlebooking_price}`
+      ).toHaveText(singlebooking_price, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check status if provided
@@ -206,10 +211,11 @@ export class AdminReservations extends PageObject {
   ) {
     // Check price if provided
     if (singlebooking_price !== "None") {
-      await this.pages.customKeywords.checkElementsTextWithRemoveNonBreakingSpace(
+      // toHaveText reads the price's non-breaking spaces as spaces
+      await expect(
         this.page.getByTestId("reservation__summary--Hinta"),
-        singlebooking_price
-      );
+        `The price is ${singlebooking_price}`
+      ).toHaveText(singlebooking_price, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check status if provided
@@ -277,15 +283,6 @@ export class AdminReservations extends PageObject {
     await this.locate(button_data_id).click();
   }
 
-  @step("admin_reservations.Admin Selects Reservation Unit")
-  async adminSelectsReservationUnit(by_unit: string) {
-    await this.page.locator("#reservation-unit-toggle-button").click();
-    await this.pages.customKeywords.findAndClickElementWithText(
-      this.page.locator("#reservation-unit-menu").locator("li"),
-      by_unit
-    );
-  }
-
   @step("admin_reservations.Admin Open Access Code Modal")
   async adminOpenAccessCodeModal() {
     await this.page.locator("#reservation__access-type").click();
@@ -307,10 +304,11 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Checks Reason For Subvention In Dialog")
   async adminChecksReasonForSubventionInDialog() {
-    await this.pages.customKeywords.findTextFromElementsOrFail(
-      this.infoDialog.locator("p"),
-      JUSTIFICATION_FOR_SUBVENTION
-    );
+    // The approval dialog shows the reason in a paragraph of its own
+    await expect(
+      this.infoDialog.getByText(JUSTIFICATION_FOR_SUBVENTION, { exact: true }),
+      "The approval dialog shows the reason for the subvention"
+    ).toBeVisible();
   }
 
   @step("admin_reservations.Admin Clicks Set Reservation To Free")
