@@ -100,4 +100,10 @@ class AllocatedTimeSlot(models.Model):
         )
 
 
-AuditLogger.register(AllocatedTimeSlot)
+AuditLogger.register(
+    AllocatedTimeSlot,
+    exclude_fields=[
+        # Exclude reverse one-to-one relations. The audit log makes a query for each one on create and delete.
+        "reservation_series",
+    ],
+)

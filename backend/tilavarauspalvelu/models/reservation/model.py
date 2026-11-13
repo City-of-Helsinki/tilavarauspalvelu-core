@@ -376,5 +376,9 @@ AuditLogger.register(
         "_reservee_name",
         "_access_code_should_be_active",
         "_is_access_code_is_active_correct",
+        # Exclude reverse one-to-one relations. The audit log makes a query for each one on create and delete.
+        "affecting_time_span",
+        "payment_order",
+        "reservation_statistic",
     ],
 )
