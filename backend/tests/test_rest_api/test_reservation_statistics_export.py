@@ -20,8 +20,6 @@ def test_reservation_statistics_export(api_client, settings, django_capture_on_c
 
     with django_capture_on_commit_callbacks(execute=True):
         reservation_1 = ReservationFactory.create()
-
-    with django_capture_on_commit_callbacks(execute=True):
         reservation_2 = ReservationFactory.create()
 
     url = reverse("reservation_statistics_export")
@@ -129,8 +127,6 @@ def test_reservation_statistics_export__only_one(api_client, settings, django_ca
 
     with django_capture_on_commit_callbacks(execute=True):
         reservation = ReservationFactory.create()
-
-    with django_capture_on_commit_callbacks(execute=True):
         ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + f"?only={reservation.ext_uuid}"
@@ -148,8 +144,6 @@ def test_reservation_statistics_export__only_two(api_client, settings, django_ca
 
     with django_capture_on_commit_callbacks(execute=True):
         reservation_1 = ReservationFactory.create()
-
-    with django_capture_on_commit_callbacks(execute=True):
         reservation_2 = ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + f"?only={reservation_1.ext_uuid},{reservation_2.ext_uuid}"
@@ -225,8 +219,6 @@ def test_reservation_statistics_export__start(api_client, settings, django_captu
 
     with django_capture_on_commit_callbacks(execute=True):
         ReservationFactory.create()
-
-    with django_capture_on_commit_callbacks(execute=True):
         reservation = ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + "?start=1"
@@ -244,8 +236,6 @@ def test_reservation_statistics_export__stop(api_client, settings, django_captur
 
     with django_capture_on_commit_callbacks(execute=True):
         reservation = ReservationFactory.create()
-
-    with django_capture_on_commit_callbacks(execute=True):
         ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + "?stop=1"

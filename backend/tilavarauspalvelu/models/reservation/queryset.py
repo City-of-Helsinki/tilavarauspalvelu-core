@@ -278,7 +278,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
             "age_group",
             "reservation_unit",
             "reservation_unit__unit",
-        )
+        ).order_by("pk")
 
         new_statistics: list[ReservationStatistic] = [
             ReservationStatistic.for_reservation(reservation) for reservation in reservations
