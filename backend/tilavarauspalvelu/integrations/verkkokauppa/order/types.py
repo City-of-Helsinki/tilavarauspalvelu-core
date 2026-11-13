@@ -204,7 +204,7 @@ class Order:
         subscription_id = json.get("subscriptionId")
         try:
             subscription_id = uuid.UUID(subscription_id)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             subscription_id = None
 
         try:

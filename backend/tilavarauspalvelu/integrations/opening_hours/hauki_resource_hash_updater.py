@@ -88,7 +88,7 @@ class HaukiResourceHashUpdater:
         try:
             client = ReservableTimeSpanClient(origin_hauki_resource)
             num_created_time_spans = len(client.run())
-        except (ReservableTimeSpanClientValueError, ReservableTimeSpanClientNothingToDoError):
+        except ReservableTimeSpanClientValueError, ReservableTimeSpanClientNothingToDoError:
             return
 
         logger.info(

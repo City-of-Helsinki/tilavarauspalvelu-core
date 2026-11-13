@@ -117,7 +117,7 @@ def validate_string_time(value: str) -> datetime.time:
     for input_format in INPUT_FORMATS:
         try:
             return datetime.datetime.strptime(value, input_format).time()  # noqa: DTZ007
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             continue
 
     raise ValidationError(_("Enter a valid time."), code="invalid")
