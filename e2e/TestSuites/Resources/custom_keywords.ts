@@ -668,20 +668,17 @@ Differences:
     expect(dayIdx, `"${DAY_TO_CHECK}" is a day of the week`).toBeGreaterThanOrEqual(0);
     await log(`Checking column index ${dayIdx + 2}`, { level: "DEBUG" });
 
-    const day_labels = this.page.locator(
-      `.rbc-time-column:nth-child(${dayIdx + 2}) .rbc-events-container .rbc-event-label`
-    );
-    // The calendar's events are loaded after the page, so the first label is waited for as long as an action waits
-    await expect(day_labels.first(), `The calendar shows reservations on ${DAY_TO_CHECK}`).toBeAttached({
-      timeout: BROWSER_TIMEOUT_GLOBAL,
-    });
-
-    // Reads the labels again until one of them is the time
-    await expect
-      .poll(async () => (await day_labels.allInnerTexts()).map((label) => normalizeTimeLabel(label)), {
-        message: `The calendar has a reservation on ${DAY_TO_CHECK} at ${TIME_TO_CHECK}`,
-      })
-      .toContain(normTime);
+    // The time's label with any dash and spaces: "9:00-10:00" matches "9:00–10:00" and "9:00 – 10:00"
+    const [start = "", end = ""] = normTime.split("-");
+    const time_label = new RegExp(`^\\s*${start}\\s*[-–—]\\s*${end}\\s*$`);
+    const slot_label = this.page
+      .locator(`.rbc-time-column:nth-child(${dayIdx + 2}) .rbc-events-container .rbc-event-label`)
+      .filter({ hasText: time_label });
+    // The calendar's events are loaded after the page, so the label is waited for as long as an action waits
+    await expect(
+      slot_label.first(),
+      `The calendar has a reservation on ${DAY_TO_CHECK} at ${TIME_TO_CHECK}`
+    ).toBeAttached({ timeout: BROWSER_TIMEOUT_GLOBAL });
 
     // Calendar extraction
   }
