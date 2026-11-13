@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from unittest.mock import patch
 
 import pytest
 from freezegun import freeze_time
@@ -10,6 +11,7 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import PriceComponent
 from tilavarauspalvelu.services.pricing.changes import save_price_component_changes
+from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
 from tilavarauspalvelu.typing import error_codes
 
 from tests.factories import (
@@ -17,6 +19,7 @@ from tests.factories import (
     PriceComponentFactory,
     PriceOptionFactory,
     PricingGroupFactory,
+    ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
     SalesItemFactory,
     TaxLevelFactory,
@@ -113,6 +116,28 @@ def test_save_price_component_changes__future_component_can_be_deleted():
     components = list(PriceComponent.objects.filter(pricing_group=pricing_group))
     assert components == [active]
     assert components[0].valid_until is None
+
+
+def test_save_price_component_changes__sends_accounting_of_reservation_units_once(settings):
+    settings.UPDATE_ACCOUNTING = True
+    pricing_group = PricingGroupFactory.create()
+    active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit, pricing_group=pricing_group, begins=JAN_1
+    )
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit, pricing_group=pricing_group, begins=FEB_1
+    )
+
+    active.valid_until = MAR_1
+    tax_level = TaxLevelFactory.create()
+    new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=tax_level, valid_from=MAR_1)
+
+    with patch.object(refresh_reservation_unit_accounting_task, "delay_on_commit") as mock:
+        save_price_component_changes(pricing_group=pricing_group, components=[active, new], deleted_component_pks=[])
+
+    assert [call.args for call in mock.call_args_list] == [(reservation_unit.pk,)]
 
 
 # ── Past components ──

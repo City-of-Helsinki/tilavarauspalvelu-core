@@ -2066,10 +2066,6 @@ msgid "Reservation block whole day"
 msgstr "Varaukset sulkevat koko päivän"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Can apply free of charge"
-msgstr "Alennuskelpoinen"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Is archived"
 msgstr "Arkistoitu"
 
@@ -2240,11 +2236,6 @@ msgid "What kind of reservations are to be booked with this reservation unit."
 msgstr "Minkä tyyppisiä varauksia voidaan tehdä tämän varausyksikön kautta."
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Can reservations to this reservation unit be able to apply free of charge."
-msgstr "Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Is reservation unit archived."
 msgstr "Onko varausyksikkö arkistoitu."
 
@@ -2291,10 +2282,6 @@ msgid ""
 msgstr ""
 "Hae varausyksikön, toimipisteen, hakemuksen osan tai käyttäjän etunimen, "
 "sukunimen tai sähköpostiosoitteen perusteella"
-
-#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
-msgid "This tax level has no rate in effect today."
-msgstr "Verotasolla ei ole tänään voimassa olevaa veroprosenttia."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"

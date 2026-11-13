@@ -281,7 +281,7 @@ def test_reservation_unit_admin__terms_validation__no_service_specific_terms_for
     ]
 
 
-def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_booking_when_free_of_change_is_set():
+def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_booking_when_price_allows_discount():
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -292,12 +292,13 @@ def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_b
         cancellation_terms=cancellation_terms,
         service_specific_terms=service_specific_terms,
         pricing_terms=pricing_terms,
+        own_price__amount=Decimal(10),
+        own_price__can_apply_for_discount=True,
     )
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
     data = get_valid_data(reservation_unit=reservation_unit)
-    data["can_apply_free_of_charge"] = True
     data["pricing_terms"] = None
     data["payment_terms"] = payment_terms
     data["cancellation_terms"] = cancellation_terms
@@ -382,6 +383,29 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     assert form.errors["payment_terms"] == [
         "Payment terms are required for direct booking of paid reservation units",
     ]
+
+
+def test_reservation_unit_admin__terms_validation__no_terms_needed_for_paid_group_that_the_unit_no_longer_uses():
+    reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
+    old_pricing_group = reservation_unit.reservation_unit_pricing_groups.get().pricing_group
+    old_pricing_group.components.update(can_apply_for_discount=True)
+
+    free_pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=free_pricing_group,
+        begins=local_date() - datetime.timedelta(days=1),
+    )
+    PriceComponentFactory.create(
+        pricing_group=free_pricing_group,
+        valid_from=local_date() - datetime.timedelta(days=1),
+        amount=Decimal(0),
+    )
+    reservation_unit.pricing_terms = None
+
+    form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
+
+    assert form.is_valid(), form.errors
 
 
 # ── Pricing groups ──

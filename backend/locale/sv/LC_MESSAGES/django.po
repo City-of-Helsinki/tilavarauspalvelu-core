@@ -2020,10 +2020,6 @@ msgid "Reservation block whole day"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Can apply free of charge"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Is archived"
 msgstr ""
 
@@ -2183,11 +2179,6 @@ msgid "What kind of reservations are to be booked with this reservation unit."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Can reservations to this reservation unit be able to apply free of charge."
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Is reservation unit archived."
 msgstr ""
 
@@ -2230,10 +2221,6 @@ msgid ""
 "Search by reservation unit, unit, application section, user's first or last "
 "name or email"
 msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit_pricing/form.py
-msgid "This tax level has no rate in effect today."
-msgstr "Skattenivån har ingen skattesats som gäller i dag."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import pytest
 
 from tilavarauspalvelu.enums import ReservationUnitReservationState
 
-from tests.factories import PaymentProductFactory, ReservationUnitFactory, ReservationUnitPricingFactory
+from tests.factories import PaymentProductFactory, ReservationUnitFactory
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -38,24 +39,22 @@ def test_reservation_unit__get_state__scheduled_period():
 
 
 def test_reservation_unit_get_state__reservable__free():
-    reservation_unit: ReservationUnit = ReservationUnitFactory()
+    reservation_unit: ReservationUnit = ReservationUnitFactory(own_price__amount=Decimal(0))
     now = datetime.datetime.now(tz=datetime.UTC)
 
     reservation_unit.reservation_ends_at = None
     reservation_unit.reservation_begins_at = now - datetime.timedelta(days=1)
-    ReservationUnitPricingFactory.create_free(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.RESERVABLE
 
 
 def test_reservation_unit_get_state__reservable__paid():
-    reservation_unit: ReservationUnit = ReservationUnitFactory()
+    reservation_unit: ReservationUnit = ReservationUnitFactory(own_price__amount=Decimal(10))
     now = datetime.datetime.now(tz=datetime.UTC)
 
     reservation_unit.reservation_ends_at = None
     reservation_unit.reservation_begins_at = now - datetime.timedelta(days=1)
     reservation_unit.payment_product = PaymentProductFactory.create()
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.RESERVABLE
 
@@ -71,35 +70,32 @@ def test_reservation_unit_get_state__not_reservable_due_to_missing_pricing():
 
 
 def test_reservation_unit_get_state__not_reservable_due_to_missing_payment_product():
-    reservation_unit: ReservationUnit = ReservationUnitFactory()
+    reservation_unit: ReservationUnit = ReservationUnitFactory(own_price__amount=Decimal(10))
     now = datetime.datetime.now(tz=datetime.UTC)
 
     reservation_unit.reservation_ends_at = None
     reservation_unit.reservation_begins_at = now - datetime.timedelta(days=1)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.RESERVATION_CLOSED
 
 
 def test_reservation_unit_get_state__scheduled_closing__free():
-    reservation_unit: ReservationUnit = ReservationUnitFactory()
+    reservation_unit: ReservationUnit = ReservationUnitFactory(own_price__amount=Decimal(0))
     now = datetime.datetime.now(tz=datetime.UTC)
 
     reservation_unit.reservation_ends_at = now + datetime.timedelta(days=1)
     reservation_unit.reservation_begins_at = now - datetime.timedelta(days=1)
-    ReservationUnitPricingFactory.create_free(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.SCHEDULED_CLOSING
 
 
 def test_reservation_unit_get_state__scheduled_closing__paid():
-    reservation_unit: ReservationUnit = ReservationUnitFactory()
+    reservation_unit: ReservationUnit = ReservationUnitFactory(own_price__amount=Decimal(10))
     now = datetime.datetime.now(tz=datetime.UTC)
 
     reservation_unit.reservation_ends_at = now + datetime.timedelta(days=1)
     reservation_unit.reservation_begins_at = now - datetime.timedelta(days=1)
     reservation_unit.payment_product = PaymentProductFactory.create()
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.SCHEDULED_CLOSING
 
@@ -115,12 +111,11 @@ def test_reservation_unit_get_state__not_scheduled_due_to_missing_pricing():
 
 
 def test_reservation_unit_get_state__not_scheduled_due_to_no_payment_product():
-    reservation_unit: ReservationUnit = ReservationUnitFactory()
+    reservation_unit: ReservationUnit = ReservationUnitFactory(own_price__amount=Decimal(10))
     now = datetime.datetime.now(tz=datetime.UTC)
 
     reservation_unit.reservation_ends_at = now + datetime.timedelta(days=1)
     reservation_unit.reservation_begins_at = now - datetime.timedelta(days=1)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.RESERVATION_CLOSED
 

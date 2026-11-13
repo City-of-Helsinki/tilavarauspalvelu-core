@@ -152,7 +152,6 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "payment_merchant",
                     "payment_accounting",
                     "payment_product",
-                    "can_apply_free_of_charge",
                 ],
             },
         ],
