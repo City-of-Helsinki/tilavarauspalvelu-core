@@ -1,6 +1,6 @@
 # Image for running backend checks and tests in GitHub Actions.
 # See ".github/workflows/build-ci-image.yml" for how it is built and tagged.
-FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core-base:python-3.13-slim-trixie
+FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core-base:python-3.14-slim-trixie
 
 # Install system dependencies
 # - build-essential: for building uWSGI and psycopg2

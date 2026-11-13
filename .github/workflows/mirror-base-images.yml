@@ -38,8 +38,8 @@ jobs:
         include:
           - source: "public.ecr.aws/docker/library/node:24-slim"
             tag: "node-24-slim"
-          - source: "public.ecr.aws/docker/library/python:3.13-slim-trixie"
-            tag: "python-3.13-slim-trixie"
+          - source: "public.ecr.aws/docker/library/python:3.14-slim-trixie"
+            tag: "python-3.14-slim-trixie"
 
     steps:
     - name: "Set up Docker Buildx"
