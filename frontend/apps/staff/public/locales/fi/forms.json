@@ -53,6 +53,7 @@
     "duration must be a multiple of the reservation start interval": "Keston on oltava varauksen alkamisvälin kerrannainen",
     "access type duplicate beginDate": "Kulkutavoilla on oltava eri alkamisajat",
     "access type invalid beginDate": "Kulkutavalla on virheellinen alkamisaika",
-    "access types are required for publish": "Varausyksikölle täytyy määrittää vähintään yksi kulkutapa ennen julkaisua"
+    "access types are required for publish": "Varausyksikölle täytyy määrittää vähintään yksi kulkutapa ennen julkaisua",
+    "Terms of wrong type": "Valitut ehdot ovat väärää tyyppiä. Valitse uudet ehdot."
   }
 }

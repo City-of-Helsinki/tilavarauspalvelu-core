@@ -254,7 +254,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             "muutos liittyy hinnoittelun tarkoituksenmukaiseen kohtuullistamiseen, "
             "varauksen tekijän sitä kirjallisesti hakiessa."
         ),
-        terms_type=TermsOfUseTypeChoices.PAYMENT,
+        terms_type=TermsOfUseTypeChoices.PRICING,
     )
 
     ###########################################################################################################
