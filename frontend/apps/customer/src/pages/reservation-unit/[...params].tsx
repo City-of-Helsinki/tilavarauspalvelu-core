@@ -12,15 +12,24 @@ import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
 import { createNodeId, getLocalizationLang, getTranslation, toNumber } from "ui/src/modules/helpers";
 import { H1, H4 } from "ui/src/styled";
-import { ReservationDocument, ReservationStateChoice, useDeleteReservationMutation } from "@gql/gql-types";
-import type { ReservationQuery, ReservationQueryVariables } from "@gql/gql-types";
+import {
+  ReservationDocument,
+  ReservationPriceDocument,
+  ReservationStateChoice,
+  useDeleteReservationMutation,
+} from "@gql/gql-types";
+import type {
+  ReservationPriceQuery,
+  ReservationPriceQueryVariables,
+  ReservationQuery,
+  ReservationQueryVariables,
+} from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { ReservationStep0, ReservationStep1 } from "@/lib/reservation-unit/[...params]";
 import { createApolloClient } from "@/modules/apolloClient";
 import { queryOptions } from "@/modules/queryOptions";
-import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   getReservationInProgressPath,
@@ -69,8 +78,10 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const reservation = props.reservation;
+  const { reservation, reservationPrice } = props;
   const reservationUnit = reservation.reservationUnit;
+  const isFreeOfCharge = reservationPrice == null || Number(reservationPrice.total) === 0;
+  const canApplyForDiscount = reservationPrice?.canApplyForDiscount === true;
 
   useRemoveStoredReservation();
 
@@ -83,9 +94,7 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
     if (reservationUnit == null) {
       return [];
     }
-    const isUnitFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit.pricings, new Date(reservation.beginsAt));
-
-    const stepLength = isUnitFreeOfCharge || requireHandling ? 2 : 5;
+    const stepLength = isFreeOfCharge || requireHandling ? 2 : 5;
 
     return Array.from({ length: stepLength }).map((_n, i) => {
       const state = i === step ? 0 : i < step ? 1 : 2;
@@ -95,7 +104,7 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
         state,
       };
     });
-  }, [reservationUnit, reservation.beginsAt, requireHandling, step, t]);
+  }, [reservationUnit, isFreeOfCharge, requireHandling, step, t]);
 
   const [deleteReservation] = useDeleteReservationMutation({
     errorPolicy: "all",
@@ -121,10 +130,8 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
     }
   };
 
-  const shouldDisplayReservationUnitPrice =
-    step === 0
-      ? reservationUnit.canApplyFreeOfCharge
-      : reservationUnit.canApplyFreeOfCharge && reservation.applyingForFreeOfCharge === true;
+  const isDiscountRange =
+    step === 0 ? canApplyForDiscount : canApplyForDiscount && reservation.applyingForFreeOfCharge === true;
 
   const lang = getLocalizationLang(i18n.language);
   const notesWhenReserving = getTranslation(reservationUnit, "notesWhenApplying", lang);
@@ -144,7 +151,8 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
         <StyledReservationInfoCard
           reservation={reservation}
           bgColor="gold"
-          shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
+          reservationPrice={reservationPrice}
+          isDiscountRange={isDiscountRange}
         />
         {notesWhenReserving && (
           <PinkBox>
@@ -167,7 +175,12 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
           )}
         </ReservationTitleSection>
         {step === 0 && (
-          <ReservationStep0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
+          <ReservationStep0
+            reservation={reservation}
+            canApplyForDiscount={canApplyForDiscount}
+            cancelReservation={cancelReservation}
+            options={props.options}
+          />
         )}
         {step === 1 && (
           <ReservationStep1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />
@@ -265,11 +278,21 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     };
   }
 
+  const { data: priceData } = await apolloClient.query<ReservationPriceQuery, ReservationPriceQueryVariables>({
+    query: ReservationPriceDocument,
+    variables: {
+      reservationUnit: reservation.reservationUnit.pk ?? 0,
+      beginsAt: reservation.beginsAt,
+      endsAt: reservation.endsAt,
+    },
+  });
+
   const options = await queryOptions(apolloClient, locale ?? "");
 
   return {
     props: {
       reservation,
+      reservationPrice: priceData.reservationPrice ?? null,
       options,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
@@ -288,7 +311,7 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
       calendarUrl
       reservationUnit {
         id
-        canApplyFreeOfCharge
+        pk
         reservationForm
         minPersons
         maxPersons

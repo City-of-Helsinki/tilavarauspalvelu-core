@@ -15,8 +15,10 @@ import { parseUIDate, formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getLocalizationLang } from "ui/src/modules/helpers";
 import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "ui/src/styled";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
+import { LoadingPrice } from "@/components/reservation/LoadingPrice";
+import { useReservationPrice } from "@/hooks";
+import { getReservationPriceDisplay, getReservationPriceString } from "@/modules/price";
 import type { FocusTimeSlot } from "@/modules/reservation";
-import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 
 type CommonProps = {
@@ -94,11 +96,13 @@ function TogglerLabelContent({
   togglerLabel,
   t,
   price,
+  isPriceLoading,
 }: {
   areControlsVisible: boolean;
   togglerLabel: string;
   t: TFunction;
   price: string | null;
+  isPriceLoading: boolean;
 }) {
   if (areControlsVisible) {
     return <div>&nbsp;</div>;
@@ -106,9 +110,11 @@ function TogglerLabelContent({
   return (
     <>
       <TogglerDate>{togglerLabel}</TogglerDate>
-      <div>
-        {t("common:price")}: {price}
-      </div>
+      {(price != null || isPriceLoading) && (
+        <div>
+          {t("common:price")}: <LoadingPrice price={price} isLoading={isPriceLoading} />
+        </div>
+      )}
     </>
   );
 }
@@ -123,24 +129,26 @@ export function ReservationCalendarControls({
   submitReservation,
   ...rest
 }: Props): React.ReactElement {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = getLocalizationLang(i18n.language);
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
   const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
-  const formDuration = watch("duration");
   const dateValue = useMemo(() => parseUIDate(formDate ?? ""), [formDate]);
 
-  const duration = !Number.isNaN(Number(formDuration)) ? formDuration : (reservationUnit.minReservationDuration ?? 0);
-
+  const { reservationPrice, isLoading: isPriceLoading } = useReservationPrice(
+    reservationUnit.pk,
+    focusSlot?.isReservable ? focusSlot : null
+  );
   const price =
-    dateValue != null
-      ? getReservationUnitPrice({
+    reservationPrice != null
+      ? getReservationPriceString(
           t,
-          reservationUnit,
-          pricingDate: dateValue,
-          minutes: duration,
-        })
+          getReservationPriceDisplay(reservationPrice, lang),
+          reservationPrice.canApplyForDiscount,
+          lang
+        )
       : null;
 
   const lastOpeningDate = maxBy(reservationUnit.reservableTimeSpans, (n) => n?.endDatetime);
@@ -157,7 +165,13 @@ export function ReservationCalendarControls({
       onSubmit={handleSubmit(submitReservation)}
       data-testid="reservation-unit__reservation-controls--wrapper"
     >
-      <ControlledToggler form={reservationForm} focusSlot={focusSlot} price={price} durationOptions={durationOptions} />
+      <ControlledToggler
+        form={reservationForm}
+        focusSlot={focusSlot}
+        price={price}
+        isPriceLoading={isPriceLoading}
+        durationOptions={durationOptions}
+      />
       {focusSlot.isReservable && !areControlsVisible && <Flex $alignItems="flex-end">{submitButton}</Flex>}
       <Transition
         nodeRef={transitionRef}
@@ -193,11 +207,13 @@ export function ReservationCalendarControls({
               placeholder={t("common:select")}
             />
             <PriceWrapper>
-              {focusSlot.isReservable && price != null && (
+              {focusSlot.isReservable && (price != null || isPriceLoading) && (
                 <Price data-testid="calendar-controls__price">
                   {t("common:price")}
                   {": "}
-                  <SemiBold>{price}</SemiBold>
+                  <SemiBold>
+                    <LoadingPrice price={price} isLoading={isPriceLoading} />
+                  </SemiBold>
                 </Price>
               )}
             </PriceWrapper>
@@ -229,11 +245,13 @@ function ControlledToggler({
   form,
   focusSlot,
   price,
+  isPriceLoading,
   durationOptions,
 }: {
   form: UseFormReturn<PendingReservationFormType>;
   focusSlot: FocusTimeSlot;
   price: string | null;
+  isPriceLoading: boolean;
   durationOptions: Array<{ label: string; value: number }>;
 }): React.ReactElement {
   const { t, i18n } = useTranslation();
@@ -265,7 +283,13 @@ function ControlledToggler({
     <Flex $alignItems="flex-start" $justifyContent="space-between" $direction="row">
       <TogglerLabel>
         {focusSlot.isReservable ? (
-          <TogglerLabelContent areControlsVisible={value} togglerLabel={togglerLabel} t={t} price={price} />
+          <TogglerLabelContent
+            areControlsVisible={value}
+            togglerLabel={togglerLabel}
+            t={t}
+            price={price}
+            isPriceLoading={isPriceLoading}
+          />
         ) : (
           t("reservationCalendar:selectTime")
         )}

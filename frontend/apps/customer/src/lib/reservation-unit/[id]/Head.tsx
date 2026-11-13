@@ -4,21 +4,17 @@ import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Toolt
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
-import { Sanitize } from "@ui/components/Sanitize";
+import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
-import { filterNonNullable, getLocalizationLang, getTranslation, stripHtml } from "ui/src/modules/helpers";
+import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { Flex, H1, H3 } from "ui/src/styled";
 import { ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitHeadFragment } from "@gql/gql-types";
 import { IconWithText } from "@/components/IconWithText";
-import {
-  getActivePricing,
-  getPriceString,
-  getReservationUnitAccessPeriods,
-  isReservationUnitPaid,
-} from "@/modules/reservationUnit";
+import { getMaterialPriceDescription, getPriceSummaryString } from "@/modules/price";
+import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { Images } from "./Images";
 
 interface HeadProps {
@@ -171,10 +167,9 @@ function IconList({
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(t, { seconds: minDur });
   const maxReservationDuration = formatDuration(t, { seconds: maxDur });
-  const pricing = getActivePricing(reservationUnit);
-  const isPaid = isReservationUnitPaid(reservationUnit.pricings);
-  const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;
-  const hasSubventionSuffix = pricing && isPaid && subventionSuffix != null;
+  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary);
+  const materialPriceDescription = getMaterialPriceDescription(reservationUnit.priceSummary, lang);
+  const hasSubventionSuffix = reservationUnit.priceSummary?.canApplyForDiscount === true && subventionSuffix != null;
 
   type IconTextType = ReadonlyArray<{
     key: string;
@@ -236,7 +231,6 @@ function IconList({
         }
       : null,
   ] as const);
-  const activePricing = getActivePricing(reservationUnit);
   return (
     <IconListWrapper>
       {iconsTexts.map(({ icon, key, text }) => {
@@ -254,9 +248,9 @@ function IconList({
             return (
               <TooltipWrapper key={key}>
                 <IconWithText icon={icon} text={text} />
-                {activePricing && stripHtml(getTranslation(activePricing, "materialPriceDescription", lang)) !== "" && (
+                {materialPriceDescription !== "" && (
                   <Tooltip>
-                    <Sanitize html={getTranslation(activePricing, "materialPriceDescription", lang)} />
+                    <Sanitize html={materialPriceDescription} />
                   </Tooltip>
                 )}
               </TooltipWrapper>
@@ -287,9 +281,7 @@ export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
     maxReservationDuration
     maxPersons
     minPersons
-    pricings {
-      ...PricingFields
-    }
+    ...PriceSummaryFields
     currentAccessType
     accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
       id

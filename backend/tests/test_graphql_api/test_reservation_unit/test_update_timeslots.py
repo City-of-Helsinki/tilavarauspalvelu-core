@@ -35,7 +35,6 @@ def test_reservation_unit__update__timeslots__add(graphql):
                 "isClosed": True,
             },
         ],
-        "pricings": [],
     }
 
     # when:
@@ -76,7 +75,6 @@ def test_reservation_unit__update__timeslots__replace(graphql):
                 "isClosed": True,
             },
         ],
-        "pricings": [],
     }
 
     # when:
@@ -105,7 +103,6 @@ def test_reservation_unit__update__timeslots__remove_all(graphql):
     data = {
         "pk": reservation_unit.pk,
         "applicationRoundTimeSlots": [],
-        "pricings": [],
     }
 
     # when:
@@ -137,7 +134,6 @@ def test_reservation_unit__update__timeslots__weekday_required(graphql):
                 ],
             },
         ],
-        "pricings": [],
     }
 
     # when:
@@ -171,7 +167,6 @@ def test_reservation_unit__update__timeslots__begin_before_end(graphql):
                 ],
             },
         ],
-        "pricings": [],
     }
 
     # when:
@@ -206,7 +201,6 @@ def test_reservation_unit__update__timeslots__overlapping_reservable_times(graph
                 ],
             },
         ],
-        "pricings": [],
     }
 
     # when:
@@ -244,7 +238,6 @@ def test_reservation_unit__update__timeslots__two_for_same_day(graphql):
                 "isClosed": True,
             },
         ],
-        "pricings": [],
     }
 
     # when:
@@ -276,7 +269,6 @@ def test_reservation_unit__update__timeslots__open_has_no_reservable_times(graph
                 "reservableTimes": [],
             },
         ],
-        "pricings": [],
     }
 
     # when:
@@ -311,7 +303,6 @@ def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphq
                 ],
             },
         ],
-        "pricings": [],
     }
 
     # when:
@@ -335,7 +326,6 @@ def test_reservation_unit__update__reservation_block_whole_day(graphql):
     data = {
         "pk": reservation_unit.pk,
         "reservationBlockWholeDay": True,
-        "pricings": [],
     }
 
     response = graphql(UPDATE_MUTATION, input_data=data)

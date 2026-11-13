@@ -32,25 +32,17 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import type {
+  OwnPricingInputSerializerInput,
   ReservationUnitEditQuery,
-  ReservationUnitPricingSerializerInput,
   UpdateApplicationRoundTimeSlotSerializerInput,
   ReservationUnitAccessTypeSerializerInput,
 } from "@gql/gql-types";
+import { getOwnPricings } from "./pricing";
+import type { OwnPriceComponent } from "./pricing";
 import type { TaxLevelOption } from "./PricingSection";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
-
-/// @param date string in UI format
-/// @returns true if date is in the future
-function isAfterToday(date: string) {
-  const d = parseUIDate(date);
-  if (d == null) {
-    return false;
-  }
-  return d > endOfDay(new Date());
-}
 
 const cleanHtmlWhitespace = (str: string) => {
   return cleanHtmlContent(formatWhitespace(str));
@@ -60,17 +52,20 @@ const PricingFormSchema = z.object({
   // pk === 0 fails silently on the backend, but undefined creates a new pricing
   // on the frontend pk <= 0 is a new pricing
   pk: z.number(),
+  // The saved price in effect today. The backend does not allow changes to it.
+  isReadOnly: z.boolean(),
   taxLevel: z.number(),
-  lowestPrice: z.number({ error: "Required" }),
-  highestPrice: z.number({ error: "Required" }),
+  salesItem: z.number().nullable(),
+  price: z.number({ error: "Required" }),
   priceUnit: z.enum(PriceUnit).nullable(),
-  paymentType: z.enum(PaymentType).nullable(),
+  canApplyForDiscount: z.boolean(),
   // NOTE this has to be a string because of HDS date input in ui format: "d.M.yyyy"
   begins: z.string(),
   // frontend only value, otherwise invalid begin values will break future dates
   isFuture: z.boolean(),
   // frontend only value, this is used to control if we should show price section
-  isPaid: z.boolean(),
+  // A new price has no choice, so that it is not saved as free by accident
+  isPaid: z.boolean().nullable(),
   hasMaterialPrice: z.boolean(),
   materialPriceDescriptionFi: z
     .string()
@@ -89,7 +84,7 @@ const PricingFormSchema = z.object({
 type PricingFormValues = z.infer<typeof PricingFormSchema>;
 
 function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx, path: string) {
-  if (data == null) {
+  if (data == null || data.isReadOnly) {
     return;
   }
   if (data.begins === "") {
@@ -115,21 +110,20 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
       code: "custom",
     });
   }
+  // A saved price can only begin in the future, so a new current price begins today or earlier
+  if (!data.isFuture && date && date > endOfDay(new Date())) {
+    ctx.addIssue({
+      message: "Begin can't be in the future",
+      path: [`${path}.begins`],
+      code: "custom",
+    });
+  }
 
   if (data.isPaid) {
-    const { lowestPrice, highestPrice } = data;
-
-    if (Number.isNaN(lowestPrice)) {
+    if (Number.isNaN(data.price)) {
       ctx.addIssue({
         message: "must be a number",
-        path: [`${path}.lowestPrice`],
-        code: "custom",
-      });
-    }
-    if (Number.isNaN(highestPrice)) {
-      ctx.addIssue({
-        message: "must be a number",
-        path: [`${path}.highestPrice`],
+        path: [`${path}.price`],
         code: "custom",
       });
     }
@@ -140,18 +134,10 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
         code: "custom",
       });
     }
-    if (lowestPrice > highestPrice) {
-      ctx.addIssue({
-        message: "lowestPrice must be lower than highestPrice",
-        path: [`${path}.lowestPrice`],
-        code: "custom",
-      });
-    }
-
-    if (!data.paymentType) {
+    if (data.priceUnit == null) {
       ctx.addIssue({
         message: "Required",
-        path: [`${path}.paymentType`],
+        path: [`${path}.priceUnit`],
         code: "custom",
       });
     }
@@ -428,7 +414,6 @@ export const ReservationUnitEditSchema = z
     requireAdultReservee: z.boolean(),
     requireReservationHandling: z.boolean(),
     reservationStartInterval: z.enum(ReservationStartInterval),
-    canApplyFreeOfCharge: z.boolean(),
     reservationsMinDaysBefore: z.number({ error: "Required" }),
     reservationsMaxDaysBefore: z.number(),
     reservationKind: z.enum(ReservationKind),
@@ -502,6 +487,7 @@ export const ReservationUnitEditSchema = z
     equipments: z.array(z.number()),
     intendedUses: z.array(z.number()),
     pricings: z.array(PricingFormSchema),
+    paymentType: z.enum(PaymentType).nullable(),
     seasons: z.array(SeasonalFormSchema),
     // "Not draft reservation unit must have a reservation unit type."
     reservationUnitType: z.number().nullable(),
@@ -516,6 +502,8 @@ export const ReservationUnitEditSchema = z
     images: z.array(ImageFormSchema),
     // internal values
     isDraft: z.boolean(),
+    // The prices of a shared pricing group are not edited in this form
+    isSharedPricingGroup: z.boolean(),
     // do we show optional fields to the user? not sent to backend but changes if the field is sent
     hasFuturePricing: z.boolean(),
     hasScheduledPublish: z.boolean(),
@@ -592,9 +580,28 @@ export const ReservationUnitEditSchema = z
       return;
     }
 
-    if (v.pricings.length > 0) {
-      for (let i = 0; i < v.pricings.length; i++) {
-        validatePricing(v.pricings[i], ctx, `pricings.${i}`);
+    const isOnlinePayment = v.paymentType === PaymentType.Online || v.paymentType === PaymentType.OnlineOrInvoice;
+    for (let i = 0; i < v.pricings.length; i++) {
+      const pricing = v.pricings[i];
+      // The prices of a shared pricing group are not edited or sent, so the form has only placeholders for them
+      if (pricing == null || v.isSharedPricingGroup || (pricing.isFuture && !v.hasFuturePricing)) {
+        continue;
+      }
+      validatePricing(pricing, ctx, `pricings.${i}`);
+      if (pricing.isPaid == null) {
+        ctx.addIssue({
+          message: "Required",
+          path: [`pricings.${i}.isPaid`],
+          code: "custom",
+        });
+      }
+      // The webshop needs the sales item for the accounting of a paid price
+      if (!pricing.isReadOnly && pricing.isPaid && isOnlinePayment && pricing.salesItem == null) {
+        ctx.addIssue({
+          message: "Required",
+          path: [`pricings.${i}.salesItem`],
+          code: "custom",
+        });
       }
     }
 
@@ -737,12 +744,21 @@ export const ReservationUnitEditSchema = z
       });
     }
 
-    const isPaid = v.pricings.some((p) => p.highestPrice > 0);
-    if (v.canApplyFreeOfCharge && isPaid && v.pricingTerms == null) {
+    const shownPricingList = v.pricings.filter((p) => !p.isFuture || v.hasFuturePricing);
+    const isPaid = shownPricingList.some((p) => p.isPaid && p.price > 0);
+    const hasDiscount = shownPricingList.some((p) => p.isPaid && p.price > 0 && p.canApplyForDiscount);
+    if (hasDiscount && v.pricingTerms == null) {
       ctx.addIssue({
         code: "custom",
         message: "Required",
         path: ["pricingTerms"],
+      });
+    }
+    if (isPaid && !v.isSharedPricingGroup && v.paymentType == null) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Required",
+        path: ["paymentType"],
       });
     }
   });
@@ -758,59 +774,63 @@ function convertBegins(begins?: string) {
   return formatDate(today);
 }
 
-type PricingNode = NonNullable<Node["pricings"]>[0];
-
-function convertPricing(p?: PricingNode): PricingFormValues {
+function convertPriceComponent(component: OwnPriceComponent, isFuture: boolean): PricingFormValues {
+  const price = toNumber(component.amount) ?? 0;
   return {
-    pk: p?.pk ?? 0,
-    taxLevel: p?.taxLevel?.pk ?? 0,
-    lowestPrice: toNumber(p?.lowestPrice) ?? 0,
-    highestPrice: toNumber(p?.highestPrice) ?? 0,
-    isPaid: (toNumber(p?.highestPrice) ?? 0) > 0,
-    isFuture: new Date(p?.begins ?? "") > new Date(),
-    priceUnit: p?.priceUnit ?? null,
-    paymentType: p?.paymentType ?? null,
-    begins: convertBegins(p?.begins),
-    hasMaterialPrice: !!p?.materialPriceDescriptionFi,
-    materialPriceDescriptionFi: p?.materialPriceDescriptionFi ?? "",
-    materialPriceDescriptionEn: p?.materialPriceDescriptionEn ?? "",
-    materialPriceDescriptionSv: p?.materialPriceDescriptionSv ?? "",
+    pk: component.pk ?? 0,
+    isReadOnly: !isFuture,
+    taxLevel: component.taxLevel.pk ?? 0,
+    salesItem: component.salesItem?.pk ?? null,
+    price,
+    isPaid: price > 0,
+    isFuture,
+    priceUnit: component.priceUnit,
+    canApplyForDiscount: component.canApplyForDiscount,
+    begins: convertBegins(component.validFrom),
+    hasMaterialPrice: !!component.materialPriceDescriptionFi,
+    materialPriceDescriptionFi: component.materialPriceDescriptionFi ?? "",
+    materialPriceDescriptionEn: component.materialPriceDescriptionEn ?? "",
+    materialPriceDescriptionSv: component.materialPriceDescriptionSv ?? "",
   };
 }
 
-function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
-  // NOTE Even though the frontend doesn't support adding more than two prices we can show / save more
-  const convertedPrices = pricings.map((pricing) => convertPricing(pricing));
-  const activePrices = convertedPrices.filter((p) => !p.isFuture);
-  const futurePrices = convertedPrices.filter((p) => p.isFuture);
+function createNewPricing(pk: number, isFuture: boolean): PricingFormValues {
+  return {
+    pk,
+    isReadOnly: false,
+    taxLevel: 0,
+    salesItem: null,
+    price: 0,
+    isFuture,
+    isPaid: null,
+    priceUnit: null,
+    canApplyForDiscount: false,
+    begins: isFuture ? formatDate(addDays(new Date(), 1)) : formatDate(new Date()),
+    hasMaterialPrice: false,
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
+  };
+}
 
-  const activePrice = activePrices[activePrices.length - 1];
-  // query data includes all past pricings also, remove them
-  const prices = activePrice != null ? [activePrice, ...futurePrices] : convertedPrices;
-
-  // Always include at least two pricings in the form data (the frontend doesn't support dynamic adding)
-  // negative pk for new pricings
-  let rollingIndex = -1;
-  while (prices.length < 2 || !prices.some((p) => p?.isFuture)) {
-    // if we need to add first price, it's always current
-    const isFuture = prices.length > 0;
-    const begins = prices.length === 0 ? formatDate(new Date()) : formatDate(addDays(new Date(), 1));
-
-    prices.push({
-      pk: rollingIndex--,
-      taxLevel: 0,
-      lowestPrice: 0,
-      highestPrice: 0,
-      isFuture,
-      isPaid: false,
-      priceUnit: null,
-      paymentType: null,
-      begins,
-      hasMaterialPrice: false,
-      materialPriceDescriptionFi: "",
-      materialPriceDescriptionEn: "",
-      materialPriceDescriptionSv: "",
-    });
+/// The form has the current price and at least one future price, because the frontend can not add prices.
+/// Negative pks are new prices.
+/// A new current price is only possible when the reservation unit has no prices yet.
+/// A saved price can only begin in the future.
+function convertPricingList(data: Node | undefined): PricingFormValues[] {
+  if (data == null) {
+    return [createNewPricing(-1, false), createNewPricing(-2, true)];
+  }
+  const { current, futureList } = getOwnPricings(data, new Date());
+  const prices = [
+    ...(current != null ? [convertPriceComponent(current, false)] : []),
+    ...futureList.map((component) => convertPriceComponent(component, true)),
+  ];
+  if (prices.length === 0) {
+    prices.push(createNewPricing(-1, false));
+  }
+  if (!prices.some((p) => p.isFuture)) {
+    prices.push(createNewPricing(-2, true));
   }
   return prices;
 }
@@ -884,7 +904,6 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     requireAdultReservee: data?.requireAdultReservee ?? false,
     requireReservationHandling: data?.requireReservationHandling ?? false,
     reservationStartInterval: data?.reservationStartInterval ?? ReservationStartInterval.Interval_15Minutes,
-    canApplyFreeOfCharge: data?.canApplyFreeOfCharge ?? false,
     reservationsMinDaysBefore: data?.reservationsMinDaysBefore ?? 0,
     reservationsMaxDaysBefore: data?.reservationsMaxDaysBefore ?? 0,
     reservationKind: data?.reservationKind ?? ReservationKind.DirectAndSeason,
@@ -920,11 +939,13 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     serviceSpecificTerms: data?.serviceSpecificTerms?.pk ?? "",
     cancellationTerms: data?.cancellationTerms?.pk ?? "",
     cancellationRule: data?.cancellationRule?.pk ?? null,
-    pricings: convertPricingList(filterNonNullable(data?.pricings)),
+    pricings: convertPricingList(data),
+    paymentType: data?.paymentType ?? null,
+    isSharedPricingGroup: data != null ? getOwnPricings(data, new Date()).isShared : false,
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isDraft ?? false,
     seasons: convertSeasonalList(filterNonNullable(data?.applicationRoundTimeSlots)),
-    hasFuturePricing: data?.pricings?.some((p) => new Date(p.begins) > new Date()) ?? false,
+    hasFuturePricing: data != null ? getOwnPricings(data, new Date()).futureList.length > 0 : false,
     hasScheduledPublish: data?.publishBeginsAt != null || data?.publishEndsAt != null,
     hasScheduledReservation: data?.reservationBeginsAt != null || data?.reservationEndsAt != null,
     hasPublishBegins: data?.publishBeginsAt != null,
@@ -965,6 +986,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     maxReservationDuration,
     pricings,
     hasFuturePricing,
+    isSharedPricingGroup,
     hasScheduledPublish,
     hasScheduledReservation,
     hasPublishBegins,
@@ -1027,7 +1049,15 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     reservationKind,
     isDraft,
     cancellationRule: hasCancellationRule ? cancellationRule : null,
-    pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing, taxLevelOptions))),
+    // Prices that are not sent are deleted, so a shared pricing group gets no prices from this form
+    ...(isSharedPricingGroup
+      ? {}
+      : {
+          // A price without the choice of paid or free is not saved, so a draft is not saved as free by accident
+          ownPricings: pricings
+            .filter((p) => (!p.isFuture || hasFuturePricing) && p.isPaid != null)
+            .map((p) => transformPricing(p, taxLevelOptions)),
+        }),
     accessTypes,
     applicationRoundTimeSlots,
   };
@@ -1035,12 +1065,8 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
 
 function transformPricing(
   values: PricingFormValues,
-  hasFuturePricing: boolean,
   taxLevelOptions: TaxLevelOption[]
-): ReservationUnitPricingSerializerInput | null {
-  if (!hasFuturePricing && isAfterToday(values.begins)) {
-    return null;
-  }
+): OwnPricingInputSerializerInput {
   // without a valid taxLevel mutation fails even if it's free pricing
   // but we don't have a valid taxLevel for free pricings (user has made no selection)
   const taxLevel = values.taxLevel > 0 ? values.taxLevel : (taxLevelOptions[0]?.pk ?? 0);
@@ -1048,15 +1074,17 @@ function transformPricing(
     throw new Error("Tax level is required for pricing");
   }
 
+  const isPaid = values.isPaid && values.price > 0;
   const begins = parseUIDate(values.begins) ?? new Date();
   return {
-    taxLevel,
-    begins: formatApiDate(begins) ?? "",
-    highestPrice: values.isPaid ? values.highestPrice.toString() : "0",
-    lowestPrice: values.isPaid ? values.lowestPrice.toString() : "0",
     ...(values.pk > 0 ? { pk: values.pk } : {}),
-    ...(values.priceUnit != null ? { priceUnit: values.priceUnit } : {}),
-    ...(values.paymentType != null ? { paymentType: values.paymentType } : {}),
+    begins: formatApiDate(begins) ?? "",
+    amount: isPaid ? values.price.toString() : "0",
+    priceUnit: values.priceUnit ?? PriceUnit.Fixed,
+    taxLevel,
+    salesItem: isPaid ? values.salesItem : null,
+    // A discount is only possible for a paid price
+    canApplyForDiscount: isPaid && values.canApplyForDiscount,
     materialPriceDescriptionFi: values.hasMaterialPrice ? values.materialPriceDescriptionFi : "",
     materialPriceDescriptionEn: values.hasMaterialPrice ? values.materialPriceDescriptionEn : "",
     materialPriceDescriptionSv: values.hasMaterialPrice ? values.materialPriceDescriptionSv : "",

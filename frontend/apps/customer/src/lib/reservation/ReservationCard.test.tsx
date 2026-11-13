@@ -12,10 +12,6 @@ vi.mock("@/modules/reservation", () => ({
   isReservationCancellable: vi.fn(() => false),
 }));
 
-vi.mock("@/modules/reservationUnit", () => ({
-  getPrice: vi.fn(() => "€100"),
-}));
-
 vi.mock("@/modules/urls", () => ({
   getReservationPath: vi.fn((pk) => `/reservations/${pk}`),
 }));
@@ -25,20 +21,6 @@ vi.mock("ui/src/components/statuses", () => ({
   OrderStatusLabel: () => <span>OrderStatus</span>,
 }));
 
-vi.mock("ui/src/modules/helpers", () => ({
-  capitalize: (str: string) => str.charAt(0).toUpperCase() + str.slice(1),
-  getImageSource: vi.fn(() => null),
-  getLocalizationLang: vi.fn(() => "en"),
-  getTranslation: vi.fn((obj: unknown) => {
-    // eslint-disable-next-line eqeqeq
-    if (typeof obj === "object" && obj != null && "nameFi" in obj) {
-      return (obj as Record<string, unknown>).nameFi || "Test";
-    }
-    return "Test";
-  }),
-  getMainImage: vi.fn(() => null),
-}));
-
 function createMockReservation(overrides: Partial<ReservationCardFragment> = {}): ReservationCardFragment {
   return {
     pk: 1,
@@ -46,6 +28,21 @@ function createMockReservation(overrides: Partial<ReservationCardFragment> = {})
     endsAt: "2026-09-15T11:00:00Z",
     state: ReservationStateChoice.Confirmed,
     accessType: AccessType.Unrestricted,
+    applyingForFreeOfCharge: false,
+    id: "reservation-1",
+    price: "20.00",
+    taxPercentageValue: "25.5",
+    priceLines: [
+      {
+        id: "line-1",
+        descriptionFi: "Tilan vuokra",
+        descriptionEn: "Space rent",
+        descriptionSv: "Hyra",
+        amount: "20.00",
+        overrideAmount: null,
+        taxPercentage: "25.5",
+      },
+    ],
     reservationUnit: {
       id: "ru-1",
       nameFi: "Test Unit",
@@ -98,6 +95,7 @@ describe("ReservationCard", () => {
     render(<ReservationCard reservation={mockReservation} apiBaseUrl="http://localhost:3000" />);
 
     expect(screen.getByLabelText("common:price")).toBeInTheDocument();
+    expect(screen.getByText("20,00 €")).toBeInTheDocument();
   });
 
   test("renders access type icon with aria label", () => {

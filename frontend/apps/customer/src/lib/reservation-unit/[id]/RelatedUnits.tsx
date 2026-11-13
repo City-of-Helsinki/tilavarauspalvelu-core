@@ -17,7 +17,7 @@ import { H3 } from "ui/src/styled";
 import { useRelatedReservationUnitsQuery } from "@gql/gql-types";
 import type { Maybe, RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import { Carousel } from "@/components/Carousel";
-import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
+import { getPriceSummaryString } from "@/modules/price";
 import { getReservationUnitPath } from "@/modules/urls";
 
 type RelatedUnitsProps = {
@@ -79,8 +79,7 @@ function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCard
 
   const name = getTranslation(reservationUnit, "name", lang);
   const unitName = getTranslation(reservationUnit.unit, "name", lang);
-  const pricing = getActivePricing(reservationUnit);
-  const unitPrice = pricing != null ? getPriceString({ t, pricing }) : undefined;
+  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary);
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
       ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
@@ -140,8 +139,6 @@ export const RELATED_UNIT_CARD_FRAGMENT = gql`
       nameSv
     }
     maxPersons
-    pricings {
-      ...PricingFields
-    }
+    ...PriceSummaryFields
   }
 `;

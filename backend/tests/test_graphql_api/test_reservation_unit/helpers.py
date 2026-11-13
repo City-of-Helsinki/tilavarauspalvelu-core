@@ -1,20 +1,12 @@
 from __future__ import annotations
 
 import datetime
-from decimal import Decimal
 from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import (
-    AccessType,
-    AuthenticationType,
-    PaymentType,
-    PriceUnit,
-    ReservationKind,
-    ReservationStartInterval,
-)
+from tilavarauspalvelu.enums import AccessType, AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
 from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
@@ -41,7 +33,6 @@ __all__ = [
     "get_create_non_draft_input_data",
     "get_draft_update_input_data",
     "get_non_draft_update_input_data",
-    "get_pricing_data",
     "reservation_unit_query",
     "reservation_units_query",
 ]
@@ -63,7 +54,6 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
     resource = ResourceFactory.create(space=space)
     reservation_unit_type = ReservationUnitTypeFactory.create()
     rule = ReservationUnitCancellationRuleFactory.create()
-    tax_level = TaxLevelFactory.create()
 
     today = local_date()
 
@@ -96,20 +86,10 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
         "maxReservationsPerUser": 2,
         "requireReservationHandling": True,
         "authentication": AuthenticationType.STRONG.name,
-        "canApplyFreeOfCharge": True,
         "reservationsMinDaysBefore": 1,
         "reservationsMaxDaysBefore": 360,
         "reservationKind": ReservationKind.DIRECT.name,
-        "pricings": [
-            {
-                "begins": today.isoformat(),
-                "priceUnit": PriceUnit.PER_15_MINS.name,
-                "lowestPrice": "10.5",
-                "highestPrice": "18.8",
-                "taxLevel": tax_level.id,
-                "paymentType": PaymentType.ONLINE_OR_INVOICE,
-            }
-        ],
+        "ownPricings": [get_free_own_pricing_data(begins=today)],
         "accessTypes": [
             {
                 "beginDate": today.isoformat(),
@@ -144,17 +124,13 @@ def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
     }
 
 
-def get_pricing_data(**overrides: Any) -> dict[str, Any]:
-    tax_level = TaxLevelFactory.create(rates__percentage=Decimal("10.0"))
-
+def get_free_own_pricing_data(*, begins: datetime.date) -> dict[str, Any]:
+    tax_level = TaxLevelFactory.create()
     return {
-        "begins": "2022-09-11",
-        "priceUnit": PriceUnit.PER_15_MINS.name,
-        "lowestPrice": "18.2",
-        "highestPrice": "21.5",
-        "taxLevel": tax_level.id,
-        "paymentType": PaymentType.ONLINE_OR_INVOICE,
-        **overrides,
+        "begins": begins.isoformat(),
+        "amount": "0",
+        "priceUnit": PriceUnit.FIXED.name,
+        "taxLevel": tax_level.pk,
     }
 
 
@@ -177,7 +153,7 @@ def get_non_draft_update_input_data(reservation_unit: ReservationUnit, **overrid
         "descriptionFi": "description",
         "descriptionEn": "description",
         "descriptionSv": "description",
-        "pricings": [get_pricing_data()],
+        "ownPricings": [get_free_own_pricing_data(begins=today)],
         "accessTypes": [
             {
                 "beginDate": today.isoformat(),

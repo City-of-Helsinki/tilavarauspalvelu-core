@@ -356,7 +356,6 @@ function Reservation({
             <PaymentNotification
               reservation={reservation}
               paymentOrder={reservation.paymentOrder}
-              appliedPricing={reservation.appliedPricing}
               apiBaseUrl={env.apiBaseUrl}
             />
           )}
@@ -526,7 +525,7 @@ export const RESERVATION_PAGE_QUERY = gql`
         unit {
           ...AddressFields
         }
-        canApplyFreeOfCharge
+        ...PriceSummaryFields
         ...TermsOfUse
       }
     }

@@ -5,11 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { MockedResponse } from "@apollo/client/testing";
 import type { EditPageReservationFragment } from "@gql/gql-types";
 import { transformReservation } from "@/modules/reservation";
 import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { createMockReservation } from "@test/reservation.mocks";
+import { createMockReservation, createReservationPriceQueryMock } from "@test/reservation.mocks";
 import { EditStep0 } from "./EditStep0";
 
 // Heavy calendar/quick-reservation UI + polling hook are covered elsewhere -
@@ -31,9 +32,13 @@ vi.mock("@/hooks", async (importOriginal) => ({
   useAvailableTimes: () => ({ startingTimeOptions: [], nextAvailableTime: undefined }),
 }));
 
+const mockErrorToast = vi.fn();
+vi.mock("ui/src/components/toast", () => ({
+  errorToast: (...args: unknown[]) => mockErrorToast(...args),
+}));
+
 const mockConvertFormToFocustimeSlot = vi.fn();
 const mockIsRangeReservable = vi.fn();
-const mockIsReservationUnitFreeOfCharge = vi.fn();
 const mockIsReservationEditable = vi.fn();
 
 vi.mock("@/modules/reservation", async (importOriginal) => ({
@@ -41,14 +46,21 @@ vi.mock("@/modules/reservation", async (importOriginal) => ({
   isReservationEditable: (...args: unknown[]) => mockIsReservationEditable(...args),
   convertFormToFocustimeSlot: (...args: unknown[]) => mockConvertFormToFocustimeSlot(...args),
 }));
-vi.mock("@/modules/reservationUnit", async (importOriginal) => ({
-  ...(await importOriginal()),
-  isReservationUnitFreeOfCharge: (...args: unknown[]) => mockIsReservationUnitFreeOfCharge(...args),
-}));
 vi.mock("@/modules/reservable", async (importOriginal) => ({
   ...(await importOriginal()),
   isRangeReservable: (...args: unknown[]) => mockIsRangeReservable(...args),
 }));
+
+const SLOT_START = new Date(2024, 0, 1, 10, 0);
+const SLOT_END = new Date(2024, 0, 1, 11, 0);
+
+function createPriceMock(total: string): MockedResponse {
+  return createReservationPriceQueryMock({
+    beginsAt: SLOT_START,
+    endsAt: SLOT_END,
+    price: { total, canApplyForDiscount: false, lines: [] },
+  });
+}
 
 function buildReservation(): EditPageReservationFragment {
   const base = createMockReservation({ pk: 1 });
@@ -68,9 +80,11 @@ function buildReservation(): EditPageReservationFragment {
 function Wrapper({
   reservation,
   nextStep,
+  mocks,
 }: {
   reservation: EditPageReservationFragment;
   nextStep: () => void;
+  mocks: ReadonlyArray<MockedResponse>;
 }): React.ReactElement {
   const reservationForm = useForm<PendingReservationFormType>({
     defaultValues: transformReservation(reservation),
@@ -86,7 +100,7 @@ function Wrapper({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <MockedProvider mocks={[]}>
+    <MockedProvider mocks={mocks}>
       <EditStep0 reservation={reservation} reservationForm={reservationForm} nextStep={nextStep} />
     </MockedProvider>
   );
@@ -95,26 +109,27 @@ function Wrapper({
 function customRender({
   reservation = buildReservation(),
   nextStep = vi.fn(),
+  mocks = [createPriceMock("0.00")],
 }: {
   reservation?: EditPageReservationFragment;
   nextStep?: () => void;
+  mocks?: ReadonlyArray<MockedResponse>;
 } = {}): ReturnType<typeof render> {
-  return render(<Wrapper reservation={reservation} nextStep={nextStep} />);
+  return render(<Wrapper reservation={reservation} nextStep={nextStep} mocks={mocks} />);
 }
 
 beforeEach(() => {
   mockConvertFormToFocustimeSlot.mockReset();
   mockIsRangeReservable.mockReset();
-  mockIsReservationUnitFreeOfCharge.mockReset();
   mockIsReservationEditable.mockReset();
+  mockErrorToast.mockReset();
   // sensible defaults, overridden per test
   mockConvertFormToFocustimeSlot.mockReturnValue({
     isReservable: true,
-    start: new Date(2024, 0, 1, 10, 0),
-    end: new Date(2024, 0, 1, 11, 0),
+    start: SLOT_START,
+    end: SLOT_END,
   });
   mockIsReservationEditable.mockReturnValue(true);
-  mockIsReservationUnitFreeOfCharge.mockReturnValue(true);
   mockIsRangeReservable.mockReturnValue(true);
 });
 
@@ -136,8 +151,36 @@ describe("EditStep0", () => {
 
     await waitFor(() => expect(nextStep).toHaveBeenCalledTimes(1));
     expect(mockIsReservationEditable).toHaveBeenCalled();
-    expect(mockIsReservationUnitFreeOfCharge).toHaveBeenCalled();
     expect(mockIsRangeReservable).toHaveBeenCalled();
+  });
+
+  it("does not call nextStep when the new time is not free of charge", async () => {
+    const nextStep = vi.fn();
+    customRender({ nextStep, mocks: [createPriceMock("10.00")] });
+
+    const form = screen.getByTestId("reservation__button--continue").closest("form");
+    form?.requestSubmit();
+
+    await waitFor(() =>
+      expect(mockErrorToast).toHaveBeenCalledWith({ text: "reservationCalendar:errors.unavailable" })
+    );
+    expect(mockIsRangeReservable).not.toHaveBeenCalled();
+    expect(nextStep).not.toHaveBeenCalled();
+  });
+
+  it("does not call nextStep when the price of the new time does not load", async () => {
+    const nextStep = vi.fn();
+    const { request } = createPriceMock("0.00");
+    customRender({ nextStep, mocks: [{ request, error: new Error("Network error") }] });
+
+    const form = screen.getByTestId("reservation__button--continue").closest("form");
+    form?.requestSubmit();
+
+    await waitFor(() =>
+      expect(mockErrorToast).toHaveBeenCalledWith({ text: "reservationCalendar:errors.unavailable" })
+    );
+    expect(mockIsRangeReservable).not.toHaveBeenCalled();
+    expect(nextStep).not.toHaveBeenCalled();
   });
 
   it("does not call nextStep when the computed slot is not reservable", async () => {

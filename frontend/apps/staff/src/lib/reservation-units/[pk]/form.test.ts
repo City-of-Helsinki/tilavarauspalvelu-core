@@ -4,6 +4,7 @@ import { formatApiDate, formatDate } from "ui/src/modules/date-utils";
 import {
   AccessType,
   PaymentType,
+  PriceComponentKind,
   PriceUnit,
   ReservationFormType,
   ReservationKind,
@@ -18,10 +19,60 @@ import {
   transformReservationUnit,
 } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
+import type { OwnPriceComponent } from "./pricing";
 
 type QueryData = NonNullable<ReservationUnitEditQuery["reservationUnit"]>;
 
 const TAX_OPTIONS = [{ label: "Yleinen (25,5 %)", pk: 1, percentage: 25.5 }];
+
+const FUTURE_DATE = formatApiDate(addDays(new Date(), 30)) ?? "";
+
+function createPriceComponent(overrides: Partial<OwnPriceComponent> = {}): OwnPriceComponent {
+  return {
+    id: "PriceComponentNode:1",
+    pk: 1,
+    kind: PriceComponentKind.Base,
+    validFrom: "2020-01-01",
+    validUntil: null,
+    priceOption: null,
+    amount: "10.00",
+    priceUnit: PriceUnit.PerHour,
+    canApplyForDiscount: true,
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
+    taxLevel: { id: "TaxLevelNode:1", pk: 1 },
+    salesItem: { id: "SalesItemNode:5", pk: 5 },
+    ...overrides,
+  };
+}
+
+/// One own pricing group from 2020 with a current price that ends when a future price begins
+function createPricingQueryData({
+  isShared = false,
+  hasFuturePrice = true,
+}: { isShared?: boolean; hasFuturePrice?: boolean } = {}): QueryData {
+  const current = createPriceComponent({ validUntil: hasFuturePrice ? FUTURE_DATE : null });
+  const future = createPriceComponent({
+    id: "PriceComponentNode:2",
+    pk: 2,
+    validFrom: FUTURE_DATE,
+    amount: "20.00",
+  });
+  return {
+    reservationUnitPricingGroups: [
+      {
+        id: "ReservationUnitPricingGroupNode:1",
+        begins: "2020-01-01",
+        pricingGroup: {
+          id: "PricingGroupNode:1",
+          unitGroup: isShared ? { id: "UnitGroupNode:1" } : null,
+          components: hasFuturePrice ? [current, future] : [current],
+        },
+      },
+    ],
+  } as unknown as QueryData;
+}
 
 // Non-null array access helper: avoids `!` (banned by lint) while still failing loudly
 // (instead of silently continuing with `undefined`) if the index doesn't exist.
@@ -38,8 +89,11 @@ function at<T>(arr: T[], index: number): T {
 // duration bounds that are valid multiples of the (default 15 minute) start interval.
 function createValidFormValues(overrides: Partial<ReservationUnitEditFormValues> = {}): ReservationUnitEditFormValues {
   const base = convertReservationUnit(undefined);
+  // A new price has no choice of paid or free, so choose free for the current price
+  const [current, ...futureList] = base.pricings;
   return {
     ...base,
+    pricings: current != null ? [{ ...current, isPaid: false }, ...futureList] : futureList,
     nameFi: "Nimi",
     nameEn: "Name",
     nameSv: "Namn",
@@ -82,21 +136,28 @@ describe("convertReservationUnit", () => {
   });
 
   it("derives bufferType from reservationBlockWholeDay and the individual buffers", () => {
-    const blocksWholeDay = convertReservationUnit({ reservationBlockWholeDay: true } as QueryData);
+    const blocksWholeDay = convertReservationUnit({
+      reservationBlockWholeDay: true,
+      reservationUnitPricingGroups: [],
+    } as unknown as QueryData);
     expect(blocksWholeDay.bufferType).toBe("blocksWholeDay");
 
-    const bufferTimesSet = convertReservationUnit({ bufferTimeBefore: 900 } as QueryData);
+    const bufferTimesSet = convertReservationUnit({
+      bufferTimeBefore: 900,
+      reservationUnitPricingGroups: [],
+    } as unknown as QueryData);
     expect(bufferTimesSet.bufferType).toBe("bufferTimesSet");
 
-    const noBuffer = convertReservationUnit({} as QueryData);
+    const noBuffer = convertReservationUnit({ reservationUnitPricingGroups: [] } as unknown as QueryData);
     expect(noBuffer.bufferType).toBe("noBuffer");
   });
 
   it("splits publish/reservation datetimes into separate date and time fields and sets the has* flags", () => {
     const values = convertReservationUnit({
+      reservationUnitPricingGroups: [],
       publishBeginsAt: "2024-01-01T10:00:00+02:00",
       reservationEndsAt: "2024-06-15T18:30:00+03:00",
-    } as QueryData);
+    } as unknown as QueryData);
     expect(values.publishBeginsDate).toBe(formatDate(new Date("2024-01-01T10:00:00+02:00")));
     expect(values.publishBeginsTime).not.toBe("");
     expect(values.hasScheduledPublish).toBe(true);
@@ -107,34 +168,50 @@ describe("convertReservationUnit", () => {
     expect(values.hasReservationBegins).toBe(false);
   });
 
-  it("keeps only the latest active pricing plus any future pricings, always at least 2 total", () => {
-    const values = convertReservationUnit({
-      pricings: [
-        {
-          pk: 1,
-          begins: "2020-01-01",
-          highestPrice: "0",
-          lowestPrice: "0",
-          taxLevel: { pk: 1 },
-        },
-        {
-          pk: 2,
-          begins: "2021-01-01",
-          highestPrice: "10",
-          lowestPrice: "5",
-          taxLevel: { pk: 3 },
-        },
-      ],
-    } as unknown as QueryData);
-    // only the most recent active pricing (pk 2) is kept, a future one is synthesized
-    expect(values.pricings.filter((p) => !p.isFuture)).toHaveLength(1);
-    expect(values.pricings.find((p) => !p.isFuture)?.pk).toBe(2);
-    expect(values.pricings.find((p) => !p.isFuture)?.taxLevel).toBe(3);
-    expect(values.pricings.some((p) => p.isFuture)).toBe(true);
+  it("reads the current price as read-only and the future prices from the own pricing group", () => {
+    const values = convertReservationUnit(createPricingQueryData());
+    expect(values.pricings).toHaveLength(2);
+    expect(at(values.pricings, 0)).toMatchObject({
+      pk: 1,
+      isReadOnly: true,
+      isFuture: false,
+      isPaid: true,
+      price: 10,
+      taxLevel: 1,
+      salesItem: 5,
+    });
+    expect(at(values.pricings, 1)).toMatchObject({ pk: 2, isReadOnly: false, isFuture: true, price: 20 });
+    expect(values.hasFuturePricing).toBe(true);
+    expect(at(values.pricings, 0).canApplyForDiscount).toBe(true);
+    expect(values.isSharedPricingGroup).toBe(false);
+  });
+
+  it("adds a new future price when the reservation unit has only a current price", () => {
+    const values = convertReservationUnit(createPricingQueryData({ hasFuturePrice: false }));
+    expect(values.pricings.map((p) => [p.pk, p.isFuture, p.isReadOnly])).toEqual([
+      [1, false, true],
+      [-2, true, false],
+    ]);
+    expect(values.hasFuturePricing).toBe(false);
+  });
+
+  it("adds an editable current price and a future price when the reservation unit has no prices", () => {
+    const values = convertReservationUnit({ reservationUnitPricingGroups: [] } as unknown as QueryData);
+    expect(values.pricings.map((p) => [p.pk, p.isFuture, p.isReadOnly])).toEqual([
+      [-1, false, false],
+      [-2, true, false],
+    ]);
+  });
+
+  it("does not read the prices of a shared pricing group", () => {
+    const values = convertReservationUnit(createPricingQueryData({ isShared: true }));
+    expect(values.isSharedPricingGroup).toBe(true);
+    expect(values.pricings.every((p) => p.pk < 0)).toBe(true);
   });
 
   it("converts access types and application round time slots", () => {
     const values = convertReservationUnit({
+      reservationUnitPricingGroups: [],
       accessTypes: [{ pk: 5, accessType: AccessType.AccessCode, beginDate: "2024-05-01" }],
       applicationRoundTimeSlots: [
         {
@@ -271,84 +348,90 @@ describe("transformReservationUnit", () => {
     ]);
   });
 
-  it("transforms pricings, dropping future pricings not yet active unless hasFuturePricing is set", () => {
-    const futureDate = formatDate(addDays(new Date(), 5));
-    const values = createValidFormValues({
+  it("sends the current price unchanged and drops the future price unless hasFuturePricing is set", () => {
+    const values = {
+      ...createValidFormValues(),
+      ...convertReservationUnit(createPricingQueryData()),
       hasFuturePricing: false,
-      pricings: [
-        {
-          pk: 1,
-          taxLevel: 0,
-          lowestPrice: 0,
-          highestPrice: 10,
-          priceUnit: PriceUnit.PerHour,
-          paymentType: PaymentType.Online,
-          begins: formatDate(new Date()),
-          isFuture: false,
-          isPaid: true,
-          hasMaterialPrice: false,
-          materialPriceDescriptionFi: "",
-          materialPriceDescriptionEn: "",
-          materialPriceDescriptionSv: "",
-        },
-        {
-          pk: -1,
-          taxLevel: 0,
-          lowestPrice: 0,
-          highestPrice: 0,
-          priceUnit: null,
-          paymentType: null,
-          begins: futureDate,
-          isFuture: true,
-          isPaid: false,
-          hasMaterialPrice: false,
-          materialPriceDescriptionFi: "",
-          materialPriceDescriptionEn: "",
-          materialPriceDescriptionSv: "",
-        },
-      ],
-    });
+    };
     const result = transformReservationUnit(values, TAX_OPTIONS);
-    // the future (not-yet-active) free pricing is dropped since hasFuturePricing is false
-    expect(result.pricings).toHaveLength(1);
-    expect(result.pricings?.[0]).toMatchObject({
-      pk: 1,
-      taxLevel: 1,
-      highestPrice: "10",
-      lowestPrice: "0",
-      priceUnit: PriceUnit.PerHour,
-      paymentType: PaymentType.Online,
+    expect(result.ownPricings).toEqual([
+      {
+        pk: 1,
+        begins: "2020-01-01",
+        amount: "10",
+        priceUnit: PriceUnit.PerHour,
+        taxLevel: 1,
+        salesItem: 5,
+        canApplyForDiscount: true,
+        materialPriceDescriptionFi: "",
+        materialPriceDescriptionEn: "",
+        materialPriceDescriptionSv: "",
+      },
+    ]);
+    expect(result).not.toHaveProperty("pricings");
+    expect(result).not.toHaveProperty("canApplyFreeOfCharge");
+  });
+
+  it("sends the discount choice of each price", () => {
+    const values = {
+      ...createValidFormValues(),
+      ...convertReservationUnit(createPricingQueryData()),
+    };
+    values.pricings[1] = { ...at(values.pricings, 1), taxLevel: 2, salesItem: 7, canApplyForDiscount: false };
+    const result = transformReservationUnit(values, TAX_OPTIONS);
+    expect(result.ownPricings?.[1]).toMatchObject({
+      pk: 2,
+      begins: FUTURE_DATE,
+      amount: "20",
+      taxLevel: 2,
+      salesItem: 7,
+      canApplyForDiscount: false,
     });
   });
 
-  it("sends the selected tax level of a pricing", () => {
+  it("does not send a price without the choice of paid or free", () => {
     const values = createValidFormValues();
-    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, taxLevel: 2, highestPrice: 10 };
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: null };
     const result = transformReservationUnit(values, TAX_OPTIONS);
-    expect(result.pricings?.[0]).toMatchObject({ taxLevel: 2, highestPrice: "10" });
-    expect(result.pricings?.[0]).not.toHaveProperty("isActivatedOnBegins");
+    expect(result.ownPricings).toEqual([]);
+  });
+
+  it("sends a free price without a sales item or a discount", () => {
+    const values = createValidFormValues();
+    values.pricings[0] = {
+      ...at(values.pricings, 0),
+      isPaid: false,
+      salesItem: 7,
+      price: 10,
+      canApplyForDiscount: true,
+    };
+    const result = transformReservationUnit(values, TAX_OPTIONS);
+    expect(result.ownPricings?.[0]).toMatchObject({
+      amount: "0",
+      priceUnit: PriceUnit.Fixed,
+      taxLevel: 1,
+      salesItem: null,
+      canApplyForDiscount: false,
+    });
+    expect(result.ownPricings?.[0]).not.toHaveProperty("pk");
+  });
+
+  it("sends the payment type of the reservation unit", () => {
+    const values = createValidFormValues({ paymentType: PaymentType.Online });
+    const result = transformReservationUnit(values, TAX_OPTIONS);
+    expect(result.paymentType).toBe(PaymentType.Online);
+  });
+
+  it("sends no prices for a shared pricing group, because the prices that are not sent are deleted", () => {
+    const values = createValidFormValues({ isSharedPricingGroup: true });
+    const result = transformReservationUnit(values, TAX_OPTIONS);
+    expect(result).not.toHaveProperty("ownPricings");
   });
 
   it("throws when a paid pricing has no valid tax level available", () => {
-    const values = createValidFormValues({
-      pricings: [
-        {
-          pk: 1,
-          taxLevel: 0,
-          lowestPrice: 5,
-          highestPrice: 10,
-          priceUnit: null,
-          paymentType: null,
-          begins: formatDate(new Date()),
-          isFuture: false,
-          isPaid: true,
-          hasMaterialPrice: false,
-          materialPriceDescriptionFi: "",
-          materialPriceDescriptionEn: "",
-          materialPriceDescriptionSv: "",
-        },
-      ],
-    });
+    const values = createValidFormValues();
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, taxLevel: 0, price: 10 };
     expect(() => transformReservationUnit(values, [])).toThrow("Tax level is required for pricing");
   });
 });
@@ -404,24 +487,99 @@ describe("ReservationUnitEditSchema", () => {
     }
   });
 
-  it("rejects a pricing without a payment type, tax, or with lowest price greater than highest price", () => {
-    const values = createValidFormValues();
-    values.pricings[0] = {
-      ...at(values.pricings, 0),
-      isPaid: true,
-      taxLevel: 0,
-      paymentType: null,
-      lowestPrice: 20,
-      highestPrice: 10,
-    };
+  it("rejects a paid price without a tax level or a price unit, and a paid reservation unit without a payment type", () => {
+    const values = createValidFormValues({ paymentType: null });
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, taxLevel: 0, priceUnit: null, price: 10 };
     const result = ReservationUnitEditSchema.safeParse(values);
     expect(result.success).toBe(false);
     if (!result.success) {
       const paths = result.error.issues.map((i) => i.path.join("."));
-      expect(paths).toContain("pricings.0.taxLevel");
-      expect(paths).toContain("pricings.0.paymentType");
-      expect(paths).toContain("pricings.0.lowestPrice");
+      expect(paths).toEqual(expect.arrayContaining(["pricings.0.taxLevel", "pricings.0.priceUnit", "paymentType"]));
     }
+  });
+
+  it("requires a sales item for a paid price when the reservation unit is paid online", () => {
+    const values = createValidFormValues({ paymentType: PaymentType.Online });
+    values.pricings[0] = {
+      ...at(values.pricings, 0),
+      isPaid: true,
+      taxLevel: 1,
+      priceUnit: PriceUnit.PerHour,
+      price: 10,
+      salesItem: null,
+    };
+    const result = ReservationUnitEditSchema.safeParse(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map((i) => i.path.join("."))).toEqual(["pricings.0.salesItem"]);
+    }
+  });
+
+  it("does not require a sales item when the reservation unit is paid on site", () => {
+    const values = createValidFormValues({ paymentType: PaymentType.OnSite });
+    values.pricings[0] = {
+      ...at(values.pricings, 0),
+      isPaid: true,
+      taxLevel: 1,
+      priceUnit: PriceUnit.PerHour,
+      price: 10,
+      salesItem: null,
+    };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
+  });
+
+  it("requires the choice of paid or free to publish", () => {
+    const values = createValidFormValues();
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: null };
+    const result = ReservationUnitEditSchema.safeParse(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map((i) => i.path.join("."))).toEqual(["pricings.0.isPaid"]);
+    }
+  });
+
+  it("does not validate the placeholder prices of a shared pricing group", () => {
+    const values = createValidFormValues({ isSharedPricingGroup: true });
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: null };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
+  });
+
+  it("does not require the choice of paid or free in a draft", () => {
+    const values = createValidFormValues({ isDraft: true });
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: null };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
+  });
+
+  it("rejects a new current price that begins in the future", () => {
+    const values = createValidFormValues();
+    values.pricings[0] = { ...at(values.pricings, 0), begins: formatDate(addDays(new Date(), 1)) };
+    const result = ReservationUnitEditSchema.safeParse(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map((i) => [i.path.join("."), i.message])).toEqual([
+        ["pricings.0.begins", "Begin can't be in the future"],
+      ]);
+    }
+  });
+
+  it("accepts a new current price that begins in the past", () => {
+    const values = createValidFormValues();
+    values.pricings[0] = { ...at(values.pricings, 0), begins: formatDate(addDays(new Date(), -30)) };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
+  });
+
+  it("does not validate the read-only current price", () => {
+    const values = createValidFormValues({ paymentType: PaymentType.Online });
+    values.pricings[0] = {
+      ...at(values.pricings, 0),
+      isReadOnly: true,
+      isPaid: true,
+      taxLevel: 0,
+      priceUnit: null,
+      price: 10,
+      salesItem: null,
+    };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
   });
 
   it("requires material price descriptions when hasMaterialPrice is set", () => {
@@ -430,9 +588,8 @@ describe("ReservationUnitEditSchema", () => {
       ...at(values.pricings, 0),
       isPaid: true,
       taxLevel: 1,
-      paymentType: PaymentType.Online,
-      lowestPrice: 5,
-      highestPrice: 10,
+      priceUnit: PriceUnit.PerHour,
+      price: 10,
       hasMaterialPrice: true,
       materialPriceDescriptionFi: "",
     };
@@ -444,9 +601,9 @@ describe("ReservationUnitEditSchema", () => {
     }
   });
 
-  it("requires pricingTerms when canApplyFreeOfCharge is set and there is a paid pricing", () => {
-    const values = createValidFormValues({ canApplyFreeOfCharge: true, pricingTerms: null });
-    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, highestPrice: 10 };
+  it("requires pricingTerms when a paid price has a discount", () => {
+    const values = createValidFormValues({ pricingTerms: null });
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, price: 10, canApplyForDiscount: true };
     const result = ReservationUnitEditSchema.safeParse(values);
     expect(result.success).toBe(false);
     if (!result.success) {

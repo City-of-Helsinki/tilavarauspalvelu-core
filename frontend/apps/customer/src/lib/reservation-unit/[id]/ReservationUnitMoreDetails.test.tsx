@@ -2,9 +2,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, test, expect, vi } from "vitest";
 import { useGenericTerms } from "@ui/hooks";
-import { PaymentType, PriceUnit, TermsOfUseTypeChoices, Weekday } from "@gql/gql-types";
+import { PriceUnit, TermsOfUseTypeChoices, Weekday } from "@gql/gql-types";
 import type { ReservationUnitMoreDetailsFragment } from "@gql/gql-types";
-import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { ReservationUnitMoreDetails } from "./ReservationUnitMoreDetails";
 
 vi.mock("next-i18next/pages", async (importOriginal) => ({
@@ -22,11 +21,6 @@ vi.mock("next-i18next/pages", async (importOriginal) => ({
 }));
 
 vi.mock("@ui/hooks", () => ({ useGenericTerms: vi.fn(() => null) }));
-
-vi.mock("@/modules/reservationUnit", () => ({
-  getFuturePricing: vi.fn(() => null),
-  getPriceString: vi.fn(() => "10,00 € / tunti"),
-}));
 
 vi.mock("./ReservationInfoSection", () => ({
   ReservationInfoSection: () => <div data-testid="reservation-info-section-stub" />,
@@ -52,18 +46,20 @@ const termsOfUseText = {
   nameSv: null,
 };
 
-const pricing = {
-  id: "pricing-1",
-  highestPrice: "20",
-  begins: "2020-01-01",
-  priceUnit: PriceUnit.PerHour,
-  paymentType: PaymentType.Online,
-  lowestPrice: "10",
-  materialPriceDescriptionFi: "",
-  materialPriceDescriptionEn: "",
-  materialPriceDescriptionSv: "",
-  taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
-};
+type PriceSummary = NonNullable<ReservationUnitMoreDetailsFragment["priceSummary"]>;
+
+function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary {
+  return {
+    isFree: false,
+    lowestAmount: "20",
+    priceUnit: PriceUnit.PerHour,
+    canApplyForDiscount: false,
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
+    ...overrides,
+  };
+}
 
 function createReservationUnit(
   overrides: Partial<ReservationUnitMoreDetailsFragment> = {}
@@ -72,7 +68,7 @@ function createReservationUnit(
     nameFi: "Test Reservation Unit",
     nameEn: "Test Reservation Unit EN",
     nameSv: "Test Reservation Unit SV",
-    canApplyFreeOfCharge: false,
+    priceSummary: null,
     id: "1",
     notesWhenApplyingFi: null,
     notesWhenApplyingEn: null,
@@ -86,7 +82,6 @@ function createReservationUnit(
     minReservationDuration: null,
     maxReservationDuration: null,
     applicationRoundTimeSlots: [],
-    pricings: [],
     unit: {
       id: "unit-1",
       pk: 1,
@@ -141,7 +136,7 @@ describe("ReservationUnitMoreDetails", () => {
     expect(termsAccordion).toHaveTextContent("Service terms");
   });
 
-  test("hides the reservation-notice accordion when there is no future pricing or notes", () => {
+  test("hides the reservation-notice accordion when there are no notes", () => {
     render(<ReservationUnitMoreDetails reservationUnit={createReservationUnit()} isReservable />);
     expect(screen.queryByTestId("reservation-unit__reservation-notice")).not.toBeInTheDocument();
   });
@@ -154,52 +149,6 @@ describe("ReservationUnitMoreDetails", () => {
       />
     );
     expect(screen.getByTestId("reservation-unit__reservation-notice")).toHaveTextContent("Please arrive early");
-  });
-
-  test("shows a future price-change notice with a tax notice when the tax rate is above zero", () => {
-    vi.mocked(getFuturePricing).mockReturnValue({
-      ...pricing,
-      taxLevel: { id: "tax-1", pk: 1, currentPercentage: "24" },
-    });
-
-    render(
-      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
-    );
-
-    const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
-    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
-    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePriceNoticeTax");
-  });
-
-  test("omits the tax notice when the future pricing is free", () => {
-    vi.mocked(getFuturePricing).mockReturnValue({
-      ...pricing,
-      taxLevel: { id: "tax-1", pk: 1, currentPercentage: "0" },
-    });
-    vi.mocked(getPriceString).mockReturnValue("Free");
-
-    render(
-      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
-    );
-
-    const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
-    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
-    expect(noticeAccordion).not.toHaveTextContent("reservationUnit:futurePriceNoticeTax");
-  });
-
-  test("omits the tax notice when the tax level of the future pricing has no rate today", () => {
-    vi.mocked(getFuturePricing).mockReturnValue({
-      ...pricing,
-      taxLevel: { id: "tax-1", pk: 1, currentPercentage: null },
-    });
-
-    render(
-      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
-    );
-
-    const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
-    expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
-    expect(noticeAccordion).not.toHaveTextContent("reservationUnit:futurePriceNoticeTax");
   });
 
   test("hides the application-round schedule accordion when there are no active application rounds", () => {
@@ -279,13 +228,12 @@ describe("ReservationUnitMoreDetails", () => {
     expect(screen.getByText("reservationUnit:paymentAndCancellationTerms")).toBeInTheDocument();
   });
 
-  test("hides the pricing terms accordion when the unit cannot apply free-of-charge", () => {
+  test("hides the pricing terms accordion when the customer can not apply for a discount", () => {
     render(
       <ReservationUnitMoreDetails
         reservationUnit={createReservationUnit({
-          canApplyFreeOfCharge: false,
+          priceSummary: createPriceSummary({ canApplyForDiscount: false }),
           pricingTerms: termsOfUseText,
-          pricings: [pricing],
         })}
         isReservable
       />
@@ -293,13 +241,12 @@ describe("ReservationUnitMoreDetails", () => {
     expect(screen.queryByTestId("reservation-unit__pricing-terms")).not.toBeInTheDocument();
   });
 
-  test("shows the pricing terms accordion when the unit can apply free-of-charge on a paid pricing", () => {
+  test("shows the pricing terms accordion when the customer can apply for a discount", () => {
     render(
       <ReservationUnitMoreDetails
         reservationUnit={createReservationUnit({
-          canApplyFreeOfCharge: true,
+          priceSummary: createPriceSummary({ canApplyForDiscount: true }),
           pricingTerms: termsOfUseText,
-          pricings: [pricing],
         })}
         isReservable
       />

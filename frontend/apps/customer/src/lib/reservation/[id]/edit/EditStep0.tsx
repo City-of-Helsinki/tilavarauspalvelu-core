@@ -9,8 +9,10 @@ import styled from "styled-components";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { Sanitize } from "ui/src/components/Sanitize";
+import { errorToast } from "ui/src/components/toast";
 import { breakpoints } from "ui/src/modules/const";
 import { H4 } from "ui/src/styled";
+import { useReservationPriceLazyQuery } from "@gql/gql-types";
 import type { EditPageReservationFragment } from "@gql/gql-types";
 import { QuickReservation } from "@/components/QuickReservation";
 import { ReservationTimePicker, ReservationInfoCard } from "@/components/reservation";
@@ -24,7 +26,6 @@ import {
   getDurationOptions,
   isReservationEditable,
 } from "@/modules/reservation";
-import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
 import { PinkBox as PinkBoxBase } from "@/styled/reservation";
@@ -123,8 +124,9 @@ function EditStep0({
   const isDirty = dirtyFields.date || dirtyFields.time || dirtyFields.duration;
 
   const reservableTimes = useReservableTimes(reservationUnit);
+  const [fetchReservationPrice] = useReservationPriceLazyQuery();
 
-  const submitReservation = (data: PendingReservationFormType) => {
+  const submitReservation = async (data: PendingReservationFormType) => {
     if (reservationUnit == null) {
       throw new Error("No reservation unit found");
     }
@@ -142,9 +144,15 @@ function EditStep0({
       return;
     }
     const { start, end } = slot;
-    const isFree = isReservationUnitFreeOfCharge(reservationUnit.pricings, start);
+    const { data: priceData, error: priceError } = await fetchReservationPrice({
+      variables: { reservationUnit: reservationUnit.pk ?? 0, beginsAt: start.toISOString(), endsAt: end.toISOString() },
+    });
+    // Only a free of charge reservation can be changed. A price that did not load is not free.
+    const isFree =
+      priceError == null && (priceData?.reservationPrice == null || Number(priceData.reservationPrice.total) === 0);
     if (!isFree) {
-      throw new Error("Reservation unit is not free of charge");
+      errorToast({ text: t("reservationCalendar:errors.unavailable") });
+      return;
     }
 
     const isNewReservationValid = isRangeReservable({
@@ -247,9 +255,6 @@ export const EDIT_PAGE_RESERVATION_UNIT_FRAGMENT = gql`
   fragment EditPageReservationUnit on ReservationUnitNode {
     id
     ...IsReservableFields
-    pricings {
-      ...PricingFields
-    }
     ...TermsOfUse
     ...ReservationTimePickerFields
     reservationForm
