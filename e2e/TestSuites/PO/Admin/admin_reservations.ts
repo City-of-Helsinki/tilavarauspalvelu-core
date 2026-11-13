@@ -106,7 +106,8 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Checks Reservation User Info")
   async adminChecksReservationUserInfo() {
-    await this.pages.customKeywords.findAndClickElementWithText(".label", "Tilan käyttäjän tiedot");
+    // text="…" matches an element with a text node of exactly this text, also when the element has other text too
+    await this.page.locator(".label").locator('text="Tilan käyttäjän tiedot"').first().click();
     await expect(
       this.page.getByTestId("reservation__info--Sukunimi"),
       `The reserver's last name is ${this.state.adminBehalfLastnameFi}`
@@ -119,7 +120,8 @@ export class AdminReservations extends PageObject {
 
   @step("admin_reservations.Admin Checks Reservation Maker Info")
   async adminChecksReservationMakerInfo() {
-    await this.pages.customKeywords.findAndClickElementWithText(".label", "Varauksen tekijä");
+    // text="…" matches an element with a text node of exactly this text, also when the element has other text too
+    await this.page.locator(".label").locator('text="Varauksen tekijä"').first().click();
     await expect(
       this.page.getByTestId("reservation__info--Varauksen tekijä"),
       `The reservation was made by ${BASIC_ADMIN_MALE.fullName}`
@@ -279,15 +281,6 @@ export class AdminReservations extends PageObject {
   @step("admin_reservations.Admin Clicks Button In Reservation Page")
   async adminClicksButtonInReservationPage(button_data_id: string | Locator) {
     await this.locate(button_data_id).click();
-  }
-
-  @step("admin_reservations.Admin Selects Reservation Unit")
-  async adminSelectsReservationUnit(by_unit: string) {
-    await this.page.locator("#reservation-unit-toggle-button").click();
-    await this.pages.customKeywords.findAndClickElementWithText(
-      this.page.locator("#reservation-unit-menu").locator("li"),
-      by_unit
-    );
   }
 
   @step("admin_reservations.Admin Open Access Code Modal")

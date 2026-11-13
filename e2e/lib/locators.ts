@@ -14,14 +14,3 @@ export async function reachesState(
     return false;
   }
 }
-
-/**
- * The elements the locator matches, after waiting for the first one to appear (the action timeout by default). An
- * empty list if none appear in time.
- */
-export async function elementsOf(locator: Locator, timeout?: number): Promise<Locator[]> {
-  if (!(await reachesState(locator.first(), "attached", timeout))) {
-    return [];
-  }
-  return locator.all();
-}
