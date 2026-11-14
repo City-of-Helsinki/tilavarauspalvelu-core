@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any, Self
 
 from graphene_django_extensions import UpdateMutation

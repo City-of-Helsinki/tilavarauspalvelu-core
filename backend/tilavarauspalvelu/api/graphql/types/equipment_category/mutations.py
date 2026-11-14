@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
 from tilavarauspalvelu.models import EquipmentCategory

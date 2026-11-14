@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from utils.utils import get_jwt_payload
 
 

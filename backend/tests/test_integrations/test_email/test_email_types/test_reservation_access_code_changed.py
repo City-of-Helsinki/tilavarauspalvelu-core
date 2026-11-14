@@ -1,7 +1,5 @@
 # type: EmailType.RESERVATION_ACCESS_CODE_CHANGED
 
-from __future__ import annotations
-
 from inspect import cleandoc
 from typing import TYPE_CHECKING
 

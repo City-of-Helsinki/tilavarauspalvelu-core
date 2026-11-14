@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 from itertools import chain
 from typing import TYPE_CHECKING

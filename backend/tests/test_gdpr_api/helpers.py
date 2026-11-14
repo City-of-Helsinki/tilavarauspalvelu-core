@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 from contextlib import contextmanager
 from dataclasses import dataclass

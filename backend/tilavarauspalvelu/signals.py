@@ -6,8 +6,6 @@ This means that a using "_" as the name (meaning we don't care about the name of
 as this module must hold strong references to the signal functions.
 """
 
-from __future__ import annotations
-
 import sys
 from typing import TYPE_CHECKING, Any, Unpack
 

@@ -1,7 +1,5 @@
 # type: EmailType.USER_PERMISSIONS_DEACTIVATION
 
-from __future__ import annotations
-
 import datetime
 from inspect import cleandoc
 from typing import TYPE_CHECKING

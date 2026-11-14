@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 from admin_extra_buttons.decorators import button
@@ -164,7 +162,11 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     ]
 
     @button(label=_("Open in staff UI"), change_form=True)
-    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def open_in_staff_ui(
+        self,
+        request: "WSGIRequest",  # noqa: UP037
+        pk: str,
+    ) -> HttpResponseRedirect:
         url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
         return HttpResponseRedirect(f"{url_base}/kasittely/applications/{pk}")
 

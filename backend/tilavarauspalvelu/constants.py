@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 # SRID 4326 - Spatial Reference System Identifier number 4326.
 # EPSG:4326 - It's the same thing, but EPSG is the name of the authority maintaining an SRID reference.
 # WGS 84 - World Geodetic System from 1984. It's the coordinate system used in GPS.

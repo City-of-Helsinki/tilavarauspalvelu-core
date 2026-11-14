@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 from dataclasses import asdict
 from typing import TYPE_CHECKING

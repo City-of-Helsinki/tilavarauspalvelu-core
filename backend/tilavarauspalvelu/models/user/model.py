@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import uuid
 from functools import cached_property
 from typing import TYPE_CHECKING, ClassVar, Literal

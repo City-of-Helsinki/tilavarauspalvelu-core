@@ -1,7 +1,5 @@
 # type: EmailType.RESERVATION_CONFIRMED
 
-from __future__ import annotations
-
 from decimal import Decimal
 from inspect import cleandoc
 from typing import TYPE_CHECKING

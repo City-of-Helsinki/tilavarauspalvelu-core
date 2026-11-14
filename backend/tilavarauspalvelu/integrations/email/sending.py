@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from copy import copy
 from itertools import batched
 from smtplib import SMTPException

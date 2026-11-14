@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from graphene_django_extensions import CreateMutation, DeleteMutation
 from graphene_django_extensions.typing import AnyUser
 from rest_framework.exceptions import ValidationError

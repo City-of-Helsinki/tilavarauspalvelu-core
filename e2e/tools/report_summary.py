@@ -11,8 +11,6 @@ Usage: python3 tools/report_summary.py [playwright-report dir or index.html] [--
   --extract DIR  write the report's JSON files to DIR, for reading further
 """
 
-from __future__ import annotations
-
 import base64
 import io
 import json

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from tests.factories import ReservationUnitFactory, SpaceFactory, UnitFactory, UserFactory

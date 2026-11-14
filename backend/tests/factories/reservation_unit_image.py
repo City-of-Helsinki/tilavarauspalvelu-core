@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tilavarauspalvelu.enums import ReservationUnitImageType
 from tilavarauspalvelu.models import ReservationUnitImage
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from graphene_django.filter import ListFilter
 from graphene_django_extensions import ModelFilterSet
 
