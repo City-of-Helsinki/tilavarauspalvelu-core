@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from unittest import mock
 
 import pytest
+from django.db import transaction
 
 from tilavarauspalvelu.enums import (
     MunicipalityChoice,
@@ -125,6 +127,49 @@ def test_statistics__create__after_commit(settings, django_capture_on_commit_cal
         assert ReservationStatistic.objects.filter(reservation=reservation).exists() is False
 
     assert ReservationStatistic.objects.filter(reservation=reservation).exists() is True
+
+
+@mock.patch("tilavarauspalvelu.signals.create_statistics_for_reservations_task.delay")
+def test_statistics__create__one_task_for_one_transaction(mock_delay, settings, django_capture_on_commit_callbacks):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_1 = ReservationFactory.create()
+        reservation_2 = ReservationFactory.create()
+
+    assert mock_delay.call_args_list == [mock.call(reservation_pks=[reservation_1.pk, reservation_2.pk])]
+
+
+@mock.patch("tilavarauspalvelu.signals.create_statistics_for_reservations_task.delay")
+def test_statistics__create__one_task_for_each_transaction(mock_delay, settings, django_capture_on_commit_callbacks):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_1 = ReservationFactory.create()
+
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_2 = ReservationFactory.create()
+
+    assert mock_delay.call_args_list == [
+        mock.call(reservation_pks=[reservation_1.pk]),
+        mock.call(reservation_pks=[reservation_2.pk]),
+    ]
+
+
+@mock.patch("tilavarauspalvelu.signals.create_statistics_for_reservations_task.delay")
+def test_statistics__create__no_task_for_rolled_back_transaction(
+    mock_delay, settings, django_capture_on_commit_callbacks
+):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    with transaction.atomic():
+        ReservationFactory.create()
+        transaction.set_rollback(True)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create()
+
+    assert mock_delay.call_args_list == [mock.call(reservation_pks=[reservation.pk])]
 
 
 def test_statistics__create__duration_over_daylight_saving_time_change(settings, django_capture_on_commit_callbacks):

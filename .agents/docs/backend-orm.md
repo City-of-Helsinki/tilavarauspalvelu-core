@@ -61,9 +61,10 @@ A lookup property defines a value once as an ORM expression. It works as a Pytho
 - `queryset.delete()` does not call the model's `delete()`. It still sends `pre_delete` and `post_delete`.
 - For these writes, check the receivers in `tilavarauspalvelu/signals.py` and the model's `save()`.
   If they do work that must happen, do that work in bulk in the same code path.
-- Models with an `AuditLogger` get their audit log from signals. A bulk write on these models writes no audit log.
+- Models with an `AuditLogger` get their audit log from signals. A plain bulk write on these models writes no audit log.
   Treat this as a correctness issue, because these models hold personal data and payments.
-- `queryset.update()` does not set `auto_now` fields. Set them in the update.
+  Use `bulk_create_with_signals`, `bulk_update_with_signals` or `update_with_signals` from `utils/model_signals.py`.
+- `queryset.update()` does not set `auto_now` fields. Set them in the update. The helpers set them for you.
 - `bulk_create` skips `full_clean()` and model validators. Validate before the write.
 - `queryset.delete()` loads the rows into memory when the model has delete signals or Python-side cascades.
 - Use `save(update_fields=[...])` when the code changes only some fields.

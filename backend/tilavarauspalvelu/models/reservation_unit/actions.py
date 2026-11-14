@@ -23,7 +23,6 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, Reservation, ReservationUnit
 from tilavarauspalvelu.tasks import (
-    create_statistics_for_reservations_task,
     notify_reservation_on_access_type_change_task,
     refresh_reservation_unit_accounting_task,
 )
@@ -40,6 +39,7 @@ from utils.date_utils import (
     utc_datetime_min,
 )
 from utils.external_service.errors import ExternalServiceError
+from utils.model_signals import update_with_signals
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -476,28 +476,25 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             for access_type in access_types
         ]
 
+        new_access_type = models.Case(
+            *whens,
+            # Use the active access type as the default (even though we should never reach this)
+            default=models.Value(access_types[-1].access_type),
+            output_field=models.CharField(),
+        )
+
         # Update all future or ongoing reservations in the reservation unit to their current access types
         qs = (
             Reservation.objects
             .filter(reservation_unit=self.reservation_unit, ends_at__gt=now)
-            .annotate(
-                new_access_type=models.Case(
-                    *whens,
-                    # Use the active access type as the default (even though we should never reach this)
-                    default=models.Value(access_types[-1].access_type),
-                    output_field=models.CharField(),
-                ),
-            )
+            .annotate(new_access_type=new_access_type)
             # Only update reservations that have changed their access type
             .exclude(access_type=models.F("new_access_type"))
         )
 
         updated_reservations = list(qs.order_by("pk").values_list("pk", flat=True))
 
-        qs.update(access_type=models.F("new_access_type"))
-
-        if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay_on_commit(reservation_pks=updated_reservations)
+        update_with_signals(qs, access_type=new_access_type)
 
         # Send emails to reservations that have changed their access type
         notify_reservation_on_access_type_change_task.delay_on_commit(reservation_pks=updated_reservations)

@@ -27,6 +27,7 @@ from tilavarauspalvelu.tasks import delete_pindora_reservation_task
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, utc_datetime
 from utils.db import Now
 from utils.mixins import SerializableModelManagerMixin
+from utils.model_signals import update_with_signals
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection
@@ -229,7 +230,8 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         Sets access code info to reservations in the queryset so that reservation that should have
         active access codes get the given values, and the rest get empty values.
         """
-        self.update(
+        update_with_signals(
+            self,
             access_code_generated_at=models.Case(
                 models.When(
                     L(access_code_should_be_active=True),
@@ -253,7 +255,8 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         Sets access code info to reservations in the queryset so that reservation that should have
         active access codes get the given values, and the rest get empty values.
         """
-        self.update(
+        update_with_signals(
+            self,
             access_code_is_active=models.Case(
                 # A reservation without a generated access code cannot be active. See 'no_access_code_but_active'.
                 models.When(

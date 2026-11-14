@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from django.conf import settings
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
 from tilavarauspalvelu.models import Reservation, ReservationSeries
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from utils.fields.serializer import input_only_field
+from utils.model_signals import update_with_signals
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import ReservationDetails
@@ -97,11 +96,6 @@ class ReservationSeriesUpdateSerializer(NestingModelSerializer):
 
         with transaction.atomic():
             instance = super().save()
-            reservations.update(**reservation_details)
-
-        if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(
-                reservation_pks=list(reservations.values_list("pk", flat=True)),
-            )
+            update_with_signals(reservations, **reservation_details)
 
         return instance
