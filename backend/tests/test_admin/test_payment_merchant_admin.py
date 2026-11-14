@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 from django.contrib import messages
 from django.contrib.messages import get_messages

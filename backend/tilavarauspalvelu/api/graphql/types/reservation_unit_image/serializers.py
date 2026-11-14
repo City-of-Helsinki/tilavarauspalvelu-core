@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from django.core import validators
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers

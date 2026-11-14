@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .add_serializer import ReservationSeriesAddReservationSerializer
 from .change_access_code import ReservationSeriesChangeAccessCodeSerializer
 from .create_serializer import ReservationSeriesCreateSerializer

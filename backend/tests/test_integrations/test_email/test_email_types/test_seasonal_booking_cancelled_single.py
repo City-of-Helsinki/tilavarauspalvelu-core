@@ -1,7 +1,5 @@
 # type: EmailType.SEASONAL_BOOKING_CANCELLED_SINGLE
 
-from __future__ import annotations
-
 from inspect import cleandoc
 from typing import TYPE_CHECKING
 

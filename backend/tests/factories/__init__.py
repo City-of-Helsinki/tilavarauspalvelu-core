@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .age_group import AgeGroupFactory
 from .allocated_time_slot import AllocatedTimeSlotFactory
 from .application import ApplicationFactory

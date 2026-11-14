@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement

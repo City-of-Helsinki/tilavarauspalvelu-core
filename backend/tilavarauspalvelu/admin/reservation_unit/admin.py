@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode
 
@@ -229,14 +227,18 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
         return obj.current_access_type  # type: ignore[return-value]
 
     @button(label=_("Reservations"), change_form=True)
-    def show_reservations(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def show_reservations(
+        self, request: "WSGIRequest", pk: str  # noqa: UP037
+    ) -> HttpResponseRedirect:
         changelist_url = reverse("admin:tilavarauspalvelu_reservation_changelist")
         # The reservation unit filter of the reservation list uses this parameter.
         query_string = urlencode({"reservation_unit__id__in": pk})
         return HttpResponseRedirect(f"{changelist_url}?{query_string}")
 
     @button(label=_("Open in staff UI"), change_form=True)
-    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def open_in_staff_ui(
+        self, request: "WSGIRequest", pk: str  # noqa: UP037
+    ) -> HttpResponseRedirect:
         unit_pk = ReservationUnit.objects.values_list("unit", flat=True).get(pk=pk)
         url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
         return HttpResponseRedirect(f"{url_base}/kasittely/units/{unit_pk}/reservation-units/{pk}")

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import operator
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any

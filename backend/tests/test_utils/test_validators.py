@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 from typing import TYPE_CHECKING, NamedTuple
 
@@ -16,7 +14,7 @@ if TYPE_CHECKING:
 
 class TimeslotParams(NamedTuple):
     timeslots: list[TimeSlot]
-    errors: Collection[str] = ()
+    errors: "Collection[str]" = ()  # noqa: UP037
 
 
 @pytest.mark.parametrize(

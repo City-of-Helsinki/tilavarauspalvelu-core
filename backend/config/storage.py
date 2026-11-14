@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import unicodedata
 
 from django.core.files.storage import FileSystemStorage

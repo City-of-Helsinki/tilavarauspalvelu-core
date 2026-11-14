@@ -1,7 +1,5 @@
 # type: EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED
 
-from __future__ import annotations
-
 import datetime
 import uuid
 from copy import deepcopy

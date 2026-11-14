@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, OrderStatus, OrderStatusWithFree
 
 

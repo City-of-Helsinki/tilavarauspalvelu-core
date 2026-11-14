@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tilavarauspalvelu.integrations.email.template_context.common import create_anchor_tag
 from utils.utils import convert_html_to_text
 

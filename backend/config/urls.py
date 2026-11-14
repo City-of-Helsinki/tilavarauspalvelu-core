@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 from csp.constants import SELF, UNSAFE_INLINE

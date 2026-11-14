@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import Enum, auto
 from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
@@ -40,7 +38,7 @@ class UserTypeParams(NamedTuple):
 
 
 class TargetParams(NamedTuple):
-    target: BannerNotificationTarget
+    target: "BannerNotificationTarget"  # noqa: UP037
     user_type: UserType
     expected: Any
 

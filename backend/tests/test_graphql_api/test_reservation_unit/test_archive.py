@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType

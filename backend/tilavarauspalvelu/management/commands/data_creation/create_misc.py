@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Literal
 
 from django_celery_beat.models import CrontabSchedule, PeriodicTask

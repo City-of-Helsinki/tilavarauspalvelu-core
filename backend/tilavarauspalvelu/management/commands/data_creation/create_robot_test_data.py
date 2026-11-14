@@ -1,8 +1,6 @@
 # NOTE: Do not use factory or any files that use factories to create test data for robot tests,
 # as factory-boy is not installed on the test environment, which causes ModuleNotFoundError.
 
-from __future__ import annotations
-
 import datetime
 import os
 import uuid

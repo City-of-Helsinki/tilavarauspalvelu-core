@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError

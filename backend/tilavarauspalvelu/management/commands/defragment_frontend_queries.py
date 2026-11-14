@@ -1,6 +1,4 @@
 # ruff: noqa: T201
-from __future__ import annotations
-
 import dataclasses
 import time
 from itertools import chain

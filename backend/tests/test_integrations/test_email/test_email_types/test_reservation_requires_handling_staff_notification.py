@@ -1,7 +1,5 @@
 # type: EmailType.RESERVATION_REQUIRES_HANDLING_STAFF_NOTIFICATION
 
-from __future__ import annotations
-
 from inspect import cleandoc
 from typing import TYPE_CHECKING
 

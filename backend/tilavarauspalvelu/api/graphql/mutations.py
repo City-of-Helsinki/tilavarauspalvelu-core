@@ -12,8 +12,6 @@ and then importing both to `schema.py` from these respective files solves the im
 """
 
 # Import all queries before importing any mutations! See explanation above.
-from __future__ import annotations
-
 from .extensions import converters  # noqa: F401  # isort:skip
 from .queries import *  # noqa: F403  # isort:skip
 

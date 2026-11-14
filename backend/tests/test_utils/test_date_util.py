@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 import zoneinfo
 from typing import TYPE_CHECKING, NamedTuple

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
@@ -225,19 +223,25 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     filter_horizontal = ["groups"]
 
     @button(label=_("Reservations"), change_form=True)
-    def show_reservations(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def show_reservations(
+        self, request: "WSGIRequest", pk: str  # noqa: UP037
+    ) -> HttpResponseRedirect:
         changelist_url = reverse("admin:tilavarauspalvelu_reservation_changelist")
         query_string = urlencode({"user__id__exact": pk})
         return HttpResponseRedirect(f"{changelist_url}?{query_string}")
 
     @button(label=_("Reservation series"), change_form=True)
-    def show_reservation_series(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def show_reservation_series(
+        self, request: "WSGIRequest", pk: str  # noqa: UP037
+    ) -> HttpResponseRedirect:
         changelist_url = reverse("admin:tilavarauspalvelu_reservationseries_changelist")
         query_string = urlencode({"user__id__exact": pk})
         return HttpResponseRedirect(f"{changelist_url}?{query_string}")
 
     @button(label=_("Applications"), change_form=True)
-    def show_applications(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def show_applications(
+        self, request: "WSGIRequest", pk: str  # noqa: UP037
+    ) -> HttpResponseRedirect:
         changelist_url = reverse("admin:tilavarauspalvelu_application_changelist")
         query_string = urlencode({"user__id__exact": pk})
         return HttpResponseRedirect(f"{changelist_url}?{query_string}")

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import (
     override_reservable_with_closed_time_spans,

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 from admin_extra_buttons.decorators import button
@@ -24,7 +22,7 @@ class ReservationUnitHierarchyAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     ]
 
     @button(label="Refresh reservation unit hierarchy", change_list=True)
-    def refresh_data(self, request: WSGIRequest) -> None:
+    def refresh_data(self, request: "WSGIRequest") -> None:  # noqa: UP037
         ReservationUnitHierarchy.refresh()
         self.message_user(request, "Reservation unit hierarchy was refreshed successfully.")
 

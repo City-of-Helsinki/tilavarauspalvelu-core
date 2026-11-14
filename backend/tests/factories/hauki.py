@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import factory
 
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import (

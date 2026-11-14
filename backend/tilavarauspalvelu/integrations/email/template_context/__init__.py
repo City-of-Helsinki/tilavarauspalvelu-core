@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .reservation import (
     get_context_for_reservation_access_code_changed,
     get_context_for_reservation_access_type_changed,

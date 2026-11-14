@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from easy_thumbnails.exceptions import InvalidImageFormatError
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger

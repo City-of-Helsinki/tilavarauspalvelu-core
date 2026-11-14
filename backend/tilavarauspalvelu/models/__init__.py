@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .affecting_time_span.model import AffectingTimeSpan
 from .age_group.model import AgeGroup
 from .allocated_timeslot.model import AllocatedTimeSlot

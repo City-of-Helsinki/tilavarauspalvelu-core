@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from factory import LazyAttribute, fuzzy
 
 from tilavarauspalvelu.models import AgeGroup

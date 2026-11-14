@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .age_group.admin import AgeGroupAdmin
 from .allocated_timeslot.admin import AllocatedTimeSlotAdmin
 from .application.admin import ApplicationAdmin

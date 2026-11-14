@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 from admin_extra_buttons.decorators import button
@@ -50,6 +48,6 @@ class TermsOfUseAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Translati
     form = TermsOfUseAdminForm
 
     @button(label=_("Show PDF"), change_form=True, visible=lambda self: self.original.id == "booking")
-    def show_pdf(self, request: WSGIRequest) -> HttpResponseRedirect:
+    def show_pdf(self, request: "WSGIRequest") -> HttpResponseRedirect:  # noqa: UP037
         url = reverse("terms_of_use_pdf") + "?as_attachment=False"
         return HttpResponseRedirect(url)

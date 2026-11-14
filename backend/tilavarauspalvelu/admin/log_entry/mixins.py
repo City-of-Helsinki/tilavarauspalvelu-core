@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 from admin_extra_buttons.decorators import button
@@ -15,7 +13,9 @@ if TYPE_CHECKING:
 
 class TVPAuditlogHistoryAdminMixin(AuditlogHistoryAdminMixin, ExtraButtonsMixin):
     @button(label=_("Audit logs"), change_form=True)
-    def link_to_object_auditlog_view(self, request: WSGIRequest, pk: int) -> HttpResponseRedirect | None:
+    def link_to_object_auditlog_view(
+        self, request: "WSGIRequest", pk: int  # noqa: UP037
+    ) -> HttpResponseRedirect | None:
         for url in self.get_urls():
             if url.name.endswith("_auditlog"):
                 return HttpResponseRedirect(reverse(f"admin:{url.name}", args=[pk]))

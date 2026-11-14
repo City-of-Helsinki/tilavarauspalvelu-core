@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 import dataclasses
+from annotationlib import Format, get_annotations
 from typing import TYPE_CHECKING, Any, ClassVar, Self, TypedDict
 
 from django.utils.functional import classproperty
@@ -416,62 +415,65 @@ class EmailType(_EmailTypeOptions):
     def choices(cls) -> list:
         return [(option.value, option.label) for option in cls.options]
 
+    # Context annotation names are used at runtime, but their values must stay unevaluated.
     # Reservation
 
     RESERVATION_ACCESS_CODE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation door code changed"),
         get_email_context=get_context_for_reservation_access_code_changed,
-        context_variables=list(ReservationAccessCodeChangedContext.__annotations__),
+        context_variables=list(get_annotations(ReservationAccessCodeChangedContext, format=Format.STRING)),
     )
     RESERVATION_ACCESS_TYPE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation access type changed"),
         get_email_context=get_context_for_reservation_access_type_changed,
-        context_variables=list(ReservationAccessTypeChangedContext.__annotations__),
+        context_variables=list(get_annotations(ReservationAccessTypeChangedContext, format=Format.STRING)),
     )
     RESERVATION_CANCELLED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation cancelled"),
         get_email_context=get_context_for_reservation_cancelled,
-        context_variables=list(ReservationCancelledContext.__annotations__),
+        context_variables=list(get_annotations(ReservationCancelledContext, format=Format.STRING)),
     )
     RESERVATION_CONFIRMED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation confirmed"),
         get_email_context=get_context_for_reservation_confirmed,
-        context_variables=list(ReservationConfirmedContext.__annotations__),
+        context_variables=list(get_annotations(ReservationConfirmedContext, format=Format.STRING)),
     )
     RESERVATION_CREATED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation created"),
         get_email_context=get_context_for_reservation_created,
-        context_variables=list(ReservationCreatedContext.__annotations__),
+        context_variables=list(get_annotations(ReservationCreatedContext, format=Format.STRING)),
     )
     RESERVATION_CREATED_STAFF_NOTIFICATION = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation created staff notification"),
         get_email_context=get_context_for_reservation_created_staff_notification,
-        context_variables=list(ReservationCreatedStaffNotificationContext.__annotations__),
+        context_variables=list(get_annotations(ReservationCreatedStaffNotificationContext, format=Format.STRING)),
     )
     RESERVATION_DENIED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation denied"),
         get_email_context=get_context_for_reservation_denied,
-        context_variables=list(ReservationDeniedContext.__annotations__),
+        context_variables=list(get_annotations(ReservationDeniedContext, format=Format.STRING)),
     )
     RESERVATION_REQUIRES_HANDLING = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation requires handling"),
         get_email_context=get_context_for_reservation_requires_handling,
-        context_variables=list(ReservationRequiresHandlingContext.__annotations__),
+        context_variables=list(get_annotations(ReservationRequiresHandlingContext, format=Format.STRING)),
     )
     RESERVATION_REQUIRES_HANDLING_STAFF_NOTIFICATION = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation requires handling staff notification"),
         get_email_context=get_context_for_reservation_requires_handling_staff_notification,
-        context_variables=list(ReservationRequiresHandlingStaffNotificationContext.__annotations__),
+        context_variables=list(
+            get_annotations(ReservationRequiresHandlingStaffNotificationContext, format=Format.STRING)
+        ),
     )
     RESERVATION_REQUIRES_PAYMENT = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation requires payment"),
         get_email_context=get_context_for_reservation_requires_payment,
-        context_variables=list(ReservationRequiresPaymentContext.__annotations__),
+        context_variables=list(get_annotations(ReservationRequiresPaymentContext, format=Format.STRING)),
     )
     RESERVATION_RESCHEDULED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation rescheduled"),
         get_email_context=get_context_for_reservation_rescheduled,
-        context_variables=list(ReservationRescheduledContext.__annotations__),
+        context_variables=list(get_annotations(ReservationRescheduledContext, format=Format.STRING)),
     )
 
     # Seasonal booking
@@ -479,12 +481,12 @@ class EmailType(_EmailTypeOptions):
     SEASONAL_BOOKING_ACCESS_CODE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal Reservation door code changed"),
         get_email_context=get_context_for_seasonal_booking_access_code_changed,
-        context_variables=list(SeasonalBookingAccessCodeChangedContext.__annotations__),
+        context_variables=list(get_annotations(SeasonalBookingAccessCodeChangedContext, format=Format.STRING)),
     )
     SEASONAL_BOOKING_ACCESS_TYPE_CHANGED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal reservation access type is changing"),
         get_email_context=get_context_for_seasonal_booking_access_type_changed,
-        context_variables=list(SeasonalBookingAccessTypeChangedContext.__annotations__),
+        context_variables=list(get_annotations(SeasonalBookingAccessTypeChangedContext, format=Format.STRING)),
     )
     SEASONAL_BOOKING_APPLICATION_RECEIVED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking application received"),
@@ -504,37 +506,39 @@ class EmailType(_EmailTypeOptions):
     SEASONAL_BOOKING_CANCELLED_ALL = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking cancelled all"),
         get_email_context=get_context_for_seasonal_booking_cancelled_all,
-        context_variables=list(SeasonalBookingCancelledAllContext.__annotations__),
+        context_variables=list(get_annotations(SeasonalBookingCancelledAllContext, format=Format.STRING)),
     )
     SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking cancelled all staff notification"),
         get_email_context=get_context_for_seasonal_booking_cancelled_all_staff_notification,
-        context_variables=list(SeasonalBookingCancelledAllStaffNotificationContext.__annotations__),
+        context_variables=list(
+            get_annotations(SeasonalBookingCancelledAllStaffNotificationContext, format=Format.STRING)
+        ),
     )
     SEASONAL_BOOKING_CANCELLED_SINGLE = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking cancelled single"),
         get_email_context=get_context_for_seasonal_booking_cancelled_single,
-        context_variables=list(SeasonalBookingCancelledSingleContext.__annotations__),
+        context_variables=list(get_annotations(SeasonalBookingCancelledSingleContext, format=Format.STRING)),
     )
     SEASONAL_BOOKING_DENIED_SERIES = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking denied series"),
         get_email_context=get_context_for_seasonal_booking_denied_series,
-        context_variables=list(SeasonalBookingDeniedSeriesContext.__annotations__),
+        context_variables=list(get_annotations(SeasonalBookingDeniedSeriesContext, format=Format.STRING)),
     )
     SEASONAL_BOOKING_DENIED_SINGLE = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking denied single"),
         get_email_context=get_context_for_seasonal_booking_denied_single,
-        context_variables=list(SeasonalBookingDeniedSingleContext.__annotations__),
+        context_variables=list(get_annotations(SeasonalBookingDeniedSingleContext, format=Format.STRING)),
     )
     SEASONAL_BOOKING_RESCHEDULED_SERIES = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking rescheduled series"),
         get_email_context=get_context_for_seasonal_booking_rescheduled_series,
-        context_variables=list(SeasonalBookingRescheduledSeriesContext.__annotations__),
+        context_variables=list(get_annotations(SeasonalBookingRescheduledSeriesContext, format=Format.STRING)),
     )
     SEASONAL_BOOKING_RESCHEDULED_SINGLE = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Seasonal booking rescheduled single"),
         get_email_context=get_context_for_seasonal_booking_rescheduled_single,
-        context_variables=list(SeasonalBookingRescheduledSingleContext.__annotations__),
+        context_variables=list(get_annotations(SeasonalBookingRescheduledSingleContext, format=Format.STRING)),
     )
 
     # User

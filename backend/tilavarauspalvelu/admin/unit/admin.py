@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import dataclasses
 from typing import TYPE_CHECKING
 
@@ -206,5 +204,5 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
                 self.message_user(request, msg, level=messages.SUCCESS)
 
     @button(label=_("Update from TPREK"), change_form=True)
-    def update_from_tprek_button(self, request: WSGIRequest, pk: int) -> None:
+    def update_from_tprek_button(self, request: "WSGIRequest", pk: int) -> None:  # noqa: UP037
         self.update_from_tprek(request, Unit.objects.filter(pk=pk))

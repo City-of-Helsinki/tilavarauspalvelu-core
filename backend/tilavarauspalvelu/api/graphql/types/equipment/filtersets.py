@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from graphene_django_extensions.filters import IntChoiceFilter, IntMultipleChoiceFilter, ModelFilterSet
 
 from tilavarauspalvelu.models import Equipment

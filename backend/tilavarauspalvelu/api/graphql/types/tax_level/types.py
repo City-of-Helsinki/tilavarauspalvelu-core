@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import graphene
 from graphene_django_extensions import DjangoNode
 from lookup_property import L

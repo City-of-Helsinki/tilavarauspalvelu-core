@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Self
 
 from dateutil.relativedelta import relativedelta

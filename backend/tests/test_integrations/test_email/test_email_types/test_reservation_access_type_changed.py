@@ -1,7 +1,5 @@
 # type: EmailType.RESERVATION_ACCESS_TYPE_CHANGED
 
-from __future__ import annotations
-
 import datetime
 from inspect import cleandoc
 from typing import TYPE_CHECKING

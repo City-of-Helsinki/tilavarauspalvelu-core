@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from contextlib import contextmanager
 from http import HTTPStatus
 from typing import TYPE_CHECKING

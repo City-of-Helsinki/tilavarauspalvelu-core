@@ -371,11 +371,7 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
-required-imports = [
-    "from __future__ import annotations",
-]
 section-order = [
-    "future",
     "standard-library",
     "third-party",
     "first-party",

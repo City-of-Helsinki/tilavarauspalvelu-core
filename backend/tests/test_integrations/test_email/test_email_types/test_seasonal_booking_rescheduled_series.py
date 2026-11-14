@@ -1,7 +1,5 @@
 # type: EmailType.SEASONAL_BOOKING_RESCHEDULED_SERIES
 
-from __future__ import annotations
-
 import uuid
 from inspect import cleandoc
 from typing import TYPE_CHECKING
