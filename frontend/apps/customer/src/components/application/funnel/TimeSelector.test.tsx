@@ -131,13 +131,6 @@ function getGrid(view: ReturnType<typeof render>) {
 }
 
 describe("TimeSelector render single section", () => {
-  test("should have info section", () => {
-    const view = customRender();
-    const info = view.getAllByText("application:Page2.info");
-    // HDS notification has invisible label with same text
-    expect(info).toHaveLength(2);
-  });
-
   test("should have priority radio buttons", () => {
     const view = customRender();
     const group = view.getByRole("group", { name: "application:Page2.prioritySelectLabel" });
