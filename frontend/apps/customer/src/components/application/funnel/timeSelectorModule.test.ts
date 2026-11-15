@@ -6,6 +6,7 @@ import {
   addTimeRange,
   findOutsideListed,
   findTooShortListed,
+  hasSameTimes,
   listTimeRanges,
   removeTimeRange,
 } from "./timeSelectorModule";
@@ -92,5 +93,29 @@ describe("findOutsideListed", () => {
       range(Weekday.Tuesday, "10:00", "11:00"),
     ]);
     expect(findOutsideListed(listed, weekdayOpen)).toEqual([false, true, true]);
+  });
+});
+
+describe("hasSameTimes", () => {
+  test("compares the times as the calendar shows them, however they are split", () => {
+    expect(
+      hasSameTimes(
+        [range(Weekday.Monday, "10:00", "11:00"), range(Weekday.Monday, "11:00", "12:00")],
+        [range(Weekday.Monday, "10:00", "12:00")]
+      )
+    ).toBe(true);
+  });
+
+  test("does not depend on the order of the ranges", () => {
+    const monday = range(Weekday.Monday, "10:00", "11:00");
+    const tuesday = range(Weekday.Tuesday, "08:00", "09:00", Priority.Secondary);
+    expect(hasSameTimes([monday, tuesday], [tuesday, monday])).toBe(true);
+  });
+
+  test("tells different times or priorities apart", () => {
+    const saved = [range(Weekday.Monday, "10:00", "12:00")];
+    expect(hasSameTimes(saved, [range(Weekday.Monday, "10:00", "11:00")])).toBe(false);
+    expect(hasSameTimes(saved, [range(Weekday.Monday, "10:00", "12:00", Priority.Secondary)])).toBe(false);
+    expect(hasSameTimes(saved, [])).toBe(false);
   });
 });

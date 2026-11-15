@@ -112,7 +112,13 @@
       "secondary": "Vaihtoehtoiset aikatoiveet"
     },
     "notification": {
-      "copyCells": "Ajat kopioitu kaikille varaustoiveille"
+      "copyCells": "Ajat kopioitu kaikille varaustoiveille",
+      "copyCellsOutsideOpeningHours": "Osa kopioiduista ajoista on aukioloaikojen ulkopuolella varaustoiveissa {{names}}. Ne on merkitty kalenteriin virheellisiksi."
+    },
+    "copyConfirm": {
+      "heading": "Korvataanko valitut ajat?",
+      "text": "Varaustoiveissa {{names}} on jo valittuja aikoja. Kopiointi korvaa ne.",
+      "accept": "Kopioi ja korvaa"
     }
   },
   "Page3": {

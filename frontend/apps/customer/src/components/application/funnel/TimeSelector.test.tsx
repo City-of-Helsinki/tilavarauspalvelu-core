@@ -1,7 +1,7 @@
 import { FormProvider, useForm } from "react-hook-form";
-import { render, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId, formatTimeStruct } from "ui/src/modules/helpers";
@@ -13,6 +13,9 @@ import { convertApplicationPage2 } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from "./TimeSelector";
 import type { TimeSelectorProps } from "./TimeSelector";
+
+const { errorToast, successToast } = vi.hoisted(() => ({ errorToast: vi.fn(), successToast: vi.fn() }));
+vi.mock("ui/src/components/toast", () => ({ errorToast, successToast }));
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 
@@ -35,6 +38,8 @@ interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   reservationUnitOpeningHours?: TimeSelectorProps["reservationUnitOpeningHours"];
   /** Defaults to the shown unit's opening hours, as if the section listed only that unit. */
   sectionOpeningHours?: TimeSelectorProps["sectionOpeningHours"];
+  /** Defaults to `sectionOpeningHours` for every section. */
+  allSectionsOpeningHours?: TimeSelectorProps["allSectionsOpeningHours"];
 }
 
 function customRender(props: TimeSelectorMockProps = {}): ReturnType<typeof render> {
@@ -49,9 +54,12 @@ function WrapTimeSelector({
   onSubmit = vi.fn(),
   reservationUnitOpeningHours = OPEN_ALL_WEEK,
   sectionOpeningHours = reservationUnitOpeningHours,
+  allSectionsOpeningHours,
   ...props
 }: TimeSelectorMockProps) {
   const application: ApplicationPage2 = createMockApplicationFragment(props);
+  const sectionsOpeningHours =
+    allSectionsOpeningHours ?? Array.from({ length: props.nSections ?? 1 }, () => sectionOpeningHours);
   const form = useForm<ApplicationPage2FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage2(application),
@@ -78,6 +86,7 @@ function WrapTimeSelector({
           reservationUnitOptions={reservationUnitOptions}
           reservationUnitOpeningHours={reservationUnitOpeningHours}
           sectionOpeningHours={sectionOpeningHours}
+          allSectionsOpeningHours={sectionsOpeningHours}
         />
         <button type="submit">submit</button>
       </FormProvider>
@@ -622,6 +631,11 @@ describe("TimeSelector time slot selecting", () => {
 });
 
 describe("TimeSelector copy times", () => {
+  beforeEach(() => {
+    errorToast.mockClear();
+    successToast.mockClear();
+  });
+
   test("copies the selection to every section without carrying primary keys over", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -639,6 +653,51 @@ describe("TimeSelector copy times", () => {
     for (const section of submitted.applicationSections) {
       expect(section.suitableTimeRanges).toEqual(copied);
     }
+    expect(successToast).toHaveBeenCalledOnce();
+    expect(errorToast).not.toHaveBeenCalled();
+  });
+
+  test("asks before replacing other sections' own times, and copies only when accepted", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const view = customRender({ page: "page2", nSections: 2, onSubmit });
+    // The first section gets a time the second one doesn't have.
+    await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Monday, 10 * 60)));
+
+    await user.click(view.getByRole("button", { name: "application:Page2.copyTimes" }));
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveTextContent('application:Page2.copyConfirm.text {"names":"foobar"}');
+    await user.click(within(dialog).getByRole("button", { name: "common:cancel" }));
+    await user.click(view.getByRole("button", { name: "submit" }));
+
+    const kept = onSubmit.mock.calls[0]?.[0] as ApplicationPage2FormValues;
+    expect(kept.applicationSections[1]?.suitableTimeRanges).toHaveLength(1);
+    expect(successToast).not.toHaveBeenCalled();
+
+    await user.click(view.getByRole("button", { name: "application:Page2.copyTimes" }));
+    await user.click(
+      within(screen.getByRole("dialog")).getByRole("button", { name: "application:Page2.copyConfirm.accept" })
+    );
+    await user.click(view.getByRole("button", { name: "submit" }));
+
+    const copied = onSubmit.mock.calls[1]?.[0] as ApplicationPage2FormValues;
+    expect(copied.applicationSections[1]?.suitableTimeRanges).toEqual(
+      copied.applicationSections[0]?.suitableTimeRanges
+    );
+    expect(successToast).toHaveBeenCalledOnce();
+  });
+
+  test("shows an error when the copied times are outside another section's opening hours", async () => {
+    const user = userEvent.setup();
+    const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
+    const view = customRender({ page: "page2", nSections: 2, allSectionsOpeningHours: [OPEN_ALL_WEEK, mondayOnly] });
+
+    await user.click(view.getByRole("button", { name: "application:Page2.copyTimes" }));
+
+    expect(errorToast).toHaveBeenCalledWith(
+      expect.objectContaining({ text: expect.stringContaining("copyCellsOutsideOpeningHours") })
+    );
+    expect(successToast).not.toHaveBeenCalled();
   });
 });
 

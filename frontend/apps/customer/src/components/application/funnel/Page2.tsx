@@ -5,12 +5,12 @@ import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { ButtonContainer } from "ui/src/styled";
-import type { ApplicationPage2Query } from "@gql/gql-types";
+import type { ApplicationPage2Query, TimeSelectorFragment } from "@gql/gql-types";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelectorForm } from "@/components/application/funnel/TimeSelector";
 import { getApplicationPath } from "@/modules/urls";
 import { ApplicationSectionSummary } from "./ApplicationSectionSummary";
-import { convertApplicationSectionPage1 } from "./form";
+import { convertApplicationSectionPage1, getSectionsOpeningHours } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;
@@ -28,6 +28,9 @@ export function Page2({ application, onNext }: Props): React.ReactElement {
 
   const onBack = () => router.push(getApplicationPath(application.pk, "page1"));
 
+  // A time can be applied for in a section when any of its reservation units is open then.
+  const allSectionsOpeningHours = getSectionsOpeningHours(application.applicationSections ?? []);
+
   const { isSubmitting, isValid } = formState;
   const enableSubmit = !isSubmitting && isValid;
 
@@ -39,6 +42,7 @@ export function Page2({ application, onNext }: Props): React.ReactElement {
             key={section.pk}
             index={index}
             section={application?.applicationSections[index]}
+            allSectionsOpeningHours={allSectionsOpeningHours}
           />
         ) : null
       )}
@@ -68,9 +72,11 @@ export function Page2({ application, onNext }: Props): React.ReactElement {
 function ApplicationSectionTimePicker({
   index: sectionIndex,
   section,
+  allSectionsOpeningHours,
 }: {
   index: number;
   section: NonNullable<Node["applicationSections"]>[0] | undefined;
+  allSectionsOpeningHours: ReadonlyArray<Readonly<TimeSelectorFragment[]>>;
 }): React.ReactElement {
   const { watch } = useFormContext<ApplicationPage2FormValues>();
 
@@ -85,7 +91,7 @@ function ApplicationSectionTimePicker({
   const selectedReservationUnitPk = watch(`applicationSections.${sectionIndex}.reservationUnitPk`);
   const reservationUnitOpeningHours =
     allOpeningHours?.find((n) => n.pk === selectedReservationUnitPk)?.openingHours ?? [];
-  const sectionOpeningHours = allOpeningHours?.flatMap((n) => n.openingHours) ?? [];
+  const sectionOpeningHours = allSectionsOpeningHours[sectionIndex] ?? [];
 
   const reservationUnitOptions = filterNonNullable(section?.reservationUnitOptions)
     .map((n) => n.reservationUnit)
@@ -113,6 +119,7 @@ function ApplicationSectionTimePicker({
         reservationUnitOptions={reservationUnitOptions}
         reservationUnitOpeningHours={reservationUnitOpeningHours}
         sectionOpeningHours={sectionOpeningHours}
+        allSectionsOpeningHours={allSectionsOpeningHours}
       />
     </Accordion>
   );

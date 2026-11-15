@@ -90,6 +90,24 @@ export function removeTimeRange(
   return fromPattern(listTimeRanges(ranges).filter((_, i) => i !== position));
 }
 
+/**
+ * A key of the times as the calendar shows them, however they are split into ranges.
+ * listTimeRanges lists them in calendar order (by weekday, then time), so equal times give equal keys without sorting.
+ */
+function timesKey(ranges: ReadonlyArray<SuitableTimeRangeFormValues>): string {
+  return listTimeRanges(ranges)
+    .map(({ weekday, beginMinutes, endMinutes, data }) => `${weekday} ${beginMinutes}-${endMinutes} ${data.priority}`)
+    .join(",");
+}
+
+/** Whether two lists hold the same times, as the calendar shows them (however they are split into ranges). */
+export function hasSameTimes(
+  a: ReadonlyArray<SuitableTimeRangeFormValues>,
+  b: ReadonlyArray<SuitableTimeRangeFormValues>
+): boolean {
+  return timesKey(a) === timesKey(b);
+}
+
 /** Which of the listed times (from `listTimeRanges`) reach outside the opening hours, position for position. */
 export function findOutsideListed(
   listed: WeeklyPatternValue<SuitableTimeData>,
