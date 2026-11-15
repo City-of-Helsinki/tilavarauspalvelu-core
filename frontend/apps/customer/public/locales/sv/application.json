@@ -112,7 +112,13 @@
       "secondary": "Alternativa tidsönskemål"
     },
     "notification": {
-      "copyCells": "Önskade tider kopierades till alla bokningar"
+      "copyCells": "Önskade tider kopierades till alla bokningar",
+      "copyCellsOutsideOpeningHours": "En del av de kopierade tiderna ligger utanför öppettiderna i {{names}}. De är markerade som ogiltiga i kalendern."
+    },
+    "copyConfirm": {
+      "heading": "Ersätta de valda tiderna?",
+      "text": "{{names}} har redan valda tider. Kopieringen ersätter dem.",
+      "accept": "Kopiera och ersätt"
     }
   },
   "Page3": {

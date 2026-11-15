@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import type { Control } from "react-hook-form";
 import { Controller, useController, useFormContext, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
@@ -9,14 +9,16 @@ import { arrow, WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar
 import type { WeeklyPatternCellInfo, WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/types";
 import { WeeklyPatternCalendar } from "@ui/components/WeeklyPatternCalendar/WeeklyPatternCalendar";
 import { breakpoints } from "@ui/modules/const";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { ControlledSelect } from "ui/src/components/form";
-import { successToast } from "ui/src/components/toast";
+import { errorToast, successToast } from "ui/src/components/toast";
 import { formatDuration } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import {
   findTooShortReasons,
   fromPattern,
+  isInsideOpeningHours,
   priorityKey,
   SUITABLE_TIME_STEP_MINUTES,
   SUITABLE_TIME_VISIBLE_HOURS,
@@ -31,6 +33,7 @@ import { TimePreview } from "@/components/application/funnel/TimePreview";
 import { OUTSIDE_OPENING_HOURS_ERROR } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { SuitableTimeRangeForm } from "./SuitableTimeRangeForm";
+import { hasSameTimes } from "./timeSelectorModule";
 
 export type TimeSelectorProps = {
   index: number;
@@ -41,13 +44,20 @@ export type TimeSelectorProps = {
    * whichever unit is shown, so the calendar and the form both paint inside these.
    */
   sectionOpeningHours: Readonly<TimeSelectorFragment[]>;
+  /** `sectionOpeningHours` of every section, by section index, so copied times can be checked against them. */
+  allSectionsOpeningHours: ReadonlyArray<Readonly<TimeSelectorFragment[]>>;
 };
+
+function sectionNames(sections: ReadonlyArray<{ section: { name: string } }>): string {
+  return sections.map(({ section }) => section.name).join(", ");
+}
 
 export function TimeSelectorForm({
   index,
   reservationUnitOptions,
   reservationUnitOpeningHours,
   sectionOpeningHours,
+  allSectionsOpeningHours,
 }: TimeSelectorProps): React.ReactElement | null {
   const { t } = useTranslation();
   const { control, getValues, setValue } = useFormContext<ApplicationPage2FormValues>();
@@ -56,15 +66,44 @@ export function TimeSelectorForm({
   const availability = useMemo(() => toAvailability(reservationUnitOpeningHours), [reservationUnitOpeningHours]);
   const paintable = useMemo(() => toAvailability(sectionOpeningHours), [sectionOpeningHours]);
 
+  // Normalising through the pattern drops the source section's primary keys, which must not leak to other sections.
+  const getCopiedTimes = () => fromPattern(toPattern(getValues(`applicationSections.${index}.suitableTimeRanges`)));
+  const otherSections = () =>
+    filterNonNullable(getValues("applicationSections").map((section, i) => (i === index ? null : { section, i })));
+
+  // The other sections whose own times the copy would replace, asked about before copying.
+  const [overwritten, setOverwritten] = useState<string | null>(null);
+  const confirmCopyCells = () => {
+    const times = getCopiedTimes();
+    const replaced = otherSections().filter(
+      ({ section }) => section.suitableTimeRanges.length > 0 && !hasSameTimes(section.suitableTimeRanges, times)
+    );
+    if (replaced.length > 0) {
+      setOverwritten(sectionNames(replaced));
+    } else {
+      copyCells();
+    }
+  };
+
   const copyCells = () => {
-    // Normalising through the pattern drops the source section's primary keys, which must not leak to other sections.
-    const times = fromPattern(toPattern(getValues(`applicationSections.${index}.suitableTimeRanges`)));
+    setOverwritten(null);
+    const times = getCopiedTimes();
     for (const i of getValues("applicationSections").keys()) {
       setValue(`applicationSections.${i}.suitableTimeRanges`, times, {
         shouldDirty: true,
         shouldValidate: true,
         shouldTouch: true,
       });
+    }
+    // The copies are kept even where another section's spaces aren't open, and marked there, so the user can see and
+    // fix them in that section rather than lose them silently.
+    const outside = otherSections().filter(({ i }) => !isInsideOpeningHours(times, allSectionsOpeningHours[i] ?? []));
+    if (outside.length > 0) {
+      errorToast({
+        text: t("application:Page2.notification.copyCellsOutsideOpeningHours", { names: sectionNames(outside) }),
+        dataTestId: "application__page2--notification-error",
+      });
+      return;
     }
     successToast({
       text: t("application:Page2.notification.copyCells"),
@@ -176,11 +215,20 @@ export function TimeSelectorForm({
           <Button
             id={`time-selector__button--copy-cells-${index}`}
             variant={ButtonVariant.Secondary}
-            onClick={copyCells}
+            onClick={confirmCopyCells}
             size={ButtonSize.Small}
           >
             {t("application:Page2.copyTimes")}
           </Button>
+          <ConfirmationDialog
+            id={`time-selector__dialog--copy-cells-${index}`}
+            isOpen={overwritten != null}
+            heading={t("application:Page2.copyConfirm.heading")}
+            content={t("application:Page2.copyConfirm.text", { names: overwritten })}
+            acceptLabel={t("application:Page2.copyConfirm.accept")}
+            onAccept={copyCells}
+            onCancel={() => setOverwritten(null)}
+          />
         </div>
       )}
       <ErrorMessage index={index} />

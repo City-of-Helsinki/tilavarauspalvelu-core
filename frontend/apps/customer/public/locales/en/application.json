@@ -112,7 +112,13 @@
       "secondary": "Other suitable time slots"
     },
     "notification": {
-      "copyCells": "Times copied to all booking requests"
+      "copyCells": "Times copied to all booking requests",
+      "copyCellsOutsideOpeningHours": "Some of the copied times are outside the opening hours in {{names}}. They are marked as invalid in the calendar."
+    },
+    "copyConfirm": {
+      "heading": "Replace the selected times?",
+      "text": "{{names}} already have selected times. Copying replaces them.",
+      "accept": "Copy and replace"
     }
   },
   "Page3": {
