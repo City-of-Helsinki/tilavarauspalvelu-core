@@ -4,9 +4,11 @@ import styled from "styled-components";
 import { Priority } from "../../gql/gql-types";
 import type { SuitableTimeFragment } from "../../gql/gql-types";
 import { WEEKDAYS } from "../modules/const";
+import { convertWeekday } from "../modules/conversion";
 import { setSundayFirst } from "../modules/date-utils";
-import { formatDayTimes } from "../modules/helpers";
+import { formatApiTimeInterval } from "../modules/helpers";
 import { AutoGrid, fontBold } from "../styled";
+import { visuallyHidden } from "./CalendarGrid/styles";
 
 const WeekWrapper = styled.div`
   display: flex;
@@ -20,20 +22,52 @@ const Label = styled.div`
   width: 100%;
 `;
 
-function Weekdays({ schedules }: { schedules: Array<Omit<SchedulesT, "priority">> }) {
+const InvalidTime = styled.span`
+  color: var(--color-error);
+`;
+
+const HiddenText = styled.span`
+  ${visuallyHidden};
+`;
+
+function Weekdays({
+  schedules,
+  invalidSchedules,
+}: {
+  schedules: ReadonlyArray<SchedulesT>;
+  invalidSchedules: ReadonlySet<SchedulesT>;
+}) {
   const { t } = useTranslation();
   return (
     <>
       {WEEKDAYS.map((day) => ({
         day,
-        times: formatDayTimes(schedules, day),
+        times: schedules.filter((s) => convertWeekday(s.dayOfTheWeek) === day),
       })).map(({ day, times }) => (
         <WeekWrapper key={day}>
           <Label>
             {t(`common:weekDay.${setSundayFirst(day)}`)}
-            {times && ":"}
+            {times.length > 0 && ":"}
           </Label>
-          <div>{times}</div>
+          <div>
+            {times.map((time, i) => {
+              const text = formatApiTimeInterval(time);
+              return (
+                <React.Fragment key={text}>
+                  {i > 0 && ", "}
+                  {invalidSchedules.has(time) ? (
+                    <InvalidTime data-invalid>
+                      {text}
+                      {/* The colour alone doesn't tell it to everyone. */}
+                      <HiddenText> ({t("application:TimeSelector.legend.invalid")})</HiddenText>
+                    </InvalidTime>
+                  ) : (
+                    text
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
         </WeekWrapper>
       ))}
     </>
@@ -52,8 +86,16 @@ const Heading = styled.p.attrs({ as: "h4" })`
 
 type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
 
-export function ApplicationTimePreview({ schedules }: { schedules: ReadonlyArray<SchedulesT> }): React.ReactElement {
+export function ApplicationTimePreview({
+  schedules,
+  invalidSchedules = [],
+}: {
+  schedules: ReadonlyArray<SchedulesT>;
+  /** Items of `schedules` to show as invalid, in the error colour. */
+  invalidSchedules?: ReadonlyArray<SchedulesT>;
+}): React.ReactElement {
   const { t } = useTranslation();
+  const invalid = new Set(invalidSchedules);
 
   const primary = schedules.filter((n) => n.priority === Priority.Primary);
   const secondary = schedules.filter((n) => n.priority === Priority.Secondary);
@@ -64,11 +106,11 @@ export function ApplicationTimePreview({ schedules }: { schedules: ReadonlyArray
       <Container>
         <div>
           <Heading>{t("application:primarySchedules")}</Heading>
-          <Weekdays schedules={primary} />
+          <Weekdays schedules={primary} invalidSchedules={invalid} />
         </div>
         <div>
           <Heading>{t("application:secondarySchedules")}</Heading>
-          <Weekdays schedules={secondary} />
+          <Weekdays schedules={secondary} invalidSchedules={invalid} />
         </div>
       </Container>
     </div>
