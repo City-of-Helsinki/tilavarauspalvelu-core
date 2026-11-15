@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import type { Control } from "react-hook-form";
-import { Controller, useController, useFormContext, useWatch } from "react-hook-form";
+import { Controller, useController, useFormContext, useFormState, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, NotificationSize, RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
@@ -335,8 +335,10 @@ function PrioritySelector({
 function ErrorMessage({ index }: { index: number }): React.ReactElement | null {
   const { t } = useTranslation();
   const fieldName = `applicationSections.${index}.suitableTimeRanges` as const;
-  const { getFieldState } = useFormContext<ApplicationPage2FormValues>();
-  const state = getFieldState(fieldName);
+  const { control, getFieldState } = useFormContext<ApplicationPage2FormValues>();
+  // Subscribes to the field's validation, which finishes after the change that re-rendered this.
+  const formState = useFormState({ control, name: fieldName });
+  const state = getFieldState(fieldName, formState);
   if (!state.invalid) {
     return null;
   }
