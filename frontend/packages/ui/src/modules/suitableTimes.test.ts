@@ -6,6 +6,7 @@ import {
   findTooShortRuns,
   fromPattern,
   hasTooShortTimes,
+  isInsideOpeningHours,
   priorityKey,
   toAvailability,
   toPattern,
@@ -201,6 +202,34 @@ describe("hasTooShortTimes", () => {
 
   test("an end of 00:00 is the end of the day", () => {
     expect(hasTooShortTimes([range(Weekday.Sunday, "23:00", "00:00", Priority.Primary)], HOUR)).toBe(false);
+  });
+});
+
+describe("isInsideOpeningHours", () => {
+  const openMonday: ReservableTimeSlots = [
+    { weekday: Weekday.Monday, isClosed: false, reservableTimes: [{ begin: "08:00:00", end: "18:00:00" }] },
+  ];
+
+  test("is true when every range is inside the opening hours", () => {
+    expect(isInsideOpeningHours([], openMonday)).toBe(true);
+    expect(isInsideOpeningHours([range(Weekday.Monday, "08:00", "18:00")], openMonday)).toBe(true);
+  });
+
+  test("is false when a range reaches past the opening hours, or is on a closed day", () => {
+    expect(isInsideOpeningHours([range(Weekday.Monday, "17:00", "19:00")], openMonday)).toBe(false);
+    expect(
+      isInsideOpeningHours(
+        [range(Weekday.Monday, "10:00", "11:00"), range(Weekday.Tuesday, "10:00", "11:00")],
+        openMonday
+      )
+    ).toBe(false);
+  });
+
+  test("an end of 00:00 is the end of the day", () => {
+    const openAllDay: ReservableTimeSlots = [
+      { weekday: Weekday.Sunday, isClosed: false, reservableTimes: [{ begin: "07:00:00", end: "00:00:00" }] },
+    ];
+    expect(isInsideOpeningHours([range(Weekday.Sunday, "23:00", "00:00")], openAllDay)).toBe(true);
   });
 });
 

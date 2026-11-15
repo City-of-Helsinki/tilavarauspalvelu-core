@@ -2,7 +2,13 @@ import { describe, expect, test } from "vitest";
 import type { ReservableTimeSlots } from "@ui/modules/suitableTimes";
 import { Priority, Weekday } from "@gql/gql-types";
 import type { SuitableTimeRangeFormValues } from "./form";
-import { addTimeRange, findTooShortListed, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
+import {
+  addTimeRange,
+  findOutsideListed,
+  findTooShortListed,
+  listTimeRanges,
+  removeTimeRange,
+} from "./timeSelectorModule";
 
 function range(
   dayOfTheWeek: Weekday,
@@ -75,5 +81,16 @@ describe("findTooShortListed", () => {
     ]);
     // Listed by day and time: Monday's long primary, its buffer, a lone short secondary, then Tuesday's short primary.
     expect(findTooShortListed(listed, 3600)).toEqual([false, false, true, true]);
+  });
+});
+
+describe("findOutsideListed", () => {
+  test("marks the listed times that reach outside the opening hours", () => {
+    const listed = listTimeRanges([
+      range(Weekday.Monday, "10:00", "11:00"),
+      range(Weekday.Monday, "17:00", "19:00"),
+      range(Weekday.Tuesday, "10:00", "11:00"),
+    ]);
+    expect(findOutsideListed(listed, weekdayOpen)).toEqual([false, true, true]);
   });
 });

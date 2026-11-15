@@ -1,5 +1,10 @@
 import { groupBy } from "lodash-es";
-import { mergeRanges, MINUTES_PER_DAY } from "@ui/components/WeeklyPatternCalendar/engine";
+import {
+  groupAvailability,
+  isRangeOpen,
+  mergeRanges,
+  MINUTES_PER_DAY,
+} from "@ui/components/WeeklyPatternCalendar/engine";
 import type {
   VisibleHours,
   WeeklyPatternAvailability,
@@ -163,6 +168,17 @@ export function countFittingReservations(
     }
   }
   return count;
+}
+
+/** Whether every range is fully inside the opening hours, i.e. can be applied for. */
+export function isInsideOpeningHours(
+  ranges: ReadonlyArray<Pick<SuitableTimeRangeValues, "dayOfTheWeek" | "beginTime" | "endTime">>,
+  openingHours: ReservableTimeSlots
+): boolean {
+  const open = groupAvailability(toAvailability(openingHours));
+  return ranges.every(({ dayOfTheWeek, beginTime, endTime }) =>
+    isRangeOpen(open[dayOfTheWeek], timeToMinutes(beginTime), endTimeToMinutes(endTime))
+  );
 }
 
 export function toAvailability(slots: ReservableTimeSlots): WeeklyPatternAvailability {

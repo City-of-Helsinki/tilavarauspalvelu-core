@@ -3,7 +3,8 @@ import { z } from "zod";
 import { parseApiDate, parseUIDate, formatApiDate, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatWhitespace } from "ui/src/modules/helpers";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
-import { countFittingReservations, hasTooShortTimes } from "ui/src/modules/suitableTimes";
+import { countFittingReservations, hasTooShortTimes, isInsideOpeningHours } from "ui/src/modules/suitableTimes";
+import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
 import { checkValidDateOnly, emailField, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
 import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
 import type {
@@ -151,6 +152,38 @@ export const ApplicationPage2Schema = z.object({
 });
 
 export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
+
+export const OUTSIDE_OPENING_HOURS_ERROR = "Suitable time range must be inside the opening hours";
+
+/**
+ * Page 2 with the times checked against each section's opening hours (by section index): every reservation unit's of
+ * the section, as a time any of them opens can be applied for. The hours aren't form values, so they're given here.
+ */
+export function ApplicationPage2SchemaRefined(sectionsOpeningHours: ReadonlyArray<ReservableTimeSlots>) {
+  return ApplicationPage2Schema.superRefine((val, ctx) => {
+    for (const [i, section] of val.applicationSections.entries()) {
+      const openingHours = sectionsOpeningHours[i];
+      if (openingHours != null && !isInsideOpeningHours(section.suitableTimeRanges, openingHours)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["applicationSections", i, "suitableTimeRanges"],
+          message: OUTSIDE_OPENING_HOURS_ERROR,
+        });
+      }
+    }
+  });
+}
+
+/** Each section's opening hours, by section index: those of all of its reservation units. */
+export function getSectionsOpeningHours<TSlot extends ReservableTimeSlots[number]>(
+  sections: ReadonlyArray<{
+    reservationUnitOptions: ReadonlyArray<{ reservationUnit: { applicationRoundTimeSlots: ReadonlyArray<TSlot> } }>;
+  }>
+): TSlot[][] {
+  return sections.map((section) =>
+    section.reservationUnitOptions.flatMap((ruo) => ruo.reservationUnit.applicationRoundTimeSlots)
+  );
+}
 
 export function convertApplicationSectionPage1(section: SectionType): ApplicationSectionPage1FormValues {
   const reservationUnits = filterNonNullable(

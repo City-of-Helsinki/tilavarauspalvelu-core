@@ -28,7 +28,9 @@
       "title": "Ilmoitetut aikatoiveet eivät vastaa varauksen kestoa",
       "Suitable time range must be at least as long as the minimum duration": "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
       "At least as many suitable time ranges as applied reservations per week": "Valitse kalenterista lisää aikatoiveita tai vähennä hakemuksen edellisessä vaiheessa valittua varausten määrää viikossa.",
-      "Required": "Valitse kalenterista aikatoiveita"
+      "Required": "Valitse kalenterista aikatoiveita",
+      "outsideOpeningHoursTitle": "Osa aikatoiveista on aukioloaikojen ulkopuolella",
+      "Suitable time range must be inside the opening hours": "Poista tai siirrä kalenterissa virheellisiksi merkityt ajat varaustoiveen tilojen aukioloajoille."
     },
     "previewError": "Sivu {{ page }} on virheellinen.",
     "fix": "Korjaa"
@@ -64,7 +66,7 @@
     "calendarLabel": "Valitse aikatoiveet kalenterista",
     "legend": {
       "unavailable": "Ei varattavissa missään hakemukselle valituista tiloista",
-      "invalid": "Liian lyhyt aikatoive",
+      "invalid": "Virheellinen aikatoive",
       "closed": "Ei varattavissa tässä tilassa",
       "primary": "Ensisijainen toive",
       "secondary": "Vaihtoehtoinen toive",
@@ -90,10 +92,12 @@
       "errors": {
         "endAfterStart": "Päättymisajan täytyy olla alkamisajan jälkeen.",
         "outsideReservable": "Aika ei ole varattavissa missään hakemukselle valitussa tilassa."
-      }
+      },
+      "outsideOpeningHours": "aukioloaikojen ulkopuolella"
     },
     "tooShort": "Aikatoive ({{duration}}) on lyhyempi kuin varauksen vähimmäiskesto ({{minDuration}}). Pidennä aikatoivetta tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
-    "tooShortNextToPrimary": "Viereinen ensisijainen toive ({{duration}}) on lyhyempi kuin varauksen vähimmäiskesto ({{minDuration}}). Pidennä ensisijaista toivetta."
+    "tooShortNextToPrimary": "Viereinen ensisijainen toive ({{duration}}) on lyhyempi kuin varauksen vähimmäiskesto ({{minDuration}}). Pidennä ensisijaista toivetta.",
+    "outsideOpeningHours": "Aika ei ole tämän varaustoiveen tilojen aukioloaikojen sisällä, joten sitä ei voi hakea. Poista aika tai siirrä se aukioloajoille."
   },
   "Page2": {
     "subHeading": "Valitse hakemuksen aikatoiveet",

@@ -28,6 +28,7 @@ import { Flex } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
 import { TimePreview } from "@/components/application/funnel/TimePreview";
+import { OUTSIDE_OPENING_HOURS_ERROR } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { SuitableTimeRangeForm } from "./SuitableTimeRangeForm";
 
@@ -90,6 +91,10 @@ export function TimeSelectorForm({
     cell: WeeklyPatternCellInfo<SuitableTimeData>,
     dayRuns: WeeklyPatternValue<SuitableTimeData>
   ) => {
+    // A time outside the section's opening hours, e.g. copied from another section, can't be applied for at all.
+    if (cell.availability === "unavailable") {
+      return t("application:TimeSelector.outsideOpeningHours");
+    }
     if (minDuration <= 0) {
       return null;
     }
@@ -293,7 +298,11 @@ function ErrorMessage({ index }: { index: number }): React.ReactElement | null {
   return (
     <ErrorText
       size={NotificationSize.Medium}
-      title={t("application:validation.calendar.title")}
+      title={
+        errorMsg === OUTSIDE_OPENING_HOURS_ERROR
+          ? t("application:validation.calendar.outsideOpeningHoursTitle")
+          : t("application:validation.calendar.title")
+      }
       data-testid="application__page2--notification-min-duration"
     >
       {msg}
