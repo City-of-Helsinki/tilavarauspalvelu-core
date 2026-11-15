@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import type { Control } from "react-hook-form";
 import { Controller, useController, useFormContext, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
-import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize, RadioButton } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, NotificationSize, RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { arrow, WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar/styles";
@@ -86,9 +86,6 @@ export function TimeSelectorForm({
     // minmax(0, 1fr) instead of the implicit auto column: an auto track grows to its widest child's min-content
     // (e.g. a long reservation unit name in the select), which would push the whole accordion wider than the viewport.
     <Flex style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)" }} $marginTop="m">
-      <Notification label={t("application:Page2.info")} size={NotificationSize.Small} type="info">
-        {t("application:Page2.info")}
-      </Notification>
       <PrioritySelector index={index} control={control} />
       <ControlledSelect
         name={`applicationSections.${index}.reservationUnitPk`}
