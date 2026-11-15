@@ -642,6 +642,30 @@ describe("TimeSelector copy times", () => {
   });
 });
 
+describe("TimeSelector times outside the opening hours", () => {
+  test("are marked in the list, before being too short", () => {
+    // The mock section has a time on Wednesday, 08:00-16:00, long enough but outside these hours.
+    const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
+    const view = customRender({ page: "page2", reservationUnitOpeningHours: mondayOnly });
+
+    const item = within(view.getByTestId("time-selector__form-0")).getByRole("listitem");
+    expect(item).toHaveTextContent(
+      "application:TimeSelector.legend.primary - (application:TimeSelector.form.outsideOpeningHours!)"
+    );
+    expect(item).toHaveAttribute("data-invalid");
+  });
+
+  test("are shown as invalid", () => {
+    // The mock section has a time on Wednesday, 08:00-16:00.
+    const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
+    const view = customRender({ page: "page2", reservationUnitOpeningHours: mondayOnly });
+
+    const cell = within(getGrid(view)).getByLabelText(new RegExp(`^${weekdayLabel(Weekday.Wednesday)}, 08:00–16:00`));
+    expect(cell).toHaveAttribute("data-invalid");
+    expect(cell).toHaveAccessibleName(expect.stringContaining("application:TimeSelector.outsideOpeningHours"));
+  });
+});
+
 describe("TimeSelector calendar select", () => {
   test("last time slot should be converted from 24:00 to 0:00", async () => {
     const user = userEvent.setup();

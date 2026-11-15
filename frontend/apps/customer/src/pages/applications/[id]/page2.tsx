@@ -14,7 +14,8 @@ import { ApplicationFunnelWrapper, Page2 as Page2Impl } from "@/components/appli
 import {
   transformApplicationPage2,
   convertApplicationPage2,
-  ApplicationPage2Schema,
+  ApplicationPage2SchemaRefined,
+  getSectionsOpeningHours,
 } from "@/components/application/funnel/form";
 import type { ApplicationPage2FormValues } from "@/components/application/funnel/form";
 import { useUnsavedChangesWarning } from "@/hooks";
@@ -55,7 +56,10 @@ function Page2({ application }: Pick<PropsNarrowed, "application">): React.React
   const form = useForm<ApplicationPage2FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage2(application),
-    resolver: zodResolver(ApplicationPage2Schema),
+    // Times outside a section's opening hours (e.g. copied from another section) can't be applied for.
+    resolver: zodResolver(
+      ApplicationPage2SchemaRefined(getSectionsOpeningHours(application.applicationSections ?? []))
+    ),
   });
   // Submit saves and then navigates. Do not ask during it.
   const { isDirty, isSubmitting } = form.formState;

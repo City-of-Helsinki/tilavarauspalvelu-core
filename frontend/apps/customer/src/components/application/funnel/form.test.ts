@@ -3,6 +3,7 @@ import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-ty
 import { createMockApplicationFragment } from "@test/application.mocks";
 import {
   ApplicationPage2Schema,
+  ApplicationPage2SchemaRefined,
   ApplicationPage3Schema,
   ApplicationPage1SchemaRefined,
   convertApplicationPage1,
@@ -323,6 +324,43 @@ describe("page 2 conversions", () => {
 
     test("times that fit fewer reservations than applied for are refused", () => {
       expect(isValid(valuesWith([{ day: Weekday.Monday, beginTime: "10:00", endTime: "12:00" }]))).toBe(false);
+    });
+  });
+
+  describe("page 2 opening hours", () => {
+    const openMonday = [
+      { weekday: Weekday.Monday, isClosed: false, reservableTimes: [{ begin: "08:00:00", end: "16:00:00" }] },
+    ];
+    const schema = ApplicationPage2SchemaRefined([openMonday]);
+    const valuesWith = (day: Weekday, beginTime: string, endTime: string, minDuration = 3600) => ({
+      pk: 1,
+      applicationSections: [
+        {
+          pk: 1,
+          name: "foobar",
+          minDuration,
+          reservationUnitPk: 1,
+          priority: Priority.Primary,
+          appliedReservationsPerWeek: 1,
+          suitableTimeRanges: [{ dayOfTheWeek: day, beginTime, endTime, priority: Priority.Primary }],
+        },
+      ],
+    });
+    const messages = (values: ReturnType<typeof valuesWith>) =>
+      schema.safeParse(values).error?.issues.map(({ path, message }) => `${path.join(".")}: ${message}`) ?? [];
+    const outside = "applicationSections.0.suitableTimeRanges: Suitable time range must be inside the opening hours";
+
+    test("accepts times inside the section's opening hours", () => {
+      expect(messages(valuesWith(Weekday.Monday, "08:00", "16:00"))).toEqual([]);
+    });
+
+    test("refuses times reaching outside them, or on a closed day", () => {
+      expect(messages(valuesWith(Weekday.Monday, "15:00", "17:00"))).toEqual([outside]);
+      expect(messages(valuesWith(Weekday.Tuesday, "10:00", "11:00"))).toEqual([outside]);
+    });
+
+    test("is checked alongside the section's other errors", () => {
+      expect(messages(valuesWith(Weekday.Tuesday, "10:00", "10:30"))).toContain(outside);
     });
   });
 

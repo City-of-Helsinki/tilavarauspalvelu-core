@@ -28,7 +28,9 @@
       "title": "Your selected time slots do not correspond to the duration of your booking",
       "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
       "At least as many suitable time ranges as applied reservations per week": "Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
-      "Required": "Select time slots from the calendar"
+      "Required": "Select time slots from the calendar",
+      "outsideOpeningHoursTitle": "Some of your time slots are outside the opening hours",
+      "Suitable time range must be inside the opening hours": "Remove the times marked as invalid in the calendar, or move them within the opening hours of this request's spaces."
     },
     "previewError": "Page {{ page }} has an error.",
     "fix": "Fix"
@@ -64,7 +66,7 @@
     "calendarLabel": "Select time slots from the calendar",
     "legend": {
       "unavailable": "Not available in any space on this application",
-      "invalid": "Time request too short",
+      "invalid": "Invalid time slot",
       "closed": "Not available in this space",
       "primary": "Preferred time slots",
       "secondary": "Other suitable time slots",
@@ -90,10 +92,12 @@
       "errors": {
         "endAfterStart": "The end time must be after the start time.",
         "outsideReservable": "The time is not available in any space on this application."
-      }
+      },
+      "outsideOpeningHours": "outside opening hours"
     },
     "tooShort": "The slot ({{duration}}) is shorter than the minimum booking duration ({{minDuration}}). Lengthen the slot or shorten the minimum booking duration in the previous step of the application.",
-    "tooShortNextToPrimary": "The adjacent preferred slot ({{duration}}) is shorter than the minimum booking duration ({{minDuration}}). Lengthen the preferred slot."
+    "tooShortNextToPrimary": "The adjacent preferred slot ({{duration}}) is shorter than the minimum booking duration ({{minDuration}}). Lengthen the preferred slot.",
+    "outsideOpeningHours": "This time is outside the opening hours of this request's spaces, so it can't be applied for. Remove it or move it within the opening hours."
   },
   "Page2": {
     "subHeading": "Select booking dates",

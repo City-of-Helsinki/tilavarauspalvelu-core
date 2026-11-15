@@ -10,7 +10,13 @@ import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
 import { priorityKey, SUITABLE_TIME_STEP_MINUTES, SUITABLE_TIME_VISIBLE_HOURS } from "ui/src/modules/suitableTimes";
 import { Weekday } from "@gql/gql-types";
 import type { ApplicationPage2FormValues, SuitableTimeRangeFormValues } from "./form";
-import { addTimeRange, findTooShortListed, listTimeRanges, removeTimeRange } from "./timeSelectorModule";
+import {
+  addTimeRange,
+  findOutsideListed,
+  findTooShortListed,
+  listTimeRanges,
+  removeTimeRange,
+} from "./timeSelectorModule";
 
 const Fieldset = styled.fieldset`
   min-inline-size: 0; /* fieldsets default to min-content, which would overflow the grid column */
@@ -146,6 +152,17 @@ export function SuitableTimeRangeForm({
   const listed = listTimeRanges(ranges);
   const minDuration = watch(`applicationSections.${index}.minDuration`);
   const tooShort = findTooShortListed(listed, minDuration);
+  const outside = findOutsideListed(listed, openingHours);
+  // Outside the opening hours is the more basic problem: such a time can't be applied for at all, whatever its length.
+  const problemOf = (position: number) => {
+    if (outside[position]) {
+      return t("application:TimeSelector.form.outsideOpeningHours");
+    }
+    if (tooShort[position]) {
+      return t("application:TimeSelector.form.tooShort");
+    }
+    return null;
+  };
 
   const weekdayName = (day: Weekday) => t(`common:weekdayLongEnum.${day}`);
   const describe = (day: Weekday, begin: number, end: number) =>
@@ -235,12 +252,12 @@ export function SuitableTimeRangeForm({
               <TimeListItem
                 key={`${day}-${beginMinutes}`}
                 $priority={priorityKey(data.priority)}
-                data-invalid={tooShort[position] ? "" : undefined}
+                data-invalid={problemOf(position) ? "" : undefined}
               >
                 <span>
                   {describe(day, beginMinutes, endMinutes)},{" "}
                   {t(`application:TimeSelector.legend.${priorityKey(data.priority)}`)}
-                  {tooShort[position] && ` - (${t("application:TimeSelector.form.tooShort")}!)`}
+                  {problemOf(position) && ` - (${problemOf(position)}!)`}
                 </span>
                 <RemoveButton
                   type="button"

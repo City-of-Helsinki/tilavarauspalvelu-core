@@ -113,7 +113,15 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     accessTypes: [],
     // Everything below is only for completeness of the mock type (not used for application tests)
     // applicationRoundTimeSlots: [] as const, // ReadonlyArray<ApplicationRoundTimeSlotNode>;
-    applicationRoundTimeSlots: [timeSelector],
+    // Tuesday is painted in the page 2 tests, Wednesday holds the mock application's saved suitable time.
+    applicationRoundTimeSlots: [
+      timeSelector,
+      {
+        ...timeSelector,
+        id: createNodeId("ApplicationRoundTimeSlotNode", 2),
+        weekday: Weekday.Wednesday,
+      },
+    ],
     applicationRounds: [] as const, // ReadonlyArray<ApplicationRoundNode>;
     authentication: AuthenticationType.Weak,
     bufferTimeAfter: 0, //Scalars["Duration"]["output"];

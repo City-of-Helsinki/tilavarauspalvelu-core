@@ -11,6 +11,7 @@ import type { WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/ty
 import {
   findTooShortRuns,
   fromPattern,
+  isInsideOpeningHours,
   SUITABLE_TIME_STEP_MINUTES,
   toAvailability,
   toPattern,
@@ -87,4 +88,12 @@ export function removeTimeRange(
   position: number
 ): SuitableTimeRangeFormValues[] {
   return fromPattern(listTimeRanges(ranges).filter((_, i) => i !== position));
+}
+
+/** Which of the listed times (from `listTimeRanges`) reach outside the opening hours, position for position. */
+export function findOutsideListed(
+  listed: WeeklyPatternValue<SuitableTimeData>,
+  openingHours: ReservableTimeSlots
+): boolean[] {
+  return fromPattern(listed).map((range) => !isInsideOpeningHours([range], openingHours));
 }
