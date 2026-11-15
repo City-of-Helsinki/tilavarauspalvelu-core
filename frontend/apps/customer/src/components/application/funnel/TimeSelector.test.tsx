@@ -1,4 +1,5 @@
 import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -9,7 +10,7 @@ import { Priority, Weekday } from "@gql/gql-types";
 import type { ApplicationPage2Query, TimeSelectorFragment } from "@gql/gql-types";
 import { createMockApplicationFragment } from "@test/application.mocks";
 import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { convertApplicationPage2 } from "./form";
+import { ApplicationPage2SchemaRefined, convertApplicationPage2 } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from "./TimeSelector";
 import type { TimeSelectorProps } from "./TimeSelector";
@@ -38,6 +39,10 @@ interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   reservationUnitOpeningHours?: TimeSelectorProps["reservationUnitOpeningHours"];
   /** Defaults to the shown unit's opening hours, as if the section listed only that unit. */
   sectionOpeningHours?: TimeSelectorProps["sectionOpeningHours"];
+  /** Validates with the page's schema, and adds a "validate" button that runs it. */
+  validate?: boolean;
+  /** Overrides the mock's applied reservations per week. */
+  appliedReservationsPerWeek?: number;
   /** Defaults to `sectionOpeningHours` for every section. */
   allSectionsOpeningHours?: TimeSelectorProps["allSectionsOpeningHours"];
 }
@@ -55,14 +60,23 @@ function WrapTimeSelector({
   reservationUnitOpeningHours = OPEN_ALL_WEEK,
   sectionOpeningHours = reservationUnitOpeningHours,
   allSectionsOpeningHours,
+  validate = false,
+  appliedReservationsPerWeek,
   ...props
 }: TimeSelectorMockProps) {
   const application: ApplicationPage2 = createMockApplicationFragment(props);
   const sectionsOpeningHours =
     allSectionsOpeningHours ?? Array.from({ length: props.nSections ?? 1 }, () => sectionOpeningHours);
+  const defaultValues = convertApplicationPage2(application);
+  if (appliedReservationsPerWeek != null) {
+    for (const section of defaultValues.applicationSections) {
+      section.appliedReservationsPerWeek = appliedReservationsPerWeek;
+    }
+  }
   const form = useForm<ApplicationPage2FormValues>({
     mode: "onChange",
-    defaultValues: convertApplicationPage2(application),
+    defaultValues,
+    resolver: validate ? zodResolver(ApplicationPage2SchemaRefined(sectionsOpeningHours)) : undefined,
   });
 
   // wrap handler to match the only form values
@@ -89,6 +103,11 @@ function WrapTimeSelector({
           allSectionsOpeningHours={sectionsOpeningHours}
         />
         <button type="submit">submit</button>
+        {validate && (
+          <button type="button" onClick={() => void form.trigger()}>
+            validate
+          </button>
+        )}
       </FormProvider>
     </form>
   );
@@ -722,6 +741,56 @@ describe("TimeSelector times outside the opening hours", () => {
     const cell = within(getGrid(view)).getByLabelText(new RegExp(`^${weekdayLabel(Weekday.Wednesday)}, 08:00–16:00`));
     expect(cell).toHaveAttribute("data-invalid");
     expect(cell).toHaveAccessibleName(expect.stringContaining("application:TimeSelector.outsideOpeningHours"));
+  });
+});
+
+describe("TimeSelector error message", () => {
+  function findError(view: ReturnType<typeof render>) {
+    return view.findByTestId("application__page2--notification-min-duration");
+  }
+
+  test("tells how many reservations per week were applied for, and how many fit", async () => {
+    const user = userEvent.setup();
+    // The mock's Wednesday 08:00-16:00 fits four reservations of 2 h.
+    const view = customRender({ page: "page2", validate: true, appliedReservationsPerWeek: 5 });
+    await user.click(view.getByRole("button", { name: "validate" }));
+
+    const error = await findError(view);
+    expect(error).toHaveTextContent(
+      'application:validation.calendar.At least as many suitable time ranges as applied reservations per week {"applied":5,"fitting":4}'
+    );
+    expect(within(error).queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  test("lists the too short times", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2", validate: true });
+    await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
+
+    const list = within(await findError(view)).getByRole("list", {
+      name: "application:validation.calendar.tooShortTimes",
+    });
+    expect(
+      within(list)
+        .getAllByRole("listitem")
+        .map((li) => li.textContent)
+    ).toEqual(["common:weekdayLongEnum.TUESDAY 14:00-14:15, application:TimeSelector.legend.primary"]);
+  });
+
+  test("lists the times outside the opening hours", async () => {
+    const user = userEvent.setup();
+    const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
+    const view = customRender({ page: "page2", validate: true, reservationUnitOpeningHours: mondayOnly });
+    await user.click(view.getByRole("button", { name: "validate" }));
+
+    const list = within(await findError(view)).getByRole("list", {
+      name: "application:validation.calendar.outsideOpeningHoursTimes",
+    });
+    expect(
+      within(list)
+        .getAllByRole("listitem")
+        .map((li) => li.textContent)
+    ).toEqual(["common:weekdayLongEnum.WEDNESDAY 08:00-16:00, application:TimeSelector.legend.primary"]);
   });
 });
 

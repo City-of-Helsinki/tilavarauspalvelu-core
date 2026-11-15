@@ -83,6 +83,11 @@ export type ApplicationSectionPage1FormValues = z.infer<typeof ApplicationSectio
 
 export type ApplicationSectionPage2FormValues = z.infer<typeof ApplicationSectionPage2Schema>;
 
+// The error messages of the suitable times, which are also their translation keys under validation.calendar.
+export const TOO_SHORT_ERROR = "Suitable time range must be at least as long as the minimum duration";
+export const PER_WEEK_ERROR = "At least as many suitable time ranges as applied reservations per week";
+export const OUTSIDE_OPENING_HOURS_ERROR = "Suitable time range must be inside the opening hours";
+
 const ApplicationSectionPage2Schema = z
   .object({
     pk: z.number(),
@@ -103,7 +108,7 @@ const ApplicationSectionPage2Schema = z
       ctx.addIssue({
         code: "custom",
         path: ["suitableTimeRanges"],
-        message: "Suitable time range must be at least as long as the minimum duration",
+        message: TOO_SHORT_ERROR,
       });
     }
   })
@@ -116,7 +121,7 @@ const ApplicationSectionPage2Schema = z
       ctx.addIssue({
         code: "custom",
         path: ["suitableTimeRanges"],
-        message: "At least as many suitable time ranges as applied reservations per week",
+        message: PER_WEEK_ERROR,
       });
     }
   });
@@ -152,8 +157,6 @@ export const ApplicationPage2Schema = z.object({
 });
 
 export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
-
-export const OUTSIDE_OPENING_HOURS_ERROR = "Suitable time range must be inside the opening hours";
 
 /**
  * Page 2 with the times checked against each section's opening hours (by section index): every reservation unit's of

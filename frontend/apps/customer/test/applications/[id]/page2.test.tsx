@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, expect, test, describe, beforeEach } from "vitest";
 import type { ApplicationPage2Query } from "@gql/gql-types";
@@ -170,6 +170,9 @@ async function sweepDown(
   await user.keyboard(`{Shift>}${"{ArrowDown}".repeat(steps)}{/Shift}`);
 }
 
+// The error's title, its message, and the label of its list of too short times.
+const ERROR_TEXTS = 3;
+
 // errors require form context so have to test on this level
 describe("Application page2 validation errors", () => {
   test("no error messages by default", () => {
@@ -183,21 +186,28 @@ describe("Application page2 validation errors", () => {
     const view = customRender({ page: "page1" });
     await user.click(tuesdayCell(view, "14:00"));
     expect(view.getByText("application:validation.calendar.title")).toBeInTheDocument();
+    // The mocked t() appends the message's options.
     expect(
       view.getByText(
-        "application:validation.calendar.Suitable time range must be at least as long as the minimum duration"
+        /^application:validation\.calendar\.Suitable time range must be at least as long as the minimum duration/
       )
     ).toBeInTheDocument();
+    const tooShort = view.getByRole("list", { name: "application:validation.calendar.tooShortTimes" });
+    expect(
+      within(tooShort)
+        .getAllByRole("listitem")
+        .map((li) => li.textContent)
+    ).toEqual([`${TUESDAY} 14:00-14:15, application:TimeSelector.legend.primary`]);
     const validationErrors = view.getAllByText(/application:validation/);
-    // title + message nothing else
-    expect(validationErrors).toHaveLength(2);
+    // title + message + the too short times' label, nothing else
+    expect(validationErrors).toHaveLength(ERROR_TEXTS);
   });
 
   test("error message should disappear if times are long enough", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
     await user.click(tuesdayCell(view, "14:00"));
-    expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
+    expect(view.queryAllByText(/application:validation/)).toHaveLength(ERROR_TEXTS);
     // 14:00 to 16:00 is two hours
     await sweepDown(user, view, "14:15", 6);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
@@ -208,14 +218,14 @@ describe("Application page2 validation errors", () => {
     const view = customRender({ page: "page1" });
     await user.click(tuesdayCell(view, "14:00"));
     await user.click(tuesdayCell(view, "16:00"));
-    expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
+    expect(view.queryAllByText(/application:validation/)).toHaveLength(ERROR_TEXTS);
   });
 
   test("submit button should be disabled if there are errors", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
     await user.click(tuesdayCell(view, "14:00"));
-    expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
+    expect(view.queryAllByText(/application:validation/)).toHaveLength(ERROR_TEXTS);
     expect(view.getByRole("button", { name: "common:next" })).toBeDisabled();
     await sweepDown(user, view, "14:15", 6);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);

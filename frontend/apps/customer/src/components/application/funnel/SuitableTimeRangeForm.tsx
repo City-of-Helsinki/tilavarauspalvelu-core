@@ -3,6 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { primaryFill, secondaryFill } from "@ui/components/WeeklyPatternCalendar/styles";
 import { fontBold } from "@ui/styled";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
@@ -116,6 +117,12 @@ const RemoveButton = styled(Button)`
 const pad = (value: number) => value.toString().padStart(2, "0");
 const formatClock = (minutes: number) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
 
+/** A time as the list (and the calendar's error message) names it, e.g. "Tuesday 14:00-15:00". */
+export function describeTime(t: TFunction, day: Weekday, begin: number, end: number): string {
+  const dayName = t(`common:weekdayLongEnum.${day}`);
+  return `${dayName} ${formatClock(begin)}-${formatClock(end)}`;
+}
+
 function minuteOptions(begin: number, end: number): number[] {
   const options: number[] = [];
   for (let minutes = begin; minutes <= end; minutes += SUITABLE_TIME_STEP_MINUTES) {
@@ -164,9 +171,7 @@ export function SuitableTimeRangeForm({
     return null;
   };
 
-  const weekdayName = (day: Weekday) => t(`common:weekdayLongEnum.${day}`);
-  const describe = (day: Weekday, begin: number, end: number) =>
-    `${weekdayName(day)} ${formatClock(begin)}-${formatClock(end)}`;
+  const describe = (day: Weekday, begin: number, end: number) => describeTime(t, day, begin, end);
 
   const save = (next: SuitableTimeRangeFormValues[]) => {
     setValue(fieldName, next, { shouldDirty: true, shouldValidate: true, shouldTouch: true });
@@ -212,7 +217,7 @@ export function SuitableTimeRangeForm({
           <select value={weekday} onChange={(event) => setWeekday(event.target.value as Weekday)}>
             {WEEKDAYS_SORTED.map((day) => (
               <option key={day} value={day}>
-                {weekdayName(day)}
+                {t(`common:weekdayLongEnum.${day}`)}
               </option>
             ))}
           </select>
