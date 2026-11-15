@@ -858,7 +858,7 @@ describe("TimeSelector with several reservation units", () => {
     const item = (day: Weekday) =>
       items.find((li) => li.textContent?.startsWith(`common:weekdayLongEnum.${day}`)) ?? null;
     expect(item(Weekday.Tuesday)).toHaveTextContent(
-      "application:TimeSelector.legend.primary - (application:TimeSelector.form.tooShort)"
+      "application:TimeSelector.legend.primary - (application:TimeSelector.form.tooShort!)"
     );
     expect(item(Weekday.Tuesday)).toHaveAttribute("data-invalid");
     // Wednesday's 8 h primary time is long enough.
