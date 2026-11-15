@@ -744,6 +744,20 @@ describe("TimeSelector times outside the opening hours", () => {
   });
 });
 
+describe("TimeSelector preview", () => {
+  test("shows the invalid times in the error colour, and says so", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
+
+    const preview = view.getByTestId("time-selector__preview-0");
+    const invalid = [...preview.querySelectorAll("[data-invalid]")].map((el) => el.textContent);
+    // Tuesday's 15 min is too short. Wednesday's 8 h is fine.
+    expect(invalid).toEqual(["14–14:15 (application:TimeSelector.legend.invalid)"]);
+    expect(preview).toHaveTextContent("8–16");
+  });
+});
+
 describe("TimeSelector error message", () => {
   function findError(view: ReturnType<typeof render>) {
     return view.findByTestId("application__page2--notification-min-duration");

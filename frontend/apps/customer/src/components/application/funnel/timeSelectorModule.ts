@@ -115,3 +115,27 @@ export function findOutsideListed(
 ): boolean[] {
   return fromPattern(listed).map((range) => !isInsideOpeningHours([range], openingHours));
 }
+
+/**
+ * Which of the saved ranges are invalid, index for index: too short, or outside the opening hours, by the same rules
+ * as the calendar and the time list. A range is judged as part of the listed time it belongs to (see `listTimeRanges`).
+ */
+export function findInvalidRanges(
+  ranges: ReadonlyArray<SuitableTimeRangeFormValues>,
+  minDurationSeconds: number,
+  openingHours: ReservableTimeSlots
+): boolean[] {
+  const listed = listTimeRanges(ranges);
+  const tooShort = findTooShortListed(listed, minDurationSeconds);
+  const outside = findOutsideListed(listed, openingHours);
+  return toPattern(ranges).map(({ weekday, beginMinutes, endMinutes, data }) => {
+    const position = listed.findIndex(
+      (run) =>
+        run.weekday === weekday &&
+        run.data.priority === data.priority &&
+        run.beginMinutes <= beginMinutes &&
+        endMinutes <= run.endMinutes
+    );
+    return position !== -1 && (tooShort[position] === true || outside[position] === true);
+  });
+}
