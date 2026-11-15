@@ -209,7 +209,7 @@ export function TimeSelectorForm({
 
       <SuitableTimeRangeForm id={formId} index={index} openingHours={sectionOpeningHours} />
       <div data-testid={`time-selector__preview-${index}`}>
-        <TimePreview index={index} />
+        <TimePreview index={index} openingHours={sectionOpeningHours} />
       </div>
       {enableCopyCells && (
         <div>

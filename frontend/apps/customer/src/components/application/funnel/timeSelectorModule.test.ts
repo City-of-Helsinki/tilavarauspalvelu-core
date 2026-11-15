@@ -4,6 +4,7 @@ import { Priority, Weekday } from "@gql/gql-types";
 import type { SuitableTimeRangeFormValues } from "./form";
 import {
   addTimeRange,
+  findInvalidRanges,
   findOutsideListed,
   findTooShortListed,
   hasSameTimes,
@@ -82,6 +83,25 @@ describe("findTooShortListed", () => {
     ]);
     // Listed by day and time: Monday's long primary, its buffer, a lone short secondary, then Tuesday's short primary.
     expect(findTooShortListed(listed, 3600)).toEqual([false, false, true, true]);
+  });
+});
+
+describe("findInvalidRanges", () => {
+  const HOUR = 3600;
+
+  test("marks the saved ranges that are too short or outside the opening hours, index for index", () => {
+    const ranges = [
+      range(Weekday.Monday, "10:00", "11:00"),
+      range(Weekday.Monday, "12:00", "12:30"),
+      range(Weekday.Monday, "17:00", "19:00"),
+    ];
+    expect(findInvalidRanges(ranges, HOUR, weekdayOpen)).toEqual([false, true, true]);
+  });
+
+  test("judges a range as part of the time it joins", () => {
+    // Two touching halves make one long enough time.
+    const ranges = [range(Weekday.Monday, "10:00", "10:30"), range(Weekday.Monday, "10:30", "11:00")];
+    expect(findInvalidRanges(ranges, HOUR, weekdayOpen)).toEqual([false, false]);
   });
 });
 
