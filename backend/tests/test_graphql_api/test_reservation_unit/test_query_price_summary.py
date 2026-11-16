@@ -538,3 +538,31 @@ def test_reservation_unit__query__price_summary__material_price_of_the_cheapest_
 
     assert response.has_errors is False, response
     assert response.first_query_object["priceSummary"]["materialPriceDescriptionFi"] == "B"
+
+
+def test_reservation_unit__query__price_summary__material_price_without_finnish(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        material_price_description_fi="",
+        material_price_description_en="<p>Materials</p>",
+        material_price_description_sv="",
+    )
+
+    query = reservation_unit_query(
+        fields=MATERIAL_PRICE_FIELDS,
+        id=to_global_id("ReservationUnitNode", reservation_unit.pk),
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object["priceSummary"]["materialPriceDescriptionFi"] == ""
+    assert response.first_query_object["priceSummary"]["materialPriceDescriptionEn"] == "<p>Materials</p>"

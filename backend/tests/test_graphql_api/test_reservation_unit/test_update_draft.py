@@ -18,6 +18,7 @@ from utils.date_utils import local_date
 
 from tests.factories import (
     PriceComponentFactory,
+    PriceOptionFactory,
     PricingGroupFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
@@ -360,6 +361,42 @@ def test_reservation_unit__update__publish(graphql):
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.is_draft is False
+
+
+def test_reservation_unit__update__publish__only_inactive_price_option(graphql):
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=True,
+        name="foo",
+        name_fi="foo",
+        name_sv="foo",
+        name_en="foo",
+        description="foo",
+        description_fi="foo",
+        description_sv="foo",
+        description_en="foo",
+        access_types__access_type=AccessType.UNRESTRICTED,
+    )
+    price_option = PriceOptionFactory.create(is_active=False)
+    pricing_group = PricingGroupFactory.create(unit_group=price_option.unit_group)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=local_date() - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        price_option=price_option,
+        valid_from=local_date() - datetime.timedelta(days=10),
+    )
+    data = get_draft_update_input_data(reservation_unit, isDraft=False)
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.field_error_codes() == [error_codes.RESERVATION_UNIT_MISSING_PRICE]
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_draft is True
 
 
 def test_reservation_unit__update__publish__no_price(graphql):
