@@ -14,6 +14,7 @@ from .equipment_category.model import EquipmentCategory
 from .general_role.model import GeneralRole
 from .intended_use.model import IntendedUse
 from .origin_hauki_resource.model import OriginHaukiResource
+from .participant_gender.model import ParticipantGender
 from .payment_accounting.model import PaymentAccounting
 from .payment_merchant.model import PaymentMerchant
 from .payment_order.model import PaymentOrder
@@ -42,6 +43,7 @@ from .reservation_unit_type.model import ReservationUnitType
 from .resource.model import Resource
 from .sales_item.model import SalesItem
 from .space.model import Space
+from .sport.model import Sport
 from .suitable_time_range.model import SuitableTimeRange
 from .tax_level.model import TaxLevel
 from .tax_level_rate.model import TaxLevelRate
@@ -67,6 +69,7 @@ __all__ = [
     "GeneralRole",
     "IntendedUse",
     "OriginHaukiResource",
+    "ParticipantGender",
     "PaymentAccounting",
     "PaymentMerchant",
     "PaymentOrder",
@@ -96,6 +99,7 @@ __all__ = [
     "Resource",
     "SalesItem",
     "Space",
+    "Sport",
     "SuitableTimeRange",
     "TaxLevel",
     "TaxLevelRate",

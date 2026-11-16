@@ -14,6 +14,7 @@ from .general_role import GeneralRoleFactory
 from .hauki import HaukiAPIResourceFactory, HaukiAPIResourceListResponseFactory
 from .intended_use import IntendedUseFactory
 from .origin_hauki_resource import OriginHaukiResourceFactory
+from .participant_gender import ParticipantGenderFactory
 from .payment_accounting import PaymentAccountingFactory
 from .payment_merchant import PaymentMerchantFactory
 from .payment_order import PaymentOrderFactory
@@ -38,6 +39,7 @@ from .reservation_unit_type import ReservationUnitTypeFactory
 from .resource import ResourceFactory
 from .sales_item import SalesItemFactory
 from .space import SpaceFactory
+from .sport import SportFactory
 from .suitable_time_range import SuitableTimeRangeFactory
 from .tax_level import TaxLevelFactory
 from .tax_level_rate import TaxLevelRateFactory
@@ -67,6 +69,7 @@ __all__ = [
     "OrderCustomerFactory",
     "OrderFactory",
     "OriginHaukiResourceFactory",
+    "ParticipantGenderFactory",
     "PaymentAccountingFactory",
     "PaymentFactory",
     "PaymentMerchantFactory",
@@ -94,6 +97,7 @@ __all__ = [
     "ResourceFactory",
     "SalesItemFactory",
     "SpaceFactory",
+    "SportFactory",
     "SuitableTimeRangeFactory",
     "TaxLevelFactory",
     "TaxLevelRateFactory",

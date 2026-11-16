@@ -11,6 +11,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import (
+    ApplicationFormType,
     ApplicationRoundReservationCreationStatusChoice,
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,
@@ -76,6 +77,11 @@ class ApplicationRound(models.Model):
 
     handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+
+    application_form: ApplicationFormType = TextChoicesField(
+        enum=ApplicationFormType,
+        default=ApplicationFormType.DEFAULT_FORM,
+    )
 
     reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet] = models.ManyToManyField(
         "tilavarauspalvelu.ReservationUnit",

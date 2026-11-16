@@ -2970,6 +2970,16 @@ msgid "Age group"
 msgstr "Ikäryhmä"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "ApplicationFormType"
+msgid "Default form"
+msgstr "Tavallinen lomake"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationFormType"
+msgid "Sports form"
+msgstr "Liikunnan lomake"
+
+#: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
 msgid "On site"
 msgstr "Paikan päällä"
@@ -4066,6 +4076,14 @@ msgstr "aukiolosovelluksen resurssi"
 msgid "origin hauki resources"
 msgstr "aukiolosovelluksen resurssit"
 
+#: tilavarauspalvelu/models/participant_gender/model.py
+msgid "participant gender"
+msgstr "osallistujien sukupuoli"
+
+#: tilavarauspalvelu/models/participant_gender/model.py
+msgid "participant genders"
+msgstr "osallistujien sukupuolet"
+
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid "payment accounting"
 msgstr "kirjanpidon tiliöintitieto"
@@ -4346,6 +4364,14 @@ msgstr "tila"
 #: tilavarauspalvelu/models/space/model.py
 msgid "spaces"
 msgstr "tilat"
+
+#: tilavarauspalvelu/models/sport/model.py
+msgid "sport"
+msgstr "laji"
+
+#: tilavarauspalvelu/models/sport/model.py
+msgid "sports"
+msgstr "lajit"
 
 #: tilavarauspalvelu/models/suitable_time_range/model.py
 msgid "suitable time range"
