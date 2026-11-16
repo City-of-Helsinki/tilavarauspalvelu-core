@@ -197,7 +197,7 @@ describe("Application page2 validation errors", () => {
       within(tooShort)
         .getAllByRole("listitem")
         .map((li) => li.textContent)
-    ).toEqual([`${TUESDAY} 14:00-14:15, application:TimeSelector.legend.primary`]);
+    ).toEqual([`${TUESDAY} 14:00–14:15, application:TimeSelector.legend.primary`]);
     const validationErrors = view.getAllByText(/application:validation/);
     // title + message + the too short times' label, nothing else
     expect(validationErrors).toHaveLength(ERROR_TEXTS);

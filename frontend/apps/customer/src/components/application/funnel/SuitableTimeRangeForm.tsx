@@ -9,6 +9,7 @@ import { fontBold } from "@ui/styled";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
 import { priorityKey, SUITABLE_TIME_STEP_MINUTES, SUITABLE_TIME_VISIBLE_HOURS } from "ui/src/modules/suitableTimes";
+import { formatClock, formatClockRange } from "ui/src/modules/time-helpers";
 import { Weekday } from "@gql/gql-types";
 import type { ApplicationPage2FormValues, SuitableTimeRangeFormValues } from "./form";
 import {
@@ -114,13 +115,10 @@ const RemoveButton = styled(Button)`
   }
 `;
 
-const pad = (value: number) => value.toString().padStart(2, "0");
-const formatClock = (minutes: number) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
-
-/** A time as the list (and the calendar's error message) names it, e.g. "Tuesday 14:00-15:00". */
+/** A time as the list (and the calendar's error message) names it, e.g. "Tuesday 14:00–15:00". */
 export function describeTime(t: TFunction, day: Weekday, begin: number, end: number): string {
   const dayName = t(`common:weekdayLongEnum.${day}`);
-  return `${dayName} ${formatClock(begin)}-${formatClock(end)}`;
+  return `${dayName} ${formatClockRange(begin, end)}`;
 }
 
 function minuteOptions(begin: number, end: number): number[] {
