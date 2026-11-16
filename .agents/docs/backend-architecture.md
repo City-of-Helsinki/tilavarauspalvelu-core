@@ -173,6 +173,19 @@ It does not work on module-level functions.
 `template_context/` builds the data for each email type.
 Each email type has an HTML and a text template under `templates/email/`.
 
+## Celery tasks
+
+Every task is in `tilavarauspalvelu/tasks.py`. A task with `tvp_auto_create_*` options gets a periodic schedule.
+`populate_celery_tasks` syncs these schedules to the database after every `migrate`.
+
+A deploy stops the worker and the scheduler before core migrates, and starts them on the new code after core is up.
+Messages wait in Redis while the worker is down. So the new worker reads messages that the previous release sent.
+Keep every task message readable by the next release:
+
+- Keep the task `name` stable. To rename a task, add the new task and keep the old one as a wrapper that calls it.
+  Remove the old task in a later release.
+- Give each new argument a default value. Remove an argument only in a later release, after no caller sends it.
+
 ## Templates
 
 Templates for emails, admin pages, and documents. Translations go in `locale/`.
