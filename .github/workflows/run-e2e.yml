@@ -76,6 +76,8 @@ jobs:
     env:
       # report_summary.py prints times in Helsinki time, like the suite
       TZ: Europe/Helsinki
+      # The name of this attempt's reports artifact. The HTML report artifacts start with it too.
+      REPORTS: e2e-reports-${{ github.run_number }}-attempt-${{ github.run_attempt }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -126,32 +128,83 @@ jobs:
             *) pnpm exec playwright test --project "$SUITE" ;;
           esac
 
-      - name: Write summary
-        if: ${{ !cancelled() }}
-        env:
-          REPORTS_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts
-          RUN_NUMBER: ${{ github.run_number }}
-        run: |
-          found=""
-          for report in playwright-report playwright-report/notifications; do
-            if [ -f "$report/index.html" ]; then
-              python3 tools/report_summary.py "$report" --markdown >> "$GITHUB_STEP_SUMMARY"
-              found=yes
-            fi
-          done
-          if [ -n "$found" ]; then
-            echo "Screenshots, videos and error contexts: [e2e-reports-$RUN_NUMBER]($REPORTS_URL)" >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-      # HAR files and traces are for local debugging only (see e2e/README.md)
+      # HAR files and traces are for local debugging only (see e2e/README.md).
+      # Each attempt has its own artifacts. "Re-run all jobs" deletes the artifacts of the earlier attempts,
+      # "Re-run failed jobs" keeps them.
       - name: Upload reports
+        id: upload-reports
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: e2e-reports-${{ github.run_number }}
+          name: ${{ env.REPORTS }}
           path: |
             e2e/playwright-report/
             e2e/test-results/
             !e2e/test-results/**/*.har
             !e2e/test-results/**/trace.zip
           retention-days: 30
+
+      # An artifact of one unzipped file opens in the browser. It gets the file's name, so each HTML report is copied
+      # to a file with a name of its own.
+      - name: Copy the HTML reports
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p html-reports
+          if [ -f playwright-report/index.html ]; then
+            cp playwright-report/index.html "html-reports/$REPORTS.html"
+          fi
+          if [ -f playwright-report/notifications/index.html ]; then
+            cp playwright-report/notifications/index.html "html-reports/$REPORTS-notifications.html"
+          fi
+
+      # The screenshots and videos are separate files, so they are only in the zip
+      - name: Upload the HTML report
+        id: upload-html-report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: e2e/html-reports/${{ env.REPORTS }}.html
+          archive: false
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Upload the HTML report of the notification tests
+        id: upload-notifications-html-report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: e2e/html-reports/${{ env.REPORTS }}-notifications.html
+          archive: false
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Write summary
+        if: ${{ !cancelled() }}
+        env:
+          # Empty when nothing was uploaded
+          REPORTS_URL: ${{ steps.upload-reports.outputs.artifact-url }}
+          HTML_REPORT_URL: ${{ steps.upload-html-report.outputs.artifact-url }}
+          NOTIFICATIONS_HTML_REPORT_URL: ${{ steps.upload-notifications-html-report.outputs.artifact-url }}
+        run: |
+          # The links go first: the run page lists the artifacts at the bottom, below the summary
+          if [ -n "$REPORTS_URL$HTML_REPORT_URL$NOTIFICATIONS_HTML_REPORT_URL" ]; then
+            {
+              echo "**Reports**"
+              echo
+              if [ -n "$HTML_REPORT_URL" ]; then
+                echo "- [HTML report]($HTML_REPORT_URL) opens in the browser, without the screenshots and videos"
+              fi
+              if [ -n "$NOTIFICATIONS_HTML_REPORT_URL" ]; then
+                echo "- [HTML report of the notification tests]($NOTIFICATIONS_HTML_REPORT_URL) opens in the browser, without the screenshots and videos"
+              fi
+              if [ -n "$REPORTS_URL" ]; then
+                echo "- [$REPORTS]($REPORTS_URL) is a zip of everything, with the screenshots, videos and error contexts"
+              fi
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          for report in playwright-report playwright-report/notifications; do
+            if [ -f "$report/index.html" ]; then
+              python3 tools/report_summary.py "$report" --markdown >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done

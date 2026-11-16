@@ -161,7 +161,9 @@ shared users) and the workers of a parallel run (3, 4 or 5).
 
 - One run goes at a time.
 - The secrets are repository secrets with the same names.
-- The job summary lists the results. The reports are in the `e2e-reports-<run number>` artifact for 30 days.
+- The job summary links the reports and lists the results. The HTML reports open in the browser, without the
+  screenshots and videos. The `e2e-reports-<run number>-attempt-<attempt>` zip has everything. All are kept 30 days.
+- "Re-run all jobs" deletes the reports of the earlier attempts. "Re-run failed jobs" and a new run keep them.
 - Both e2e workflows (E2E checks and E2E tests) run in the official Playwright image of the `@playwright/test` version
   in `package.json`, which has the browsers. Keep that version exact, without `^`.
 
