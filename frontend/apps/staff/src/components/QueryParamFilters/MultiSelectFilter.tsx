@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import { defaultFilter, Select } from "hds-react";
@@ -50,9 +50,11 @@ function BaseMultiSelectFilter({
   const { t } = useTranslation();
   const label = t(`filters:label.${name}`);
   const placeholder = t(`filters:placeholder.${name}`);
+  const id = useId();
   return (
     <Select
       {...rest}
+      id={id}
       clearable
       multiSelect
       filter={enableSearch ? defaultFilter : undefined}

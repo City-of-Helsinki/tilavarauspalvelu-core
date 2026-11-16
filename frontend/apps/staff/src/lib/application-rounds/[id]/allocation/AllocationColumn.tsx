@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useId } from "react";
 import { addMinutes, startOfDay } from "date-fns";
 import { IconCross, Select } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
@@ -127,6 +127,8 @@ function deserializeSlot(slot: string): { day: DayT; hour: number; mins: number 
 
 function TimeSelection(): React.ReactElement {
   const { t } = useTranslation();
+  const startTimeId = useId();
+  const endTimeId = useId();
   const [selection, setSelection] = useSlotSelection();
 
   const getOptions = useCallback(
@@ -251,6 +253,7 @@ function TimeSelection(): React.ReactElement {
   return (
     <TimeSelectWrapper>
       <Select
+        id={startTimeId}
         texts={{
           label: t("allocation:startingTime"),
         }}
@@ -260,6 +263,7 @@ function TimeSelection(): React.ReactElement {
         onChange={onStartTimeChange}
       />
       <Select
+        id={endTimeId}
         texts={{
           label: t("allocation:endingTime"),
         }}

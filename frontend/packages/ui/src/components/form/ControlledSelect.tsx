@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import { defaultFilter, Select, Tooltip } from "hds-react";
@@ -73,10 +73,13 @@ export function ControlledSelect<T extends FieldValues>({
   afterChange,
   enableSearch,
   strongLabel,
+  id,
   ...rest
 }: SelectProps<T>): React.ReactElement {
   const { t, i18n } = useTranslation(["common"]);
   const language = getLocalizationLang(i18n.language);
+  // HDS Select makes its id from a module counter. That id differs between server and client, so give a stable one.
+  const generatedId = useId();
 
   const {
     field: { value, onChange },
@@ -112,6 +115,7 @@ export function ControlledSelect<T extends FieldValues>({
   return (
     <StyledControlledSelect
       {...rest}
+      id={id ?? generatedId}
       style={style}
       className={className}
       clearable={clearable ?? false}
