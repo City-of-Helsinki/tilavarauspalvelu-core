@@ -663,6 +663,17 @@ msgid ""
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
+msgid ""
+"Application form cannot be changed after the application period has begun."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid ""
+"Application form cannot be changed when the application round has "
+"applications."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Name (Finnish)"
 msgstr ""
@@ -708,6 +719,13 @@ msgstr ""
 #: tilavarauspalvelu/admin/application_round/form.py
 msgid "IntendedUses"
 msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "My applications"
+msgid "Application form"
+msgstr "Egna ansökningar"
 
 #: tilavarauspalvelu/admin/application_round/form.py
 msgctxt "ApplicationRound"
@@ -804,6 +822,12 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
 msgid "IntendedUses that are allowed in this application period."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid ""
+"Which application form is used in this application round. Cannot be changed "
+"after the application period has begun or when the round has applications."
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py

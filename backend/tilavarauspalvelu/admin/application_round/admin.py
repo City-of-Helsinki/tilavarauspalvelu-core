@@ -53,6 +53,7 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
                     "name",
                     "status",
                     "terms_of_use",
+                    "application_form",
                     "reservation_units",
                     "purposes",
                 ],

@@ -8,7 +8,7 @@ from django.db import connection
 from django.template.response import TemplateResponse
 from django.test.utils import CaptureQueriesContext
 
-from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import ApplicationFormType, TermsOfUseTypeChoices
 
 from tests.factories import ReservationPurposeFactory, TermsOfUseFactory
 
@@ -75,7 +75,12 @@ def required_reservation_unit_form_data(reservation_unit: ReservationUnit) -> di
     }
 
 
-def round_form_data(*, name: str, reservation_unit_pks: list[int]) -> dict[str, Any]:
+def round_form_data(
+    *,
+    name: str,
+    reservation_unit_pks: list[int],
+    application_form: ApplicationFormType = ApplicationFormType.DEFAULT_FORM,
+) -> dict[str, Any]:
     terms_of_use = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.RECURRING)
     purpose = ReservationPurposeFactory.create()
     return {
@@ -83,6 +88,7 @@ def round_form_data(*, name: str, reservation_unit_pks: list[int]) -> dict[str, 
         "name_en": "",
         "name_sv": "",
         "terms_of_use": terms_of_use.pk,
+        "application_form": application_form.value,
         "purposes": [purpose.pk],
         "reservation_units": reservation_unit_pks,
         "application_period_begins_at_0": "2027-01-01",

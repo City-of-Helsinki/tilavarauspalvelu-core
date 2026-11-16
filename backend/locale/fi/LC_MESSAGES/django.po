@@ -659,6 +659,17 @@ msgstr ""
 "hakijoille. <br>"
 
 #: tilavarauspalvelu/admin/application_round/form.py
+msgid ""
+"Application form cannot be changed after the application period has begun."
+msgstr "Hakulomaketta ei voi muuttaa, kun hakuaika on alkanut."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid ""
+"Application form cannot be changed when the application round has "
+"applications."
+msgstr "Hakulomaketta ei voi muuttaa, kun kierroksella on hakemuksia."
+
+#: tilavarauspalvelu/admin/application_round/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Name (Finnish)"
 msgstr "Nimi (suomeksi)"
@@ -704,6 +715,10 @@ msgstr "Käsittelyn valmistumispäivä ja -aika"
 #: tilavarauspalvelu/admin/application_round/form.py
 msgid "IntendedUses"
 msgstr "Varaustarkoitukset"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application form"
+msgstr "Hakulomake"
 
 #: tilavarauspalvelu/admin/application_round/form.py
 msgctxt "ApplicationRound"
@@ -807,6 +822,14 @@ msgstr ""
 #: tilavarauspalvelu/admin/application_round/form.py
 msgid "IntendedUses that are allowed in this application period."
 msgstr "Kausivarauskierroksella mahdolliset käyttötarkoitukset."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid ""
+"Which application form is used in this application round. Cannot be changed "
+"after the application period has begun or when the round has applications."
+msgstr ""
+"Mitä hakulomaketta tällä kausivarauskierroksella käytetään. Ei voi muuttaa, "
+"kun hakuaika on alkanut tai kierroksella on hakemuksia."
 
 #: tilavarauspalvelu/admin/application_round/form.py
 msgid "Terms of use for the application round."
