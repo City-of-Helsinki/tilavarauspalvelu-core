@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useId, useMemo } from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import { defaultFilter, Select } from "hds-react";
@@ -55,6 +55,7 @@ function BaseSelectFilter({
   const { t } = useTranslation();
   const label = t(`filters:label.${name}`);
   const placeholder = t("common:select");
+  const id = useId();
 
   const sortedOptions = useMemo(() => {
     const opts = [...options];
@@ -75,6 +76,7 @@ function BaseSelectFilter({
 
   return (
     <Select
+      id={id}
       texts={{
         label,
         placeholder,
