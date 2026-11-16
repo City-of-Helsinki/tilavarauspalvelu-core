@@ -344,6 +344,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
             root={rootRef}
             startSelector={runCellSelector(activeInfo.weekday, activeInfo.runBeginMinutes)}
             endSelector={runCellSelector(activeInfo.weekday, activeInfo.runEndMinutes - step)}
+            activeSelector={runCellSelector(activeInfo.weekday, activeInfo.beginMinutes)}
             text={activeError}
             onDismiss={dismissTooltip}
             onPointerEnter={cancelHide}
