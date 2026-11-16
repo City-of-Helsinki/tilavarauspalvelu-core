@@ -29,7 +29,7 @@ const NO_ANNOUNCEMENTS = { painted: "", erased: "" };
 
 const pad = (value: number) => value.toString().padStart(2, "0");
 
-// How long the tooltip stays after the pointer leaves the grid, so the pointer can move onto it (WCAG 1.4.13).
+// How long the tooltip stays after the pointer leaves its run, so the pointer can move onto it (WCAG 1.4.13).
 const TOOLTIP_HIDE_DELAY_MS = 200;
 
 type CellPosition = { weekday: Weekday; index: number };
@@ -150,18 +150,38 @@ function WeeklyPatternTable<TData extends CalendarData>(
   // show once the pointer leaves the calendar. Only keyboard use does, like :focus-visible, which jsdom can't tell.
   const isPointerFocus = useRef(false);
   const [dismissedRun, setDismissedRun] = useState<string | null>(null);
+  // Leaving a run whose tooltip is shown moves `hovered` on only after a delay, so the pointer can cross the cells
+  // between the run and the tooltip. The delay starts when the pointer leaves the run and isn't restarted by the cells
+  // it crosses: only the cell it ends on is kept, in `pendingHover`.
   const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const cancelHide = useCallback(() => clearTimeout(hideTimer.current), []);
-  const hideHover = useCallback(() => {
+  const pendingHover = useRef<CellPosition | null>(null);
+  const cancelHide = useCallback(() => {
     clearTimeout(hideTimer.current);
-    setHovered(null);
+    hideTimer.current = undefined;
   }, []);
+  const hoverAfterDelay = useCallback((next: CellPosition | null) => {
+    pendingHover.current = next;
+    hideTimer.current ??= setTimeout(() => {
+      hideTimer.current = undefined;
+      setHovered(keepIfSame(pendingHover.current));
+    }, TOOLTIP_HIDE_DELAY_MS);
+  }, []);
+  const hideHover = useCallback(() => {
+    cancelHide();
+    setHovered(null);
+  }, [cancelHide]);
   useEffect(() => () => clearTimeout(hideTimer.current), []);
+
+  const runKeyOf = (info: WeeklyPatternCellInfo<TData>) => `${info.weekday}:${info.runBeginMinutes}`;
+  const invalidRunAt = (position: CellPosition | null) => {
+    const info = position ? grid.cellInfo(position.weekday, position.index) : null;
+    return info && runErrorOf(info) ? runKeyOf(info) : null;
+  };
 
   const activeCell = hovered ?? focused;
   const activeInfo = activeCell ? grid.cellInfo(activeCell.weekday, activeCell.index) : null;
   const activeError = activeInfo ? runErrorOf(activeInfo) : null;
-  const activeRun = activeInfo && activeError ? `${activeInfo.weekday}:${activeInfo.runBeginMinutes}` : null;
+  const activeRun = activeInfo && activeError ? runKeyOf(activeInfo) : null;
   const dismissTooltip = useCallback(() => setDismissedRun(activeRun), [activeRun]);
   // Escape hides the tooltip of that run only. Another run, or coming back later, shows it again.
   // Reset while rendering when the run changes (React's "adjusting state on a prop change" pattern), not in an effect.
@@ -235,15 +255,18 @@ function WeeklyPatternTable<TData extends CalendarData>(
             {...tableAttributes}
             {...grid.tableHandlers}
             onPointerOver={(event) => {
-              cancelHide();
               // Touch has no hover, and a held button means a paint gesture, which the tooltip would only cover.
               const isHover = event.pointerType !== "touch" && event.buttons === 0;
-              setHovered(keepIfSame(isHover ? cellFromTarget(event.target) : null));
-            }}
-            onPointerLeave={() => {
+              const next = isHover ? cellFromTarget(event.target) : null;
+              const isTooltipShown = hovered != null && activeRun != null && activeRun !== dismissedRun;
+              if (isHover && isTooltipShown && invalidRunAt(next) !== activeRun) {
+                hoverAfterDelay(next);
+                return;
+              }
               cancelHide();
-              hideTimer.current = setTimeout(() => setHovered(null), TOOLTIP_HIDE_DELAY_MS);
+              setHovered(keepIfSame(next));
             }}
+            onPointerLeave={() => hoverAfterDelay(null)}
             // Capture, so these run before the cells' own handlers (which may move focus) and leave theirs in place.
             onPointerDownCapture={() => {
               isPointerFocus.current = true;
