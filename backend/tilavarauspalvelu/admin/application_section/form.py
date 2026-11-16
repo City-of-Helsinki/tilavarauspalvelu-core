@@ -6,7 +6,7 @@ from typing import Any
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
+from tilavarauspalvelu.enums import ApplicationFormType, ApplicationSectionStatusChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
 from utils.external_service.errors import ExternalServiceError
@@ -128,6 +128,11 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "application": _("Application"),
             "age_group": _("Age group"),
             "purpose": _("Purpose"),
+            "sport": _("Sport"),
+            "sport_other": _("Other sport"),
+            "participant_gender": _("Participant gender"),
+            "league_level": _("League level"),
+            "multiple_reservations_per_day_wish": _("Wish for multiple reservations per day"),
             "should_have_active_access_code": _("Should have active door code"),
         }
         help_texts = {
@@ -142,6 +147,11 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "application": _("Application this section is in."),
             "age_group": _("Age group for this section."),
             "purpose": _("Purpose for this section."),
+            "sport": _("Sport for this section."),
+            "sport_other": _("Sport given by the applicant when the sport is not in the list."),
+            "participant_gender": _("Gender of the participants, e.g. for dressing rooms."),
+            "league_level": _("League level of the group."),
+            "multiple_reservations_per_day_wish": _("The applicant's wish for more than one reservation per day."),
             "should_have_active_access_code": _("Should this application section have an active door code?"),
         }
 
@@ -159,6 +169,38 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             pindora_field = self.fields["pindora_response"]
             pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
             pindora_field.initial = self.get_pindora_response()
+
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean()
+
+        if self.instance.pk is not None:
+            self.validate_sports_data(cleaned_data)
+
+        return cleaned_data
+
+    def validate_sports_data(self, cleaned_data: dict[str, Any]) -> None:
+        has_sport = cleaned_data.get("sport") is not None
+        has_sport_other = bool(cleaned_data.get("sport_other", "").strip())
+
+        has_sports_data = (
+            has_sport
+            or has_sport_other
+            or cleaned_data.get("participant_gender") is not None
+            or bool(cleaned_data.get("league_level", "").strip())
+            or bool(cleaned_data.get("multiple_reservations_per_day_wish", "").strip())
+        )
+        if not has_sports_data:
+            return
+
+        application_form = self.instance.application.application_round.application_form
+        if application_form != ApplicationFormType.SPORTS_FORM:
+            msg = _("Sports data can only be given when the application round uses the sports application form.")
+            self.add_error(None, msg)
+            return
+
+        if has_sport and has_sport_other:
+            msg = _("Application section cannot have both a sport and an other sport set.")
+            self.add_error("sport_other", msg)
 
     def get_pindora_response(self) -> str | None:
         try:

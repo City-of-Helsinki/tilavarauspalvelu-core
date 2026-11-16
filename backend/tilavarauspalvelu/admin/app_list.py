@@ -71,6 +71,8 @@ ADMIN_APP_GROUPS: list[AdminAppGroup] = [
             "tilavarauspalvelu.ApplicationSection",
             "tilavarauspalvelu.ReservationUnitOption",
             "tilavarauspalvelu.AllocatedTimeSlot",
+            "tilavarauspalvelu.Sport",
+            "tilavarauspalvelu.ParticipantGender",
         ],
     ),
     AdminAppGroup(
