@@ -14,7 +14,7 @@ from tilavarauspalvelu.models import ReservationUnitImage
 from tests.factories import ReservationUnitFactory
 
 if TYPE_CHECKING:
-    from pytest_django import Settings
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
 
 # Applied to all tests
 pytestmark = [
@@ -22,22 +22,27 @@ pytestmark = [
 ]
 
 
-@mock.patch("tilavarauspalvelu.signals.update_reservation_unit_image_urls_task.delay")
+@mock.patch("tilavarauspalvelu.signals.update_reservation_unit_image_urls_task.apply_async")
 def test_reservation_unit_image__save__update_urls_called_on_save(
-    mock_update_urls: mock.MagicMock, settings: Settings
+    mock_update_urls: mock.MagicMock,
+    settings: Settings,
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
 ) -> None:
     settings.UPDATE_RESERVATION_UNIT_THUMBNAILS = True
 
     reservation_unit = ReservationUnitFactory.create()
     image = ReservationUnitImage(reservation_unit=reservation_unit, image_type=ReservationUnitImageType.MAIN)
-    image.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        image.save()
 
-    assert mock_update_urls.call_count == 1
+    assert mock_update_urls.call_args_list == [mock.call(kwargs={"pks": [image.pk]})]
 
 
-@mock.patch("tilavarauspalvelu.signals.purge_image_cache_task.delay")
+@mock.patch("tilavarauspalvelu.signals.purge_image_cache_task.apply_async")
 def test_reservation_unit_image__purge__image_cache_is_purged_on_save(
-    mock_purge_image_cache: mock.MagicMock, settings: Settings
+    mock_purge_image_cache: mock.MagicMock,
+    settings: Settings,
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
 ) -> None:
     mock_image_data = BytesIO()
     mock_image = Image.new("RGB", (100, 100))
@@ -50,7 +55,8 @@ def test_reservation_unit_image__purge__image_cache_is_purged_on_save(
         image_type=ReservationUnitImageType.MAIN,
         image=mock_file,
     )
-    runit_image.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        runit_image.save()
 
     assert mock_purge_image_cache.call_count == 0
 
@@ -60,6 +66,8 @@ def test_reservation_unit_image__purge__image_cache_is_purged_on_save(
     runit_image.refresh_from_db()
 
     runit_image.image_type = ReservationUnitImageType.OTHER
-    runit_image.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        runit_image.save()
 
-    assert mock_purge_image_cache.call_count == 4
+    assert mock_purge_image_cache.call_count == 1
+    assert len(mock_purge_image_cache.call_args.kwargs["kwargs"]["image_paths"]) == 4

@@ -148,7 +148,7 @@ def test_save_price_component_changes__sends_accounting_of_reservation_units_onc
     with patch.object(refresh_reservation_unit_accounting_task, "delay_on_commit") as mock:
         save_price_component_changes(pricing_group=pricing_group, components=[active, new], deleted_component_pks=[])
 
-    assert [call.args for call in mock.call_args_list] == [(reservation_unit.pk,)]
+    assert [call.kwargs for call in mock.call_args_list] == [{"reservation_unit_pks": [reservation_unit.pk]}]
 
 
 # ── Past components ──

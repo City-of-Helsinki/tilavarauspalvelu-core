@@ -25,11 +25,11 @@ class PricingGroupActions:
         if not settings.UPDATE_ACCOUNTING:
             return
 
-        reservation_unit_pks = (
+        reservation_unit_pks = list(
             self.pricing_group.reservation_unit_pricing_groups
             .order_by("reservation_unit_id")
             .values_list("reservation_unit_id", flat=True)
             .distinct()
         )
-        for reservation_unit_pk in reservation_unit_pks:
-            refresh_reservation_unit_accounting_task.delay_on_commit(reservation_unit_pk)
+        if reservation_unit_pks:
+            refresh_reservation_unit_accounting_task.delay_on_commit(reservation_unit_pks=reservation_unit_pks)
