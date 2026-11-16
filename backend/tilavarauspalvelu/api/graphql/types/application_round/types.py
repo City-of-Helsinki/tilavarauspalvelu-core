@@ -77,6 +77,7 @@ class ApplicationRoundNode(DjangoNode):
             "public_display_ends_at",
             "handled_at",
             "sent_at",
+            "application_form",
             "reservation_units",
             "purposes",
             "status",

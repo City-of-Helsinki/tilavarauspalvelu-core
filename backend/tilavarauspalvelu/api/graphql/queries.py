@@ -20,6 +20,7 @@ from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
 from .types.intended_use.types import IntendedUseNode
+from .types.participant_gender.types import ParticipantGenderNode
 from .types.payment_merchant.types import PaymentMerchantNode
 from .types.payment_order.types import PaymentOrderNode
 from .types.payment_product.types import PaymentProductNode
@@ -44,6 +45,7 @@ from .types.reservation_unit_type.types import ReservationUnitTypeNode
 from .types.resource.types import ResourceNode
 from .types.sales_item.types import SalesItemNode
 from .types.space.types import SpaceNode
+from .types.sport.types import SportNode
 from .types.suitable_time_range.types import SuitableTimeRangeNode
 from .types.tax_level.types import TaxLevelNode
 from .types.terms_of_use.types import TermsOfUseNode
@@ -66,6 +68,7 @@ __all__ = [
     "GeneralRoleNode",
     "HelsinkiProfileDataNode",
     "IntendedUseNode",
+    "ParticipantGenderNode",
     "PaymentMerchantNode",
     "PaymentOrderNode",
     "PaymentProductNode",
@@ -92,6 +95,7 @@ __all__ = [
     "ResourceNode",
     "SalesItemNode",
     "SpaceNode",
+    "SportNode",
     "SuitableTimeRangeNode",
     "TaxLevelNode",
     "TermsOfUseNode",

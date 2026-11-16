@@ -79,6 +79,24 @@ type Query {
     """Ordering"""
     orderBy: [ApplicationSectionOrderingChoices]
   ): ApplicationSectionNodeConnection
+  sports(
+    nameFi: String
+    nameEn: String
+    nameSv: String
+    pk: [Int]
+
+    """Ordering"""
+    orderBy: [SportOrderingChoices]
+  ): [SportNode!]
+  participantGenders(
+    nameFi: String
+    nameEn: String
+    nameSv: String
+    pk: [Int]
+
+    """Ordering"""
+    orderBy: [ParticipantGenderOrderingChoices]
+  ): [ParticipantGenderNode!]
   allocatedTimeSlots(
     first: Int
     last: Int
@@ -654,6 +672,7 @@ type ApplicationRoundNode implements Node {
   publicDisplayEndsAt: DateTime!
   handledAt: DateTime
   sentAt: DateTime
+  applicationForm: ApplicationFormType!
   reservationUnits(
     nameFi: String
     nameFi_Icontains: String
@@ -755,6 +774,15 @@ value as specified by
 [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
 """
 scalar Date
+
+"""An enumeration."""
+enum ApplicationFormType {
+  """Default form"""
+  DEFAULT_FORM
+
+  """Sports form"""
+  SPORTS_FORM
+}
 
 type ReservationUnitNode implements Node {
   extUuid: UUID!
@@ -1859,10 +1887,15 @@ type ApplicationSectionNode implements Node {
   reservationMinDuration: Duration!
   reservationMaxDuration: Duration!
   appliedReservationsPerWeek: Int!
+  sportOther: String!
+  leagueLevel: String!
+  multipleReservationsPerDayWish: String!
   application: ApplicationNode!
   purpose: ReservationPurposeNode
   ageGroup: AgeGroupNode
   priceOption: PriceOptionNode
+  sport: SportNode
+  participantGender: ParticipantGenderNode
   reservationUnitOptions(
     pk: [Int]
     preferredOrder: [Int]
@@ -2059,6 +2092,28 @@ type PriceOptionNode implements Node {
   descriptionSv: String
   isActive: Boolean!
   unitGroup: UnitGroupNode!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type SportNode implements Node {
+  rank: Int!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type ParticipantGenderNode implements Node {
+  rank: Int!
+  nameFi: String
+  nameEn: String
+  nameSv: String
 
   """The ID of the object"""
   id: ID!
@@ -2625,6 +2680,30 @@ type ApplicationSectionNodeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+"""Ordering fields for the 'Sport' model."""
+enum SportOrderingChoices {
+  rankAsc
+  rankDesc
+  nameFiAsc
+  nameFiDesc
+  nameEnAsc
+  nameEnDesc
+  nameSvAsc
+  nameSvDesc
+}
+
+"""Ordering fields for the 'ParticipantGender' model."""
+enum ParticipantGenderOrderingChoices {
+  rankAsc
+  rankDesc
+  nameFiAsc
+  nameFiDesc
+  nameEnAsc
+  nameEnDesc
+  nameSvAsc
+  nameSvDesc
 }
 
 type AllocatedTimeSlotNodeConnection {
@@ -3419,6 +3498,11 @@ input ApplicationSectionForApplicationSerializerInput {
   purpose: Int
   ageGroup: Int
   priceOption: Int
+  sport: Int
+  sportOther: String
+  participantGender: Int
+  leagueLevel: String
+  multipleReservationsPerDayWish: String
   reservationUnitOptions: [ReservationUnitOptionApplicantSerializerInput]!
   suitableTimeRanges: [SuitableTimeRangeSerializerInput]!
 }
@@ -3504,6 +3588,11 @@ input UpdateApplicationSectionForApplicationSerializerInput {
   purpose: Int
   ageGroup: Int
   priceOption: Int
+  sport: Int
+  sportOther: String
+  participantGender: Int
+  leagueLevel: String
+  multipleReservationsPerDayWish: String
   reservationUnitOptions: [UpdateReservationUnitOptionApplicantSerializerInput]
   suitableTimeRanges: [UpdateSuitableTimeRangeSerializerInput]
 }
@@ -3561,6 +3650,11 @@ type ApplicationSectionCreateMutationPayload {
   purpose: Int
   ageGroup: Int
   priceOption: Int
+  sport: Int
+  sportOther: String
+  participantGender: Int
+  leagueLevel: String
+  multipleReservationsPerDayWish: String
   reservationUnitOptions: [ReservationUnitOptionNode]
   suitableTimeRanges: [SuitableTimeRangeNode]
 }
@@ -3578,6 +3672,11 @@ input ApplicationSectionCreateMutationInput {
   purpose: Int
   ageGroup: Int
   priceOption: Int
+  sport: Int
+  sportOther: String
+  participantGender: Int
+  leagueLevel: String
+  multipleReservationsPerDayWish: String
   reservationUnitOptions: [ReservationUnitOptionApplicantSerializerInput]!
   suitableTimeRanges: [SuitableTimeRangeSerializerInput]!
 }
@@ -3595,6 +3694,11 @@ type ApplicationSectionUpdateMutationPayload {
   purpose: Int
   ageGroup: Int
   priceOption: Int
+  sport: Int
+  sportOther: String
+  participantGender: Int
+  leagueLevel: String
+  multipleReservationsPerDayWish: String
   reservationUnitOptions: [ReservationUnitOptionNode]
   suitableTimeRanges: [SuitableTimeRangeNode]
 }
@@ -3612,6 +3716,11 @@ input ApplicationSectionUpdateMutationInput {
   purpose: Int
   ageGroup: Int
   priceOption: Int
+  sport: Int
+  sportOther: String
+  participantGender: Int
+  leagueLevel: String
+  multipleReservationsPerDayWish: String
   reservationUnitOptions: [UpdateReservationUnitOptionApplicantSerializerInput]
   suitableTimeRanges: [UpdateSuitableTimeRangeSerializerInput]
 }

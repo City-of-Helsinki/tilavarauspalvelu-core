@@ -110,6 +110,7 @@ from .queries import (
     EquipmentNode,
     HelsinkiProfileDataNode,
     IntendedUseNode,
+    ParticipantGenderNode,
     PaymentOrderNode,
     PermissionCheckerType,
     PriceOptionNode,
@@ -128,6 +129,7 @@ from .queries import (
     ResourceNode,
     SalesItemNode,
     SpaceNode,
+    SportNode,
     TaxLevelNode,
     TermsOfUseNode,
     UnitAllNode,
@@ -161,6 +163,8 @@ class Query(graphene.ObjectType):
     applications = ApplicationNode.Connection()
     application_section = ApplicationSectionNode.Node()
     application_sections = ApplicationSectionNode.Connection()
+    sports = SportNode.ListField()
+    participant_genders = ParticipantGenderNode.ListField()
     allocated_time_slots = AllocatedTimeSlotNode.Connection()
     affecting_allocated_time_slots = DjangoListField(
         AllocatedTimeSlotNode,
