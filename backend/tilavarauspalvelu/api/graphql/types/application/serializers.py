@@ -14,7 +14,7 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.api.graphql.types.application_section.serializers import (
     ApplicationSectionForApplicationSerializer,
 )
-from tilavarauspalvelu.enums import ApplicationStatusChoice, ReserveeType, Weekday
+from tilavarauspalvelu.enums import ApplicationFormType, ApplicationStatusChoice, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRoundTimeSlot, ReservationUnitOption
 from tilavarauspalvelu.services.pricing.application_round_options import application_round_price_options
@@ -198,6 +198,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
 
         offered_options = application_round_price_options(self.instance.application_round)
         offered_option_pks = {option.pk for option in offered_options}
+        application_form = self.instance.application_round.application_form
 
         for section in sections:
             if not section.name:
@@ -230,6 +231,9 @@ class ApplicationSendSerializer(NestingModelSerializer):
                 error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_PRICE_OPTION_NOT_OFFERED)
                 errors.append(error)
 
+            if application_form == ApplicationFormType.SPORTS_FORM:
+                self.validate_sport(section, errors)
+
             self.validate_suitable_time_ranges(section, errors)
 
             number_of_reservation_unit_options = section.reservation_unit_options.count()
@@ -248,6 +252,20 @@ class ApplicationSendSerializer(NestingModelSerializer):
                 )
                 code = error_codes.APPLICATION_SECTION_RESERVATION_UNIT_NOT_IN_APPLICATION_ROUND
                 errors.append(ValidationError(msg, code=code))
+
+    def validate_sport(self, section: ApplicationSection, errors: ErrorList) -> None:
+        has_sport = section.sport_id is not None
+        has_sport_other = bool(section.sport_other.strip())
+
+        if has_sport and has_sport_other:
+            msg = f"Application section {section.pk} cannot have both a sport and an other sport set."
+            error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_SPORT_AND_SPORT_OTHER_BOTH_SET)
+            errors.append(error)
+
+        if not has_sport and not has_sport_other:
+            msg = f"Application section {section.pk} must have its sport set."
+            error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_SPORT_MISSING)
+            errors.append(error)
 
     def validate_suitable_time_ranges(self, section: ApplicationSection, errors: ErrorList) -> None:
         time_ranges = section.suitable_time_ranges.all()
