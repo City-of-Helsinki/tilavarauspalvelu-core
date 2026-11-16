@@ -3,8 +3,10 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import PriceUnit
@@ -47,6 +49,13 @@ class ReservationPriceLine(models.Model):
     )
 
     description: str = models.CharField(max_length=255, blank=True, default="")
+    material_price_description: str = Nh3CharField(
+        blank=True,
+        default="",
+        max_length=1000,
+        allowed_tags=settings.NH3_ALLOWED_TAGS,
+        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
 
     # Minutes in a part of a day can give a fraction, so four decimals keep `quantity * unit_amount` close to `amount`.
     quantity: Decimal = models.DecimalField(max_digits=12, decimal_places=4)
@@ -91,6 +100,9 @@ class ReservationPriceLine(models.Model):
     description_fi: str | None
     description_en: str | None
     description_sv: str | None
+    material_price_description_fi: str | None
+    material_price_description_en: str | None
+    material_price_description_sv: str | None
 
     objects: ClassVar[ReservationPriceLineManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservationPriceLineActions] = LazyModelAttribute.new()

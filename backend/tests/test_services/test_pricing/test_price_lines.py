@@ -111,6 +111,9 @@ def test_build_price_lines__hourly_price():
     assert line.description_fi == ""
     assert line.description_en == ""
     assert line.description_sv == ""
+    assert line.material_price_description_fi == ""
+    assert line.material_price_description_en == ""
+    assert line.material_price_description_sv == ""
     assert line.quantity == Decimal("1.5")
     assert line.price_unit == PriceUnit.PER_HOUR
     assert line.unit_amount == Decimal(10)
@@ -194,6 +197,35 @@ def test_build_price_lines__description_from_price_option():
     assert result.lines[0].description_fi == "Aikuiset"
     assert result.lines[0].description_en == "Adults"
     assert result.lines[0].description_sv == "Vuxna"
+
+
+def test_build_price_lines__material_price_description_from_price_component():
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1,
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=JAN_1,
+        material_price_description_fi="Materiaalit",
+        material_price_description_en="Materials",
+        material_price_description_sv="Material",
+    )
+
+    result = build_price_lines(
+        reservation_unit=reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 2, 1, 10),
+        end=local_datetime(2026, 2, 1, 11),
+    )
+
+    assert len(result.lines) == 1
+    assert result.lines[0].material_price_description_fi == "Materiaalit"
+    assert result.lines[0].material_price_description_en == "Materials"
+    assert result.lines[0].material_price_description_sv == "Material"
 
 
 def test_build_price_lines__no_pricing_group():
