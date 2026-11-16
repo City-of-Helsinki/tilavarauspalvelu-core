@@ -156,7 +156,10 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         ]
 
     # For GDPR API
-    serialize_fields = ({"name": "name"},)
+    serialize_fields = (
+        {"name": "name"},
+        {"name": "multiple_reservations_per_day_wish"},
+    )
 
     def __str__(self) -> str:
         return self.name

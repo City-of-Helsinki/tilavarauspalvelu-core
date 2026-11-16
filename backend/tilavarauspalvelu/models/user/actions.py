@@ -138,6 +138,7 @@ class UserActions:
 
         application_sections.update(
             name=SENSITIVE_APPLICATION,
+            multiple_reservations_per_day_wish=SENSITIVE_APPLICATION,
         )
         applications.update(
             additional_information=SENSITIVE_APPLICATION,

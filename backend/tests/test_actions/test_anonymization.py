@@ -100,6 +100,7 @@ def test_anonymization__application():
 
     # Section
     assert app_section.name == SENSITIVE_APPLICATION
+    assert app_section.multiple_reservations_per_day_wish == SENSITIVE_APPLICATION
 
     # Actual application
     application.refresh_from_db()
