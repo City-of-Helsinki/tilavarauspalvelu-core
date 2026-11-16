@@ -295,18 +295,16 @@ const PriorityRadioButton = styled(RadioButton)`
   }
 
   &:not(:first-of-type) {
-    margin-top: 0; /* override hds-react default margin-top */
-  }
-
-  &:last-of-type {
-    margin-top: 0; /* override hds-react default margin-top */
-    &:before {
-      background-color: var(--color-engel);
-      border: 1px solid var(--color-black);
-    }
-    &:after {
-      border-bottom: none;
-      border-top: 10px solid var(--color-black);
+    &:last-of-type {
+      margin-top: 0; /* override hds-react default margin-top */
+      &:before {
+        background-color: var(--color-engel);
+        border: 1px solid var(--color-black);
+      }
+      &:after {
+        border-bottom: none;
+        border-top: 10px solid var(--color-black);
+      }
     }
   }
 
