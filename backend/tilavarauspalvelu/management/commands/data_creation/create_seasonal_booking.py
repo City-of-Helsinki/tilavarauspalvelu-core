@@ -4,7 +4,14 @@ import datetime
 import random
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.enums import Priority, ReservationKind, ReserveeType, TermsOfUseTypeChoices, Weekday
+from tilavarauspalvelu.enums import (
+    ApplicationFormType,
+    Priority,
+    ReservationKind,
+    ReserveeType,
+    TermsOfUseTypeChoices,
+    Weekday,
+)
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
@@ -96,6 +103,12 @@ def _create_application_rounds(
     )
 
     _create_upcoming_application_rounds(
+        terms_of_use,
+        reservation_units,
+        reservation_purposes,
+    )
+
+    _create_open_sports_application_round(
         terms_of_use,
         reservation_units,
         reservation_purposes,
@@ -577,6 +590,44 @@ def _create_upcoming_application_rounds(
 
     selected_purposes = random_subset(reservation_purposes, min_size=1, max_size=min(4, len(reservation_purposes)))
     upcoming_round.purposes.add(*selected_purposes)
+
+
+@with_logs
+def _create_open_sports_application_round(
+    terms_of_use: TermsOfUse,
+    reservation_units: list[ReservationUnit],
+    reservation_purposes: list[ReservationPurpose],
+) -> None:
+    now = local_datetime()
+    today = now.date()
+
+    sports_round = ApplicationRoundBuilder().create(
+        name="Liikunnan kausivarauskierros",
+        name_fi="Liikunnan kausivarauskierros",
+        name_en="Sports application round",
+        name_sv="Ansökningsomgång för idrott",
+        #
+        application_form=ApplicationFormType.SPORTS_FORM,
+        #
+        application_period_begins_at=now - datetime.timedelta(days=1),
+        application_period_ends_at=now + datetime.timedelta(days=30),
+        #
+        reservation_period_begin_date=today + datetime.timedelta(days=100),
+        reservation_period_end_date=today + datetime.timedelta(days=150),
+        #
+        handled_at=None,
+        sent_at=None,
+        #
+        public_display_begins_at=now - datetime.timedelta(days=1),
+        public_display_ends_at=now + datetime.timedelta(days=720),
+        #
+        terms_of_use=terms_of_use,
+    )
+
+    sports_round.reservation_units.add(*reservation_units)
+
+    selected_purposes = random_subset(reservation_purposes, min_size=1, max_size=min(4, len(reservation_purposes)))
+    sports_round.purposes.add(*selected_purposes)
 
 
 @with_logs

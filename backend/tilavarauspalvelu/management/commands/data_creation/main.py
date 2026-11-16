@@ -12,8 +12,10 @@ from .create_reservation_related_things import (
     _create_age_groups,
     _create_cancellation_rules,
     _create_hauki_resources,
+    _create_participant_genders,
     _create_reservation_purposes,
     _create_specific_terms_of_use,
+    _create_sports,
     _create_tax_levels,
 )
 from .create_reservation_units import _create_reservation_units
@@ -46,6 +48,8 @@ def create_test_data(*, flush: bool = True, number_of_days_that_have_reservation
 
     reservation_purposes = _create_reservation_purposes()
     age_groups = _create_age_groups()
+    _create_sports()
+    _create_participant_genders()
 
     _create_reservations(
         reservation_purposes=reservation_purposes,
