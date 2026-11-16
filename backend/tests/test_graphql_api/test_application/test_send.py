@@ -1,16 +1,20 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import Priority, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.models import ApplicationRoundTimeSlot
+from tilavarauspalvelu.typing import TimeSlotDB
 from utils.date_utils import local_datetime, local_start_of_day, local_time
 
 from tests.factories import (
     ApplicationFactory,
+    ApplicationRoundTimeSlotFactory,
     PriceOptionFactory,
     ReservationUnitFactory,
     ReservationUnitOptionFactory,
@@ -20,6 +24,9 @@ from tests.factories import (
 from tests.helpers import patch_method
 
 from .helpers import SEND_MUTATION
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
 
 # Applied to all tests
 pytestmark = [
@@ -410,6 +417,101 @@ def test_application__send__section_suitable_time_range__two_ranges_on_same_day_
 
     assert response.has_errors is False, response.errors
 
+    application.refresh_from_db()
+    assert application.sent_at is not None
+
+
+def _set_opening_hours(reservation_unit: ReservationUnit, weekday: Weekday, *times: tuple[str, str]) -> None:
+    """Replace the reservation unit's opening hours with the given ones on the weekday, closed on other days."""
+    ApplicationRoundTimeSlot.objects.filter(reservation_unit=reservation_unit).delete()
+    if times:
+        ApplicationRoundTimeSlotFactory.create(
+            reservation_unit=reservation_unit,
+            weekday=weekday,
+            reservable_times=[TimeSlotDB(begin=begin, end=end) for begin, end in times],
+        )
+
+
+def _send_with_monday_range(graphql, begin_time: datetime.time, end_time: datetime.time, *opening_hours):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
+        application_sections__suitable_time_ranges__begin_time=begin_time,
+        application_sections__suitable_time_ranges__end_time=end_time,
+    )
+    section = application.application_sections.first()
+    reservation_unit = section.reservation_unit_options.first().reservation_unit
+    _set_opening_hours(reservation_unit, Weekday.MONDAY, *opening_hours)
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+    return application, section, response
+
+
+def test_application__send__section_suitable_time_range__inside_opening_hours(graphql):
+    application, _, response = _send_with_monday_range(
+        graphql, local_time(10, 0), local_time(11, 0), ("10:00:00", "11:00:00")
+    )
+
+    assert response.has_errors is False, response.errors
+    application.refresh_from_db()
+    assert application.sent_at is not None
+
+
+def test_application__send__section_suitable_time_range__inside_opening_hours_until_midnight(graphql):
+    application, _, response = _send_with_monday_range(
+        graphql, local_time(22, 0), datetime.time(0, 0), ("20:00:00", "00:00:00")
+    )
+
+    assert response.has_errors is False, response.errors
+    application.refresh_from_db()
+    assert application.sent_at is not None
+
+
+@pytest.mark.parametrize(
+    "opening_hours",
+    [
+        pytest.param([("12:00:00", "18:00:00")], id="outside"),
+        pytest.param([("10:30:00", "18:00:00")], id="partly outside"),
+        pytest.param([("09:00:00", "10:30:00"), ("11:00:00", "12:00:00")], id="across a closed gap"),
+        pytest.param([], id="closed"),
+    ],
+)
+def test_application__send__section_suitable_time_range__outside_opening_hours(graphql, opening_hours):
+    application, section, response = _send_with_monday_range(
+        graphql, local_time(10, 0), local_time(11, 0), *opening_hours
+    )
+
+    assert response.has_errors is True
+    assert response.field_error_messages() == [
+        (
+            f"Suitable time range for Monday 10:00-11:00 in application section {section.pk} "
+            f"is outside the opening hours of its reservation units."
+        )
+    ]
+    application.refresh_from_db()
+    assert application.sent_at is None
+
+
+def test_application__send__section_suitable_time_range__opening_hours_of_any_reservation_unit(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
+        application_sections__suitable_time_ranges__begin_time=local_time(10, 0),
+        application_sections__suitable_time_ranges__end_time=local_time(12, 0),
+    )
+    section = application.application_sections.first()
+    first_unit = section.reservation_unit_options.first().reservation_unit
+    other_unit = ReservationUnitFactory.create()
+    ReservationUnitOptionFactory.create(application_section=section, reservation_unit=other_unit, preferred_order=2)
+    application.application_round.reservation_units.add(other_unit)
+
+    # Neither is open for the whole range, but together they are, back to back.
+    _set_opening_hours(first_unit, Weekday.MONDAY, ("09:00:00", "11:00:00"))
+    _set_opening_hours(other_unit, Weekday.MONDAY, ("11:00:00", "13:00:00"))
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is False, response.errors
     application.refresh_from_db()
     assert application.sent_at is not None
 
