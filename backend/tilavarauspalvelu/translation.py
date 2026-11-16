@@ -134,7 +134,7 @@ class PricingGroupTranslationOptions(TranslationOptions):
 
 @register_lazy(ReservationPriceLine)
 class ReservationPriceLineTranslationOptions(TranslationOptions):
-    fields = ["description"]
+    fields = ["description", "material_price_description"]
 
 
 @register_lazy(ReservationUnitPricing)
