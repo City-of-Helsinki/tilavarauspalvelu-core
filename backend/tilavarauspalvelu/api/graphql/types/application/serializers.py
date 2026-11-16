@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import operator
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
@@ -15,14 +16,24 @@ from tilavarauspalvelu.api.graphql.types.application_section.serializers import 
 )
 from tilavarauspalvelu.enums import ApplicationStatusChoice, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
+from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRoundTimeSlot, ReservationUnitOption
 from tilavarauspalvelu.services.pricing.application_round_options import application_round_price_options
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import TimeSlot, local_datetime, local_timedelta_string, merge_time_slots, time_difference
+from utils.date_utils import (
+    TimeSlot,
+    end_time_as_timedelta,
+    local_datetime,
+    local_timedelta_string,
+    merge_time_slots,
+    time_as_timedelta,
+    time_difference,
+)
 from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, User
+    from collections.abc import Iterable
+
+    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, SuitableTimeRange, User
     from tilavarauspalvelu.typing import AnyUser, ErrorList
 
 __all__ = [
@@ -274,6 +285,64 @@ class ApplicationSendSerializer(NestingModelSerializer):
                 )
                 error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT)
                 errors.append(error)
+
+        self.validate_suitable_time_ranges_inside_opening_hours(section, time_ranges, errors)
+
+    def validate_suitable_time_ranges_inside_opening_hours(
+        self,
+        section: ApplicationSection,
+        time_ranges: Iterable[SuitableTimeRange],
+        errors: ErrorList,
+    ) -> None:
+        """
+        Check that each suitable time range is inside the current opening hours of the section's reservation units.
+
+        A time that any of the section's reservation units is open can be applied for, so their opening hours are
+        combined, as in the customer UI. A range must fit inside one contiguous opening, it can't span a closed gap.
+        """
+        if not section.reservation_unit_options.exists():
+            return  # Reported as missing reservation unit options, every range would be outside opening hours too.
+
+        open_slots: dict[Weekday, list[TimeSlot]] = defaultdict(list)
+        opening_hours = ApplicationRoundTimeSlot.objects.filter(
+            reservation_unit__reservation_unit_options__application_section=section,
+            is_closed=False,
+        )
+        for opening in opening_hours:
+            for reservable_time in opening.reservable_times:
+                timeslot = TimeSlot(
+                    begin_time=datetime.time.fromisoformat(reservable_time["begin"]),
+                    end_time=datetime.time.fromisoformat(reservable_time["end"]),
+                )
+                open_slots[Weekday(opening.weekday)].append(timeslot)
+
+        for weekday in list(open_slots):
+            ordered_time_slots = sorted(open_slots[weekday], key=lambda slot: time_as_timedelta(slot["begin_time"]))
+            open_slots[weekday] = merge_time_slots(ordered_time_slots)
+
+        weekdays = list(Weekday)
+        ordered_time_ranges = sorted(
+            time_ranges,
+            key=lambda time_range: (weekdays.index(Weekday(time_range.day_of_the_week)), time_range.begin_time),
+        )
+        for time_range in ordered_time_ranges:
+            weekday = Weekday(time_range.day_of_the_week)
+            begin = time_as_timedelta(time_range.begin_time)
+            end = end_time_as_timedelta(time_range.end_time)
+            is_open = any(
+                time_as_timedelta(slot["begin_time"]) <= begin and end <= end_time_as_timedelta(slot["end_time"])
+                for slot in open_slots[weekday]
+            )
+            if is_open:
+                continue
+
+            msg = (
+                f"Suitable time range for {weekday.label} {time_range.begin_time.isoformat(timespec='minutes')}-"
+                f"{time_range.end_time.isoformat(timespec='minutes')} in application section {section.pk} "
+                f"is outside the opening hours of its reservation units."
+            )
+            code = error_codes.APPLICATION_SECTION_SUITABLE_TIME_RANGES_OUTSIDE_OPENING_HOURS
+            errors.append(ValidationError(msg, code=code))
 
     def validate_applicant(self, errors: ErrorList) -> None:
         """Validate applicant differently based on applicant type."""

@@ -61,6 +61,7 @@
       "APPLICATION_APPLICANT_TYPE_MISSING": "Applicant type is missing.",
       "APPLICATION_SECTIONS_MISSING": "Application section is missing.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Suitable times are missing.",
+      "APPLICATION_SECTION_SUITABLE_TIME_RANGES_OUTSIDE_OPENING_HOURS": "The desired time is outside the opening hours.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "The desired time is too short.",
       "APPLICATION_STATUS_CANNOT_SEND": "Application cannot be sent.",
       "CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed",

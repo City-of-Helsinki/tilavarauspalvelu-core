@@ -61,6 +61,7 @@
       "APPLICATION_APPLICANT_TYPE_MISSING": "Hakijan tyyppi puuttuu.",
       "APPLICATION_SECTIONS_MISSING": "Hakemusosio puuttuu.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Sopivat ajat puuttuvat.",
+      "APPLICATION_SECTION_SUITABLE_TIME_RANGES_OUTSIDE_OPENING_HOURS": "Toivottu aika on aukioloaikojen ulkopuolella.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Toivottu aika on liian lyhyt.",
       "APPLICATION_STATUS_CANNOT_SEND": "Hakemusta ei voi lähettää.",
       "CANCELLATION_NOT_ALLOWED": "Peruutus ei ole sallittu",

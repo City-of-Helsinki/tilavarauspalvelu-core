@@ -8,6 +8,7 @@ from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice, MunicipalityChoice, Priority, ReserveeType, Weekday
 from tilavarauspalvelu.models import Application, ReservationUnit
+from tilavarauspalvelu.typing import TimeSlotDB
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
@@ -201,6 +202,18 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             reservation_unit_options__application_section__application=application,
         )
         application_round.reservation_units.add(*reservation_units)
+
+        # Suitable time ranges must be inside the reservation units' opening hours, so open any without them all day.
+        from .application_round_time_slot import ApplicationRoundTimeSlotFactory
+
+        all_day = [TimeSlotDB(begin="00:00:00", end="00:00:00")]
+        for reservation_unit in reservation_units.filter(application_round_time_slots__isnull=True):
+            for weekday in Weekday:
+                ApplicationRoundTimeSlotFactory.create(
+                    reservation_unit=reservation_unit,
+                    weekday=weekday,
+                    reservable_times=all_day,
+                )
         return application
 
     @classmethod
