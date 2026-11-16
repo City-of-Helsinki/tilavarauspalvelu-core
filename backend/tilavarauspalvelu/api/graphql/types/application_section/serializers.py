@@ -57,6 +57,11 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             "purpose",
             "age_group",
             "price_option",
+            "sport",
+            "sport_other",
+            "participant_gender",
+            "league_level",
+            "multiple_reservations_per_day_wish",
             "reservation_unit_options",
             "suitable_time_ranges",
         ]

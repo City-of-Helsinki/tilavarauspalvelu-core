@@ -138,6 +138,42 @@ def test_application_section__query__relations(graphql):
     }
 
 
+def test_application_section__query__sports_form_fields(graphql):
+    section = ApplicationSectionFactory.create_in_status_unallocated(
+        sport__name="Jalkapallo",
+        participant_gender__name="Naiset",
+        league_level="3. divisioona",
+        multiple_reservations_per_day_wish="Kaksi vuoroa lauantaisin",
+    )
+    graphql.login_with_superuser()
+
+    fields = """
+        pk
+        sport {
+            nameFi
+        }
+        sportOther
+        participantGender {
+            nameFi
+        }
+        leagueLevel
+        multipleReservationsPerDayWish
+    """
+    query = sections_query(fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {
+        "pk": section.pk,
+        "sport": {"nameFi": "Jalkapallo"},
+        "sportOther": "",
+        "participantGender": {"nameFi": "Naiset"},
+        "leagueLevel": "3. divisioona",
+        "multipleReservationsPerDayWish": "Kaksi vuoroa lauantaisin",
+    }
+
+
 def test_application_section__query__statuses__query_count(graphql):
     ApplicationSectionFactory.create_in_status_handled()
     ApplicationSectionFactory.create_in_status_in_allocation()

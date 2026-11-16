@@ -5,6 +5,7 @@ import datetime
 import pytest
 
 from tilavarauspalvelu.enums import (
+    ApplicationFormType,
     ApplicationRoundReservationCreationStatusChoice,
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,
@@ -47,6 +48,7 @@ def test_application_round_query__all_fields(graphql):
         publicDisplayEndsAt
         handledAt
         sentAt
+        applicationForm
         reservationUnits {
             nameFi
         }
@@ -90,6 +92,7 @@ def test_application_round_query__all_fields(graphql):
         "publicDisplayEndsAt": application_round.public_display_ends_at.astimezone(datetime.UTC).isoformat(),
         "handledAt": None,
         "sentAt": None,
+        "applicationForm": ApplicationFormType.DEFAULT_FORM,
         "reservationUnits": [],
         "purposes": [],
         "termsOfUse": {"nameFi": application_round.terms_of_use.name_fi},
