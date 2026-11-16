@@ -297,6 +297,26 @@ describe("PricingSection for a reservation unit with a saved price", () => {
     expect(within(newPricing).getByRole("spinbutton", { name: nameLike("label.price") })).toHaveValue(20);
   });
 
+  it("shows the pricing terms for a saved current price that has a discount", async () => {
+    const [current, future] = createReadOnlyPricingList();
+    if (current == null || future == null) {
+      throw new Error("Expected a current and a future price");
+    }
+    render(
+      <Harness overrides={{ pricings: [{ ...current, canApplyForDiscount: true }, future], pricingTerms: null }} />
+    );
+    await openAccordion();
+
+    expect(screen.getByRole("button", { name: /^label\.pricingTerms/ })).toBeInTheDocument();
+  });
+
+  it("shows no pricing terms for a saved current price without a discount", async () => {
+    render(<Harness overrides={{ pricings: createReadOnlyPricingList(), pricingTerms: null }} />);
+    await openAccordion();
+
+    expect(screen.queryByRole("button", { name: /^label\.pricingTerms/ })).not.toBeInTheDocument();
+  });
+
   it("shows a notice and no prices for a shared pricing group", async () => {
     render(<Harness overrides={{ isSharedPricingGroup: true }} />);
     await openAccordion();

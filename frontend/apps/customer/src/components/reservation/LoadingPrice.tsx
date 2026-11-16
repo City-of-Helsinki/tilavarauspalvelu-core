@@ -13,14 +13,15 @@ type LoadingPriceProps = Readonly<{
   isLoading: boolean;
 }>;
 
-/// While a new price loads, the previous price stays in its place grayed out, so that the layout does not jump
+/// While a new price loads, the previous price stays in its place grayed out, so that the layout does not jump.
+/// The price is a polite live region, so a screen reader reads the new price when it has loaded.
 export function LoadingPrice({ price, isLoading }: LoadingPriceProps): React.ReactElement | null {
   const { t } = useTranslation();
   if (price == null) {
     return isLoading ? <LoadingSpinner small loadingText={t("prices:loading")} /> : null;
   }
   return (
-    <PriceText $isLoading={isLoading} aria-busy={isLoading}>
+    <PriceText $isLoading={isLoading} aria-live="polite" aria-busy={isLoading}>
       {price}
     </PriceText>
   );

@@ -203,6 +203,24 @@ describe("convertReservationUnit", () => {
     ]);
   });
 
+  it("adds an editable current price when the reservation unit has only a future price", () => {
+    const future = createPriceComponent({ id: "PriceComponentNode:2", pk: 2, validFrom: FUTURE_DATE, amount: "20.00" });
+    const data = {
+      reservationUnitPricingGroups: [
+        {
+          id: "ReservationUnitPricingGroupNode:1",
+          begins: "2020-01-01",
+          pricingGroup: { id: "PricingGroupNode:1", unitGroup: null, components: [future] },
+        },
+      ],
+    } as unknown as QueryData;
+    const values = convertReservationUnit(data);
+    expect(values.pricings.map((p) => [p.pk, p.isFuture, p.isReadOnly])).toEqual([
+      [-1, false, false],
+      [2, true, false],
+    ]);
+  });
+
   it("does not read the prices of a shared pricing group", () => {
     const values = convertReservationUnit(createPricingQueryData({ isShared: true }));
     expect(values.isSharedPricingGroup).toBe(true);
@@ -542,6 +560,16 @@ describe("ReservationUnitEditSchema", () => {
     const values = createValidFormValues({ isSharedPricingGroup: true });
     values.pricings[0] = { ...at(values.pricings, 0), isPaid: null };
     expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
+  });
+
+  it("rejects a negative paid price in a draft", () => {
+    const values = createValidFormValues({ isDraft: true });
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, price: -5 };
+    const result = ReservationUnitEditSchema.safeParse(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map((i) => i.path.join("."))).toContain("pricings.0.price");
+    }
   });
 
   it("does not require the choice of paid or free in a draft", () => {

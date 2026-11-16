@@ -576,6 +576,22 @@ export const ReservationUnitEditSchema = z
       }
     }
 
+    // A paid price that is not above zero is saved as free, so a negative price is an error in a draft too
+    for (let i = 0; i < v.pricings.length; i++) {
+      const pricing = v.pricings[i];
+      const isSent = !v.isSharedPricingGroup && (!pricing?.isFuture || v.hasFuturePricing);
+      if (pricing == null || pricing.isReadOnly || !isSent || !pricing.isPaid) {
+        continue;
+      }
+      if (pricing.price < 0) {
+        ctx.addIssue({
+          message: "Number must be greater than or equal to 0",
+          path: [`pricings.${i}.price`],
+          code: "custom",
+        });
+      }
+    }
+
     if (v.isDraft) {
       return;
     }
@@ -815,7 +831,7 @@ function createNewPricing(pk: number, isFuture: boolean): PricingFormValues {
 
 /// The form has the current price and at least one future price, because the frontend can not add prices.
 /// Negative pks are new prices.
-/// A new current price is only possible when the reservation unit has no prices yet.
+/// A new current price is only possible when the reservation unit has no price in effect today.
 /// A saved price can only begin in the future.
 function convertPricingList(data: Node | undefined): PricingFormValues[] {
   if (data == null) {
@@ -826,8 +842,9 @@ function convertPricingList(data: Node | undefined): PricingFormValues[] {
     ...(current != null ? [convertPriceComponent(current, false)] : []),
     ...futureList.map((component) => convertPriceComponent(component, true)),
   ];
-  if (prices.length === 0) {
-    prices.push(createNewPricing(-1, false));
+  // Without a price today, for example a draft with only a future price, staff must be able to add one to publish
+  if (current == null) {
+    prices.unshift(createNewPricing(-1, false));
   }
   if (!prices.some((p) => p.isFuture)) {
     prices.push(createNewPricing(-2, true));
