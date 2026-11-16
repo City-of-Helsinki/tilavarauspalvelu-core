@@ -1,6 +1,7 @@
 import { addDays, addMonths, addYears } from "date-fns";
 import { createNodeId } from "ui/src/modules/helpers";
 import {
+  ApplicationFormType,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
   ApplicationSectionStatusChoice,
@@ -289,6 +290,7 @@ export function createMockApplicationRound({
     applicationPeriodBeginsAt: applicationPeriodBeginsAt.toISOString(),
     applicationPeriodEndsAt: applicationPeriodEndsAt.toISOString(),
     status,
+    applicationForm: ApplicationFormType.DefaultForm,
     reservationUnits,
     applicationsCount: 0, // Scalars["Int"]["output"];
     criteriaEn: null, // Maybe<Scalars["String"]["output"]>;
