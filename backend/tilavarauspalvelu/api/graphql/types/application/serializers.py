@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import IntegerPrimaryKeyField
+from graphene_django_extensions.serializers import NotProvided
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -116,7 +117,20 @@ class ApplicationCreateSerializer(NestingModelSerializer):
         section_count = len(data.get("application_sections", []))
         Application.validators.validate_not_too_many_sections(section_count)
 
+        self.validate_active_members_allowed_by_form(application_round, data)
+
         return data
+
+    def validate_active_members_allowed_by_form(
+        self, application_round: ApplicationRound, data: dict[str, Any]
+    ) -> None:
+        organisation_active_members: int | None = self.get_or_default("organisation_active_members", data)
+        if organisation_active_members is None or organisation_active_members is NotProvided:
+            return
+
+        if application_round.application_form != ApplicationFormType.SPORTS_FORM:
+            msg = "Active members can only be given when the application round uses the sports application form."
+            raise ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_ACTIVE_MEMBERS_NOT_ALLOWED)
 
 
 class ApplicationUpdateSerializer(ApplicationCreateSerializer):
@@ -136,6 +150,8 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
 
         section_count = len(data.get("application_sections", []))
         Application.validators.validate_not_too_many_sections(section_count)
+
+        self.validate_active_members_allowed_by_form(application_round, data)
 
         return data
 

@@ -44,7 +44,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
     organisation_email = FakerFI("ascii_email")
     organisation_identifier = FakerFI("company_business_id")
     organisation_year_established = fuzzy.FuzzyInteger(low=2000, high=2025)
-    organisation_active_members = fuzzy.FuzzyInteger(low=1, high=500)
+    organisation_active_members = None
     organisation_core_business = FakerFI("sentence")
     organisation_street_address = FakerFI("address")
     organisation_post_code = FakerFI("postcode")
