@@ -15,6 +15,7 @@ from .models import (
     Equipment,
     EquipmentCategory,
     IntendedUse,
+    ParticipantGender,
     PriceComponent,
     PriceOption,
     PricingGroup,
@@ -27,6 +28,7 @@ from .models import (
     ReservationUnitType,
     Resource,
     Space,
+    Sport,
     TaxLevel,
     TermsOfUse,
     Unit,
@@ -82,6 +84,11 @@ class EquipmentCategoryTranslationOptions(TranslationOptions):
 
 @register_lazy(IntendedUse)
 class IntendedUseTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register_lazy(ParticipantGender)
+class ParticipantGenderTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
@@ -149,6 +156,11 @@ class ResourceTranslationOptions(TranslationOptions):
 
 @register_lazy(Space)
 class SpaceTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register_lazy(Sport)
+class SportTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 

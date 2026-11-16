@@ -797,6 +797,21 @@ class ReservationFormType(models.TextChoices):
     """Asks for user's age group, in addition to contact and reservee information, and purpose of use."""
 
 
+class ApplicationFormType(models.TextChoices):
+    """Application forms that an application round can use."""
+
+    DEFAULT_FORM = (
+        "DEFAULT_FORM",
+        pgettext_lazy("ApplicationFormType", "Default form"),
+    )
+
+    SPORTS_FORM = (
+        "SPORTS_FORM",
+        pgettext_lazy("ApplicationFormType", "Sports form"),
+    )
+    """Asks for the sport and the group details of each application section."""
+
+
 class PaymentType(models.TextChoices):
     ON_SITE = "ON_SITE", pgettext_lazy("PaymentType", "On site")
     ONLINE = "ONLINE", pgettext_lazy("PaymentType", "Online")

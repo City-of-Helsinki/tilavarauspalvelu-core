@@ -24,9 +24,11 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
         AgeGroup,
         Application,
+        ParticipantGender,
         PriceOption,
         ReservationPurpose,
         ReservationUnitOption,
+        Sport,
         SuitableTimeRange,
     )
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
@@ -61,6 +63,11 @@ class ApplicationSection(SerializableModelMixin, models.Model):
     reservation_max_duration: datetime.timedelta = models.DurationField()
     applied_reservations_per_week: int = models.PositiveIntegerField()
 
+    # Sports application form
+    sport_other: str = models.CharField(max_length=255, blank=True, default="")
+    league_level: str = models.CharField(max_length=255, blank=True, default="")
+    multiple_reservations_per_day_wish: str = models.TextField(blank=True, default="")
+
     application: Application = models.ForeignKey(
         "tilavarauspalvelu.Application",
         related_name="application_sections",
@@ -82,6 +89,20 @@ class ApplicationSection(SerializableModelMixin, models.Model):
     )
     price_option: PriceOption | None = models.ForeignKey(
         "tilavarauspalvelu.PriceOption",
+        related_name="application_sections",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+    )
+    sport: Sport | None = models.ForeignKey(
+        "tilavarauspalvelu.Sport",
+        related_name="application_sections",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+    )
+    participant_gender: ParticipantGender | None = models.ForeignKey(
+        "tilavarauspalvelu.ParticipantGender",
         related_name="application_sections",
         on_delete=models.PROTECT,
         blank=True,

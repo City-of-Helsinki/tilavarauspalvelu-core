@@ -50,6 +50,8 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
     purpose = ForeignKeyFactory("tests.factories.ReservationPurposeFactory", required=True)
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory", required=True)
     price_option = ForeignKeyFactory("tests.factories.PriceOptionFactory")
+    sport = ForeignKeyFactory("tests.factories.SportFactory")
+    participant_gender = ForeignKeyFactory("tests.factories.ParticipantGenderFactory")
 
     reservation_unit_options = ReverseForeignKeyFactory("tests.factories.ReservationUnitOptionFactory")
     suitable_time_ranges = ReverseForeignKeyFactory("tests.factories.SuitableTimeRangeFactory")

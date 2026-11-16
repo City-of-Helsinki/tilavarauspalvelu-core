@@ -2902,6 +2902,16 @@ msgid "Age group"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "ApplicationFormType"
+msgid "Default form"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationFormType"
+msgid "Sports form"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
 msgid "On site"
 msgstr ""
@@ -3994,6 +4004,14 @@ msgstr ""
 msgid "origin hauki resources"
 msgstr ""
 
+#: tilavarauspalvelu/models/participant_gender/model.py
+msgid "participant gender"
+msgstr ""
+
+#: tilavarauspalvelu/models/participant_gender/model.py
+msgid "participant genders"
+msgstr ""
+
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid "payment accounting"
 msgstr ""
@@ -4273,6 +4291,14 @@ msgstr ""
 
 #: tilavarauspalvelu/models/space/model.py
 msgid "spaces"
+msgstr ""
+
+#: tilavarauspalvelu/models/sport/model.py
+msgid "sport"
+msgstr ""
+
+#: tilavarauspalvelu/models/sport/model.py
+msgid "sports"
 msgstr ""
 
 #: tilavarauspalvelu/models/suitable_time_range/model.py
