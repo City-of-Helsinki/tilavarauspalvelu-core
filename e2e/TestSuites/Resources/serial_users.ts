@@ -1,7 +1,8 @@
 /**
  * Shared user data. The testData fixture (TestSuites/test-data.ts) uses these users:
- * - in sequential mode (FORCE_SINGLE_USER=True or one worker), where all tests share them
- * - in tests without a data set tag, like the notification tests
+ * - in sequential mode (FORCE_SINGLE_USER=True or one worker, like the notification suite's run), where all tests
+ *   share them
+ * - in tests without a data set tag
  * In parallel runs, the other tests get their own users from test_users.ts.
  */
 
