@@ -28,7 +28,9 @@ import {
 import { Session } from "../lib/session";
 import { Booking } from "../TestSuites/booking";
 import { Pages } from "../TestSuites/pages";
+import { staffRenderOutcome } from "../TestSuites/PO/Admin/admin_landingpage";
 import { isConfirmedReservationUrl } from "../TestSuites/PO/Common/checkout";
+import { slotsToPickFrom } from "../TestSuites/PO/User/quick_reservation";
 import { python_keywords } from "../TestSuites/Resources/python_keywords";
 import { BASIC_PERMISSION_TARGET_ADMIN, BASIC_USER_MALE } from "../TestSuites/Resources/serial_users";
 import { ANDROID_UNITS, COMBINED_UNITS, DESKTOP_UNITS } from "../TestSuites/Resources/suite_specific_units";
@@ -36,6 +38,13 @@ import { PLATFORMS, USER_DATA_SETS } from "../TestSuites/Resources/test_users";
 import { platformOf, resolveTestData } from "../TestSuites/test-data";
 
 const dataPage = (html: string) => `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+
+/** A time on 12.11.2026, in milliseconds */
+const timeOn12Nov = (hours: number, minutes: number) => new Date(2026, 10, 12, hours, minutes).getTime();
+
+/** A page of the staff app: its heading, and the server render data that Next.js puts in the page */
+const staffPage = (heading: string, props: object) =>
+  `<h1>${heading}</h1><script id="__NEXT_DATA__" type="application/json">${JSON.stringify({ props })}</script>`;
 
 /** A keyword that fails, to see what `@step` does with the error. */
 class FailingKeywords {
@@ -237,6 +246,40 @@ test.describe("Runtime", () => {
     expect(times.size).toBe(30);
   });
 
+  test("Get Modified Date And Time never gives a start hour of 23, at any time of the day", async () => {
+    // The staff form has one date and refuses 23:00 to 00:00.
+    // A run between 00:00 and 05:00 can draw a start hour of 23.
+    for (let hour = 0; hour < 24; hour++) {
+      // A new state for each hour: a test is never given the same day and hour twice
+      const { dataModification } = new Pages();
+      for (let call = 0; call < 20; call++) {
+        // oxlint-disable-next-line no-await-in-loop -- each call has to see the days and hours of the calls before it
+        const [, start_hour, end_hour] = await dataModification.getModifiedDateAndTime(
+          new Date(2026, 10, 13, hour, 13)
+        );
+        expect(Number(start_hour), `The start hour of a run at ${hour}:13`).toBeLessThan(23);
+        expect(Number(end_hour), `The end hour of a run at ${hour}:13`).toBe(Number(start_hour) + 1);
+      }
+    }
+  });
+
+  test("The quick reservation picks only slots that end before midnight", () => {
+    const date = "12.11.2026";
+    // At 11:50 the slots from 12:20 on are 30 minutes ahead, so 12:15 is left out
+    expect(slotsToPickFrom(["12:15", "12:30", "12:45", "13:00"], date, timeOn12Nov(11, 50), 60)).toEqual([1, 2, 3]);
+    // A 60 min booking from 23:00 ends at midnight, so 22:45 is the last start
+    expect(slotsToPickFrom(["22:30", "22:45", "23:00", "23:15", "23:30"], date, timeOn12Nov(21, 0), 60)).toEqual([
+      0, 1,
+    ]);
+    expect(slotsToPickFrom(["22:15", "22:30", "22:45", "23:00"], date, timeOn12Nov(22, 0), 60)).toEqual([1, 2]);
+    // At 22:20 none is 30 minutes ahead, so all the slots that end before midnight are used
+    expect(slotsToPickFrom(["22:30", "22:45", "23:00", "23:15"], date, timeOn12Nov(22, 20), 60)).toEqual([0, 1]);
+    // At 23:10 every slot ends at midnight or later
+    expect(slotsToPickFrom(["23:15", "23:30", "23:45"], date, timeOn12Nov(23, 10), 60)).toEqual([]);
+    // A 30 min booking can start later: 23:15 ends at 23:45
+    expect(slotsToPickFrom(["23:15", "23:30", "23:45"], date, timeOn12Nov(23, 10), 30)).toEqual([0]);
+  });
+
   test("Python keywords give the same results as python_keywords.py", () => {
     expect(python_keywords.convert_booking_time_to_ics("Ti 1.10.2024 klo 10:30–11:30")).toEqual([
       "DTSTART;TZID=Europe/Helsinki:20241001T103000",
@@ -271,6 +314,16 @@ test.describe("Runtime", () => {
     ]) {
       expect(isConfirmedReservationUrl(new URL(path, site)), path).toBe(true);
     }
+  });
+
+  test("The staff render data tells a failed server render from a missing session", () => {
+    // No session: the queries succeed, so the page has handling variables, as the test environment's landing page does
+    expect(staffRenderOutcome({ hasUser: false, hasHandlingVariables: true })).toBe("no session");
+    // A failed query: no user and no handling variables, though the session may be valid
+    expect(staffRenderOutcome({ hasUser: false, hasHandlingVariables: false })).toBe("server render failed");
+    expect(staffRenderOutcome({ hasUser: true, hasHandlingVariables: true })).toBe("logged in");
+    // No data: the page is being replaced, or isn't a staff page
+    expect(staffRenderOutcome(null)).toBe("unknown");
   });
 
   test("Tags choose the test data", () => {
@@ -609,6 +662,46 @@ test.describe("Runtime", () => {
       server.close();
     }
   });
+
+  testWithBrowser(
+    "The admin landing page is reloaded once when its server render failed",
+    async ({ browser, context, page }, info) => {
+      const session = new Session({ browser, context, page }, info);
+      const { adminLandingpage } = new Pages(session);
+      await session.openPage();
+      // A failed render leaves no user and no handling variables
+      const greeted = staffPage("Tervetuloa, Hannu!", {
+        currentUser: { pk: 1 },
+        handlingVariables: { state: "REQUIRES_HANDLING" },
+      });
+      const failed = staffPage("Tilavarauskäsittely", {
+        currentUser: null,
+        handlingData: null,
+        handlingVariables: null,
+      });
+      let loads = 0;
+      await page.route(/^https:\/\/staff\.test\//, (route) => {
+        if (route.request().resourceType() !== "document") {
+          return route.fulfill({ status: 204 });
+        }
+        loads++;
+        // The second load is the one whose server render fails
+        return route.fulfill({ contentType: "text/html; charset=utf-8", body: loads === 2 ? failed : greeted });
+      });
+
+      // A page that greets the admin is not reloaded
+      await page.goto("https://staff.test/");
+      await adminLandingpage.checksTheAdminLandingPageH1("Tervetuloa, ");
+      expect(loads).toBe(1);
+
+      // After a failed render the page is reloaded once, and the report gets a warning
+      await page.goto("https://staff.test/");
+      await adminLandingpage.checksTheAdminLandingPageH1("Tervetuloa, ");
+      expect(loads).toBe(3);
+      expect(info.annotations.filter((annotation) => annotation.type === "warning")).toHaveLength(1);
+      await session.close();
+    }
+  );
 
   testWithBrowser("Backend errors are recorded for the report", async ({ context, page }) => {
     // The server answers like a failing backend: a 500, GraphQL errors, a slow answer, the apps' 503 page (served
