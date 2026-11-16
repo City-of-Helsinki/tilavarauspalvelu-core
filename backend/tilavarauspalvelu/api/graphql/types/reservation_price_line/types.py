@@ -21,11 +21,16 @@ __all__ = [
 
 
 class ReservationPriceLineNode(DjangoNode):
+    material_price_description_fi = graphene.String(required=True)
+    material_price_description_en = graphene.String(required=True)
+    material_price_description_sv = graphene.String(required=True)
+
     class Meta:
         model = ReservationPriceLine
         fields = [
             "pk",
             "description",
+            "material_price_description",
             "quantity",
             "price_unit",
             "unit_amount",
@@ -35,6 +40,15 @@ class ReservationPriceLineNode(DjangoNode):
             "override_amount",
             "tax_percentage",
         ]
+
+    def resolve_material_price_description_fi(root: ReservationPriceLine, info: GQLInfo) -> str:
+        return root.material_price_description_fi or ""
+
+    def resolve_material_price_description_en(root: ReservationPriceLine, info: GQLInfo) -> str:
+        return root.material_price_description_en or ""
+
+    def resolve_material_price_description_sv(root: ReservationPriceLine, info: GQLInfo) -> str:
+        return root.material_price_description_sv or ""
 
 
 class ReservationPriceCalculationLineType(graphene.ObjectType):
