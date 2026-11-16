@@ -45,6 +45,8 @@ class ReservationUnitValidator:
             pricing_group_row is not None
             and PriceComponent.objects.filter(
                 models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+                # Same as the price summary: a component of an inactive price option is not a price.
+                models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
                 pricing_group_id=pricing_group_row.pricing_group_id,
                 kind=PriceComponentKind.BASE,
                 valid_from__lte=today,
