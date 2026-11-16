@@ -1,4 +1,3 @@
-import { groupBy } from "lodash-es";
 import {
   groupAvailability,
   gridToPattern,
@@ -9,9 +8,10 @@ import {
 } from "@ui/components/WeeklyPatternCalendar/engine";
 import type { WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/types";
 import {
-  findTooShortRuns,
+  findTooShortListed,
   fromPattern,
   isInsideOpeningHours,
+  listSuitableTimes,
   SUITABLE_TIME_STEP_MINUTES,
   toAvailability,
   toPattern,
@@ -22,40 +22,14 @@ import type { SuitableTimeRangeFormValues } from "./form";
 
 export type TimeRangeInput = { weekday: Weekday; beginMinutes: number; endMinutes: number; priority: Priority };
 
-// The saved ranges as the calendar shows them. Neighbouring ranges with the same priority are joined.
+// The saved ranges as the calendar shows them (see `listSuitableTimes`, which the form validation uses too).
 export function listTimeRanges(
   ranges: ReadonlyArray<SuitableTimeRangeFormValues>
 ): WeeklyPatternValue<SuitableTimeData> {
-  const step = SUITABLE_TIME_STEP_MINUTES;
-  return gridToPattern(patternToGrid(toPattern(ranges), step), step, shallowEqual);
+  return listSuitableTimes(ranges);
 }
 
-/**
- * Which of the listed times (from `listTimeRanges`) are shorter than the minimum duration (in seconds), position for
- * position, by the same rules as the calendar and the form validation (`findTooShortRuns`, applied per day).
- */
-export function findTooShortListed(
-  listed: WeeklyPatternValue<SuitableTimeData>,
-  minDurationSeconds: number
-): boolean[] {
-  const flags = listed.map(() => false);
-  const byDay = groupBy(
-    listed.map((run, position) => ({ run, position })),
-    ({ run }) => run.weekday
-  );
-  for (const entries of Object.values(byDay)) {
-    const runs = entries.map(({ run: { beginMinutes, endMinutes, data } }) => ({
-      priority: data.priority,
-      beginMinutes,
-      endMinutes,
-    }));
-    const results = findTooShortRuns(runs, minDurationSeconds);
-    for (const [i, { position }] of entries.entries()) {
-      flags[position] = results[i] ?? false;
-    }
-  }
-  return flags;
-}
+export { findTooShortListed };
 
 /**
  * Adds a time range, in the same way as painting it in the calendar.

@@ -7,6 +7,7 @@ import {
   fromPattern,
   hasTooShortTimes,
   isInsideOpeningHours,
+  listSuitableTimes,
   priorityKey,
   toAvailability,
   toPattern,
@@ -202,6 +203,29 @@ describe("hasTooShortTimes", () => {
 
   test("an end of 00:00 is the end of the day", () => {
     expect(hasTooShortTimes([range(Weekday.Sunday, "23:00", "00:00", Priority.Primary)], HOUR)).toBe(false);
+  });
+
+  // Overlapping ranges are judged as the calendar and the time list show them: a later range replaces an earlier one.
+  test("a later range that cuts an earlier one short makes it too short", () => {
+    const ranges = [
+      range(Weekday.Monday, "10:00", "11:00", Priority.Primary),
+      range(Weekday.Monday, "09:00", "10:30", Priority.Secondary),
+    ];
+    // Shown as secondary 09:00–10:30 and primary 10:30–11:00.
+    expect(listSuitableTimes(ranges).map(({ beginMinutes, endMinutes }) => [beginMinutes, endMinutes])).toEqual([
+      [540, 630],
+      [630, 660],
+    ]);
+    expect(hasTooShortTimes(ranges, HOUR)).toBe(true);
+  });
+
+  test("a too short range hidden under a later one doesn't count", () => {
+    const ranges = [
+      range(Weekday.Monday, "10:00", "10:30", Priority.Primary),
+      range(Weekday.Monday, "09:00", "11:00", Priority.Secondary),
+    ];
+    expect(listSuitableTimes(ranges)).toHaveLength(1);
+    expect(hasTooShortTimes(ranges, HOUR)).toBe(false);
   });
 });
 
