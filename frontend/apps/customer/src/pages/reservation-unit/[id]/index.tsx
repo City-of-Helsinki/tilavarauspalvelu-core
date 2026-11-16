@@ -47,7 +47,13 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { InfoDialog } from "@/components/InfoDialog";
 import { LoginFragment } from "@/components/LoginFragment";
 import { QuickReservation } from "@/components/QuickReservation";
-import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useReservableTimes } from "@/hooks";
+import {
+  useAvailableTimes,
+  useBlockingReservations,
+  useRemoveStoredReservation,
+  useReservableTimes,
+  useReservationPrice,
+} from "@/hooks";
 import {
   EquipmentList,
   Head,
@@ -72,12 +78,14 @@ import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import { SubmitButton } from "@/styled/utils";
 
 function SubmitFragment({
+  reservationUnitPk,
   focusSlot,
   buttonText,
   loadingText,
   reservationForm,
   isQuotaReached,
 }: Readonly<{
+  reservationUnitPk: number | null | undefined;
   focusSlot: FocusTimeSlot;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   loadingText: string;
@@ -98,6 +106,13 @@ function SubmitFragment({
 
   const { isReservable } = focusSlot;
   const { isSubmitting } = reservationForm.formState;
+  // The shown price can be of the previous time while the price of this time loads, or missing after an error.
+  // The same query as the shown price, so it comes from the cache.
+  const { reservationPrice, isLoading: isPriceLoading } = useReservationPrice(
+    reservationUnitPk,
+    isReservable ? focusSlot : null
+  );
+  const hasPrice = reservationPrice != null && !isPriceLoading;
 
   return (
     <LoginFragment
@@ -108,7 +123,7 @@ function SubmitFragment({
           type="submit"
           variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
           iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
-          disabled={!isReservable || isSubmitting || isQuotaReached}
+          disabled={!isReservable || !hasPrice || isSubmitting || isQuotaReached}
           data-testid="quick-reservation__button--submit"
         >
           {isSubmitting ? loadingText : buttonText}
@@ -308,6 +323,7 @@ function ReservationUnit({
   const LoginAndSubmit = useMemo(
     () => (
       <SubmitFragment
+        reservationUnitPk={reservationUnit.pk}
         focusSlot={focusSlot}
         reservationForm={reservationForm}
         loadingText={t("reservationCalendar:makeReservationLoading")}
@@ -315,7 +331,7 @@ function ReservationUnit({
         isQuotaReached={isQuotaReached}
       />
     ),
-    [focusSlot, reservationForm, isQuotaReached, t]
+    [reservationUnit.pk, focusSlot, reservationForm, isQuotaReached, t]
   );
 
   useToastIfQueryParam({

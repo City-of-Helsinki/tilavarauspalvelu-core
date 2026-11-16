@@ -42,18 +42,22 @@ export function getMaterialPriceDescription(
 
 /// The price of a reservation unit for search cards, lists and the reservation unit page.
 /// If the customer can apply for a discount, the price is a range from 0 to the normal price.
-export function getPriceSummaryString(t: TFunction, priceSummary: PriceSummary | null | undefined): string | null {
+export function getPriceSummaryString(
+  t: TFunction,
+  priceSummary: PriceSummary | null | undefined,
+  lang: LocalizationLanguages
+): string | null {
   if (priceSummary == null) {
     return null;
   }
-  const hasMaterialPrice = getMaterialPriceDescription(priceSummary, "fi") !== "";
+  const hasMaterialPrice = getMaterialPriceDescription(priceSummary, lang) !== "";
   const amount = toNumber(priceSummary.lowestAmount) ?? 0;
   if (priceSummary.isFree || amount === 0) {
     return hasMaterialPrice ? capitalize(t("prices:materialPrice")) : t("prices:priceFree");
   }
   const priceString = priceSummary.canApplyForDiscount
-    ? `${formatPrice(0, false)} - ${formatPrice(amount, true)}`
-    : formatPrice(amount, true);
+    ? `${formatPrice(0, false, lang)} - ${formatPrice(amount, true, lang)}`
+    : formatPrice(amount, true, lang);
   const materialPriceString = hasMaterialPrice ? ` + ${t("prices:materialPrice")}` : "";
   return `${priceString}${getPriceUnitString(t, priceSummary.priceUnit)}${materialPriceString}`;
 }

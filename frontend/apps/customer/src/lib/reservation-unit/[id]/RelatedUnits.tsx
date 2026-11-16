@@ -79,7 +79,7 @@ function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCard
 
   const name = getTranslation(reservationUnit, "name", lang);
   const unitName = getTranslation(reservationUnit.unit, "name", lang);
-  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary);
+  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary, lang);
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
       ? getTranslation(reservationUnit.reservationUnitType, "name", lang)

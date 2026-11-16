@@ -191,6 +191,7 @@ describe("QuickReservation", () => {
 
     expect(screen.getByText("40,00 €")).toHaveAttribute("aria-busy", "true");
     expect(await screen.findByText("50,00 €")).toHaveAttribute("aria-busy", "false");
+    expect(screen.getByText("50,00 €")).toHaveAttribute("aria-live", "polite");
   });
 
   test("keeps an empty price cell next to the button when the price fails to load", async () => {

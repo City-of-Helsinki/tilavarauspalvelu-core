@@ -167,7 +167,7 @@ function IconList({
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(t, { seconds: minDur });
   const maxReservationDuration = formatDuration(t, { seconds: maxDur });
-  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary);
+  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary, lang);
   const materialPriceDescription = getMaterialPriceDescription(reservationUnit.priceSummary, lang);
   const hasSubventionSuffix = reservationUnit.priceSummary?.canApplyForDiscount === true && subventionSuffix != null;
 

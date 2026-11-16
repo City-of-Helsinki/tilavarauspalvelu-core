@@ -126,6 +126,12 @@ export function PricingSection({
 
   if (currentPricing?.isReadOnly) {
     const futureBegins = hasFuturePricing ? futurePricingList[0]?.begins : undefined;
+    // The saved current price can need pricing terms, and no editable price shows the selector then
+    const isCurrentPricingTermsShown =
+      pricingTermsPk == null &&
+      currentPricing.isPaid === true &&
+      currentPricing.price > 0 &&
+      currentPricing.canApplyForDiscount;
     return (
       <EditAccordion forceOpen={hasErrors} heading={t("label.pricings")}>
         <Flex $gap="m">
@@ -143,6 +149,7 @@ export function PricingSection({
             />
           </section>
           <PaymentTypeSelect form={form} />
+          {isCurrentPricingTermsShown && <PricingTermsSelect form={form} pricingTermsOptions={pricingTermsOptions} />}
           <ControlledCheckbox control={control} name="hasFuturePricing" label={t("label.changePricing")} />
           {hasFuturePricing && <Fieldset heading={t("label.newPricing")}>{futurePricingFields}</Fieldset>}
         </Flex>
@@ -220,6 +227,31 @@ function useCopyCurrentPricingToFuture(form: UseFormReturn<ReservationUnitEditFo
 }
 
 /// The payment type is of the reservation unit, not of one price, and a change to it is saved at once
+function PricingTermsSelect({
+  form,
+  pricingTermsOptions,
+}: Readonly<{
+  form: UseFormReturn<ReservationUnitEditFormValues>;
+  pricingTermsOptions: PricingOptionsProps["pricingTermsOptions"];
+}>) {
+  const { t } = useTranslation("reservationUnitEditor");
+  const { control, formState } = form;
+  return (
+    <AutoGrid $gap="xs">
+      <ControlledSelect
+        control={control}
+        name="pricingTerms"
+        label={t("label.pricingTerms")}
+        required
+        options={pricingTermsOptions}
+        error={getTranslatedError(t, formState.errors.pricingTerms?.message)}
+        tooltip={t("tooltip.pricingTerms")}
+        enableSearch
+      />
+    </AutoGrid>
+  );
+}
+
 function PaymentTypeSelect({ form }: Readonly<{ form: UseFormReturn<ReservationUnitEditFormValues> }>) {
   const { t } = useTranslation("reservationUnitEditor");
   const { control, formState, watch } = form;
@@ -380,18 +412,7 @@ function PricingFields({
         />
       )}
       {pricing.isPaid && pricing.canApplyForDiscount && isPricingTermsShown && (
-        <AutoGrid $gap="xs">
-          <ControlledSelect
-            control={control}
-            name="pricingTerms"
-            label={t("label.pricingTerms")}
-            required
-            options={pricingTermsOptions}
-            error={getTranslatedError(t, errors.pricingTerms?.message)}
-            tooltip={t("tooltip.pricingTerms")}
-            enableSearch
-          />
-        </AutoGrid>
+        <PricingTermsSelect form={form} pricingTermsOptions={pricingTermsOptions} />
       )}
       <ControlledCheckbox
         name={`pricings.${index}.hasMaterialPrice`}
