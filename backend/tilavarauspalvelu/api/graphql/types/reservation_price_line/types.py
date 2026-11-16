@@ -77,13 +77,13 @@ class ReservationPriceCalculationLineType(graphene.ObjectType):
         return root.description_sv or ""
 
     def resolve_material_price_description_fi(root: ReservationPriceLine, info: GQLInfo) -> str:
-        return root.price_component.material_price_description_fi or ""
+        return root.material_price_description_fi or ""
 
     def resolve_material_price_description_en(root: ReservationPriceLine, info: GQLInfo) -> str:
-        return root.price_component.material_price_description_en or ""
+        return root.material_price_description_en or ""
 
     def resolve_material_price_description_sv(root: ReservationPriceLine, info: GQLInfo) -> str:
-        return root.price_component.material_price_description_sv or ""
+        return root.material_price_description_sv or ""
 
 
 class ReservationPriceType(graphene.ObjectType):
