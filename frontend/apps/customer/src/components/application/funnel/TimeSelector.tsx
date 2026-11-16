@@ -148,12 +148,28 @@ export function TimeSelectorForm({
     if (!reason) {
       return null;
     }
-    const duration = formatDuration(t, { seconds: cell.runEndMinutes * 60 - cell.runBeginMinutes * 60 }, false);
+    const toDuration = (run: { beginMinutes: number; endMinutes: number }) =>
+      formatDuration(t, { seconds: (run.endMinutes - run.beginMinutes) * 60 }, false);
     const minDurationString = formatDuration(t, { seconds: minDuration }, false);
-    // A buffer next to a too short primary time is fixed by lengthening that primary time, so say so.
-    return reason === "nextToShortPrimary"
-      ? t("application:TimeSelector.tooShortNextToPrimary", { minDuration: minDurationString, duration })
-      : t("application:TimeSelector.tooShort", { minDuration: minDurationString, duration });
+    if (reason === "nextToShortPrimary") {
+      // A buffer next to a too short primary time is fixed by lengthening that primary time, so say so and name the
+      // primary time's duration, found as findTooShortReasons finds it: the touching run before, else the one after.
+      const run = runs[position];
+      const isShortPrimary = (other: (typeof runs)[number] | undefined): other is (typeof runs)[number] =>
+        other?.priority === Priority.Primary && (other.endMinutes - other.beginMinutes) * 60 < minDuration;
+      const before = runs[position - 1];
+      const after = runs[position + 1];
+      const primary =
+        isShortPrimary(before) && before.endMinutes === run?.beginMinutes
+          ? before
+          : isShortPrimary(after) && after.beginMinutes === run?.endMinutes
+            ? after
+            : undefined;
+      const duration = toDuration(primary ?? { beginMinutes: cell.runBeginMinutes, endMinutes: cell.runEndMinutes });
+      return t("application:TimeSelector.tooShortNextToPrimary", { minDuration: minDurationString, duration });
+    }
+    const duration = toDuration({ beginMinutes: cell.runBeginMinutes, endMinutes: cell.runEndMinutes });
+    return t("application:TimeSelector.tooShort", { minDuration: minDurationString, duration });
   };
 
   const getStateLabel = (cell: WeeklyPatternCellInfo<SuitableTimeData>) =>

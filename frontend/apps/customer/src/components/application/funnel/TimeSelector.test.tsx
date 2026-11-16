@@ -468,11 +468,12 @@ describe("TimeSelector time slot selecting", () => {
     expect(
       within(calendar).getByLabelText(cellName("primary", Weekday.Tuesday, 14 * 60, undefined, { tooShort: true }))
     ).toHaveAttribute("data-invalid");
-    expect(
-      within(calendar).getByLabelText(
-        cellName("secondary", Weekday.Tuesday, 14 * 60 + STEP, 16 * 60, { tooShort: "nextToPrimary" })
-      )
-    ).toHaveAttribute("data-invalid");
+    const buffer = within(calendar).getByLabelText(
+      cellName("secondary", Weekday.Tuesday, 14 * 60 + STEP, 16 * 60, { tooShort: "nextToPrimary" })
+    );
+    expect(buffer).toHaveAttribute("data-invalid");
+    // The reason names the primary run's duration (15 min), the one to lengthen, not the buffer's own.
+    expect(buffer.getAttribute("aria-label")).toContain(String.raw`"duration":"common:minute {\"count\":15}"`);
   });
 
   test("a long enough primary run with a short secondary buffer after it is valid", async () => {
