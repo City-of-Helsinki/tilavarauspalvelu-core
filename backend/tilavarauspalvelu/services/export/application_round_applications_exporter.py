@@ -48,6 +48,11 @@ class ApplicationExportRow(BaseExportRow):
     applied_reservations_per_week: str = ""
     reservation_min_duration: str = ""
     reservation_max_duration: str = ""
+    sport_name: str = ""
+    participant_gender_name: str = ""
+    league_level: str = ""
+    multiple_reservations_per_day_wish: str = ""
+    organisation_active_members: str = ""
 
     primary_monday: str = ""
     primary_tuesday: str = ""
@@ -115,6 +120,8 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
                 "application__application_round",
                 "purpose",
                 "age_group",
+                "sport",
+                "participant_gender",
             )
             .prefetch_related(
                 # All suitable time ranges ordered by begin time
@@ -171,6 +178,11 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
                 applied_reservations_per_week="vuoroja, kpl / vko",
                 reservation_min_duration="minimi aika",
                 reservation_max_duration="maksimi aika",
+                sport_name="laji",
+                participant_gender_name="osallistujien sukupuoli",
+                league_level="sarjataso",
+                multiple_reservations_per_day_wish="toive useammasta vuorosta päivässä",
+                organisation_active_members="aktiiviharrastajien määrä",
                 primary_monday="ma",
                 primary_tuesday="ti",
                 primary_wednesday="ke",
@@ -213,6 +225,9 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
             reservations_begin_date=local_date_string(instance.reservations_begin_date),
             reservations_end_date=local_date_string(instance.reservations_end_date),
             organisation_id=application.organisation_identifier,
+            sport_name=instance.sport_other,
+            league_level=instance.league_level,
+            multiple_reservations_per_day_wish=instance.multiple_reservations_per_day_wish,
         )
 
         if instance.purpose is not None:
@@ -220,6 +235,15 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
 
         if instance.age_group is not None:
             row.age_group_str = str(instance.age_group)
+
+        if instance.sport is not None:
+            row.sport_name = instance.sport.name
+
+        if instance.participant_gender is not None:
+            row.participant_gender_name = instance.participant_gender.name
+
+        if application.organisation_active_members is not None:
+            row.organisation_active_members = str(application.organisation_active_members)
 
         for time_range in instance.suitable_time_ranges.all():
             row.add_time_range(time_range.priority, time_range.day_of_the_week, time_range)

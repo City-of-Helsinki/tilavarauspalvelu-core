@@ -88,6 +88,11 @@ def test_application_round_applications_export__multiple_applications(graphql):
         "vuoroja, kpl / vko",
         "minimi aika",
         "maksimi aika",
+        "laji",
+        "osallistujien sukupuoli",
+        "sarjataso",
+        "toive useammasta vuorosta päivässä",
+        "aktiiviharrastajien määrä",
         "ma",
         "ti",
         "ke",
@@ -128,6 +133,7 @@ def test_application_round_applications_export__multiple_applications(graphql):
             applied_reservations_per_week=str(section_1.applied_reservations_per_week),
             reservation_min_duration=local_timedelta_string(section_1.reservation_min_duration),
             reservation_max_duration=local_timedelta_string(section_1.reservation_max_duration),
+            organisation_active_members=str(application_1.organisation_active_members),
             primary_monday="",
             primary_tuesday="12:00-14:00",
             primary_wednesday="",
@@ -169,6 +175,7 @@ def test_application_round_applications_export__multiple_applications(graphql):
             applied_reservations_per_week=str(section_2.applied_reservations_per_week),
             reservation_min_duration=local_timedelta_string(section_2.reservation_min_duration),
             reservation_max_duration=local_timedelta_string(section_2.reservation_max_duration),
+            organisation_active_members=str(application_2.organisation_active_members),
             primary_monday="",
             primary_tuesday="",
             primary_wednesday="",
@@ -304,6 +311,58 @@ def test_application_round_applications_export__missing_data(graphql, column_val
     for column, expected_value in column_value_mapping.items():
         index = header_row.index(column)
         assert data_row[index] == expected_value
+
+
+def test_application_round_applications_export__sports_form_data(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation()
+    ApplicationFactory.create_in_status_in_allocation(
+        application_round=application_round,
+        organisation_name="aaa",
+        organisation_active_members=25,
+        application_sections__sport__name="Jalkapallo",
+        application_sections__participant_gender__name="Naiset",
+        application_sections__league_level="3. divisioona",
+        application_sections__multiple_reservations_per_day_wish="Tytöt & pojat <18v lauantaisin",
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
+    )
+    ApplicationFactory.create_in_status_in_allocation(
+        application_round=application_round,
+        organisation_name="bbb",
+        organisation_active_members=None,
+        application_sections__sport_other="Kabaddi",
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
+    )
+
+    exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round.id)
+    with mock_csv_writer() as mock_writer:
+        exporter.write_csv()
+
+    writes = mock_writer.get_writes()
+
+    header_row = writes[2]
+    columns = [
+        "laji",
+        "osallistujien sukupuoli",
+        "sarjataso",
+        "toive useammasta vuorosta päivässä",
+        "aktiiviharrastajien määrä",
+    ]
+    indexes = [header_row.index(column) for column in columns]
+
+    assert [writes[3][index] for index in indexes] == [
+        "Jalkapallo",
+        "Naiset",
+        "3. divisioona",
+        "Tytöt & pojat <18v lauantaisin",
+        "25",
+    ]
+    assert [writes[4][index] for index in indexes] == [
+        "Kabaddi",
+        "",
+        "",
+        "",
+        "",
+    ]
 
 
 def test_application_round_applications_export__no_reservation_unit_options(graphql):
