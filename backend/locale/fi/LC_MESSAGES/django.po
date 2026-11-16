@@ -3906,6 +3906,11 @@ msgctxt "EmailType"
 msgid "User anonymization"
 msgstr "Käyttäjän anonymisointi"
 
+#: tilavarauspalvelu/migrations/0195_add_price_lines_to_reservations.py
+#: tilavarauspalvelu/models/reservation/model.py
+msgid "reservation"
+msgstr "varaus"
+
 #: tilavarauspalvelu/models/affecting_time_span/model.py
 msgid "affecting time span"
 msgstr "vaikuttava aikaväli"
@@ -4197,10 +4202,6 @@ msgid ""
 msgstr ""
 "Hallitse varaustasi Varaamossa. Voit perua varauksesi ja tarkistaa varauksen "
 "tiedot sekä Varaamon sopimus- ja peruutusehdot %(my_bookings)s -sivulla."
-
-#: tilavarauspalvelu/models/reservation/model.py
-msgid "reservation"
-msgstr "varaus"
 
 #: tilavarauspalvelu/models/reservation/model.py
 msgid "reservations"

@@ -3839,6 +3839,11 @@ msgctxt "EmailType"
 msgid "User anonymization"
 msgstr ""
 
+#: tilavarauspalvelu/migrations/0195_add_price_lines_to_reservations.py
+#: tilavarauspalvelu/models/reservation/model.py
+msgid "reservation"
+msgstr ""
+
 #: tilavarauspalvelu/models/affecting_time_span/model.py
 msgid "affecting time span"
 msgstr ""
@@ -4125,10 +4130,6 @@ msgid ""
 msgstr ""
 "Hantera din bokning på Varaamo. Du kan kontrollera uppgifterna om din "
 "bokning samt Varaamos avtals- och avbokningsvillkor på sidan %(my_bookings)s."
-
-#: tilavarauspalvelu/models/reservation/model.py
-msgid "reservation"
-msgstr ""
 
 #: tilavarauspalvelu/models/reservation/model.py
 msgid "reservations"
