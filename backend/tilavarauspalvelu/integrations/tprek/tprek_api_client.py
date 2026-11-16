@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -36,7 +34,7 @@ class TprekUnitData:
         try:
             modified_time = response_json.get("modified_time")
             tprek_last_modified = datetime.datetime.fromisoformat(modified_time)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             tprek_last_modified = None
 
         # TPREK sends the time without an offset, in local time.

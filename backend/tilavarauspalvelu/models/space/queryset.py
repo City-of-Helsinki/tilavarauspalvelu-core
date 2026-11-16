@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tilavarauspalvelu.models import Space
 from tilavarauspalvelu.models._base import ModelTreeManager, ModelTreeQuerySet
 

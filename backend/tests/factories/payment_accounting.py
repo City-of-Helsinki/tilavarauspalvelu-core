@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tilavarauspalvelu.models import PaymentAccounting
 
 from ._base import FakerFI, GenericDjangoModelFactory, ReverseForeignKeyFactory

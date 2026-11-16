@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from django.test import override_settings
 
 from tilavarauspalvelu.integrations.email.sending import (

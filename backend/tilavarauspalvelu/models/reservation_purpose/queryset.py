@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from tilavarauspalvelu.models import ReservationPurpose
 from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
 

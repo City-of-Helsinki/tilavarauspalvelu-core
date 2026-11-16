@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import bisect
 from copy import copy
 from itertools import chain

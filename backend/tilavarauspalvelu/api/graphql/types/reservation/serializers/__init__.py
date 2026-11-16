@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .adjust_time_serializers import ReservationAdjustTimeSerializer
 from .approve_serializers import ReservationApproveSerializer
 from .cancellation_serializers import ReservationCancellationSerializer

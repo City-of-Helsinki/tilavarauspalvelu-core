@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import uuid
 
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient

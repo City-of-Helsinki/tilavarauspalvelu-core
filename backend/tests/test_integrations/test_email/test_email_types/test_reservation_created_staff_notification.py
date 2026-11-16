@@ -1,7 +1,5 @@
 # type: EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION
 
-from __future__ import annotations
-
 from inspect import cleandoc
 from typing import TYPE_CHECKING
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import ast
 from contextlib import contextmanager
 from functools import cache

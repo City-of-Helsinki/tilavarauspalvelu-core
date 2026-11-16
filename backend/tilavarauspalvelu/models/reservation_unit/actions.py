@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import dataclasses
 import datetime
 import itertools
@@ -135,7 +133,7 @@ class ReservationUnitHaukiExporter:
         try:
             resource_data = HaukiAPIClient.get_resource(hauki_resource_id=unit_origin_resource_id)
             return resource_data["id"]
-        except (ExternalServiceError, KeyError, IndexError, TypeError):
+        except ExternalServiceError, KeyError, IndexError, TypeError:
             return None
 
     def _create_hauki_resource(self, hauki_resource_data: dict[str, Any]) -> None:

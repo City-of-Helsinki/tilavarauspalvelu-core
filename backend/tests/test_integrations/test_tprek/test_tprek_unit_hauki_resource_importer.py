@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pytest
 
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient

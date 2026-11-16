@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Self
 
 from django.contrib.postgres.aggregates import ArrayAgg

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from graphene_django_extensions import NestingModelSerializer
 
 from tilavarauspalvelu.models import ReservationUnitPricing

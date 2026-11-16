@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from celery.signals import beat_init
 from django_celery_beat import schedulers
 

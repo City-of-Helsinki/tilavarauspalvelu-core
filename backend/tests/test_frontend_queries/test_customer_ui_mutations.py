@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 from copy import deepcopy
 from inspect import isfunction

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import uuid
 from dataclasses import dataclass
 from decimal import Decimal
@@ -204,7 +202,7 @@ class Order:
         subscription_id = json.get("subscriptionId")
         try:
             subscription_id = uuid.UUID(subscription_id)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             subscription_id = None
 
         try:

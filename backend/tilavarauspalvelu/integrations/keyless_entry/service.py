@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import datetime
 from contextlib import suppress
 from typing import TYPE_CHECKING, overload
