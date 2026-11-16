@@ -789,7 +789,7 @@ describe("TimeSelector error message", () => {
       within(list)
         .getAllByRole("listitem")
         .map((li) => li.textContent)
-    ).toEqual(["common:weekdayLongEnum.TUESDAY 14:00-14:15, application:TimeSelector.legend.primary"]);
+    ).toEqual(["common:weekdayLongEnum.TUESDAY 14:00–14:15, application:TimeSelector.legend.primary"]);
   });
 
   test("lists the times outside the opening hours", async () => {
@@ -805,7 +805,7 @@ describe("TimeSelector error message", () => {
       within(list)
         .getAllByRole("listitem")
         .map((li) => li.textContent)
-    ).toEqual(["common:weekdayLongEnum.WEDNESDAY 08:00-16:00, application:TimeSelector.legend.primary"]);
+    ).toEqual(["common:weekdayLongEnum.WEDNESDAY 08:00–16:00, application:TimeSelector.legend.primary"]);
   });
 });
 

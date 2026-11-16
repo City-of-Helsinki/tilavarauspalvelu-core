@@ -11,6 +11,7 @@ import { useTranslation } from "next-i18next/pages";
 import type { TFunction } from "i18next";
 import { WEEKDAYS_SORTED } from "@ui/modules/const";
 import { formatTimeRange, minutesToHoursString } from "@ui/modules/date-utils";
+import { formatClock, formatClockRange } from "@ui/modules/time-helpers";
 import type { Weekday } from "../../../gql/gql-types";
 import { HiddenText, LiveRegion, SkipLink } from "../CalendarGrid/styles";
 import { RunErrorTooltip } from "./RunErrorTooltip";
@@ -26,8 +27,6 @@ import { useWeeklyPatternCalendar } from "./useWeeklyPatternCalendar";
 
 const NOOP = () => {};
 const NO_ANNOUNCEMENTS = { painted: "", erased: "" };
-
-const pad = (value: number) => value.toString().padStart(2, "0");
 
 // How long the tooltip stays after the pointer leaves its run, so the pointer can move onto it (WCAG 1.4.13).
 const TOOLTIP_HIDE_DELAY_MS = 200;
@@ -45,15 +44,6 @@ const runCellSelector = (weekday: Weekday, beginMinutes: number) =>
 // Keeps the previous object when the cell is the same, so React skips the re-render.
 const keepIfSame = (next: CellPosition | null) => (previous: CellPosition | null) =>
   previous?.weekday === next?.weekday && previous?.index === next?.index ? previous : next;
-
-/** 24 hour clock text. The end of the day reads as 24:00. */
-function formatClock(minutes: number): string {
-  return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
-}
-
-function formatRange(beginMinutes: number, endMinutes: number): string {
-  return `${formatClock(beginMinutes)}–${formatClock(endMinutes)}`;
-}
 
 function weekdayNames(style: "long" | "short", t: TFunction): Record<Weekday, string> {
   return Object.fromEntries(
@@ -111,7 +101,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     disabled,
     announcements,
     describeSpan: (weekday, beginMinutes, endMinutes) =>
-      `${longNames[weekday]}, ${formatRange(beginMinutes, endMinutes)}`,
+      `${longNames[weekday]}, ${formatClockRange(beginMinutes, endMinutes)}`,
   });
 
   useImperativeHandle(ref, () => ({ focus: grid.focus }), [grid.focus]);
@@ -200,7 +190,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     const [begin, end] = cell.isRunStart
       ? [cell.runBeginMinutes, cell.runEndMinutes]
       : [cell.beginMinutes, cell.endMinutes];
-    const label = `${longNames[cell.weekday]}, ${formatRange(begin, end)}, ${getStateLabel(cell)}`;
+    const label = `${longNames[cell.weekday]}, ${formatClockRange(begin, end)}, ${getStateLabel(cell)}`;
     const error = runErrorOf(cell);
     return error ? `${label}, ${error}` : label;
   };
