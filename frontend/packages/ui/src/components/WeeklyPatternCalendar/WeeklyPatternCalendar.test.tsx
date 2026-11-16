@@ -277,6 +277,64 @@ describe("WeeklyPatternCalendar", () => {
     });
   });
 
+  describe("run error tooltip", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    // Monday 08:00–08:30 alone is too short.
+    const renderInvalidRun = () =>
+      render(
+        <Harness
+          initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 510, data: primary }]}
+          getRunError={(cell) => (cell.endMinutes - cell.beginMinutes < 60 ? "Too short" : null)}
+        />
+      );
+    const tooltip = () => screen.queryByTestId("weekly-pattern__run-error");
+    const hover = (target: Element) => fireEvent.pointerOver(target, { pointerType: "mouse", buttons: 0 });
+    const wait = (ms: number) =>
+      act(() => {
+        vi.advanceTimersByTime(ms);
+      });
+
+    test("stays while the pointer crosses other cells, then follows the cell it ends on", () => {
+      renderInvalidRun();
+      hover(cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/));
+      expect(tooltip()).toHaveTextContent("Too short");
+
+      hover(cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00/));
+      wait(150);
+      hover(cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/));
+      expect(tooltip()).toBeInTheDocument();
+
+      // Crossing more cells doesn't restart the delay.
+      wait(50);
+      expect(tooltip()).not.toBeInTheDocument();
+    });
+
+    test("stays when the pointer reaches it across the gap", () => {
+      renderInvalidRun();
+      hover(cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/));
+      hover(cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00/));
+      fireEvent.pointerEnter(screen.getByTestId("weekly-pattern__run-error"));
+      wait(1000);
+      expect(tooltip()).toHaveTextContent("Too short");
+    });
+
+    test("coming back to the run keeps it", () => {
+      renderInvalidRun();
+      const run = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+      hover(run);
+      hover(cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00/));
+      hover(run);
+      wait(1000);
+      expect(tooltip()).toHaveTextContent("Too short");
+    });
+  });
+
   describe("on touch", () => {
     // jsdom has no layout, so the test decides which cell is under the finger.
     let under: Element | null = null;
