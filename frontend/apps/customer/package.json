@@ -20,7 +20,7 @@
   "dependencies": {
     "@apollo/client": "^3.14.1",
     "@hookform/resolvers": "7.0.2",
-    "@sentry/core": "^10.76.2",
+    "@sentry/core": "^11.11.0",
     "@sentry/nextjs": "^10.76.2",
     "date-fns": "^4.4.0",
     "focus-trap-react": "^11.0.6",
