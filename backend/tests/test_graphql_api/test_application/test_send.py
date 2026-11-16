@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import Priority, ReserveeType, Weekday
+from tilavarauspalvelu.enums import ApplicationFormType, Priority, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import ApplicationRoundTimeSlot
 from tilavarauspalvelu.typing import TimeSlotDB
@@ -18,6 +18,7 @@ from tests.factories import (
     PriceOptionFactory,
     ReservationUnitFactory,
     ReservationUnitOptionFactory,
+    SportFactory,
     SuitableTimeRangeFactory,
     UserFactory,
 )
@@ -118,6 +119,71 @@ def test_application__send__no_age_group(graphql):
 
     assert response.has_errors is True
     assert response.field_error_messages() == [f"Application section {section.pk} must have age group set."]
+
+
+@patch_method(EmailService.send_seasonal_booking_application_received_email)
+def test_application__send__sports_form__sport_selected(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_round__application_form=ApplicationFormType.SPORTS_FORM,
+        application_sections__sport=SportFactory.create(),
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is False, response
+    application.refresh_from_db()
+    assert application.sent_at is not None
+
+
+@patch_method(EmailService.send_seasonal_booking_application_received_email)
+def test_application__send__sports_form__other_sport_given(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_round__application_form=ApplicationFormType.SPORTS_FORM,
+        application_sections__sport_other="Kabaddi",
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is False, response
+    application.refresh_from_db()
+    assert application.sent_at is not None
+
+
+def test_application__send__sports_form__no_sport(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_round__application_form=ApplicationFormType.SPORTS_FORM,
+        application_sections__sport_other="  ",
+    )
+    section = application.application_sections.first()
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is True
+    assert response.field_error_messages() == [f"Application section {section.pk} must have its sport set."]
+    application.refresh_from_db()
+    assert application.sent_at is None
+
+
+def test_application__send__sports_form__sport_and_other_sport(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_round__application_form=ApplicationFormType.SPORTS_FORM,
+        application_sections__sport=SportFactory.create(),
+        application_sections__sport_other="Kabaddi",
+    )
+    section = application.application_sections.first()
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is True
+    assert response.field_error_messages() == [
+        f"Application section {section.pk} cannot have both a sport and an other sport set."
+    ]
+    application.refresh_from_db()
+    assert application.sent_at is None
 
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
