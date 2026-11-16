@@ -16,12 +16,14 @@ from tilavarauspalvelu.models import (
     EquipmentCategory,
     IntendedUse,
     OriginHaukiResource,
+    ParticipantGender,
     PaymentAccounting,
     PaymentMerchant,
     ReservableTimeSpan,
     ReservationDenyReason,
     ReservationPurpose,
     ReservationUnitCancellationRule,
+    Sport,
     TaxLevelRate,
     TermsOfUse,
 )
@@ -33,6 +35,7 @@ from tests.factories import (
     EquipmentFactory,
     IntendedUseFactory,
     OriginHaukiResourceFactory,
+    ParticipantGenderFactory,
     PaymentAccountingFactory,
     PaymentMerchantFactory,
     ReservableTimeSpanFactory,
@@ -40,6 +43,7 @@ from tests.factories import (
     ReservationPurposeFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitImageFactory,
+    SportFactory,
     TaxLevelFactory,
     TaxLevelRateFactory,
     TermsOfUseFactory,
@@ -371,6 +375,57 @@ def _create_age_groups() -> list[AgeGroup]:
     ]
 
     return AgeGroup.objects.bulk_create(age_groups)
+
+
+@with_logs
+def _create_sports() -> list[Sport]:
+    names = [
+        ("Jalkapallo", "Football", "Fotboll"),
+        ("Salibandy", "Floorball", "Innebandy"),
+        ("Koripallo", "Basketball", "Basket"),
+        ("Lentopallo", "Volleyball", "Volleyboll"),
+        ("Jääkiekko", "Ice hockey", "Ishockey"),
+        ("Futsal", "Futsal", "Futsal"),
+        ("Käsipallo", "Handball", "Handboll"),
+        ("Sulkapallo", "Badminton", "Badminton"),
+        ("Voimistelu", "Gymnastics", "Gymnastik"),
+        ("Tanssi", "Dance", "Dans"),
+    ]
+
+    sports = [
+        SportFactory.build(
+            rank=rank,
+            name=name_fi,
+            name_fi=name_fi,
+            name_en=name_en,
+            name_sv=name_sv,
+        )
+        for rank, (name_fi, name_en, name_sv) in enumerate(names)
+    ]
+
+    return Sport.objects.bulk_create(sports)
+
+
+@with_logs
+def _create_participant_genders() -> list[ParticipantGender]:
+    names = [
+        ("Naiset", "Women", "Kvinnor"),
+        ("Miehet", "Men", "Män"),
+        ("Seka", "Mixed", "Blandat"),
+    ]
+
+    participant_genders = [
+        ParticipantGenderFactory.build(
+            rank=rank,
+            name=name_fi,
+            name_fi=name_fi,
+            name_en=name_en,
+            name_sv=name_sv,
+        )
+        for rank, (name_fi, name_en, name_sv) in enumerate(names)
+    ]
+
+    return ParticipantGender.objects.bulk_create(participant_genders)
 
 
 @with_logs
