@@ -15,7 +15,12 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers imp
     ReservationUnitOptionApplicantSerializer,
 )
 from tilavarauspalvelu.api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationCancelReasonChoice, ReservationStateChoice
+from tilavarauspalvelu.enums import (
+    ApplicationFormType,
+    ApplicationRoundStatusChoice,
+    ReservationCancelReasonChoice,
+    ReservationStateChoice,
+)
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection, Reservation
@@ -27,7 +32,7 @@ from utils.utils import comma_sep_str
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import PriceOption
+    from tilavarauspalvelu.models import ParticipantGender, PriceOption, Sport
     from tilavarauspalvelu.typing import AnyUser
 
 
@@ -105,6 +110,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             raise ValidationError(errors)
 
         self.validate_price_option_is_offered(data)
+        self.validate_sports_data(data)
 
         return data
 
@@ -247,6 +253,35 @@ class ApplicationSectionSerializer(NestingModelSerializer):
         if price_option not in offered_options:
             msg = f"Price option {price_option.pk} is not offered by the application round."
             raise ValidationError(msg, code=error_codes.APPLICATION_SECTION_PRICE_OPTION_NOT_OFFERED)
+
+    def validate_sports_data(self, data: dict[str, Any]) -> None:
+        sport: Sport | None = self.get_or_default("sport", data)
+        sport_other: str = self.get_or_default("sport_other", data)
+        participant_gender: ParticipantGender | None = self.get_or_default("participant_gender", data)
+        league_level: str = self.get_or_default("league_level", data)
+        multiple_reservations_per_day_wish: str = self.get_or_default("multiple_reservations_per_day_wish", data)
+
+        has_sport = bool(sport)
+        has_sport_other = bool(sport_other.strip())
+
+        has_sports_data = (
+            has_sport
+            or has_sport_other
+            or bool(participant_gender)
+            or bool(league_level.strip())
+            or bool(multiple_reservations_per_day_wish.strip())
+        )
+        if not has_sports_data:
+            return
+
+        application_round = self.find_application_round(data)
+        if application_round.application_form != ApplicationFormType.SPORTS_FORM:
+            msg = "Sports data can only be given when the application round uses the sports application form."
+            raise ValidationError(msg, code=error_codes.APPLICATION_SECTION_SPORTS_DATA_NOT_ALLOWED)
+
+        if has_sport and has_sport_other:
+            msg = "Application section cannot have both a sport and an other sport set."
+            raise ValidationError(msg, code=error_codes.APPLICATION_SECTION_SPORT_AND_SPORT_OTHER_BOTH_SET)
 
     def find_application_round(self, data: dict[str, Any]) -> ApplicationRound:
         application: Application | NotProvided = self.get_or_default("application", data)
