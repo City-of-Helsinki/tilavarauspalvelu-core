@@ -45,7 +45,7 @@ export function mergeRanges(ranges: ReadonlyArray<Range>): Range[] {
 
   const merged: Range[] = [];
   for (const range of sorted) {
-    const last = merged.at(-1);
+    const last = merged[merged.length - 1];
     if (last && range.beginMinutes <= last.endMinutes) {
       last.endMinutes = Math.max(last.endMinutes, range.endMinutes);
     } else {
