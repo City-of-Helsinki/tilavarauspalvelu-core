@@ -69,27 +69,27 @@ if TYPE_CHECKING:
 @receiver(pre_save, sender=IntendedUse, dispatch_uid="intended_uses_pre_save")
 def _intended_uses_pre_save(sender: Any, **kwargs: Unpack[PreSaveKwargs[IntendedUse]]) -> None:
     instance = kwargs["instance"]
+    using = kwargs["using"]
 
     if settings.IMAGE_CACHE_ENABLED and instance.pk is not None:
         previous: IntendedUse | None = IntendedUse.objects.filter(pk=instance.pk).first()
         if previous is not None and previous.image is not None:
             aliases = settings.THUMBNAIL_ALIASES[""]
-            for conf_key in list(aliases.keys()):
-                image_path = get_thumbnailer(previous.image)[conf_key].url
-                purge_image_cache_task.delay(image_path)
+            image_paths = [get_thumbnailer(previous.image)[conf_key].url for conf_key in aliases]
+            delay_on_commit_batched(purge_image_cache_task, database=using, image_paths=image_paths)
 
 
 @receiver(pre_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_pre_save")
 def _reservation_unit_image_pre_save(sender: Any, **kwargs: Unpack[PreSaveKwargs[ReservationUnitImage]]) -> None:
     instance = kwargs["instance"]
+    using = kwargs["using"]
 
     if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS and settings.IMAGE_CACHE_ENABLED and instance.pk is not None:
         previous: ReservationUnitImage | None = ReservationUnitImage.objects.filter(pk=instance.pk).first()
         if previous is not None and previous.image is not None:
             aliases = settings.THUMBNAIL_ALIASES[""]
-            for conf_key in list(aliases.keys()):
-                image_path = get_thumbnailer(previous.image)[conf_key].url
-                purge_image_cache_task.delay(image_path)
+            image_paths = [get_thumbnailer(previous.image)[conf_key].url for conf_key in aliases]
+            delay_on_commit_batched(purge_image_cache_task, database=using, image_paths=image_paths)
 
 
 # --- Post save signals -------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ def _space_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Space]]) -> No
         Space.objects.rebuild()
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
-        update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
+        delay_on_commit_batched(update_reservation_unit_hierarchy_task, database=using, using=using)
 
 
 @receiver(post_save, sender=Reservation, dispatch_uid="reservation_post_save")
@@ -127,41 +127,53 @@ def _reservation_unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Res
     using = kwargs["using"]
 
     if settings.UPDATE_PRODUCT_MAPPING:
-        refresh_reservation_unit_product_mapping_task.delay(instance.pk)
+        delay_on_commit_batched(
+            refresh_reservation_unit_product_mapping_task,
+            database=using,
+            reservation_unit_pks=[instance.pk],
+        )
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
-        update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
+        delay_on_commit_batched(update_reservation_unit_hierarchy_task, database=using, using=using)
 
     if settings.UPDATE_SEARCH_VECTORS:
-        update_reservation_unit_search_vectors_task.delay(pks=[instance.pk])
+        delay_on_commit_batched(update_reservation_unit_search_vectors_task, database=using, pks=[instance.pk])
 
 
 @receiver(post_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_post_save")
 def _reservation_unit_image_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[ReservationUnitImage]]) -> None:
     instance = kwargs["instance"]
+    using = kwargs["using"]
 
     if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS:
-        update_reservation_unit_image_urls_task.delay(instance.pk)
+        delay_on_commit_batched(update_reservation_unit_image_urls_task, database=using, pks=[instance.pk])
 
 
 @receiver(post_save, sender=Unit, dispatch_uid="unit_post_save")
 def _unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Unit]]) -> None:
     instance = kwargs["instance"]
+    using = kwargs["using"]
 
     if settings.UPDATE_SEARCH_VECTORS:
         pks = list(instance.reservation_units.values_list("pk", flat=True))
-        update_reservation_unit_search_vectors_task.delay(pks=pks)
+        delay_on_commit_batched(update_reservation_unit_search_vectors_task, database=using, pks=pks)
 
 
 @receiver(post_save, sender=PaymentAccounting, dispatch_uid="payment_accounting_post_save")
 def _payment_accounting_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[PaymentAccounting]]) -> None:
     instance = kwargs["instance"]
+    using = kwargs["using"]
 
     if settings.UPDATE_ACCOUNTING:
         reservation_units_from_units = ReservationUnit.objects.filter(unit__in=instance.units.all())
         reservation_units = reservation_units_from_units.union(instance.reservation_units.all())
-        for reservation_unit in reservation_units:
-            refresh_reservation_unit_accounting_task.delay(reservation_unit.pk)
+        reservation_unit_pks = [reservation_unit.pk for reservation_unit in reservation_units]
+        if reservation_unit_pks:
+            delay_on_commit_batched(
+                refresh_reservation_unit_accounting_task,
+                database=using,
+                reservation_unit_pks=reservation_unit_pks,
+            )
 
 
 # --- Post delete signals -----------------------------------------------------------------------------------------

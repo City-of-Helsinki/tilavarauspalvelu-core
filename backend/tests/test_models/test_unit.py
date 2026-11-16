@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import pytest
 
@@ -26,7 +26,7 @@ pytestmark = [
 def mock_refresh_reservation_unit_product_mapping_task() -> Generator[NonCallableMock]:
     path = "tilavarauspalvelu.tasks."
     path += refresh_reservation_unit_product_mapping_task.__name__
-    path += ".delay"
+    path += ".apply_async"
 
     with patch(path) as mock:
         yield mock
@@ -51,8 +51,7 @@ def test_unit__save__payment_merchant_changed__refreshes_reservation_units_witho
     ):
         unit.save()
 
-    assert mock.call_count == 1
-    assert mock.call_args.args == (reservation_unit.pk,)
+    assert mock.call_args_list == [call((), {"reservation_unit_pks": [reservation_unit.pk]})]
 
 
 def test_unit__save__payment_merchant_not_changed__does_not_refresh_reservation_units(
