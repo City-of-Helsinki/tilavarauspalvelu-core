@@ -33,7 +33,13 @@ from tilavarauspalvelu.models import (
     Reservation,
     ReservationUnit,
     ReservationUnitPricingGroup,
+    TaxLevelRate,
     Unit,
+)
+from tilavarauspalvelu.services.pricing.next_price_change import (
+    ScheduledBasePrice,
+    ScheduledPricingGroup,
+    find_next_price_change,
 )
 from tilavarauspalvelu.services.pricing.price_summary import BasePrice, summarize_base_prices
 from tilavarauspalvelu.typing import error_codes
@@ -44,6 +50,7 @@ from .filtersets import ReservationUnitAllFilterSet, ReservationUnitFilterSet
 from .permissions import ReservationUnitAllPermission, ReservationUnitPermission
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.services.pricing.next_price_change import PriceChange
     from tilavarauspalvelu.services.pricing.price_summary import PriceSummary
     from tilavarauspalvelu.typing import GQLInfo
 
@@ -72,9 +79,17 @@ class PriceSummaryType(graphene.ObjectType):
     material_price_description_fi = graphene.String(required=True)
     material_price_description_en = graphene.String(required=True)
     material_price_description_sv = graphene.String(required=True)
+    tax_percentage = graphene.Decimal(
+        description="Today's tax percentage of the cheapest base price. Null if its tax level has no rate today.",
+    )
 
     def resolve_price_unit(root: PriceSummary, info: GQLInfo) -> str:
         return root.price_unit.value
+
+
+class PriceChangeType(graphene.ObjectType):
+    begins = graphene.Date(required=True)
+    summary = graphene.Field(PriceSummaryType, required=True)
 
 
 class ReservationUnitNode(DjangoNode):
@@ -99,6 +114,13 @@ class ReservationUnitNode(DjangoNode):
     price_summary = ManuallyOptimizedField(
         PriceSummaryType,
         description="Summary of the base prices of the pricing group that the reservation unit uses today.",
+    )
+    next_price_change = ManuallyOptimizedField(
+        PriceChangeType,
+        description=(
+            "The first future change to the price summary, on a date on which a reservation can still begin. "
+            "Null if there is none."
+        ),
     )
 
     reservable_time_spans = ManuallyOptimizedField(
@@ -207,6 +229,7 @@ class ReservationUnitNode(DjangoNode):
             "effective_access_type",
             "num_active_user_reservations",
             "price_summary",
+            "next_price_change",
         ]
         restricted_fields = {
             "cancellation_rule": lambda user: user.is_authenticated,
@@ -414,10 +437,57 @@ class ReservationUnitNode(DjangoNode):
                 material_price_description_fi=component["material_price_description_fi"] or "",
                 material_price_description_en=component["material_price_description_en"] or "",
                 material_price_description_sv=component["material_price_description_sv"] or "",
+                tax_percentage=(
+                    Decimal(component["tax_percentage"]) if component["tax_percentage"] is not None else None
+                ),
             )
             for component in components
         ]
         return summarize_base_prices(base_prices)
+
+    @staticmethod
+    def optimize_next_price_change(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        optimizer.annotations["scheduled_pricing_groups"] = _scheduled_pricing_group_data()
+        optimizer.only_fields.append("reservation_ends_at")
+        optimizer.only_fields.append("reservations_max_days_before")
+        return queryset
+
+    def resolve_next_price_change(root: ReservationUnit, info: GQLInfo) -> PriceChange | None:
+        pricing_groups: list[ScheduledPricingGroup] = []
+        for pricing_group in root.scheduled_pricing_groups:
+            scheduled_prices = [
+                ScheduledBasePrice(
+                    base_price=BasePrice(
+                        amount=Decimal(component["amount"]),
+                        price_unit=PriceUnit(component["price_unit"]),
+                        can_apply_for_discount=component["can_apply_for_discount"],
+                        material_price_description_fi=component["material_price_description_fi"] or "",
+                        material_price_description_en=component["material_price_description_en"] or "",
+                        material_price_description_sv=component["material_price_description_sv"] or "",
+                        tax_percentage=(
+                            Decimal(component["tax_percentage"]) if component["tax_percentage"] is not None else None
+                        ),
+                    ),
+                    valid_from=datetime.date.fromisoformat(component["valid_from"]),
+                    valid_until=(
+                        datetime.date.fromisoformat(component["valid_until"])
+                        if component["valid_until"] is not None
+                        else None
+                    ),
+                )
+                for component in pricing_group["components"]
+            ]
+            scheduled_pricing_group = ScheduledPricingGroup(
+                begins=datetime.date.fromisoformat(pricing_group["begins"]),
+                base_prices=scheduled_prices,
+            )
+            pricing_groups.append(scheduled_pricing_group)
+
+        return find_next_price_change(
+            pricing_groups=pricing_groups,
+            reservation_ends_at=root.reservation_ends_at,
+            reservations_max_days_before=root.reservations_max_days_before,
+        )
 
     @staticmethod
     def optimize_num_active_user_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
@@ -473,6 +543,12 @@ def _active_base_component_data() -> ArraySubquery:
         .order_by("-begins")
         .values("pricing_group")[:1]
     )
+    tax_percentage_today = (
+        TaxLevelRate.objects
+        .filter(tax_level=models.OuterRef("tax_level"), begins__lte=today)
+        .order_by("-begins")
+        .values("percentage")[:1]
+    )
     active_base_components = (
         PriceComponent.objects
         .filter(
@@ -484,7 +560,7 @@ def _active_base_component_data() -> ArraySubquery:
         )
         .order_by("amount", "pk")
         .annotate(
-            # Amount as text, so that it does not go through a float in JSON.
+            # Amounts as text, so that they do not go through a float in JSON.
             data=JSONObject(
                 amount=Cast("amount", models.CharField()),
                 price_unit="price_unit",
@@ -492,8 +568,66 @@ def _active_base_component_data() -> ArraySubquery:
                 material_price_description_fi="material_price_description_fi",
                 material_price_description_en="material_price_description_en",
                 material_price_description_sv="material_price_description_sv",
+                tax_percentage=Cast(models.Subquery(tax_percentage_today), models.CharField()),
             ),
         )
         .values("data")
     )
     return ArraySubquery(active_base_components)
+
+
+def _scheduled_pricing_group_data() -> ArraySubquery:
+    """
+    The pricing group that the reservation unit in the outer query uses today and the ones that begin later.
+    Each with its base components that are valid today or later.
+    """
+    today = local_date()
+
+    active_begins = (
+        ReservationUnitPricingGroup.objects
+        .filter(reservation_unit=models.OuterRef("reservation_unit"), begins__lte=today)
+        .order_by("-begins")
+        .values("begins")[:1]
+    )
+    tax_percentage_today = (
+        TaxLevelRate.objects
+        .filter(tax_level=models.OuterRef("tax_level"), begins__lte=today)
+        .order_by("-begins")
+        .values("percentage")[:1]
+    )
+    components = (
+        PriceComponent.objects
+        .filter(
+            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+            models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
+            pricing_group=models.OuterRef("pricing_group"),
+            kind=PriceComponentKind.BASE,
+        )
+        .order_by("amount", "pk")
+        .annotate(
+            # Amounts as text, so that they do not go through a float in JSON.
+            data=JSONObject(
+                amount=Cast("amount", models.CharField()),
+                price_unit="price_unit",
+                can_apply_for_discount="can_apply_for_discount",
+                material_price_description_fi="material_price_description_fi",
+                material_price_description_en="material_price_description_en",
+                material_price_description_sv="material_price_description_sv",
+                tax_percentage=Cast(models.Subquery(tax_percentage_today), models.CharField()),
+                valid_from="valid_from",
+                valid_until="valid_until",
+            ),
+        )
+        .values("data")
+    )
+    pricing_groups = (
+        ReservationUnitPricingGroup.objects
+        .filter(
+            models.Q(begins__gt=today) | models.Q(begins=models.Subquery(active_begins)),
+            reservation_unit=models.OuterRef("pk"),
+        )
+        .order_by("begins")
+        .annotate(data=JSONObject(begins="begins", components=ArraySubquery(components)))
+        .values("data")
+    )
+    return ArraySubquery(pricing_groups)

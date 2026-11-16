@@ -23,6 +23,7 @@ class BasePrice:
     material_price_description_fi: str
     material_price_description_en: str
     material_price_description_sv: str
+    tax_percentage: Decimal | None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -35,6 +36,7 @@ class PriceSummary:
     material_price_description_fi: str
     material_price_description_en: str
     material_price_description_sv: str
+    tax_percentage: Decimal | None
 
 
 def summarize_base_prices(base_prices: list[BasePrice]) -> PriceSummary | None:
@@ -42,7 +44,7 @@ def summarize_base_prices(base_prices: list[BasePrice]) -> PriceSummary | None:
     Summarize the base prices that a reservation unit has today, for search cards and lists.
 
     The lowest price is compared by amount only, even if the price units differ.
-    Of equal amounts, the first one in the list gives the price unit.
+    Of equal amounts, the first one in the list gives the price unit and the tax percentage.
     The material price description comes from the cheapest base price that has one.
     """
     if not base_prices:
@@ -62,4 +64,5 @@ def summarize_base_prices(base_prices: list[BasePrice]) -> PriceSummary | None:
         material_price_description_fi=material_price.material_price_description_fi if material_price else "",
         material_price_description_en=material_price.material_price_description_en if material_price else "",
         material_price_description_sv=material_price.material_price_description_sv if material_price else "",
+        tax_percentage=cheapest.tax_percentage,
     )

@@ -928,6 +928,11 @@ type ReservationUnitNode implements Node {
   Summary of the base prices of the pricing group that the reservation unit uses today.
   """
   priceSummary: PriceSummaryType
+
+  """
+  The first future change to the price summary, on a date on which a reservation can still begin. Null if there is none.
+  """
+  nextPriceChange: PriceChangeType
   reservableTimeSpans(startDate: Date!, endDate: Date!): [ReservableTimeSpanType!]
   numActiveUserReservations: Int!
   calculatedSurfaceArea: Int!
@@ -2486,6 +2491,16 @@ type PriceSummaryType {
   materialPriceDescriptionFi: String!
   materialPriceDescriptionEn: String!
   materialPriceDescriptionSv: String!
+
+  """
+  Today's tax percentage of the cheapest base price. Null if its tax level has no rate today.
+  """
+  taxPercentage: Decimal
+}
+
+type PriceChangeType {
+  begins: Date!
+  summary: PriceSummaryType!
 }
 
 type ReservableTimeSpanType {

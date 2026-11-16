@@ -16,6 +16,8 @@ from tests.factories import (
     ReservationFactory,
     ReservationUnitFactory,
     ReservationUnitPricingGroupFactory,
+    TaxLevelFactory,
+    TaxLevelRateFactory,
     UnitGroupFactory,
 )
 from tests.test_graphql_api.test_reservation.helpers import reservations_query
@@ -32,6 +34,7 @@ pytestmark = [
 
 
 FIELDS = "priceSummary { isFree lowestAmount priceUnit varies canApplyForDiscount }"
+TAX_FIELDS = "priceSummary { lowestAmount taxPercentage }"
 MATERIAL_PRICE_FIELDS = (
     "priceSummary { isFree materialPriceDescriptionFi materialPriceDescriptionEn materialPriceDescriptionSv }"
 )
@@ -360,6 +363,93 @@ def test_reservation_unit__query__price_summary__through_foreign_key(graphql):
         "30.00",
     ]
     assert len(response.queries) == 6, response.query_log
+
+
+# ── Tax percentage ──
+
+
+def test_reservation_unit__query__price_summary__tax_percentage_of_the_cheapest_price(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    unit_group = UnitGroupFactory.create()
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        price_option=PriceOptionFactory.create(unit_group=unit_group),
+        amount=Decimal(30),
+        tax_level=TaxLevelFactory.create(rates__percentage=Decimal("25.5")),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        price_option=PriceOptionFactory.create(unit_group=unit_group),
+        amount=Decimal(15),
+        tax_level=TaxLevelFactory.create(rates__percentage=Decimal(14)),
+    )
+
+    query = reservation_unit_query(fields=TAX_FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"priceSummary": {"lowestAmount": "15.00", "taxPercentage": "14.00"}}
+
+
+def test_reservation_unit__query__price_summary__tax_percentage_of_today(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    tax_level = TaxLevelFactory.create(
+        rates__percentage=Decimal(24), rates__begins=today - datetime.timedelta(days=100)
+    )
+    TaxLevelRateFactory.create(
+        tax_level=tax_level, begins=today + datetime.timedelta(days=10), percentage=Decimal("25.5")
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        amount=Decimal(20),
+        tax_level=tax_level,
+    )
+
+    query = reservation_unit_query(fields=TAX_FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"priceSummary": {"lowestAmount": "20.00", "taxPercentage": "24.00"}}
+
+
+def test_reservation_unit__query__price_summary__tax_percentage_without_rate(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        amount=Decimal(20),
+        tax_level=TaxLevelFactory.create(rates=[]),
+    )
+
+    query = reservation_unit_query(fields=TAX_FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"priceSummary": {"lowestAmount": "20.00", "taxPercentage": None}}
 
 
 # ── Material price ──
