@@ -234,6 +234,10 @@ def test_query_user_data__full(api_client, settings):
                                                 "key": "NAME",
                                                 "value": section.name,
                                             },
+                                            {
+                                                "key": "MULTIPLE_RESERVATIONS_PER_DAY_WISH",
+                                                "value": section.multiple_reservations_per_day_wish,
+                                            },
                                         ],
                                     }
                                 ],
