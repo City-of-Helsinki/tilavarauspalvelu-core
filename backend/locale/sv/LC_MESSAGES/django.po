@@ -848,6 +848,13 @@ msgid ""
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/admin.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "My applications"
+msgid "Sports application form"
+msgstr "Egna ansökningar"
+
+#: tilavarauspalvelu/admin/application_section/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation_series/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
@@ -980,6 +987,31 @@ msgid "Purpose"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
+msgid "Sport"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#, fuzzy
+#| msgctxt "ReservationCancelReason"
+#| msgid "Other reason"
+msgid "Other sport"
+msgstr "Annan orsak"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Participant gender"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#, fuzzy
+#| msgid "tax level"
+msgid "League level"
+msgstr "skattenivå"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Wish for multiple reservations per day"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation_series/filters.py
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Should have active door code"
@@ -1021,7 +1053,37 @@ msgid "Purpose for this section."
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
+msgid "Sport for this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Sport given by the applicant when the sport is not in the list."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Gender of the participants, e.g. for dressing rooms."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "League level of the group."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "The applicant's wish for more than one reservation per day."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
 msgid "Should this application section have an active door code?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid ""
+"Sports data can only be given when the application round uses the sports "
+"application form."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Application section cannot have both a sport and an other sport set."
 msgstr ""
 
 #: tilavarauspalvelu/admin/banner_notification/admin.py

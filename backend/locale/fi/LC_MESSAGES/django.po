@@ -851,6 +851,10 @@ msgstr ""
 "Etsi nimellä, hakijan etu- tai sukunimellä, tai ulkoisella tunnisteella"
 
 #: tilavarauspalvelu/admin/application_section/admin.py
+msgid "Sports application form"
+msgstr "Liikunnan hakulomake"
+
+#: tilavarauspalvelu/admin/application_section/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation_series/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
@@ -992,6 +996,26 @@ msgid "Purpose"
 msgstr "Käyttötarkoitus"
 
 #: tilavarauspalvelu/admin/application_section/form.py
+msgid "Sport"
+msgstr "Laji"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Other sport"
+msgstr "Muu laji"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Participant gender"
+msgstr "Osallistujien sukupuoli"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "League level"
+msgstr "Sarjataso"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Wish for multiple reservations per day"
+msgstr "Toive useammasta vuorosta päivässä"
+
+#: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation_series/filters.py
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Should have active door code"
@@ -1034,8 +1058,40 @@ msgid "Purpose for this section."
 msgstr "Hakemuksen osan käyttötarkoitus."
 
 #: tilavarauspalvelu/admin/application_section/form.py
+msgid "Sport for this section."
+msgstr "Hakemuksen osan laji."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Sport given by the applicant when the sport is not in the list."
+msgstr "Hakijan antama laji, kun lajia ei ole listassa."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Gender of the participants, e.g. for dressing rooms."
+msgstr "Osallistujien sukupuoli, esimerkiksi pukuhuoneita varten."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "League level of the group."
+msgstr "Ryhmän sarjataso."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "The applicant's wish for more than one reservation per day."
+msgstr "Hakijan toive useammasta vuorosta päivässä."
+
+#: tilavarauspalvelu/admin/application_section/form.py
 msgid "Should this application section have an active door code?"
 msgstr "Tulisiko tässä hakemuksen osassa olla aktiivista pääsykoodia?"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid ""
+"Sports data can only be given when the application round uses the sports "
+"application form."
+msgstr ""
+"Liikunnan tietoja voi antaa vain, kun kierros käyttää liikunnan "
+"hakulomaketta."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Application section cannot have both a sport and an other sport set."
+msgstr "Hakemuksen osalla ei voi olla sekä lajia että muuta lajia."
 
 #: tilavarauspalvelu/admin/banner_notification/admin.py
 msgid "Name of the notification. Should be unique."

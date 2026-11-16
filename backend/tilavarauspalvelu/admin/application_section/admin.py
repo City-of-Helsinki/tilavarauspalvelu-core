@@ -107,6 +107,18 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             },
         ],
         [
+            _("Sports application form"),
+            {
+                "fields": [
+                    "sport",
+                    "sport_other",
+                    "participant_gender",
+                    "league_level",
+                    "multiple_reservations_per_day_wish",
+                ],
+            },
+        ],
+        [
             _("Time"),
             {
                 "fields": [
@@ -155,6 +167,8 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                 "age_group",
                 "purpose",
                 "price_option",
+                "sport",
+                "participant_gender",
             )
         )
 

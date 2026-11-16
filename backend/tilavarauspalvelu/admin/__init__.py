@@ -13,6 +13,7 @@ from .general_role.admin import GeneralRoleAdmin
 from .intended_use.admin import IntendedUseAdmin
 from .log_entry.admin import LogEntryAdmin
 from .origin_hauki_resource.admin import OriginHaukiResourceAdmin
+from .participant_gender.admin import ParticipantGenderAdmin
 from .payment_accounting.admin import PaymentAccountingAdmin
 from .payment_merchant.admin import PaymentMerchantAdmin
 from .payment_order.admin import PaymentOrderAdmin
@@ -33,6 +34,7 @@ from .reservation_unit_type.admin import ReservationUnitTypeAdmin
 from .resource.admin import ResourceAdmin
 from .sales_item.admin import SalesItemAdmin
 from .space.admin import SpaceAdmin
+from .sport.admin import SportAdmin
 from .tax_level.admin import TaxLevelAdmin
 from .terms_of_use.admin import TermsOfUseAdmin
 from .unit.admin import UnitAdmin
@@ -54,6 +56,7 @@ __all__ = [
     "IntendedUseAdmin",
     "LogEntryAdmin",
     "OriginHaukiResourceAdmin",
+    "ParticipantGenderAdmin",
     "PaymentAccountingAdmin",
     "PaymentMerchantAdmin",
     "PaymentOrderAdmin",
@@ -74,6 +77,7 @@ __all__ = [
     "ResourceAdmin",
     "SalesItemAdmin",
     "SpaceAdmin",
+    "SportAdmin",
     "TaxLevelAdmin",
     "TermsOfUseAdmin",
     "UnitAdmin",
