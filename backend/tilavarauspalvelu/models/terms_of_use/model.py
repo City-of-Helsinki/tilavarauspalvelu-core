@@ -66,7 +66,7 @@ class TermsOfUse(models.Model):
         ordering = ["pk"]
 
     def __str__(self) -> str:
-        return self.name
+        return self.name or ""
 
 
 AuditLogger.register(TermsOfUse)
