@@ -291,7 +291,7 @@ const PriorityRadioButton = styled(RadioButton)`
     left: 45px;
     right: auto;
     top: 0;
-    border-top: 10px solid var(--color-white);
+    border-bottom: 10px solid var(--color-white);
   }
 
   &:not(:first-of-type) {
