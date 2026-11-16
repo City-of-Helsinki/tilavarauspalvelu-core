@@ -60,6 +60,33 @@ def test_reservation__query__price_lines_for_own_reservation(graphql):
     }
 
 
+def test_reservation__query__price_lines_material_price_description(graphql):
+    user = UserFactory.create()
+    reservation = ReservationFactory.create(user=user)
+    ReservationPriceLineFactory.create(
+        reservation=reservation,
+        material_price_description_fi="Materiaalit",
+        material_price_description_en="Materials",
+        material_price_description_sv=None,
+    )
+
+    graphql.force_login(user)
+    fields = "priceLines { materialPriceDescriptionFi materialPriceDescriptionEn materialPriceDescriptionSv }"
+    query = reservation_query(fields=fields, id=to_global_id("ReservationNode", reservation.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "priceLines": [
+            {
+                "materialPriceDescriptionFi": "Materiaalit",
+                "materialPriceDescriptionEn": "Materials",
+                "materialPriceDescriptionSv": "",
+            },
+        ],
+    }
+
+
 def test_reservation__query__price_lines_for_other_users_reservation(graphql):
     reservation = ReservationFactory.create()
     ReservationPriceLineFactory.create(reservation=reservation)
@@ -91,7 +118,7 @@ def test_reservation__query__price_lines_are_prefetched(graphql):
         ReservationPriceLineFactory.create(reservation=reservation)
 
     graphql.login_with_superuser()
-    query = reservations_query(fields="pk priceLines { amount }")
+    query = reservations_query(fields="pk priceLines { amount materialPriceDescriptionFi }")
     response = graphql(query)
 
     assert response.has_errors is False, response
