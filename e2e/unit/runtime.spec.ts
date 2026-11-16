@@ -694,9 +694,15 @@ test.describe("Runtime", () => {
       await adminLandingpage.checksTheAdminLandingPageH1("Tervetuloa, ");
       expect(loads).toBe(1);
 
-      // After a failed render the page is reloaded once, and the report gets a warning
-      await page.goto("https://staff.test/");
-      await adminLandingpage.checksTheAdminLandingPageH1("Tervetuloa, ");
+      // After a failed render the page is reloaded once, and the report gets a warning (LOG_LEVEL=ERROR would drop it)
+      const previous = { LOG_LEVEL: process.env.LOG_LEVEL };
+      process.env.LOG_LEVEL = "WARN";
+      try {
+        await page.goto("https://staff.test/");
+        await adminLandingpage.checksTheAdminLandingPageH1("Tervetuloa, ");
+      } finally {
+        restoreEnv(previous);
+      }
       expect(loads).toBe(3);
       expect(info.annotations.filter((annotation) => annotation.type === "warning")).toHaveLength(1);
       await session.close();
