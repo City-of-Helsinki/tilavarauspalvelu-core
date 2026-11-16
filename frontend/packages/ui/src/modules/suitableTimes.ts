@@ -1,9 +1,12 @@
 import { groupBy } from "lodash-es";
 import {
+  gridToPattern,
   groupAvailability,
   isRangeOpen,
   mergeRanges,
   MINUTES_PER_DAY,
+  patternToGrid,
+  shallowEqual,
 } from "@ui/components/WeeklyPatternCalendar/engine";
 import type {
   VisibleHours,
@@ -112,36 +115,48 @@ export function findTooShortReasons(
   });
 }
 
-/** One day's ranges as runs in order, with touching or overlapping ranges of the same priority merged. */
-function toDayRuns(ranges: ReadonlyArray<Pick<SuitableTimeRangeValues, "beginTime" | "endTime" | "priority">>) {
-  const sorted = ranges
-    .map(({ beginTime, endTime, priority }) => ({
-      priority,
-      beginMinutes: timeToMinutes(beginTime),
-      endMinutes: endTimeToMinutes(endTime),
-    }))
-    .sort((a, b) => a.beginMinutes - b.beginMinutes);
-  const runs: PriorityRun[] = [];
-  for (const range of sorted) {
-    const last = runs.at(-1);
-    if (last && last.priority === range.priority && range.beginMinutes <= last.endMinutes) {
-      last.endMinutes = Math.max(last.endMinutes, range.endMinutes);
-    } else {
-      runs.push(range);
-    }
-  }
-  return runs;
+/**
+ * The times as the calendar and the time list show them: each range painted on the grid in order, so a later range
+ * replaces an earlier one where they overlap, and neighbouring times of the same priority joined. Validation judges
+ * these times too, so a saved list is valid exactly when what the user sees is.
+ */
+export function listSuitableTimes(
+  ranges: ReadonlyArray<SuitableTimeRangeValues>
+): WeeklyPatternValue<SuitableTimeData> {
+  const step = SUITABLE_TIME_STEP_MINUTES;
+  return gridToPattern(patternToGrid(toPattern(ranges), step), step, shallowEqual);
 }
 
-/** Whether any time is shorter than the minimum duration (in seconds), by the rules of `findTooShortRuns`. */
-export function hasTooShortTimes(
-  ranges: ReadonlyArray<Pick<SuitableTimeRangeValues, "dayOfTheWeek" | "beginTime" | "endTime" | "priority">>,
+/**
+ * Which of the listed times (from `listSuitableTimes`) are shorter than the minimum duration (in seconds), position
+ * for position, by the rules of `findTooShortRuns` applied per day.
+ */
+export function findTooShortListed(
+  listed: WeeklyPatternValue<SuitableTimeData>,
   minDurationSeconds: number
-): boolean {
-  const byDay = groupBy(ranges, (range) => range.dayOfTheWeek);
-  return Object.values(byDay).some((dayRanges) =>
-    findTooShortRuns(toDayRuns(dayRanges), minDurationSeconds).includes(true)
+): boolean[] {
+  const flags = listed.map(() => false);
+  const byDay = groupBy(
+    listed.map((run, position) => ({ run, position })),
+    ({ run }) => run.weekday
   );
+  for (const entries of Object.values(byDay)) {
+    const runs = entries.map(({ run: { beginMinutes, endMinutes, data } }) => ({
+      priority: data.priority,
+      beginMinutes,
+      endMinutes,
+    }));
+    const results = findTooShortRuns(runs, minDurationSeconds);
+    for (const [i, { position }] of entries.entries()) {
+      flags[position] = results[i] ?? false;
+    }
+  }
+  return flags;
+}
+
+/** Whether any of the times as listed (see `listSuitableTimes`) is shorter than the minimum duration (in seconds). */
+export function hasTooShortTimes(ranges: ReadonlyArray<SuitableTimeRangeValues>, minDurationSeconds: number): boolean {
+  return findTooShortListed(listSuitableTimes(ranges), minDurationSeconds).includes(true);
 }
 
 /**
