@@ -155,17 +155,18 @@ export class DataModification extends PageObject {
     this.state.calendarTimeslot = full_slot;
   }
 
-  /** Returns a random date 1–15 days ahead, a start hour 1–5 hours before the current one, and the hour after it. */
+  /**
+   * Returns a random date 1–15 days ahead, a start hour 1–5 hours before the current one, and the hour after it,
+   * e.g. ["26.11.2026", "10", "11"]. The start hour is never 23, because the staff form has one date and refuses
+   * 23:00 to 00:00.
+   */
   @step("data_modification.Get Modified Date And Time")
-  async getModifiedDateAndTime(): Promise<[string, string, string]> {
-    // Get the current date and time
-    const current_date = new Date();
-
+  async getModifiedDateAndTime(current_date = new Date()): Promise<[string, string, string]> {
     // DEVNOTE to test this manually
     // ${current_date}=  Set Variable  2024-04-29 18:52:45
 
     // A day and hour that this test has got before is drawn again: its reservations are on one unit, which can't have
-    // two reservations at the same time
+    // two reservations at the same time. A start hour of 23 is drawn again too.
     let date_plus_x_days: string;
     let start_hour: string;
     let end_hour: string;
@@ -182,11 +183,11 @@ export class DataModification extends PageObject {
       // Calculate the modified date and times
       date_plus_x_days = ddmmyyyy(addToDate(current_date, { days: number_day }));
       start_hour = pad2(addToDate(current_date, { hours: -start_hour_subtraction }).getHours());
-      end_hour = pad2(addToDate(current_date, { hours: -(start_hour_subtraction - 1) }).getHours());
-    } while (this.state.modifiedDateAndHours.includes(`${date_plus_x_days} ${start_hour}`));
+      end_hour = pad2(Number(start_hour) + 1);
+    } while (start_hour === "23" || this.state.modifiedDateAndHours.includes(`${date_plus_x_days} ${start_hour}`));
     this.state.modifiedDateAndHours.push(`${date_plus_x_days} ${start_hour}`);
 
-    const drawn_again = draws > 1 ? ` (drawn ${draws} times, as this test had got the earlier ones)` : "";
+    const drawn_again = draws > 1 ? ` (drawn ${draws} times: the earlier ones were this test's, or started at 23)` : "";
     await log(`Modified date and hours: ${date_plus_x_days}, ${start_hour}–${end_hour}${drawn_again}`);
 
     return [date_plus_x_days, start_hour, end_hour];

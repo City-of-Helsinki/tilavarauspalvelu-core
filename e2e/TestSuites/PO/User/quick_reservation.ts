@@ -2,11 +2,38 @@ import type { Response } from "@playwright/test";
 import { graphqlErrorsIn } from "../../../lib/responses";
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
-import { CONTENT_WAIT_TIMEOUT } from "../../Resources/variables";
+import { CONTENT_WAIT_TIMEOUT, QUICK_RESERVATION_DURATION } from "../../Resources/variables";
 
 /** A response that a keyword started waiting for. In an object, because a keyword would wait for a returned promise. */
 export interface PendingResponse {
   response: Promise<Response>;
+}
+
+/**
+ * The indexes of the slots to pick from. A slot that ends at midnight or later is never one: the checks after the pick
+ * expect a booking within one day. Of the rest, the slots that start 30 minutes or later from `now` (in ms) are used if
+ * there are any. e.g. at 22:00 for 60 minutes, ["22:15", "22:30", "22:45", "23:00"] gives [1, 2]
+ */
+export function slotsToPickFrom(
+  slot_times: string[],
+  date_value: string,
+  now: number,
+  duration_minutes: number
+): number[] {
+  const [day = 0, month = 0, year = 0] = date_value.split(".").map(Number);
+  const before_midnight: number[] = [];
+  const later_slots: number[] = [];
+  for (const [index, slot_time] of slot_times.entries()) {
+    const [hours = 0, minutes = 0] = slot_time.split(":").map(Number);
+    if (hours * 60 + minutes + duration_minutes >= 24 * 60) {
+      continue;
+    }
+    before_midnight.push(index);
+    if (new Date(year, month - 1, day, hours, minutes).getTime() >= now + 30 * 60_000) {
+      later_slots.push(index);
+    }
+  }
+  return later_slots.length > 0 ? later_slots : before_midnight;
 }
 
 /** Quick reservation on a unit's page, and the booking's info card. */
@@ -32,23 +59,22 @@ export class QuickReservation extends PageObject {
     const total_slots = await slots.count();
     await log(`Total available slots: ${total_slots}`);
 
-    // Picks from the slots that start in 30 minutes or later, if there are any. A test can take minutes from
-    // booking to cancelling, and a reservation that has started can't be cancelled.
-    const date_value = await this.getTheValueFromDateInput();
-    const [day = 0, month = 0, year = 0] = date_value.split(".").map(Number);
-    let later_slots: number[] = [];
-    for (const [index, slot_time] of (await slots.allInnerTexts()).entries()) {
-      const [hours = 0, minutes = 0] = slot_time.split(":").map(Number);
-      if (new Date(year, month - 1, day, hours, minutes).getTime() >= Date.now() + 30 * 60_000) {
-        later_slots.push(index);
-      }
-    }
-    if (later_slots.length === 0) {
-      later_slots = Array.from({ length: total_slots }, (_, index) => index);
-    }
+    // Prefers slots that start in 30 minutes or later: a test can take minutes from booking to cancelling, and a
+    // reservation that has started can't be cancelled. Slots that end at midnight or later are never picked.
+    const slot_times = await slots.allInnerTexts();
+    const slots_to_pick_from = slotsToPickFrom(
+      slot_times,
+      await this.getTheValueFromDateInput(),
+      Date.now(),
+      Number.parseInt(QUICK_RESERVATION_DURATION, 10)
+    );
+    expect(
+      slots_to_pick_from,
+      `Quick reservation has a free slot that ends before midnight. Its slots: ${slot_times.join(", ")}`
+    ).not.toHaveLength(0);
 
     // Pick one of them at random
-    const random_index = later_slots[Math.floor(Math.random() * later_slots.length)] ?? 0;
+    const random_index = slots_to_pick_from[Math.floor(Math.random() * slots_to_pick_from.length)] ?? 0;
     await log(`Randomly selected slot index: ${random_index}`, { level: "DEBUG" });
     const selected_slot = slots.nth(random_index);
 
