@@ -11,6 +11,7 @@ from tinymce.widgets import TinyMCE
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
 from tilavarauspalvelu.services.pricing.application_round_options import check_application_round_change
+from utils.date_utils import utc_datetime
 from utils.utils import only_django_validation_errors
 
 
@@ -47,6 +48,9 @@ class ApplicationRoundAdminForm(forms.ModelForm):
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
+
+        if self.instance.pk is not None and "application_form" in self.changed_data:
+            self.validate_application_form_can_change()
 
         reservation_units = cleaned_data.get("reservation_units")
         if reservation_units is not None:
@@ -85,6 +89,17 @@ class ApplicationRoundAdminForm(forms.ModelForm):
 
         return cleaned_data
 
+    def validate_application_form_can_change(self) -> None:
+        # The required fields of an application depend on the form, so draft applications must not see it change.
+        if self.instance.application_period_begins_at <= utc_datetime():
+            msg = _("Application form cannot be changed after the application period has begun.")
+            self.add_error("application_form", msg)
+            return
+
+        if self.instance.applications.exists():
+            msg = _("Application form cannot be changed when the application round has applications.")
+            self.add_error("application_form", msg)
+
     class Meta:
         model = ApplicationRound
         fields = []  # Use fields from ModelAdmin
@@ -107,6 +122,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "handled_at": _("Handled date"),
             "sent_at": _("Sent date"),
             "purposes": _("IntendedUses"),
+            "application_form": _("Application form"),
             "terms_of_use": pgettext_lazy("ApplicationRound", "Terms of use"),
             "criteria": _("Application criteria"),
             "criteria_fi": _("Application criteria (Finnish)"),
@@ -132,6 +148,10 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "handled_at": _("When the application round was handled."),
             "sent_at": _("When the application round applications were sent to applicants."),
             "purposes": _("IntendedUses that are allowed in this application period."),
+            "application_form": _(
+                "Which application form is used in this application round. "
+                "Cannot be changed after the application period has begun or when the round has applications."
+            ),
             "terms_of_use": _("Terms of use for the application round."),
             "criteria": _("Application criteria for the application round."),
             "criteria_fi": _("Application criteria for the application round in Finnish."),
