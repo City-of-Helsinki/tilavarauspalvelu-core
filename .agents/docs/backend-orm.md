@@ -68,6 +68,25 @@ A lookup property defines a value once as an ORM expression. It works as a Pytho
 - `queryset.delete()` loads the rows into memory when the model has delete signals or Python-side cascades.
 - Use `save(update_fields=[...])` when the code changes only some fields.
   A plain `save()` writes every column and can overwrite a parallel change.
+- `bulk_update` and `queryset.update()` do not remove HTML from NH3 fields. See `NH3 fields`.
+
+## NH3 fields
+
+`Nh3TextField` and `Nh3CharField` remove HTML tags that are not on the allowed list.
+
+- Use them only for rich text that the frontend renders as HTML, such as text from a rich text editor.
+- Use a plain `CharField` or `TextField` for plain text, such as names, notes and wishes.
+  The frontend and Django templates escape plain text when they render it, so it cannot cause XSS.
+- NH3 escapes `&`, `<` and `>` in the text. `Tytöt & pojat <18v` is saved as `Tytöt &amp; pojat &lt;18v`.
+  The API and the CSV exports return the escaped value. If the frontend renders it as plain text, the user sees `&amp;`.
+- Every NH3 field uses `NH3_ALLOWED_TAGS` and `NH3_ALLOWED_ATTRIBUTES` from the settings.
+  django-nh3 falls back to these settings for an empty option, so `allowed_tags=set()` keeps the same tags.
+  Leave the `allowed_*` options out.
+- The field keeps the text inside a removed tag. `<script>x</script>` becomes `x`.
+- The field cleans the value in `pre_save`. `save()` and `bulk_create` clean it.
+  `bulk_update` and `queryset.update()` write the value as it is, and reads mark it safe for templates.
+  In these writes, use only values that the code controls,
+  or clean user input first with `nh3.clean(value, **Model._meta.get_field("name").nh3_options)`.
 
 ## Concurrency and transactions
 
