@@ -65,6 +65,7 @@ __all__ = [
     "send_application_in_allocation_email_task",
     "send_permission_deactivation_email_task",
     "send_user_anonymization_email_task",
+    "sleep_for_deploy_test_task",
     "update_affecting_time_spans_task",
     "update_origin_hauki_resource_reservable_time_spans_task",
     "update_pindora_access_code_is_active_task",
@@ -608,3 +609,14 @@ def create_robot_test_data_task() -> None:
             return
 
         create_robot_test_data()
+
+
+@app.task(name="sleep_for_deploy_test")
+def sleep_for_deploy_test_task(seconds: int) -> None:
+    """
+    Sleeps for the given time. Use it to check that a deploy does not kill a running task.
+    Start it from a shell in a core pod. If the finish message never reaches Sentry, the deploy lost the task.
+    """
+    SentryLogger.log_message(message="Deploy test task started.", details={"seconds": seconds})
+    time.sleep(seconds)
+    SentryLogger.log_message(message="Deploy test task finished.", details={"seconds": seconds})
