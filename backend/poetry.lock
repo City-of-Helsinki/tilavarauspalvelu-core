@@ -3180,14 +3180,14 @@ crypto = ["cryptography (>=3.4.0)"]
 
 [[package]]
 name = "pypdf"
-version = "7.0.1"
+version = "7.1.0"
 description = "A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files"
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "test"]
 files = [
-    {file = "pypdf-7.0.1-py3-none-any.whl", hash = "sha256:6131b764b046282357037309e7ef2a1b7679d4a5c53eed3db2bfbf7c673ddc2b"},
-    {file = "pypdf-7.0.1.tar.gz", hash = "sha256:0a78bb99efb41e9088260e9a8e5da134a5cbb9a322014744177bf29b5267ea6d"},
+    {file = "pypdf-7.1.0-py3-none-any.whl", hash = "sha256:47cca6b24bdcf4c4d65b5f7b8b972535c61710a061261e737688777cfd9a7bfb"},
+    {file = "pypdf-7.1.0.tar.gz", hash = "sha256:ca3fa902369e98a6d2cb7b56396de902b72ef9bb3c1e8706c1bfc7d8bd0cf0d7"},
 ]
 
 [package.extras]
@@ -4076,4 +4076,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "2c2b70c84d739096fb0b01bf7c6fa546d11e8a32718d21877d0b8aa40805a910"
+content-hash = "b9eb2aa66cceff90943869a9d08d13a7cd4d1cc660aec1ffc015f10a445bb85d"
