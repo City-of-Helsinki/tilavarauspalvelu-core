@@ -38,7 +38,7 @@ import type {
   ReservationUnitAccessTypeSerializerInput,
 } from "@gql/gql-types";
 import { getOwnPricings } from "./pricing";
-import type { OwnPriceComponent } from "./pricing";
+import type { OwnPriceComponent, OwnPricings } from "./pricing";
 import type { TaxLevelOption } from "./PricingSection";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
@@ -845,11 +845,11 @@ function createNewPricing(pk: number, isFuture: boolean): PricingFormValues {
 /// Negative pks are new prices.
 /// A new current price is only possible when the reservation unit has no price in effect today.
 /// A saved price can only begin in the future.
-function convertPricingList(data: Node | undefined): PricingFormValues[] {
-  if (data == null) {
+function convertPricingList(ownPricings: OwnPricings | null): PricingFormValues[] {
+  if (ownPricings == null) {
     return [createNewPricing(-1, false), createNewPricing(-2, true)];
   }
-  const { current, futureList } = getOwnPricings(data, new Date());
+  const { current, futureList } = ownPricings;
   const prices = [
     ...(current != null ? [convertPriceComponent(current, false)] : []),
     ...futureList.map((component) => convertPriceComponent(component, true)),
@@ -905,6 +905,7 @@ function convertAccessTypes(accessTypes: NonNullable<Node["accessTypes"]>): Acce
 }
 
 export function convertReservationUnit(data?: Node): ReservationUnitEditFormValues {
+  const ownPricings = data != null ? getOwnPricings(data, new Date()) : null;
   // Convert from API data to form values
   return {
     bufferType:
@@ -968,13 +969,13 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     serviceSpecificTerms: data?.serviceSpecificTerms?.pk ?? "",
     cancellationTerms: data?.cancellationTerms?.pk ?? "",
     cancellationRule: data?.cancellationRule?.pk ?? null,
-    pricings: convertPricingList(data),
+    pricings: convertPricingList(ownPricings),
     paymentType: data?.paymentType ?? null,
-    isSharedPricingGroup: data != null ? getOwnPricings(data, new Date()).isShared : false,
+    isSharedPricingGroup: ownPricings?.isShared ?? false,
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isDraft ?? false,
     seasons: convertSeasonalList(filterNonNullable(data?.applicationRoundTimeSlots)),
-    hasFuturePricing: data != null ? getOwnPricings(data, new Date()).futureList.length > 0 : false,
+    hasFuturePricing: (ownPricings?.futureList.length ?? 0) > 0,
     hasScheduledPublish: data?.publishBeginsAt != null || data?.publishEndsAt != null,
     hasScheduledReservation: data?.reservationBeginsAt != null || data?.reservationEndsAt != null,
     hasPublishBegins: data?.publishBeginsAt != null,

@@ -64,8 +64,9 @@ export const PaymentNotification = ({ reservation, paymentOrder }: PaymentNotifi
           <div data-testid="reservation__payment-notification__price">
             {t("common:price")}: {price}
             {taxPercentage != null && ` (${t("common:inclTax", { taxPercentage: taxPercentage })})`}
-            {priceLineList.map((priceLine) => (
-              <div key={priceLine}>{priceLine}</div>
+            {priceLineList.map((priceLine, index) => (
+              // oxlint-disable-next-line react/no-array-index-key -- two lines can have the same text, and the list never changes order
+              <div key={index}>{priceLine}</div>
             ))}
           </div>
           <div data-testid="reservation__payment-notification__deadline">
