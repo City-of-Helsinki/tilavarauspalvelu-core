@@ -77,10 +77,10 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const { reservation, reservationPrice } = props;
+  const { reservation, canApplyForDiscount } = props;
   const reservationUnit = reservation.reservationUnit;
-  const isFreeOfCharge = reservationPrice == null || Number(reservationPrice.total) === 0;
-  const canApplyForDiscount = reservationPrice?.canApplyForDiscount === true;
+  // The price lines of the reservation are saved when it is created. The payment uses the same total.
+  const isFreeOfCharge = toNumber(reservation.totalPrice) === 0;
 
   useRemoveStoredReservation();
 
@@ -147,12 +147,7 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
     <>
       <TimeZoneNotification />
       <ReservationPageWrapper>
-        <StyledReservationInfoCard
-          reservation={reservation}
-          bgColor="gold"
-          reservationPrice={reservationPrice}
-          isDiscountRange={isDiscountRange}
-        />
+        <StyledReservationInfoCard reservation={reservation} bgColor="gold" isDiscountRange={isDiscountRange} />
         {notesWhenReserving && (
           <PinkBox>
             <H4 as="h2" $marginTop="none">
@@ -276,6 +271,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     };
   }
 
+  // Only the discount choice comes from the price calculation. If it fails, the customer can reserve without a discount.
   const { data: priceData } = await apolloClient.query<ReservationPriceQuery, ReservationPriceQueryVariables>({
     query: ReservationPriceDocument,
     variables: {
@@ -283,6 +279,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       beginsAt: reservation.beginsAt,
       endsAt: reservation.endsAt,
     },
+    errorPolicy: "all",
   });
 
   const options = await queryOptions(apolloClient, locale ?? "");
@@ -290,7 +287,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       reservation,
-      reservationPrice: priceData.reservationPrice ?? null,
+      canApplyForDiscount: priceData?.reservationPrice?.canApplyForDiscount === true,
       options,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
