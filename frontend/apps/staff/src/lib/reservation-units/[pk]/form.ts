@@ -83,6 +83,15 @@ const PricingFormSchema = z.object({
 
 type PricingFormValues = z.infer<typeof PricingFormSchema>;
 
+/// The price is paid and the form shows it. The form shows a future price only when the handler adds a price change.
+/// The validation, the payment type and the pricing terms use this, so that they agree on which prices are paid.
+export function isShownPaidPricing(
+  pricing: Pick<PricingFormValues, "isPaid" | "isFuture">,
+  hasFuturePricing: boolean
+): boolean {
+  return pricing.isPaid === true && (!pricing.isFuture || hasFuturePricing);
+}
+
 function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx, path: string) {
   if (data == null || data.isReadOnly) {
     return;
@@ -120,13 +129,6 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
   }
 
   if (data.isPaid) {
-    if (Number.isNaN(data.price)) {
-      ctx.addIssue({
-        message: "must be a number",
-        path: [`${path}.price`],
-        code: "custom",
-      });
-    }
     if (data.taxLevel <= 0) {
       ctx.addIssue({
         message: "taxLevel must be selected",
@@ -576,16 +578,26 @@ export const ReservationUnitEditSchema = z
       }
     }
 
-    // A paid price that is not above zero is saved as free, so a negative price is an error in a draft too
+    // A paid price must be above zero, also in a draft. Else the handler chooses paid and the price is saved as free.
     for (let i = 0; i < v.pricings.length; i++) {
       const pricing = v.pricings[i];
-      const isSent = !v.isSharedPricingGroup && (!pricing?.isFuture || v.hasFuturePricing);
-      if (pricing == null || pricing.isReadOnly || !isSent || !pricing.isPaid) {
+      if (
+        pricing == null ||
+        pricing.isReadOnly ||
+        v.isSharedPricingGroup ||
+        !isShownPaidPricing(pricing, v.hasFuturePricing)
+      ) {
         continue;
       }
-      if (pricing.price < 0) {
+      if (Number.isNaN(pricing.price)) {
         ctx.addIssue({
-          message: "Number must be greater than or equal to 0",
+          message: "must be a number",
+          path: [`pricings.${i}.price`],
+          code: "custom",
+        });
+      } else if (pricing.price <= 0) {
+        ctx.addIssue({
+          message: "Number must be greater than 0",
           path: [`pricings.${i}.price`],
           code: "custom",
         });
@@ -760,9 +772,9 @@ export const ReservationUnitEditSchema = z
       });
     }
 
-    const shownPricingList = v.pricings.filter((p) => !p.isFuture || v.hasFuturePricing);
-    const isPaid = shownPricingList.some((p) => p.isPaid && p.price > 0);
-    const hasDiscount = shownPricingList.some((p) => p.isPaid && p.price > 0 && p.canApplyForDiscount);
+    const paidPricingList = v.pricings.filter((p) => isShownPaidPricing(p, v.hasFuturePricing));
+    const isPaid = paidPricingList.length > 0;
+    const hasDiscount = paidPricingList.some((p) => p.canApplyForDiscount);
     if (hasDiscount && v.pricingTerms == null) {
       ctx.addIssue({
         code: "custom",
@@ -1091,7 +1103,8 @@ function transformPricing(
     throw new Error("Tax level is required for pricing");
   }
 
-  const isPaid = values.isPaid && values.price > 0;
+  // The validation makes sure that a paid price is above zero
+  const isPaid = values.isPaid === true;
   const begins = parseUIDate(values.begins) ?? new Date();
   return {
     ...(values.pk > 0 ? { pk: values.pk } : {}),

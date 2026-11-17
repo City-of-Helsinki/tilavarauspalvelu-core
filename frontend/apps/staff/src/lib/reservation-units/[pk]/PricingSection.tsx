@@ -19,6 +19,7 @@ import { formatters as getFormatters } from "ui/src/modules/number-formatters";
 import { AutoGrid, Flex, H5 } from "ui/src/styled";
 import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { getTranslatedError } from "@/modules/helpers";
+import { isShownPaidPricing } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 
@@ -109,7 +110,7 @@ export function PricingSection({
   const futurePricingList = pricings.filter((p) => p.isFuture);
   // The pricing terms are of the reservation unit, so they are shown once, with the first price that has a discount
   const pricingTermsPk = pricings.find(
-    (p) => !p.isReadOnly && (!p.isFuture || hasFuturePricing) && p.isPaid && p.canApplyForDiscount
+    (p) => !p.isReadOnly && isShownPaidPricing(p, hasFuturePricing) && p.canApplyForDiscount
   )?.pk;
 
   const futurePricingFields = futurePricingList.map((pricing) => (
@@ -129,8 +130,7 @@ export function PricingSection({
     // The saved current price can need pricing terms, and no editable price shows the selector then
     const isCurrentPricingTermsShown =
       pricingTermsPk == null &&
-      currentPricing.isPaid === true &&
-      currentPricing.price > 0 &&
+      isShownPaidPricing(currentPricing, hasFuturePricing) &&
       currentPricing.canApplyForDiscount;
     return (
       <EditAccordion forceOpen={hasErrors} heading={t("label.pricings")}>
@@ -189,8 +189,8 @@ export function PricingSection({
 /// The first time the handler adds a future price, it starts as a copy of the current price.
 /// The copy is made once, so the changes of the handler stay if the future price is hidden and shown again.
 function useCopyCurrentPricingToFuture(form: UseFormReturn<ReservationUnitEditFormValues>): void {
-  const { getValues, setValue, watch } = form;
-  const hasFuturePricing = watch("hasFuturePricing");
+  const { control, getValues, setValue } = form;
+  const hasFuturePricing = useWatch({ control, name: "hasFuturePricing" });
   const isCopiedRef = useRef(getValues("pricings").some((p) => p.isFuture && p.pk > 0));
 
   useEffect(() => {
@@ -254,8 +254,12 @@ function PricingTermsSelect({
 
 function PaymentTypeSelect({ form }: Readonly<{ form: UseFormReturn<ReservationUnitEditFormValues> }>) {
   const { t } = useTranslation("reservationUnitEditor");
-  const { control, formState, watch } = form;
-  const isPaid = watch("pricings").some((p) => p.isPaid);
+  const { control, formState } = form;
+  const pricingList = useWatch({ control, name: "pricings" });
+  const hasFuturePricing = useWatch({ control, name: "hasFuturePricing" });
+  const isSharedPricingGroup = useWatch({ control, name: "isSharedPricingGroup" });
+  // The prices of a shared pricing group are not edited here, so they do not make the payment type required
+  const isRequired = !isSharedPricingGroup && pricingList.some((p) => isShownPaidPricing(p, hasFuturePricing));
 
   const paymentTypeOptions = Object.values(PaymentType).map((choice) => ({
     label: t(`translation:paymentType.${choice}`),
@@ -267,7 +271,7 @@ function PaymentTypeSelect({ form }: Readonly<{ form: UseFormReturn<ReservationU
       <ControlledSelect
         control={control}
         name="paymentType"
-        required={isPaid}
+        required={isRequired}
         options={paymentTypeOptions}
         label={t("label.paymentType")}
         tooltip={t("tooltip.paymentType")}
@@ -294,11 +298,12 @@ function PricingFields({
   }
 >) {
   const { t } = useTranslation("reservationUnitEditor");
-  const { control, formState, watch, setValue } = form;
+  const { control, formState, setValue } = form;
   const { errors } = formState;
-  const paymentType = watch("paymentType");
+  const paymentType = useWatch({ control, name: "paymentType" });
+  const pricingList = useWatch({ control, name: "pricings" });
 
-  const index = watch("pricings").findIndex((p) => p.pk === pricing.pk);
+  const index = pricingList.findIndex((p) => p.pk === pricing.pk);
   if (index === -1) {
     return null;
   }

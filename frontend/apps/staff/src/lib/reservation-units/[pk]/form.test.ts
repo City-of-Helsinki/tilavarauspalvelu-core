@@ -562,14 +562,37 @@ describe("ReservationUnitEditSchema", () => {
     expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
   });
 
-  it("rejects a negative paid price in a draft", () => {
+  it.each([0, -5])("rejects a paid price of %d in a draft, so that it is not saved as free", (price) => {
     const values = createValidFormValues({ isDraft: true });
-    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, price: -5 };
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, price };
     const result = ReservationUnitEditSchema.safeParse(values);
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues.map((i) => i.path.join("."))).toContain("pricings.0.price");
     }
+  });
+
+  it("rejects a paid price of zero, and requires the payment type and pricing terms of the paid price", () => {
+    const values = createValidFormValues({ paymentType: null, pricingTerms: null });
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: true, price: 0, canApplyForDiscount: true };
+    const result = ReservationUnitEditSchema.safeParse(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.find((i) => i.path.join(".") === "pricings.0.price")?.message).toBe(
+        "Number must be greater than 0"
+      );
+      expect(result.error.issues.map((i) => i.path.join("."))).toEqual(
+        expect.arrayContaining(["paymentType", "pricingTerms"])
+      );
+    }
+  });
+
+  it("does not require the payment type for a paid future price that is not shown", () => {
+    // The current price is free, and the future price is paid with a discount
+    const { pricings } = convertReservationUnit(createPricingQueryData());
+    const values = createValidFormValues({ pricings, hasFuturePricing: false, paymentType: null, pricingTerms: null });
+    values.pricings[0] = { ...at(values.pricings, 0), isPaid: false, price: 0, canApplyForDiscount: false };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
   });
 
   it("does not require the choice of paid or free in a draft", () => {
