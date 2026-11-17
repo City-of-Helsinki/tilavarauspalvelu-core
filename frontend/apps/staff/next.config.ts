@@ -27,6 +27,7 @@ const config: NextConfig = {
   experimental: {
     cpus: numberOfCores,
     serverSourceMaps: env.SENTRY_CREATE_RELEASE,
+    agentUpgrade: false,
     // A <Link> prefetch loads only the page code. It does not send a data request through the proxy.
     // The default ("flexible") runs the proxy and its backend query for every link in the viewport.
     // The proxy redirects only when the user navigates, so the prefetch does not need its result.
