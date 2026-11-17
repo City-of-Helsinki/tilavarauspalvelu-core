@@ -119,8 +119,8 @@ importers:
         specifier: ^6.0.7
         version: 6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18next:
-        specifier: ^26.7.1
-        version: 26.7.1(typescript@7.0.2)
+        specifier: ^27.1.0
+        version: 27.1.0(typescript@7.0.2)
       import-in-the-middle:
         specifier: ^3.5.2
         version: 3.5.2
@@ -134,8 +134,8 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
       next-i18next:
-        specifier: ^16.4.6
-        version: 16.4.6(@types/react@19.3.0)(i18next@26.7.1(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.11(i18next@26.7.1(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
+        specifier: ^16.4.8
+        version: 16.4.8(@types/react@19.3.0)(i18next@27.1.0(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.0(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
       nuka-carousel:
         specifier: ^7.0.0
         version: 7.0.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -273,8 +273,8 @@ importers:
         specifier: ^7.14.0
         version: 7.14.0
       i18next:
-        specifier: ^26.7.1
-        version: 26.7.1(typescript@7.0.2)
+        specifier: ^27.1.0
+        version: 27.1.0(typescript@7.0.2)
       import-in-the-middle:
         specifier: ^3.5.2
         version: 3.5.2
@@ -285,8 +285,8 @@ importers:
         specifier: ^16.4.2
         version: 16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0)
       next-i18next:
-        specifier: ^16.4.6
-        version: 16.4.6(@types/react@19.3.0)(i18next@26.7.1(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.11(i18next@26.7.1(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
+        specifier: ^16.4.8
+        version: 16.4.8(@types/react@19.3.0)(i18next@27.1.0(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.0(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
       quill:
         specifier: ^2.0.3
         version: 2.0.3
@@ -421,8 +421,8 @@ importers:
         specifier: ^6.0.7
         version: 6.0.7(@types/react@19.3.0)(graphql-ws@6.4.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18next:
-        specifier: ^26.7.1
-        version: 26.7.1(typescript@7.0.2)
+        specifier: ^27.1.0
+        version: 27.1.0(typescript@7.0.2)
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
@@ -512,8 +512,8 @@ importers:
         specifier: ^16.4.2
         version: 16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0)
       next-i18next:
-        specifier: ^16.4.6
-        version: 16.4.6(@types/react@19.3.0)(i18next@26.7.1(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.11(i18next@26.7.1(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
+        specifier: ^16.4.8
+        version: 16.4.8(@types/react@19.3.0)(i18next@27.1.0(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.0(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
       postcss-styled-syntax:
         specifier: ^0.7.3
         version: 0.7.3(postcss@8.5.29)
@@ -709,8 +709,8 @@ packages:
     resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/runtime@8.0.10':
-    resolution: {integrity: sha512-0QyWQOIhl2onOgg96BuOYV+oCgLINVDPC8RkVPCiQhLILVqpefDUmcY+aAsW6vp7fcuTZL6SXXlFrSDCTFIu1w==}
+  '@babel/runtime@8.1.0':
+    resolution: {integrity: sha512-MQye/pU7gzXerMzlhScFNH1u4Je6rR8cqJWSgAfD+rIwbbtwG8tVDegoI7sWfcXkfVRW09G7vk2vjxGIuKFfwg==}
 
   '@babel/template@7.29.7':
     resolution: {integrity: sha512-puq+Gf35oI24FeN11LkoUQFqv9uwNeWpxXZi/Ji3rRIoKAzKnxRaZ+Gkj0vKS9ZCiTESfng1N9LyOyXvo+m+Gg==}
@@ -3440,8 +3440,8 @@ packages:
     resolution: {integrity: sha512-rNjApaLzuwaOTjCiT8lSDdGN1APCiqkChLMJxJPWLunPAt5fy8xgU9/jNOchV84wfIxrA0lRQB7oCT8jrn/wrQ==}
     engines: {node: '>=6.0'}
 
-  ci-info@4.4.0:
-    resolution: {integrity: sha512-77PSwercCZU2Fc4sX94eF8k8Pxte6JAwL4/ICZLFjJLqegs7kCuAsqqj/70NQF6TvDpgFjkubQB2FW2ZZddvQg==}
+  ci-info@4.5.0:
+    resolution: {integrity: sha512-d1uM8k5UZEyPza1n/MG3ko8nKupKN0KJpFsipgPcgaCCvV+IqIfJ+NzTjetlLM+UcXZx3+cLrNr76+eAO7G1Mw==}
     engines: {node: '>=8'}
 
   cjs-module-lexer@2.3.0:
@@ -4116,8 +4116,9 @@ packages:
   i18next-resources-to-backend@1.2.4:
     resolution: {integrity: sha512-NV0bCktHrBNyEnjS5sq5k6J8HL3A+iR2MORcSJ7ZbQOnRwizrRmq+8K9WsdYy9mJv/Vki3VPnspBcFmF97UsQw==}
 
-  i18next@26.7.1:
-    resolution: {integrity: sha512-cX+3RRVczel/V2kCMTACckSGSpqgtWYEA6beXNYVms7dOQiHojdPYHD26lT4IKimNeoGWrLvtPgjftbRvmZJVw==}
+  i18next@27.1.0:
+    resolution: {integrity: sha512-xdjb2OXFRm33rClqknpJmmYBvrPcaoEQ7/4kur5uTrbqckqzkbRO0ns6gFFki5TDmHzbIrFYpNBXhaRafmhJ/Q==}
+    engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
     peerDependenciesMeta:
@@ -4510,10 +4511,11 @@ packages:
   next-compose-plugins@2.2.1:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
 
-  next-i18next@16.4.6:
-    resolution: {integrity: sha512-Nm/zOpgMB+rwsal6SWTEy1l4KPxPy6v7ckOTzX1uDfM08wNEK78kLlHByApwY+QUOBTB4Mu4wJIBdBQa/SLtsw==}
+  next-i18next@16.4.8:
+    resolution: {integrity: sha512-vXD1HgEEDENuk1xSV18ugx+g8zHSdJ1E1/q7S2k83sXO+ux9QH1HVHTUUiYzm4bxPhPcXlDiaeiSLSylycUWaA==}
     engines: {node: '>=20'}
     peerDependencies:
+      '@types/react': '*'
       i18next: '>= 23.7.13'
       i18next-icu: '>= 2.0.0'
       i18next-mf2: '>= 1.0.0'
@@ -4521,6 +4523,8 @@ packages:
       react: '>= 18.0.0'
       react-i18next: '>= 14.0.0'
     peerDependenciesMeta:
+      '@types/react':
+        optional: true
       i18next-icu:
         optional: true
       i18next-mf2:
@@ -5044,12 +5048,12 @@ packages:
   scheduler@0.28.0:
     resolution: {integrity: sha512-juorfCmIkIw8tT+p5BXSm6PJjQF/ycEYmKyzURCIt/RaZIhL+PulbQ9Yu2z1HdOJDdqDTlxA1+xKBmHXJsczAw==}
 
-  schema-utils@4.8.2:
-    resolution: {integrity: sha512-iKlak3OFHF0dgD1nZRvgWQzG+P1TiEcMnLSBtIVBg937z5Jd6WE1c3SyZkXIyCfPHowL35yMsVvIjotm1c1qiw==}
+  schema-utils@4.8.3:
+    resolution: {integrity: sha512-qIfo3f+lRNqnMPgpXSKvUhsT3pY5U+ppmgGr4j8LanFP3W/Ze+xj8DY/dPb5qVu3m6qFIMyMWKVRLNKxrNhxWg==}
     engines: {node: '>= 10.13.0'}
     hasBin: true
     peerDependencies:
-      webpack: ^5.112.0
+      webpack: ^5.0.0
     peerDependenciesMeta:
       webpack:
         optional: true
@@ -5616,8 +5620,8 @@ packages:
   warning@4.0.3:
     resolution: {integrity: sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==}
 
-  watchpack@2.6.3:
-    resolution: {integrity: sha512-s3NZy0QpTY9qGqzc0wtz4qI28z3+5qKbbAec4MV4G9N3CfgZ9wgvQRr0cl2jh/tqkWG1NWHkmVMHZpCamev5Wg==}
+  watchpack@2.6.4:
+    resolution: {integrity: sha512-5H3Tce2GfzWbcr9VnSqyak2whFaONw4BdmI5BDnMXold4qSlCFd64XaMQESRh2vkDKmdUkv6rUo17UvZ9f9nXw==}
     engines: {node: '>=10.13.0'}
 
   web-streams-polyfill@3.3.3:
@@ -5791,7 +5795,7 @@ snapshots:
 
   '@ardatan/relay-compiler@13.0.2(graphql@16.14.2)':
     dependencies:
-      '@babel/runtime': 8.0.10
+      '@babel/runtime': 8.1.0
       graphql: 16.14.2
       immutable: 5.1.9
       invariant: 2.2.4
@@ -5961,7 +5965,7 @@ snapshots:
 
   '@babel/runtime@7.29.7': {}
 
-  '@babel/runtime@8.0.10': {}
+  '@babel/runtime@8.1.0': {}
 
   '@babel/template@7.29.7':
     dependencies:
@@ -8436,7 +8440,7 @@ snapshots:
 
   chrome-trace-event@1.0.4: {}
 
-  ci-info@4.4.0: {}
+  ci-info@4.5.0: {}
 
   cjs-module-lexer@2.3.0: {}
 
@@ -9109,9 +9113,9 @@ snapshots:
 
   i18next-resources-to-backend@1.2.4:
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
 
-  i18next@26.7.1(typescript@7.0.2):
+  i18next@27.1.0(typescript@7.0.2):
     optionalDependencies:
       typescript: 7.0.2
 
@@ -9239,7 +9243,7 @@ snapshots:
       '@jest/types': 30.4.1
       '@types/node': 24.19.2
       chalk: 4.1.2
-      ci-info: 4.4.0
+      ci-info: 4.5.0
       graceful-fs: 4.2.11
       picomatch: 4.0.7
 
@@ -9455,17 +9459,17 @@ snapshots:
 
   next-compose-plugins@2.2.1: {}
 
-  next-i18next@16.4.6(@types/react@19.3.0)(i18next@26.7.1(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.11(i18next@26.7.1(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0):
+  next-i18next@16.4.8(@types/react@19.3.0)(i18next@27.1.0(typescript@7.0.2))(next@16.4.2(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.0(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0):
     dependencies:
       '@types/hoist-non-react-statics': 3.3.7(@types/react@19.3.0)
       hoist-non-react-statics: 3.3.2
-      i18next: 26.7.1(typescript@7.0.2)
+      i18next: 27.1.0(typescript@7.0.2)
       i18next-resources-to-backend: 1.2.4
       next: 16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0)
       react: 19.3.0
-      react-i18next: 17.1.11(i18next@26.7.1(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
-    transitivePeerDependencies:
-      - '@types/react'
+      react-i18next: 17.1.11(i18next@27.1.0(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
+    optionalDependencies:
+      '@types/react': 19.3.0
 
   next@16.4.2(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0):
     dependencies:
@@ -9834,11 +9838,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
-  react-i18next@17.1.11(i18next@26.7.1(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2):
+  react-i18next@17.1.11(i18next@27.1.0(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2):
     dependencies:
       '@babel/runtime': 7.29.13
       html-parse-stringify: 4.0.1
-      i18next: 26.7.1(typescript@7.0.2)
+      i18next: 27.1.0(typescript@7.0.2)
       react: 19.3.0
       use-sync-external-store: 1.7.0(react@19.3.0)
     optionalDependencies:
@@ -10051,7 +10055,7 @@ snapshots:
 
   rtl-css-js@1.16.1:
     dependencies:
-      '@babel/runtime': 7.29.10
+      '@babel/runtime': 7.29.13
 
   run-parallel@1.2.0:
     dependencies:
@@ -10084,7 +10088,7 @@ snapshots:
 
   scheduler@0.28.0: {}
 
-  schema-utils@4.8.2(webpack@5.107.2(postcss@8.5.29)):
+  schema-utils@4.8.3(webpack@5.107.2(postcss@8.5.29)):
     dependencies:
       '@types/json-schema': 7.0.15
       ajv: 8.20.0
@@ -10374,7 +10378,7 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
-      schema-utils: 4.8.2(webpack@5.107.2(postcss@8.5.29))
+      schema-utils: 4.8.3(webpack@5.107.2(postcss@8.5.29))
       terser: 5.51.2
       webpack: 5.107.2(postcss@8.5.29)
     optionalDependencies:
@@ -10609,7 +10613,7 @@ snapshots:
     dependencies:
       loose-envify: 1.4.0
 
-  watchpack@2.6.3:
+  watchpack@2.6.4:
     dependencies:
       graceful-fs: 4.2.11
 
@@ -10639,10 +10643,10 @@ snapshots:
       loader-runner: 4.3.2
       mime-db: 1.54.0
       neo-async: 2.6.2
-      schema-utils: 4.8.2(webpack@5.107.2(postcss@8.5.29))
+      schema-utils: 4.8.3(webpack@5.107.2(postcss@8.5.29))
       tapable: 2.3.3
       terser-webpack-plugin: 5.6.1(postcss@8.5.29)(webpack@5.107.2(postcss@8.5.29))
-      watchpack: 2.6.3
+      watchpack: 2.6.4
       webpack-sources: 3.7.0
     transitivePeerDependencies:
       - '@minify-html/node'
