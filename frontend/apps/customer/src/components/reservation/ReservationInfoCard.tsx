@@ -160,8 +160,9 @@ export function ReservationInfoCard({
             `(${t("common:inclTax", {
               taxPercentage: formatters.strippedDecimal?.format(taxPercentage),
             })})`}
-          {priceLineList.map((priceLine) => (
-            <div key={priceLine}>{priceLine}</div>
+          {priceLineList.map((priceLine, index) => (
+            // oxlint-disable-next-line react/no-array-index-key -- two lines can have the same text, and the list never changes order
+            <div key={index}>{priceLine}</div>
           ))}
         </div>
         {reservation.accessType !== AccessType.Unrestricted && (
