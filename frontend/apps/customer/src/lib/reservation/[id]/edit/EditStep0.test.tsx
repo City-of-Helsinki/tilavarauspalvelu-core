@@ -168,6 +168,21 @@ describe("EditStep0", () => {
     expect(nextStep).not.toHaveBeenCalled();
   });
 
+  it("does not count a missing price of the new time as free", async () => {
+    const nextStep = vi.fn();
+    const { request } = createPriceMock("0.00");
+    customRender({ nextStep, mocks: [{ request, result: { data: { reservationPrice: null } } }] });
+
+    const form = screen.getByTestId("reservation__button--continue").closest("form");
+    form?.requestSubmit();
+
+    await waitFor(() =>
+      expect(mockErrorToast).toHaveBeenCalledWith({ text: "reservationCalendar:errors.priceNotLoaded" })
+    );
+    expect(mockIsRangeReservable).not.toHaveBeenCalled();
+    expect(nextStep).not.toHaveBeenCalled();
+  });
+
   it("does not call nextStep when the price of the new time does not load", async () => {
     const nextStep = vi.fn();
     const { request } = createPriceMock("0.00");
@@ -177,7 +192,7 @@ describe("EditStep0", () => {
     form?.requestSubmit();
 
     await waitFor(() =>
-      expect(mockErrorToast).toHaveBeenCalledWith({ text: "reservationCalendar:errors.unavailable" })
+      expect(mockErrorToast).toHaveBeenCalledWith({ text: "reservationCalendar:errors.priceNotLoaded" })
     );
     expect(mockIsRangeReservable).not.toHaveBeenCalled();
     expect(nextStep).not.toHaveBeenCalled();

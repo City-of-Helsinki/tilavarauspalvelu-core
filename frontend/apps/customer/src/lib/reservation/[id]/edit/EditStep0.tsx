@@ -148,9 +148,12 @@ function EditStep0({
       variables: { reservationUnit: reservationUnit.pk ?? 0, beginsAt: start.toISOString(), endsAt: end.toISOString() },
     });
     // Only a free of charge reservation can be changed. A price that did not load is not free.
-    const isFree =
-      priceError == null && (priceData?.reservationPrice == null || Number(priceData.reservationPrice.total) === 0);
-    if (!isFree) {
+    const reservationPrice = priceData?.reservationPrice;
+    if (priceError != null || reservationPrice == null) {
+      errorToast({ text: t("reservationCalendar:errors.priceNotLoaded") });
+      return;
+    }
+    if (Number(reservationPrice.total) !== 0) {
       errorToast({ text: t("reservationCalendar:errors.unavailable") });
       return;
     }

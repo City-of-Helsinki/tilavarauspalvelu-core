@@ -76,7 +76,8 @@
     "collision": "Kohde on jo varattu valitsemanasi ajankohtana. Muuta varauksen ajankohtaa.",
     "unavailable": "Kohde ei ole varattavissa kyseisenä ajankohtana. Muuta varauksen ajankohtaa.",
     "termsNotAccepted": "Hyväksy sopimusehdot jatkaaksesi varausta.",
-    "invalidReservationRedirect": "Varaus ei ole enää voimassa."
+    "invalidReservationRedirect": "Varaus ei ole enää voimassa.",
+    "priceNotLoaded": "Varauksen hintaa ei voitu hakea. Yritä hetken kuluttua uudelleen."
   },
   "reservingStartsAt": "Kohde on varattavissa {{date}} alkaen.",
   "reservationQuota": {
