@@ -5,6 +5,8 @@ description: >-
   Use when the user references a Jira issue or epic with a URL or a key like TILA-123,
   asks to list the issues of an epic, asks to edit, label, link, assign or change the status of an issue,
   or asks to create an issue.
+  Also use when the user asks what they or the whole team did in Jira in a time window,
+  for example the past two weeks.
 ---
 
 How to read, list, change and create Jira issues.
@@ -68,6 +70,42 @@ Each link has the link type, the direction from the child issue (for example "is
 
 Add `--with-description` to also get each description. The output is much longer with descriptions.
 To read one child issue with its comments, use `jira-issue`.
+
+### List what you or the team did in a time window
+
+```bash
+.agents/skills/jira-issue/jira-activity
+.agents/skills/jira-issue/jira-activity --since 2026-11-01 --until 2026-11-15
+.agents/skills/jira-issue/jira-activity --team --summary-only
+```
+
+| Option           | Value                                                                  |
+|------------------|------------------------------------------------------------------------|
+| `--team`         | The whole project, with totals for the team. Without it, your own work. |
+| `--since <date>` | The first day, `YYYY-MM-DD`. Default 14 days ago.                      |
+| `--until <date>` | The last day, `YYYY-MM-DD`. Default today.                             |
+| `--summary-only` | Print only the counts, not the issues.                                 |
+
+The script shows only your own work or the team totals. It has no option for the work of another person.
+The team agreed on this, because nobody uses the summaries to report on or follow other people.
+If the user asks for the work of another person, tell them this and do not work around it.
+
+The script prints JSON with a `summary` and a list of `issues`:
+
+- `summary.by_status` counts the issues by their status now.
+- `summary.created`, `summary.comments` and `summary.moved_to` count what you did in the window,
+  or for `--team`, what the whole team did. `moved_to` counts the status changes by target status.
+  For the team, it includes "Automation for Jira", which moves issues to Testing when a pull request merges.
+- Each issue has its key, URL, summary, type, status, assignee and parent (usually the epic).
+  `events` lists the status changes, assignee changes, creation and comments in the window, oldest first.
+  For `--team`, the issues and events do not name the persons.
+
+For you, the list has the issues where you did something in the window or that you have now.
+For `--team`, it has the issues that changed status or were created in the window.
+Jira cannot search for comments, so an issue that you only commented on is not in the list.
+
+Tempo logs the hours in Jira as a bot user, so the script cannot show whose hours they are.
+To match the work to the hours, combine the events with the pull requests from the `github-pr` skill.
 
 ### Change an issue
 

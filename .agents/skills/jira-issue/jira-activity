@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+# List what you or the whole team did in Jira in a date window, from the Jira Cloud REST API.
+# Usage: jira-activity [--team] [--since <date>] [--until <date>] [--summary-only]
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: jira-activity [--team] [--since <date>] [--until <date>] [--summary-only]
+  --team            The whole project, with totals for the team. Without it, your own work.
+  --since <date>    The first day, YYYY-MM-DD. Default: 14 days ago.
+  --until <date>    The last day, YYYY-MM-DD. Default: today.
+  --summary-only    Print only the counts, not the issues.
+EOF
+  exit 2
+}
+
+# The script shows only your own work or the team totals, not the work of another person.
+# The team agreed on this. Do not add an option for another person.
+team=false
+since=""
+until_date=""
+summary_only=false
+
+while [[ $# -gt 0 ]]; do
+  option="$1"
+  shift
+  case "$option" in
+    --team) team=true ;;
+    --summary-only) summary_only=true ;;
+    --since | --until)
+      [[ $# -ge 1 ]] || { echo "Missing value for $option" >&2; usage; }
+      [[ "$option" == --since ]] && since="$1" || until_date="$1"
+      shift
+      ;;
+    *) echo "Unknown option: $option" >&2; usage ;;
+  esac
+done
+
+# GNU date takes -d. BSD date on macOS takes -v.
+[[ -n "$since" ]] || since="$(date -d '-14 days' +%F 2>/dev/null || date -v-14d +%F)"
+[[ -n "$until_date" ]] || until_date="$(date +%F)"
+for day in "$since" "$until_date"; do
+  [[ "$day" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "Not a date in the form YYYY-MM-DD: $day" >&2; usage; }
+done
+[[ ! "$since" > "$until_date" ]] || { echo "--since $since is after --until $until_date." >&2; exit 2; }
+
+load_credentials
+
+# JQL reads a date without a time as the start of the day. Give the end of the last day.
+start="\"$since 00:00\""
+end="\"$until_date 23:59\""
+
+if [[ "$team" == true ]]; then
+  me=""
+  jql="project = TILA AND (status CHANGED DURING ($start, $end) OR created >= $start AND created <= $end)"
+else
+  me="$(api "rest/api/2/myself" | jq --raw-output '.displayName')"
+  # JQL cannot find the issues that you only commented on.
+  jql="project = TILA AND updated >= $start AND (assignee = currentUser() OR assignee WAS currentUser() DURING ($start, $end)"
+  jql="$jql OR status CHANGED BY currentUser() DURING ($start, $end) OR reporter = currentUser() AND created >= $start AND created <= $end)"
+fi
+
+# The old `rest/api/2/search` is removed from Jira Cloud. `search/jql` pages with `nextPageToken`.
+fields="summary,status,issuetype,assignee,reporter,parent,created,updated,comment"
+encoded_jql="$(jq --raw-output --null-input --arg q "$jql ORDER BY updated DESC" '$q | @uri')"
+issues="[]"
+page_token=""
+while :; do
+  path="rest/api/2/search/jql?jql=$encoded_jql&fields=$fields&expand=changelog&maxResults=100"
+  [[ -z "$page_token" ]] || path="$path&nextPageToken=$(jq --raw-output --null-input --arg t "$page_token" '$t | @uri')"
+  page="$(api "$path")"
+  issues="$(jq --slurp '.[0] + .[1].issues' <(printf '%s' "$issues") <(printf '%s' "$page"))"
+  page_token="$(jq --raw-output '.nextPageToken // empty' <<<"$page")"
+  [[ "$(jq '.isLast' <<<"$page")" != true && -n "$page_token" ]] || break
+done
+
+# The search gives at most 100 changes and 20 comments of an issue, and for a long changelog not the newest.
+# Fetch the full changelog and comments of those issues. Both endpoints page with startAt.
+fetch_all() {
+  local path="$1" list="$2" start_at=0 page all="[]"
+  while :; do
+    page="$(api "$path?startAt=$start_at&maxResults=100")"
+    all="$(jq --slurp --arg l "$list" '.[0] + .[1][$l]' <(printf '%s' "$all") <(printf '%s' "$page"))"
+    start_at="$(jq 'length' <<<"$all")"
+    [[ "$start_at" -lt "$(jq '.total' <<<"$page")" && "$(jq --arg l "$list" '.[$l] | length' <<<"$page")" -gt 0 ]] || break
+  done
+  printf '%s' "$all"
+}
+for key in $(jq --raw-output '.[] | select(.changelog.total > (.changelog.histories | length)) | .key' <<<"$issues"); do
+  histories="$(fetch_all "rest/api/2/issue/$key/changelog" values)"
+  issues="$(jq --arg k "$key" --slurpfile h <(printf '%s' "$histories") \
+    'map(if .key == $k then .changelog = {total: ($h[0] | length), histories: $h[0]} else . end)' <<<"$issues")"
+done
+for key in $(jq --raw-output '.[] | select(.fields.comment.total > (.fields.comment.comments | length)) | .key' <<<"$issues"); do
+  comments="$(fetch_all "rest/api/2/issue/$key/comment" comments)"
+  issues="$(jq --arg k "$key" --slurpfile c <(printf '%s' "$comments") \
+    'map(if .key == $k then .fields.comment = {total: ($c[0] | length), comments: $c[0]} else . end)' <<<"$issues")"
+done
+
+# A Jira timestamp has the offset of the user's time zone, e.g. 2026-11-12T14:01:00.000+0200.
+# Its first 10 characters are the local date, so compare the dates as text.
+# Tempo writes the worklogs as a bot user, so the changelog does not tell whose hours they are.
+jq --arg base "$base_url" --arg since "$since" --arg until "$until_date" --arg me "$me" \
+  --argjson summary_only "$summary_only" '
+  def in_window: .[0:10] as $d | $d >= $since and $d <= $until;
+  def count_by(f): group_by(f) | map({key: (.[0] | f), value: length}) | from_entries;
+  def team: $me == "";
+
+  map(
+    {
+      key,
+      url: "\($base)/browse/\(.key)",
+      summary: .fields.summary,
+      type: .fields.issuetype.name,
+      status: .fields.status.name,
+      assignee: .fields.assignee.displayName,
+      parent: (.fields.parent | if . then {key, summary: .fields.summary} else null end),
+      created: .fields.created[0:10],
+      events: (
+        [
+          if (.fields.created | in_window)
+          then {at: .fields.created[0:16], by: .fields.reporter.displayName, change: "created"}
+          else empty end
+        ]
+        + [
+          .changelog.histories[]
+          | select(.created | in_window)
+          | .created[0:16] as $at
+          | .author.displayName as $by
+          | .items[]
+          | select(.field == "status" or .field == "assignee")
+          | {at: $at, by: $by, change: .field, from: .fromString, to: .toString}
+        ]
+        + [
+          .fields.comment.comments[]
+          | select(.created | in_window)
+          | {at: .created[0:16], by: .author.displayName, change: "comment"}
+        ]
+        | sort_by(.at)
+      )
+    }
+  )
+  # For you, keep the issues where you did something in the window or that you have now.
+  | map(select(team or .assignee == $me or any(.events[]; .by == $me)))
+  | sort_by(.events[-1].at // "") | reverse
+  # Count your own events, or all events for the team. The team totals do not name the persons.
+  | ([.[].events[] | select(team or .by == $me)]) as $counted
+  | {
+      who: (if team then "team" else $me end),
+      since: $since,
+      until: $until,
+      summary: {
+        issues: length,
+        by_status: (map(.status) | count_by(.)),
+        created: ($counted | map(select(.change == "created")) | length),
+        comments: ($counted | map(select(.change == "comment")) | length),
+        moved_to: ($counted | map(select(.change == "status")) | count_by(.to))
+      }
+    }
+    + (
+      if $summary_only then {}
+      elif team then {issues: map(.events |= map(del(.by)) | del(.assignee))}
+      else {issues: .}
+      end
+    )
+' <<<"$issues"
