@@ -4,6 +4,7 @@ import type { GetServerSidePropsContext } from "next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
@@ -12,16 +13,18 @@ import {
   createNodeId,
   filterNonNullable,
   getLocalizationLang,
+  getTranslation,
   ignoreMaybeArray,
   toNumber,
 } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
-import { ApplicationPage1Document, useUpdateApplicationMutation } from "@gql/gql-types";
+import { ApplicationFormType, ApplicationPage1Document, useUpdateApplicationMutation } from "@gql/gql-types";
 import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql/gql-types";
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
   ApplicationPage1SchemaRefined,
   clearPriceOptionsIfNoneOffered,
+  SPORT_OTHER_OPTION_VALUE,
   transformApplicationPage1,
   convertApplicationPage1,
 } from "@/components/application/funnel/form";
@@ -37,10 +40,13 @@ function Page1({
   options: optionsOrig,
   priceOptionList,
   offeredPriceOptionPkList,
+  sports,
+  participantGenders,
 }: Pick<
   PropsNarrowed,
-  "application" | "options" | "priceOptionList" | "offeredPriceOptionPkList"
+  "application" | "options" | "priceOptionList" | "offeredPriceOptionPkList" | "sports" | "participantGenders"
 >): React.ReactElement {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const dislayError = useDisplayError();
   const [mutate, { loading: isSaving }] = useUpdateApplicationMutation();
@@ -72,6 +78,19 @@ function Page1({
   // Do not keep them in localStorage or similar, because that state goes stale and its bugs are hard to track.
   const { getReservationUnits } = useReservationUnitList(applicationRound);
 
+  const lang = getLocalizationLang(i18n.language);
+  const sportsFormOptions = {
+    sports: [
+      ...sports.map((sport) => ({ value: sport.pk ?? 0, label: getTranslation(sport, "name", lang) })),
+      { value: SPORT_OTHER_OPTION_VALUE, label: t("application:Page1.sportOtherOption") },
+    ],
+    participantGenders: participantGenders.map((gender) => ({
+      value: gender.pk ?? 0,
+      label: getTranslation(gender, "name", lang),
+    })),
+  };
+
+  const isSportsForm = applicationRound.applicationForm === ApplicationFormType.SportsForm;
   const begin = parseApiDate(applicationRound.reservationPeriodBeginDate) ?? new Date();
   const end = parseApiDate(applicationRound.reservationPeriodEndDate) ?? new Date();
   const form = useForm<ApplicationPage1FormValues>({
@@ -80,7 +99,7 @@ function Page1({
       convertApplicationPage1(application, getReservationUnits()),
       offeredPriceOptionPkList
     ),
-    resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end }, { offeredPriceOptionPkList })),
+    resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end, isSportsForm }, { offeredPriceOptionPkList })),
   });
 
   const { handleSubmit, trigger, getValues } = form;
@@ -112,6 +131,7 @@ function Page1({
             isSaving={isSaving || form.formState.isSubmitting}
             options={options}
             priceOptionList={priceOptionList}
+            sportsFormOptions={sportsFormOptions}
           />
         </ApplicationFunnelWrapper>
       </Flex>
@@ -144,7 +164,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       id: createNodeId("ApplicationNode", pk),
     },
   });
-  const { application } = data;
+  const { application, sports, participantGenders } = data;
   if (application == null) {
     return notFound;
   }
@@ -162,6 +182,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       options: searchOptionsList,
       priceOptionList: roundPriceOptionList.map((priceOption) => translateOption(priceOption, lang)),
       offeredPriceOptionPkList: toPriceOptionPkList(roundPriceOptionList),
+      sports: sports ?? [],
+      participantGenders: participantGenders ?? [],
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -173,6 +195,20 @@ export const APPLICATION_PAGE1_QUERY = gql`
   query ApplicationPage1($id: ID!) {
     application(id: $id) {
       ...ApplicationForm
+    }
+    sports(orderBy: [rankAsc]) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    participantGenders(orderBy: [rankAsc]) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
     }
   }
 `;

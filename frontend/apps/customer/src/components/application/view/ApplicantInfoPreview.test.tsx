@@ -16,7 +16,7 @@ function customRender({
     applicantType,
     additionalInformation,
   };
-  return render(<ApplicantInfoPreview application={application} />);
+  return render(<ApplicantInfoPreview application={application} isSportsForm={false} />);
 }
 
 describe("ApplicantInfoPreview", () => {

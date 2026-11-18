@@ -9,19 +9,28 @@ import { ControlledNumberInput, ControlledSelect } from "ui/src/components/form"
 import { formatDate, formatDateRange, parseApiDate } from "ui/src/modules/date-utils";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import type { OptionsListT, OptionT } from "ui/src/modules/search";
-import { AutoGrid, Flex, H4 } from "ui/src/styled";
+import { AutoGrid, Flex, H4, H5 } from "ui/src/styled";
+import { ApplicationFormType } from "@gql/gql-types";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { Accordion } from "@/components/Accordion";
 import { ApplicationSectionSummary } from "@/components/application/funnel/ApplicationSectionSummary";
 import { ReservationUnitList } from "@/components/application/funnel/ReservationUnitList";
 import { getDurationOptions } from "@/modules/const";
+import { SPORT_OTHER_OPTION_VALUE } from "./form";
 import type { ApplicationPage1FormValues } from "./form";
+
+/** The select options of the sports form. The sports include the "other sport" option. */
+export type SportsFormOptions = Readonly<{
+  sports: ReadonlyArray<OptionT>;
+  participantGenders: ReadonlyArray<OptionT>;
+}>;
 
 type Props = Readonly<{
   index: number;
   applicationRound: ApplicationRoundForApplicationFragment;
   options: Readonly<OptionsListT>;
   priceOptionList: Readonly<OptionT[]>;
+  sportsFormOptions: SportsFormOptions;
   onDeleteEvent: () => void;
 }>;
 
@@ -30,6 +39,7 @@ function ApplicationSectionInner({
   applicationRound,
   options,
   priceOptionList,
+  sportsFormOptions,
   onDeleteEvent,
 }: Props): React.ReactElement {
   const { t, i18n } = useTranslation();
@@ -60,6 +70,8 @@ function ApplicationSectionInner({
   const applicationPeriodBeginsAt = watch(`applicationSections.${index}.begin`);
   const applicationPeriodEndsAt = watch(`applicationSections.${index}.end`);
   const numPersons = watch(`applicationSections.${index}.numPersons`);
+  const isSportsForm = applicationRound.applicationForm === ApplicationFormType.SportsForm;
+  const isOtherSport = watch(`applicationSections.${index}.sport`) === SPORT_OTHER_OPTION_VALUE;
 
   const selectionIsDefaultPeriod =
     applicationPeriodEndsAt != null &&
@@ -78,7 +90,10 @@ function ApplicationSectionInner({
     | "name"
     | "appliedReservationsPerWeek"
     | "reservationUnits"
-    | "priceOption";
+    | "priceOption"
+    | "sport"
+    | "sportOther"
+    | "leagueLevel";
   const getTranslatedError = (field: FieldName): string | undefined => {
     const error = errors.applicationSections?.[index]?.[field];
     if (error?.message != null) {
@@ -148,7 +163,52 @@ function ApplicationSectionInner({
             error={getTranslatedError("priceOption")}
           />
         )}
+        {isSportsForm && (
+          <ControlledSelect
+            control={control}
+            options={sportsFormOptions.participantGenders}
+            name={`applicationSections.${index}.participantGender`}
+            label={t("application:Page1.participantGender")}
+            clearable
+          />
+        )}
       </AutoGrid>
+      {isSportsForm && (
+        <>
+          <H5 as="h4">{t("application:Page1.sportSubHeading")}</H5>
+          <AutoGrid>
+            <ControlledSelect
+              control={control}
+              options={sportsFormOptions.sports}
+              name={`applicationSections.${index}.sport`}
+              label={t("application:Page1.sport")}
+              required
+              enableSearch
+              error={getTranslatedError("sport")}
+            />
+            {isOtherSport && (
+              <TextInput
+                {...register(`applicationSections.${index}.sportOther`)}
+                label={t("application:Page1.sportOther")}
+                id={`applicationSections.${index}.sportOther`}
+                required
+                invalid={errors.applicationSections?.[index]?.sportOther != null}
+                errorText={getTranslatedError("sportOther")}
+              />
+            )}
+          </AutoGrid>
+          <AutoGrid>
+            <TextInput
+              {...register(`applicationSections.${index}.leagueLevel`)}
+              label={t("application:Page1.leagueLevel")}
+              id={`applicationSections.${index}.leagueLevel`}
+              helperText={t("application:Page1.leagueLevelHelper")}
+              invalid={errors.applicationSections?.[index]?.leagueLevel != null}
+              errorText={getTranslatedError("leagueLevel")}
+            />
+          </AutoGrid>
+        </>
+      )}
       <H4 as="h3"> {t("application:Page1.spacesSubHeading")}</H4>
       <ReservationUnitList
         name={`applicationSections.${index}.reservationUnits`}
@@ -341,5 +401,6 @@ export const APPLICATION_ROUND_FRAGMENT = gql`
     }
     reservationPeriodBeginDate
     reservationPeriodEndDate
+    applicationForm
   }
 `;

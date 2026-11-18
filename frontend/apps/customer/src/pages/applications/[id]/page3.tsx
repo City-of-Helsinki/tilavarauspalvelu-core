@@ -10,7 +10,12 @@ import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { AutoGrid, ButtonContainer, Flex } from "ui/src/styled";
-import { ApplicationPage3Document, ReserveeType, useUpdateApplicationMutation } from "@gql/gql-types";
+import {
+  ApplicationFormType,
+  ApplicationPage3Document,
+  ReserveeType,
+  useUpdateApplicationMutation,
+} from "@gql/gql-types";
 import type { ApplicationPage3Query, ApplicationPage3QueryVariables } from "@gql/gql-types";
 import {
   ApplicantTypeSelector,
@@ -31,7 +36,7 @@ import { getApplicationRoundPriceOptions, toPriceOptionPkList } from "@/modules/
 import { getApplicationPath } from "@/modules/urls";
 import { FormSubHeading } from "@/styled/application";
 
-function Page3Form(): React.ReactElement | null {
+function Page3Form({ isSportsForm }: Readonly<{ isSportsForm: boolean }>): React.ReactElement | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
@@ -67,9 +72,9 @@ function Page3Form(): React.ReactElement | null {
     case ReserveeType.Individual:
       return <IndividualForm />;
     case ReserveeType.Nonprofit:
-      return <OrganisationForm />;
+      return <OrganisationForm isSportsForm={isSportsForm} />;
     case ReserveeType.Company:
-      return <CompanyForm />;
+      return <CompanyForm isSportsForm={isSportsForm} />;
     case undefined:
       return null;
   }
@@ -80,10 +85,11 @@ export default function Page3({
   offeredPriceOptionPkList,
 }: Pick<PropsNarrowed, "application" | "offeredPriceOptionPkList">): React.ReactElement {
   const router = useRouter();
+  const isSportsForm = application.applicationRound.applicationForm === ApplicationFormType.SportsForm;
 
   const form = useForm<ApplicationPage3FormValues>({
     mode: "onChange",
-    values: convertApplicationPage3(application),
+    values: convertApplicationPage3(application, isSportsForm),
     resolver: zodResolver(ApplicationPage3Schema),
     reValidateMode: "onChange",
   });
@@ -126,7 +132,7 @@ export default function Page3({
           <ApplicantTypeSelector />
           <AutoGrid>
             <FormSubHeading as="h2">{t("application:Page3.sectionHeadings.basicInfo")}</FormSubHeading>
-            <Page3Form />
+            <Page3Form isSportsForm={isSportsForm} />
           </AutoGrid>
           <ButtonContainer>
             <Button

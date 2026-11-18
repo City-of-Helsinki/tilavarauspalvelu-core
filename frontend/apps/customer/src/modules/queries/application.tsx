@@ -58,6 +58,23 @@ export const APPLICATION_FORM_FRAGMENT = gql`
         nameEn
         nameSv
       }
+      sport {
+        id
+        pk
+        nameFi
+        nameEn
+        nameSv
+      }
+      sportOther
+      participantGender {
+        id
+        pk
+        nameFi
+        nameEn
+        nameSv
+      }
+      leagueLevel
+      multipleReservationsPerDayWish
     }
   }
 `;

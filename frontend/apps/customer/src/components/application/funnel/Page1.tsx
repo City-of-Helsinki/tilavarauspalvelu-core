@@ -8,6 +8,7 @@ import { ButtonContainer } from "ui/src/styled";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { ApplicationSectionPage1 } from "@/components/application/funnel/ApplicationSectionPage1";
 import { useReservationUnitList } from "@/hooks";
+import type { SportsFormOptions } from "./ApplicationSectionPage1";
 import { createDefaultPage1Section } from "./form";
 import type { ApplicationPage1FormValues } from "./form";
 
@@ -16,9 +17,16 @@ type Page1Props = Readonly<{
   isSaving: boolean;
   options: Readonly<OptionsListT>;
   priceOptionList: Readonly<OptionT[]>;
+  sportsFormOptions: SportsFormOptions;
 }>;
 
-export function Page1({ applicationRound, isSaving, options, priceOptionList }: Page1Props): React.ReactElement | null {
+export function Page1({
+  applicationRound,
+  isSaving,
+  options,
+  priceOptionList,
+  sportsFormOptions,
+}: Page1Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   // get the user selected defaults for reservationUnits field
@@ -50,6 +58,7 @@ export function Page1({ applicationRound, isSaving, options, priceOptionList }: 
           applicationRound={applicationRound}
           options={options}
           priceOptionList={priceOptionList}
+          sportsFormOptions={sportsFormOptions}
           onDeleteEvent={() => handleDeleteEvent(index)}
         />
       ))}

@@ -6,7 +6,7 @@ import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { countFittingReservations, hasTooShortTimes, isInsideOpeningHours } from "ui/src/modules/suitableTimes";
 import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
 import { checkValidDateOnly, emailField, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
-import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
+import { ApplicationFormType, MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
 import type {
   ApplicantFieldsFragment,
   ApplicationFormFragment,
@@ -31,6 +31,9 @@ const SuitableTimeRangeFormTypeSchema = z.object({
 });
 export type SuitableTimeRangeFormValues = z.infer<typeof SuitableTimeRangeFormTypeSchema>;
 
+/** The value of the "other sport" option of the sport select. It is not a sport in the database. */
+export const SPORT_OTHER_OPTION_VALUE = -1;
+
 const ApplicationSectionPage1Schema = z
   .object({
     pk: z.number().optional(),
@@ -43,6 +46,12 @@ const ApplicationSectionPage1Schema = z
       .refine((s) => s, { message: "Required" }),
     ageGroup: z.number().refine((s) => s, { path: [""], message: "Required" }),
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
+    // The sports form fields. The round decides if they are used, see ApplicationPage1SchemaRefined.
+    // The sport is 0 when it is not selected and SPORT_OTHER_OPTION_VALUE when the applicant writes the sport.
+    sport: z.number(),
+    sportOther: z.string().max(255),
+    participantGender: z.number().nullable(),
+    leagueLevel: z.string().max(255),
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
     appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
@@ -100,6 +109,8 @@ const ApplicationSectionPage2Schema = z
     priority: z.enum(Priority),
     // NOTE: not sent or modified here, but required for validation
     appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
+    // Only the sports form shows this field. It is empty on the default form.
+    multipleReservationsPerDayWish: z.string(),
   })
   .superRefine((s, ctx) => {
     // No too short times allowed. A primary time must be long enough by itself, a secondary one can be a buffer that
@@ -135,12 +146,13 @@ function transformApplicationSectionPage2(
   return {
     pk: Number(values.pk),
     suitableTimeRanges: values.suitableTimeRanges.map((timeRange) => transformSuitableTimeRange(timeRange)),
+    multipleReservationsPerDayWish: values.multipleReservationsPerDayWish.trim(),
   };
 }
 
 function convertApplicationSectionPage2(section: ReadonlyDeep<SectionTypePage2>): ApplicationSectionPage2FormValues {
   const reservationUnitPk = section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
-  const { name, appliedReservationsPerWeek } = section;
+  const { name, appliedReservationsPerWeek, multipleReservationsPerDayWish } = section;
   return {
     // NOTE: there is a type issue somewhere that causes the mutation output to be a string for some cases
     pk: Number(section.pk ?? 0),
@@ -150,6 +162,7 @@ function convertApplicationSectionPage2(section: ReadonlyDeep<SectionTypePage2>)
     appliedReservationsPerWeek,
     reservationUnitPk,
     priority: Priority.Primary,
+    multipleReservationsPerDayWish,
   };
 }
 
@@ -211,12 +224,26 @@ export function convertApplicationSectionPage1(section: SectionType): Applicatio
     minDuration: section.reservationMinDuration ?? 0,
     maxDuration: section.reservationMaxDuration ?? 0,
     appliedReservationsPerWeek: section.appliedReservationsPerWeek,
+    sport: convertSport(section),
+    sportOther: section.sportOther,
+    participantGender: section.participantGender?.pk ?? null,
+    leagueLevel: section.leagueLevel,
     reservationUnits,
     begin: convertDate(section.reservationsBeginDate) ?? "",
     end: convertDate(section.reservationsEndDate) ?? "",
     priceOption: section.priceOption?.pk ?? undefined,
     isAccordionOpen: false,
   };
+}
+
+function convertSport(section: Pick<SectionType, "sport" | "sportOther">): number {
+  if (section.sport?.pk != null) {
+    return section.sport.pk;
+  }
+  if (section.sportOther !== "") {
+    return SPORT_OTHER_OPTION_VALUE;
+  }
+  return 0;
 }
 
 function convertTimeRange(timeRange: NonNullable<SectionType["suitableTimeRanges"][0]>): SuitableTimeRangeFormValues {
@@ -345,10 +372,27 @@ export function clearPriceOptionsIfNoneOffered(
   };
 }
 
+function checkSportsData(section: ApplicationSectionPage1FormValues, index: number, ctx: z.RefinementCtx): void {
+  if (section.sport === 0) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["applicationSections", index, "sport"],
+      message: "Required",
+    });
+  }
+  if (section.sport === SPORT_OTHER_OPTION_VALUE && section.sportOther.trim() === "") {
+    ctx.addIssue({
+      code: "custom",
+      path: ["applicationSections", index, "sportOther"],
+      message: "Required",
+    });
+  }
+}
+
 /// @param offeredPriceOptionPkList the price options of the application round (applicationRoundPriceOptions).
 /// A section must select one of them if there are any, and must not have an option the round does not offer.
 export function ApplicationPage1SchemaRefined(
-  round: { begin: Date; end: Date },
+  round: { begin: Date; end: Date; isSportsForm: boolean },
   { offeredPriceOptionPkList }: { offeredPriceOptionPkList: ReadonlyArray<number> }
 ) {
   return ApplicationPage1Schema.superRefine((val, ctx) => {
@@ -375,6 +419,9 @@ export function ApplicationPage1SchemaRefined(
           message: priceOptionError,
         });
       }
+      if (round.isSportsForm) {
+        checkSportsData(section, i, ctx);
+      }
     }
   });
 }
@@ -391,6 +438,8 @@ export const ApplicationPage3Schema = z
     organisationStreetAddress: z.string().min(1, { error: "Required" }).max(80).optional(),
     organisationCity: z.string().min(1, { error: "Required" }).max(80).optional(),
     organisationPostCode: z.string().min(1, { error: "Required" }).max(32).optional(),
+    // Only the sports form asks this, and it is optional there.
+    organisationActiveMembers: z.number().int().min(1, { error: "gte_1" }).nullable().optional(),
 
     contactPersonFirstName: z.string().min(1, { error: "Required" }).max(255),
     contactPersonLastName: z.string().min(1, { error: "Required" }).max(255),
@@ -485,6 +534,12 @@ function transformApplicationSection(
     reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
+    // Exactly one of the sport and the other sport is saved. Empty values are not sports data for the backend,
+    // so the default form can send them too.
+    sport: ae.sport > 0 ? ae.sport : null,
+    sportOther: ae.sport === SPORT_OTHER_OPTION_VALUE ? ae.sportOther.trim() : "",
+    participantGender: ae.participantGender,
+    leagueLevel: ae.leagueLevel.trim(),
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) => transformEventReservationUnit(ruo, ruoIndex)),
     // Always sent, so that null clears a saved option
     priceOption: ae.priceOption ?? null,
@@ -555,6 +610,10 @@ export function createDefaultPage1Section(
     begin: "",
     end: "",
     appliedReservationsPerWeek: 1,
+    sport: 0,
+    sportOther: "",
+    participantGender: null,
+    leagueLevel: "",
     reservationUnits,
     isAccordionOpen: true,
   };
@@ -571,7 +630,10 @@ function isAnyOrganisationField(app: ApplicantFieldsFragment): boolean {
   );
 }
 
-export function convertApplicationPage3(app: Maybe<ApplicantFieldsFragment>): ApplicationPage3FormValues {
+export function convertApplicationPage3(
+  app: Maybe<ApplicantFieldsFragment>,
+  isSportsForm: boolean
+): ApplicationPage3FormValues {
   const isOrganisation = app?.applicantType !== ReserveeType.Individual;
 
   const hasBillingAddress =
@@ -596,6 +658,8 @@ export function convertApplicationPage3(app: Maybe<ApplicantFieldsFragment>): Ap
     organisationStreetAddress: isOrganisation ? app?.organisationStreetAddress : undefined,
     organisationCity: isOrganisation ? app?.organisationCity : undefined,
     organisationPostCode: isOrganisation ? app?.organisationPostCode : undefined,
+    // Old applications of the default form can have a value. The backend accepts it only on the sports form.
+    organisationActiveMembers: isOrganisation && isSportsForm ? (app?.organisationActiveMembers ?? null) : undefined,
 
     contactPersonFirstName: app?.contactPersonFirstName ?? "",
     contactPersonLastName: app?.contactPersonLastName ?? "",
@@ -651,6 +715,7 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
           organisationStreetAddress: isOrganisationAddressValid ? values.organisationStreetAddress : undefined,
           organisationPostCode: isOrganisationAddressValid ? values.organisationPostCode : undefined,
           organisationCity: isOrganisationAddressValid ? values.organisationCity : undefined,
+          organisationActiveMembers: values.organisationActiveMembers ?? null,
         }
       : {
           organisationName: "",
@@ -659,6 +724,7 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
           organisationStreetAddress: "",
           organisationPostCode: "",
           organisationCity: "",
+          organisationActiveMembers: null,
         }),
 
     ...(shouldSaveBillingAddress
@@ -688,7 +754,8 @@ export function validateApplication(
   if (begin == null || end == null) {
     return { valid: false, page: 1 };
   }
-  const schema = ApplicationPage1SchemaRefined({ begin, end }, { offeredPriceOptionPkList });
+  const isSportsForm = applicationRound.applicationForm === ApplicationFormType.SportsForm;
+  const schema = ApplicationPage1SchemaRefined({ begin, end, isSportsForm }, { offeredPriceOptionPkList });
   const page1 = schema.safeParse(convertApplicationPage1(application, []));
   if (!page1.success) {
     return { valid: false, page: 1 };
@@ -699,7 +766,7 @@ export function validateApplication(
   if (!page2.success) {
     return { valid: false, page: 2 };
   }
-  const page3 = ApplicationPage3Schema.safeParse(convertApplicationPage3(application));
+  const page3 = ApplicationPage3Schema.safeParse(convertApplicationPage3(application, isSportsForm));
   if (!page3.success) {
     return { valid: false, page: 3 };
   }

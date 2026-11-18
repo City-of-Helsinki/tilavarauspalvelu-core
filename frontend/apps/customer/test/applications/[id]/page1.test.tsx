@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { vi, expect, test, describe, beforeEach } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
 import type { OptionsListT, OptionT } from "ui/src/modules/search";
+import { ApplicationFormType } from "@gql/gql-types";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import Page1 from "@/pages/applications/[id]/page1";
 import { createMockApplicationFragment } from "@test/application.mocks";
@@ -10,7 +11,7 @@ import type { CreateMockApplicationFragmentProps } from "@test/application.mocks
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createOptionMock } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { selectFirstOption } from "@test/test.utils";
+import { selectFirstOption, selectOption } from "@test/test.utils";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -120,6 +121,10 @@ function customRender(
         options={options}
         priceOptionList={priceOptionList}
         offeredPriceOptionPkList={offeredPriceOptionPkList}
+        sports={[{ id: "SportNode:1", pk: 1, nameFi: "Futsal", nameEn: "Futsal", nameSv: "Futsal" }]}
+        participantGenders={[
+          { id: "ParticipantGenderNode:1", pk: 1, nameFi: "Seka", nameEn: "Mixed", nameSv: "Blandat" },
+        ]}
       />
     </MockedGraphQLProvider>
   );
@@ -160,6 +165,30 @@ describe("Page1 common to all funnel pages", () => {
     expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
   });
   test.todo("should not render notes if they are empty or null");
+});
+
+describe("Page1 sports form", () => {
+  test("shows the sports fields only on the sports form", () => {
+    const defaultView = customRender({ page: "page1" });
+    expect(defaultView.queryByRole("textbox", { name: "application:Page1.leagueLevel" })).not.toBeInTheDocument();
+    defaultView.unmount();
+
+    const view = customRender({ page: "page1", applicationForm: ApplicationFormType.SportsForm });
+    const section = within(view.getByTestId("application__applicationSection_0"));
+    expect(section.getByRole("heading", { name: "application:Page1.sportSubHeading" })).toBeInTheDocument();
+    expect(section.getByLabelText(/application:Page1.participantGender/, { selector: "button" })).toBeInTheDocument();
+    expect(section.getByRole("textbox", { name: "application:Page1.leagueLevel" })).toBeInTheDocument();
+    expect(section.queryByLabelText(/application:Page1.sportOther\b/, { selector: "input" })).not.toBeInTheDocument();
+  });
+
+  test("asks the sport as text when the other sport is selected", async () => {
+    const view = customRender({ page: "page1", applicationForm: ApplicationFormType.SportsForm });
+    const section = within(view.getByTestId("application__applicationSection_0"));
+
+    await selectOption(section, /application:Page1.sport\b/, "application:Page1.sportOtherOption");
+
+    expect(await section.findByLabelText(/application:Page1.sportOther\b/, { selector: "input" })).toBeInTheDocument();
+  });
 });
 
 describe("Page1", () => {

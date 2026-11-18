@@ -133,6 +133,7 @@ function createMockSubmitValues(
         priority: Priority.Primary,
         reservationUnitPk: 1,
         suitableTimeRanges,
+        multipleReservationsPerDayWish: "",
       },
     ],
     pk: 1,

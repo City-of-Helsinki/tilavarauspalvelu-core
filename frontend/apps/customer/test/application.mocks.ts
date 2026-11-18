@@ -136,6 +136,11 @@ function createMockApplicationSection({
     ageGroup: createMockAgeGroupNode(),
     purpose: createMockIntendedUseNode(),
     priceOption: null,
+    sport: null,
+    sportOther: "",
+    participantGender: null,
+    leagueLevel: "",
+    multipleReservationsPerDayWish: "",
     reservationUnitOptions,
     ...page2Data,
   };
@@ -182,6 +187,7 @@ export type CreateMockApplicationFragmentProps = {
   status?: ApplicationStatusChoice;
   nReservationUnitOptions?: number;
   nSections?: number;
+  applicationForm?: ApplicationFormType;
 };
 
 export function createMockApplicationFragment({
@@ -191,6 +197,7 @@ export function createMockApplicationFragment({
   status = ApplicationStatusChoice.Draft,
   nReservationUnitOptions = 1,
   nSections = 1,
+  applicationForm = ApplicationFormType.DefaultForm,
 }: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const page3Data = {
     applicantType: ReserveeType.Nonprofit,
@@ -203,6 +210,7 @@ export function createMockApplicationFragment({
     organisationIdentifier: "1234567-8",
     organisationCoreBusiness: "Core business FI",
     organisationYearEstablished: 2020,
+    organisationActiveMembers: null,
     organisationPostCode: "00000",
     organisationStreetAddress: "Street address FI",
     organisationCity: "City FI",
@@ -245,12 +253,13 @@ export function createMockApplicationFragment({
           organisationCity: "",
           organisationPostCode: "",
           organisationYearEstablished: null,
+          organisationActiveMembers: null,
           municipality: null,
         }),
   };
   return {
     ...MockApplicationForm,
-    applicationRound: createMockApplicationRound({ pk, notesWhenApplying }),
+    applicationRound: createMockApplicationRound({ pk, notesWhenApplying, applicationForm }),
   };
 }
 
@@ -260,8 +269,10 @@ export function createMockApplicationRound({
   status = ApplicationRoundStatusChoice.Open,
   applicationPeriodBeginsAt = getTestBaseDate(),
   applicationPeriodEndsAt = addYears(getTestBaseDate(), 1),
+  applicationForm = ApplicationFormType.DefaultForm,
 }: {
   pk?: number;
+  applicationForm?: ApplicationFormType;
   status?: ApplicationRoundStatusChoice;
   notesWhenApplying?: string | null;
   applicationPeriodBeginsAt?: Date;
@@ -291,7 +302,7 @@ export function createMockApplicationRound({
     applicationPeriodBeginsAt: applicationPeriodBeginsAt.toISOString(),
     applicationPeriodEndsAt: applicationPeriodEndsAt.toISOString(),
     status,
-    applicationForm: ApplicationFormType.DefaultForm,
+    applicationForm,
     reservationUnits,
     applicationsCount: 0, // Scalars["Int"]["output"];
     criteriaEn: null, // Maybe<Scalars["String"]["output"]>;

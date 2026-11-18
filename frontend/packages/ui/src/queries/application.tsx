@@ -35,6 +35,7 @@ export const APPLICANT_FIELDS_FRAGMENT = gql`
     organisationIdentifier
     organisationCoreBusiness
     organisationYearEstablished
+    organisationActiveMembers
     organisationPostCode
     organisationStreetAddress
     organisationCity

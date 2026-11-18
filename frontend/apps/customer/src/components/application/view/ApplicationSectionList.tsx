@@ -60,6 +60,10 @@ function SingleApplicationSection({
   const shouldShowStatusLabel =
     aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
 
+  // The sports data exists only on the sports form. Empty optional fields are not shown.
+  const sport = aes.sport != null ? getTranslation(aes.sport, "name", lang) : aes.sportOther;
+  const participantGender = aes.participantGender != null ? getTranslation(aes.participantGender, "name", lang) : "";
+
   const reservationsBegin = formatDate(parseApiDate(aes.reservationsBeginDate));
   const reservationsEnd = formatDate(parseApiDate(aes.reservationsEndDate));
   const duration = formatDurationRange({
@@ -102,6 +106,26 @@ function SingleApplicationSection({
       key: "priceOption",
       label: t("application:preview.applicationEvent.priceOption"),
       value: aes.priceOption != null ? <span>{getTranslation(aes.priceOption, "name", lang)}</span> : null,
+    },
+    {
+      key: "participantGender",
+      label: t("application:preview.applicationEvent.participantGender"),
+      value: participantGender !== "" ? <span>{participantGender}</span> : null,
+    },
+    {
+      key: "sport",
+      label: t("application:preview.applicationEvent.sport"),
+      value: sport !== "" ? <span>{sport}</span> : null,
+    },
+    {
+      key: "leagueLevel",
+      label: t("application:preview.applicationEvent.leagueLevel"),
+      value: aes.leagueLevel !== "" ? <span>{aes.leagueLevel}</span> : null,
+    },
+    {
+      key: "multipleReservationsPerDayWish",
+      label: t("application:preview.applicationEvent.multipleReservationsPerDayWish"),
+      value: aes.multipleReservationsPerDayWish !== "" ? <span>{aes.multipleReservationsPerDayWish}</span> : null,
     },
   ];
 
