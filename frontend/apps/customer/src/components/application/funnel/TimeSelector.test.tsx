@@ -165,7 +165,19 @@ function cellName(
 }
 
 function getGrid(view: ReturnType<typeof render>) {
-  return view.getByLabelText("application:TimeSelector.calendarLabel");
+  return view.getByRole("grid", { name: "application:TimeSelector.calendarLabel" });
+}
+
+/** Shows the form tab, where only one tab panel is rendered at a time, and returns the form. */
+async function openFormTab(view: ReturnType<typeof render>): Promise<HTMLElement> {
+  await userEvent.setup().click(view.getByRole("tab", { name: "application:TimeSelector.formLabel" }));
+  return view.getByTestId("time-selector__form-0");
+}
+
+/** Shows the calendar tab again and returns the calendar. */
+async function openCalendarTab(view: ReturnType<typeof render>): Promise<HTMLElement> {
+  await userEvent.setup().click(view.getByRole("tab", { name: "application:TimeSelector.calendarLabel" }));
+  return getGrid(view);
 }
 
 describe("TimeSelector render single section", () => {
@@ -723,12 +735,12 @@ describe("TimeSelector copy times", () => {
 });
 
 describe("TimeSelector times outside the opening hours", () => {
-  test("are marked in the list, before being too short", () => {
+  test("are marked in the list, before being too short", async () => {
     // The mock section has a time on Wednesday, 08:00-16:00, long enough but outside these hours.
     const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
     const view = customRender({ page: "page2", reservationUnitOpeningHours: mondayOnly });
 
-    const item = within(view.getByTestId("time-selector__form-0")).getByRole("listitem");
+    const item = within(await openFormTab(view)).getByRole("listitem");
     expect(item).toHaveTextContent(
       "application:TimeSelector.legend.primary - (application:TimeSelector.form.outsideOpeningHours!)"
     );
@@ -743,20 +755,6 @@ describe("TimeSelector times outside the opening hours", () => {
     const cell = within(getGrid(view)).getByLabelText(new RegExp(`^${weekdayLabel(Weekday.Wednesday)}, 08:00–16:00`));
     expect(cell).toHaveAttribute("data-invalid");
     expect(cell).toHaveAccessibleName(expect.stringContaining("application:TimeSelector.outsideOpeningHours"));
-  });
-});
-
-describe("TimeSelector preview", () => {
-  test("shows the invalid times in the error colour, and says so", async () => {
-    const user = userEvent.setup();
-    const view = customRender({ page: "page2" });
-    await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
-
-    const preview = view.getByTestId("time-selector__preview-0");
-    const invalid = [...preview.querySelectorAll("[data-invalid]")].map((el) => el.textContent);
-    // Tuesday's 15 min is too short. Wednesday's 8 h is fine.
-    expect(invalid).toEqual(["14–14:15 (application:TimeSelector.legend.invalid)"]);
-    expect(preview).toHaveTextContent("8–16");
   });
 });
 
@@ -867,34 +865,21 @@ describe("TimeSelector priority select", () => {
 });
 
 describe("TimeSelector form alternative", () => {
-  function getForm(view: ReturnType<typeof render>) {
-    return view.getByTestId("time-selector__form-0");
-  }
-
-  test("has a skip link from the calendar to the form", () => {
-    const view = customRender();
-    expect(view.getByRole("link", { name: "application:TimeSelector.skipToForm" })).toHaveAttribute(
-      "href",
-      "#time-selector__form-0"
-    );
-    expect(getForm(view)).toHaveAttribute("id", "time-selector__form-0");
-  });
-
   test("a time can be added with the form and shows in the calendar", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     const view = customRender({ onSubmit });
-    const form = getForm(view);
+    const form = await openFormTab(view);
 
     await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.day"), Weekday.Thursday);
     await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(10 * 60));
     await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(12 * 60));
     await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
 
-    expect(
-      within(getGrid(view)).getByLabelText(cellName("primary", Weekday.Thursday, 10 * 60, 12 * 60))
-    ).toHaveAttribute("aria-selected", "true");
     expect(within(form).getByRole("status")).toHaveTextContent("application:TimeSelector.announcements.painted");
+    expect(
+      within(await openCalendarTab(view)).getByLabelText(cellName("primary", Weekday.Thursday, 10 * 60, 12 * 60))
+    ).toHaveAttribute("aria-selected", "true");
 
     await user.click(view.getByRole("button", { name: "submit" }));
     expect(onSubmit).toHaveBeenCalledWith(
@@ -906,7 +891,7 @@ describe("TimeSelector form alternative", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     const view = customRender({ page: "page2", onSubmit });
-    const form = getForm(view);
+    const form = await openFormTab(view);
 
     await user.click(within(form).getByRole("button", { name: /application:TimeSelector\.form\.removeTime/ }));
     expect(within(form).getByText("application:TimeSelector.form.empty")).toBeInTheDocument();
@@ -918,7 +903,7 @@ describe("TimeSelector form alternative", () => {
   test("a time that ends before it starts is refused", async () => {
     const user = userEvent.setup();
     const view = customRender();
-    const form = getForm(view);
+    const form = await openFormTab(view);
 
     await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(12 * 60));
     await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(11 * 60));
@@ -938,7 +923,7 @@ describe("TimeSelector form alternative", () => {
       },
     ];
     const view = customRender({ reservationUnitOpeningHours: openTimes });
-    const form = getForm(view);
+    const form = await openFormTab(view);
 
     await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
 
@@ -1000,7 +985,7 @@ describe("TimeSelector with several reservation units", () => {
   test("the form adds a time only another unit opens, and refuses one no unit opens", async () => {
     const user = userEvent.setup();
     const view = customRender({ reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
-    const form = view.getByTestId("time-selector__form-0");
+    let form = await openFormTab(view);
     const add = async (from: number, to: number) => {
       await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.day"), Weekday.Tuesday);
       await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(from));
@@ -1010,9 +995,12 @@ describe("TimeSelector with several reservation units", () => {
 
     await add(12 * 60, 13 * 60);
     expect(
-      within(getGrid(view)).getByLabelText(cellName("primary", Weekday.Tuesday, 12 * 60, 13 * 60, { tooShort: true }))
+      within(await openCalendarTab(view)).getByLabelText(
+        cellName("primary", Weekday.Tuesday, 12 * 60, 13 * 60, { tooShort: true })
+      )
     ).toBeInTheDocument();
 
+    form = await openFormTab(view);
     await add(13 * 60, 15 * 60);
     expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.outsideReservable");
   });
@@ -1022,7 +1010,7 @@ describe("TimeSelector with several reservation units", () => {
     const view = customRender({ page: "page2" });
     await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
 
-    const items = within(view.getByTestId("time-selector__form-0")).getAllByRole("listitem");
+    const items = within(await openFormTab(view)).getAllByRole("listitem");
     const item = (day: Weekday) =>
       items.find((li) => li.textContent?.startsWith(`common:weekdayLongEnum.${day}`)) ?? null;
     expect(item(Weekday.Tuesday)).toHaveTextContent(

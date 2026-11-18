@@ -504,6 +504,11 @@ describe("WeeklyPatternCalendar", () => {
     expect(screen.getByRole("link", { name: "Skip to the time form" })).toHaveAttribute("href", "#form");
   });
 
+  test("has no skip link without an alternative", () => {
+    render(<Harness alternative={undefined} />);
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
+
   test("rows are labelled with the hour they start", () => {
     render(<Harness />);
     expect(within(screen.getByRole("grid")).getByRole("rowheader", { name: "08:00" })).toBeInTheDocument();
