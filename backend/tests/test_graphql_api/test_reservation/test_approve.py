@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
+from auditlog.models import LogEntry
+from auditlog.registry import auditlog
 from freezegun import freeze_time
 from rest_framework.status import HTTP_204_NO_CONTENT
 
@@ -29,9 +32,23 @@ from tests.helpers import ResponseMock, patch_method
 
 from .helpers import APPROVE_MUTATION, get_approve_data
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
 pytestmark = [
     pytest.mark.django_db,
 ]
+
+
+@pytest.fixture
+def price_line_audit_logging(settings) -> Generator[None]:
+    """Register price lines for audit logging, and unregister them after the test."""
+    settings.AUDIT_LOGGING_ENABLED = True
+    auditlog.register(ReservationPriceLine)
+    try:
+        yield
+    finally:
+        auditlog.unregister(ReservationPriceLine)
 
 
 @patch_method(EmailService.send_reservation_confirmed_email)
@@ -745,6 +762,29 @@ def test_reservation__approve__price_lines__amounts_corrected_up_and_down(graphq
 
     second_line.refresh_from_db()
     assert second_line.override_amount == Decimal("15.25")
+
+
+@pytest.mark.usefixtures("price_line_audit_logging")
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+def test_reservation__approve__price_lines__writes_audit_log(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_on_site()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+    )
+    line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
+
+    user = graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data["priceLines"] = [{"pk": line.pk, "overrideAmount": "0"}]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    entries = LogEntry.objects.get_for_object(line).filter(action=LogEntry.Action.UPDATE)
+    assert list(entries.values_list("changes", "actor")) == [({"override_amount": ["None", "0.00"]}, user.pk)]
 
 
 @patch_method(EmailService.send_reservation_confirmed_email)

@@ -134,7 +134,10 @@ def save_reservation_price_lines(*, reservation: Reservation, price_lines: Price
 
     with transaction.atomic():
         reservation.price_lines.all().delete()
-        ReservationPriceLine.objects.bulk_create(price_lines.lines)
+
+        # Save each line, so that the audit log gets an entry. Bulk writes make none.
+        for line in price_lines.lines:
+            line.save()
 
 
 def set_price_line_taxes(*, reservation: Reservation, on_date: datetime.date) -> None:
@@ -151,4 +154,7 @@ def set_price_line_taxes(*, reservation: Reservation, on_date: datetime.date) ->
     for line in price_lines:
         line.tax_percentage = line.tax_level.actions.get_percentage(on_date=on_date)
 
-    ReservationPriceLine.objects.bulk_update(price_lines, fields=["tax_percentage"])
+    # Save each line, so that the audit log gets an entry. Bulk writes make none.
+    with transaction.atomic():
+        for line in price_lines:
+            line.save(update_fields=["tax_percentage"])
