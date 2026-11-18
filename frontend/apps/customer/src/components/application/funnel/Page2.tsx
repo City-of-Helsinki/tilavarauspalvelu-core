@@ -1,6 +1,14 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  IconArrowLeft,
+  IconArrowRight,
+  Notification,
+  NotificationSize,
+} from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
@@ -36,6 +44,9 @@ export function Page2({ application, onNext }: Props): React.ReactElement {
 
   return (
     <form noValidate onSubmit={handleSubmit(onNext)}>
+      <Notification label={t("application:Page2.info")} size={NotificationSize.Small} type="info">
+        {t("application:Page2.info")}
+      </Notification>
       {applicationSections.map((section, index) =>
         application?.applicationSections?.[index] != null ? (
           <ApplicationSectionTimePicker

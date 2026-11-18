@@ -103,7 +103,7 @@
   },
   "Page2": {
     "subHeading": "Valitse hakemuksen aikatoiveet",
-    "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Useamman tila- ja aikatoiveen ilmoittaminen parantaa mahdollisuuksiasi saada toiveidesi mukaiset tilat ja ajat.",
+    "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Ilmoitathan kaikki sinulle sopivat tila- ja aikatoiveet, sillä vuoro voidaan myöntää vain valitsemiisi tiloihin ja ajankohtiin.",
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",

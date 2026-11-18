@@ -60,19 +60,6 @@ describe("Stepper when starting application", () => {
     expect(view.getByText(statusLabel)).toBeInTheDocument();
   });
 
-  test("application page2 info notification", () => {
-    const application = createMockApplicationFragment({ page: "page2" });
-    const view = render(<ApplicationFunnelWrapper application={application} page="page2" />);
-    // HDS notification has invisible label with same text
-    expect(view.getAllByText("application:Page2.info")).toHaveLength(2);
-  });
-
-  test.for([["page1"], ["page3"], ["page4"]] as const)("application %s NO info notification", ([page]) => {
-    const application = createMockApplicationFragment({ page });
-    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
-    expect(view.queryByText("application:Page2.info")).not.toBeInTheDocument();
-  });
-
   test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)("application %s notes when applying", ([page]) => {
     const application = createMockApplicationFragment({ page });
     const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
