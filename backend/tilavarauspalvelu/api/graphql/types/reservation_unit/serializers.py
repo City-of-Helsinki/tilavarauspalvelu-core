@@ -24,6 +24,7 @@ from tilavarauspalvelu.enums import AccessType, PriceUnit, ReservationStartInter
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, Resource, SalesItem, Space, TaxLevel
 from tilavarauspalvelu.services.pricing.own_pricing import OwnPricing, save_own_pricings
 from tilavarauspalvelu.services.pricing.sales_items import validate_sales_items_for_payment_type
@@ -420,8 +421,13 @@ class ReservationUnitSerializer(NestingModelSerializer):
         After mutating the instance, check if the reservation unit
         was published and thus should be sent to HAUKI and do it here.
         """
+        # The changes are already saved here, so a failed refetch must not fail the mutation.
+        # The periodic opening hours task updates the resource when its hash in Hauki changes.
         if instance.origin_hauki_resource is not None:
-            HaukiResourceHashUpdater([instance.origin_hauki_resource.id]).run(force_refetch=True)
+            try:
+                HaukiResourceHashUpdater([instance.origin_hauki_resource.id]).run(force_refetch=True)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation unit: {instance.pk}")
 
         if settings.HAUKI_EXPORTS_ENABLED:
             try:

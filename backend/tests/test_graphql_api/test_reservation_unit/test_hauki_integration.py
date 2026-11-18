@@ -7,11 +7,13 @@ import pytest
 from graphql_relay import to_global_id
 
 from tilavarauspalvelu.exceptions import HaukiAPIError
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models.reservation_unit.actions import ReservationUnitHaukiExporter
 
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.helpers import ResponseMock, patch_method
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data, reservation_unit_query
 
@@ -38,6 +40,31 @@ def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_exist
 
     assert HaukiResourceHashUpdater.run.call_count == 1
     assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
+
+
+@patch_method(HaukiAPIClient.request, return_value=ResponseMock(status_code=503, url="https://hauki.test/resource/"))
+@patch_method(SentryLogger.log_exception)
+def test_reservation_unit__update__opening_hours_refetch_error_does_not_fail_mutation(graphql, settings):
+    settings.HAUKI_EXPORTS_ENABLED = False
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=True,
+        name="old name",
+        origin_hauki_resource=OriginHaukiResourceFactory.create(),
+    )
+    data = get_draft_update_input_data(reservation_unit, name="new name")
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.name == "new name"
+
+    assert SentryLogger.log_exception.call_count == 1
+    error = SentryLogger.log_exception.call_args.args[0]
+    assert str(error) == "GET request to HAUKI (https://hauki.test/resource/) failed with status 503."
+    assert SentryLogger.log_exception.call_args.kwargs == {"details": f"Reservation unit: {reservation_unit.pk}"}
 
 
 @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
