@@ -25,7 +25,13 @@ const LabelValue = ({
 
 type ApplicantT = Omit<ApplicantFieldsFragment, "municipality">;
 
-export function ApplicantInfoPreview({ application }: { application: ApplicantT }): React.ReactElement {
+type ApplicantInfoPreviewProps = Readonly<{
+  application: ApplicantT;
+  // Old applications of the default form can have active members. Show them only on the sports form.
+  isSportsForm: boolean;
+}>;
+
+export function ApplicantInfoPreview({ application, isSportsForm }: ApplicantInfoPreviewProps): React.ReactElement {
   const { t } = useTranslation();
   const applicant = {
     name: `${application.contactPersonFirstName} ${application.contactPersonLastName}`,
@@ -53,6 +59,12 @@ export function ApplicantInfoPreview({ application }: { application: ApplicantT 
             label={t("application:preview.organisation.registrationNumber")}
             value={application.organisationIdentifier}
           />
+          {isSportsForm && application.organisationActiveMembers != null && (
+            <LabelValue
+              label={t("application:preview.organisation.activeMembers")}
+              value={application.organisationActiveMembers}
+            />
+          )}
         </>
       ) : null}
       <LabelValue label={t("application:preview.contactPerson")} value={applicant.name} />

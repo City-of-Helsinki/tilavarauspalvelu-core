@@ -6,8 +6,9 @@ import { ApplicationFormTextInput } from "@/components/application/funnel/Applic
 import { FormSubHeading } from "@/styled/application";
 import { BillingAddress } from "./BillingAddress";
 import type { ApplicationPage3FormValues } from "./form";
+import { OrganisationActiveMembersInput } from "./OrganisationActiveMembersInput";
 
-export function CompanyForm(): React.ReactElement {
+export function CompanyForm({ isSportsForm }: Readonly<{ isSportsForm: boolean }>): React.ReactElement {
   const { t } = useTranslation();
 
   const { watch, control } = useFormContext<ApplicationPage3FormValues>();
@@ -19,6 +20,7 @@ export function CompanyForm(): React.ReactElement {
       <ApplicationFormTextInput name="organisationName" />
       <ApplicationFormTextInput name="organisationCoreBusiness" />
       <ApplicationFormTextInput name="organisationIdentifier" />
+      {isSportsForm && <OrganisationActiveMembersInput />}
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisationStreetAddress" />
       <ApplicationFormTextInput name="organisationPostCode" />

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
+import { ApplicationFormType, MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
 import { createMockApplicationFragment } from "@test/application.mocks";
 import {
   ApplicationPage2Schema,
@@ -11,13 +11,15 @@ import {
   convertApplicationPage2,
   convertApplicationPage3,
   createDefaultPage1Section,
+  SPORT_OTHER_OPTION_VALUE,
   transformApplicationPage1,
   transformApplicationPage2,
   transformPage3Application,
   validateApplication,
 } from "./form";
+import type { ApplicationSectionPage1FormValues } from "./form";
 
-function createValidPage1Section() {
+function createValidPage1Section(): ApplicationSectionPage1FormValues {
   return {
     name: "Choir rehearsal",
     formKey: "event-NEW",
@@ -29,6 +31,10 @@ function createValidPage1Section() {
     begin: "2.2.2099",
     end: "3.2.2099",
     appliedReservationsPerWeek: 1,
+    sport: 0,
+    sportOther: "",
+    participantGender: null,
+    leagueLevel: "",
     reservationUnits: [7, 9],
     isAccordionOpen: false,
   };
@@ -38,6 +44,7 @@ describe("ApplicationPage1SchemaRefined", () => {
   const round = {
     begin: new Date(2099, 1, 1),
     end: new Date(2099, 1, 10),
+    isSportsForm: false,
   };
 
   test("requires at least one section", () => {
@@ -137,6 +144,10 @@ describe("page 1 conversions", () => {
           reservationMinDuration: 3600,
           reservationMaxDuration: 7200,
           appliedReservationsPerWeek: 1,
+          sport: null,
+          sportOther: "",
+          participantGender: null,
+          leagueLevel: "",
           reservationsBeginDate: "2099-02-02",
           reservationsEndDate: "2099-02-03",
           reservationUnitOptions: [
@@ -175,6 +186,10 @@ describe("page 1 conversions", () => {
           reservationMinDuration: 3600,
           reservationMaxDuration: 7200,
           appliedReservationsPerWeek: 1,
+          sport: null,
+          sportOther: "",
+          participantGender: null,
+          leagueLevel: "",
           reservationUnitOptions: [
             { preferredOrder: 0, reservationUnit: 7 },
             { preferredOrder: 1, reservationUnit: 9 },
@@ -224,6 +239,10 @@ describe("page 1 conversions", () => {
       begin: "",
       end: "",
       appliedReservationsPerWeek: 1,
+      sport: 0,
+      sportOther: "",
+      participantGender: null,
+      leagueLevel: "",
       reservationUnits: [1, 2],
       isAccordionOpen: true,
     });
@@ -256,6 +275,7 @@ describe("page 2 conversions", () => {
           appliedReservationsPerWeek: 1,
           reservationUnitPk: 1,
           priority: Priority.Primary,
+          multipleReservationsPerDayWish: "",
         },
       ],
     });
@@ -274,6 +294,7 @@ describe("page 2 conversions", () => {
               priority: Priority.Primary,
             },
           ],
+          multipleReservationsPerDayWish: "",
         },
       ],
     });
@@ -290,6 +311,7 @@ describe("page 2 conversions", () => {
           reservationUnitPk: 1,
           priority: Priority.Primary,
           appliedReservationsPerWeek: 1,
+          multipleReservationsPerDayWish: "",
           suitableTimeRanges: suitableTimeRanges.map((range) => ({ ...range, dayOfTheWeek: Weekday.Monday })),
         },
       ],
@@ -324,6 +346,7 @@ describe("page 2 conversions", () => {
           reservationUnitPk: 1,
           priority: Priority.Primary,
           appliedReservationsPerWeek: 3,
+          multipleReservationsPerDayWish: "",
           suitableTimeRanges: suitableTimeRanges.map(({ day, ...range }) => ({
             ...range,
             dayOfTheWeek: day,
@@ -382,6 +405,7 @@ describe("page 2 conversions", () => {
           reservationUnitPk: 1,
           priority: Priority.Primary,
           appliedReservationsPerWeek: 1,
+          multipleReservationsPerDayWish: "",
           suitableTimeRanges: [{ dayOfTheWeek: day, beginTime, endTime, priority: Priority.Primary }],
         },
       ],
@@ -415,6 +439,7 @@ describe("page 2 conversions", () => {
           reservationUnitPk: 1,
           priority: Priority.Primary,
           appliedReservationsPerWeek: 1,
+          multipleReservationsPerDayWish: "",
           suitableTimeRanges: [
             {
               beginTime: "23:00",
@@ -446,6 +471,7 @@ describe("page 2 conversions", () => {
         reservationUnitPk: 1,
         priority: Priority.Primary,
         appliedReservationsPerWeek,
+        multipleReservationsPerDayWish: "",
         suitableTimeRanges: days.map((dayOfTheWeek, i) => ({
           beginTime: `${String(8 + i * 3).padStart(2, "0")}:00`,
           endTime: `${String(10 + i * 3).padStart(2, "0")}:00`,
@@ -475,6 +501,7 @@ describe("page 2 conversions", () => {
         reservationUnitPk: 1,
         priority: Priority.Primary,
         appliedReservationsPerWeek,
+        multipleReservationsPerDayWish: "",
         suitableTimeRanges: ranges.map(([dayOfTheWeek, beginTime, endTime, priority]) => ({
           beginTime,
           endTime,
@@ -592,16 +619,19 @@ describe("page 3 conversions", () => {
 
   test("convertApplicationPage3 strips organisation fields for individuals", () => {
     expect(
-      convertApplicationPage3({
-        ...createMockApplicationFragment({ page: "page3" }),
-        applicantType: ReserveeType.Individual,
-        organisationName: "Should disappear",
-        organisationIdentifier: "123",
-        organisationCoreBusiness: "Should disappear",
-        organisationStreetAddress: "Should disappear",
-        organisationCity: "Should disappear",
-        organisationPostCode: "Should disappear",
-      })
+      convertApplicationPage3(
+        {
+          ...createMockApplicationFragment({ page: "page3" }),
+          applicantType: ReserveeType.Individual,
+          organisationName: "Should disappear",
+          organisationIdentifier: "123",
+          organisationCoreBusiness: "Should disappear",
+          organisationStreetAddress: "Should disappear",
+          organisationCity: "Should disappear",
+          organisationPostCode: "Should disappear",
+        },
+        false
+      )
     ).toMatchObject({
       applicantType: ReserveeType.Individual,
       organisationName: undefined,
@@ -613,14 +643,17 @@ describe("page 3 conversions", () => {
 
   test("convertApplicationPage3 detects unregistered associations", () => {
     expect(
-      convertApplicationPage3({
-        ...createMockApplicationFragment({ page: "page3" }),
-        applicantType: ReserveeType.Nonprofit,
-        organisationIdentifier: "",
-        billingStreetAddress: "",
-        billingPostCode: "",
-        billingCity: "",
-      })
+      convertApplicationPage3(
+        {
+          ...createMockApplicationFragment({ page: "page3" }),
+          applicantType: ReserveeType.Nonprofit,
+          organisationIdentifier: "",
+          billingStreetAddress: "",
+          billingPostCode: "",
+          billingCity: "",
+        },
+        false
+      )
     ).toMatchObject({
       applicantType: ReserveeType.Nonprofit,
       hasBillingAddress: false,
@@ -664,6 +697,7 @@ describe("page 3 conversions", () => {
       organisationStreetAddress: "",
       organisationPostCode: "",
       organisationCity: "",
+      organisationActiveMembers: null,
       billingStreetAddress: "Street 1",
       billingPostCode: "00100",
       billingCity: "Helsinki",
@@ -706,6 +740,7 @@ describe("page 3 conversions", () => {
       organisationStreetAddress: undefined,
       organisationPostCode: undefined,
       organisationCity: undefined,
+      organisationActiveMembers: null,
       billingStreetAddress: "",
       billingPostCode: "",
       billingCity: "",
@@ -785,3 +820,114 @@ function withPriceOption(
     })),
   };
 }
+
+describe("sports form", () => {
+  const sportsRound = {
+    begin: new Date(2099, 1, 1),
+    end: new Date(2099, 1, 10),
+    isSportsForm: true,
+  };
+
+  function parsePage1(section: ReturnType<typeof createValidPage1Section>, round = sportsRound) {
+    const result = ApplicationPage1SchemaRefined(round, { offeredPriceOptionPkList: [] }).safeParse({
+      pk: 1,
+      applicantType: ReserveeType.Company,
+      applicationSections: [section],
+    });
+    return result.error?.issues.map((issue) => `${issue.path.join(".")}:${issue.message}`) ?? [];
+  }
+
+  test("requires a sport on the sports form", () => {
+    expect(parsePage1(createValidPage1Section())).toEqual(["applicationSections.0.sport:Required"]);
+  });
+
+  test("does not require a sport on the default form", () => {
+    expect(parsePage1(createValidPage1Section(), { ...sportsRound, isSportsForm: false })).toEqual([]);
+  });
+
+  test("requires the sport text when the other sport is selected", () => {
+    const section = { ...createValidPage1Section(), sport: SPORT_OTHER_OPTION_VALUE, sportOther: "  " };
+    expect(parsePage1(section)).toEqual(["applicationSections.0.sportOther:Required"]);
+  });
+
+  test("accepts a sport with the optional fields empty", () => {
+    expect(parsePage1({ ...createValidPage1Section(), sport: 3 })).toEqual([]);
+  });
+
+  test("transformApplicationPage1 sends only the selected sport", () => {
+    const transform = (section: ReturnType<typeof createValidPage1Section>) =>
+      transformApplicationPage1({ pk: 1, applicantType: undefined, applicationSections: [section] })
+        .applicationSections?.[0];
+
+    expect(
+      transform({
+        ...createValidPage1Section(),
+        sport: 3,
+        sportOther: "Left from an earlier choice",
+        participantGender: 2,
+        leagueLevel: " 3. divisioona ",
+      })
+    ).toMatchObject({ sport: 3, sportOther: "", participantGender: 2, leagueLevel: "3. divisioona" });
+
+    expect(
+      transform({ ...createValidPage1Section(), sport: SPORT_OTHER_OPTION_VALUE, sportOther: " Curling " })
+    ).toMatchObject({ sport: null, sportOther: "Curling" });
+  });
+
+  test("convertApplicationPage1 selects the other sport option when the sport is written", () => {
+    const application = createMockApplicationFragment({ page: "page1" });
+    const section = application.applicationSections?.[0];
+    if (section == null) {
+      throw new Error("Mock application has no section");
+    }
+    const sport = { id: "SportNode:3", pk: 3, nameFi: "Futsal", nameEn: null, nameSv: null };
+    const withSport = { ...section, sport };
+    const withOtherSport = { ...section, sportOther: "Curling" };
+
+    expect(convertApplicationPage1({ ...application, applicationSections: [withSport] }, [])).toMatchObject({
+      applicationSections: [{ sport: 3, sportOther: "" }],
+    });
+    expect(convertApplicationPage1({ ...application, applicationSections: [withOtherSport] }, [])).toMatchObject({
+      applicationSections: [{ sport: SPORT_OTHER_OPTION_VALUE, sportOther: "Curling" }],
+    });
+  });
+
+  test("page 2 trims the wish for more than one reservation per day", () => {
+    const converted = convertApplicationPage2(createMockApplicationFragment({ page: "page2" }));
+    const section = converted.applicationSections[0];
+    if (section == null) {
+      throw new Error("Mock application has no section");
+    }
+    const values = {
+      ...converted,
+      applicationSections: [{ ...section, multipleReservationsPerDayWish: " Two in a row on Mondays " }],
+    };
+
+    expect(transformApplicationPage2(values).applicationSections?.[0]?.multipleReservationsPerDayWish).toBe(
+      "Two in a row on Mondays"
+    );
+  });
+
+  test("convertApplicationPage3 keeps the active members only on the sports form", () => {
+    const application = { ...createMockApplicationFragment({ page: "page3" }), organisationActiveMembers: 1 };
+
+    expect(convertApplicationPage3(application, true).organisationActiveMembers).toBe(1);
+    expect(convertApplicationPage3(application, false).organisationActiveMembers).toBeUndefined();
+    expect(transformPage3Application(convertApplicationPage3(application, false)).organisationActiveMembers).toBeNull();
+  });
+
+  test("validateApplication returns page 1 when a sports form section has no sport", () => {
+    const application = createMockApplicationFragment({
+      page: "page3",
+      applicationForm: ApplicationFormType.SportsForm,
+    });
+    expect(validateApplication(application, { offeredPriceOptionPkList: [] })).toEqual({ valid: false, page: 1 });
+
+    const sections = (application.applicationSections ?? []).map((section) => ({ ...section, sportOther: "Curling" }));
+    expect(
+      validateApplication({ ...application, applicationSections: sections }, { offeredPriceOptionPkList: [] })
+    ).toEqual({
+      valid: true,
+    });
+  });
+});
