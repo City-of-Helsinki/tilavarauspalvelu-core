@@ -1,5 +1,4 @@
 import React from "react";
-import { Notification, NotificationSize } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
@@ -86,11 +85,6 @@ export function ApplicationFunnelWrapper({
       <InnerContainer>
         <>
           {!isPreviewPage && <StyledNotesWhenApplying applicationRound={application.applicationRound} />}
-          {page === "page2" && (
-            <Notification label={t("application:Page2.info")} size={NotificationSize.Small} type="info">
-              {t("application:Page2.info")}
-            </Notification>
-          )}
           <ChildWrapper $isFullWidth={isPreviewPage}>{children}</ChildWrapper>
         </>
       </InnerContainer>

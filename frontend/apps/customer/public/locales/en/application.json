@@ -112,7 +112,7 @@
   },
   "Page2": {
     "subHeading": "Select booking dates",
-    "info": "Please select both preferred times and also select other times that suit you. Providing more space and time options will improve your chances of getting spaces and times you like.",
+    "info": "You can select both preferred times and other suitable times. Please provide all space and time options that suit you, as the shift can only be granted for the spaces and times you select.",
     "copyTimes": "Copy times for all booking requests",
     "resetTimes": "Clear calendar",
     "summary": "Summary",
