@@ -19,14 +19,14 @@ function BaseLinkSet({ reservationUnitHome }: Props): React.ReactElement {
       {resUnitUrl ? (
         <IconButton
           href={resUnitUrl}
-          label={t("common.actions.backTo", { destination: t("reservation:reservationUnitPage") })}
+          label={t("common:actions.backTo", { destination: t("reservation:reservationUnitPage") })}
           icon={<IconArrowRight size={IconSize.Medium} aria-hidden="true" />}
         />
       ) : (
         <IconButton
           href={getSingleSearchPath()}
           icon={<IconArrowRight size={IconSize.Medium} aria-hidden="true" />}
-          label={t("common.actions.backTo", { destination: t("reservation:searchPage") })}
+          label={t("common:actions.backTo", { destination: t("reservation:searchPage") })}
         />
       )}
       <IconButton
