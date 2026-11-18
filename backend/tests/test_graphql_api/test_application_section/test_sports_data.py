@@ -14,6 +14,7 @@ from tests.factories import (
     SportFactory,
 )
 from tests.test_graphql_api.test_application.helpers import CREATE_MUTATION as CREATE_APPLICATION_MUTATION
+from tests.test_graphql_api.test_application.helpers import UPDATE_MUTATION as UPDATE_APPLICATION_MUTATION
 from tests.test_graphql_api.test_application.helpers import get_application_create_data
 from tests.test_graphql_api.test_application_section.helpers import (
     CREATE_MUTATION,
@@ -201,6 +202,33 @@ def test_application_section__update__sports_form__switch_from_sport_to_other_sp
     section.refresh_from_db()
     assert section.sport is None
     assert section.sport_other == "Kabaddi"
+
+
+def test_application_section__update_with_application__sports_form__each_section_uses_its_own_data(graphql):
+    application = ApplicationFactory.create_in_status_draft_no_sections(
+        application_round__application_form=ApplicationFormType.SPORTS_FORM,
+    )
+    first_section = ApplicationSectionFactory.create_in_status_unallocated(application=application)
+    second_section = ApplicationSectionFactory.create_in_status_unallocated(
+        application=application,
+        sport=SportFactory.create(),
+    )
+    graphql.force_login(application.user)
+
+    input_data = {
+        "pk": application.pk,
+        "applicationSections": [
+            {"pk": first_section.pk},
+            {"pk": second_section.pk, "sportOther": "Kabaddi"},
+        ],
+    }
+    response = graphql(UPDATE_APPLICATION_MUTATION, input_data=input_data)
+
+    assert response.field_error_messages("applicationSections.1.nonFieldErrors") == [
+        "Application section cannot have both a sport and an other sport set.",
+    ]
+    second_section.refresh_from_db()
+    assert second_section.sport_other == ""
 
 
 def test_application_section__update__sports_form__free_text_is_saved_as_written(graphql):
