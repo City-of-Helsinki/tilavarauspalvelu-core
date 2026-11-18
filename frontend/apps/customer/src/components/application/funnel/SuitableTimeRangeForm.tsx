@@ -4,7 +4,12 @@ import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
-import { primaryFill, secondaryFill } from "@ui/components/WeeklyPatternCalendar/styles";
+import {
+  primaryFill,
+  primaryIndicator,
+  secondaryFill,
+  secondaryIndicator,
+} from "@ui/components/WeeklyPatternCalendar/styles";
 import { fontBold } from "@ui/styled";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
@@ -27,11 +32,6 @@ const Fieldset = styled.fieldset`
   margin: 0;
   padding: var(--spacing-s);
   border: 1px solid var(--color-black-50);
-
-  legend {
-    padding: 0 var(--spacing-2-xs);
-    font-family: var(--font-bold), sans-serif;
-  }
 `;
 
 const Fields = styled.div`
@@ -71,16 +71,19 @@ const TimeList = styled.ul`
 `;
 
 const TimeListItem = styled.li<{ $priority?: "primary" | "secondary" }>`
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-s);
-  padding-left: var(--spacing-2-xs);
+  padding-left: var(--spacing-m);
   border-radius: var(--spacing-3-xs);
   ${({ $priority }) => $priority === "primary" && primaryFill}
+  ${({ $priority }) => $priority === "primary" && primaryIndicator}
   ${({ $priority }) => $priority === "secondary" && secondaryFill}
-
+  ${({ $priority }) => $priority === "secondary" && secondaryIndicator}
+  ${({ $priority }) => $priority === "secondary" && "border: 1px solid var(--color-black-50);"}
   /* A too short time, drawn as in the calendar: primary in solid error red with white text, secondary in light error
      red with an error red outline and black text. */
   &[data-invalid] {
@@ -207,7 +210,6 @@ export function SuitableTimeRangeForm({
 
   return (
     <Fieldset id={id} data-testid={`time-selector__form-${index}`}>
-      <legend>{t("application:TimeSelector.form.legend")}</legend>
       <p>{t("application:TimeSelector.form.priorityNote")}</p>
       <Fields>
         <label>

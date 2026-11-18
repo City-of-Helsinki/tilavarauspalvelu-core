@@ -38,14 +38,14 @@ export const secondaryFill = css`
 `;
 
 // Primary and secondary differ by shape as well as colour, so they stay distinguishable without colour.
-const primaryIndicator = css`
+export const primaryIndicator = css`
   &::after {
     ${arrow};
     border-bottom: 8px solid var(--color-white);
   }
 `;
 
-const secondaryIndicator = css`
+export const secondaryIndicator = css`
   &::after {
     ${arrow};
     border-top: 8px solid var(--color-black);
@@ -277,7 +277,7 @@ export const WeeklyPatternRoot = styled.div`
       The selectors repeat [data-appearance] and [data-run-start] to outweigh the appearance, closed and arrow rules.
     */
     &[data-invalid][data-appearance]::before {
-      background-color: rgb(from var(--color-error) r g b / 0.7);
+      background-color: var(--color-error);
       border-color: var(--color-error);
       box-shadow: none;
     }
@@ -299,7 +299,7 @@ export const WeeklyPatternRoot = styled.div`
     */
     &[data-invalid][data-appearance="secondary"] {
       &::before {
-        background-color: rgb(from var(--color-error) r g b / 0.3);
+        background-color: var(--color-error-light);
         border-color: var(--color-error);
       }
       &[data-block-start]::before {
@@ -411,8 +411,8 @@ const LegendBox = styled.div<{ $state: LegendState }>`
   height: 30px;
   border: 1px solid var(--color-black-50);
 
-  --primary-error: rgb(from var(--color-error) r g b / 0.7);
-  --secondary-error: rgb(from var(--color-error) r g b / 0.3);
+  --primary-error: var(--color-error);
+  --secondary-error: var(--color-error-light);
   background-color: ${({ $state }) =>
     $state === "unavailable"
       ? "var(--color-black-30)"
