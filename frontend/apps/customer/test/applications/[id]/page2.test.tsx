@@ -93,6 +93,13 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
 }
 
 describe("Application Page2", () => {
+  test("shows the info notification once", () => {
+    const view = customRender();
+    // Page2 shows the notification at the top of its content, and the funnel wrapper around it must not repeat it.
+    // The HDS notification's label is a heading, one per notification.
+    expect(view.getAllByRole("heading", { name: "application:Page2.info" })).toHaveLength(1);
+  });
+
   test("should render page properly", () => {
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page2.subHeading" })).toBeInTheDocument();
