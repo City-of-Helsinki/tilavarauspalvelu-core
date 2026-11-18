@@ -74,14 +74,18 @@ class ApplicationSectionSerializer(NestingModelSerializer):
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         errors: list[str] = []
 
-        # Using serializer as a sub-serializer, and trying to reuse the same object.
-        if "pk" in data and not self.instance:
-            # The parent is the list serializer of the sections. Its parent is the application serializer.
-            parent_application = self.parent.parent.instance if self.parent is not None else None
-            self.instance = ApplicationSection.objects.filter(pk=data["pk"], application=parent_application).first()
-            if self.instance is None:
-                msg = f"Application section {data['pk']} does not belong to this application."
-                raise ValidationError(msg)
+        # The parent is the list serializer of the sections. DRF validates every item of the list
+        # with this same serializer, so the instance must be loaded again for each item.
+        if self.parent is not None:
+            self.instance = None
+
+            if "pk" in data:
+                # The parent of the list serializer is the application serializer.
+                parent_application = self.parent.parent.instance
+                self.instance = ApplicationSection.objects.filter(pk=data["pk"], application=parent_application).first()
+                if self.instance is None:
+                    msg = f"Application section {data['pk']} does not belong to this application."
+                    raise ValidationError(msg)
 
         application: Application | None = data.get("application")
         if self.instance is not None and application is not None and application.pk != self.instance.application_id:
