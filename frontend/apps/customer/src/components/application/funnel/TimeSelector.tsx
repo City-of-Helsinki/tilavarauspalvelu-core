@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import type { Control } from "react-hook-form";
 import { Controller, useController, useFormContext, useFormState, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
-import { Button, ButtonSize, ButtonVariant, NotificationSize, RadioButton } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, NotificationSize, RadioButton, Tabs } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { arrow, WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar/styles";
@@ -30,7 +30,6 @@ import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
 import { Flex } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
-import { TimePreview } from "@/components/application/funnel/TimePreview";
 import { OUTSIDE_OPENING_HOURS_ERROR, TOO_SHORT_ERROR } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { describeTime, SuitableTimeRangeForm } from "./SuitableTimeRangeForm";
@@ -52,6 +51,15 @@ export type TimeSelectorProps = {
 function sectionNames(sections: ReadonlyArray<{ section: { name: string } }>): string {
   return sections.map(({ section }) => section.name).join(", ");
 }
+
+const TimeSelectorRoot = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
+  padding-bottom: var(--spacing-m);
+  border-bottom: 1px solid var(--color-black-50);
+`;
 
 export function TimeSelectorForm({
   index,
@@ -175,58 +183,64 @@ export function TimeSelectorForm({
   const getStateLabel = (cell: WeeklyPatternCellInfo<SuitableTimeData>) =>
     t(`application:TimeSelector.legend.${cell.data ? priorityKey(cell.data.priority) : cell.availability}`);
   return (
-    // minmax(0, 1fr) instead of the implicit auto column: an auto track grows to its widest child's min-content
-    // (e.g. a long reservation unit name in the select), which would push the whole accordion wider than the viewport.
-    <Flex style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)" }} $marginTop="m">
+    <TimeSelectorRoot>
       <PrioritySelector index={index} control={control} />
-      <ControlledSelect
-        name={`applicationSections.${index}.reservationUnitPk`}
-        label={t("application:Page2.reservationUnitSelectLabel")}
-        control={control}
-        options={reservationUnitOptions}
-      />
-      <Controller
-        control={control}
-        name={`applicationSections.${index}.suitableTimeRanges`}
-        render={({ field }) => (
-          <WeeklyPatternCalendar<SuitableTimeData>
-            ref={field.ref}
-            name={field.name}
-            value={toPattern(field.value)}
-            onChange={(pattern) => onChange(pattern)}
-            onBlur={field.onBlur}
-            step={SUITABLE_TIME_STEP_MINUTES}
-            availability={availability}
-            paintable={paintable}
-            visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
-            brush={{ priority }}
-            getStateLabel={(cell) => getStateLabel(cell)}
-            getRunError={(cell, dayRuns) => getRunError(cell, dayRuns)}
-            getCellAppearance={({ priority: cellPriority }) =>
-              cellPriority === Priority.Primary ? "primary" : "secondary"
-            }
-            announcements={{
-              painted: t("application:TimeSelector.announcements.painted"),
-              erased: t("application:TimeSelector.announcements.erased"),
-            }}
-            alternative={{ id: formId, label: t("application:TimeSelector.skipToForm") }}
-            aria-label={t("application:TimeSelector.calendarLabel")}
-          />
-        )}
-      />
-      <WeeklyPatternLegend
-        items={[
-          { state: "open", label: t("application:TimeSelector.legend.open") },
-          { state: "closed", label: t("application:TimeSelector.legend.closed") },
-          { state: "unavailable", label: t("application:TimeSelector.legend.unavailable") },
-          { state: "invalid", label: t("application:TimeSelector.legend.invalid") },
-        ]}
-      />
+      <Tabs>
+        <Tabs.TabList>
+          <Tabs.Tab>{t("application:TimeSelector.calendarLabel")}</Tabs.Tab>
+          <Tabs.Tab>{t("application:TimeSelector.formLabel")}</Tabs.Tab>
+        </Tabs.TabList>
+        <Tabs.TabPanel>
+          <Flex style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)" }} $marginTop="m">
+            <ControlledSelect
+              name={`applicationSections.${index}.reservationUnitPk`}
+              label={t("application:Page2.reservationUnitSelectLabel")}
+              control={control}
+              options={reservationUnitOptions}
+            />
+            <Controller
+              control={control}
+              name={`applicationSections.${index}.suitableTimeRanges`}
+              render={({ field }) => (
+                <WeeklyPatternCalendar<SuitableTimeData>
+                  ref={field.ref}
+                  name={field.name}
+                  value={toPattern(field.value)}
+                  onChange={(pattern) => onChange(pattern)}
+                  onBlur={field.onBlur}
+                  step={SUITABLE_TIME_STEP_MINUTES}
+                  availability={availability}
+                  paintable={paintable}
+                  visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
+                  brush={{ priority }}
+                  getStateLabel={(cell) => getStateLabel(cell)}
+                  getRunError={(cell, dayRuns) => getRunError(cell, dayRuns)}
+                  getCellAppearance={({ priority: cellPriority }) =>
+                    cellPriority === Priority.Primary ? "primary" : "secondary"
+                  }
+                  announcements={{
+                    painted: t("application:TimeSelector.announcements.painted"),
+                    erased: t("application:TimeSelector.announcements.erased"),
+                  }}
+                  aria-label={t("application:TimeSelector.calendarLabel")}
+                />
+              )}
+            />
+            <WeeklyPatternLegend
+              items={[
+                { state: "open", label: t("application:TimeSelector.legend.open") },
+                { state: "closed", label: t("application:TimeSelector.legend.closed") },
+                { state: "unavailable", label: t("application:TimeSelector.legend.unavailable") },
+                { state: "invalid", label: t("application:TimeSelector.legend.invalid") },
+              ]}
+            />
+          </Flex>
+        </Tabs.TabPanel>
+        <Tabs.TabPanel>
+          <SuitableTimeRangeForm id={formId} index={index} openingHours={sectionOpeningHours} />
+        </Tabs.TabPanel>
+      </Tabs>
 
-      <SuitableTimeRangeForm id={formId} index={index} openingHours={sectionOpeningHours} />
-      <div data-testid={`time-selector__preview-${index}`}>
-        <TimePreview index={index} openingHours={sectionOpeningHours} />
-      </div>
       {enableCopyCells && (
         <div>
           <Button
@@ -248,8 +262,7 @@ export function TimeSelectorForm({
           />
         </div>
       )}
-      <ErrorMessage index={index} openingHours={sectionOpeningHours} />
-    </Flex>
+    </TimeSelectorRoot>
   );
 }
 

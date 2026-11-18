@@ -109,8 +109,11 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
    */
   getRunError?: (cell: WeeklyPatternCellInfo<TData>, dayRuns: WeeklyPatternValue<TData>) => string | null;
   getCellProps?: (cell: WeeklyPatternCellInfo<TData>) => WeeklyPatternCellProps;
-  /** The equal form for the same task. A skip link to it is shown before the grid. */
-  alternative: { id: string; label: string };
+  /**
+   * The equal alternative for the same task, e.g. a form or a list of the times. A skip link to it is shown before the
+   * grid. Leave it out when the alternative is already as easy to reach, e.g. in a tab next to the calendar.
+   */
+  alternative?: { id: string; label: string };
 
   className?: string;
   style?: CSSProperties;

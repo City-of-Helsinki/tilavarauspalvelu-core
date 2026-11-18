@@ -66,6 +66,7 @@
   },
   "TimeSelector": {
     "calendarLabel": "Valitse aikatoiveet kalenterista",
+    "formLabel": "Valitse aikatoiveet lomakkeella",
     "legend": {
       "unavailable": "Ei varattavissa missään hakemukselle valituista tiloista",
       "invalid": "Virheellinen aikatoive",
@@ -74,15 +75,12 @@
       "secondary": "Vaihtoehtoinen toive",
       "open": "Varattavissa tässä tilassa"
     },
-    "skipToForm": "Siirry lomakkeeseen, jolla voit lisätä aikoja",
     "announcements": {
       "painted": "Lisätty",
       "erased": "Poistettu"
     },
     "form": {
       "tooShort": "liian lyhyt",
-      "legend": "Lisää aikoja lomakkeella",
-      "priorityNote": "Uudet ajat saavat yllä valitun toiveen tyypin.",
       "day": "Päivä",
       "from": "Alkaa",
       "to": "Päättyy",
@@ -108,7 +106,7 @@
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",
     "prioritySelectLabel": "Valitse aikatoiveen tyyppi",
-    "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
+    "reservationUnitSelectLabel": "Näytä kalenterissa kausivarattavat ajankohdat tilalle",
     "priorityLabels": {
       "primary": "Ensisijaiset aikatoiveet",
       "secondary": "Vaihtoehtoiset aikatoiveet"

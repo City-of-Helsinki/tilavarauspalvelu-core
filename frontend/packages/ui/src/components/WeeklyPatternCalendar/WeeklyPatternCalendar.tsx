@@ -222,7 +222,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
 
   return (
     <>
-      <SkipLink href={`#${alternative.id}`}>{alternative.label}</SkipLink>
+      {alternative && <SkipLink href={`#${alternative.id}`}>{alternative.label}</SkipLink>}
       <WeeklyPatternRoot ref={rootRef} className={className} style={style}>
         {/* A visual copy of the weekday header that stays at the top of the page. See WeeklyPatternStickyHeader. */}
         <WeeklyPatternStickyHeader ref={stickyHeaderRef} aria-hidden="true" data-testid="weekly-pattern__sticky-header">
