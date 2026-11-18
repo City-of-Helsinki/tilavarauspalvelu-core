@@ -8,8 +8,9 @@ import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
 import { BillingAddress } from "./BillingAddress";
 import { ContactPersonSection } from "./CompanyForm";
 import type { ApplicationPage3FormValues } from "./form";
+import { OrganisationActiveMembersInput } from "./OrganisationActiveMembersInput";
 
-export function OrganisationForm(): React.ReactElement {
+export function OrganisationForm({ isSportsForm }: Readonly<{ isSportsForm: boolean }>): React.ReactElement {
   const { t } = useTranslation();
   const {
     control,
@@ -39,6 +40,7 @@ export function OrganisationForm(): React.ReactElement {
         options={municipalityOptions}
         error={translateError(errors.municipality?.message)}
       />
+      {isSportsForm && <OrganisationActiveMembersInput />}
       <ControlledCheckbox
         control={control}
         label={t("application:Page3.organisationNotRegistered")}

@@ -62,7 +62,14 @@
     "deleteDialog": {
       "heading": "Är du säker på att du vill radera ansökningen?",
       "content": "Ansökningens information kan inte återställas då ansökningen har raderats."
-    }
+    },
+    "participantGender": "Vem är bokningen avsedd för?",
+    "sportSubHeading": "Idrott",
+    "sport": "Idrott",
+    "sportOtherOption": "Annan idrott",
+    "sportOther": "Skriv idrotten",
+    "leagueLevel": "Serienivå",
+    "leagueLevelHelper": "T.ex. division 3. Lämna tomt om gruppen inte spelar i en serie."
   },
   "TimeSelector": {
     "calendarLabel": "Välj önskade tider",
@@ -121,7 +128,9 @@
       "heading": "Ersätta de valda tiderna?",
       "text": "{{names}} har redan valda tider. Kopieringen ersätter dem.",
       "accept": "Kopiera och ersätt"
-    }
+    },
+    "multipleReservationsPerDayWish": "Önskemål om flera turer per dag",
+    "multipleReservationsPerDayWishHelper": "Berätta om gruppen behöver flera turer under samma dag."
   },
   "Page3": {
     "subHeading": "Kontaktuppgifter",
@@ -163,7 +172,9 @@
     "organisationStreetAddress": "Adress",
     "organisationPostCode": "Postnummer",
     "organisationCity": "Postanstalt",
-    "additionalInformation": "Tilläggsinformation om bokningens ändamål"
+    "additionalInformation": "Tilläggsinformation om bokningens ändamål",
+    "organisationActiveMembers": "Antal aktiva medlemmar",
+    "organisationActiveMembersHelper": "Utövare som regelbundet deltar i verksamheten"
   },
   "preview": {
     "subHeading": "Kontrollera och lämna in ansökan",
@@ -183,7 +194,8 @@
     "organisation": {
       "name": "Ansökarens namn",
       "coreBusiness": "Kärnverksamhet",
-      "billingAddress": "Fakturaadress"
+      "billingAddress": "Fakturaadress",
+      "activeMembers": "Antal aktiva medlemmar"
     },
     "applicationEvent": {
       "applicationInfo": "Säsongbokningens detaljer",
@@ -196,7 +208,11 @@
       "eventsPerWeek": "Bokningar per vecka",
       "appliedSpaces": "Önskade lokaler",
       "schedules": "Önskade tider",
-      "scheduleTooltip": "Sekundära tidsönskemål i parentes ( )"
+      "scheduleTooltip": "Sekundära tidsönskemål i parentes ( )",
+      "participantGender": "Vem bokningen är avsedd för",
+      "sport": "Idrott",
+      "leagueLevel": "Serienivå",
+      "multipleReservationsPerDayWish": "Önskemål om flera turer per dag"
     },
     "applicationEventSchedules": "Önskade tider",
     "notification": {

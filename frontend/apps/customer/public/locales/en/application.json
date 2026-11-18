@@ -62,7 +62,14 @@
     "deleteDialog": {
       "heading": "Are you sure you want to remove the application?",
       "content": "Once removed, the application cannot be restored."
-    }
+    },
+    "participantGender": "Who is the booking for?",
+    "sportSubHeading": "Sport",
+    "sport": "Sport",
+    "sportOtherOption": "Other sport",
+    "sportOther": "Enter the sport",
+    "leagueLevel": "League level",
+    "leagueLevelHelper": "For example 3rd division. Leave empty if the group does not play in a league."
   },
   "TimeSelector": {
     "calendarLabel": "Select time slots from the calendar",
@@ -121,7 +128,9 @@
       "heading": "Replace the selected times?",
       "text": "{{names}} already have selected times. Copying replaces them.",
       "accept": "Copy and replace"
-    }
+    },
+    "multipleReservationsPerDayWish": "Wish for more than one booking per day",
+    "multipleReservationsPerDayWishHelper": "Tell us if the group needs more than one booking on the same day."
   },
   "Page3": {
     "subHeading": "Customer information",
@@ -163,7 +172,9 @@
     "organisationStreetAddress": "Address",
     "organisationPostCode": "Postal code",
     "organisationCity": "City",
-    "additionalInformation": "Additional details about the purpose of the booking"
+    "additionalInformation": "Additional details about the purpose of the booking",
+    "organisationActiveMembers": "Number of active members",
+    "organisationActiveMembersHelper": "Members who take part in the activities regularly"
   },
   "preview": {
     "heading": "Review and submit the application",
@@ -183,7 +194,8 @@
       "name": "Official name",
       "coreBusiness": "Core business",
       "registrationNumber": "Business ID",
-      "billingAddress": "Billing address"
+      "billingAddress": "Billing address",
+      "activeMembers": "Number of active members"
     },
     "applicationEvent": {
       "applicationInfo": "Application details",
@@ -200,7 +212,11 @@
       "eventsPerWeek": "Number of bookings per week",
       "appliedSpaces": "Requested spaces",
       "schedules": "Requested time slots",
-      "scheduleTooltip": "Secondary time slots in parentheses ( )"
+      "scheduleTooltip": "Secondary time slots in parentheses ( )",
+      "participantGender": "Who the booking is for",
+      "sport": "Sport",
+      "leagueLevel": "League level",
+      "multipleReservationsPerDayWish": "Wish for more than one booking per day"
     },
     "applicationEventSchedules": "Requested time slots",
     "notification": {

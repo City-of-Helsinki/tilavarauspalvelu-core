@@ -1,10 +1,11 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight, TextArea } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { ButtonContainer } from "ui/src/styled";
+import { ApplicationFormType } from "@gql/gql-types";
 import type { ApplicationPage2Query, TimeSelectorFragment } from "@gql/gql-types";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelectorForm } from "@/components/application/funnel/TimeSelector";
@@ -15,7 +16,7 @@ import type { ApplicationPage2FormValues } from "./form";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;
 type Props = {
-  application: Pick<Node, "applicationSections" | "pk">;
+  application: Pick<Node, "applicationSections" | "applicationRound" | "pk">;
   onNext: (appToSave: ApplicationPage2FormValues) => void;
 };
 
@@ -31,6 +32,8 @@ export function Page2({ application, onNext }: Props): React.ReactElement {
   // A time can be applied for in a section when any of its reservation units is open then.
   const allSectionsOpeningHours = getSectionsOpeningHours(application.applicationSections ?? []);
 
+  const isSportsForm = application.applicationRound.applicationForm === ApplicationFormType.SportsForm;
+
   const { isSubmitting, isValid } = formState;
   const enableSubmit = !isSubmitting && isValid;
 
@@ -43,6 +46,7 @@ export function Page2({ application, onNext }: Props): React.ReactElement {
             index={index}
             section={application?.applicationSections[index]}
             allSectionsOpeningHours={allSectionsOpeningHours}
+            isSportsForm={isSportsForm}
           />
         ) : null
       )}
@@ -73,14 +77,16 @@ function ApplicationSectionTimePicker({
   index: sectionIndex,
   section,
   allSectionsOpeningHours,
+  isSportsForm,
 }: {
   index: number;
   section: NonNullable<Node["applicationSections"]>[0] | undefined;
   allSectionsOpeningHours: ReadonlyArray<Readonly<TimeSelectorFragment[]>>;
+  isSportsForm: boolean;
 }): React.ReactElement {
-  const { watch } = useFormContext<ApplicationPage2FormValues>();
+  const { watch, register } = useFormContext<ApplicationPage2FormValues>();
 
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const language = getLocalizationLang(i18n.language);
 
   const allOpeningHours = section?.reservationUnitOptions.map((ruo) => ({
@@ -121,6 +127,14 @@ function ApplicationSectionTimePicker({
         sectionOpeningHours={sectionOpeningHours}
         allSectionsOpeningHours={allSectionsOpeningHours}
       />
+      {isSportsForm && (
+        <TextArea
+          {...register(`applicationSections.${sectionIndex}.multipleReservationsPerDayWish`)}
+          id={`applicationSections.${sectionIndex}.multipleReservationsPerDayWish`}
+          label={t("application:Page2.multipleReservationsPerDayWish")}
+          helperText={t("application:Page2.multipleReservationsPerDayWishHelper")}
+        />
+      )}
     </Accordion>
   );
 }
