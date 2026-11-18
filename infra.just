@@ -7,7 +7,7 @@ az_project := "tilavarauspalvelu"
 
 # List all available commands
 help:
-    @just --list
+    @just --justfile {{ source_file() }} --list
 
 # Print or check the release of an env (dev, test, staging, production). See "just infra release-check --help".
 release-check *args:
@@ -143,14 +143,16 @@ oc-copy-from app env path dest=".": (oc-select env)
 
     deploymentconfig=$(just --justfile "{{ source_file() }}" _oc-deploymentconfig "{{ app }}")
 
-    pod=$(oc get pods -l deploymentconfig="${deploymentconfig}" --field-selector=status.phase=Running -o name | head -n 1)
+    # Take the first pod in bash. 'head' would close the pipe early and fail the script with SIGPIPE.
+    pods=$(oc get pods -l deploymentconfig="${deploymentconfig}" --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
+    pod="${pods%% *}"
     if [ -z "${pod}" ]; then
         echo "No running pod for '{{ app }}' in '{{ env }}'." >&2
         exit 1
     fi
-    echo "Using pod ${pod#pod/}" >&2
+    echo "Using pod ${pod}" >&2
 
-    oc rsync "${pod#pod/}:{{ path }}" "{{ dest }}"
+    oc rsync "${pod}:{{ path }}" "{{ dest }}"
 
 # Copy a local file or directory to a running pod of an app for an env. A file goes into the directory 'path'.
 oc-copy-to app env src path: (oc-select env)
@@ -159,21 +161,23 @@ oc-copy-to app env src path: (oc-select env)
 
     deploymentconfig=$(just --justfile "{{ source_file() }}" _oc-deploymentconfig "{{ app }}")
 
-    pod=$(oc get pods -l deploymentconfig="${deploymentconfig}" --field-selector=status.phase=Running -o name | head -n 1)
+    # Take the first pod in bash. 'head' would close the pipe early and fail the script with SIGPIPE.
+    pods=$(oc get pods -l deploymentconfig="${deploymentconfig}" --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
+    pod="${pods%% *}"
     if [ -z "${pod}" ]; then
         echo "No running pod for '{{ app }}' in '{{ env }}'." >&2
         exit 1
     fi
-    echo "Using pod ${pod#pod/}" >&2
+    echo "Using pod ${pod}" >&2
 
     # 'oc rsync' copies only directories.
     if [ -f "{{ src }}" ]; then
-        oc cp "{{ src }}" "${pod#pod/}:{{ path }}/$(basename "{{ src }}")"
+        oc cp "{{ src }}" "${pod}:{{ path }}/$(basename "{{ src }}")"
         exit 0
     fi
 
     # The app user cannot change the permissions of the directories in the pod.
-    oc rsync --no-perms "{{ src }}" "${pod#pod/}:{{ path }}"
+    oc rsync --no-perms "{{ src }}" "${pod}:{{ path }}"
 
 # Log in to Azure DevOps in the City of Helsinki tenant
 az-login:
