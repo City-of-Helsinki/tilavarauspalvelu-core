@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from auditlog.models import LogEntry
+from auditlog.registry import auditlog
 from django.contrib.contenttypes.models import ContentType
 
 from tilavarauspalvelu.enums import ReservationStateChoice
@@ -13,10 +16,39 @@ from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFac
 
 from .helpers import ARCHIVE_MUTATION
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
+
+
+# ── Helpers ──
+
+
+@pytest.fixture
+def reservation_unit_audit_logging(settings) -> Generator[None]:
+    """Register reservation units for audit logging, and unregister them after the test."""
+    settings.AUDIT_LOGGING_ENABLED = True
+    AuditLogger.register(
+        ReservationUnit,
+        # Exclude lookup properties, since they are calculated values.
+        exclude_fields=[
+            "_publishing_state",
+            "_reservation_state",
+            "_highest_price_today",
+            "_current_access_type",
+        ],
+    )
+    try:
+        yield
+    finally:
+        auditlog.unregister(ReservationUnit)
+
+
+# ── Tests ──
 
 
 def test_reservation_unit__archive__also_sets_as_draft(graphql):
@@ -81,19 +113,8 @@ def test_reservation_unit__archive__not_blocked_if_reservation_unit_has_future_i
     assert reservation_unit.is_draft is True
 
 
-def test_reservation_unit__archive__removes_contact_information_and_audit_logs(graphql, settings):
-    settings.AUDIT_LOGGING_ENABLED = True
-    AuditLogger.register(
-        ReservationUnit,
-        # Exclude lookup properties, since they are calculated values.
-        exclude_fields=[
-            "_publishing_state",
-            "_reservation_state",
-            "_highest_price_today",
-            "_current_access_type",
-        ],
-    )
-
+@pytest.mark.usefixtures("reservation_unit_audit_logging")
+def test_reservation_unit__archive__removes_contact_information_and_audit_logs(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True, contact_information="foo")
