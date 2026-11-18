@@ -239,6 +239,95 @@ def test_reservation_unit__update__access_types__cannot_move_to_the_past(graphql
     assert response.field_error_messages() == ["Access type cannot be moved to the past."]
 
 
+@pytest.mark.parametrize("begins_in_days", [0, 1])
+def test_reservation_unit__update__access_types__without_pk_updates_access_type_on_same_date(graphql, begins_in_days):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+
+    today = local_date()
+    begin_date = today + datetime.timedelta(days=begins_in_days)
+
+    past_access_type = ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        begin_date=today - datetime.timedelta(days=1),
+        access_type=AccessType.UNRESTRICTED,
+    )
+    access_type = ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        begin_date=begin_date,
+        access_type=AccessType.PHYSICAL_KEY,
+    )
+
+    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data["accessTypes"] = [
+        {
+            "pk": past_access_type.pk,
+            "beginDate": past_access_type.begin_date.isoformat(),
+            "accessType": AccessType.UNRESTRICTED.value,
+        },
+        {
+            "beginDate": begin_date.isoformat(),
+            "accessType": AccessType.OPENED_BY_STAFF.value,
+        },
+    ]
+
+    graphql.login_with_superuser()
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    access_types = list(reservation_unit.access_types.order_by("begin_date").all())
+    assert len(access_types) == 2
+    assert access_types[0].pk == past_access_type.pk
+    assert access_types[1].pk == access_type.pk
+    assert access_types[1].begin_date == begin_date
+    assert access_types[1].access_type == AccessType.OPENED_BY_STAFF
+
+
+def test_reservation_unit__update__access_types__without_pk_on_date_of_moved_access_type(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+
+    today = local_date()
+
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        begin_date=today,
+        access_type=AccessType.PHYSICAL_KEY,
+    )
+    moved_access_type = ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        begin_date=today + datetime.timedelta(days=1),
+        access_type=AccessType.UNRESTRICTED,
+    )
+
+    data = get_draft_update_input_data(reservation_unit=reservation_unit)
+    data["accessTypes"] = [
+        {
+            "pk": moved_access_type.pk,
+            "beginDate": (today + datetime.timedelta(days=2)).isoformat(),
+            "accessType": AccessType.UNRESTRICTED.value,
+        },
+        {
+            "beginDate": (today + datetime.timedelta(days=1)).isoformat(),
+            "accessType": AccessType.OPENED_BY_STAFF.value,
+        },
+    ]
+
+    graphql.login_with_superuser()
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    access_types = list(reservation_unit.access_types.order_by("begin_date").all())
+    assert len(access_types) == 3
+
+    assert access_types[0].access_type == AccessType.PHYSICAL_KEY
+    assert access_types[1].begin_date == today + datetime.timedelta(days=1)
+    assert access_types[1].access_type == AccessType.OPENED_BY_STAFF
+    assert access_types[1].pk != moved_access_type.pk
+    assert access_types[2].pk == moved_access_type.pk
+    assert access_types[2].begin_date == today + datetime.timedelta(days=2)
+
+
 @freeze_time(local_datetime(2023, 1, 1, hour=0))
 def test_reservation_unit__update__access_types__set_new_access_type_to_reservations(graphql):
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
