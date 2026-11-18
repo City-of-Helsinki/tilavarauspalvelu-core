@@ -58,6 +58,7 @@ import { getGenericTerms } from "@/modules/serverUtils";
 import {
   getApplicationPath,
   getFeedbackUrl,
+  getLocalizedRedirectPath,
   getReservationPath,
   getReservationUnitPath,
   reservationsPrefix,
@@ -448,7 +449,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return {
         redirect: {
           permanent: true,
-          destination: getApplicationPath(applicationPk, "view"),
+          destination: getLocalizedRedirectPath(getApplicationPath(applicationPk, "view"), ctx),
         },
         props: {
           notFound: true, // for prop narrowing

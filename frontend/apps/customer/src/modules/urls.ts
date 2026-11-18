@@ -1,3 +1,4 @@
+import type { GetServerSidePropsContext } from "next";
 import type { Maybe } from "@gql/gql-types";
 
 export const reservationUnitPrefix = "/reservation-unit";
@@ -98,4 +99,17 @@ export function getFeedbackUrl(feedbackUrl: string, i18n: { language: string }) 
   } catch {
     return null;
   }
+}
+
+/// Next.js does not add the locale prefix to a redirect from getServerSideProps.
+/// Use this for the redirect destination, so the user stays in the same language.
+/// The default locale has no prefix. An empty path stays empty.
+export function getLocalizedRedirectPath(
+  path: string,
+  { locale, defaultLocale }: Readonly<Pick<GetServerSidePropsContext, "locale" | "defaultLocale">>
+): string {
+  if (path === "" || locale == null || locale === defaultLocale) {
+    return path;
+  }
+  return `/${locale}${path}`;
 }
