@@ -2,8 +2,8 @@ import React from "react";
 import { IconArrowRight, IconSignout, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { IconButton } from "ui/src/components";
-import { signOut } from "ui/src/modules/browserHelpers";
 import { Flex } from "ui/src/styled";
+import { signOutToCurrentPage } from "@/modules/logout";
 import { getSingleSearchPath } from "@/modules/urls";
 
 type Props = {
@@ -35,7 +35,7 @@ function BaseLinkSet({ reservationUnitHome }: Props): React.ReactElement {
         icon={<IconArrowRight size={IconSize.Medium} aria-hidden="true" />}
       />
       <IconButton
-        onClick={() => signOut()}
+        onClick={() => signOutToCurrentPage()}
         label={t("common:logout")}
         icon={<IconSignout size={IconSize.Medium} aria-hidden="true" />}
       />

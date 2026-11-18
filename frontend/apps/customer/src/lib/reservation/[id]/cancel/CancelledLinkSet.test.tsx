@@ -1,7 +1,9 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { getCookie } from "typescript-cookie";
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import { LOGOUT_RETURN_PATH_COOKIE } from "@/modules/logout";
 import { CancelledLinkSet, BackLinkList } from "./CancelledLinkSet";
 
 const mockedSignOut = vi.fn();
@@ -28,6 +30,16 @@ describe("CancelledLinkSet", () => {
     await user.click(screen.getByText("common:logout"));
 
     expect(mockedSignOut).toHaveBeenCalledWith();
+  });
+
+  test("saves the current page for the return after the logout", async () => {
+    window.history.replaceState({}, "", "/en/reservations/5/cancel?step=1");
+    const user = userEvent.setup();
+    render(<CancelledLinkSet />);
+
+    await user.click(screen.getByText("common:logout"));
+
+    expect(getCookie(LOGOUT_RETURN_PATH_COOKIE)).toBe("/en/reservations/5/cancel?step=1");
   });
 });
 

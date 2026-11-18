@@ -10,7 +10,13 @@ import { getSignInUrl } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { env } from "@/env.mjs";
-import { getReservationInProgressPath } from "./modules/urls";
+import {
+  APPLICATION_ROUTES,
+  AUTHENTICATED_ROUTES,
+  doesUrlMatch,
+  getReservationInProgressPath,
+  RESERVATION_ROUTES,
+} from "./modules/urls";
 
 const API_BASE_URL = env.TILAVARAUS_API_URL ?? "";
 
@@ -220,27 +226,6 @@ function getRedirectProtectedRoute(req: NextRequest, user: User | null): string 
     });
   }
   return null;
-}
-
-// Run the middleware only on paths that require authentication
-// NOTE don't define nested routes, only single word top level routes are supported
-// refactor the matcher or fix the underlining matcher issue in nextjs
-// matcher syntax: /hard-path/:path* -> /hard-path/anything
-// our syntax: hard-path
-const RESERVATION_ROUTES = [
-  "reservation", //:path*',
-  "reservations", //:path*',
-];
-const APPLICATION_ROUTES = [
-  "applications", //:path*',
-  "application", //:path*',
-];
-const AUTHENTICATED_ROUTES = [...RESERVATION_ROUTES, ...APPLICATION_ROUTES, "success"];
-
-// url matcher that is very specific to our case
-function doesUrlMatch(url: string, route: string) {
-  const ref: string[] = url.split("/");
-  return ref.includes(route);
 }
 
 function getLangPrefix(url: URL): "" | "en" | "sv" {

@@ -6,13 +6,14 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import type { LanguageOption } from "hds-react";
 import { Logo } from "ui/src/components/Logo";
-import { signIn, signOut } from "ui/src/modules/browserHelpers";
+import { signIn } from "ui/src/modules/browserHelpers";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { fontBold, fontMedium } from "ui/src/styled";
 import type { CurrentUserQuery } from "@gql/gql-types";
 import { env } from "@/env.mjs";
 import { useSession } from "@/hooks";
+import { signOutToCurrentPage } from "@/modules/logout";
 import {
   applicationsPrefix,
   reservationsPrefix,
@@ -248,7 +249,7 @@ function ActionBar({ profileLink }: Readonly<HeaderProps>) {
               <IconLinkExternal />
             </a>
           )}
-          <button type="button" aria-label={t("common:logout")} onClick={() => signOut()}>
+          <button type="button" aria-label={t("common:logout")} onClick={() => signOutToCurrentPage()}>
             {t("common:logout")}
             <IconSignout />
           </button>

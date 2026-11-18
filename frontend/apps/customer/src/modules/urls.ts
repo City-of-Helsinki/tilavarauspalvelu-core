@@ -10,6 +10,27 @@ export const seasonalPrefix = "/recurring";
 export const applicationsPath = `${applicationsPrefix}/`;
 export const reservationsPath = `${reservationsPrefix}/`;
 
+// Paths that require authentication. The proxy sends a user who is not logged in to the login.
+// NOTE don't define nested routes, only single word top level routes are supported
+// refactor the matcher or fix the underlining matcher issue in nextjs
+// matcher syntax: /hard-path/:path* -> /hard-path/anything
+// our syntax: hard-path
+export const RESERVATION_ROUTES = [
+  "reservation", //:path*',
+  "reservations", //:path*',
+];
+export const APPLICATION_ROUTES = [
+  "applications", //:path*',
+  "application", //:path*',
+];
+export const AUTHENTICATED_ROUTES = [...RESERVATION_ROUTES, ...APPLICATION_ROUTES, "success"];
+
+// url matcher that is very specific to our case
+export function doesUrlMatch(url: string, route: string) {
+  const ref: string[] = url.split("/");
+  return ref.includes(route);
+}
+
 type ApplicationRoundPages = "criteria";
 export function getApplicationRoundPath(pk: Maybe<number> | undefined, page?: ApplicationRoundPages): string {
   if (pk == null) {
