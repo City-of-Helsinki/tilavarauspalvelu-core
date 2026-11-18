@@ -86,5 +86,6 @@
   "applicationsSelected_one": "{{count}} hakemus valittu",
   "applicationsSelected_other": "{{count}} hakemusta valittu",
   "allApplications": "Kaikki hakemukset",
-  "gotoLink": "Tarkastele hakemusta"
+  "gotoLink": "Tarkastele hakemusta",
+  "organisationActiveMembers": "Aktiiviharrastajien määrä"
 }

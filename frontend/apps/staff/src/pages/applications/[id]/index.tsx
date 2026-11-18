@@ -18,6 +18,7 @@ import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject }
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "ui/src/styled";
 import {
+  ApplicationFormType,
   ApplicationStatusChoice,
   ReserveeType,
   useApplicationAdminQuery,
@@ -390,6 +391,8 @@ function ApplicationSectionDetails({
 }): React.ReactElement {
   const { t } = useTranslation();
 
+  const isSportsForm = application.applicationRound.applicationForm === ApplicationFormType.SportsForm;
+  const sport = section.sport?.nameFi || section.sportOther;
   const minDuration = section.reservationMinDuration;
   const maxDuration = section.reservationMaxDuration;
   const duration = appEventDuration(minDuration, maxDuration, t);
@@ -416,11 +419,24 @@ function ApplicationSectionDetails({
               value={formatNumber(section.numPersons, t("common:membersSuffix"))}
             />
             <ValueBox label={t("applicationSection:purpose")} value={section.purpose?.nameFi ?? undefined} />
+            {isSportsForm && (
+              <>
+                <ValueBox label={t("applicationSection:participantGender")} value={section.participantGender?.nameFi} />
+                <ValueBox label={t("applicationSection:sport")} value={sport} />
+                <ValueBox label={t("applicationSection:leagueLevel")} value={section.leagueLevel} />
+              </>
+            )}
             <ValueBox label={t("applicationSection:eventDuration")} value={duration} />
             <ValueBox label={t("applicationSection:eventsPerWeek")} value={`${section.appliedReservationsPerWeek}`} />
             <ValueBox label={t("applicationSection:dates")} value={dates} />
             {section.priceOption != null && (
               <ValueBox label={t("applicationSection:priceOption")} value={section.priceOption.nameFi} />
+            )}
+            {isSportsForm && (
+              <ValueBox
+                label={t("applicationSection:multipleReservationsPerDayWish")}
+                value={section.multipleReservationsPerDayWish}
+              />
             )}
           </ApplicationDatas>
           <Flex $justifyContent="space-between" $direction="row" $alignItems="center">
@@ -561,6 +577,8 @@ export default function ApplicationPage({ pk }: PropsNarrowed): React.ReactEleme
   }
 
   const isOrganisation = !!application.organisationName;
+  // Old applications of the default form can have active members. Show them only on the sports form.
+  const isSportsForm = applicationRound.applicationForm === ApplicationFormType.SportsForm;
 
   const hasBillingAddress =
     !!application.billingStreetAddress &&
@@ -626,6 +644,12 @@ export default function ApplicationPage({ pk }: PropsNarrowed): React.ReactEleme
               <ValueBox label={t("application:coreActivity")} value={application.organisationCoreBusiness} />
               <ValueBox label={t("common:municipality")} value={municipality} />
               <ValueBox label={t("application:identificationNumber")} value={application.organisationIdentifier} />
+              {isSportsForm && (
+                <ValueBox
+                  label={t("application:organisationActiveMembers")}
+                  value={application.organisationActiveMembers?.toString()}
+                />
+              )}
             </>
           )}
           <ValueBox label={t("application:headings.additionalInformation")} value={application.additionalInformation} />
@@ -709,6 +733,17 @@ export const APPLICATION_PAGE_SECTION_FRAGMENT = gql`
       pk
       nameFi
     }
+    sport {
+      id
+      nameFi
+    }
+    sportOther
+    participantGender {
+      id
+      nameFi
+    }
+    leagueLevel
+    multipleReservationsPerDayWish
     allocations
     reservationUnitOptions {
       id
@@ -730,6 +765,7 @@ export const APPLICATION_PAGE_FRAGMENT = gql`
       id
       pk
       nameFi
+      applicationForm
     }
     applicationSections {
       ...ApplicationPageSection
