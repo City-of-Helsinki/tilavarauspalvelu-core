@@ -2,11 +2,13 @@ import {
   groupAvailability,
   gridToPattern,
   isRangeOpen,
+  MINUTES_PER_DAY,
   paintRange,
   patternToGrid,
   shallowEqual,
 } from "@ui/components/WeeklyPatternCalendar/engine";
 import type { WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/types";
+import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import {
   findTooShortListed,
   fromPattern,
@@ -30,6 +32,39 @@ export function listTimeRanges(
 }
 
 export { findTooShortListed };
+
+/** The days that have any time open, in week order. */
+export function listOpenWeekdays(openingHours: ReservableTimeSlots): Weekday[] {
+  const open = groupAvailability(toAvailability(openingHours));
+  return WEEKDAYS_SORTED.filter((weekday) => listStartOptions(openingHours, weekday, open).length > 0);
+}
+
+/** The start times (in minutes) that can be picked on a day: every step whose first step is open. */
+export function listStartOptions(
+  openingHours: ReservableTimeSlots,
+  weekday: Weekday,
+  open = groupAvailability(toAvailability(openingHours))
+): number[] {
+  const step = SUITABLE_TIME_STEP_MINUTES;
+  const options: number[] = [];
+  for (let minutes = 0; minutes + step <= MINUTES_PER_DAY; minutes += step) {
+    if (isRangeOpen(open[weekday], minutes, minutes + step)) {
+      options.push(minutes);
+    }
+  }
+  return options;
+}
+
+/** The end times (in minutes) that can be picked for a start: every step up to where its opening hours end. */
+export function listEndOptions(openingHours: ReservableTimeSlots, weekday: Weekday, beginMinutes: number): number[] {
+  const step = SUITABLE_TIME_STEP_MINUTES;
+  const open = groupAvailability(toAvailability(openingHours))[weekday];
+  const options: number[] = [];
+  for (let minutes = beginMinutes + step; isRangeOpen(open, beginMinutes, minutes); minutes += step) {
+    options.push(minutes);
+  }
+  return options;
+}
 
 /**
  * Adds a time range, in the same way as painting it in the calendar.

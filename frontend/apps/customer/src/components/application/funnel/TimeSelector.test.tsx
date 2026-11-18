@@ -10,6 +10,7 @@ import { Priority, Weekday } from "@gql/gql-types";
 import type { ApplicationPage2Query, TimeSelectorFragment } from "@gql/gql-types";
 import { createMockApplicationFragment } from "@test/application.mocks";
 import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { getSelectOptionLabels, selectOption } from "@test/test.utils";
 import { ApplicationPage2SchemaRefined, convertApplicationPage2 } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from "./TimeSelector";
@@ -864,6 +865,36 @@ describe("TimeSelector priority select", () => {
   });
 });
 
+const FORM_DAY = "application:TimeSelector.form.day";
+const FORM_FROM = "application:TimeSelector.form.from";
+const FORM_TO = "application:TimeSelector.form.to";
+
+/** Picks a time in the time selector form, leaving out the fields not given. */
+async function pickTime(
+  form: HTMLElement,
+  { day, from, to }: { day?: Weekday; from?: number; to?: number }
+): Promise<void> {
+  if (day != null) {
+    await selectOption(within(form), FORM_DAY, weekdayLabel(day));
+  }
+  if (from != null) {
+    await selectOption(within(form), FORM_FROM, hhmm(from));
+  }
+  if (to != null) {
+    await selectOption(within(form), FORM_TO, hhmm(to));
+  }
+}
+
+/** The options a select in the time selector form offers, by their labels. */
+function getOptionLabels(form: HTMLElement, label: string): Promise<string[]> {
+  return getSelectOptionLabels(within(form), label);
+}
+
+/** The label of the option a select in the time selector form shows as picked. */
+function getPickedLabel(form: HTMLElement, label: string): string {
+  return within(form).getByLabelText(label, { selector: "button" }).textContent ?? "";
+}
+
 describe("TimeSelector form alternative", () => {
   test("a time can be added with the form and shows in the calendar", async () => {
     const user = userEvent.setup();
@@ -871,9 +902,7 @@ describe("TimeSelector form alternative", () => {
     const view = customRender({ onSubmit });
     const form = await openFormTab(view);
 
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.day"), Weekday.Thursday);
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(10 * 60));
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(12 * 60));
+    await pickTime(form, { day: Weekday.Thursday, from: 10 * 60, to: 12 * 60 });
     await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
 
     expect(within(form).getByRole("status")).toHaveTextContent("application:TimeSelector.announcements.painted");
@@ -900,34 +929,70 @@ describe("TimeSelector form alternative", () => {
     expect(onSubmit).toHaveBeenCalledWith(createMockSubmitValues([]));
   });
 
-  test("a time that ends before it starts is refused", async () => {
-    const user = userEvent.setup();
-    const view = customRender();
-    const form = await openFormTab(view);
+  // Tuesday opens 10:00-12:00 and Thursday 14:00-15:00, every other day is closed.
+  const twoDays: TimeSelectorFragment[] = [
+    {
+      id: createNodeId("TimeSelector", 0),
+      weekday: Weekday.Tuesday,
+      isClosed: false,
+      reservableTimes: [{ begin: "10:00:00", end: "12:00:00" }],
+    },
+    {
+      id: createNodeId("TimeSelector", 1),
+      weekday: Weekday.Thursday,
+      isClosed: false,
+      reservableTimes: [{ begin: "14:00:00", end: "15:00:00" }],
+    },
+  ];
+  const quarters = (from: number, to: number) =>
+    Array.from({ length: (to - from) / STEP + 1 }, (_, i) => hhmm(from + i * STEP));
 
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(12 * 60));
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(11 * 60));
-    await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
+  test("offers only the days that are open", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
 
-    expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.endAfterStart");
+    expect(await getOptionLabels(await openFormTab(view), FORM_DAY)).toEqual([
+      weekdayLabel(Weekday.Tuesday),
+      weekdayLabel(Weekday.Thursday),
+    ]);
   });
 
-  test("a time outside the opening hours is refused", async () => {
-    const user = userEvent.setup();
-    const openTimes: TimeSelectorFragment[] = [
-      {
-        id: createNodeId("TimeSelector", 0),
-        weekday: Weekday.Tuesday,
-        isClosed: false,
-        reservableTimes: [{ begin: "10:00:00", end: "12:00:00" }],
-      },
-    ];
-    const view = customRender({ reservationUnitOpeningHours: openTimes });
+  test("offers only the open start times of the day, and the end times the start reaches", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
     const form = await openFormTab(view);
 
-    await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
+    expect(await getOptionLabels(form, FORM_FROM)).toEqual(quarters(10 * 60, 11 * 60 + 45));
+    await pickTime(form, { from: 11 * 60 });
+    expect(await getOptionLabels(form, FORM_TO)).toEqual(quarters(11 * 60 + 15, 12 * 60));
+  });
 
-    expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.outsideReservable");
+  test("starts on the first open time, an hour long", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
+    const form = await openFormTab(view);
+
+    expect(getPickedLabel(form, FORM_DAY)).toContain(weekdayLabel(Weekday.Tuesday));
+    expect(getPickedLabel(form, FORM_FROM)).toContain("10:00");
+    expect(getPickedLabel(form, FORM_TO)).toContain("11:00");
+  });
+
+  test("moves the times onto the opening hours of a newly picked day", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
+    const form = await openFormTab(view);
+
+    await pickTime(form, { day: Weekday.Thursday });
+
+    expect(getPickedLabel(form, FORM_FROM)).toContain("14:00");
+    expect(getPickedLabel(form, FORM_TO)).toContain("15:00");
+    expect(await getOptionLabels(form, FORM_FROM)).toEqual(quarters(14 * 60, 14 * 60 + 45));
+  });
+
+  test("keeps an end time that the new start time still reaches", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
+    const form = await openFormTab(view);
+
+    await pickTime(form, { to: 12 * 60 });
+    await pickTime(form, { from: 11 * 60 });
+
+    expect(getPickedLabel(form, FORM_TO)).toContain("12:00");
   });
 });
 
@@ -982,27 +1047,21 @@ describe("TimeSelector with several reservation units", () => {
     expect(onSubmit).toHaveBeenCalledWith(createMockSubmitValues([]));
   });
 
-  test("the form adds a time only another unit opens, and refuses one no unit opens", async () => {
+  test("the form offers and adds times only another unit opens, but not ones no unit opens", async () => {
     const user = userEvent.setup();
     const view = customRender({ reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
-    let form = await openFormTab(view);
-    const add = async (from: number, to: number) => {
-      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.day"), Weekday.Tuesday);
-      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(from));
-      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(to));
-      await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
-    };
+    const form = await openFormTab(view);
 
-    await add(12 * 60, 13 * 60);
+    await pickTime(form, { from: 13 * 60 });
+    expect((await getOptionLabels(form, FORM_TO)).at(-1)).toBe("14:00");
+
+    await pickTime(form, { from: 12 * 60, to: 13 * 60 });
+    await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
     expect(
       within(await openCalendarTab(view)).getByLabelText(
         cellName("primary", Weekday.Tuesday, 12 * 60, 13 * 60, { tooShort: true })
       )
     ).toBeInTheDocument();
-
-    form = await openFormTab(view);
-    await add(13 * 60, 15 * 60);
-    expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.outsideReservable");
   });
 
   test("a too short time is marked in the list too", async () => {

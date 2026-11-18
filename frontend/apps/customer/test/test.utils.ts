@@ -56,6 +56,27 @@ export async function selectOption(
   await user.click(opt);
 }
 
+/** The labels of the options an HDS select offers. Opens the list to read them, and closes it again. */
+export async function getSelectOptionLabels(
+  view: ReturnType<typeof render> | ReturnType<typeof within>,
+  listLabel: RegExp | string
+): Promise<string[]> {
+  const user = userEvent.setup();
+  const btn = view.getByLabelText(listLabel, {
+    selector: "button",
+  });
+  await user.click(btn);
+  const openedAt = Date.now();
+  const labels = within(view.getByRole("listbox"))
+    .getAllByRole("option")
+    .map((option) => option.textContent ?? "");
+  await waitForSelectToggleDebounce(openedAt);
+  await user.click(btn);
+  // Wait out the debounce again, so the select can be opened straight after this.
+  await waitForSelectToggleDebounce(Date.now());
+  return labels;
+}
+
 export async function selectFirstOption(
   view: ReturnType<typeof render> | ReturnType<typeof within>,
   listLabel: RegExp | string

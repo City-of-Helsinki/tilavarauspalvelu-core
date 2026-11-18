@@ -99,10 +99,6 @@
       "empty": "Inga valda tider.",
       "remove": "Ta bort",
       "removeTime": "Ta bort {{time}}",
-      "errors": {
-        "endAfterStart": "Sluttiden måste vara efter starttiden.",
-        "outsideReservable": "Tiden kan inte bokas i någon av ansökningens lokaler."
-      },
       "outsideOpeningHours": "utanför öppettiderna"
     },
     "tooShort": "Tidsönskemålet ({{duration}}) är kortare än bokningens minsta varaktighet ({{minDuration}}). Förläng önskemålet eller minska på den minsta varaktigheten som valdes i ansökans föregående steg.",
