@@ -2,16 +2,23 @@
 # Fetch a Sentry issue with one of its events from the Sentry REST API.
 # The event is the one in the URL, or the latest event if the URL has none.
 # Tag keys after the issue add the top values of each tag over all events of the issue.
+# With --events, the script lists all events of the issue instead. Each event has the values of the tag keys.
 # The token is read from the secret file or from 1Password. See lib.sh.
-# Usage: sentry-issue <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name
+# Usage: sentry-issue [--events] <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name
 set -euo pipefail
 
 source "$(dirname "$0")/lib.sh"
 
 usage() {
-  echo "Usage: sentry-issue <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name" >&2
+  echo "Usage: sentry-issue [--events] <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name" >&2
   exit 2
 }
+
+list_events=false
+if [[ "${1:-}" == "--events" ]]; then
+  list_events=true
+  shift
+fi
 [[ $# -ge 1 ]] || usage
 
 parse_issue "$1" || usage
@@ -25,6 +32,51 @@ for key in "$@"; do
 done
 
 load_token
+
+if $list_events; then
+  # Sentry gives 100 events on a page. Stop after max_pages, so that a large issue does not run for long.
+  max_pages=20
+  keys=("$@")
+  [[ ${#keys[@]} -gt 0 ]] || keys=(environment url transaction release)
+
+  tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"' EXIT
+
+  cursor=""
+  page=0
+  truncated=false
+  while :; do
+    page=$((page + 1))
+    api "issues/$issue_id/events/?full=true${cursor:+&cursor=$cursor}" \
+      --dump-header "$tmp_dir/headers" >"$tmp_dir/page-$(printf '%03d' "$page").json"
+    # The Link header has the next cursor. results="true" tells that the next page has events.
+    next="$(grep -io 'rel="next"; *results="true"; *cursor="[^"]*"' "$tmp_dir/headers" || true)"
+    [[ -n "$next" ]] || break
+    if [[ $page -ge $max_pages ]]; then
+      truncated=true
+      break
+    fi
+    cursor="$(sed -E 's/.*cursor="([^"]*)".*/\1/' <<<"$next")"
+  done
+
+  keys_json="$(printf '%s\n' "${keys[@]}" | jq --raw-input . | jq --slurp .)"
+  jq --slurp --argjson keys "$keys_json" --argjson truncated "$truncated" '
+    [.[][]] as $events | {
+      count: ($events | length),
+      truncated: $truncated,
+      events: [$events[] | ([.tags[]? | {(.key): .value}] | add // {}) as $tags | {
+        id: .eventID,
+        at: .dateCreated,
+        tags: ([$keys[] | {(.): $tags[.]}] | add),
+        message: .message,
+        # Sentry lists the chained exceptions root cause first. Take the outermost one that has a message,
+        # because a wrapper exception often has no message.
+        exception: ([.entries[]? | select(.type == "exception") | .data.values[]
+          | select(.value != null) | "\(.type): \(.value)"] | last)
+      }]
+    }' "$tmp_dir"/page-*.json
+  exit 0
+fi
 
 issue="$(api "issues/$issue_id/")"
 event="$(api "issues/$issue_id/events/$event_id/")"

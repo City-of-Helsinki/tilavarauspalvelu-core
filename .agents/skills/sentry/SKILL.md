@@ -71,6 +71,21 @@ The keys are the same as in the event `tags`, for example `browser.name`, `os.na
 ```
 
 The `tags` field then has the top values of each key over all events, with a count for each.
+Sentry gives only the top 9 values of a key. If `unique` is larger, some values are missing. Then list the events.
+
+### List all events
+
+To get a value from each event, such as the ID in each URL, add `--events` before the issue:
+
+```bash
+.agents/skills/sentry/sentry-issue --events 153768154
+.agents/skills/sentry/sentry-issue --events 153768154 environment url user.id
+```
+
+Each event has its ID, its time, the values of the tag keys and its message.
+Without tag keys, the script shows `environment`, `url`, `transaction` and `release`.
+`exception` is the outermost exception that has a message. It often has the ID of the failed request.
+The script stops after 2000 events and then sets `truncated` to true.
 
 ### Resolve issues
 
