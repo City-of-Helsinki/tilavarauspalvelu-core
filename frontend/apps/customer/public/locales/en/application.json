@@ -90,10 +90,6 @@
       "empty": "No times selected.",
       "remove": "Remove",
       "removeTime": "Remove {{time}}",
-      "errors": {
-        "endAfterStart": "The end time must be after the start time.",
-        "outsideReservable": "The time is not available in any space on this application."
-      },
       "outsideOpeningHours": "outside opening hours"
     },
     "tooShort": "The slot ({{duration}}) is shorter than the minimum booking duration ({{minDuration}}). Lengthen the slot or shorten the minimum booking duration in the previous step of the application.",
