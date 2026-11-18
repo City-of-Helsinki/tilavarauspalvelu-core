@@ -67,6 +67,45 @@ export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY = "Vaihtoehtois
 export const RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_GROUP = "Valitse aikatoiveen tyyppi";
 // The application's calendar, where the times are painted
 export const RECURRING_BOOKING_CALENDAR_FI = "Valitse aikatoiveet kalenterista";
+// The states of the calendar's cells, and the types of the times as the calendar and the list of the times name them.
+// An unavailable cell is closed in every unit of the application. The app calls a cell that is closed only in the
+// unit shown "closed" ("Ei varattavissa tässä tilassa"), and that one can still be painted.
+export const RECURRING_BOOKING_FREE_CELL = "Varattavissa tässä tilassa";
+export const RECURRING_BOOKING_UNAVAILABLE_CELL = "Ei varattavissa missään hakemukselle valituista tiloista";
+export const RECURRING_BOOKING_PRIMARY_TIME = "Ensisijainen toive";
+export const RECURRING_BOOKING_SECONDARY_TIME = "Vaihtoehtoinen toive";
+// The message in the calendar cell of a 15-minute time, shorter than the 30-minute minimum length
+export const RECURRING_BOOKING_TOO_SHORT_15_MIN =
+  "Aikatoive (15 minuuttia) on lyhyempi kuin varauksen vähimmäiskesto (30 minuuttia). Pidennä aikatoivetta tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.";
+// The form under the calendar: its fields, its button, and its error for a time outside the opening hours
+export const RECURRING_BOOKING_FORM_DAY = "Päivä";
+export const RECURRING_BOOKING_FORM_FROM = "Alkaa";
+export const RECURRING_BOOKING_FORM_TO = "Päättyy";
+export const RECURRING_BOOKING_FORM_ADD = "Lisää aika";
+export const RECURRING_BOOKING_FORM_NOT_BOOKABLE = "Aika ei ole varattavissa missään hakemukselle valitussa tilassa.";
+// The form's list of the selected times. Its × buttons are named "Poista" and the time.
+export const RECURRING_BOOKING_SELECTED_TIMES = "Valitut ajat";
+export const RECURRING_BOOKING_NO_SELECTED_TIMES = "Ei valittuja aikoja.";
+export const RECURRING_BOOKING_REMOVE_TIME = "Poista";
+export const RECURRING_BOOKING_TOO_SHORT_MARK = " - (liian lyhyt!)";
+// The summary under the form has a column for each type. A time it shows as invalid has a hidden note.
+export const RECURRING_BOOKING_SUMMARY_PRIMARY = "Ensisijaiset aikatoiveet";
+export const RECURRING_BOOKING_SUMMARY_SECONDARY = "Muut aikatoiveet";
+export const RECURRING_BOOKING_INVALID_TIME = "Virheellinen aikatoive";
+// The weekdays: shortened, as the summaries write them, and in full, as the calendar, the form and the list write them
+export const RECURRING_BOOKING_WEEKDAYS = [
+  ["Ma", "Maanantai"],
+  ["Ti", "Tiistai"],
+  ["Ke", "Keskiviikko"],
+  ["To", "Torstai"],
+  ["Pe", "Perjantai"],
+  ["La", "Lauantai"],
+  ["Su", "Sunnuntai"],
+] as const;
+// The notice under the summary that tells why page 2 can't be continued
+export const RECURRING_BOOKING_NO_TIMES_ERROR = "Valitse kalenterista aikatoiveita";
+export const RECURRING_BOOKING_TOO_SHORT_ERROR =
+  "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.";
 export const RECURRING_BOOKING_UNIT_NAME_KESKUSTA =
   "Harakka, piilokoju: KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)";
 export const RECURRING_BOOKING_UNIT_NAME_MALMI =

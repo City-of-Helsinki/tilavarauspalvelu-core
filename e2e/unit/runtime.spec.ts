@@ -31,6 +31,7 @@ import { Pages } from "../TestSuites/pages";
 import { staffRenderOutcome } from "../TestSuites/PO/Admin/admin_landingpage";
 import { isConfirmedReservationUrl } from "../TestSuites/PO/Common/checkout";
 import { slotsToPickFrom } from "../TestSuites/PO/User/quick_reservation";
+import { selectedTimesAsShown, sentTimesAsPreviewed } from "../TestSuites/recurring-times";
 import { python_keywords } from "../TestSuites/Resources/python_keywords";
 import { BASIC_PERMISSION_TARGET_ADMIN, BASIC_USER_MALE } from "../TestSuites/Resources/serial_users";
 import { ANDROID_UNITS, COMBINED_UNITS, DESKTOP_UNITS } from "../TestSuites/Resources/suite_specific_units";
@@ -313,6 +314,75 @@ test.describe("Runtime", () => {
       "/en/reservations/59472/?notify=confirmed",
     ]) {
       expect(isConfirmedReservationUrl(new URL(path, site)), path).toBe(true);
+    }
+  });
+
+  test("The seasonal application's times are written as page 2 and the preview page show them", () => {
+    const shown = selectedTimesAsShown([
+      "To 19:00–21:00 E",
+      "Ma 10:15–12:00 E",
+      "To 09:00–11:00 V",
+      "To 13:00–13:15 E (liian lyhyt)",
+      "To 18:45–19:00 V",
+      "Pe 08:45–09:00 V (liian lyhyt)",
+    ]);
+    // The list is in calendar order: by weekday, then by time, whatever the type
+    expect(shown.list).toEqual([
+      "Maanantai 10:15–12:00, Ensisijainen toive",
+      "Torstai 09:00–11:00, Vaihtoehtoinen toive",
+      "Torstai 13:00–13:15, Ensisijainen toive - (liian lyhyt!)",
+      "Torstai 18:45–19:00, Vaihtoehtoinen toive",
+      "Torstai 19:00–21:00, Ensisijainen toive",
+      "Perjantai 08:45–09:00, Vaihtoehtoinen toive - (liian lyhyt!)",
+    ]);
+    // The summary drops whole minutes and notes an invalid time in its own column, and a day with no times shows
+    // only its name
+    expect(shown.primary).toEqual([
+      "Ma:10:15–12",
+      "Ti",
+      "Ke",
+      "To:13–13:15 (Virheellinen aikatoive), 19–21",
+      "Pe",
+      "La",
+      "Su",
+    ]);
+    expect(shown.secondary).toEqual([
+      "Ma",
+      "Ti",
+      "Ke",
+      "To:9–11, 18:45–19",
+      "Pe:8:45–9 (Virheellinen aikatoive)",
+      "La",
+      "Su",
+    ]);
+    // The calendar cells the times cover, 15 minutes each: 7 + 8 + 1 + 1 + 8 + 1
+    expect(shown.cells).toBe(26);
+    expect(selectedTimesAsShown([])).toEqual({
+      list: [],
+      primary: ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
+      secondary: ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
+      cells: 0,
+    });
+    expect(
+      sentTimesAsPreviewed([
+        "To 19:00–21:00 E",
+        "To 18:45–19:00 V",
+        "To 09:00–11:00 V",
+        "Ke 10:00–12:00 V",
+        "Pe 15:00–17:00 E",
+      ])
+    ).toEqual([
+      ["Ma", "-", "-"],
+      ["Ti", "-", "-"],
+      ["Ke", "-", "(10–12)"],
+      ["To", "19–21", "(9–11, 18:45–19)"],
+      ["Pe", "15–17", "-"],
+      ["La", "-", "-"],
+      ["Su", "-", "-"],
+    ]);
+    // The likeliest typo: a hyphen instead of the en dash
+    for (const typo of ["Torstai 19:00–21:00 E", "To 19:00-21:00 E", "To 19:00–21:00"]) {
+      expect(() => selectedTimesAsShown([typo]), typo).toThrow(`"${typo}" is not a selected time`);
     }
   });
 

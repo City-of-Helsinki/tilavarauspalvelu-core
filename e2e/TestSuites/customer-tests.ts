@@ -415,6 +415,7 @@ export function customerTests(title: string, device: string): void {
             await appUser.userFillsInTheApplicationDetailsForRecurringApplication();
             await appUser.userSelectsTimesForRecurringApplication();
             await appUser.userFillsInTheApplicationUserInfoDetails();
+            await appUser.userChecksTheTimesInThePreview();
             await appUser.userAcceptsTermsOfUseAndClicksSubmit();
           });
 

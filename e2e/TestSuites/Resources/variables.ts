@@ -49,6 +49,39 @@ export const UNIT_NAME_FOR_PICTURE_TEST = "Maksuton Mankeli";
 // calendar paints only inside the seasonal units' opening hours, 09:00–21:00 in the test data.
 export const RECURRING_THU_19_21_PRIMARY = ["Torstai", "19:00", "21:00"] as const;
 export const RECURRING_THU_09_11_SECONDARY = ["Torstai", "09:00", "11:00"] as const;
+// Closed hours, and a drag past the closing time, which paints only the open part
+export const RECURRING_THU_07_09_CLOSED = ["Torstai", "07:00", "09:00"] as const;
+export const RECURRING_THU_21_23_CLOSED = ["Torstai", "21:00", "23:00"] as const;
+export const RECURRING_THU_20_22_PAST_CLOSING = ["Torstai", "20:00", "22:00"] as const;
+export const RECURRING_THU_20_21 = ["Torstai", "20:00", "21:00"] as const;
+// A 3-hour time, the half hour erased from its middle, and the two pieces left
+export const RECURRING_TUE_11_14 = ["Tiistai", "11:00", "14:00"] as const;
+export const RECURRING_TUE_12_1230 = ["Tiistai", "12:00", "12:30"] as const;
+export const RECURRING_TUE_11_12 = ["Tiistai", "11:00", "12:00"] as const;
+export const RECURRING_TUE_1230_14 = ["Tiistai", "12:30", "14:00"] as const;
+// Times added with the form
+export const RECURRING_WED_10_12 = ["Keskiviikko", "10:00", "12:00"] as const;
+export const RECURRING_FRI_15_17 = ["Perjantai", "15:00", "17:00"] as const;
+// A time shorter than the 30-minute minimum, and a 15-minute time just before 19:00–21:00
+export const RECURRING_THU_13_1315 = ["Torstai", "13:00", "13:15"] as const;
+export const RECURRING_THU_1845_19 = ["Torstai", "18:45", "19:00"] as const;
+// Times painted with the keyboard, the cell toggled with Space, and the times painted next to them
+export const RECURRING_MON_10_12 = ["Maanantai", "10:00", "12:00"] as const;
+export const RECURRING_MON_10 = ["Maanantai", "10:00"] as const;
+export const RECURRING_MON_1015_12 = ["Maanantai", "10:15", "12:00"] as const;
+export const RECURRING_MON_12_13 = ["Maanantai", "12:00", "13:00"] as const;
+export const RECURRING_MON_10_13 = ["Maanantai", "10:00", "13:00"] as const;
+export const RECURRING_MON_13_14 = ["Maanantai", "13:00", "14:00"] as const;
+// The times the application is sent with, as the time checks write them (recurring_applications_page2.ts)
+export const RECURRING_SENT_TIMES = [
+  "Ma 10:00–13:00 E",
+  "Ma 13:00–14:00 V",
+  "Ke 10:00–12:00 V",
+  "To 09:00–11:00 V",
+  "To 18:45–19:00 V",
+  "To 19:00–21:00 E",
+  "Pe 15:00–17:00 E",
+] as const;
 export const QUICK_RESERVATION_DURATION = "60 min";
 export const RESERVATION_INDIVIDUAL = "#reserveeType__INDIVIDUAL";
 export const RESERVATION_NONPROFIT = "#reserveeType__NONPROFIT";

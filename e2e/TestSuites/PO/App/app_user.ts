@@ -22,16 +22,22 @@ import {
   RECURRING_BOOKING_CITY,
   RECURRING_BOOKING_EMAIL,
   RECURRING_BOOKING_FIRST_NAME,
+  RECURRING_BOOKING_FORM_NOT_BOOKABLE,
   RECURRING_BOOKING_LAST_NAME,
   RECURRING_BOOKING_MAX_LENGTH_TEXT,
   RECURRING_BOOKING_MIN_LENGTH_TEXT,
   RECURRING_BOOKING_NAME,
+  RECURRING_BOOKING_NO_TIMES_ERROR,
   RECURRING_BOOKING_PHONE_NUMBER,
   RECURRING_BOOKING_POST_CODE,
+  RECURRING_BOOKING_PRIMARY_TIME,
   RECURRING_BOOKING_PURPOSE_TEXT,
   RECURRING_BOOKING_RESERVATION_PER_WEEK,
+  RECURRING_BOOKING_SECONDARY_TIME,
   RECURRING_BOOKING_SIZE_OF_GROUP,
   RECURRING_BOOKING_STREET_ADDRESS,
+  RECURRING_BOOKING_TOO_SHORT_15_MIN,
+  RECURRING_BOOKING_TOO_SHORT_ERROR,
   RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY,
   RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY,
   RECURRING_BOOKING_UNIT_NAME_KESKUSTA,
@@ -49,8 +55,27 @@ import {
 } from "../../Resources/texts_FI";
 import {
   QUICK_RESERVATION_DURATION,
+  RECURRING_FRI_15_17,
+  RECURRING_MON_10,
+  RECURRING_MON_1015_12,
+  RECURRING_MON_10_12,
+  RECURRING_MON_10_13,
+  RECURRING_MON_12_13,
+  RECURRING_MON_13_14,
+  RECURRING_SENT_TIMES,
+  RECURRING_THU_07_09_CLOSED,
   RECURRING_THU_09_11_SECONDARY,
+  RECURRING_THU_13_1315,
+  RECURRING_THU_1845_19,
   RECURRING_THU_19_21_PRIMARY,
+  RECURRING_THU_20_21,
+  RECURRING_THU_20_22_PAST_CLOSING,
+  RECURRING_THU_21_23_CLOSED,
+  RECURRING_TUE_11_12,
+  RECURRING_TUE_11_14,
+  RECURRING_TUE_12_1230,
+  RECURRING_TUE_1230_14,
+  RECURRING_WED_10_12,
   RESERVATION_INDIVIDUAL,
 } from "../../Resources/variables";
 
@@ -787,6 +812,12 @@ export class AppUser extends PageObject {
     await this.pages.recurringApplications.userClicksContinueButton();
   }
 
+  /**
+   * Page 2: tries the calendar, the form and the list of the selected times in phases, a keyword each, and leaves the
+   * times the application is sent with (`RECURRING_SENT_TIMES`). The phases check the times in the calendar, and in
+   * the list and the summary under it. The times are written as in `recurring-times.ts`, e.g. "To 19:00–21:00 E", and
+   * each phase calls the times it leaves alone `earlier_times`.
+   */
   @step("app_user.User Selects Times For Recurring Application")
   async userSelectsTimesForRecurringApplication() {
     await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
@@ -795,9 +826,44 @@ export class AppUser extends PageObject {
     await this.pages.recurringApplicationsPage2.userClicksAvailableSeasonalBookingTimesFor(
       RECURRING_BOOKING_UNIT_NAME_KESKUSTA
     );
+    await this.userCannotPaintClosedHours();
+    await this.userPaintsAndErasesTimes();
+    await this.userSplitsATime();
+    await this.userRemovesTimesFromTheList();
+    await this.userChecksTheTimeForm();
+    await this.userChangesTheTypeOfTimes();
+    await this.userChecksTooShortTimes();
+    await this.userPaintsWithTheKeyboard();
+    await this.userJoinsTouchingTimes();
+    await this.pages.recurringApplicationsPage2.userClicksContinueButton();
+  }
+
+  /** Closed hours can't be painted, and a drag past the closing time paints only the open part */
+  @step("app_user.User Cannot Paint Closed Hours")
+  async userCannotPaintClosedHours() {
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_THU_07_09_CLOSED);
+    await this.pages.recurringApplicationsPage2.userChecksTheTimesAreClosed(...RECURRING_THU_07_09_CLOSED);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes();
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_THU_21_23_CLOSED);
+    await this.pages.recurringApplicationsPage2.userChecksTheTimesAreClosed(...RECURRING_THU_21_23_CLOSED);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes();
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_THU_20_22_PAST_CLOSING);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_THU_20_21,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("To 20:00–21:00 E");
+    await this.pages.recurringApplicationsPage2.userRemovesTheSelectedTime(...RECURRING_THU_20_21);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes();
+  }
+
+  /** Paints two times, erases both by dragging over them again, and paints them again */
+  @step("app_user.User Paints And Erases Times")
+  async userPaintsAndErasesTimes() {
     await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(
       ...RECURRING_THU_19_21_PRIMARY
     );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("To 19:00–21:00 E");
     await this.pages.recurringApplicationsPage2.userClicksAvailableSeasonalBookingTimesFor(
       RECURRING_BOOKING_UNIT_NAME_MALMI
     );
@@ -807,7 +873,250 @@ export class AppUser extends PageObject {
     await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(
       ...RECURRING_THU_09_11_SECONDARY
     );
-    await this.pages.recurringApplicationsPage2.userClicksContinueButton();
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("To 09:00–11:00 V", "To 19:00–21:00 E");
+    // A drag over a time of the selected type erases it
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_THU_09_11_SECONDARY);
+    await this.pages.recurringApplicationsPage2.userChecksTheTimesAreFree(...RECURRING_THU_09_11_SECONDARY);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("To 19:00–21:00 E");
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY
+    );
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_THU_19_21_PRIMARY);
+    await this.pages.recurringApplicationsPage2.userChecksTheTimesAreFree(...RECURRING_THU_19_21_PRIMARY);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes();
+    await this.pages.recurringApplicationsPage2.userChecksContinueIsDisabled(RECURRING_BOOKING_NO_TIMES_ERROR);
+    await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(
+      ...RECURRING_THU_19_21_PRIMARY
+    );
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY
+    );
+    await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(
+      ...RECURRING_THU_09_11_SECONDARY
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("To 09:00–11:00 V", "To 19:00–21:00 E");
+    await this.pages.recurringApplicationsPage2.userChecksContinueIsEnabled();
+  }
+
+  /** Erasing the middle of a time splits it in two */
+  @step("app_user.User Splits A Time")
+  async userSplitsATime() {
+    const earlier_times = ["To 09:00–11:00 V", "To 19:00–21:00 E"];
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY
+    );
+    await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(...RECURRING_TUE_11_14);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("Ti 11:00–14:00 E", ...earlier_times);
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_TUE_12_1230);
+    await this.pages.recurringApplicationsPage2.userChecksTheTimesAreFree(...RECURRING_TUE_12_1230);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_TUE_11_12,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_TUE_1230_14,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(
+      "Ti 11:00–12:00 E",
+      "Ti 12:30–14:00 E",
+      ...earlier_times
+    );
+  }
+
+  /** The × buttons in the list of the selected times remove whole times */
+  @step("app_user.User Removes Times From The List")
+  async userRemovesTimesFromTheList() {
+    const earlier_times = ["To 09:00–11:00 V", "To 19:00–21:00 E"];
+    await this.pages.recurringApplicationsPage2.userRemovesTheSelectedTime(...RECURRING_TUE_11_12);
+    await this.pages.recurringApplicationsPage2.userRemovesTheSelectedTime(...RECURRING_TUE_1230_14);
+    await this.pages.recurringApplicationsPage2.userChecksTheTimesAreFree(...RECURRING_TUE_11_12);
+    await this.pages.recurringApplicationsPage2.userChecksTheTimesAreFree(...RECURRING_TUE_1230_14);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(...earlier_times);
+  }
+
+  /**
+   * The form refuses a time that isn't fully inside the opening hours, and adds open times with the selected type. An
+   * added time clears the form's error, so the refusals take turns with the additions: each one has to show the error
+   * again.
+   */
+  @step("app_user.User Checks The Time Form")
+  async userChecksTheTimeForm() {
+    const earlier_times = ["To 09:00–11:00 V", "To 19:00–21:00 E"];
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY
+    );
+    await this.pages.recurringApplicationsPage2.userAddsTheTimesWithTheForm(...RECURRING_THU_07_09_CLOSED);
+    await this.pages.recurringApplicationsPage2.userChecksTheFormError(RECURRING_BOOKING_FORM_NOT_BOOKABLE);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(...earlier_times);
+    await this.pages.recurringApplicationsPage2.userAddsTheTimesWithTheForm(...RECURRING_WED_10_12);
+    await this.pages.recurringApplicationsPage2.userChecksTheFormHasNoError();
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_WED_10_12,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("Ke 10:00–12:00 E", ...earlier_times);
+    await this.pages.recurringApplicationsPage2.userAddsTheTimesWithTheForm(...RECURRING_THU_21_23_CLOSED);
+    await this.pages.recurringApplicationsPage2.userChecksTheFormError(RECURRING_BOOKING_FORM_NOT_BOOKABLE);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("Ke 10:00–12:00 E", ...earlier_times);
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY
+    );
+    await this.pages.recurringApplicationsPage2.userAddsTheTimesWithTheForm(...RECURRING_FRI_15_17);
+    await this.pages.recurringApplicationsPage2.userChecksTheFormHasNoError();
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_FRI_15_17,
+      RECURRING_BOOKING_SECONDARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(
+      "Ke 10:00–12:00 E",
+      "Pe 15:00–17:00 V",
+      ...earlier_times
+    );
+    // A drag over this time paints its open part, but the form refuses the whole time
+    await this.pages.recurringApplicationsPage2.userAddsTheTimesWithTheForm(...RECURRING_THU_20_22_PAST_CLOSING);
+    await this.pages.recurringApplicationsPage2.userChecksTheFormError(RECURRING_BOOKING_FORM_NOT_BOOKABLE);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(
+      "Ke 10:00–12:00 E",
+      "Pe 15:00–17:00 V",
+      ...earlier_times
+    );
+  }
+
+  /** A drag over a time of the other type gives it the selected type */
+  @step("app_user.User Changes The Type Of Times")
+  async userChangesTheTypeOfTimes() {
+    const earlier_times = ["To 09:00–11:00 V", "To 19:00–21:00 E"];
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY
+    );
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_WED_10_12);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_WED_10_12,
+      RECURRING_BOOKING_SECONDARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(
+      "Ke 10:00–12:00 V",
+      "Pe 15:00–17:00 V",
+      ...earlier_times
+    );
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY
+    );
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_FRI_15_17);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_FRI_15_17,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(
+      "Ke 10:00–12:00 V",
+      "Pe 15:00–17:00 E",
+      ...earlier_times
+    );
+  }
+
+  /**
+   * A time shorter than the minimum length stops the application. A short Vaihtoehtoinen time next to another time
+   * is a buffer that counts together with it, so it is valid.
+   */
+  @step("app_user.User Checks Too Short Times")
+  async userChecksTooShortTimes() {
+    const earlier_times = ["Ke 10:00–12:00 V", "To 09:00–11:00 V", "To 19:00–21:00 E", "Pe 15:00–17:00 E"];
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY
+    );
+    await this.pages.recurringApplicationsPage2.userAddsTheTimesWithTheForm(...RECURRING_THU_13_1315);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_THU_13_1315,
+      RECURRING_BOOKING_PRIMARY_TIME,
+      RECURRING_BOOKING_TOO_SHORT_15_MIN
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(
+      "To 13:00–13:15 E (liian lyhyt)",
+      ...earlier_times
+    );
+    await this.pages.recurringApplicationsPage2.userChecksContinueIsDisabled(RECURRING_BOOKING_TOO_SHORT_ERROR);
+    await this.pages.recurringApplicationsPage2.userRemovesTheSelectedTime(...RECURRING_THU_13_1315);
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(...earlier_times);
+    await this.pages.recurringApplicationsPage2.userChecksContinueIsEnabled();
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY
+    );
+    // 18:45–19:00 touches 19:00–21:00, so it counts together with it and is valid
+    await this.pages.recurringApplicationsPage2.userAddsTheTimesWithTheForm(...RECURRING_THU_1845_19);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_THU_1845_19,
+      RECURRING_BOOKING_SECONDARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("To 18:45–19:00 V", ...earlier_times);
+  }
+
+  /** Shift+↓ paints a time with the keyboard, and Space erases and paints one cell */
+  @step("app_user.User Paints With The Keyboard")
+  async userPaintsWithTheKeyboard() {
+    const earlier_times = [
+      "Ke 10:00–12:00 V",
+      "To 09:00–11:00 V",
+      "To 18:45–19:00 V",
+      "To 19:00–21:00 E",
+      "Pe 15:00–17:00 E",
+    ];
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY
+    );
+    await this.pages.recurringApplicationsPage2.userSelectsTheTimesWithTheKeyboard(...RECURRING_MON_10_12);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_MON_10_12,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("Ma 10:00–12:00 E", ...earlier_times);
+    await this.pages.recurringApplicationsPage2.userTogglesTheTimeWithTheKeyboard(...RECURRING_MON_10);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_MON_1015_12,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("Ma 10:15–12:00 E", ...earlier_times);
+    await this.pages.recurringApplicationsPage2.userTogglesTheTimeWithTheKeyboard(...RECURRING_MON_10);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_MON_10_12,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("Ma 10:00–12:00 E", ...earlier_times);
+  }
+
+  /** Touching times of the same type join into one, and times of different types stay apart */
+  @step("app_user.User Joins Touching Times")
+  async userJoinsTouchingTimes() {
+    const earlier_times = [
+      "Ke 10:00–12:00 V",
+      "To 09:00–11:00 V",
+      "To 18:45–19:00 V",
+      "To 19:00–21:00 E",
+      "Pe 15:00–17:00 E",
+    ];
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_PRIMARY
+    );
+    // After the join, 12:00 is in the middle of a time, so the drag is checked by the time it joined
+    await this.pages.recurringApplicationsPage2.userDragsOverTheTimes(...RECURRING_MON_12_13);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_MON_10_13,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes("Ma 10:00–13:00 E", ...earlier_times);
+    await this.pages.recurringApplicationsPage2.userSelectsTypeOfTheBookingRequest(
+      RECURRING_BOOKING_TYPE_OF_BOOKING_REQUEST_SECONDARY
+    );
+    await this.pages.recurringApplicationsPage2.userSelectsTheTimesForRecurringApplication(...RECURRING_MON_13_14);
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_MON_10_13,
+      RECURRING_BOOKING_PRIMARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_MON_13_14,
+      RECURRING_BOOKING_SECONDARY_TIME
+    );
+    await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(...RECURRING_SENT_TIMES);
   }
 
   @step("app_user.User Fills In The Application User Info Details")
@@ -822,6 +1131,12 @@ export class AppUser extends PageObject {
     await this.pages.recurringApplicationsPage3.userTypesEmail(RECURRING_BOOKING_EMAIL);
     await this.pages.recurringApplicationsPage3.userTypesAdditionalInformation(RECURRING_BOOKING_ADDITIONAL_INFO);
     await this.pages.recurringApplicationsPage2.userClicksContinueButton();
+  }
+
+  /** The preview page shows the times the application is sent with */
+  @step("app_user.User Checks The Times In The Preview")
+  async userChecksTheTimesInThePreview() {
+    await this.pages.recurringApplicationsPagePreview.userChecksTheTimes(...RECURRING_SENT_TIMES);
   }
 
   @step("app_user.User Accepts Terms Of Use And Clicks Submit")
