@@ -2,12 +2,23 @@
 # PreToolUse hook for Bash. Blocks calls to skill scripts that the shell could expand,
 # and commands that name the skill secret files.
 # A skill script is an executable file in .agents/skills/<skill>/.
-# A call is allowed only as the script path from the repository root, followed by arguments
-# that are single-quoted without a quote inside, or that use only safe characters.
+# A call is allowed only as the absolute script path, or as the path from the repository root
+# when the shell is in the repository root. The arguments must be single-quoted without a quote inside,
+# or use only safe characters.
 set -euo pipefail
 
-command="$(jq -r '.tool_input.command // empty')"
+input="$(cat)"
+command="$(jq -r '.tool_input.command // empty' <<<"$input")"
+cwd="$(jq -r '.cwd // empty' <<<"$input")"
 root="$(git rev-parse --show-toplevel)"
+
+# Escape the regular expression characters in the repository path.
+root_re="$(printf '%s' "$root" | sed 's/[][\.*^$+?(){}|]/\\&/g')"
+if [[ -z "$cwd" || "$cwd" == "$root" ]]; then
+  path_prefix="(${root_re}/)?"
+else
+  path_prefix="${root_re}/"
+fi
 
 # Block commands that name the skill secret files. Only the skill scripts read them.
 # The gh token is not a skill secret. Other tools in the container use it.
@@ -30,11 +41,11 @@ for script in "$root"/.agents/skills/*/*; do
   call="${command_start}(\"[^\"]*\"|'[^']*'|[^[:space:];&|\"'])*($skill/$name|\./$name)[\"']?([[:space:];&|)]|\$)"
   [[ "$command" =~ $call ]] || continue
 
-  allowed="^(\.agents|\.claude)/skills/$skill/$name( +$safe_arg)* *\$"
+  allowed="^${path_prefix}(\.agents|\.claude)/skills/$skill/$name( +$safe_arg)* *\$"
   if [[ ! "$command" =~ $allowed ]]; then
     {
-      echo "Blocked: run the skill script as a single command from the repository root:"
-      echo "  .agents/skills/$skill/$name <arguments>"
+      echo "Blocked: run the skill script as a single command:"
+      echo "  $root/.agents/skills/$skill/$name <arguments>"
       echo "Put URLs in single quotes. Do not pipe, chain or redirect the command."
     } >&2
     exit 2
