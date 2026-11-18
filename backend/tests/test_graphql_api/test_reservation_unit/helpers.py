@@ -46,6 +46,16 @@ reservation_units_all_query = partial(build_query, "reservationUnitsAll", connec
 CREATE_MUTATION = build_mutation("createReservationUnit", "ReservationUnitCreateMutation")
 UPDATE_MUTATION = build_mutation("updateReservationUnit", "ReservationUnitUpdateMutation")
 ARCHIVE_MUTATION = build_mutation("archiveReservationUnit", "ReservationUnitArchiveMutation")
+CREATE_MUTATION_WITH_HAUKI_EXPORT_FAILED = build_mutation(
+    "createReservationUnit",
+    "ReservationUnitCreateMutation",
+    fields="pk haukiExportFailed",
+)
+UPDATE_MUTATION_WITH_HAUKI_EXPORT_FAILED = build_mutation(
+    "updateReservationUnit",
+    "ReservationUnitUpdateMutation",
+    fields="pk haukiExportFailed",
+)
 
 
 def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:

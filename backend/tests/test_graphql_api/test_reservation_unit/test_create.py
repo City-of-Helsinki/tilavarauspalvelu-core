@@ -8,6 +8,7 @@ from tilavarauspalvelu.enums import ReservationKind, Weekday
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
@@ -15,7 +16,12 @@ from utils.date_utils import local_date
 from tests.factories import ResourceFactory, SpaceFactory, UnitFactory, UserFactory
 from tests.helpers import patch_method
 
-from .helpers import CREATE_MUTATION, get_create_non_draft_input_data, get_free_own_pricing_data
+from .helpers import (
+    CREATE_MUTATION,
+    CREATE_MUTATION_WITH_HAUKI_EXPORT_FAILED,
+    get_create_non_draft_input_data,
+    get_free_own_pricing_data,
+)
 
 # Applied to all tests
 pytestmark = [
@@ -133,6 +139,7 @@ def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
 
 @patch_method(HaukiAPIClient.get_resource, return_value=HaukiAPIResource(id=123))
 @patch_method(HaukiAPIClient.create_resource, side_effect=HaukiAPIError("foo"))
+@patch_method(SentryLogger.log_exception)
 def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
     settings.HAUKI_EXPORTS_ENABLED = True
 
@@ -145,16 +152,20 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
         "unit": unit.pk,
     }
 
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(CREATE_MUTATION_WITH_HAUKI_EXPORT_FAILED, input_data=data)
 
     assert HaukiAPIClient.get_resource.call_count == 1
     assert HaukiAPIClient.create_resource.call_count == 1
 
-    assert response.error_message() == "Sending reservation unit as resource to HAUKI failed."
+    assert response.has_errors is False, response
+    assert response.first_query_object["haukiExportFailed"] is True
 
-    # Unit is still created
-    reservation_unit: ReservationUnit | None = ReservationUnit.objects.first()
-    assert reservation_unit is not None
+    assert SentryLogger.log_exception.call_count == 1
+    error = SentryLogger.log_exception.call_args.args[0]
+    assert isinstance(error, HaukiAPIError)
+    assert str(error) == "foo"
+
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
     assert reservation_unit.origin_hauki_resource is None  # Unit doesn't have origin hauki resource

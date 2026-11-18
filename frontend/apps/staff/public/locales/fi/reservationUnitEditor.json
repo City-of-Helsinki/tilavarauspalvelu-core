@@ -197,6 +197,7 @@
   "saveAsDraft": "Tallenna luonnos",
   "reservationUnitCreatedNotification": "Varausyksikkö {{name}} luotu",
   "reservationUnitUpdatedNotification": "Varausyksikön muutokset tallennettu.",
+  "haukiExportFailedNotification": "Varausyksikkö tallennettiin, mutta tietoja ei voitu päivittää Aukiolosovellukseen. Tallenna varausyksikkö uudelleen myöhemmin.",
   "saveSuccess": "Tiedot tallennettu.",
   "saveFailed": "Valitettavasti varausyksikön tallennus / julkaisu ei juuri nyt onnistu, kokeile myöhemmin uudelleen. ({{error}})",
   "imageSaveFailed": "Varausyksikön tallennus onnistui, mutta kuvien tallennus epäonnistui.",

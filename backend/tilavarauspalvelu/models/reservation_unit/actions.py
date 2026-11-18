@@ -44,7 +44,6 @@ from utils.date_utils import (
     utc_datetime_max,
     utc_datetime_min,
 )
-from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -81,7 +80,7 @@ class ReservationUnitHaukiExporter:
     def _convert_reservation_unit_to_hauki_resource_data(self) -> dict[str, Any]:
         parent_unit_resource_id = self._get_parent_resource_id()
         if not parent_unit_resource_id:
-            msg = "Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API."
+            msg = "Parent Unit does not have 'Hauki Resource' set and could not get it from Hauki API."
             raise HaukiAPIError(msg)
 
         if not self.reservation_unit.unit.tprek_department_id:
@@ -135,7 +134,7 @@ class ReservationUnitHaukiExporter:
         try:
             resource_data = HaukiAPIClient.get_resource(hauki_resource_id=unit_origin_resource_id)
             return resource_data["id"]
-        except (ExternalServiceError, KeyError, IndexError, TypeError):
+        except (KeyError, IndexError, TypeError):
             return None
 
     def _create_hauki_resource(self, hauki_resource_data: dict[str, Any]) -> None:

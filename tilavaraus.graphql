@@ -4131,6 +4131,7 @@ type ReservationUnitCreateMutationPayload {
   images: [ReservationUnitImageNode]
   accessTypes: [ReservationUnitAccessTypeNode]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
+  haukiExportFailed: Boolean
 }
 
 input ReservationUnitCreateMutationInput {
@@ -4309,6 +4310,7 @@ type ReservationUnitUpdateMutationPayload {
   images: [ReservationUnitImageNode]
   accessTypes: [ReservationUnitAccessTypeNode]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
+  haukiExportFailed: Boolean
 }
 
 input ReservationUnitUpdateMutationInput {

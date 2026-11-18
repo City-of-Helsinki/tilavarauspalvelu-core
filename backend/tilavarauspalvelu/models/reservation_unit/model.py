@@ -323,6 +323,10 @@ class ReservationUnit(models.Model):
     actions: LazyAttribute[ReservationUnitActions] = LazyModelAttribute.new()
     validators: LazyAttribute[ReservationUnitValidator] = LazyModelAttribute.new()
 
+    # Not stored in the database. The GraphQL save sets it when the Hauki export fails,
+    # so that the mutation output can tell the staff UI to show a warning.
+    hauki_export_failed: bool = False
+
     reservation_unit_hierarchy: ReservationUnitHierarchy | None  # Can be missing
     pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
     reservation_unit_pricing_groups: OneToManyRelatedManager[

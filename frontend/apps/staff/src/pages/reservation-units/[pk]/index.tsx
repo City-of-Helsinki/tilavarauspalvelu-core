@@ -9,7 +9,7 @@ import { serverSideTranslations } from "next-i18next/pages/serverSideTranslation
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { errorToast, successToast } from "ui/src/components/toast";
+import { errorToast, successToast, warningToast } from "ui/src/components/toast";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
@@ -205,6 +205,21 @@ const getPk = (d: UpdateReservationUnitMutation | CreateReservationUnitMutation 
   return null;
 };
 
+const getIsHaukiExportFailed = (
+  d: UpdateReservationUnitMutation | CreateReservationUnitMutation | null | undefined
+) => {
+  if (d == null) {
+    return false;
+  }
+  if ("updateReservationUnit" in d) {
+    return d.updateReservationUnit?.haukiExportFailed === true;
+  }
+  if ("createReservationUnit" in d) {
+    return d.createReservationUnit?.haukiExportFailed === true;
+  }
+  return false;
+};
+
 function ReservationUnitEditor({
   reservationUnit,
   form,
@@ -296,9 +311,13 @@ function ReservationUnitEditor({
     }
 
     const upPk = getPk(data);
+    const isHaukiExportFailed = getIsHaukiExportFailed(data);
 
     // crude way to handle different logic for archive vs save (avoids double toast)
     if (upPk) {
+      if (isHaukiExportFailed) {
+        warningToast({ text: t("reservationUnitEditor:haukiExportFailedNotification") });
+      }
       const { images } = formValues;
       // res unit is saved, we can save changes to images
       const success = await reconcileImageChanges?.(upPk, images);
@@ -307,7 +326,9 @@ function ReservationUnitEditor({
           formValues.pk === 0
             ? "reservationUnitEditor:reservationUnitCreatedNotification"
             : "reservationUnitEditor:reservationUnitUpdatedNotification";
-        successToast({ text: t(tkey, { name: getValues("nameFi") }) });
+        if (!isHaukiExportFailed) {
+          successToast({ text: t(tkey, { name: getValues("nameFi") }) });
+        }
         // redirect if new one was created
         if (formValues.pk === 0 && upPk > 0) {
           await router.push(getReservationUnitUrl(unitPk, upPk));
@@ -598,6 +619,7 @@ export const UPDATE_RESERVATION_UNIT = gql`
   mutation UpdateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
     updateReservationUnit(input: $input) {
       pk
+      haukiExportFailed
     }
   }
 `;
@@ -606,6 +628,7 @@ export const CREATE_RESERVATION_UNIT = gql`
   mutation CreateReservationUnit($input: ReservationUnitCreateMutationInput!) {
     createReservationUnit(input: $input) {
       pk
+      haukiExportFailed
     }
   }
 `;
