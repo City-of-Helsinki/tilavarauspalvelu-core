@@ -74,7 +74,8 @@
     "leagueLevelHelper": "T.ex. division 3. Lämna tomt om gruppen inte spelar i en serie."
   },
   "TimeSelector": {
-    "calendarLabel": "Välj önskade tider",
+    "calendarLabel": "Välj önskade tider i kalendern",
+    "formLabel": "Välj önskade tider med ett formulär",
     "legend": {
       "unavailable": "Kan inte bokas i någon av ansökningens lokaler",
       "invalid": "Felaktigt önskemål",
@@ -83,14 +84,12 @@
       "secondary": "Alternativt önskemål",
       "open": "Kan reserveras i denna lokal"
     },
-    "skipToForm": "Hoppa till formuläret för att lägga till tider",
     "announcements": {
       "painted": "Tillagd",
       "erased": "Borttagen"
     },
     "form": {
       "tooShort": "för kort",
-      "legend": "Lägg till tider med ett formulär",
       "priorityNote": "Nya tider får den typ av önskemål som valts ovan.",
       "day": "Dag",
       "from": "Från",
@@ -117,7 +116,7 @@
     "resetTimes": "Töm kalendern",
     "summary": "Sammanfattning",
     "prioritySelectLabel": "Välj typ av tidsönskemål",
-    "reservationUnitSelectLabel": "Visa säsongbokningstider för lokalen",
+    "reservationUnitSelectLabel": "Visa säsongbokningstider i kalendern för lokalen",
     "priorityLabels": {
       "primary": "Prioriterade tidsönskemål",
       "secondary": "Alternativa tidsönskemål"

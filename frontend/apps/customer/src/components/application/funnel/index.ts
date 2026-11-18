@@ -1,7 +1,6 @@
 export { ApplicationSectionPage1 } from "./ApplicationSectionPage1";
 export { ApplicationStepper, PAGES_WITH_STEPPER } from "./ApplicationStepper";
 export { ApplicationFunnelWrapper } from "./ApplicationFunnelWrapper";
-export { TimePreview } from "./TimePreview";
 export { validateApplication } from "./form";
 export { Page1 } from "./Page1";
 export { Page2 } from "./Page2";
