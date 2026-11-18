@@ -17,6 +17,8 @@ const Ingress = styled(H2)`
   line-height: 1.8125rem;
 `;
 
+const CUSTOM_WELCOME_USERNAME_SET = new Set(["u-gptwmnqqnjahlfj2uas2glyx5a", "u-zwckoxj3abdandug5odsi3q2la"]);
+
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function Index({ rand }: PageProps) {
   const { t } = useTranslation();
@@ -25,7 +27,8 @@ export default function Index({ rand }: PageProps) {
 
   let headingStr = t("mainLander:welcome");
   if (
-    user?.username === "u-gptwmnqqnjahlfj2uas2glyx5a" &&
+    user != null &&
+    CUSTOM_WELCOME_USERNAME_SET.has(user.username) &&
     rand < 0.1 // 10% chance
   ) {
     headingStr = t("mainLander:welcomeCustom");
