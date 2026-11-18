@@ -53,14 +53,10 @@ class ApplicationRound(models.Model):
     criteria: str = Nh3TextField(
         blank=True,
         default="",
-        allowed_tags=settings.NH3_ALLOWED_TAGS,
-        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
     notes_when_applying: str = Nh3TextField(
         blank=True,
         default="",
-        allowed_tags=settings.NH3_ALLOWED_TAGS,
-        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
     # Period when the application round accepts applications

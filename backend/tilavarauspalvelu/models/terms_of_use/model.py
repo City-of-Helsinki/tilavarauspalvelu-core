@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import pgettext_lazy
 from django_nh3.models import Nh3TextField
@@ -33,10 +32,7 @@ class TermsOfUse(models.Model):
     id: str = models.CharField(primary_key=True, max_length=100)
     name: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
 
-    text: str = Nh3TextField(
-        allowed_tags=settings.NH3_ALLOWED_TAGS,
-        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
-    )
+    text: str = Nh3TextField()
 
     terms_type: TermsOfUseTypeChoices = TextChoicesField(
         enum=TermsOfUseTypeChoices,
