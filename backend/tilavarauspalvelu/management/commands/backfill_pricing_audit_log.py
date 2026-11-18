@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 BATCH_SIZE = 5_000
 
-# The migrations 0192 and 0193 create rows of these models with bulk writes, which make no audit log.
+# The migrations 0194 and 0195 create rows of these models with bulk writes, which make no audit log.
 CREATED_MODELS: list[type[models.Model]] = [
     SalesItem,
     PricingGroup,
@@ -44,7 +44,7 @@ ADDITIONAL_DATA = {
 
 class Command(BaseCommand):
     help = (
-        "Writes the audit log entries for the rows that the migrations 0192 and 0193 (TILA-4545) made or changed "
+        "Writes the audit log entries for the rows that the migrations 0194 and 0195 (TILA-4545) made or changed "
         "with bulk writes. A row that already has an entry is skipped, so the command can be run again. "
         "Run it once after the release that has these migrations."
     )
