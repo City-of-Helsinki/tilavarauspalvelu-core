@@ -98,10 +98,6 @@
       "empty": "Ei valittuja aikoja.",
       "remove": "Poista",
       "removeTime": "Poista {{time}}",
-      "errors": {
-        "endAfterStart": "Päättymisajan täytyy olla alkamisajan jälkeen.",
-        "outsideReservable": "Aika ei ole varattavissa missään hakemukselle valitussa tilassa."
-      },
       "outsideOpeningHours": "aukioloaikojen ulkopuolella"
     },
     "tooShort": "Aikatoive ({{duration}}) on lyhyempi kuin varauksen vähimmäiskesto ({{minDuration}}). Pidennä aikatoivetta tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import React, { useEffect, useMemo, useState } from "react";
+import { useForm, useFormContext } from "react-hook-form";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
@@ -11,16 +11,19 @@ import {
   secondaryIndicator,
 } from "@ui/components/WeeklyPatternCalendar/styles";
 import { fontBold } from "@ui/styled";
-import { WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { ControlledSelect } from "ui/src/components/form";
 import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
-import { priorityKey, SUITABLE_TIME_STEP_MINUTES, SUITABLE_TIME_VISIBLE_HOURS } from "ui/src/modules/suitableTimes";
+import { priorityKey, toAvailability } from "ui/src/modules/suitableTimes";
 import { formatClock, formatClockRange } from "ui/src/modules/time-helpers";
-import { Weekday } from "@gql/gql-types";
+import type { Weekday } from "@gql/gql-types";
 import type { ApplicationPage2FormValues, SuitableTimeRangeFormValues } from "./form";
 import {
   addTimeRange,
   findOutsideListed,
   findTooShortListed,
+  listEndOptions,
+  listOpenWeekdays,
+  listStartOptions,
   listTimeRanges,
   removeTimeRange,
 } from "./timeSelectorModule";
@@ -40,17 +43,8 @@ const Fields = styled.div`
   align-items: flex-end;
   gap: var(--spacing-s);
 
-  label {
-    display: grid;
-    gap: var(--spacing-3-xs);
-  }
-
-  select {
-    min-height: 56px;
-    padding: 0 var(--spacing-s);
-    border: 2px solid var(--color-black-50);
-    background: var(--color-white);
-    font-size: var(--fontsize-body-l);
+  > :not(button) {
+    flex: 1 1 10rem;
   }
 `;
 
@@ -124,12 +118,36 @@ export function describeTime(t: TFunction, day: Weekday, begin: number, end: num
   return `${dayName} ${formatClockRange(begin, end)}`;
 }
 
-function minuteOptions(begin: number, end: number): number[] {
-  const options: number[] = [];
-  for (let minutes = begin; minutes <= end; minutes += SUITABLE_TIME_STEP_MINUTES) {
-    options.push(minutes);
+function toClockOption(minutes: number): { value: number; label: string } {
+  return { value: minutes, label: formatClock(minutes) };
+}
+
+type TimePickerValues = { weekday: Weekday | null; from: number | null; to: number | null };
+
+// An hour, the length a new time gets by default, when the opening hours allow it.
+const DEFAULT_LENGTH_MINUTES = 60;
+
+/**
+ * The picked time, moved onto the opening hours: a closed day becomes the first open day, a start that day doesn't
+ * open becomes its first open start, and an end the start can't reach becomes an hour after the start (or as far as
+ * the opening hours reach). Picks that are still open are kept.
+ */
+function toOpenPick(openingHours: ReservableTimeSlots, { weekday, from, to }: TimePickerValues): TimePickerValues {
+  const openWeekdayList = listOpenWeekdays(openingHours);
+  const day = weekday != null && openWeekdayList.includes(weekday) ? weekday : (openWeekdayList[0] ?? null);
+  if (day == null) {
+    return { weekday: null, from: null, to: null };
   }
-  return options;
+  const startList = listStartOptions(openingHours, day);
+  const start = from != null && startList.includes(from) ? from : (startList[0] ?? null);
+  if (start == null) {
+    return { weekday: day, from: null, to: null };
+  }
+  const endList = listEndOptions(openingHours, day, start);
+  const preferredEnd = start + DEFAULT_LENGTH_MINUTES;
+  const fallbackEnd = endList.includes(preferredEnd) ? preferredEnd : (endList.at(-1) ?? null);
+  const end = to != null && endList.includes(to) ? to : fallbackEnd;
+  return { weekday: day, from: start, to: end };
 }
 
 type SuitableTimeRangeFormProps = {
@@ -147,11 +165,36 @@ export function SuitableTimeRangeForm({
   const { t } = useTranslation();
   const { getValues, setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
-  const { beginMinutes: dayBegin, endMinutes: dayEnd } = SUITABLE_TIME_VISIBLE_HOURS;
-  const [weekday, setWeekday] = useState<Weekday>(Weekday.Monday);
-  const [from, setFrom] = useState(dayBegin);
-  const [to, setTo] = useState(dayBegin + 60);
-  const [errorKey, setErrorKey] = useState<"endAfterStart" | "outsideReservable" | null>(null);
+  // The pickers only build the next time to add, so they keep their own form, apart from the application's.
+  const picker = useForm<TimePickerValues>({
+    defaultValues: toOpenPick(openingHours, { weekday: null, from: null, to: null }),
+  });
+  const weekday = picker.watch("weekday");
+  const from = picker.watch("from");
+  const to = picker.watch("to");
+  // After a pick, or when the opening hours change, move the picks that are no longer open onto the open times.
+  const syncPicker = () => {
+    const next = toOpenPick(openingHours, picker.getValues());
+    picker.setValue("weekday", next.weekday);
+    picker.setValue("from", next.from);
+    picker.setValue("to", next.to);
+  };
+  // The parent builds the opening hours anew on each render, so compare them by content, not by reference.
+  const openingHoursKey = JSON.stringify(toAvailability(openingHours));
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- runs only when the opening hours change, not on each pick
+  useEffect(syncPicker, [openingHoursKey]);
+
+  const dayOptionList = useMemo(
+    () => listOpenWeekdays(openingHours).map((day) => ({ value: day, label: t(`common:weekdayLongEnum.${day}`) })),
+    [openingHours, t]
+  );
+  const fromOptionList =
+    weekday == null ? [] : listStartOptions(openingHours, weekday).map((minutes) => toClockOption(minutes));
+  const toOptionList =
+    weekday == null || from == null
+      ? []
+      : listEndOptions(openingHours, weekday, from).map((minutes) => toClockOption(minutes));
+
   const [status, setStatus] = useState("");
 
   const fieldName = `applicationSections.${index}.suitableTimeRanges` as const;
@@ -179,8 +222,7 @@ export function SuitableTimeRangeForm({
   };
 
   const handleAdd = () => {
-    if (to <= from) {
-      setErrorKey("endAfterStart");
+    if (weekday == null || from == null || to == null) {
       return;
     }
     const next = addTimeRange(
@@ -189,10 +231,8 @@ export function SuitableTimeRangeForm({
       openingHours
     );
     if (!next) {
-      setErrorKey("outsideReservable");
       return;
     }
-    setErrorKey(null);
     save(next);
     setStatus(`${t("application:TimeSelector.announcements.painted")}: ${describe(weekday, from, to)}`);
   };
@@ -212,41 +252,39 @@ export function SuitableTimeRangeForm({
     <Fieldset id={id} data-testid={`time-selector__form-${index}`}>
       <p>{t("application:TimeSelector.form.priorityNote")}</p>
       <Fields>
-        <label>
-          {t("application:TimeSelector.form.day")}
-          <select value={weekday} onChange={(event) => setWeekday(event.target.value as Weekday)}>
-            {WEEKDAYS_SORTED.map((day) => (
-              <option key={day} value={day}>
-                {t(`common:weekdayLongEnum.${day}`)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          {t("application:TimeSelector.form.from")}
-          <select value={from} onChange={(event) => setFrom(Number(event.target.value))}>
-            {minuteOptions(dayBegin, dayEnd - SUITABLE_TIME_STEP_MINUTES).map((minutes) => (
-              <option key={minutes} value={minutes}>
-                {formatClock(minutes)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          {t("application:TimeSelector.form.to")}
-          <select value={to} onChange={(event) => setTo(Number(event.target.value))}>
-            {minuteOptions(dayBegin + SUITABLE_TIME_STEP_MINUTES, dayEnd).map((minutes) => (
-              <option key={minutes} value={minutes}>
-                {formatClock(minutes)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <Button type="button" size={ButtonSize.Small} variant={ButtonVariant.Secondary} onClick={handleAdd}>
+        <ControlledSelect
+          id={`${id}-day`}
+          name="weekday"
+          control={picker.control}
+          label={t("application:TimeSelector.form.day")}
+          options={dayOptionList}
+          afterChange={syncPicker}
+        />
+        <ControlledSelect
+          id={`${id}-from`}
+          name="from"
+          control={picker.control}
+          label={t("application:TimeSelector.form.from")}
+          options={fromOptionList}
+          afterChange={syncPicker}
+        />
+        <ControlledSelect
+          id={`${id}-to`}
+          name="to"
+          control={picker.control}
+          label={t("application:TimeSelector.form.to")}
+          options={toOptionList}
+        />
+        <Button
+          type="button"
+          size={ButtonSize.Small}
+          variant={ButtonVariant.Secondary}
+          onClick={handleAdd}
+          disabled={weekday == null || from == null || to == null}
+        >
           {t("application:TimeSelector.form.add")}
         </Button>
       </Fields>
-      {errorKey && <p role="alert">{t(`application:TimeSelector.form.errors.${errorKey}`)}</p>}
       <div>
         <p id={`${id}-list-label`}>{t("application:TimeSelector.form.listLabel")}</p>
         {listed.length === 0 ? (
