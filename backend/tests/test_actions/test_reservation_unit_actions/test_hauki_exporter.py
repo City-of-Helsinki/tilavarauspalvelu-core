@@ -6,9 +6,10 @@ import pytest
 
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
-from tests.helpers import exact, patch_method
+from tests.helpers import ResponseMock, exact, patch_method
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -70,7 +71,7 @@ def test__hauki_exporter__send_reservation_unit_to_hauki__parent_is_fetched_from
 def test__hauki_exporter__send_reservation_unit_to_hauki__parent_does_not_exist_in_hauki_api(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
 
-    msg = "Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API."
+    msg = "Parent Unit does not have 'Hauki Resource' set and could not get it from Hauki API."
     with pytest.raises(HaukiAPIError, match=exact(msg)):
         reservation_unit.actions.send_reservation_unit_to_hauki()
 
@@ -83,7 +84,7 @@ def test__hauki_exporter__send_reservation_unit_to_hauki__parent_without_tprek_i
     reservation_unit.unit.origin_hauki_resource = None
     reservation_unit.unit.tprek_id = None
 
-    msg = "Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API."
+    msg = "Parent Unit does not have 'Hauki Resource' set and could not get it from Hauki API."
     with pytest.raises(HaukiAPIError, match=exact(msg)):
         reservation_unit.actions.send_reservation_unit_to_hauki()
 
@@ -91,13 +92,13 @@ def test__hauki_exporter__send_reservation_unit_to_hauki__parent_without_tprek_i
     assert HaukiAPIClient.update_resource.call_count == 0
 
 
-@patch_method(HaukiAPIClient.get_resource, side_effect=HaukiAPIError("foo"))
+@patch_method(HaukiAPIClient.request, return_value=ResponseMock(status_code=503, url="https://hauki.test/resource/"))
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__hauki_api_error_when_fetching_parent(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__request_error_when_fetching_parent(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
 
-    msg = "Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API."
-    with pytest.raises(HaukiAPIError, match=exact(msg)):
+    msg = "GET request to HAUKI (https://hauki.test/resource/) failed with status 503."
+    with pytest.raises(ExternalServiceRequestError, match=exact(msg)):
         reservation_unit.actions.send_reservation_unit_to_hauki()
 
     assert HaukiAPIClient.update_resource.call_count == 0

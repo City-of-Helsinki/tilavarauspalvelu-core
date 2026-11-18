@@ -191,4 +191,8 @@ const successToast = (props: Omit<ToastProps, "type">) => {
   return toast({ ...props, type: "success" });
 };
 
-export { type Id, type ToastProps, ToastContainer, errorToast, successToast };
+const warningToast = (props: Omit<ToastProps, "type">) => {
+  return toast({ ...props, type: "alert" });
+};
+
+export { type Id, type ToastProps, ToastContainer, errorToast, successToast, warningToast };

@@ -8,7 +8,6 @@ from django.conf import settings
 from django.db import transaction
 from graphene.utils.str_converters import to_camel_case
 from graphene_django_extensions import NestingModelSerializer
-from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -69,6 +68,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
     own_pricings = OwnPricingInputSerializer(many=True, required=False, write_only=True)
     application_round_time_slots = ApplicationRoundTimeSlotSerializer(many=True, required=False)
     access_types = ReservationUnitAccessTypeSerializer(many=True, required=False)
+    hauki_export_failed = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = ReservationUnit
@@ -144,6 +144,9 @@ class ReservationUnitSerializer(NestingModelSerializer):
             #
             # Input only
             "own_pricings",
+            #
+            # Output only
+            "hauki_export_failed",
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
@@ -421,7 +424,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
         After mutating the instance, check if the reservation unit
         was published and thus should be sent to HAUKI and do it here.
         """
-        # The changes are already saved here, so a failed refetch must not fail the mutation.
+        # The changes are already saved here, so a failed Hauki call must not fail the mutation.
         # The periodic opening hours task updates the resource when its hash in Hauki changes.
         if instance.origin_hauki_resource is not None:
             try:
@@ -429,12 +432,13 @@ class ReservationUnitSerializer(NestingModelSerializer):
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Reservation unit: {instance.pk}")
 
+        # Nothing sends the reservation unit to Hauki again, so the staff UI asks the user to save again later.
         if settings.HAUKI_EXPORTS_ENABLED:
             try:
                 instance.actions.send_reservation_unit_to_hauki()
-            except ExternalServiceError as err:
-                msg = "Sending reservation unit as resource to HAUKI failed."
-                raise GQLCodeError(msg, code=error_codes.HAUKI_EXPORTS_ERROR) from err
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation unit: {instance.pk}")
+                instance.hauki_export_failed = True
 
     @staticmethod
     def handle_own_pricings(own_pricings: list[dict[str, Any]], reservation_unit: ReservationUnit) -> None:

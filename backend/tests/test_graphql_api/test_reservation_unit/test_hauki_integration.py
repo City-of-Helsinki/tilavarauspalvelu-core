@@ -15,7 +15,12 @@ from tilavarauspalvelu.models.reservation_unit.actions import ReservationUnitHau
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 from tests.helpers import ResponseMock, patch_method
 
-from .helpers import UPDATE_MUTATION, get_draft_update_input_data, reservation_unit_query
+from .helpers import (
+    UPDATE_MUTATION,
+    UPDATE_MUTATION_WITH_HAUKI_EXPORT_FAILED,
+    get_draft_update_input_data,
+    reservation_unit_query,
+)
 
 # Applied to all tests
 pytestmark = [
@@ -96,18 +101,40 @@ def test_reservation_unit__update__send_resource_to_hauki_when_exports_disabled(
     assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 0
 
 
-@patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki, side_effect=HaukiAPIError("foo"))
-def test_reservation_unit__update__send_resource_to_hauki_errors_returns_error_message(graphql, settings):
+@patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
+def test_reservation_unit__update__send_resource_to_hauki__export_failed_is_false(graphql, settings):
     settings.HAUKI_EXPORTS_ENABLED = True
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     data = get_draft_update_input_data(reservation_unit)
-    response = graphql(UPDATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION_WITH_HAUKI_EXPORT_FAILED, input_data=data)
 
-    assert response.error_message() == "Sending reservation unit as resource to HAUKI failed."
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"pk": reservation_unit.pk, "haukiExportFailed": False}
 
-    assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
+
+@patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki, side_effect=HaukiAPIError("foo"))
+@patch_method(SentryLogger.log_exception)
+def test_reservation_unit__update__send_resource_to_hauki_error_does_not_fail_mutation(graphql, settings):
+    settings.HAUKI_EXPORTS_ENABLED = True
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(is_draft=True, name="old name")
+    data = get_draft_update_input_data(reservation_unit, name="new name")
+    response = graphql(UPDATE_MUTATION_WITH_HAUKI_EXPORT_FAILED, input_data=data)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"pk": reservation_unit.pk, "haukiExportFailed": True}
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.name == "new name"
+
+    assert SentryLogger.log_exception.call_count == 1
+    error = SentryLogger.log_exception.call_args.args[0]
+    assert isinstance(error, HaukiAPIError)
+    assert str(error) == "foo"
+    assert SentryLogger.log_exception.call_args.kwargs == {"details": f"Reservation unit: {reservation_unit.pk}"}
 
 
 @freezegun.freeze_time("2023-01-01T12:00:00+02:00")
