@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3CharField
@@ -46,8 +45,6 @@ class ReservationUnitPricing(models.Model):
         blank=True,
         default="",
         max_length=1000,  # Double of the limit of 500 chars in order to accommodate HTML tags
-        allowed_tags=settings.NH3_ALLOWED_TAGS,
-        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
     tax_level: TaxLevel = models.ForeignKey(

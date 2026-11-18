@@ -50,8 +50,6 @@ class Unit(models.Model):
         max_length=8000,  # Double of the limit of 4000 chars in order to accommodate HTML tags
         blank=True,
         default="",
-        allowed_tags=settings.NH3_ALLOWED_TAGS,
-        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
     short_description: str = models.CharField(max_length=255, blank=True, default="")
     web_page: str = models.URLField(max_length=255, blank=True, default="")

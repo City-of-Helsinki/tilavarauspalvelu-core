@@ -3,7 +3,6 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import TYPE_CHECKING, ClassVar
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3CharField
@@ -53,8 +52,6 @@ class ReservationPriceLine(models.Model):
         blank=True,
         default="",
         max_length=1000,
-        allowed_tags=settings.NH3_ALLOWED_TAGS,
-        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
     # Minutes in a part of a day can give a fraction, so four decimals keep `quantity * unit_amount` close to `amount`.
