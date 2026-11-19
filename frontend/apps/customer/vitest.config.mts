@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    tsconfigPaths: true
+    tsconfigPaths: true,
   },
   test: {
     environment: "happy-dom",
@@ -12,7 +12,7 @@ export default defineConfig({
     reporters: ["verbose"],
     coverage: {
       reporter: ["clover", "json", "lcov", "text"],
-      include: ["src/**/*"],
+      include: ["src/**/*.{ts,tsx,mjs,cjs}"],
       exclude: ["src/instrumentation-client.ts", "src/middleware.ts", "src/pages/_app.tsx"],
       provider: "istanbul",
     },

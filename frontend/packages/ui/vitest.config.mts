@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    tsconfigPaths: true
+    tsconfigPaths: true,
   },
   test: {
     environment: "happy-dom",
@@ -12,7 +12,7 @@ export default defineConfig({
     coverage: {
       reporter: ["clover", "json", "lcov", "text"],
       // Only code: istanbul tries to parse anything else, such as the screen reader checklists, as JavaScript.
-      include: ["src/**/*.{ts,tsx}"],
+      include: ["src/**/*.{ts,tsx,mjs,cjs}"],
       provider: "istanbul",
     },
   },
