@@ -71,7 +71,9 @@ def test_reservation_series__cancel_section_series__cancel_whole_remaining(graph
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__update_statistics(graphql, settings):
+def test_reservation_series__cancel_section_series__update_statistics(
+    graphql, settings, django_capture_on_commit_callbacks
+):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     user = UserFactory.create()
@@ -100,7 +102,8 @@ def test_reservation_series__cancel_section_series__update_statistics(graphql, s
     }
 
     graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 

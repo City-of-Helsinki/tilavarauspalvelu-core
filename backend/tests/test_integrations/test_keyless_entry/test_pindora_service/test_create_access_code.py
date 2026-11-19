@@ -3,11 +3,13 @@ from __future__ import annotations
 import uuid
 
 import pytest
+from auditlog.models import LogEntry
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCodeModifyResponse
+from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -17,7 +19,7 @@ from tests.factories import (
     UnitFactory,
     UserFactory,
 )
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, audit_log_enabled, exact, patch_method
 from tests.test_integrations.test_keyless_entry.helpers import (
     default_reservation_response,
     default_reservation_series_response,
@@ -195,6 +197,32 @@ def test_create_access_code__series(settings):
 
     assert patch.call_args.kwargs["method"] == "post"
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series"
+
+
+def test_create_access_code__series__logs_access_code_info():
+    series = ReservationSeriesFactory.create()
+    reservation = ReservationFactory.create(
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    data = default_reservation_series_response()
+
+    with (
+        patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)),
+        audit_log_enabled(Reservation),
+    ):
+        PindoraService.create_access_code(obj=series, is_active=True)
+
+    log_entries = list(LogEntry.objects.get_for_object(reservation))
+    assert [log_entry.changes for log_entry in log_entries] == [
+        {"access_code_generated_at": ["None", "2021-12-31 22:00:00"], "access_code_is_active": ["False", "True"]},
+    ]
 
 
 def test_create_access_code__series__in_seasonal_booking(settings):

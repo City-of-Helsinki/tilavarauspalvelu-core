@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 from typing import TYPE_CHECKING
+from unittest import mock
 
 import pytest
 
@@ -34,6 +35,12 @@ def run_other_while_locked_task(first: str, second: str = "") -> None:
     if task_runs.calls_to_make_while_locked:
         call_to_make = task_runs.calls_to_make_while_locked.pop()
         call_to_make()
+
+
+@singleton_task
+@app.task(name="test_singleton_task_with_time_limit", time_limit=1800)
+def run_with_time_limit_task(first: str) -> None:
+    task_runs.calls.append((first, ""))
 
 
 @pytest.fixture
@@ -89,3 +96,24 @@ def test_singleton_task__skips_same_arguments_given_by_keyword_or_default_while_
 
     assert runs.calls == [("1", "")]
     assert SentryLogger.log_message.call_count == 1
+
+
+# ── Lock time ──
+
+
+@mock.patch("tilavarauspalvelu.tasks.cache")
+def test_singleton_task__locks_for_the_default_time_limit(mock_cache, runs, settings):
+    settings.CELERY_TASK_TIME_LIMIT = 600
+
+    run_other_while_locked_task("1")
+
+    assert mock_cache.add.call_args == mock.call('test_singleton_task:{"first":"1","second":""}', 1, 600)
+
+
+@mock.patch("tilavarauspalvelu.tasks.cache")
+def test_singleton_task__locks_for_the_time_limit_of_the_task(mock_cache, runs, settings):
+    settings.CELERY_TASK_TIME_LIMIT = 600
+
+    run_with_time_limit_task("1")
+
+    assert mock_cache.add.call_args == mock.call('test_singleton_task_with_time_limit:{"first":"1"}', 1, 1800)

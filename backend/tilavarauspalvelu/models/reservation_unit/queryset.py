@@ -271,6 +271,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
                     ),
                 )
 
+        # Send no save signals. The reservation unit 'post_save' receiver starts this update, so they would loop.
         self.model.objects.bulk_update(
             reservation_units,
             ["search_vector_fi", "search_vector_en", "search_vector_sv"],

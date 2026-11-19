@@ -7,6 +7,7 @@ from django.conf import settings
 from tilavarauspalvelu.models import GeneralRole
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import local_date
+from utils.model_signals import update_with_signals
 
 __all__ = [
     "GeneralRoleManager",
@@ -19,11 +20,12 @@ class GeneralRoleQuerySet(ModelQuerySet[GeneralRole]):
         today = local_date()
         cutoff = today - datetime.timedelta(days=settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS)
 
-        self.filter(
+        old_roles = self.filter(
             is_role_active=True,
             user__is_active=True,
             user__last_login__date__lt=cutoff,
-        ).update(is_role_active=False)
+        )
+        update_with_signals(old_roles, is_role_active=False)
 
 
 class GeneralRoleManager(ModelManager[GeneralRole, GeneralRoleQuerySet]): ...

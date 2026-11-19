@@ -13,6 +13,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationSeries
 from tilavarauspalvelu.typing import error_codes
 from utils.external_service.errors import ExternalServiceError
+from utils.model_signals import update_with_signals
 
 __all__ = [
     "ReservationSeriesChangeAccessCodeSerializer",
@@ -49,11 +50,16 @@ class ReservationSeriesChangeAccessCodeSerializer(NestingModelSerializer):
 
         except PindoraNotFoundError:
             if instance.allocated_time_slot is None:
-                instance.reservations.update(access_code_generated_at=None, access_code_is_active=False)
+                update_with_signals(
+                    instance.reservations.all(),
+                    access_code_generated_at=None,
+                    access_code_is_active=False,
+                )
                 return instance
 
             section = instance.allocated_time_slot.reservation_unit_option.application_section
-            Reservation.objects.for_application_section(section).update(
+            update_with_signals(
+                Reservation.objects.for_application_section(section),
                 access_code_generated_at=None,
                 access_code_is_active=False,
             )

@@ -636,5 +636,7 @@ AuditLogger.register(
         "_reservation_state",
         "_current_access_type",
         "_is_visible",
+        # Exclude reverse one-to-one relations. The audit log makes a query for each one on create and delete.
+        "reservation_unit_hierarchy",
     ],
 )

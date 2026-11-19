@@ -3,7 +3,6 @@ from __future__ import annotations
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
-from django.conf import settings
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
@@ -14,10 +13,10 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import ReservationDenyReason, ReservationSeries
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
+from utils.model_signals import update_with_signals
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
@@ -63,11 +62,9 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
 
         has_access_code = reservations.requires_active_access_code().exists()
 
-        # Evaluate before the update, since denied reservations no longer match the filter.
-        reservation_pks = list(reservations.values_list("pk", flat=True))
-
         with transaction.atomic():
-            reservations.update(
+            update_with_signals(
+                reservations,
                 state=ReservationStateChoice.DENIED,
                 deny_reason=validated_data["deny_reason"],
                 handling_details=validated_data.get("handling_details", ""),
@@ -88,9 +85,6 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         #  Refresh still happens on a background task every 2 minutes.
         #  if settings.UPDATE_AFFECTING_TIME_SPANS:
         #      update_affecting_time_spans_task.delay()  # noqa: ERA001
-
-        if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(reservation_pks=reservation_pks)
 
         if instance.allocated_time_slot is not None:
             EmailService.send_seasonal_booking_denied_series_email(instance)

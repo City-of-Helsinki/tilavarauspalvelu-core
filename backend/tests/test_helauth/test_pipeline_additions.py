@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import datetime
+from unittest.mock import ANY
 
 import pytest
+from auditlog.models import LogEntry
 from django.contrib.auth.models import AnonymousUser
 
 from tilavarauspalvelu.enums import MunicipalityChoice, ReservationNotification
@@ -13,6 +15,7 @@ from tilavarauspalvelu.integrations.helauth.pipeline import (
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helsinki_profile.parsers import ssn_to_date
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.models import Application, GeneralRole, Reservation, ReservationSeries, UnitRole
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 
@@ -25,7 +28,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.factories.helsinki_profile import MyProfileDataFactory
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, audit_log_enabled, exact, patch_method
 
 from .helpers import mock_request
 
@@ -317,6 +320,54 @@ def test_migrate_from_tunnistamo_to_keycloak():
 
     assert oldest_user.is_active is False
     assert oldest_user.last_name == "Oldest EXPIRED"
+
+
+def test_migrate_from_tunnistamo_to_keycloak__audit_log():
+    old_user = UserFactory.create(
+        email="foo@example.com",
+        profile_id="",
+        is_active=True,
+        date_joined=local_datetime(2021, 1, 1),
+    )
+
+    application = ApplicationFactory.create(user=old_user)
+    reservation = ReservationFactory.create(user=old_user)
+    reservation_series = ReservationSeriesFactory.create(user=old_user)
+    general_role = GeneralRoleFactory.create(user=old_user)
+    unit_role = UnitRoleFactory.create(user=old_user)
+
+    new_user = UserFactory.create(
+        email="foo@example.com",
+        profile_id="",
+        is_active=True,
+        date_joined=local_datetime(2022, 1, 1),
+    )
+
+    with audit_log_enabled(Application, Reservation, ReservationSeries, GeneralRole, UnitRole):
+        migrate_from_tunnistamo_to_keycloak(user=new_user, email=new_user.email)
+
+    user_change = [str(old_user.pk), str(new_user.pk)]
+
+    application_log_entries = list(LogEntry.objects.get_for_object(application))
+    assert [log_entry.changes for log_entry in application_log_entries] == [
+        {"user": user_change, "updated_at": [ANY, ANY]},
+    ]
+
+    reservation_log_entries = list(LogEntry.objects.get_for_object(reservation))
+    assert [log_entry.changes for log_entry in reservation_log_entries] == [{"user": user_change}]
+
+    reservation_series_log_entries = list(LogEntry.objects.get_for_object(reservation_series))
+    assert [log_entry.changes for log_entry in reservation_series_log_entries] == [{"user": user_change}]
+
+    general_role_log_entries = list(LogEntry.objects.get_for_object(general_role))
+    assert [log_entry.changes for log_entry in general_role_log_entries] == [
+        {"user": user_change, "updated_at": [ANY, ANY]},
+    ]
+
+    unit_role_log_entries = list(LogEntry.objects.get_for_object(unit_role))
+    assert [log_entry.changes for log_entry in unit_role_log_entries] == [
+        {"user": user_change, "updated_at": [ANY, ANY]},
+    ]
 
 
 def test_migrate_from_tunnistamo_to_keycloak__newer_account_is_not_the_logged_in_user():

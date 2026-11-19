@@ -33,6 +33,7 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.typing import UserAnonymizationInfo
 from utils.date_utils import local_date, local_datetime
+from utils.model_signals import bulk_create_with_signals
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -104,6 +105,7 @@ class UserActions:
             series.name = ANONYMIZED
             series.description = ANONYMIZED
 
+        # Send no save signals for these writes. The audit log would store the personal data that they remove.
         Reservation.objects.bulk_update(
             reservations,
             [
@@ -136,6 +138,7 @@ class UserActions:
         application_sections = ApplicationSection.objects.filter(application__user=self.user)
         applications = Application.objects.filter(user=self.user)
 
+        # Send no save signals for these writes. The audit log would store the personal data that they remove.
         application_sections.update(
             name=SENSITIVE_APPLICATION,
         )
@@ -308,7 +311,7 @@ class UserActions:
             UnitRole.objects.filter(id__in=remove_ids).delete()
 
         if roles_to_add:
-            UnitRole.objects.bulk_create(roles_to_add)
+            bulk_create_with_signals(roles_to_add)
 
         if role_units_to_add:
             UnitRoleUnit.objects.bulk_create(role_units_to_add)

@@ -6,6 +6,7 @@ from inspect import cleandoc
 from typing import TYPE_CHECKING
 
 import pytest
+from auditlog.models import LogEntry
 from django.test import override_settings
 from freezegun import freeze_time
 
@@ -17,10 +18,11 @@ from tilavarauspalvelu.integrations.email.template_context import (
 )
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.models import Application
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.helpers import TranslationsFromPOFiles, audit_log_enabled, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -180,6 +182,25 @@ def test_seasonal_booking_application_round_handled__send_email(outbox):
 
     application.refresh_from_db()
     assert application.results_ready_notification_sent_at == local_datetime(2024, 1, 1, 12)
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+def test_seasonal_booking_application_round_handled__send_email__logs_sent_date_and_keeps_updated_at(outbox):
+    with freeze_time(local_datetime(2024, 1, 1, 11)):
+        application_round = ApplicationRoundFactory.create_in_status_results_sent()
+        application = ApplicationFactory.create_in_status_handled(application_round=application_round)
+
+    with freeze_time(local_datetime(2024, 1, 1, 12)), audit_log_enabled(Application):
+        EmailService.send_seasonal_booking_application_round_handled_emails()
+
+    application.refresh_from_db()
+    assert application.updated_at == local_datetime(2024, 1, 1, 11)
+
+    log_entries = list(LogEntry.objects.get_for_object(application))
+    assert [log_entry.changes for log_entry in log_entries] == [
+        {"results_ready_notification_sent_at": ["None", "2024-01-01 10:00:00"]},
+    ]
 
 
 @pytest.mark.django_db

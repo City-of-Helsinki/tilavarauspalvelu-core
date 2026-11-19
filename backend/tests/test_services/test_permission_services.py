@@ -3,13 +3,16 @@ from __future__ import annotations
 import datetime
 
 import pytest
+from auditlog.models import LogEntry
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.models import GeneralRole, UnitRole
 from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
 from utils.date_utils import local_start_of_day
 
 from tests.factories import GeneralRoleFactory, UnitRoleFactory, UserFactory
+from tests.helpers import audit_log_enabled
 
 pytestmark = [
     pytest.mark.django_db,
@@ -51,6 +54,30 @@ def test_deactivate_old_permissions__last_login_older_than_limit__deactivates_ro
     assert unit_role_2.is_role_active is False
     assert user.is_staff is False
     assert user.is_superuser is False
+
+
+@freeze_time("2024-01-01 00:00:00")
+def test_deactivate_old_permissions__last_login_older_than_limit__logs_role_changes(settings):
+    delta = 1
+    settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = delta
+    last_login = local_start_of_day() - datetime.timedelta(days=delta, seconds=1)
+
+    user = UserFactory.create(last_login=last_login)
+    general_role = GeneralRoleFactory.create(user=user)
+    unit_role = UnitRoleFactory.create(user=user)
+
+    with audit_log_enabled(GeneralRole, UnitRole):
+        deactivate_old_permissions()
+
+    general_role_log_entries = list(LogEntry.objects.get_for_object(general_role))
+    assert [log_entry.changes for log_entry in general_role_log_entries] == [
+        {"is_role_active": ["True", "False"]},
+    ]
+
+    unit_role_log_entries = list(LogEntry.objects.get_for_object(unit_role))
+    assert [log_entry.changes for log_entry in unit_role_log_entries] == [
+        {"is_role_active": ["True", "False"]},
+    ]
 
 
 @freeze_time("2024-01-01 00:00:00")

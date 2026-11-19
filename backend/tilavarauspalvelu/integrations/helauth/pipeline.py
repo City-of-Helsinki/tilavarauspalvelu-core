@@ -11,6 +11,7 @@ from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProf
 from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, GeneralRole, Reservation, ReservationSeries, UnitRole, User
+from utils.model_signals import update_with_signals
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
@@ -131,15 +132,15 @@ def migrate_from_tunnistamo_to_keycloak(*, user: User, email: str) -> None:
     new_user.save()
 
     # Migrate general roles.
-    GeneralRole.objects.filter(user=old_user).update(user=new_user)
+    update_with_signals(GeneralRole.objects.filter(user=old_user), user=new_user)
     # Migrate unit roles.
-    UnitRole.objects.filter(user=old_user).update(user=new_user)
+    update_with_signals(UnitRole.objects.filter(user=old_user), user=new_user)
     # Migrate applications.
-    Application.objects.filter(user=old_user).update(user=new_user)
+    update_with_signals(Application.objects.filter(user=old_user), user=new_user)
     # Migrate reservations.
-    Reservation.objects.filter(user=old_user).update(user=new_user)
+    update_with_signals(Reservation.objects.filter(user=old_user), user=new_user)
     # Migrate reservation series.
-    ReservationSeries.objects.filter(user=old_user).update(user=new_user)
+    update_with_signals(ReservationSeries.objects.filter(user=old_user), user=new_user)
 
     # Mark the old user as inactive.
     old_user.is_active = False
