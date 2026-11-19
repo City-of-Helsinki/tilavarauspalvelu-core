@@ -532,7 +532,8 @@
     "*.d.ts",
     "**/test.*",
     "**/__mocks__/**",
-    "**/gql-types.ts"
+    "**/gql-types.ts",
+    "**/gql-schema-types.ts"
   ],
   "overrides": [
     {

@@ -40,52 +40,43 @@ const gqlConfig = {
 };
 
 const schema = "../tilavaraus.graphql";
-const plugins = ["typescript", "typescript-operations", "typescript-react-apollo"] as const;
+
+// Since version 6, typescript-operations writes the enum and input types that the operations use.
+// The typescript plugin writes all schema types, which the code also imports (for example `ReservationNode`).
+// Both plugins in one file declare these types two times. So the typescript plugin writes its own file,
+// and the operations file imports from it and re-exports it. Code imports everything from `gql-types.ts`.
+function codegenProject(dir: string) {
+  return {
+    schema,
+    documents: `${dir}/**/!(*.d|gql-types|gql-schema-types|*.test).{ts,tsx}`,
+    extensions: {
+      codegen: {
+        config: gqlConfig,
+        generates: {
+          [`${dir}/gql/gql-schema-types.ts`]: {
+            plugins: ["typescript"],
+          },
+          [`${dir}/gql/gql-types.ts`]: {
+            plugins: [
+              { add: { content: 'export * from "./gql-schema-types";' } },
+              "typescript-operations",
+              "typescript-react-apollo",
+            ],
+            config: {
+              importSchemaTypesFrom: `${dir}/gql/gql-schema-types.ts`,
+            },
+          },
+        },
+      },
+    },
+  };
+}
 
 const config: IGraphQLConfig = {
   projects: {
-    ui: {
-      schema,
-      documents: "packages/ui/**/!(*.d|gql-types|*.test).{ts,tsx}",
-      extensions: {
-        codegen: {
-          config: gqlConfig,
-          generates: {
-            "packages/ui/gql/gql-types.ts": {
-              plugins,
-            },
-          },
-        },
-      },
-    },
-    staff: {
-      schema,
-      documents: "apps/staff/**/!(*.d|gql-types|*.test).{ts,tsx}",
-      extensions: {
-        codegen: {
-          config: gqlConfig,
-          generates: {
-            "apps/staff/gql/gql-types.ts": {
-              plugins,
-            },
-          },
-        },
-      },
-    },
-    customer: {
-      schema,
-      documents: "apps/customer/**/!(*.d|gql-types|*.test).{ts,tsx}",
-      extensions: {
-        codegen: {
-          config: gqlConfig,
-          generates: {
-            "apps/customer/gql/gql-types.ts": {
-              plugins,
-            },
-          },
-        },
-      },
-    },
+    ui: codegenProject("packages/ui"),
+    staff: codegenProject("apps/staff"),
+    customer: codegenProject("apps/customer"),
   },
 };
 

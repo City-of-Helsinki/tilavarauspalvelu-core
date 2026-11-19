@@ -40,6 +40,9 @@ importers:
 
   .:
     devDependencies:
+      '@graphql-codegen/add':
+        specifier: ^8.0.0
+        version: 8.0.0(graphql@16.15.0)
       '@graphql-codegen/cli':
         specifier: ^8.0.0
         version: 8.0.0(@parcel/watcher@2.6.0)(@types/node@26.6.5)(graphql@16.15.0)(typescript@7.0.2)
