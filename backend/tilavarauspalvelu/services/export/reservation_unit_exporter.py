@@ -146,7 +146,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "service_specific_terms",
                 "pricing_terms",
                 "payment_terms",
-                "payment_product",
                 "payment_merchant",
                 "payment_accounting",
             )

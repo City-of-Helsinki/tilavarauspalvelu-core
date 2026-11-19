@@ -23,7 +23,6 @@ from .types.intended_use.types import IntendedUseNode
 from .types.participant_gender.types import ParticipantGenderNode
 from .types.payment_merchant.types import PaymentMerchantNode
 from .types.payment_order.types import PaymentOrderNode
-from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
 from .types.price_component.types import PriceComponentNode
 from .types.price_option.types import PriceOptionNode
@@ -71,7 +70,6 @@ __all__ = [
     "ParticipantGenderNode",
     "PaymentMerchantNode",
     "PaymentOrderNode",
-    "PaymentProductNode",
     "PermissionCheckerType",
     "PriceComponentNode",
     "PriceOptionNode",
