@@ -3,7 +3,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconPlus } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { filterNonNullable } from "ui/src/modules/helpers";
-import type { OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT, OptionT } from "ui/src/modules/search";
 import { ButtonContainer } from "ui/src/styled";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { ApplicationSectionPage1 } from "@/components/application/funnel/ApplicationSectionPage1";
@@ -15,9 +15,10 @@ type Page1Props = Readonly<{
   applicationRound: Readonly<ApplicationRoundForApplicationFragment>;
   isSaving: boolean;
   options: Readonly<OptionsListT>;
+  priceOptions: Readonly<OptionT[]>;
 }>;
 
-export function Page1({ applicationRound, isSaving, options }: Page1Props): React.ReactElement | null {
+export function Page1({ applicationRound, isSaving, options, priceOptions }: Page1Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   // get the user selected defaults for reservationUnits field
@@ -48,6 +49,7 @@ export function Page1({ applicationRound, isSaving, options }: Page1Props): Reac
           index={index}
           applicationRound={applicationRound}
           options={options}
+          priceOptions={priceOptions}
           onDeleteEvent={() => handleDeleteEvent(index)}
         />
       ))}

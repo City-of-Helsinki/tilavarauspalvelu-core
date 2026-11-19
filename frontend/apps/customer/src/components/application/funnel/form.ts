@@ -53,6 +53,8 @@ const ApplicationSectionPage1Schema = z
     isAccordionOpen: z.boolean(),
     // form specific: new events don't have pks and we need a unique identifier
     formKey: z.string(),
+    // required only when the application round has price options (checked in ApplicationPage1SchemaRefined)
+    priceOption: z.number().optional(),
   })
   .refine((s) => s.maxDuration >= s.minDuration, {
     path: ["maxDuration"],
@@ -212,6 +214,7 @@ export function convertApplicationSectionPage1(section: SectionType): Applicatio
     reservationUnits,
     begin: convertDate(section.reservationsBeginDate) ?? "",
     end: convertDate(section.reservationsEndDate) ?? "",
+    priceOption: section.priceOption?.pk ?? undefined,
     isAccordionOpen: false,
   };
 }
@@ -310,7 +313,10 @@ function checkApplicationRoundDates(
   }
 }
 
-export function ApplicationPage1SchemaRefined(round: { begin: Date; end: Date }) {
+export function ApplicationPage1SchemaRefined(
+  round: { begin: Date; end: Date },
+  { isPriceOptionRequired = false }: { isPriceOptionRequired?: boolean } = {}
+) {
   return ApplicationPage1Schema.superRefine((val, ctx) => {
     if (val.applicationSections == null || val.applicationSections.length === 0) {
       ctx.addIssue({
@@ -327,6 +333,13 @@ export function ApplicationPage1SchemaRefined(round: { begin: Date; end: Date })
       }
       const pathRoot = `applicationSections.${i}`;
       checkApplicationRoundDates(round, section, pathRoot, ctx);
+      if (isPriceOptionRequired && section.priceOption == null) {
+        ctx.addIssue({
+          code: "custom",
+          path: [`${pathRoot}.priceOption`],
+          message: "Required",
+        });
+      }
     }
   });
 }
@@ -438,6 +451,7 @@ function transformApplicationSection(
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) => transformEventReservationUnit(ruo, ruoIndex)),
+    ...(ae.priceOption != null ? { priceOption: ae.priceOption } : {}),
   };
   if (ae.pk != null) {
     return {
