@@ -23,6 +23,9 @@ const {
   mockErrorToast,
   mockSuccessToast,
   mockDisplayError,
+  mockCaptureMessage,
+  mockRouterEventsOn,
+  mockRouterEventsOff,
 } = vi.hoisted(() => ({
   mockUseCurrentUser: vi.fn(),
   mockUseRouter: vi.fn(),
@@ -38,7 +41,12 @@ const {
   mockErrorToast: vi.fn(),
   mockSuccessToast: vi.fn(),
   mockDisplayError: vi.fn(),
+  mockCaptureMessage: vi.fn(),
+  mockRouterEventsOn: vi.fn(),
+  mockRouterEventsOff: vi.fn(),
 }));
+
+vi.mock("@sentry/nextjs", () => ({ captureMessage: (...args: unknown[]) => mockCaptureMessage(...args) }));
 
 vi.mock("@/hooks", () => ({ useCurrentUser: () => mockUseCurrentUser() }));
 
@@ -82,6 +90,23 @@ function createReservation(overrides: Partial<ReservationNotificationFragment> =
   };
 }
 
+function mockRouter(pathname: string, query: Record<string, string> = {}): void {
+  mockUseRouter.mockReturnValue({
+    pathname,
+    query,
+    push: mockRouterPush,
+    events: { on: mockRouterEventsOn, off: mockRouterEventsOff },
+  });
+}
+
+function getRouteChangeHandler(): (url: string, options: { shallow: boolean }) => void {
+  const call = mockRouterEventsOn.mock.calls.find(([event]) => event === "routeChangeComplete");
+  if (call == null) {
+    throw new Error("No routeChangeComplete handler");
+  }
+  return call[1];
+}
+
 function mockReservations(reservations: ReadonlyArray<ReservationNotificationFragment>): void {
   mockUseListInProgressReservationsQuery.mockReturnValue({
     data: { reservations: { edges: reservations.map((node) => ({ node })) } },
@@ -92,13 +117,15 @@ function mockReservations(reservations: ReadonlyArray<ReservationNotificationFra
 beforeEach(() => {
   vi.clearAllMocks();
   mockUseCurrentUser.mockReturnValue({ currentUser: { pk: 1 }, error: undefined, loading: false });
-  mockUseRouter.mockReturnValue({ pathname: "/", query: {}, push: mockRouterPush });
+  mockRouter("/");
   mockUseApolloClient.mockReturnValue({ refetchQueries: mockRefetchQueries });
   mockUseDeleteReservationMutation.mockReturnValue([mockDeleteReservation, { loading: false }]);
   mockUseReservationStateLazyQuery.mockReturnValue([mockReservationQ]);
   mockReservations([]);
   mockDeleteReservation.mockResolvedValue({ data: { deleteTentativeReservation: { deleted: true } } });
-  mockReservationQ.mockResolvedValue({ data: { reservation: { id: "r1" } } });
+  mockReservationQ.mockResolvedValue({
+    data: { reservation: { id: "r1", state: ReservationStateChoice.WaitingForPayment } },
+  });
 });
 
 describe("InProgressReservationNotification", () => {
@@ -112,7 +139,7 @@ describe("InProgressReservationNotification", () => {
     const { rerender } = render(<InProgressReservationNotification />);
     expect(screen.getByTestId("unpaid-reservation-notification__title")).toBeInTheDocument();
 
-    mockUseRouter.mockReturnValue({ pathname: "/reservation/cancel", query: {}, push: mockRouterPush });
+    mockRouter("/reservation/cancel");
     rerender(<InProgressReservationNotification />);
     expect(screen.queryByTestId("unpaid-reservation-notification__title")).not.toBeInTheDocument();
   });
@@ -158,7 +185,7 @@ describe("InProgressReservationNotification", () => {
   it("redirects to the front page when deleting the reservation whose page is currently open", async () => {
     const reservation = createReservation({ pk: 5 });
     mockReservations([reservation]);
-    mockUseRouter.mockReturnValue({ pathname: "/reservations/5", query: { id: "5" }, push: mockRouterPush });
+    mockRouter("/reservations/5", { id: "5" });
     render(<InProgressReservationNotification />);
 
     await userEvent.click(screen.getByTestId("reservation-notification__button--delete"));
@@ -192,6 +219,67 @@ describe("InProgressReservationNotification", () => {
     await userEvent.click(screen.getByTestId("reservation-notification__button--delete"));
 
     await waitFor(() => expect(mockDisplayError).toHaveBeenCalledWith(error));
+  });
+
+  it("does not delete, warns Sentry and shows an error toast when the reservation can no longer be deleted", async () => {
+    mockReservations([createReservation({ pk: 7 })]);
+    mockReservationQ.mockResolvedValue({
+      data: { reservation: { id: "r7", state: ReservationStateChoice.Confirmed } },
+    });
+    render(<InProgressReservationNotification />);
+
+    await userEvent.click(screen.getByTestId("reservation-notification__button--delete"));
+
+    await waitFor(() =>
+      expect(mockErrorToast).toHaveBeenCalledWith({ text: "notification:reservationCannotBeCancelled" })
+    );
+    expect(mockCaptureMessage).toHaveBeenCalledWith(
+      "In-progress reservation notification showed a reservation that cannot be deleted",
+      {
+        level: "warning",
+        extra: {
+          reservationPk: 7,
+          shownState: ReservationStateChoice.WaitingForPayment,
+          currentState: ReservationStateChoice.Confirmed,
+          pathname: "/",
+        },
+      }
+    );
+    expect(mockDeleteReservation).not.toHaveBeenCalled();
+    expect(mockRefetch).toHaveBeenCalled();
+  });
+
+  it("does not delete and refreshes without a toast when the reservation no longer exists", async () => {
+    mockReservations([createReservation({ pk: 7 })]);
+    mockReservationQ.mockResolvedValue({ data: { reservation: null } });
+    render(<InProgressReservationNotification />);
+
+    await userEvent.click(screen.getByTestId("reservation-notification__button--delete"));
+
+    await waitFor(() => expect(mockRefetch).toHaveBeenCalled());
+    expect(mockDeleteReservation).not.toHaveBeenCalled();
+    expect(mockErrorToast).not.toHaveBeenCalled();
+    expect(mockCaptureMessage).not.toHaveBeenCalled();
+  });
+
+  it("fetches the list again after a page change", () => {
+    render(<InProgressReservationNotification />);
+
+    act(() => {
+      getRouteChangeHandler()("/search", { shallow: false });
+    });
+
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not fetch the list again after a shallow page change", () => {
+    render(<InProgressReservationNotification />);
+
+    act(() => {
+      getRouteChangeHandler()("/reservation-unit/1?date=2026-11-20", { shallow: true });
+    });
+
+    expect(mockRefetch).not.toHaveBeenCalled();
   });
 
   it("navigates to the computed checkout URL on checkout click", async () => {

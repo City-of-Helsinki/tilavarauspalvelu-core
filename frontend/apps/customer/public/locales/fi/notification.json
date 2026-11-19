@@ -1,6 +1,7 @@
 {
   "reservationCancelledTitle": "Varauksesi on peruttu.",
   "cancelReservationButton": "Peru varaus",
+  "reservationCannotBeCancelled": "Varausta ei voi perua. Vain alustavan varauksen voi perua.",
   "waitingForPayment": {
     "title": "Varauksesi odottaa maksua",
     "body": "Varauksesi peruuntuu automaattisesti, jos maksua ei suoriteta {{time}} minuutin kuluessa.",
