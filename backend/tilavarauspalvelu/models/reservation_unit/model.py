@@ -9,7 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import Subquery
-from django.db.models.functions import TruncDate
+from django.db.models.functions import Coalesce, TruncDate
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
@@ -485,6 +485,9 @@ class ReservationUnit(models.Model):
 
     @lookup_property
     def reservation_state() -> ReservationUnitReservationState:
+        # The generated Python code cannot use enum members as constants, so use their values.
+        webshop_payment_types = [payment_type.value for payment_type in PaymentType.requires_verkkokauppa]
+
         case = models.Case(
             # Reservation Unit is currently not reservable, but will be in the future.
             models.When(
@@ -516,7 +519,7 @@ class ReservationUnit(models.Model):
                 then=models.Value(ReservationUnitReservationState.SCHEDULED_PERIOD.value),
             ),
             # Reservation Unit doesn't have a price today,
-            #  OR it has a paid price with no payment product,
+            #  OR it has a paid price paid in verkkokauppa with no payment product,
             #  OR it was reservable in the past (but not anymore),
             #  OR reservation period is zero-length.
             models.When(
@@ -524,8 +527,10 @@ class ReservationUnit(models.Model):
                     # No price today.
                     L(highest_price_today=None)
                     | (
-                        # Paid price with no payment product.
-                        L(highest_price_today__gt=0) & models.Q(payment_product__isnull=True)
+                        # Paid price paid in verkkokauppa with no payment product.
+                        L(highest_price_today__gt=0)
+                        & models.Q(payment_type__in=webshop_payment_types)
+                        & L(has_payment_product=False)
                         # When using Mock Verkkokauppa API, pricing is valid even if there is no payment product.
                         if not settings.MOCK_VERKKOKAUPPA_API_ENABLED
                         else ~models.Q()  # Evaluates to False
@@ -577,6 +582,29 @@ class ReservationUnit(models.Model):
         )
 
         return case  # type: ignore[return-value]  # noqa: RET504
+
+    @lookup_property
+    def has_payment_product() -> bool:
+        """Whether the reservation unit has a verkkokauppa product with a sales item for its current merchant."""
+        from tilavarauspalvelu.models import PaymentProduct
+
+        merchant = Coalesce(
+            models.OuterRef("payment_merchant"),
+            models.OuterRef("unit__payment_merchant"),
+        )
+        products = PaymentProduct.objects.filter(
+            reservation_unit=models.OuterRef("pk"),
+            sales_item__isnull=False,
+            merchant=merchant,
+        )
+        return models.Exists(products)  # type: ignore[return-value]
+
+    @has_payment_product.override
+    def _(self) -> bool:
+        merchant = self.actions.get_merchant()
+        if merchant is None:
+            return False
+        return self.payment_products.filter(sales_item__isnull=False, merchant=merchant).exists()
 
     @lookup_property
     def current_access_type() -> AccessType | None:
