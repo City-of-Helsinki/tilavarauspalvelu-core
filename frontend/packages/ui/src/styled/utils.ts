@@ -44,7 +44,7 @@ export const P = styled.p<{
   ${({ $noMargin }) => ($noMargin ? "margin: 0" : "")}
 `;
 
-export type SpacingSize = "none" | "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-xl";
+export type SpacingSize = "none" | "3-xs" | "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-xl";
 
 export const Flex = styled.div<{
   $direction?: "row" | "column" | "row-reverse" | "column-reverse";

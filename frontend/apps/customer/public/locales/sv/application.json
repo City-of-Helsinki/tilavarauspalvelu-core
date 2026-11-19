@@ -93,7 +93,6 @@
     },
     "form": {
       "tooShort": "för kort",
-      "priorityNote": "Nya tider får den typ av önskemål som valts ovan.",
       "day": "Dag",
       "from": "Från",
       "to": "Till",

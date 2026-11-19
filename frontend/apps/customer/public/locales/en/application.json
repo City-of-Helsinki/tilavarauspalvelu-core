@@ -93,7 +93,6 @@
     },
     "form": {
       "tooShort": "too short",
-      "priorityNote": "New times use the type of booking request selected above.",
       "day": "Day",
       "from": "From",
       "to": "To",
