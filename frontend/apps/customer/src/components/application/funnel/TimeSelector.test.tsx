@@ -10,7 +10,7 @@ import { Priority, Weekday } from "@gql/gql-types";
 import type { ApplicationPage2Query, TimeSelectorFragment } from "@gql/gql-types";
 import { createMockApplicationFragment } from "@test/application.mocks";
 import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { getSelectOptionLabels, selectOption } from "@test/test.utils";
+import { getSelectOptionLabels, getSelectOptions, selectOption } from "@test/test.utils";
 import { ApplicationPage2SchemaRefined, convertApplicationPage2 } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from "./TimeSelector";
@@ -1010,13 +1010,16 @@ describe("TimeSelector form alternative", () => {
   const quarters = (from: number, to: number) =>
     Array.from({ length: (to - from) / STEP + 1 }, (_, i) => hhmm(from + i * STEP));
 
-  test("offers only the days that are open", async () => {
+  test("lists every day, but only the open days can be picked", async () => {
     const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
 
-    expect(await getOptionLabels(await openFormTab(view), FORM_DAY)).toEqual([
-      weekdayLabel(Weekday.Tuesday),
-      weekdayLabel(Weekday.Thursday),
-    ]);
+    const options = await getSelectOptions(within(await openFormTab(view)), FORM_DAY);
+    expect(options).toEqual(
+      WEEKDAYS_SORTED.map((day) => ({
+        label: weekdayLabel(day),
+        disabled: day !== Weekday.Tuesday && day !== Weekday.Thursday,
+      }))
+    );
   });
 
   test("offers only the open start times of the day, and the end times the start reaches", async () => {

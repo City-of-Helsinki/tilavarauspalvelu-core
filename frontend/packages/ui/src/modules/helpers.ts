@@ -232,10 +232,15 @@ export function ignoreMaybeArray<T>(value: T | T[]): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
-export function convertOptionToHDS(option: { label: string; value: string | number }): OptionInProps {
+export function convertOptionToHDS(option: {
+  label: string;
+  value: string | number;
+  disabled?: boolean;
+}): OptionInProps {
   return {
     label: option.label,
     value: option.value.toString(),
+    ...(option.disabled ? { disabled: true } : {}),
   };
 }
 
