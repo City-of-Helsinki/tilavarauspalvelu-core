@@ -29,6 +29,7 @@ import {
   ReservationFormType,
   ReservationKind,
   ReservationStartInterval,
+  TermsOfUseTypeChoices,
   Weekday,
 } from "@gql/gql-types";
 import type {
@@ -508,9 +509,17 @@ export const ReservationUnitEditSchema = z
     cancellationRule: z.number().nullable(),
     // Terms pks are actually slugs
     paymentTerms: z.string().prefault("").nonoptional(),
-    pricingTerms: z.string().nullable(),
+    // The select sets undefined when it is cleared
+    pricingTerms: z.string().nullish(),
     cancellationTerms: z.string().prefault("").nonoptional(),
     serviceSpecificTerms: z.string().prefault("").nonoptional(),
+    // Terms pks that the reservation unit had on load, but that are of the wrong type for the field
+    termsWithWrongType: z.object({
+      paymentTerms: z.string().nullable(),
+      pricingTerms: z.string().nullable(),
+      cancellationTerms: z.string().nullable(),
+      serviceSpecificTerms: z.string().nullable(),
+    }),
     reservationForm: z.enum(ReservationFormType).optional(),
     surfaceArea: z.number({ error: "Required" }),
     images: z.array(ImageFormSchema),
@@ -745,6 +754,18 @@ export const ReservationUnitEditSchema = z
         path: ["pricingTerms"],
       });
     }
+
+    // The mutation rejects terms of the wrong type. The user must select other terms or clear the select.
+    for (const field of ["paymentTerms", "cancellationTerms", "serviceSpecificTerms", "pricingTerms"] as const) {
+      const value = v[field];
+      if (value != null && value !== "" && value === v.termsWithWrongType[field]) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Terms of wrong type",
+          path: [field],
+        });
+      }
+    }
   });
 
 export type ReservationUnitEditFormValues = z.infer<typeof ReservationUnitEditSchema>;
@@ -855,6 +876,16 @@ function convertAccessTypes(accessTypes: NonNullable<Node["accessTypes"]>): Acce
   }));
 }
 
+function getPkIfWrongType(
+  terms: { pk?: string | null; termsType: TermsOfUseTypeChoices } | null | undefined,
+  termsType: TermsOfUseTypeChoices
+): string | null {
+  if (terms == null || terms.termsType === termsType) {
+    return null;
+  }
+  return terms.pk ?? null;
+}
+
 export function convertReservationUnit(data?: Node): ReservationUnitEditFormValues {
   // Convert from API data to form values
   return {
@@ -919,6 +950,12 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     pricingTerms: data?.pricingTerms?.pk ?? null,
     serviceSpecificTerms: data?.serviceSpecificTerms?.pk ?? "",
     cancellationTerms: data?.cancellationTerms?.pk ?? "",
+    termsWithWrongType: {
+      paymentTerms: getPkIfWrongType(data?.paymentTerms, TermsOfUseTypeChoices.Payment),
+      pricingTerms: getPkIfWrongType(data?.pricingTerms, TermsOfUseTypeChoices.Pricing),
+      serviceSpecificTerms: getPkIfWrongType(data?.serviceSpecificTerms, TermsOfUseTypeChoices.Service),
+      cancellationTerms: getPkIfWrongType(data?.cancellationTerms, TermsOfUseTypeChoices.Cancellation),
+    },
     cancellationRule: data?.cancellationRule?.pk ?? null,
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
@@ -981,6 +1018,8 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     seasons,
     accessTypes: accessTypesForm,
     images, // images are updated with a separate mutation
+    termsWithWrongType,
+    pricingTerms,
     ...vals
   } = values;
 
@@ -1027,6 +1066,8 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     reservationKind,
     isDraft,
     cancellationRule: hasCancellationRule ? cancellationRule : null,
+    // The mutation keeps the saved value if the field is missing
+    pricingTerms: pricingTerms ?? null,
     pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing, taxLevelOptions))),
     accessTypes,
     applicationRoundTimeSlots,

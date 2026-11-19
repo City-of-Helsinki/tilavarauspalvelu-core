@@ -306,9 +306,11 @@ export function PricingSection({
   const pricings = useWatch({ control, name: "pricings" });
   const hasFuturePricing = useWatch({ control, name: "hasFuturePricing" });
   const canApplyFreeOfCharge = useWatch({ control, name: "canApplyFreeOfCharge" });
+  const pricingTerms = useWatch({ control, name: "pricingTerms" });
 
   const isPaid = pricings.some((p) => p.isPaid);
-  const hasErrors = errors.pricings != null;
+  const isPricingTermsRequired = canApplyFreeOfCharge && isPaid;
+  const hasErrors = errors.pricings != null || errors.pricingTerms != null;
 
   return (
     <EditAccordion forceOpen={hasErrors} heading={t("label.pricings")}>
@@ -321,12 +323,14 @@ export function PricingSection({
             tooltip={t("tooltip.canApplyFreeOfCharge")}
             disabled={!isPaid}
           />
-          {canApplyFreeOfCharge && isPaid && (
+          {/* Saved pricing terms stay visible, so that the user can clear them */}
+          {(isPricingTermsRequired || pricingTerms != null) && (
             <ControlledSelect
               control={control}
               name="pricingTerms"
               label={t("label.pricingTerms")}
-              required
+              required={isPricingTermsRequired}
+              clearable={!isPricingTermsRequired}
               options={pricingTermsOptions}
               error={getTranslatedError(t, errors.pricingTerms?.message)}
               tooltip={t("tooltip.pricingTerms")}

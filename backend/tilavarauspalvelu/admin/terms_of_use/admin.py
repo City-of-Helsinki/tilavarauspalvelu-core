@@ -14,8 +14,10 @@ from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import TermsOfUse
+from utils.utils import only_django_validation_errors
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.enums import TermsOfUseTypeChoices
     from tilavarauspalvelu.typing import WSGIRequest
 
 
@@ -34,6 +36,12 @@ class TermsOfUseAdminForm(ModelForm):
             "terms_type",
         ]
         widgets = {"text": TinyMCE()}
+
+    @only_django_validation_errors()
+    def clean_terms_type(self) -> TermsOfUseTypeChoices:
+        terms_type: TermsOfUseTypeChoices = self.cleaned_data["terms_type"]
+        self.instance.validators.validate_terms_type_not_changed_while_in_use(terms_type)
+        return terms_type
 
 
 @admin.register(TermsOfUse)

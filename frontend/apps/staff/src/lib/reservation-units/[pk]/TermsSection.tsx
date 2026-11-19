@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ControlledSelect } from "ui/src/components/form";
 import { AutoGrid } from "ui/src/styled";
+import { getTranslatedError } from "@/modules/helpers";
 import { ControlledRichTextInput } from "./ControlledRichTextInput";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
@@ -30,7 +31,12 @@ export function TermsSection({
   const { errors } = formState;
 
   const hasErrors =
-    errors.notesWhenApplyingFi != null || errors.notesWhenApplyingEn != null || errors.notesWhenApplyingSv != null;
+    errors.notesWhenApplyingFi != null ||
+    errors.notesWhenApplyingEn != null ||
+    errors.notesWhenApplyingSv != null ||
+    errors.serviceSpecificTerms != null ||
+    errors.paymentTerms != null ||
+    errors.cancellationTerms != null;
 
   const termsOptions = [
     {
@@ -60,6 +66,7 @@ export function TermsSection({
             label={t(`reservationUnitEditor:label.${name}`)}
             placeholder={t(`reservationUnitEditor:termsPlaceholder`)}
             tooltip={t(`reservationUnitEditor:tooltip.${name}`)}
+            error={getTranslatedError(t, errors[name]?.message)}
             enableSearch
           />
         ))}
