@@ -198,10 +198,11 @@ read_remarks() {
 # or all checks when none is required. A remark counts unless it has the agent marker. Remarks is null when they
 # were not read, and the remark watermark then stays where it is.
 evaluate() {
-  jq -cn --argjson watch "$1" --argjson detail "$2" --argjson remarks "$3" \
-    --arg marker "$MARKER" --argjson limit "$WAKE_LIMIT" '
+  # The JSON goes in on stdin. One argument is limited to 128 KB, and the remarks of a long pull request are larger.
+  printf '%s\n' "$1" "$2" "$3" | jq -cn --arg marker "$MARKER" --argjson limit "$WAKE_LIMIT" '
     def has($list; $item): $list | any(.[]; . == $item);
-    ($detail.headSha != $watch.headSha) as $moved
+    input as $watch | input as $detail | input as $remarks
+    | ($detail.headSha != $watch.headSha) as $moved
     | (if $moved then [] else $watch.failedChecks end) as $failedBefore
     | (if $moved then false else $watch.passed end) as $passedBefore
     | (if $moved then [] else $watch.passedChecks end) as $passedChecksBefore
@@ -277,12 +278,13 @@ evaluate() {
 
 # The text the agent reads when it wakes.
 message() {
-  jq -rn --argjson report "$1" --argjson detail "$2" --arg url "https://github.com/$repo/pull/$number" \
+  printf '%s\n' "$1" "$2" | jq -rn --arg url "https://github.com/$repo/pull/$number" \
     --arg number "$number" --argjson limit "$WAKE_LIMIT" '
     def snippet: gsub("(?s)<!--.*?-->"; " ") | gsub("\\s+"; " ") | sub("^ "; "") | sub(" $"; "")
       | if length <= 200 then . else .[0:197] + "..." end;
     def listed(line): (.[0:10] | map(line)) + (if length > 10 then ["  - and \(length - 10) more"] else [] end);
-    " on \($detail.headSha[0:7])" as $commit
+    input as $report | input as $detail
+    | " on \($detail.headSha[0:7])" as $commit
     | [
         "Update on pull request #\($number) (\($url)):",
         ($report.changes[] | if .kind == "checks-failed" then
@@ -390,8 +392,10 @@ pass() {
   esac
 
   local last_read
-  last_read="$(jq -cn --argjson last "$(jq -c .lastRead <<< "$watch")" --argjson fp "$fingerprint" \
-    --argjson detail "$detail" --argjson remarks "$remarks" --argjson now "$now" --argjson read "$read_remarks_now" '{
+  last_read="$(printf '%s\n' "$detail" "$remarks" | jq -cn --argjson last "$(jq -c .lastRead <<< "$watch")" \
+    --argjson fp "$fingerprint" --argjson now "$now" --argjson read "$read_remarks_now" '
+    input as $detail | input as $remarks
+    | {
       at: (if $read or $last == null then $now else $last.at end),
       status: $fp.status,
       remarks: $fp.remarks,
