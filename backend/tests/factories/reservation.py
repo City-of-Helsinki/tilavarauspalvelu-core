@@ -173,13 +173,14 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     def create_for_confirmation(cls, **kwargs: Any) -> Reservation:
         """Create a Reservation for a single ReservationUnit in the necessary state for confirmation."""
         from .payment_accounting import PaymentAccountingFactory
-        from .payment_product import PaymentProductFactory
         from .reservable_time_span import ReservableTimeSpanFactory
         from .reservation_unit import ReservationUnitFactory
 
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         sub_kwargs.setdefault("origin_hauki_resource__id", "987")
-        sub_kwargs.setdefault("payment_product", PaymentProductFactory.create())
+        # Give `reservation_unit__payment_product=None` to create the reservation unit without a payment product.
+        if "payment_product" not in sub_kwargs:
+            sub_kwargs.setdefault("payment_product__id", uuid.uuid4())
         sub_kwargs.setdefault("payment_accounting", PaymentAccountingFactory.create())
         sub_kwargs.setdefault("own_price__amount", Decimal(20))
         sub_kwargs.setdefault("payment_type", PaymentType.ON_SITE)
