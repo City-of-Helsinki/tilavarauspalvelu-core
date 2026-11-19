@@ -4,13 +4,13 @@ import { NotificationSize } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/types";
+import { fontBold, fontMedium } from "@ui/styled";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { countFittingReservations, priorityKey } from "ui/src/modules/suitableTimes";
 import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
 import type { TimeSelectorFragment } from "@gql/gql-types";
-import { OUTSIDE_OPENING_HOURS_ERROR, TOO_SHORT_ERROR } from "./form";
+import { OUTSIDE_OPENING_HOURS_ERROR, PER_WEEK_ERROR, TOO_SHORT_ERROR } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
-import { fontBold, fontMedium } from "@ui/styled";
 import { describeTime } from "./SuitableTimeRangeForm";
 import { findOutsideListed, findTooShortListed, listTimeRanges } from "./timeSelectorModule";
 
@@ -85,7 +85,7 @@ export function TimesErrorSummary({
   }
 
   return (
-    <ErrorText
+    <TimesErrorText
       size={NotificationSize.Medium}
       title={t("application:validation.calendar.summaryTitle")}
       data-testid="application__page2--error-summary"
@@ -103,7 +103,7 @@ export function TimesErrorSummary({
           />
         ))}
       </SectionList>
-    </ErrorText>
+    </TimesErrorText>
   );
 }
 
@@ -118,12 +118,6 @@ const SectionList = styled.ul`
   p {
     margin: var(--spacing-3-xs) 0 0;
   }
-`;
-
-const SectionLink = styled.a`
-  font-family: var(--font-bold);
-  font-weight: 700;
-  color: var(--color-black-90);
 `;
 
 /** Which of the listed times an error message is about, position for position. None for the other errors. */
@@ -163,16 +157,29 @@ function SectionErrors({
   const formState = useFormState({ control, name: fieldName });
   const errorMsg = getFieldState(fieldName, formState).error?.message;
 
-  const title =
-    errorMsg === OUTSIDE_OPENING_HOURS_ERROR
-      ? t("application:validation.calendar.outsideOpeningHoursTitle")
-      : t("application:validation.calendar.title");
-  const msg = errorMsg
-    ? t(`application:validation.calendar.${errorMsg}`, {
+  let title;
+  let msg;
+  switch (errorMsg) {
+    case OUTSIDE_OPENING_HOURS_ERROR:
+      title = t("application:validation.calendar.outsideOpeningHoursTitle");
+      break;
+    case TOO_SHORT_ERROR:
+      title = t("application:validation.calendar.tooShortTitle");
+      break;
+    case PER_WEEK_ERROR:
+      title = t("application:validation.calendar.title");
+      msg = t(`application:validation.calendar.${errorMsg}`, {
         applied,
         fitting: countFittingReservations(ranges, minDuration),
-      })
-    : t("errors:general_error");
+      });
+      break;
+    case "Required":
+      title = t("application:validation.calendar.requiredTitle");
+      msg = t(`application:validation.calendar.${errorMsg}`);
+      break;
+    case undefined:
+      break;
+  }
 
   // The times an error is about, named as in the time list, by the same rules that flag them there.
   const listed = listTimeRanges(ranges);
@@ -188,17 +195,17 @@ function SectionErrors({
 
   return (
     <li data-testid={`application__page2--error-summary-section-${index}`}>
-      <SectionLink
+      <a
+        className="SectionHeaderLink"
         href={href}
         onClick={(e) => {
           e.preventDefault();
           onShow();
         }}
       >
-        {name}
-      </SectionLink>
-      <p>{title}</p>
-      <p>{msg}</p>
+        {name}: {title}
+      </a>
+      {msg && <p>{msg}</p>}
       {invalidTimes.length > 0 && (
         <>
           <p id={timesId}>

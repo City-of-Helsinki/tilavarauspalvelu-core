@@ -27,12 +27,14 @@
     "calendar": {
       "summaryTitle": "Fix the time slots of your requests before continuing",
       "title": "Your selected time slots do not correspond to the duration of your booking",
-      "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
-      "At least as many suitable time ranges as applied reservations per week": "Bookings per week applied for: {{applied}}. Bookings that fit your selected time slots: {{fitting}}. Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
-      "Required": "Select time slots from the calendar",
-      "outsideOpeningHoursTitle": "Some of your time slots are outside the opening hours",
+      "Suitable time range must be at least as long as the minimum duration": "Lengthen the time slots or shorten the minimum duration selected in the previous step of the application.",
+      "At least as many suitable time ranges as applied reservations per week": "Bookings per week applied for: {{applied}}. Bookings that fit your selected time slots: {{fitting}}.\nSelect more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
+      "requiredTitle": "No time slots selected",
+      "Required": "Select time slots for the application",
       "Suitable time range must be inside the opening hours": "Remove the times marked as invalid in the calendar, or move them within the opening hours of this request's spaces.",
+      "tooShortTitle": "Too short time slot",
       "tooShortTimes": "Time slots that are too short:",
+      "outsideOpeningHoursTitle": "Some of your time slots are outside the opening hours",
       "outsideOpeningHoursTimes": "Time slots outside the opening hours:"
     },
     "previewError": "Page {{ page }} has an error.",

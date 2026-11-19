@@ -88,43 +88,51 @@ export const TOO_SHORT_ERROR = "Suitable time range must be at least as long as 
 export const PER_WEEK_ERROR = "At least as many suitable time ranges as applied reservations per week";
 export const OUTSIDE_OPENING_HOURS_ERROR = "Suitable time range must be inside the opening hours";
 
-const ApplicationSectionPage2Schema = z
-  .object({
-    pk: z.number(),
-    suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).min(1, { message: "Required" }),
-    minDuration: z.number().min(1, { message: "Required" }),
-    name: z.string().min(1, { message: "Required" }).max(100),
-    reservationUnitPk: z.number(),
-    priority: z.enum(Priority),
-    // NOTE: not sent or modified here, but required for validation
-    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
-  })
-  .superRefine((s, ctx) => {
-    // No too short times allowed. A primary time must be long enough by itself, a secondary one can be a buffer that
-    // counts together with the times it touches, unless it touches a too short primary time (see findTooShortRuns).
-    // minDuration is in seconds.
-    const isValid = s.minDuration > 0 && !hasTooShortTimes(s.suitableTimeRanges, s.minDuration);
-    if (!isValid) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["suitableTimeRanges"],
-        message: TOO_SHORT_ERROR,
-      });
-    }
-  })
-  .superRefine((s, ctx) => {
-    // The times must fit the applied reservations per week. They can be on separate days or on the same day, in one
-    // long enough time or in several (see countFittingReservations).
-    const isValid = countFittingReservations(s.suitableTimeRanges, s.minDuration) >= s.appliedReservationsPerWeek;
+// Without the checks of the times, which ApplicationPage2SchemaRefined runs in its own order (see checkSuitableTimes).
+const ApplicationSectionPage2BaseSchema = z.object({
+  pk: z.number(),
+  suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).min(1, { message: "Required" }),
+  minDuration: z.number().min(1, { message: "Required" }),
+  name: z.string().min(1, { message: "Required" }).max(100),
+  reservationUnitPk: z.number(),
+  priority: z.enum(Priority),
+  // NOTE: not sent or modified here, but required for validation
+  appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }),
+});
 
-    if (!isValid) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["suitableTimeRanges"],
-        message: PER_WEEK_ERROR,
-      });
-    }
-  });
+/**
+ * Add an issue for each problem with the times of a section, most important first: the form shows only the first
+ * error of a field, so a time that can't be applied for at all must not be hidden behind the other errors.
+ * @param openingHours of the section, or undefined to not check them
+ */
+function checkSuitableTimes(
+  s: z.infer<typeof ApplicationSectionPage2BaseSchema>,
+  ctx: z.RefinementCtx,
+  path: ReadonlyArray<string | number>,
+  openingHours: ReservableTimeSlots | undefined
+): void {
+  const addIssue = (message: string) =>
+    ctx.addIssue({ code: "custom", path: [...path, "suitableTimeRanges"], message });
+
+  if (openingHours != null && !isInsideOpeningHours(s.suitableTimeRanges, openingHours)) {
+    addIssue(OUTSIDE_OPENING_HOURS_ERROR);
+  }
+  // No too short times allowed. A primary time must be long enough by itself, a secondary one can be a buffer that
+  // counts together with the times it touches, unless it touches a too short primary time (see findTooShortRuns).
+  // minDuration is in seconds.
+  if (s.minDuration <= 0 || hasTooShortTimes(s.suitableTimeRanges, s.minDuration)) {
+    addIssue(TOO_SHORT_ERROR);
+  }
+  // The times must fit the applied reservations per week. They can be on separate days or on the same day, in one
+  // long enough time or in several (see countFittingReservations).
+  if (countFittingReservations(s.suitableTimeRanges, s.minDuration) < s.appliedReservationsPerWeek) {
+    addIssue(PER_WEEK_ERROR);
+  }
+}
+
+const ApplicationSectionPage2Schema = ApplicationSectionPage2BaseSchema.superRefine((s, ctx) =>
+  checkSuitableTimes(s, ctx, [], undefined)
+);
 
 function transformApplicationSectionPage2(
   values: ApplicationSectionPage2FormValues
@@ -163,18 +171,17 @@ export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
  * the section, as a time any of them opens can be applied for. The hours aren't form values, so they're given here.
  */
 export function ApplicationPage2SchemaRefined(sectionsOpeningHours: ReadonlyArray<ReservableTimeSlots>) {
-  return ApplicationPage2Schema.superRefine((val, ctx) => {
-    for (const [i, section] of val.applicationSections.entries()) {
-      const openingHours = sectionsOpeningHours[i];
-      if (openingHours != null && !isInsideOpeningHours(section.suitableTimeRanges, openingHours)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["applicationSections", i, "suitableTimeRanges"],
-          message: OUTSIDE_OPENING_HOURS_ERROR,
-        });
+  // The sections' own schema can't know their opening hours, so all the checks of the times are run here, in order.
+  return z
+    .object({
+      pk: z.number(),
+      applicationSections: z.array(ApplicationSectionPage2BaseSchema),
+    })
+    .superRefine((val, ctx) => {
+      for (const [i, section] of val.applicationSections.entries()) {
+        checkSuitableTimes(section, ctx, ["applicationSections", i], sectionsOpeningHours[i]);
       }
-    }
-  });
+    });
 }
 
 /** Each section's opening hours, by section index: those of all of its reservation units. */
