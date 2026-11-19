@@ -2,13 +2,14 @@
 name: sentry
 description: >-
   Fetch a Sentry issue and its events, resolve issues, and drive a Seer autofix run up to the code changes,
-  and list or delete releases, through the Sentry REST API. Use when the user references a Sentry issue
-  with a URL or an issue ID, asks to resolve Sentry issues, asks to run or continue Seer or autofix on an issue,
-  or asks to list or delete releases.
+  list or delete releases, and list, create or delete alerts, through the Sentry REST API.
+  Use when the user references a Sentry issue with a URL or an issue ID, asks to resolve Sentry issues,
+  asks to run or continue Seer or autofix on an issue, asks to list or delete releases,
+  or asks to list, create or delete alerts.
 ---
 
 How to fetch a Sentry issue to find the cause of an error, how to take it through Seer,
-and how to list and delete releases.
+how to list and delete releases, and how to manage alerts.
 
 ## 1. Authentication
 
@@ -22,9 +23,11 @@ If the directory does not exist, the scripts read the token from 1Password with 
 1Password asks the user to unlock. Wait for it.
 
 The token is a personal token from https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/.
-Set "Issue & Event" to Read & Write, "Organization" to Read, "Project" to Read and "Release" to Admin.
+Set "Issue & Event" to Read & Write, "Organization" to Read, "Project" to Read, "Release" to Admin
+and "Alerts" to Read & Write.
 Only `sentry-autofix` and `sentry-resolve` need the write permission of "Issue & Event".
 Only `sentry-releases delete` needs the admin permission of "Release".
+Only `sentry-alerts create` and `sentry-alerts delete` need the write permission of "Alerts".
 
 The 1Password setup is as follows. If a call fails because of it, stop and tell the user which part is missing:
 
@@ -157,6 +160,51 @@ Seer runs cost money, so do not start or rethink without a reason.
 - Sentry does not delete a release that issues, events or health data refer to. Such a release is in `failed`
   with the reason. The script then exits with 1, but it still deletes the other releases.
 - A delete can time out with an empty `error`, but Sentry can still delete the release. Run `list` again to check.
+
+### List, create and delete alerts
+
+```bash
+.agents/skills/sentry/sentry-alerts scopes
+.agents/skills/sentry/sentry-alerts list
+.agents/skills/sentry/sentry-alerts show 878723
+.agents/skills/sentry/sentry-alerts create /path/to/alert.json
+.agents/skills/sentry/sentry-alerts delete 1514703
+```
+
+Sentry calls an alert a "workflow" and a monitor a "detector" in the API.
+The older alert rule endpoints, such as `projects/<org>/<project>/rules/`, return 404. Do not use them.
+
+- `scopes` shows the scopes of the token and the access of the user in the organization.
+  To write alerts, `organization_access` must have `alerts:write`.
+- `list` shows the alerts and the monitors of the three projects of this service.
+  An alert that is shared by many projects shows once for each project.
+- `show` shows one alert. Use an existing alert as an example for the request body of `create`.
+- `create` takes a file with the request body. Write the file in the temporary directory of the job.
+  `detectorIds` links the alert to the monitors of a project. Use the `id` of the "Error Monitor" of the project from `list`.
+  Put `"enabled": false` in the body until the user has checked the alert in the web UI.
+- `delete` cannot be undone. Run `show` first, and delete only after the user agrees.
+
+An example body. The alert fires on the first event of a new issue in `tilavarauspalvelu-core`.
+It has no actions yet, so it does not notify anyone:
+
+```json
+{
+  "name": "New issue in core",
+  "enabled": false,
+  "environment": null,
+  "config": {"frequency": 30},
+  "triggers": {
+    "logicType": "any-short",
+    "conditions": [{"type": "first_seen_event", "comparison": true, "conditionResult": true}],
+    "actions": []
+  },
+  "actionFilters": [],
+  "detectorIds": ["1232471"]
+}
+```
+
+`config.frequency` is the minimum number of minutes between two notifications for one issue.
+Actions go in `actionFilters[].actions`. See `show 878723` for an email action.
 
 ## 3. Seer workflow
 

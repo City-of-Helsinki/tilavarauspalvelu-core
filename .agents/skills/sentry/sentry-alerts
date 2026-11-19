@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Show, create or delete the alerts of the Sentry projects of this service through the Sentry REST API.
+# Sentry calls alerts "workflows" and monitors "detectors" in the API.
+# The older alert rule endpoints, such as projects/<org>/<project>/rules/, return 404.
+# The create and delete commands write to Sentry. Run them only when the user asks for it.
+# The token is read from the secret file or from 1Password. See lib.sh.
+#
+# Usage: sentry-alerts <command> [arguments]
+#
+# Commands:
+#   scopes                 Show the scopes of the token, and the alert access of the user in the organization.
+#   list                   List the alerts and monitors of the projects of this service.
+#   show <alert id>        Show an alert with its triggers, filters and actions.
+#   create <json file>     Create an alert from the request body in the file. Print the new alert.
+#   delete <alert id>      Delete an alert.
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  sed -n '/^# Usage:/,/^set -euo/p' "$0" | sed '$d; s/^# \{0,1\}//' >&2
+  exit 2
+}
+[[ $# -ge 1 ]] || usage
+
+command="$1"
+shift
+case "$command" in
+  scopes | list) [[ $# -eq 0 ]] || usage ;;
+  show | delete)
+    [[ $# -eq 1 && "$1" =~ ^[0-9]+$ ]] || usage
+    workflow_id="$1"
+    ;;
+  create)
+    [[ $# -eq 1 ]] || usage
+    body_file="$1"
+    if ! jq -e 'type == "object" and (.name | type == "string")' "$body_file" >/dev/null; then
+      echo "Not a JSON object with a name: $body_file" >&2
+      usage
+    fi
+    ;;
+  *)
+    echo "Unknown command: $command" >&2
+    usage
+    ;;
+esac
+
+# The Sentry projects of this service.
+projects=(tilavarauspalvelu-core tilavarauspalvelu-customer-ui tilavarauspalvelu-staff-ui)
+
+load_token
+
+case "$command" in
+  scopes)
+    # The API root is not under the organization, so call it without the api function.
+    token_scopes="$(
+      printf 'header = "Authorization: Bearer %s"\n' "$token" \
+        | curl --silent --show-error --fail-with-body --max-time 30 --config - "https://sentry.io/api/0/"
+    )"
+    # The access in the organization is the token scopes limited by the role of the user.
+    api "" | jq --argjson root "$token_scopes" '{
+      token_scopes: $root.auth.scopes,
+      organization_access: .access,
+      members_can_write_alerts: .alertsMemberWrite
+    }'
+    ;;
+  list)
+    for project in "${projects[@]}"; do
+      project_id="$(api "projects/?query=slug:$project" | jq -r --arg slug "$project" '.[] | select(.slug == $slug) | .id')"
+      api "workflows/?project=$project_id&per_page=100" \
+        | jq -c --arg project "$project" '.[] | {kind: "alert", project: $project, id, name, enabled}'
+      api "detectors/?project=$project_id&per_page=100" \
+        | jq -c --arg project "$project" '.[] | {kind: "monitor", project: $project, id, name, type, enabled}'
+    done
+    ;;
+  show)
+    api "workflows/$workflow_id/" | jq .
+    ;;
+  create)
+    api "workflows/" --request POST --header "Content-Type: application/json" --data-binary "@$body_file" | jq .
+    ;;
+  delete)
+    api "workflows/$workflow_id/" --request DELETE
+    echo "Deleted alert $workflow_id"
+    ;;
+esac
