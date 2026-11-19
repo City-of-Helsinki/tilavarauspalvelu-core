@@ -18,19 +18,24 @@ pytestmark = [
 ]
 
 
-@mock.patch("tilavarauspalvelu.signals.update_reservation_unit_image_urls_task.delay")
-def test_reservation_unit_image__save__update_urls_called_on_save(mock_update_urls, settings):
+@mock.patch("tilavarauspalvelu.signals.update_reservation_unit_image_urls_task.apply_async")
+def test_reservation_unit_image__save__update_urls_called_on_save(
+    mock_update_urls, settings, django_capture_on_commit_callbacks
+):
     settings.UPDATE_RESERVATION_UNIT_THUMBNAILS = True
 
     reservation_unit = ReservationUnitFactory.create()
     image = ReservationUnitImage(reservation_unit=reservation_unit, image_type=ReservationUnitImageType.MAIN)
-    image.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        image.save()
 
-    assert mock_update_urls.call_count == 1
+    assert mock_update_urls.call_args_list == [mock.call(kwargs={"pks": [image.pk]})]
 
 
-@mock.patch("tilavarauspalvelu.signals.purge_image_cache_task.delay")
-def test_reservation_unit_image__purge__image_cache_is_purged_on_save(mock_purge_image_cache, settings):
+@mock.patch("tilavarauspalvelu.signals.purge_image_cache_task.apply_async")
+def test_reservation_unit_image__purge__image_cache_is_purged_on_save(
+    mock_purge_image_cache, settings, django_capture_on_commit_callbacks
+):
     mock_image_data = BytesIO()
     mock_image = Image.new("RGB", (100, 100))
     mock_image.save(fp=mock_image_data, format="PNG")
@@ -42,7 +47,8 @@ def test_reservation_unit_image__purge__image_cache_is_purged_on_save(mock_purge
         image_type=ReservationUnitImageType.MAIN,
         image=mock_file,
     )
-    runit_image.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        runit_image.save()
 
     assert mock_purge_image_cache.call_count == 0
 
@@ -52,6 +58,8 @@ def test_reservation_unit_image__purge__image_cache_is_purged_on_save(mock_purge
     runit_image.refresh_from_db()
 
     runit_image.image_type = ReservationUnitImageType.OTHER
-    runit_image.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        runit_image.save()
 
-    assert mock_purge_image_cache.call_count == 4
+    assert mock_purge_image_cache.call_count == 1
+    assert len(mock_purge_image_cache.call_args.kwargs["kwargs"]["image_paths"]) == 4
