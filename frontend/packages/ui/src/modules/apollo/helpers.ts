@@ -20,7 +20,7 @@ import { fetchWithTimeout, getOperationType } from "../fetch";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import { getClientOrigin } from "../urlBuilder";
 import type { LocalizationLanguages } from "../urlBuilder";
-import { classifyError, isPermissionErrorCode, isToastedByErrorLink } from "./errors";
+import { classifyError, isPermissionErrorCode, isToastedByErrorLink, setNodeLogFormat } from "./errors";
 import type { ApiError, FetchError } from "./errors";
 
 /// Validation codes that are a normal outcome for the user, not a bug.
@@ -53,6 +53,7 @@ function isExpectedError(error: FetchError): boolean {
 /// This is the only place that logs these errors, so the callers don't have to.
 export const errorLink = new ErrorLink(({ error, operation }) => {
   const fetchError = classifyError(error);
+  setNodeLogFormat(error, operation.operationName ?? "");
   toastFetchError(fetchError, operation);
   if (isExpectedError(fetchError)) {
     log.info(`expected graphql error in ${operation.operationName}: ${JSON.stringify(fetchError)}`);

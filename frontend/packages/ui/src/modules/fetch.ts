@@ -69,3 +69,13 @@ export function getConnectionErrorCode(error: unknown): string | null {
   }
   return null;
 }
+
+/// The parsed body of a response, or null if the body is not JSON.
+/// Use it before you log a response body. A gateway error, for example a 503, has a long HTML page as the body.
+export function parseJsonBody(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
