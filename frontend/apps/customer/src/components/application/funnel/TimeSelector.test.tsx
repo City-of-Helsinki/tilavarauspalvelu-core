@@ -15,9 +15,14 @@ import { ApplicationPage2SchemaRefined, convertApplicationPage2 } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from "./TimeSelector";
 import type { TimeSelectorProps } from "./TimeSelector";
+import { TimesErrorSummary } from "./TimesErrorSummary";
 
-const { errorToast, successToast } = vi.hoisted(() => ({ errorToast: vi.fn(), successToast: vi.fn() }));
-vi.mock("ui/src/components/toast", () => ({ errorToast, successToast }));
+const { errorToast, successToast, toast } = vi.hoisted(() => ({
+  errorToast: vi.fn(),
+  successToast: vi.fn(),
+  toast: vi.fn(),
+}));
+vi.mock("ui/src/components/toast", () => ({ errorToast, successToast, toast }));
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 
@@ -46,6 +51,8 @@ interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   appliedReservationsPerWeek?: number;
   /** Defaults to `sectionOpeningHours` for every section. */
   allSectionsOpeningHours?: TimeSelectorProps["allSectionsOpeningHours"];
+  /** Called when a section's link in the error summary is followed. */
+  onShowSection?: (index: number) => void;
 }
 
 function customRender(props: TimeSelectorMockProps = {}): ReturnType<typeof render> {
@@ -63,6 +70,7 @@ function WrapTimeSelector({
   allSectionsOpeningHours,
   validate = false,
   appliedReservationsPerWeek,
+  onShowSection = vi.fn(),
   ...props
 }: TimeSelectorMockProps) {
   const application: ApplicationPage2 = createMockApplicationFragment(props);
@@ -105,9 +113,16 @@ function WrapTimeSelector({
         />
         <button type="submit">submit</button>
         {validate && (
-          <button type="button" onClick={() => void form.trigger()}>
-            validate
-          </button>
+          <>
+            <TimesErrorSummary
+              allSectionsOpeningHours={sectionsOpeningHours}
+              onShowSection={onShowSection}
+              getSectionId={(i) => `timeSelector-${i}`}
+            />
+            <button type="button" onClick={() => void form.trigger()}>
+              validate
+            </button>
+          </>
         )}
       </FormProvider>
     </form>
@@ -667,6 +682,7 @@ describe("TimeSelector copy times", () => {
   beforeEach(() => {
     errorToast.mockClear();
     successToast.mockClear();
+    toast.mockClear();
   });
 
   test("copies the selection to every section without carrying primary keys over", async () => {
@@ -720,15 +736,15 @@ describe("TimeSelector copy times", () => {
     expect(successToast).toHaveBeenCalledOnce();
   });
 
-  test("shows an error when the copied times are outside another section's opening hours", async () => {
+  test("warns when the copied times are outside another section's opening hours", async () => {
     const user = userEvent.setup();
     const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
     const view = customRender({ page: "page2", nSections: 2, allSectionsOpeningHours: [OPEN_ALL_WEEK, mondayOnly] });
 
     await user.click(view.getByRole("button", { name: "application:Page2.copyTimes" }));
 
-    expect(errorToast).toHaveBeenCalledWith(
-      expect.objectContaining({ text: expect.stringContaining("copyCellsOutsideOpeningHours") })
+    expect(toast).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "alert", text: expect.stringContaining("copyCellsOutsideOpeningHours") })
     );
     expect(successToast).not.toHaveBeenCalled();
   });
@@ -758,10 +774,58 @@ describe("TimeSelector times outside the opening hours", () => {
   });
 });
 
-describe("TimeSelector error message", () => {
+describe("TimeSelector error summary", () => {
   function findError(view: ReturnType<typeof render>) {
-    return view.findByTestId("application__page2--notification-min-duration");
+    return view.findByTestId("application__page2--error-summary");
   }
+
+  test("is shown on load for the errors already in the saved times", async () => {
+    // The mock's Wednesday 08:00-16:00 fits four reservations of 2 h, not the five applied for.
+    const view = customRender({ page: "page2", validate: true, nSections: 2, appliedReservationsPerWeek: 5 });
+
+    const error = await findError(view);
+    for (const index of [0, 1]) {
+      expect(within(error).getByTestId(`application__page2--error-summary-section-${index}`)).toHaveTextContent(
+        'application:validation.calendar.At least as many suitable time ranges as applied reservations per week {"applied":5,"fitting":4}'
+      );
+    }
+  });
+
+  test("is not shown while every section is valid", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2", validate: true });
+    await user.click(view.getByRole("button", { name: "validate" }));
+
+    expect(view.queryByTestId("application__page2--error-summary")).not.toBeInTheDocument();
+  });
+
+  test("lists the errors of every invalid section, with a link to it", async () => {
+    const user = userEvent.setup();
+    const onShowSection = vi.fn();
+    const view = customRender({
+      page: "page2",
+      validate: true,
+      nSections: 2,
+      appliedReservationsPerWeek: 5,
+      onShowSection,
+    });
+    await user.click(view.getByRole("button", { name: "validate" }));
+
+    const error = await findError(view);
+    for (const index of [0, 1]) {
+      const item = within(error).getByTestId(`application__page2--error-summary-section-${index}`);
+      expect(item).toHaveTextContent(
+        'application:validation.calendar.At least as many suitable time ranges as applied reservations per week {"applied":5,"fitting":4}'
+      );
+      const link = within(item).getByRole("link", { name: "foobar" });
+      expect(link).toHaveAttribute("href", `#timeSelector-${index}`);
+    }
+
+    await user.click(
+      within(within(error).getByTestId("application__page2--error-summary-section-1")).getByRole("link")
+    );
+    expect(onShowSection).toHaveBeenCalledWith(1);
+  });
 
   test("tells how many reservations per week were applied for, and how many fit", async () => {
     const user = userEvent.setup();
@@ -773,7 +837,7 @@ describe("TimeSelector error message", () => {
     expect(error).toHaveTextContent(
       'application:validation.calendar.At least as many suitable time ranges as applied reservations per week {"applied":5,"fitting":4}'
     );
-    expect(within(error).queryByRole("list")).not.toBeInTheDocument();
+    expect(within(error).getAllByRole("list")).toHaveLength(1); // only the list of sections, no list of times
   });
 
   test("lists the too short times", async () => {
