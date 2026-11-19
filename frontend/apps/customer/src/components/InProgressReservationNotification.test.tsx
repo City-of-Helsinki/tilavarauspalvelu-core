@@ -339,6 +339,7 @@ describe("InProgressReservationNotification", () => {
   });
 
   it("navigates to the in-progress path when continuing a created reservation that still exists", async () => {
+    mockReservationQ.mockResolvedValue({ data: { reservation: { id: "r2", state: ReservationStateChoice.Created } } });
     mockReservations([
       createReservation({
         pk: 2,
@@ -353,6 +354,41 @@ describe("InProgressReservationNotification", () => {
     await userEvent.click(screen.getByTestId("reservation-notification__button--checkout"));
 
     await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith("/reservation-unit/9/reservation/2"));
+  });
+
+  it("warns Sentry, refreshes and opens the reservation page without a toast when the reservation is no longer created", async () => {
+    mockReservationQ.mockResolvedValue({
+      data: { reservation: { id: "r2", state: ReservationStateChoice.Confirmed } },
+    });
+    mockReservations([
+      createReservation({
+        pk: 2,
+        state: ReservationStateChoice.Created,
+        draftExpiresAt: new Date(Date.now() + 10 * 60_000).toISOString(),
+        paymentOrder: null,
+        reservationUnit: { id: "ru-9", pk: 9 },
+      }),
+    ]);
+    mockRouter("/reservations/[id]", { id: "2" });
+    render(<InProgressReservationNotification />);
+
+    await userEvent.click(screen.getByTestId("reservation-notification__button--checkout"));
+
+    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith("/reservations/2/"));
+    expect(mockCaptureMessage).toHaveBeenCalledWith(
+      "In-progress reservation notification showed a reservation that cannot be continued",
+      {
+        level: "warning",
+        extra: {
+          reservationPk: 2,
+          shownState: ReservationStateChoice.Created,
+          currentState: ReservationStateChoice.Confirmed,
+          pathname: "/reservations/[id]",
+        },
+      }
+    );
+    expect(mockRefetch).toHaveBeenCalled();
+    expect(mockErrorToast).not.toHaveBeenCalled();
   });
 
   it("shows a NOT_FOUND error and refreshes when continuing a reservation that no longer exists", async () => {

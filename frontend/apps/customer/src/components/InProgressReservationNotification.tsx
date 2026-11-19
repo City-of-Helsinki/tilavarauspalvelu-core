@@ -25,7 +25,7 @@ import {
 import type { ReservationNotificationFragment } from "@gql/gql-types";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
-import { getReservationInProgressPath } from "@/modules/urls";
+import { getReservationInProgressPath, getReservationPath } from "@/modules/urls";
 
 // Same as ReservationStateChoice.states_that_can_be_deleted in the backend
 const DELETABLE_STATES: ReadonlySet<ReservationStateChoice> = new Set([
@@ -298,6 +298,23 @@ export function InProgressReservationNotification(): React.ReactElement {
         text: t("errors:api:NOT_FOUND"),
       });
       await refreshQueryCache();
+      return;
+    }
+    // The list can be older than the reservation state, for example after the user confirmed the reservation.
+    // The funnel page redirects such a reservation to its own page, so go there directly.
+    const currentState = res.data.reservation.state;
+    if (currentState !== ReservationStateChoice.Created) {
+      Sentry.captureMessage("In-progress reservation notification showed a reservation that cannot be continued", {
+        level: "warning",
+        extra: {
+          reservationPk: reservation.pk,
+          shownState: reservation.state,
+          currentState,
+          pathname: router.pathname,
+        },
+      });
+      await refreshQueryCache();
+      await router.push(getReservationPath(reservation.pk));
       return;
     }
     const url = getReservationInProgressPath(reservation.reservationUnit.pk, reservation.pk);
