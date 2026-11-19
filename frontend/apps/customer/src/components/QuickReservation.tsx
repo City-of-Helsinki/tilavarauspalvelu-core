@@ -221,7 +221,8 @@ export function QuickReservation({
         <Price data-testid="quick-reservation__price">
           {focusSlot?.isReservable && (price != null || isPriceLoading) && (
             <>
-              {t("common:price")}:{" "}
+              {/* Browser translation replaces bare text nodes, and React then fails to remove them */}
+              <span>{t("common:price")}: </span>
               <PriceValue>
                 <LoadingPrice price={price} isLoading={isPriceLoading} />
               </PriceValue>
