@@ -17,10 +17,9 @@ from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
     get_verkkokauppa_order_params,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order, OrderCustomer, WebShopOrderStatus
-from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import PaymentMerchantFactory, PaymentProductFactory, ReservationFactory, ReservationUnitFactory
+from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
 # Applied to all tests
 pytestmark = [
@@ -63,9 +62,7 @@ def test_get_formatted_reservation_time(language, result):
 
 
 def test_get_verkkokauppa_order_params__respect_reservee_language():
-    payment_product = PaymentProductFactory.create()
     reservation_unit = ReservationUnitFactory.create(
-        payment_product=payment_product,
         name_fi="Nimi",
         name_en="Name",
         name_sv="Namn",
@@ -78,17 +75,22 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
         reservation_unit=reservation_unit,
         user__preferred_language="en",
         reservee_type=ReserveeType.INDIVIDUAL,
+        price_lines__payment_product=PaymentProductFactory.create(),
+        price_lines__description_fi="Aikuiset",
+        price_lines__description_en="Adults",
     )
-    order_params = get_verkkokauppa_order_params(reservation_en, vat_percentage=Decimal(24))
-    assert order_params.items[0].product_name == "Name, NAME"
+    order_params = get_verkkokauppa_order_params(reservation_en)
+    assert order_params.items[0].product_name == "Name, NAME, Adults"
 
     reservation_sv = ReservationFactory.create(
         reservation_unit=reservation_unit,
         user__preferred_language="sv",
         reservee_type=ReserveeType.INDIVIDUAL,
+        price_lines__payment_product=PaymentProductFactory.create(),
+        price_lines__description_fi="Aikuiset",
     )
-    order_params = get_verkkokauppa_order_params(reservation_sv, vat_percentage=Decimal(24))
-    assert order_params.items[0].product_name == "Namn, NAMN"
+    order_params = get_verkkokauppa_order_params(reservation_sv)
+    assert order_params.items[0].product_name == "Namn, NAMN, Aikuiset"
 
 
 def test_get_meta_label():
@@ -115,9 +117,7 @@ def test_get_meta_label__raises_exception_with_unsupported_key():
 @pytest.mark.urls(__name__)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_create_mock_verkkokauppa_order__returns_draft_order_with_mock_urls():
-    payment_product = PaymentProductFactory.create()
     reservation = ReservationFactory.create(
-        reservation_unit__payment_product=payment_product,
         user__first_name="John",
         user__last_name="Doe",
         user__email="john.doe@example.com",
@@ -148,39 +148,3 @@ def test_create_mock_verkkokauppa_order__returns_draft_order_with_mock_urls():
         checkout_url=f"https://mock-verkkokauppa.com/mock_verkkokauppa/{order.order_id}/",
         receipt_url=f"https://mock-verkkokauppa.com/admin/tilavarauspalvelu/reservation/{reservation.pk}/change/?",
     )
-
-    reservation.reservation_unit.refresh_from_db()
-    assert reservation.reservation_unit.payment_product == payment_product
-
-
-@pytest.mark.urls(__name__)
-def test_create_mock_verkkokauppa_order__creates_product_for_existing_merchant():
-    payment_merchant = PaymentMerchantFactory.create()
-    reservation = ReservationFactory.create(
-        reservation_unit__payment_product=None,
-        reservation_unit__payment_merchant=payment_merchant,
-    )
-
-    create_mock_verkkokauppa_order(reservation)
-
-    reservation_unit = ReservationUnit.objects.get(pk=reservation.reservation_unit.pk)
-    assert reservation_unit.payment_product is not None
-    assert reservation_unit.payment_product.merchant == payment_merchant
-    assert reservation_unit.payment_merchant == payment_merchant
-
-
-@pytest.mark.urls(__name__)
-def test_create_mock_verkkokauppa_order__creates_product_and_merchant_when_missing():
-    reservation = ReservationFactory.create(
-        reservation_unit__payment_product=None,
-        reservation_unit__payment_merchant=None,
-        reservation_unit__unit__payment_merchant=None,
-    )
-
-    create_mock_verkkokauppa_order(reservation)
-
-    reservation_unit = ReservationUnit.objects.get(pk=reservation.reservation_unit.pk)
-    assert reservation_unit.payment_merchant is not None
-    assert reservation_unit.payment_merchant.name == "MOCK VERKKOKAUPPA MERCHANT"
-    assert reservation_unit.payment_product is not None
-    assert reservation_unit.payment_product.merchant == reservation_unit.payment_merchant

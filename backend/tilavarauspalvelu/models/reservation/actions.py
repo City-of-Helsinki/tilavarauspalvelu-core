@@ -21,7 +21,6 @@ from tilavarauspalvelu.enums import (
     TimezoneProperty,
     TimezoneRuleProperty,
 )
-from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
     create_mock_verkkokauppa_order,
@@ -36,10 +35,14 @@ from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_date_of, local_datetime
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-
     from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
-    from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, Unit
+    from tilavarauspalvelu.models import (
+        PaymentProduct,
+        ReservationPriceLine,
+        ReservationUnit,
+        ReservationUnitAccessType,
+        Unit,
+    )
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import Lang
 
@@ -191,21 +194,6 @@ class ReservationActions:
 
     def get_instructions(self, *, kind: Literal["confirmed", "pending", "cancelled"], language: Lang) -> str:
         return get_attr_by_language(self.reservation.reservation_unit, f"reservation_{kind}_instructions", language)
-
-    def get_vat_percentage(self) -> Decimal:
-        """
-        The tax percentage of the price lines of the reservation.
-        A webshop order has one row with one tax percentage until it has one row for each line (TILA-4594).
-
-        :raises ReservationPriceCalculationError: If the reservation has no price lines,
-                                                  or they have more than one tax percentage.
-        """
-        tax_percentages = set(self.reservation.price_lines.values_list("tax_percentage", flat=True))
-        if len(tax_percentages) != 1:
-            msg = "Reservation must have price lines with exactly one tax percentage."
-            raise ReservationPriceCalculationError(msg)
-
-        return tax_percentages.pop()
 
     def can_apply_for_discount(self) -> bool:
         """The customer can apply for a discount, if a price component of the reservation allows it."""
@@ -372,21 +360,13 @@ class ReservationActions:
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             return create_mock_verkkokauppa_order(self.reservation)
 
+        self.set_price_line_payment_products()
+
         invoicing_date: datetime.date | None = None
         if self.should_offer_invoicing():
             invoicing_date = local_date_of(self.reservation.begins_at)
 
-        try:
-            vat_percentage = self.get_vat_percentage()
-        except ReservationPriceCalculationError as error:
-            msg = "The price lines of the reservation must have exactly one tax percentage."
-            raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_LINES_HAVE_MANY_TAX_PERCENTAGES) from error
-
-        order_params = get_verkkokauppa_order_params(
-            self.reservation,
-            vat_percentage=vat_percentage,
-            invoicing_date=invoicing_date,
-        )
+        order_params = get_verkkokauppa_order_params(self.reservation, invoicing_date=invoicing_date)
 
         try:
             return VerkkokauppaAPIClient.create_order(order_params=order_params)
@@ -395,6 +375,39 @@ class ReservationActions:
             SentryLogger.log_exception(err, details=sentry_msg, reservation_id=self.reservation.pk)
             msg = "Upstream service call failed. Unable to confirm the reservation."
             raise ValidationError(msg, code=error_codes.UPSTREAM_CALL_FAILED) from err
+
+    def set_price_line_payment_products(self) -> None:
+        """
+        Give each price line with a positive final amount the verkkokauppa product
+        of its reservation unit and sales item, for the current merchant.
+
+        :raises ValidationError: If a price line has no product.
+        """
+        reservation_unit: ReservationUnit = self.reservation.reservation_unit
+        merchant = reservation_unit.actions.get_merchant()
+
+        products_by_sales_item_pk: dict[int, PaymentProduct] = {}
+        if merchant is not None:
+            products = reservation_unit.payment_products.filter(merchant=merchant, sales_item__isnull=False)
+            products_by_sales_item_pk = {product.sales_item_id: product for product in products}
+
+        price_lines: list[ReservationPriceLine] = list(self.reservation.price_lines.all())
+        paid_lines = [
+            line for line in price_lines if (line.amount if line.override_amount is None else line.override_amount) > 0
+        ]
+
+        for line in paid_lines:
+            product = products_by_sales_item_pk.get(line.sales_item_id)
+            if product is None:
+                msg = "Reservation unit is missing payment product"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT)
+
+            line.payment_product = product
+
+        # Save each line, so that the audit log gets an entry. Bulk writes make none.
+        with transaction.atomic():
+            for line in paid_lines:
+                line.save(update_fields=["payment_product"])
 
     def overlapping_reservations(self) -> ReservationQuerySet:
         """Find all reservations that overlap with this reservation."""
