@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+// Finds which development setup runs and prints its URLs as JSON.
+// Usage: browser-env [--project NAME]
+//   --project   the Compose project of the stack, for an agent in a container of its own. Default: tilavarauspalvelu-core.
+import { parseArgs } from "node:util";
+import { DEFAULT_PROJECT, detect } from "./lib.mjs";
+
+const { values } = parseArgs({ options: { project: { type: "string", default: DEFAULT_PROJECT } } });
+const env = await detect({ project: values.project });
+
+const START = 'Ask the user to start the stack with "just stack up" or "just stack up-no-gateway". Do not start it yourself.';
+const hints = {
+  direct: "Ready. The frontends send the browser to the backend directly. A gateway on localhost:8080 is not used.",
+  gateway: "Ready. NEXT_PUBLIC_LOCAL_API_URL is empty, so all goes through the gateway on localhost:8080.",
+  proxy: "Ready. The browser-proxy runs on localhost:8000.",
+  container:
+    "The stack runs in the Docker network, but nothing listens on localhost:8000. " +
+    `Start "${env.proxy}" in the background, then run browser-env again.` +
+    (env.reason === "no-frontends" ? ' The stack has no frontends. Run "pnpm dev" in frontend/ first.' : ""),
+  none: {
+    "frontend-needs-gateway":
+      "The frontends have an empty NEXT_PUBLIC_LOCAL_API_URL and need the gateway on localhost:8080, but it does not run. " +
+      'Ask the user to start the stack with "just stack up", or to set NEXT_PUBLIC_LOCAL_API_URL in apps/<app>/.env.local.',
+    incomplete: `Only a part of the stack answers. See "found". ${START}`,
+    nothing: `No setup found. ${START}`,
+  }[env.reason],
+};
+console.log(JSON.stringify({ ...env, hint: hints[env.setup] }, null, 2));
+process.exitCode = env.customer ? 0 : 1;
