@@ -24,5 +24,7 @@ describe("getPostLogoutPath", () => {
     expect(getPostLogoutPath("https://example.com/en")).toBe("/");
     expect(getPostLogoutPath("//example.com/en")).toBe("/");
     expect(getPostLogoutPath("/\\example.com")).toBe("/");
+    expect(getPostLogoutPath("/\t/example.com")).toBe("/");
+    expect(getPostLogoutPath("/\n/example.com")).toBe("/");
   });
 });
