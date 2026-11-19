@@ -32,6 +32,11 @@ function cellEndAfter(time: string): string {
   return clockOf(minutesOf(time) + CALENDAR_STEP_MINUTES);
 }
 
+/** Expected texts for a check's message, so that a passing check shows them in the report too */
+function listed(texts: ReadonlyArray<string>): string {
+  return texts.length > 0 ? texts.join("; ") : "none";
+}
+
 /**
  * Page 2 of the seasonal application: the type of the time requests, the times painted in the calendar, the form
  * that adds times, its list of the selected times, and the summary of the times under it.
@@ -101,6 +106,8 @@ export class RecurringApplicationsPage2 extends PageObject {
     await main_button.click();
     await this.page.getByRole("option", { name: name_of_the_unit, exact: true }).click();
     await this.pages.customKeywords.closeSelectListIfOpen(main_button);
+    // The button shows the picked unit, whose opening hours the calendar shows
+    await expect(main_button, "The calendar shows the unit's times").toContainText(name_of_the_unit);
   }
 
   /** Paints the times of one weekday, from `from` to `to`, in the calendar with the type selected before. */
@@ -174,9 +181,7 @@ export class RecurringApplicationsPage2 extends PageObject {
   async userChecksThePaintedTimes(weekday: string, from: string, to: string, type: string, message = "") {
     // The first cell of a time names the whole time. A message, like a too short time's, follows the type.
     const name = `${weekday}, ${from}–${to}, ${type}${message ? `, ${message}` : ""}`;
-    await expect(this.cellAt(weekday, from), `The calendar has ${weekday} ${from}–${to}, ${type}`).toHaveAccessibleName(
-      name
-    );
+    await expect(this.cellAt(weekday, from), `The calendar has ${name}`).toHaveAccessibleName(name);
   }
 
   /** Checks that the first and the last cell from `from` to `to` are free */
@@ -189,6 +194,13 @@ export class RecurringApplicationsPage2 extends PageObject {
   @step("recurring_applications_page2.User Checks The Times Are Closed")
   async userChecksTheTimesAreClosed(weekday: string, from: string, to: string) {
     await this.expectCellsToBe(weekday, from, to, RECURRING_BOOKING_UNAVAILABLE_CELL);
+    // Disabled for assistive technology too, as the grey shows on screen
+    for (const time of [from, cellStartBefore(to)]) {
+      await expect(this.cellAt(weekday, time), `${weekday} ${time} is disabled`).toHaveAttribute(
+        "aria-disabled",
+        "true"
+      );
+    }
   }
 
   /**
@@ -203,7 +215,7 @@ export class RecurringApplicationsPage2 extends PageObject {
     const items = this.form
       .getByRole("list", { name: RECURRING_BOOKING_SELECTED_TIMES, exact: true })
       .locator("li > span");
-    await expect(items, "The list has the selected times").toHaveText(shown.list);
+    await expect(items, `The list has: ${listed(shown.list)}`).toHaveText(shown.list);
     if (times.length === 0) {
       await expect(
         this.form.getByText(RECURRING_BOOKING_NO_SELECTED_TIMES, { exact: true }),
@@ -217,19 +229,19 @@ export class RecurringApplicationsPage2 extends PageObject {
     ] as const) {
       // A column is its heading and a row per weekday
       const column = summary.getByRole("heading", { name: heading, exact: true }).locator("..");
-      await expect(column.locator(":scope > div"), `The summary's ${heading} are the selected ones`).toHaveText(rows);
+      await expect(column.locator(":scope > div"), `The summary's ${heading}: ${rows.join(" | ")}`).toHaveText(rows);
     }
     // A cell with a time on it is selected, so the count covers every cell, not only the first and the last
     await expect(
       this.calendar.getByRole("gridcell", { selected: true }),
-      "The calendar has the cells of the selected times painted, and no other cells"
+      `The calendar has ${shown.cells} painted cells, those of the selected times`
     ).toHaveCount(shown.cells);
   }
 
   /** Checks the form's error, which tells why it didn't add a time */
   @step("recurring_applications_page2.User Checks The Form Error")
   async userChecksTheFormError(error: string) {
-    await expect(this.form.getByRole("alert"), "The form tells why it didn't add the time").toHaveText(error);
+    await expect(this.form.getByRole("alert"), `The form says: ${error}`).toHaveText(error);
   }
 
   @step("recurring_applications_page2.User Checks The Form Has No Error")
@@ -237,11 +249,17 @@ export class RecurringApplicationsPage2 extends PageObject {
     await expect(this.form.getByRole("alert"), "The form has no error").toBeHidden();
   }
 
-  /** Checks that page 2 can't be continued: Continue is disabled, and the notice under the summary tells why */
+  /**
+   * Checks that page 2 can't be continued: Continue is disabled, and the notice under the summary tells why and lists
+   * exactly the times it is about, written as in `recurring-times.ts`
+   */
   @step("recurring_applications_page2.User Checks Continue Is Disabled")
-  async userChecksContinueIsDisabled(error: string) {
+  async userChecksContinueIsDisabled(error: string, ...flagged_times: string[]) {
     await expect(this.continueButton, "Continue is disabled").toBeDisabled();
-    await expect(this.notice, "The notice tells why").toContainText(error);
+    await expect(this.notice, `The notice says: ${error}`).toContainText(error);
+    // The notice names the times like the list of the selected times does, without its marks
+    const flagged = selectedTimesAsShown(flagged_times).list;
+    await expect(this.notice.getByRole("listitem"), `The notice lists: ${listed(flagged)}`).toHaveText(flagged);
   }
 
   /** Checks that page 2 can be continued: Continue is enabled, and there's no notice */

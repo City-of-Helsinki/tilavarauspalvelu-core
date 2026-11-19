@@ -16,8 +16,10 @@ export class RecurringApplicationsPagePreview extends PageObject {
     const expected = sentTimesAsPreviewed(times);
     await expect(rows, "The preview page has a row of times for each weekday").toHaveCount(expected.length);
     for (const [index, row] of expected.entries()) {
-      const [day = ""] = row;
-      await expect(rows.nth(index).locator("span"), `The preview page's times on ${day}`).toHaveText(row);
+      const [day = "", ...times_of_day] = row;
+      await expect(rows.nth(index).locator("span"), `The preview page's ${day}: ${times_of_day.join(" ")}`).toHaveText(
+        row
+      );
     }
   }
 

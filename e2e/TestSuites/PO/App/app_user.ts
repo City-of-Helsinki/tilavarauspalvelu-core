@@ -1008,6 +1008,11 @@ export class AppUser extends PageObject {
       ...RECURRING_FRI_15_17,
       RECURRING_BOOKING_PRIMARY_TIME
     );
+    // The calendar names a time by its own type, not by the selected one
+    await this.pages.recurringApplicationsPage2.userChecksThePaintedTimes(
+      ...RECURRING_WED_10_12,
+      RECURRING_BOOKING_SECONDARY_TIME
+    );
     await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(
       "Ke 10:00–12:00 V",
       "Pe 15:00–17:00 E",
@@ -1035,7 +1040,10 @@ export class AppUser extends PageObject {
       "To 13:00–13:15 E (liian lyhyt)",
       ...earlier_times
     );
-    await this.pages.recurringApplicationsPage2.userChecksContinueIsDisabled(RECURRING_BOOKING_TOO_SHORT_ERROR);
+    await this.pages.recurringApplicationsPage2.userChecksContinueIsDisabled(
+      RECURRING_BOOKING_TOO_SHORT_ERROR,
+      "To 13:00–13:15 E"
+    );
     await this.pages.recurringApplicationsPage2.userRemovesTheSelectedTime(...RECURRING_THU_13_1315);
     await this.pages.recurringApplicationsPage2.userChecksTheSelectedTimes(...earlier_times);
     await this.pages.recurringApplicationsPage2.userChecksContinueIsEnabled();
