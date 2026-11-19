@@ -54,6 +54,9 @@ export const APPLICATION_FORM_FRAGMENT = gql`
       priceOption {
         id
         pk
+        nameFi
+        nameEn
+        nameSv
       }
     }
   }

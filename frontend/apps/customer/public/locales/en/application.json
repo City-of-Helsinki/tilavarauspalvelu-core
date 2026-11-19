@@ -191,6 +191,7 @@
       "numPersons": "Group size",
       "ageGroup": "Age group",
       "purpose": "Booking purpose",
+      "priceOption": "Customer group",
       "duration": "Duration",
       "period": "Period",
       "additionalInfo": "",
