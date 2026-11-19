@@ -165,6 +165,8 @@ export function InProgressReservationNotification(): React.ReactElement {
     .find((r) => r.state === ReservationStateChoice.Created);
 
   const [deleteReservation, { loading: isDeleteLoading }] = useDeleteReservationMutation();
+  // The state check runs before the delete starts, so isDeleteLoading does not cover it.
+  const [isCancelPending, setIsCancelPending] = useState(false);
 
   const lang = getLocalizationLang(i18n.language);
 
@@ -209,63 +211,68 @@ export function InProgressReservationNotification(): React.ReactElement {
     if (reservation?.pk == null) {
       return;
     }
-    // The list can be older than the reservation state, for example after the user paid in another tab.
-    // Check the current state, so that we do not send a delete that the backend refuses.
-    const stateResult = await reservationQ({
-      variables: {
-        id: createNodeId("ReservationNode", reservation.pk),
-      },
-    });
-    if (stateResult.error == null) {
-      const currentState = stateResult.data?.reservation?.state;
-      if (currentState == null) {
-        await refreshQueryCache();
-        return;
-      }
-      if (!DELETABLE_STATES.has(currentState)) {
-        Sentry.captureMessage("In-progress reservation notification showed a reservation that cannot be deleted", {
-          level: "warning",
-          extra: {
-            reservationPk: reservation.pk,
-            shownState: reservation.state,
-            currentState,
-            pathname: router.pathname,
-          },
-        });
-        errorToast({
-          text: t("notification:reservationCannotBeCancelled"),
-        });
-        await refreshQueryCache();
-        return;
-      }
-    }
-    // If we are on the page for the reservation we are deleting, we should redirect to the front page.
-    // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
+    setIsCancelPending(true);
     try {
-      const { data } = await deleteReservation({
+      // The list can be older than the reservation state, for example after the user paid in another tab.
+      // Check the current state, so that we do not send a delete that the backend refuses.
+      const stateResult = await reservationQ({
         variables: {
-          input: {
-            pk: reservation.pk.toString(),
-          },
+          id: createNodeId("ReservationNode", reservation.pk),
         },
       });
-      const deleted = data?.deleteTentativeReservation?.deleted;
-      if (deleted) {
-        successToast({
-          text: t("notification:reservationCancelledTitle"),
-        });
+      if (stateResult.error == null) {
+        const currentState = stateResult.data?.reservation?.state;
+        if (currentState == null) {
+          await refreshQueryCache();
+          return;
+        }
+        if (!DELETABLE_STATES.has(currentState)) {
+          Sentry.captureMessage("In-progress reservation notification showed a reservation that cannot be deleted", {
+            level: "warning",
+            extra: {
+              reservationPk: reservation.pk,
+              shownState: reservation.state,
+              currentState,
+              pathname: router.pathname,
+            },
+          });
+          errorToast({
+            text: t("notification:reservationCannotBeCancelled"),
+          });
+          await refreshQueryCache();
+          return;
+        }
       }
-    } catch (err) {
-      // silently ignore NOT_FOUND (just refresh query cache)
-      if (!isNotFoundError(err)) {
-        displayError(err);
+      // If we are on the page for the reservation we are deleting, we should redirect to the front page.
+      // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
+      try {
+        const { data } = await deleteReservation({
+          variables: {
+            input: {
+              pk: reservation.pk.toString(),
+            },
+          },
+        });
+        const deleted = data?.deleteTentativeReservation?.deleted;
+        if (deleted) {
+          successToast({
+            text: t("notification:reservationCancelledTitle"),
+          });
+        }
+      } catch (err) {
+        // silently ignore NOT_FOUND (just refresh query cache)
+        if (!isNotFoundError(err)) {
+          displayError(err);
+        }
+      } finally {
+        if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {
+          await router.push("/");
+        } else {
+          await refreshQueryCache();
+        }
       }
     } finally {
-      if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {
-        await router.push("/");
-      } else {
-        await refreshQueryCache();
-      }
+      setIsCancelPending(false);
     }
   };
 
@@ -297,7 +304,8 @@ export function InProgressReservationNotification(): React.ReactElement {
     await router.push(url);
   };
 
-  // We want to only show the most recent reservation one of each type
+  // We want to only show the most recent reservation one of each type.
+  // The key has the state, so that the countdown starts again when a refetch changes the state.
   const list = filterNonNullable([unpaidReservation, createdReservation]);
 
   return (
@@ -305,19 +313,19 @@ export function InProgressReservationNotification(): React.ReactElement {
       {list.map((x) =>
         x.state === ReservationStateChoice.Created ? (
           <ReservationNotification
-            key={x.pk}
+            key={`${x.pk}-${x.state}`}
             onDelete={() => handleDelete(x)}
             onNext={() => handleContinue(x)}
-            isLoading={isDeleteLoading}
+            isLoading={isDeleteLoading || isCancelPending}
             reservation={x}
           />
         ) : (
           <ReservationNotification
-            key={x.pk}
+            key={`${x.pk}-${x.state}`}
             onDelete={() => handleDelete(x)}
             onNext={() => handleCheckout(x)}
             disabled={x.paymentOrder?.checkoutUrl == null}
-            isLoading={isDeleteLoading}
+            isLoading={isDeleteLoading || isCancelPending}
             reservation={x}
           />
         )

@@ -262,6 +262,47 @@ describe("InProgressReservationNotification", () => {
     expect(mockCaptureMessage).not.toHaveBeenCalled();
   });
 
+  it("disables the buttons while it checks the reservation state before the delete", async () => {
+    mockReservations([createReservation({ pk: 7 })]);
+    let resolveStateCheck: (value: unknown) => void = () => {};
+    mockReservationQ.mockReturnValue(
+      new Promise((resolve) => {
+        resolveStateCheck = resolve;
+      })
+    );
+    render(<InProgressReservationNotification />);
+    const deleteButton = screen.getByTestId("reservation-notification__button--delete");
+
+    await userEvent.click(deleteButton);
+
+    expect(deleteButton).toBeDisabled();
+    expect(screen.getByTestId("reservation-notification__button--checkout")).toBeDisabled();
+
+    resolveStateCheck({ data: { reservation: { id: "r7", state: ReservationStateChoice.WaitingForPayment } } });
+
+    await waitFor(() => expect(deleteButton).toBeEnabled());
+    expect(mockDeleteReservation).toHaveBeenCalledTimes(1);
+  });
+
+  it("starts the countdown again when a refetch changes the reservation state", () => {
+    vi.useFakeTimers({ now: new Date("2024-01-01T10:00:00Z") });
+    mockReservations([
+      createReservation({
+        pk: 2,
+        state: ReservationStateChoice.Created,
+        draftExpiresAt: new Date("2024-01-01T10:02:00Z").toISOString(),
+        paymentOrder: null,
+      }),
+    ]);
+    const { rerender } = render(<InProgressReservationNotification />);
+    expect(screen.getByText(/"time":2/)).toBeInTheDocument();
+
+    mockReservations([createReservation({ pk: 2, state: ReservationStateChoice.WaitingForPayment })]);
+    rerender(<InProgressReservationNotification />);
+
+    expect(screen.getByText(/"time":30/)).toBeInTheDocument();
+  });
+
   it("fetches the list again after a page change", () => {
     render(<InProgressReservationNotification />);
 
