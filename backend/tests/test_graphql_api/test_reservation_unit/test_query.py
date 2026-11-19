@@ -21,7 +21,6 @@ from tests.factories import (
     EquipmentFactory,
     IntendedUseFactory,
     PaymentMerchantFactory,
-    PaymentProductFactory,
     ReservationFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
@@ -250,9 +249,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
         paymentTerms {
             termsType
         }
-        paymentProduct {
-            pk
-        }
         paymentMerchant {
             name
         }
@@ -264,7 +260,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
         service_specific_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE),
         pricing_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING),
         payment_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT),
-        payment_product=PaymentProductFactory.create(),
         payment_merchant=PaymentMerchantFactory.create(),
     )
     query = reservation_units_query(fields=fields)
@@ -294,9 +289,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
         },
         "paymentTerms": {
             "termsType": reservation_unit.payment_terms.terms_type.upper(),
-        },
-        "paymentProduct": {
-            "pk": str(reservation_unit.payment_product.pk),
         },
         "paymentMerchant": {
             "name": reservation_unit.payment_merchant.name,
@@ -673,27 +665,6 @@ def test_reservation_unit__query__payment_merchant__from_unit(graphql):
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
     assert response.node(0) == {"paymentMerchant": {"name": merchant.name}}
-
-
-def test_reservation_unit__query__payment_product(graphql):
-    merchant = PaymentMerchantFactory.create()
-    product = PaymentProductFactory.create(merchant=merchant)
-    ReservationUnitFactory.create(payment_merchant=merchant, payment_product=product)
-
-    graphql.login_with_superuser()
-    query = reservation_units_query(fields="paymentProduct { pk merchant { pk } }")
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {
-        "paymentProduct": {
-            "pk": str(product.id),
-            "merchant": {
-                "pk": str(merchant.id),
-            },
-        },
-    }
 
 
 def test_reservation_unit__query__num_active_user_reservations(graphql):

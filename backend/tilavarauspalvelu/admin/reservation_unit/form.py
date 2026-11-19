@@ -256,7 +256,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "payment_type": _("Payment type"),
             "payment_merchant": _("Payment merchant"),
             "payment_accounting": _("Payment accounting"),
-            "payment_product": _("Payment product"),
             "search_terms": _("Search terms"),
             "pindora_response": _("Pindora API response"),
         }
@@ -333,7 +332,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "rank": _("Order number to be use in api sorting."),
             "payment_merchant": _("Merchant used for payments"),
             "payment_accounting": _("Payment accounting information"),
-            "payment_product": _("Product used for payments"),
             "search_terms": _(
                 "Additional search terms that will bring up this reservation unit when making text searches "
                 "in the customer UI. These terms should be added to make sure search results using text search in "
