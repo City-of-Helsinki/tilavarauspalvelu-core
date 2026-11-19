@@ -224,7 +224,9 @@ export function QuickReservation({
         <Price data-testid="quick-reservation__price">
           {focusSlot?.isReservable && (
             <>
-              {t("common:price")}: <PriceValue>{price}</PriceValue>
+              {/* Text wrapped in an element so browser translation can't detach a bare text node React later removes */}
+              <span>{`${t("common:price")}: `}</span>
+              <PriceValue>{price}</PriceValue>
               <NoWrap>{!isFreeOfCharge && subventionSuffix}</NoWrap>
             </>
           )}

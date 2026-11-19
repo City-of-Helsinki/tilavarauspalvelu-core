@@ -89,6 +89,19 @@ describe("QuickReservation", () => {
     expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
   });
 
+  test("renders the price label in its own element, not as a bare text node", () => {
+    render(<QuickReservationWrapper focusSlot={{ isReservable: true }} />);
+
+    // Browser translation (e.g. Chrome on iOS) replaces bare text nodes, which crashes React when it removes them
+    const label = screen.getByText("common:price:");
+    expect(label.tagName).toBe("SPAN");
+    const price = screen.getByTestId("quick-reservation__price");
+    const bareText = [...price.childNodes].filter(
+      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim() !== ""
+    );
+    expect(bareText).toHaveLength(0);
+  });
+
   test("hides the submit button but keeps its place when slot is not reservable", () => {
     render(<QuickReservationWrapper focusSlot={{ isReservable: false }} showSubmit={false} />);
 

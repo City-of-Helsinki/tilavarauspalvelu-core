@@ -106,9 +106,7 @@ function TogglerLabelContent({
   return (
     <>
       <TogglerDate>{togglerLabel}</TogglerDate>
-      <div>
-        {t("common:price")}: {price}
-      </div>
+      <div>{`${t("common:price")}: ${price}`}</div>
     </>
   );
 }
@@ -195,8 +193,7 @@ export function ReservationCalendarControls({
             <PriceWrapper>
               {focusSlot.isReservable && price != null && (
                 <Price data-testid="calendar-controls__price">
-                  {t("common:price")}
-                  {": "}
+                  <span>{`${t("common:price")}: `}</span>
                   <SemiBold>{price}</SemiBold>
                 </Price>
               )}
@@ -267,7 +264,8 @@ function ControlledToggler({
         {focusSlot.isReservable ? (
           <TogglerLabelContent areControlsVisible={value} togglerLabel={togglerLabel} t={t} price={price} />
         ) : (
-          t("reservationCalendar:selectTime")
+          // Wrapped in an element so browser translation can't detach a bare text node React later removes
+          <span>{t("reservationCalendar:selectTime")}</span>
         )}
       </TogglerLabel>
       <ToggleButton
