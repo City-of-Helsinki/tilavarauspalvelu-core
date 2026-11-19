@@ -50,6 +50,9 @@ const RuntimeSchema = z.object({
   SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
   SENTRY_TRACE_PROPAGATION_TARGETS: z.string().optional(),
   SENTRY_PROJECT: z.string().optional(),
+  // Timeout in milliseconds for backend requests from the browser. The default is CLIENT_FETCH_TIMEOUT_MS.
+  // An invalid value uses the default, so it can not break the other runtime settings.
+  CLIENT_FETCH_TIMEOUT_MS: z.coerce.number().int().positive().optional().catch(undefined),
 });
 
 const RUNTIME_ENV_KEYS = RuntimeSchema.keyof().options;

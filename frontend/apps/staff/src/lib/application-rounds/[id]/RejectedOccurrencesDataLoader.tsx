@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import { getPermissionErrors } from "@ui/modules/apollo/helpers";
+import { getPermissionErrors } from "@ui/modules/apollo/errors";
 import { useQueryErrorToast } from "ui/src/hooks";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";

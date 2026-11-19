@@ -38,3 +38,28 @@ export const breakpoints = {
 export const pixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
 export const EXPECTED_TIMEZONE = "Europe/Helsinki";
+
+// The server timeouts must stay below the gateway timeout, so we can show an error page and not a 504.
+// The backend is in the same cluster, so the network adds almost no time.
+
+/// Timeout for one backend request made by the proxy middleware.
+/// The middleware runs on every page request and its queries are small, so this is short.
+export const MIDDLEWARE_FETCH_TIMEOUT_MS = 2000;
+
+/// Timeout for one query made by the Next.js server, in getServerSideProps and getInitialProps.
+export const SERVER_QUERY_TIMEOUT_MS = 10_000;
+
+/// Timeout for one mutation made by the Next.js server, in getServerSideProps.
+/// Some mutations call external services, for example the webshop (15 second timeout in the backend).
+/// After a timeout the backend can still complete the mutation, so this must be longer than those calls.
+export const SERVER_MUTATION_TIMEOUT_MS = 20_000;
+
+/// Default timeout for one backend request made by the browser.
+/// The user can have a slow connection, so this is longer than the server timeouts.
+/// Slow mutations run as background tasks that the client polls, so no request should take longer.
+/// Override it at runtime with the CLIENT_FETCH_TIMEOUT_MS environment variable.
+export const CLIENT_FETCH_TIMEOUT_MS = 30_000;
+
+/// Timeout for a file upload from the browser.
+/// The timeout includes the time to send the file, so it must be longer than CLIENT_FETCH_TIMEOUT_MS.
+export const CLIENT_UPLOAD_TIMEOUT_MS = 300_000;

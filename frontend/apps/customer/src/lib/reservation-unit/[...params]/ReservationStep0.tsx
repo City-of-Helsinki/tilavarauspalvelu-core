@@ -11,7 +11,7 @@ import { ErrorListBox } from "@ui/components/ErrorListBox";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/components/reservation-form";
 import { getExtendedGeneralFormFields } from "@ui/components/reservation-form/utils";
 import { useDisplayError } from "@ui/hooks";
-import { isNotFoundError } from "@ui/modules/apollo/helpers";
+import { isNotFoundError } from "@ui/modules/apollo/errors";
 import { transformMunicipality } from "@ui/modules/conversion";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { getReservationFormSchema } from "@ui/schemas";

@@ -3,17 +3,6 @@ import * as Sentry from "@sentry/nextjs";
 import { Roarr as log } from "roarr";
 import type { GqlQuery } from "@ui/middlewareHelpers";
 
-export class EconnRefusedError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ECONNREFUSED";
-
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, EconnRefusedError);
-    }
-  }
-}
-
 export class GraphQLFetchError extends Error {
   data: unknown;
   operation: GqlQuery;
