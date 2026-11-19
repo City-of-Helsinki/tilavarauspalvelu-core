@@ -1,6 +1,7 @@
 {
   "reservationCancelledTitle": "Your booking has been cancelled.",
   "cancelReservationButton": "Cancel booking",
+  "reservationCannotBeCancelled": "The booking cannot be cancelled. Only a preliminary booking can be cancelled.",
   "waitingForPayment": {
     "title": "Your booking is waiting for payment",
     "body": "Your booking will be cancelled automatically, if the booking won’t be paid within {{time}} minutes.",

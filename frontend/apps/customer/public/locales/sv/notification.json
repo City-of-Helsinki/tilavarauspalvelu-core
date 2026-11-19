@@ -1,6 +1,7 @@
 {
   "reservationCancelledTitle": "Din bokning har avbokats.",
   "cancelReservationButton": "Avboka bokningen",
+  "reservationCannotBeCancelled": "Bokningen kan inte avbokas. Endast en preliminär bokning kan avbokas.",
   "waitingForPayment": {
     "title": "Din bokning väntar på betalning",
     "body": "Din bokning annulleras automatiskt om betalning inte görs inom {{time}} minuter.",

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type { ParsedUrlQuery } from "node:querystring";
 import { gql, useApolloClient } from "@apollo/client";
+import * as Sentry from "@sentry/nextjs";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
@@ -25,6 +26,12 @@ import type { ReservationNotificationFragment } from "@gql/gql-types";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { getReservationInProgressPath } from "@/modules/urls";
+
+// Same as ReservationStateChoice.states_that_can_be_deleted in the backend
+const DELETABLE_STATES: ReadonlySet<ReservationStateChoice> = new Set([
+  ReservationStateChoice.Created,
+  ReservationStateChoice.WaitingForPayment,
+]);
 
 const BodyText = styled.p`
   margin: 0;
@@ -168,6 +175,23 @@ export function InProgressReservationNotification(): React.ReactElement {
 
   const displayError = useDisplayError();
 
+  // The component stays mounted between pages, so fetch the list again after each page change.
+  // Skip shallow changes, because a page can change its query string many times, for example in the calendar.
+  useEffect(() => {
+    if (currentUser?.pk == null) {
+      return;
+    }
+    const handleRouteChange = (_url: string, { shallow }: { shallow: boolean }) => {
+      if (!shallow) {
+        void refetch();
+      }
+    };
+    router.events.on("routeChangeComplete", handleRouteChange);
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [currentUser?.pk, refetch, router.events]);
+
   const client = useApolloClient();
   const refreshQueryCache = () => {
     const p1 = client.refetchQueries({
@@ -184,6 +208,36 @@ export function InProgressReservationNotification(): React.ReactElement {
     // never happens but isn't type enforced
     if (reservation?.pk == null) {
       return;
+    }
+    // The list can be older than the reservation state, for example after the user paid in another tab.
+    // Check the current state, so that we do not send a delete that the backend refuses.
+    const stateResult = await reservationQ({
+      variables: {
+        id: createNodeId("ReservationNode", reservation.pk),
+      },
+    });
+    if (stateResult.error == null) {
+      const currentState = stateResult.data?.reservation?.state;
+      if (currentState == null) {
+        await refreshQueryCache();
+        return;
+      }
+      if (!DELETABLE_STATES.has(currentState)) {
+        Sentry.captureMessage("In-progress reservation notification showed a reservation that cannot be deleted", {
+          level: "warning",
+          extra: {
+            reservationPk: reservation.pk,
+            shownState: reservation.state,
+            currentState,
+            pathname: router.pathname,
+          },
+        });
+        errorToast({
+          text: t("notification:reservationCannotBeCancelled"),
+        });
+        await refreshQueryCache();
+        return;
+      }
     }
     // If we are on the page for the reservation we are deleting, we should redirect to the front page.
     // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
