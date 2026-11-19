@@ -159,6 +159,19 @@ describe("QuickReservation", () => {
     expect(screen.getByText("Subvention")).toBeInTheDocument();
   });
 
+  test("keeps every text of the price cell inside an element", async () => {
+    customRender({ focusSlot: { isReservable: true } });
+    expect(await screen.findByText("40,00 €")).toBeInTheDocument();
+
+    // Browser translation replaces bare text nodes, and React then fails to remove them
+    const priceCell = screen.getByTestId("quick-reservation__price");
+    const bareTextList = [...priceCell.childNodes].filter(
+      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim() !== ""
+    );
+    expect(bareTextList).toHaveLength(0);
+    expect(screen.getByText("common:price:")).toBeInTheDocument();
+  });
+
   test("shows free of charge for a free time", async () => {
     customRender({ focusSlot: { isReservable: true }, mocks: [createPriceMock({ total: "0.00" })] });
 
