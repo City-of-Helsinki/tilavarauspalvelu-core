@@ -191,6 +191,7 @@
       "numPersons": "Ryhmän koko",
       "ageGroup": "Ikäryhmä",
       "purpose": "Varauksen käyttötarkoitus",
+      "priceOption": "Asiakasryhmä",
       "additionalInfo": "Lisätietoja varaukseen liittyen",
       "period": "Kausi",
       "duration": "Varauksen kesto",

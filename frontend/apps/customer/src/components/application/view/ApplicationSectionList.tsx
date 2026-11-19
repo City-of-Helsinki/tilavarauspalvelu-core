@@ -98,6 +98,11 @@ function SingleApplicationSection({
       label: t("application:preview.applicationEvent.purpose"),
       value: aes.purpose != null ? <span>{getTranslation(aes.purpose, "name", lang)}</span> : null,
     },
+    {
+      key: "priceOption",
+      label: t("application:preview.applicationEvent.priceOption"),
+      value: aes.priceOption != null ? <span>{getTranslation(aes.priceOption, "name", lang)}</span> : null,
+    },
   ];
 
   return (
