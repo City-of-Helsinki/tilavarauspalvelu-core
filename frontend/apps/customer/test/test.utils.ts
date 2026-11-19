@@ -77,6 +77,30 @@ export async function getSelectOptionLabels(
   return labels;
 }
 
+/** The options a select offers, by their labels, and whether each is disabled. */
+export async function getSelectOptions(
+  view: ReturnType<typeof render> | ReturnType<typeof within>,
+  listLabel: RegExp | string
+): Promise<Array<{ label: string; disabled: boolean }>> {
+  const user = userEvent.setup();
+  const btn = view.getByLabelText(listLabel, {
+    selector: "button",
+  });
+  await user.click(btn);
+  const openedAt = Date.now();
+  const options = within(view.getByRole("listbox"))
+    .getAllByRole("option")
+    .map((option) => ({
+      label: option.textContent ?? "",
+      disabled: option.getAttribute("aria-disabled") === "true",
+    }));
+  await waitForSelectToggleDebounce(openedAt);
+  await user.click(btn);
+  // Wait out the debounce again, so the select can be opened straight after this.
+  await waitForSelectToggleDebounce(Date.now());
+  return options;
+}
+
 export async function selectFirstOption(
   view: ReturnType<typeof render> | ReturnType<typeof within>,
   listLabel: RegExp | string
