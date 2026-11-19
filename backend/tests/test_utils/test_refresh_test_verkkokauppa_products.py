@@ -4,6 +4,7 @@ import datetime
 import io
 import uuid
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from django.core.management import CommandError, call_command
@@ -18,7 +19,12 @@ from tilavarauspalvelu.management.commands.data_creation.create_reservation_rela
 )
 from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct, ReservationUnit, Unit
 
-from tests.factories import PaymentMerchantFactory, PaymentProductFactory, ReservationUnitFactory
+from tests.factories import (
+    PaymentMerchantFactory,
+    ReservationPriceLineFactory,
+    ReservationUnitFactory,
+    SalesItemFactory,
+)
 from tests.helpers import exact, patch_method
 
 # Applied to all tests
@@ -31,6 +37,7 @@ pytestmark = [
 
 
 NEW_MERCHANT_ID = uuid.UUID("11111111-2222-3333-4444-555555555555")
+OLD_PRODUCT_ID = uuid.UUID("66666666-7777-8888-9999-000000000000")
 
 
 def run_command() -> str:
@@ -87,6 +94,16 @@ def create_test_merchant() -> PaymentMerchant:
     return PaymentMerchantFactory.create(id=TEST_PAYMENT_MERCHANT_ID, name=TEST_PAYMENT_MERCHANT_NAME)
 
 
+def create_paid_reservation_unit(**kwargs: Any) -> ReservationUnit:
+    sales_item = SalesItemFactory.create()
+    return ReservationUnitFactory.create(
+        own_price__amount=Decimal(10),
+        own_price__tax_level=sales_item.tax_level,
+        own_price__sales_item=sales_item,
+        **kwargs,
+    )
+
+
 @pytest.fixture(autouse=True)
 def dev_environment(monkeypatch, settings):
     monkeypatch.setenv("DJANGO_SETTINGS_ENVIRONMENT", "Development")
@@ -126,25 +143,32 @@ def test_refresh_test_verkkokauppa_products__no_test_merchant__refuses_to_run():
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=build_product)
 def test_refresh_test_verkkokauppa_products__merchant_exists__products_are_replaced():
     merchant = create_test_merchant()
-    old_product = PaymentProductFactory.create(merchant=merchant)
-    own_merchant = ReservationUnitFactory.create(
-        payment_merchant=merchant,
-        payment_product=old_product,
-        own_price__amount=Decimal(10),
-    )
-    unit_merchant = ReservationUnitFactory.create(
-        payment_merchant=None,
-        unit__payment_merchant=merchant,
-        own_price__amount=Decimal(10),
-    )
+    own_merchant = create_paid_reservation_unit(payment_merchant=merchant, payment_product__id=OLD_PRODUCT_ID)
+    unit_merchant = create_paid_reservation_unit(payment_merchant=None, unit__payment_merchant=merchant)
 
     output = run_command()
 
-    own_merchant = ReservationUnit.objects.get(pk=own_merchant.pk)
-    unit_merchant = ReservationUnit.objects.get(pk=unit_merchant.pk)
-    assert own_merchant.payment_product_id not in {None, old_product.pk}
-    assert unit_merchant.payment_product_id is not None
+    own_merchant_product = PaymentProduct.objects.get(reservation_unit=own_merchant)
+    assert own_merchant_product.pk != OLD_PRODUCT_ID
+    assert own_merchant_product.merchant_id == uuid.UUID(TEST_PAYMENT_MERCHANT_ID)
+    assert PaymentProduct.objects.filter(reservation_unit=unit_merchant, merchant=merchant).count() == 1
     assert output == "Refreshed the products of 2 reservation units.\n"
+
+
+@patch_method(VerkkokauppaAPIClient.get_merchant, return_value=build_merchant_info())
+@patch_method(VerkkokauppaAPIClient.create_product, side_effect=build_product)
+def test_refresh_test_verkkokauppa_products__product_has_price_lines__product_is_kept():
+    merchant = create_test_merchant()
+    reservation_unit = create_paid_reservation_unit(payment_merchant=merchant, payment_product__id=OLD_PRODUCT_ID)
+    ReservationPriceLineFactory.create(payment_product_id=OLD_PRODUCT_ID)
+
+    output = run_command()
+
+    assert list(PaymentProduct.objects.filter(reservation_unit=reservation_unit).values_list("pk", flat=True)) == [
+        OLD_PRODUCT_ID
+    ]
+    assert VerkkokauppaAPIClient.create_product.called is False
+    assert output == "Refreshed the products of 1 reservation units.\n"
 
 
 @patch_method(VerkkokauppaAPIClient.get_merchant, return_value=build_merchant_info())
@@ -152,18 +176,18 @@ def test_refresh_test_verkkokauppa_products__merchant_exists__products_are_repla
 def test_refresh_test_verkkokauppa_products__other_merchant__reservation_unit_is_not_changed():
     create_test_merchant()
     other_merchant = PaymentMerchantFactory.create(name="Pihlajasaarten testikirjasto")
-    other_product = PaymentProductFactory.create(merchant=other_merchant)
-    reservation_unit = ReservationUnitFactory.create(
+    reservation_unit = create_paid_reservation_unit(
         payment_merchant=other_merchant,
-        payment_product=other_product,
-        own_price__amount=Decimal(10),
+        payment_product__id=OLD_PRODUCT_ID,
     )
 
     output = run_command()
 
     reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
     assert reservation_unit.payment_merchant_id == other_merchant.pk
-    assert reservation_unit.payment_product_id == other_product.pk
+    assert list(PaymentProduct.objects.filter(reservation_unit=reservation_unit).values_list("pk", flat=True)) == [
+        OLD_PRODUCT_ID
+    ]
     assert output == "Refreshed the products of 0 reservation units.\n"
 
 
@@ -171,7 +195,7 @@ def test_refresh_test_verkkokauppa_products__other_merchant__reservation_unit_is
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=CreateProductError("Product creation failed"))
 def test_refresh_test_verkkokauppa_products__product_creation_fails__lists_failed_reservation_units():
     merchant = create_test_merchant()
-    reservation_unit = ReservationUnitFactory.create(payment_merchant=merchant, own_price__amount=Decimal(10))
+    reservation_unit = create_paid_reservation_unit(payment_merchant=merchant)
 
     msg = f"Could not create a product for reservation units: [{reservation_unit.pk}]"
     with pytest.raises(CommandError, match=exact(msg)):
@@ -186,23 +210,21 @@ def test_refresh_test_verkkokauppa_products__product_creation_fails__lists_faile
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=build_product)
 def test_refresh_test_verkkokauppa_products__merchant_missing_in_verkkokauppa__units_move_to_new_merchant():
     merchant = create_test_merchant()
-    old_product = PaymentProductFactory.create(merchant=merchant)
-    reservation_unit = ReservationUnitFactory.create(
+    reservation_unit = create_paid_reservation_unit(
         payment_merchant=merchant,
-        payment_product=old_product,
         unit__payment_merchant=merchant,
-        own_price__amount=Decimal(10),
+        payment_product__id=OLD_PRODUCT_ID,
     )
 
     output = run_command()
 
     reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
     unit = Unit.objects.get(pk=reservation_unit.unit_id)
-    old_product = PaymentProduct.objects.get(pk=old_product.pk)
+    product = PaymentProduct.objects.get(reservation_unit=reservation_unit)
     assert reservation_unit.payment_merchant_id == NEW_MERCHANT_ID
     assert unit.payment_merchant_id == NEW_MERCHANT_ID
-    assert old_product.merchant_id == NEW_MERCHANT_ID
-    assert reservation_unit.payment_product_id not in {None, old_product.pk}
+    assert product.pk != OLD_PRODUCT_ID
+    assert product.merchant_id == NEW_MERCHANT_ID
     assert list(PaymentMerchant.objects.values_list("pk", flat=True)) == [NEW_MERCHANT_ID]
 
     assert output == (

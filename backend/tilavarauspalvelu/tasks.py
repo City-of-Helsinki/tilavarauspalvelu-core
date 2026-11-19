@@ -57,8 +57,7 @@ __all__ = [
     "purge_image_cache_task",
     "rebuild_space_tree_hierarchy_task",
     "refresh_expired_payments_in_verkkokauppa_task",
-    "refresh_reservation_unit_accounting_task",
-    "refresh_reservation_unit_product_mapping_task",
+    "refresh_reservation_unit_payment_products_task",
     "remove_old_personal_info_view_logs_task",
     "save_personal_info_view_log_task",
     "send_application_handled_email_task",
@@ -336,41 +335,22 @@ def create_statistics_for_reservations_task(reservation_pks: list[int]) -> None:
 
 
 @app.task(
-    name="refresh_reservation_unit_product_mapping",
+    name="refresh_reservation_unit_payment_products",
     autoretry_for=(TypeError,),
     max_retries=5,
     retry_backoff=True,
 )
-def refresh_reservation_unit_product_mapping_task(reservation_unit_pk: int) -> None:
+def refresh_reservation_unit_payment_products_task(reservation_unit_pk: int) -> None:
     reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
-            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) product mapping.",
+            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) payment products.",
             details=f"Reservation unit ({reservation_unit_pk}) not found.",
             level="warning",
         )
         return
 
-    reservation_unit.actions.refresh_reservation_unit_product_mapping()
-
-
-@app.task(
-    name="refresh_reservation_unit_accounting",
-    autoretry_for=(TypeError,),
-    max_retries=5,
-    retry_backoff=True,
-)
-def refresh_reservation_unit_accounting_task(reservation_unit_pk: int) -> None:
-    reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
-    if reservation_unit is None:
-        SentryLogger.log_message(
-            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) accounting data.",
-            details=f"Reservation unit ({reservation_unit_pk}) not found.",
-            level="warning",
-        )
-        return
-
-    reservation_unit.actions.refresh_reservation_unit_accounting()
+    reservation_unit.actions.refresh_payment_products()
 
 
 @app.task(name="update_reservation_unit_image_urls")
