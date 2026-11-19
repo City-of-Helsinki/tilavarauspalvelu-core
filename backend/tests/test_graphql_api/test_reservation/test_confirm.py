@@ -690,6 +690,44 @@ def test_reservation__confirm__no_invoicing__sales_item_without_material(graphql
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__no_invoicing__one_sales_item_without_material(graphql):
+    sales_item = SalesItemFactory.create(material="12345678")
+    reservation = ReservationFactory.create_for_confirmation(
+        reservee_type=ReserveeType.COMPANY,
+        reservation_unit__payment_type=PaymentType.ONLINE_OR_INVOICE,
+        reservation_unit__own_price__tax_level=sales_item.tax_level,
+        reservation_unit__own_price__sales_item=sales_item,
+        reservation_unit__payment_accounting__product_invoicing_sales_org="2900",
+        reservation_unit__payment_accounting__product_invoicing_sales_office="2911",
+        reservation_unit__payment_accounting__product_invoicing_material="12345678",
+        reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
+    )
+    sales_item_without_material = SalesItemFactory.create(material="")
+    PaymentProductFactory.create(
+        reservation_unit=reservation.reservation_unit,
+        sales_item=sales_item_without_material,
+        merchant=reservation.reservation_unit.actions.get_merchant(),
+    )
+    ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal(10),
+        sales_item=sales_item_without_material,
+        tax_level=sales_item_without_material.tax_level,
+    )
+
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    assert [item.invoicing_date for item in order_params.items] == [None, None]
+
+
+@patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__no_invoicing__no_payment_accounting(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservee_type=ReserveeType.COMPANY,
