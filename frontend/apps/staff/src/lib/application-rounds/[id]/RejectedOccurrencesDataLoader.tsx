@@ -1,9 +1,8 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import type { ApolloError } from "@apollo/client";
 import { getPermissionErrors } from "@ui/modules/apollo/helpers";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
 import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
@@ -27,7 +26,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
     unitOptions: unitOptions,
   });
 
-  const { data, previousData, loading, fetchMore } = useRejectedOccurrencesQuery({
+  const { data, previousData, loading, fetchMore, error } = useRejectedOccurrencesQuery({
     variables: {
       first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
@@ -37,17 +36,11 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
       unitGroup: unitGroupFilter,
       reservationUnit: reservationUnitFilter,
     },
-    onError: (err: ApolloError) => {
-      const permErrors = getPermissionErrors(err);
-      if (permErrors.length > 0) {
-        errorToast({ text: t("errors:noPermission") });
-      } else {
-        errorToast({ text: t("errors:errorFetchingData") });
-      }
-    },
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
+  const hasPermissionError = getPermissionErrors(error).length > 0;
+  useQueryErrorToast(error, hasPermissionError ? t("errors:noPermission") : t("errors:errorFetchingData"));
 
   const dataToUse = data ?? previousData;
   if (loading && !dataToUse) {

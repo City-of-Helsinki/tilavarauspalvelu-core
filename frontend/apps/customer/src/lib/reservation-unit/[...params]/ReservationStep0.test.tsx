@@ -1,9 +1,9 @@
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { ReservationStateChoice, ReserveeType, UpdateReservationDocument } from "@gql/gql-types";
 import type { ReservationQuery, ReservationUpdateMutationInput } from "@gql/gql-types";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
@@ -54,7 +54,7 @@ function customRender({
   cancelReservation = vi.fn(),
 }: {
   reservation?: ReservationT;
-  mocks?: ReadonlyArray<MockedResponse>;
+  mocks?: ReadonlyArray<MockLink.MockedResponse>;
   cancelReservation?: () => void;
 } = {}): ReturnType<typeof render> {
   return render(
@@ -76,8 +76,8 @@ function createUpdateReservationMock({
   return {
     request: {
       query: UpdateReservationDocument,
+      variables: () => true,
     },
-    variableMatcher: () => true,
     result: (variables: { input: ReservationUpdateMutationInput }) => {
       onVariables?.(variables);
       if (errors) {

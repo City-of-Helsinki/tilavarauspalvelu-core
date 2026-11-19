@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import styled from "styled-components";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
@@ -43,13 +43,11 @@ const ReservationUnit = styled.div`
 function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): React.ReactElement {
   const { t } = useTranslation();
 
-  const { data, loading } = useApplicationRoundCriteriaQuery({
+  const { error, data, loading } = useApplicationRoundCriteriaQuery({
     variables: { id: createNodeId("ApplicationRoundNode", applicationRoundPk) },
     skip: !applicationRoundPk,
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
   const { applicationRound } = data ?? {};
   const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
 

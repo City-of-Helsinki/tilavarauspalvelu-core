@@ -1,6 +1,6 @@
 import React from "react";
 import type { ReactElement } from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, test, expect, beforeEach } from "vitest";

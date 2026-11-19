@@ -1,10 +1,10 @@
 import React, { createRef } from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { RequireHandlingDocument } from "@gql/gql-types";
 import { ReturnToRequiresHandlingDialog } from "./ReturnToRequiresHandlingDialog";
 
@@ -24,7 +24,7 @@ beforeEach(() => {
   mockSuccessToast.mockReset();
 });
 
-function renderDialog(mocks: ReadonlyArray<MockedResponse>, reservation: { pk: number | null } = { pk: 1 }) {
+function renderDialog(mocks: ReadonlyArray<MockLink.MockedResponse>, reservation: { pk: number | null } = { pk: 1 }) {
   const onClose = vi.fn();
   const onAccept = vi.fn();
   const focusAfterCloseRef = createRef<HTMLElement>();

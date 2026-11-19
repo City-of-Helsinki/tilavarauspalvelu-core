@@ -1,11 +1,11 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { formatDate, formatTime, fromUIDateTimeUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import {
@@ -123,7 +123,7 @@ beforeEach(() => {
   mockUseCheckCollisions.mockReturnValue({ isLoading: false, hasCollisions: false });
 });
 
-function renderModal(mocks: ReadonlyArray<MockedResponse>, onClose = vi.fn()) {
+function renderModal(mocks: ReadonlyArray<MockLink.MockedResponse>, onClose = vi.fn()) {
   const focusAfterCloseRef = { current: document.createElement("div") };
   return {
     onClose,

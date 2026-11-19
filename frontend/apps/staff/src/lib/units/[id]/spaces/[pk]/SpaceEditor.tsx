@@ -6,8 +6,8 @@ import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { errorToast, successToast } from "ui/src/components/toast";
-import { useDisplayError } from "ui/src/hooks";
+import { successToast } from "ui/src/components/toast";
+import { useDisplayError, useQueryErrorToast } from "ui/src/hooks";
 import { createNodeId } from "ui/src/modules/helpers";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "ui/src/styled";
 import { useUpdateSpaceMutation, useSpaceQuery } from "@gql/gql-types";
@@ -39,15 +39,14 @@ export function SpaceEditor({ space, unit }: Props): React.ReactElement {
   const displayError = useDisplayError();
 
   const {
+    error,
     data,
     refetch,
     loading: isQueryLoading,
   } = useSpaceQuery({
     variables: { id: createNodeId("SpaceNode", space) },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const form = useForm<SpaceUpdateForm>({
     resolver: zodResolver(SpaceUpdateSchema),

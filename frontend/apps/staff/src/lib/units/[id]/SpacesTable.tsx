@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next/pages";
@@ -59,11 +59,6 @@ export function SpacesTable({ unit, refetch }: IProps): React.ReactElement {
       const res = await deleteSpaceMutation({
         variables: { input: { pk: String(pk) } },
       });
-      if (res.errors != null && res.errors.length > 0) {
-        throw new ApolloError({
-          graphQLErrors: res.errors,
-        });
-      }
       if (res.data?.deleteSpace?.deleted) {
         setSpaceWaitingForDelete(null);
         await refetch();

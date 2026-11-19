@@ -1,5 +1,5 @@
 import React from "react";
-import { ApolloError } from "@apollo/client";
+import { CombinedGraphQLErrors } from "@apollo/client";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
@@ -44,7 +44,7 @@ vi.mock("@/hooks", () => ({ useCurrentUser: () => mockUseCurrentUser() }));
 
 vi.mock("next/router", () => ({ useRouter: () => mockUseRouter() }));
 
-vi.mock("@apollo/client", async (importOriginal) => ({
+vi.mock("@apollo/client/react", async (importOriginal) => ({
   ...(await importOriginal()),
   useApolloClient: () => mockUseApolloClient(),
 }));
@@ -170,7 +170,7 @@ describe("InProgressReservationNotification", () => {
   it("silently refreshes without an error toast when delete fails with NOT_FOUND", async () => {
     mockReservations([createReservation()]);
     mockDeleteReservation.mockRejectedValue(
-      new ApolloError({ graphQLErrors: [new GraphQLError("Boom", { extensions: { code: "NOT_FOUND" } })] })
+      new CombinedGraphQLErrors({ errors: [new GraphQLError("Boom", { extensions: { code: "NOT_FOUND" } })] })
     );
     render(<InProgressReservationNotification />);
 
@@ -182,8 +182,8 @@ describe("InProgressReservationNotification", () => {
   });
 
   it("shows a generic error via displayError when delete fails for another reason", async () => {
-    const error = new ApolloError({
-      graphQLErrors: [new GraphQLError("Boom", { extensions: { code: "GENERIC_ERROR" } })],
+    const error = new CombinedGraphQLErrors({
+      errors: [new GraphQLError("Boom", { extensions: { code: "GENERIC_ERROR" } })],
     });
     mockReservations([createReservation()]);
     mockDeleteReservation.mockRejectedValue(error);

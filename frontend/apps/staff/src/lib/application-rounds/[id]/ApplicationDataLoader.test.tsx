@@ -1,9 +1,9 @@
 import React from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { ApplicationsDocument } from "@gql/gql-types";
 import type { ApplicationsTableElementFragment } from "@gql/gql-types";
 import { ApplicationDataLoader } from "./ApplicationDataLoader";
@@ -27,15 +27,14 @@ vi.mock("ui/src/components/toast", () => ({
   errorToast: (...args: unknown[]) => mockErrorToast(...args),
 }));
 
-function listMock(totalCount: number = 0, hasNextPage = false): MockedResponse {
+function listMock(totalCount: number = 0, hasNextPage = false): MockLink.MockedResponse {
   const applications: ApplicationsTableElementFragment[] = Array.from({ length: totalCount }, (_, i) => ({
     __typename: "ApplicationNode",
     pk: 100 + i,
   })) as unknown as ApplicationsTableElementFragment[];
 
   return {
-    request: { query: ApplicationsDocument },
-    variableMatcher: () => true,
+    request: { query: ApplicationsDocument, variables: () => true },
     result: {
       data: {
         applications: {
@@ -52,15 +51,14 @@ function listMock(totalCount: number = 0, hasNextPage = false): MockedResponse {
   };
 }
 
-function errorMock(): MockedResponse {
+function errorMock(): MockLink.MockedResponse {
   return {
-    request: { query: ApplicationsDocument },
-    variableMatcher: () => true,
+    request: { query: ApplicationsDocument, variables: () => true },
     result: { errors: [new GraphQLError("Error")] },
   };
 }
 
-function renderLoader(mocks: MockedResponse[]) {
+function renderLoader(mocks: MockLink.MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks}>
       <ApplicationDataLoader applicationRoundPk={1} />

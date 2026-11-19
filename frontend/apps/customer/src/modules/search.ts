@@ -201,7 +201,7 @@ function getUnitsOrderBy(lang: LocalizationLanguages) {
 }
 
 export async function getSearchOptions(
-  apolloClient: ApolloClient<unknown>,
+  apolloClient: ApolloClient,
   page: "seasonal" | "direct",
   locale: string
 ): Promise<OptionsListT> {
@@ -227,7 +227,7 @@ export async function getSearchOptions(
 
   const equipments = filterNonNullable(optionsData?.equipmentsAll).map((n) => translateOption(n, lang));
   const units = filterNonNullable(optionsData?.unitsAll).map((n) => translateOption(n, lang));
-  const ageGroupNodes = filterNonNullable(optionsData.ageGroups?.edges?.map((edge) => edge?.node));
+  const ageGroupNodes = filterNonNullable(optionsData?.ageGroups?.edges?.map((edge) => edge?.node));
   const ageGroups = sortAgeGroups(ageGroupNodes).map((n) => ({
     value: n.pk ?? 0,
     label: `${n.minimum} - ${n.maximum ?? ""}`,

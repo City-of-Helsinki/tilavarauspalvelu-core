@@ -48,7 +48,7 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
     query: SeriesReservationUnitDocument,
     variables: { id: createNodeId("UnitNode", unitPk) },
   });
-  const reservationUnits = unitData.data.unit?.reservationUnits ?? [];
+  const reservationUnits = unitData.data?.unit?.reservationUnits ?? [];
   return {
     props: {
       unitPk,

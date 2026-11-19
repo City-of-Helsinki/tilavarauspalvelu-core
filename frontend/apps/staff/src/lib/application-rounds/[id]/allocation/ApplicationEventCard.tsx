@@ -4,14 +4,13 @@ import { IconAngleDown, IconAngleUp, IconLinkExternal, IconSize, RadioButton } f
 import { useTranslation } from "next-i18next/pages";
 import Link from "next/link";
 import styled, { css } from "styled-components";
-import type { ApolloQueryResult } from "@apollo/client";
 import { PopupMenu } from "ui/src/components/PopupMenu";
 import { useDisplayError } from "ui/src/hooks";
 import { convertWeekday } from "ui/src/modules/conversion";
 import { filterNonNullable, truncate } from "ui/src/modules/helpers";
 import { fontMedium, SemiBold } from "ui/src/styled";
 import { useRejectRestMutation } from "@gql/gql-types";
-import type { ApplicationSectionAllocationsQuery, Maybe, ReservationUnitNode } from "@gql/gql-types";
+import type { Maybe, ReservationUnitNode } from "@gql/gql-types";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/modules/const";
 import { formatAgeGroup, getApplicantName } from "@/modules/helpers";
 import { getApplicationUrl } from "@/modules/urls";
@@ -27,7 +26,7 @@ type Props = {
   applicationSection: SectionNodeT;
   reservationUnit: ReservationUnitT;
   type: AllocationApplicationSectionCardType;
-  refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
+  refetch: () => Promise<unknown>;
 };
 
 const borderCss = css<{ $type: AllocationApplicationSectionCardType }>`
@@ -239,7 +238,7 @@ function SchedulesList({
   currentReservationUnit: ReservationUnitT;
   section: SectionNodeT;
   eventsPerWeek: number;
-  refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
+  refetch: () => Promise<unknown>;
 }): React.ReactElement {
   const { t } = useTranslation();
 

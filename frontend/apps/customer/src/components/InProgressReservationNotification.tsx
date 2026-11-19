@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type { ParsedUrlQuery } from "node:querystring";
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client/react";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next/pages";

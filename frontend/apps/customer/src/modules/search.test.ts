@@ -206,10 +206,10 @@ describe("getSearchOptions", () => {
     const query = vi.fn().mockResolvedValue({ data });
     const client = {
       query,
-    } satisfies Pick<ApolloClient<unknown>, "query">;
+    } satisfies Pick<ApolloClient, "query">;
 
     return {
-      apolloClient: client as unknown as ApolloClient<unknown>,
+      apolloClient: client as unknown as ApolloClient,
       query,
     };
   }

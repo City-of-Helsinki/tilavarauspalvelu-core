@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
-import { errorToast } from "ui/src/components/toast";
+import { useQueryErrorToast } from "ui/src/hooks";
 import { filterEmptyArray, filterNonNullable, mapParamToInteger } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
 import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
@@ -31,18 +31,16 @@ export function UnitsDataLoader({ isMyUnits }: Props): React.ReactElement {
   const unitGroupFilter = filterEmptyArray(mapParamToInteger(searchParams.getAll("unitGroup"), 1));
   const nameFilter = searchParams.get("search") ?? undefined;
 
-  const { fetchMore, loading, data, previousData } = useUnitListQuery({
+  const { error, fetchMore, loading, data, previousData } = useUnitListQuery({
     variables: {
       orderBy,
       first: LARGE_LIST_PAGE_SIZE,
       nameFi: nameFilter,
       unitGroup: unitGroupFilter,
     },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
     fetchPolicy: "cache-and-network",
   });
+  useQueryErrorToast(error, t("errors:errorFetchingData"));
 
   const { units } = data ?? previousData ?? {};
   const unitsArr = filterNonNullable(units?.edges?.map((e) => e?.node));

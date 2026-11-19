@@ -59,17 +59,11 @@ export function ApplicationCard({ application, actionCallback }: Props): React.R
 
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
 
-  const [mutation, { loading: isLoading }] = useCancelApplicationMutation({
-    variables: {
-      input: {
-        pk: application.pk ?? 0,
-      },
-    },
-  });
+  const [mutation, { loading: isLoading }] = useCancelApplicationMutation();
 
   const cancel = async () => {
     try {
-      await mutation();
+      await mutation({ variables: { input: { pk: application.pk ?? 0 } } });
       setIsWaitingForDelete(false);
       await actionCallback("cancel");
     } catch {

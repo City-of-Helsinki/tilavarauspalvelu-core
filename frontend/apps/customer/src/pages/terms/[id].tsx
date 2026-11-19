@@ -24,7 +24,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       pk: genericTermsId ?? "",
     },
   });
-  const genericTerms = data.termsOfUse?.edges?.map((n) => n?.node).find(() => true) ?? null;
+  const genericTerms = data?.termsOfUse?.edges?.map((n) => n?.node).find(() => true) ?? null;
 
   if (genericTerms == null) {
     return {

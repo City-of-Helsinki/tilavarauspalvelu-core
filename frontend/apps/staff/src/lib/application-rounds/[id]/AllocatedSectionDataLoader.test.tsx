@@ -1,9 +1,9 @@
 import React from "react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider } from "@apollo/client/testing/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockedResponse } from "@apollo/client/testing";
+import type { MockLink } from "@apollo/client/testing";
 import { AllocatedTimeSlotsDocument } from "@gql/gql-types";
 import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 import { TimeSlotDataLoader } from "./AllocatedSectionDataLoader";
@@ -31,15 +31,14 @@ vi.mock("@ui/modules/apollo/helpers", () => ({
   getPermissionErrors: () => [],
 }));
 
-function listMock(totalCount: number = 0, hasNextPage = false): MockedResponse {
+function listMock(totalCount: number = 0, hasNextPage = false): MockLink.MockedResponse {
   const allocatedTimeSlots: AllocatedSectionsTableElementFragment[] = Array.from({ length: totalCount }, (_, i) => ({
     __typename: "AllocatedTimeSlotNode",
     pk: i + 1,
   })) as unknown as AllocatedSectionsTableElementFragment[];
 
   return {
-    request: { query: AllocatedTimeSlotsDocument },
-    variableMatcher: () => true,
+    request: { query: AllocatedTimeSlotsDocument, variables: () => true },
     result: {
       data: {
         allocatedTimeSlots: {
@@ -56,15 +55,14 @@ function listMock(totalCount: number = 0, hasNextPage = false): MockedResponse {
   };
 }
 
-function errorMock(): MockedResponse {
+function errorMock(): MockLink.MockedResponse {
   return {
-    request: { query: AllocatedTimeSlotsDocument },
-    variableMatcher: () => true,
+    request: { query: AllocatedTimeSlotsDocument, variables: () => true },
     result: { errors: [new GraphQLError("Error")] },
   };
 }
 
-function renderLoader(mocks: MockedResponse[]) {
+function renderLoader(mocks: MockLink.MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks}>
       <TimeSlotDataLoader applicationRoundPk={1} unitOptions={[]} />
