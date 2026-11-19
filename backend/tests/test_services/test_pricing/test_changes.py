@@ -11,7 +11,7 @@ from rest_framework.exceptions import ErrorDetail, ValidationError
 from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import PriceComponent
 from tilavarauspalvelu.services.pricing.changes import save_price_component_changes
-from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
+from tilavarauspalvelu.tasks import refresh_reservation_unit_payment_products_task
 from tilavarauspalvelu.typing import error_codes
 
 from tests.factories import (
@@ -134,7 +134,7 @@ def test_save_price_component_changes__sends_accounting_of_reservation_units_onc
     tax_level = TaxLevelFactory.create()
     new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=tax_level, valid_from=MAR_1)
 
-    with patch.object(refresh_reservation_unit_accounting_task, "delay_on_commit") as mock:
+    with patch.object(refresh_reservation_unit_payment_products_task, "delay_on_commit") as mock:
         save_price_component_changes(pricing_group=pricing_group, components=[active, new], deleted_component_pks=[])
 
     assert [call.args for call in mock.call_args_list] == [(reservation_unit.pk,)]

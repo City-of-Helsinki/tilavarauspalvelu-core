@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from tilavarauspalvelu.tasks import refresh_reservation_unit_product_mapping_task
+from tilavarauspalvelu.tasks import refresh_reservation_unit_payment_products_task
 
 from tests.factories import PaymentMerchantFactory, ReservationUnitFactory, UnitFactory
 
@@ -23,9 +23,9 @@ pytestmark = [
 
 
 @contextmanager
-def mock_refresh_reservation_unit_product_mapping_task() -> Generator[NonCallableMock]:
+def mock_refresh_reservation_unit_payment_products_task() -> Generator[NonCallableMock]:
     path = "tilavarauspalvelu.tasks."
-    path += refresh_reservation_unit_product_mapping_task.__name__
+    path += refresh_reservation_unit_payment_products_task.__name__
     path += ".delay"
 
     with patch(path) as mock:
@@ -46,7 +46,7 @@ def test_unit__save__payment_merchant_changed__refreshes_reservation_units_witho
     unit.payment_merchant = PaymentMerchantFactory.create()
 
     with (
-        mock_refresh_reservation_unit_product_mapping_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         unit.save()
@@ -65,7 +65,7 @@ def test_unit__save__payment_merchant_not_changed__does_not_refresh_reservation_
     unit.name = "New name"
 
     with (
-        mock_refresh_reservation_unit_product_mapping_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         unit.save()
@@ -83,7 +83,7 @@ def test_unit__save__product_mapping_updates_turned_off__does_not_refresh_reserv
     unit.payment_merchant = PaymentMerchantFactory.create()
 
     with (
-        mock_refresh_reservation_unit_product_mapping_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         unit.save()

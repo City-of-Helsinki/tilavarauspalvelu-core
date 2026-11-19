@@ -49,4 +49,4 @@ class PricingGroupAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslationAdmin):
     def save_related(self, request: HttpRequest, form: ModelForm, formsets: Any, change: bool) -> None:  # noqa: FBT001
         super().save_related(request, form, formsets, change)
         # The inlines save the components without 'save_price_component_changes'.
-        form.instance.actions.refresh_reservation_unit_accounting()
+        form.instance.actions.refresh_reservation_unit_payment_products()
