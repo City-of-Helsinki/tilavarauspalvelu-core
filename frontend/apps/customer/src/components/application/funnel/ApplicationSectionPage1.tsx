@@ -8,7 +8,7 @@ import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, formatDateRange, parseApiDate } from "ui/src/modules/date-utils";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
-import type { OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT, OptionT } from "ui/src/modules/search";
 import { AutoGrid, Flex, H4 } from "ui/src/styled";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { Accordion } from "@/components/Accordion";
@@ -21,10 +21,17 @@ type Props = Readonly<{
   index: number;
   applicationRound: ApplicationRoundForApplicationFragment;
   options: Readonly<OptionsListT>;
+  priceOptions: Readonly<OptionT[]>;
   onDeleteEvent: () => void;
 }>;
 
-function ApplicationSectionInner({ index, applicationRound, options, onDeleteEvent }: Props): React.ReactElement {
+function ApplicationSectionInner({
+  index,
+  applicationRound,
+  options,
+  priceOptions,
+  onDeleteEvent,
+}: Props): React.ReactElement {
   const { t, i18n } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
   const {
@@ -70,7 +77,8 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
     | "maxDuration"
     | "name"
     | "appliedReservationsPerWeek"
-    | "reservationUnits";
+    | "reservationUnits"
+    | "priceOption";
   const getTranslatedError = (field: FieldName): string | undefined => {
     const error = errors.applicationSections?.[index]?.[field];
     if (error?.message != null) {
@@ -130,6 +138,16 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
           required
           error={getTranslatedError("purpose")}
         />
+        {priceOptions.length > 0 && (
+          <ControlledSelect
+            control={control}
+            options={priceOptions}
+            name={`applicationSections.${index}.priceOption`}
+            label={t("application:Page1.priceOption")}
+            required
+            error={getTranslatedError("priceOption")}
+          />
+        )}
       </AutoGrid>
       <H4 as="h3"> {t("application:Page1.spacesSubHeading")}</H4>
       <ReservationUnitList
