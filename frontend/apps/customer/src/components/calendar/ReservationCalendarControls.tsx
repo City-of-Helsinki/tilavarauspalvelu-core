@@ -112,7 +112,9 @@ function TogglerLabelContent({
       <TogglerDate>{togglerLabel}</TogglerDate>
       {(price != null || isPriceLoading) && (
         <div>
-          {t("common:price")}: <LoadingPrice price={price} isLoading={isPriceLoading} />
+          {/* Browser translation replaces bare text nodes, and React then fails to remove them */}
+          <span>{t("common:price")}: </span>
+          <LoadingPrice price={price} isLoading={isPriceLoading} />
         </div>
       )}
     </>
@@ -209,8 +211,7 @@ export function ReservationCalendarControls({
             <PriceWrapper>
               {focusSlot.isReservable && (price != null || isPriceLoading) && (
                 <Price data-testid="calendar-controls__price">
-                  {t("common:price")}
-                  {": "}
+                  <span>{t("common:price")}: </span>
                   <SemiBold>
                     <LoadingPrice price={price} isLoading={isPriceLoading} />
                   </SemiBold>
@@ -291,7 +292,7 @@ function ControlledToggler({
             isPriceLoading={isPriceLoading}
           />
         ) : (
-          t("reservationCalendar:selectTime")
+          <span>{t("reservationCalendar:selectTime")}</span>
         )}
       </TogglerLabel>
       <ToggleButton
