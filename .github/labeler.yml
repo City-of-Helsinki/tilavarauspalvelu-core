@@ -1,10 +1,17 @@
 # Configuration for actions/labeler: https://github.com/actions/labeler
 # Branch rules accept an optional Jira ticket prefix, e.g. "TILA-1234/fix-..." or "fix/...".
 
+# Frontend and e2e PRs often change the frontend query tests and the test data.
+# These changes do not need a backend review, so they do not add the backend label.
 backend:
   - changed-files:
-      - any-glob-to-any-file:
+      - all-globs-to-any-file:
           - "backend/**"
+          - "!backend/tests/test_frontend_queries/**"
+          - "!backend/tests/test_rest_api/test_create_robot_test_data.py"
+          - "!backend/tilavarauspalvelu/management/commands/data_creation/**"
+          - "!backend/tilavarauspalvelu/management/commands/create_test_data.py"
+          - "!backend/tilavarauspalvelu/management/commands/create_robot_test_data.py"
 
 frontend:
   - changed-files:
