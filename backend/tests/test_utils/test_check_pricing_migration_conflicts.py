@@ -93,6 +93,26 @@ def test_check_pricing_migration_conflicts__skips_reservation_unit_with_pricing_
     assert run_command() == "No conflicts. The pricing migrations can run.\n"
 
 
+def test_check_pricing_migration_conflicts__skips_sales_items_of_archived_reservation_unit():
+    general = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
+    reduced = TaxLevelFactory.create(rates__percentage=Decimal("13.5"))
+    accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116")
+    reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
+    create_pricing(reservation_unit=reservation_unit, tax_level=general, begins=local_date())
+
+    archived_with_other_tax_level = ReservationUnitFactory.create(payment_accounting=accounting, is_archived=True)
+    create_pricing(reservation_unit=archived_with_other_tax_level, tax_level=reduced, begins=local_date())
+
+    archived_without_accounting = ReservationUnitFactory.create(
+        payment_accounting=None,
+        unit__payment_accounting=None,
+        is_archived=True,
+    )
+    create_pricing(reservation_unit=archived_without_accounting, tax_level=general, begins=local_date())
+
+    assert run_command() == "No conflicts. The pricing migrations can run.\n"
+
+
 # ── Conflicts ──
 
 

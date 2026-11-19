@@ -86,6 +86,10 @@ def _pricing_group_errors() -> list[str]:
             )
             continue
 
+        # Archived reservation units are hidden and cannot be reserved, so their prices need no sales item.
+        if reservation_unit.is_archived:
+            continue
+
         accounting: PaymentAccounting | None = reservation_unit.payment_accounting
         if accounting is None and reservation_unit.unit is not None:
             accounting = reservation_unit.unit.payment_accounting
