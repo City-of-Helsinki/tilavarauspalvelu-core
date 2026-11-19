@@ -136,6 +136,86 @@ oc-logs app env: (oc-select env)
 
     oc logs -l deploymentconfig="${deploymentconfig}" --prefix --tail=100 -f
 
+# Run a command in a running pod of an app for an env. Without a command, open bash.
+[positional-arguments]
+oc-exec app env *command: (oc-select env)
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    deploymentconfig=$(just --justfile "{{ source_file() }}" _oc-deploymentconfig "{{ app }}")
+
+    # Take the first pod in bash. 'head' would close the pipe early and fail the script with SIGPIPE.
+    pods=$(oc get pods -l deploymentconfig="${deploymentconfig}" --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
+    pod="${pods%% *}"
+    if [ -z "${pod}" ]; then
+        echo "No running pod for '{{ app }}' in '{{ env }}'." >&2
+        exit 1
+    fi
+    echo "Using pod ${pod}" >&2
+
+    # The first two arguments are the app and the env. The rest is the command.
+    shift 2
+    if [ "$#" -eq 0 ]; then
+        set -- bash
+    fi
+
+    oc exec -it "${pod}" -- "$@"
+
+# Run a local Python file with "manage.py shell" in a running core pod for an env, and copy back the results
+oc-run-script env script dest="/tmp": (oc-select env)
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # The printed output goes to "output.txt", next to the files that the script writes to the directory
+    # in the SCRIPT_OUTPUT_DIR environment variable. Both go to a new directory under "dest".
+    # The log lines start with "==>", so they stand out from the output of the script.
+    log() { echo "==> $*" >&2; }
+
+    if [ ! -f "{{ script }}" ]; then
+        echo "No file '{{ script }}'." >&2
+        exit 1
+    fi
+
+    deploymentconfig=$(just --justfile "{{ source_file() }}" _oc-deploymentconfig core)
+
+    # Take the first pod in bash. 'head' would close the pipe early and fail the script with SIGPIPE.
+    pods=$(oc get pods -l deploymentconfig="${deploymentconfig}" --field-selector=status.phase=Running -o jsonpath='{.items[*].metadata.name}')
+    pod="${pods%% *}"
+    if [ -z "${pod}" ]; then
+        echo "No running pod for 'core' in '{{ env }}'." >&2
+        exit 1
+    fi
+    log "Using pod ${pod}"
+
+    name="$(basename "{{ script }}" .py)-$(date +%Y%m%d-%H%M%S)"
+    remote_dir="/tmp/${name}"
+    local_dir="{{ dest }}/${name}"
+    mkdir -p "${local_dir}"
+
+    # The output can have personal data, so do not leave it in the pod.
+    trap 'log "Removing ${remote_dir} from the pod"; oc exec "${pod}" -- rm -rf "${remote_dir}"' EXIT
+
+    log "Copying {{ script }} to ${pod}:${remote_dir}/script.py"
+    oc exec "${pod}" -- mkdir -p "${remote_dir}/output"
+    oc cp "{{ script }}" "${pod}:${remote_dir}/script.py"
+
+    # Keep going after a failed script, so that its output and partial files are copied back.
+    log "Running the script with 'python manage.py shell'. Output follows."
+    started=${SECONDS}
+    status=0
+    oc exec "${pod}" -- env SCRIPT_OUTPUT_DIR="${remote_dir}/output" \
+        bash -c 'python manage.py shell < "$0"' "${remote_dir}/script.py" 2>&1 \
+        | tee "${local_dir}/output.txt" || status=$?
+    log "The script finished in $((SECONDS - started)) s with exit code ${status}"
+
+    log "Copying the results to ${local_dir}"
+    oc rsync --quiet "${pod}:${remote_dir}/output/" "${local_dir}"
+    for file in "${local_dir}"/*; do
+        log "  $(basename "${file}")"
+    done
+
+    exit "${status}"
+
 # Copy a directory from a running pod of an app to a local directory for an env
 oc-copy-from app env path dest=".": (oc-select env)
     #!/usr/bin/env bash
