@@ -49,7 +49,7 @@ requests = "2.34.2"
 sentry-sdk = "2.75.0"
 social-auth-app-django = "5.7.0"
 social-auth-core = "4.8.5"
-stamina = "26.1.0"
+stamina = "26.2.0"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
 uWSGI = { version = "2.0.31", markers = "sys_platform != 'win32'" }
 whitenoise = "6.12.0"
