@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
+import uuid
 from collections import defaultdict
 from decimal import Decimal
 from typing import TYPE_CHECKING, NamedTuple
@@ -14,6 +15,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.models import (
+    PaymentProduct,
     PriceComponent,
     PriceOption,
     PricingGroup,
@@ -119,6 +121,53 @@ def create_own_prices(prices: list[OwnPrice]) -> None:
 
     ReservationUnitPricingGroup.objects.bulk_create(reservation_unit_pricing_groups)
     PriceComponent.objects.bulk_create(components)
+
+
+def create_payment_product(*, reservation_unit: ReservationUnit, product_id: str) -> None:
+    """
+    Make the verkkokauppa product of the reservation unit with the given id, for the sales item of its pricing.
+    The id is of a product in the test verkkokauppa. The pricing must be saved first.
+    """
+    component = PriceComponent.objects.filter(
+        pricing_group__reservation_unit_pricing_groups__reservation_unit=reservation_unit,
+        sales_item__isnull=False,
+    ).first()
+
+    PaymentProduct.objects.update_or_create(
+        id=product_id,
+        defaults={
+            "merchant": reservation_unit.actions.get_merchant(),
+            "reservation_unit": reservation_unit,
+            "sales_item": component.sales_item if component is not None else None,
+        },
+    )
+
+
+def create_payment_products(*, reservation_units: list[ReservationUnit]) -> None:
+    """
+    Make a made-up verkkokauppa product for each sales item in the pricing of each reservation unit.
+    The pricings must be saved first.
+    """
+    merchants = {reservation_unit.pk: reservation_unit.actions.get_merchant() for reservation_unit in reservation_units}
+
+    pairs = (
+        ReservationUnitPricingGroup.objects
+        .filter(reservation_unit__in=reservation_units, pricing_group__components__sales_item__isnull=False)
+        .values_list("reservation_unit_id", "pricing_group__components__sales_item_id")
+        .distinct()
+    )
+
+    products = [
+        PaymentProduct(
+            id=uuid.uuid4(),
+            merchant=merchants[reservation_unit_pk],
+            reservation_unit_id=reservation_unit_pk,
+            sales_item_id=sales_item_pk,
+        )
+        for reservation_unit_pk, sales_item_pk in pairs
+        if merchants[reservation_unit_pk] is not None
+    ]
+    PaymentProduct.objects.bulk_create(products)
 
 
 @with_logs

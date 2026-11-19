@@ -22,7 +22,6 @@ from tests.factories import (
     EquipmentFactory,
     OriginHaukiResourceFactory,
     PaymentAccountingFactory,
-    PaymentProductFactory,
     ReservableTimeSpanFactory,
     ReservationUnitAccessTypeFactory,
     ReservationUnitCancellationRuleFactory,
@@ -33,7 +32,7 @@ from tests.factories import (
     UnitFactory,
 )
 
-from .create_pricing_groups import OwnPrice, create_own_prices
+from .create_pricing_groups import OwnPrice, create_own_prices, create_payment_product
 from .create_reservation_related_things import _fetch_and_build_reservation_unit_image
 from .utils import SetName, with_logs
 
@@ -684,10 +683,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: 
         payment_merchant=payment_merchant,
         payment_accounting=payment_accounting_library_pih,
         origin_hauki_resource=aina_kasiteltava_kellarikerros_hauki,
-        payment_product=PaymentProductFactory.create(
-            id="31382206-6783-3868-aa1b-85545823edd8",
-            merchant=payment_merchant,
-        ),
     )
     aina_kasiteltava_kellarikerros.spaces.add(
         SpaceFactory.create(
@@ -720,6 +715,9 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: 
             tax_level=tax_levels["general"],
         )
     ])
+    create_payment_product(
+        reservation_unit=aina_kasiteltava_kellarikerros, product_id="31382206-6783-3868-aa1b-85545823edd8"
+    )
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_kasiteltava_kellarikerros,
         access_type=AccessType.UNRESTRICTED,
@@ -911,10 +909,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: 
         payment_merchant=payment_merchant,
         payment_accounting=payment_accounting_library_ita,
         origin_hauki_resource=aina_maksullinen_aitio_hauki,
-        payment_product=PaymentProductFactory.create(
-            id="2d01d6ec-a235-32cd-91a5-850d6f22c821",
-            merchant=payment_merchant,
-        ),
     )
     aina_maksullinen_aitio.spaces.add(
         SpaceFactory.create(
@@ -942,6 +936,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: 
             tax_level=tax_levels["general"],
         )
     ])
+    create_payment_product(reservation_unit=aina_maksullinen_aitio, product_id="2d01d6ec-a235-32cd-91a5-850d6f22c821")
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=aina_maksullinen_aitio,
         access_type=AccessType.UNRESTRICTED,
@@ -1021,10 +1016,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: 
         payment_merchant=payment_merchant,
         payment_accounting=payment_accounting_library_pih,
         origin_hauki_resource=alennuskelpoinen_aula_hauki,
-        payment_product=PaymentProductFactory.create(
-            id="e32855cc-13a8-32a9-8e80-8f67b8286698",
-            merchant=payment_merchant,
-        ),
     )
     alennuskelpoinen_aula.spaces.add(
         SpaceFactory.create(
@@ -1054,6 +1045,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: 
             tax_level=tax_levels["general"],
         )
     ])
+    create_payment_product(reservation_unit=alennuskelpoinen_aula, product_id="e32855cc-13a8-32a9-8e80-8f67b8286698")
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=alennuskelpoinen_aula,
         access_type=AccessType.UNRESTRICTED,
@@ -1203,10 +1195,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: 
         reservation_form=SetName.set_3.reservation_form,
         payment_merchant=payment_merchant,
         origin_hauki_resource=perumiskelvoton_patio_hauki,
-        payment_product=PaymentProductFactory.create(
-            id="459a183b-a55d-39f3-80d0-23f3e458b93d",
-            merchant=payment_merchant,
-        ),
     )
     perumiskelvoton_patio.spaces.add(
         SpaceFactory.create(
@@ -1239,6 +1227,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: 
             tax_level=tax_levels["general"],
         )
     ])
+    create_payment_product(reservation_unit=perumiskelvoton_patio, product_id="459a183b-a55d-39f3-80d0-23f3e458b93d")
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=perumiskelvoton_patio,
         access_type=AccessType.UNRESTRICTED,

@@ -21,7 +21,6 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
 )
 from tilavarauspalvelu.models import (
-    PaymentProduct,
     ReservationUnit,
     ReservationUnitAccessType,
     ReservationUnitImage,
@@ -33,7 +32,6 @@ from tilavarauspalvelu.tasks import update_reservation_unit_image_urls_task
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
-    PaymentProductFactory,
     ReservationUnitAccessTypeFactory,
     ReservationUnitTypeFactory,
     ResourceFactory,
@@ -43,7 +41,7 @@ from tests.factories import (
 from tests.factories.reservation_unit import ReservationUnitBuilder
 from tests.factories.reservation_unit_access_type import ReservationUnitAccessTypeBuilder
 
-from .create_pricing_groups import OwnPrice, create_own_prices
+from .create_pricing_groups import OwnPrice, create_own_prices, create_payment_products
 from .create_reservation_related_things import (
     _create_equipments,
     _create_intended_uses,
@@ -532,7 +530,6 @@ def _create_paid_reservation_units(
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[OwnPrice] = []
     reservation_unit_access_types: list[ReservationUnitAccessType] = []
-    payment_products: list[PaymentProduct] = []
     images: list[ReservationUnitImage] = []
 
     unit_counter = itertools.count(start=1)
@@ -589,9 +586,6 @@ def _create_paid_reservation_units(
         )
         spaces.append(space)
 
-        payment_product = PaymentProductFactory.build(merchant=payment_merchant)
-        payment_products.append(payment_product)
-
         reservation_unit = (
             ReservationUnitBuilder()
             .set(
@@ -600,7 +594,6 @@ def _create_paid_reservation_units(
                 name_en=f"Paid toilet #{number}",
                 name_sv=f"Betalad toalett #{number}",
                 unit=unit,
-                payment_product=payment_product,
                 payment_merchant=payment_merchant,
                 payment_accounting=accounting,
                 origin_hauki_resource=random.choice(hauki_resources),
@@ -685,11 +678,11 @@ def _create_paid_reservation_units(
 
     Unit.objects.bulk_create(units)
     Space.objects.bulk_create(spaces)
-    PaymentProduct.objects.bulk_create(payment_products)
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     create_own_prices(pricings)
     ReservationUnitAccessType.objects.bulk_create(reservation_unit_access_types)
+    create_payment_products(reservation_units=reservation_units)
     ReservationUnitImage.objects.bulk_create(images)
 
 
