@@ -133,7 +133,7 @@ read_detail() {
         headSha: $pr.headRefOid,
         baseRef: $pr.baseRefName,
         baseSha: $pr.baseRef.target.oid,
-        checks: [($pr.commits.nodes[0].commit.statusCheckRollup.contexts.nodes // [])[]
+        checks: ([($pr.commits.nodes[0].commit.statusCheckRollup.contexts.nodes // [])[]
           | if .__typename == "CheckRun" then {
               name,
               url: .detailsUrl,
@@ -151,6 +151,10 @@ read_detail() {
                 elif .state | IN("FAILURE", "ERROR") then "failed"
                 else "passed" end)
             } end]
+          # GitHub can start a workflow twice for one push, and concurrency then cancels the first run.
+          # A cancelled check is left out when another check with the same name was not cancelled.
+          | (map(select(.result != "CANCELLED") | .name)) as $kept
+          | map(select(.result != "CANCELLED" or (.name | IN($kept[]) | not))))
       }' <<< "$raw")"
   # GraphQL can compare only with a ref that is known before the query, so ask REST.
   # A failed compare gives null. The watch then keeps what it knew and reads again on the next pass.
