@@ -26,6 +26,7 @@
     "Too big. expected string to have <=80 characters": "Maximum of 80 characters",
     "Too big. expected string to have <=32 characters": "Maximum of 32 characters",
     "calendar": {
+      "summaryTitle": "Fix the selected times of your requests before continuing",
       "title": "Your selected time slots do not correspond to the duration of your booking",
       "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
       "At least as many suitable time ranges as applied reservations per week": "Bookings per week applied for: {{applied}}. Bookings that fit your selected time slots: {{fitting}}. Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
