@@ -177,8 +177,8 @@ async function sweepDown(
   await user.keyboard(`{Shift>}${"{ArrowDown}".repeat(steps)}{/Shift}`);
 }
 
-// The error's title, its message, and the label of its list of too short times.
-const ERROR_TEXTS = 3;
+// The error summary's title, and the section's error title, message, and the label of its list of too short times.
+const ERROR_TEXTS = 4;
 
 // errors require form context so have to test on this level
 describe("Application page2 validation errors", () => {
@@ -206,7 +206,7 @@ describe("Application page2 validation errors", () => {
         .map((li) => li.textContent)
     ).toEqual([`${TUESDAY} 14:00–14:15, application:TimeSelector.legend.primary`]);
     const validationErrors = view.getAllByText(/application:validation/);
-    // title + message + the too short times' label, nothing else
+    // summary title + section's title + message + the too short times' label, nothing else
     expect(validationErrors).toHaveLength(ERROR_TEXTS);
   });
 
