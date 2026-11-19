@@ -547,6 +547,48 @@ def test_migrate_pricings_to_pricing_groups__past_online_pricing_needs_no_accoun
     assert list(PriceComponent.objects.values_list("sales_item", flat=True)) == [None, None]
 
 
+def test_migrate_pricings_to_pricing_groups__archived_reservation_unit_needs_no_sales_item():
+    accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350080")
+    reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
+    archived_with_other_tax_level = ReservationUnitFactory.create(payment_accounting=accounting, is_archived=True)
+    archived_without_accounting = ReservationUnitFactory.create(
+        payment_accounting=None,
+        unit__payment_accounting=None,
+        is_archived=True,
+    )
+    today = local_date()
+
+    apps = migrate_to(BEFORE_MIGRATION)
+    general = create_tax_level(apps, name="Yleinen", percentage=Decimal("25.50"))
+    reduced = create_tax_level(apps, name="Alennettu", percentage=Decimal("13.50"))
+    create_pricing(apps, reservation_unit=reservation_unit, tax_level=general, begins=today, payment_type="ONLINE")
+    create_pricing(
+        apps,
+        reservation_unit=archived_with_other_tax_level,
+        tax_level=reduced,
+        begins=today,
+        payment_type="ONLINE",
+    )
+    create_pricing(
+        apps,
+        reservation_unit=archived_without_accounting,
+        tax_level=general,
+        begins=today,
+        payment_type="ONLINE",
+    )
+
+    apps = migrate_to(AFTER_MIGRATION)
+
+    SalesItem = apps.get_model("tilavarauspalvelu", "SalesItem")
+    PriceComponent = apps.get_model("tilavarauspalvelu", "PriceComponent")
+
+    sales_items = SalesItem.objects.values_list("material", "tax_level__name")
+    assert list(sales_items) == [("10000116", "Yleinen")]
+
+    components = PriceComponent.objects.order_by("pricing_group__reservation_unit_pricing_groups__reservation_unit")
+    assert list(components.values_list("sales_item__material", flat=True)) == ["10000116", None, None]
+
+
 # ── Conflicts ──
 
 
