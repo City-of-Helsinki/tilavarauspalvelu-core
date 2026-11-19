@@ -21,7 +21,7 @@ from utils.date_utils import local_date, local_datetime, local_start_of_day, utc
 if TYPE_CHECKING:
     from collections.abc import Collection
 
-    from tilavarauspalvelu.models import ReservationUnit, User
+    from tilavarauspalvelu.models import ReservationPriceLine, ReservationUnit, User
 
 __all__ = [
     "ReservationUnitValidator",
@@ -236,12 +236,31 @@ class ReservationUnitValidator:
             msg = "Reservation unit has no payment type."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_TYPE)
 
-    def validate_has_payment_product(self) -> None:
+    def validate_has_payment_products(self, *, price_lines: Collection[ReservationPriceLine]) -> None:
+        """Each price line with a positive final amount must have a verkkokauppa product for its sales item."""
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             return
 
-        if not self.reservation_unit.payment_product:
-            msg = "Reservation unit is missing payment product"
+        paid_lines = [
+            line for line in price_lines if (line.amount if line.override_amount is None else line.override_amount) > 0
+        ]
+        if not paid_lines:
+            return
+
+        msg = "Reservation unit is missing payment product"
+
+        if any(line.sales_item_id is None for line in paid_lines):
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT)
+
+        merchant = self.reservation_unit.actions.get_merchant()
+        if merchant is None:
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT)
+
+        sales_item_pks = {line.sales_item_id for line in paid_lines}
+        products = self.reservation_unit.payment_products.filter(merchant=merchant, sales_item__in=sales_item_pks)
+        sales_item_pks_with_product = set(products.values_list("sales_item_id", flat=True))
+
+        if sales_item_pks != sales_item_pks_with_product:
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT)
 
     def validate_cancellation_rule(self, begin: datetime.datetime) -> None:
