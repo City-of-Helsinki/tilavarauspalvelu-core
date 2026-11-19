@@ -155,7 +155,12 @@ class ReservationApproveSerializer(NestingModelSerializer[Reservation, Reservati
             return data
 
         if payment_type != PaymentType.ON_SITE:
-            reservation_unit.validators.validate_has_payment_product()
+            # The overrides are saved in the update. Check the lines with them, without saving.
+            price_lines: list[ReservationPriceLine] = list(self.instance.price_lines.all())
+            for line in price_lines:
+                line.override_amount = data["price_line_overrides"][line.pk]
+
+            reservation_unit.validators.validate_has_payment_products(price_lines=price_lines)
 
         data["payment_type"] = payment_type
         return data

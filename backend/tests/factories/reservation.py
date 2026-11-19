@@ -200,6 +200,10 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("reservation_unit", reservation_unit)
         kwargs.setdefault("price_lines__amount", Decimal("12.4"))
         kwargs.setdefault("price_lines__tax_percentage", Decimal("25.5"))
+
+        payment_product = reservation_unit.payment_products.first()
+        if payment_product is not None:
+            kwargs.setdefault("price_lines__sales_item", payment_product.sales_item)
         kwargs.setdefault("price_lines__tax_level__rates__percentage", Decimal("25.5"))
         return cls.create(**kwargs)
 
@@ -338,6 +342,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("payment_order__handled_payment_due_by", due_by)
         kwargs.setdefault("price_lines__amount", Decimal("12.4"))
         kwargs.setdefault("price_lines__tax_percentage", Decimal("24.0"))
+        kwargs.setdefault("price_lines__sales_item", reservation_unit.payment_products.get().sales_item)
         kwargs.setdefault("price_lines__tax_level__rates__percentage", Decimal("25.5"))
 
         return cls.create(**kwargs)

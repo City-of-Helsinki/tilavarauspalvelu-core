@@ -823,6 +823,7 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
         price_unit=PriceUnit.FIXED,
         amount=Decimal(10),
         tax_level__rates__percentage=Decimal(24),
+        sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     graphql.login_with_superuser()

@@ -28,8 +28,10 @@ from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     OrderFactory,
+    PaymentMerchantFactory,
     PaymentOrderFactory,
     ReservationFactory,
+    ReservationPriceLineFactory,
     SalesItemFactory,
     TaxLevelFactory,
     TaxLevelRateFactory,
@@ -456,6 +458,60 @@ def test_reservation__confirm__default_payment_type__online(graphql):
     assert orders[0].payment_type == PaymentType.ONLINE
 
     assert VerkkokauppaAPIClient.create_order.called is True
+
+
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__price_line_sales_item_has_no_product(graphql):
+    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_type=PaymentType.ONLINE)
+    sales_item = SalesItemFactory.create()
+    ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal(10),
+        sales_item=sales_item,
+        tax_level=sales_item.tax_level,
+    )
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit is missing payment product"]
+
+    assert VerkkokauppaAPIClient.create_order.called is False
+    assert PaymentOrder.objects.exists() is False
+
+
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__paid_price_line_has_no_sales_item(graphql):
+    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_type=PaymentType.ONLINE)
+    ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10), sales_item=None)
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit is missing payment product"]
+
+    assert VerkkokauppaAPIClient.create_order.called is False
+
+
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__product_of_other_merchant_is_not_used(graphql):
+    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_type=PaymentType.ONLINE)
+    reservation_unit = reservation.reservation_unit
+    reservation_unit.payment_merchant = PaymentMerchantFactory.create()
+    reservation_unit.save()
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit is missing payment product"]
+
+    assert VerkkokauppaAPIClient.create_order.called is False
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
