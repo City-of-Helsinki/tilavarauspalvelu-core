@@ -113,6 +113,7 @@ ADMIN_APP_GROUPS: list[AdminAppGroup] = [
         app_label="system",
         name=_("System"),
         models=[
+            "tilavarauspalvelu.FeatureFlag",
             "auditlog.LogEntry",
             "django_celery_beat.PeriodicTask",
             "django_celery_beat.CrontabSchedule",

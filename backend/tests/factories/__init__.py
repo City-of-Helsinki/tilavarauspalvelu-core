@@ -10,6 +10,7 @@ from .banner_notification import BannerNotificationFactory
 from .email_message import EmailMessageFactory
 from .equipment import EquipmentFactory
 from .equipment_category import EquipmentCategoryFactory
+from .feature_flag import FeatureFlagFactory
 from .general_role import GeneralRoleFactory
 from .hauki import HaukiAPIResourceFactory, HaukiAPIResourceListResponseFactory
 from .intended_use import IntendedUseFactory
@@ -62,6 +63,7 @@ __all__ = [
     "EmailMessageFactory",
     "EquipmentCategoryFactory",
     "EquipmentFactory",
+    "FeatureFlagFactory",
     "GeneralRoleFactory",
     "HaukiAPIResourceFactory",
     "HaukiAPIResourceListResponseFactory",

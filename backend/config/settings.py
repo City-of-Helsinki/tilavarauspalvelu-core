@@ -99,6 +99,7 @@ class Common(Environment):
         "rest_framework",
         "social_django",
         "tinymce",
+        "waffle",
         "subforms",
         # Health check
         "health_check",
@@ -534,6 +535,21 @@ class Common(Environment):
                 },
             }
         }
+
+    # --- Feature flags ----------------------------------------------------------------------------------------------
+
+    WAFFLE_FLAG_MODEL = "tilavarauspalvelu.FeatureFlag"
+    # Waffle's migrations create tables for its own 'Flag' model even when 'FeatureFlag' replaces it.
+    # Django does not flush those tables, and 'waffle_flag_groups' then blocks the flush of 'auth_group'.
+    # 'migrate' then creates no tables for 'Switch' and 'Sample' either. Do not use them.
+    MIGRATION_MODULES = {"waffle": None}
+    # 'tilavarauspalvelu/admin/feature_flag' registers the admin for 'FeatureFlag' only.
+    WAFFLE_ENABLE_ADMIN_PAGES = False
+    # The first read of an unknown flag adds it to the admin, so no data migration is needed for a new flag.
+    WAFFLE_CREATE_MISSING_FLAGS = True
+    # The new row gets this value for 'Everyone'. With 'False', the flag would ignore its other rules
+    # until someone changes 'Everyone' to 'Unknown'. A missing flag returns this value, and 'None' counts as off.
+    WAFFLE_FLAG_DEFAULT = None
 
     # --- Admin data views ------------------------------------------------------------------------------------------
 

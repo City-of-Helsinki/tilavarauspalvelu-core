@@ -1163,6 +1163,10 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
+#: tilavarauspalvelu/admin/feature_flag/admin.py
+msgid "Users"
+msgstr ""
+
 #: tilavarauspalvelu/admin/general_role/admin.py
 msgid "Search by username, email, first name or last name"
 msgstr ""
@@ -4072,6 +4076,24 @@ msgstr ""
 
 #: tilavarauspalvelu/models/equipment_category/model.py
 msgid "equipment categories"
+msgstr ""
+
+#: tilavarauspalvelu/models/feature_flag/model.py
+msgid "Active for everyone from"
+msgstr ""
+
+#: tilavarauspalvelu/models/feature_flag/model.py
+msgid ""
+"From this time, the flag is on for every user. Before this time, the other "
+"rules decide. 'Everyone: No' turns the flag off even after this time."
+msgstr ""
+
+#: tilavarauspalvelu/models/feature_flag/model.py
+msgid "feature flag"
+msgstr ""
+
+#: tilavarauspalvelu/models/feature_flag/model.py
+msgid "feature flags"
 msgstr ""
 
 #: tilavarauspalvelu/models/general_role/model.py

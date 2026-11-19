@@ -11,6 +11,7 @@ from .banner_notification.model import BannerNotification
 from .email_message.model import EmailMessage
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
+from .feature_flag.model import FeatureFlag
 from .general_role.model import GeneralRole
 from .intended_use.model import IntendedUse
 from .origin_hauki_resource.model import OriginHaukiResource
@@ -66,6 +67,7 @@ __all__ = [
     "EmailMessage",
     "Equipment",
     "EquipmentCategory",
+    "FeatureFlag",
     "GeneralRole",
     "IntendedUse",
     "OriginHaukiResource",

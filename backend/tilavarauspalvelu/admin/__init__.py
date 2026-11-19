@@ -9,6 +9,7 @@ from .banner_notification.admin import BannerNotificationAdmin
 from .email_message.admin import EmailMessageAdmin
 from .equipment.admin import EquipmentAdmin
 from .equipment_category.admin import EquipmentCategoryAdmin
+from .feature_flag.admin import FeatureFlagAdmin
 from .general_role.admin import GeneralRoleAdmin
 from .intended_use.admin import IntendedUseAdmin
 from .log_entry.admin import LogEntryAdmin
@@ -52,6 +53,7 @@ __all__ = [
     "EmailMessageAdmin",
     "EquipmentAdmin",
     "EquipmentCategoryAdmin",
+    "FeatureFlagAdmin",
     "GeneralRoleAdmin",
     "IntendedUseAdmin",
     "LogEntryAdmin",

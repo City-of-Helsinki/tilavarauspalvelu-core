@@ -55,6 +55,7 @@ uWSGI = { version = "2.0.31", markers = "sys_platform != 'win32'" }
 whitenoise = "6.12.0"
 xhtml2pdf = "0.2.29"
 django-csp = "4.0"
+django-waffle = "5.0.0"
 
 [tool.poetry.group.admin.dependencies]
 # Dependencies related to the admin panel or other "administrative" tasks.

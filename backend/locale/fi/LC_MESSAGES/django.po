@@ -1175,6 +1175,10 @@ msgstr "Pohja"
 msgid "Text"
 msgstr "Teksti"
 
+#: tilavarauspalvelu/admin/feature_flag/admin.py
+msgid "Users"
+msgstr "Käyttäjät"
+
 #: tilavarauspalvelu/admin/general_role/admin.py
 msgid "Search by username, email, first name or last name"
 msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
@@ -4139,6 +4143,27 @@ msgstr "varustekategoria"
 #: tilavarauspalvelu/models/equipment_category/model.py
 msgid "equipment categories"
 msgstr "varustekategoriat"
+
+#: tilavarauspalvelu/models/feature_flag/model.py
+msgid "Active for everyone from"
+msgstr "Päällä kaikille alkaen"
+
+#: tilavarauspalvelu/models/feature_flag/model.py
+msgid ""
+"From this time, the flag is on for every user. Before this time, the other "
+"rules decide. 'Everyone: No' turns the flag off even after this time."
+msgstr ""
+"Tästä ajasta alkaen flagi on päällä kaikille käyttäjille. Ennen tätä aikaa "
+"muut säännöt ratkaisevat. 'Everyone: No' pitää flagin pois päältä myös tämän "
+"ajan jälkeen."
+
+#: tilavarauspalvelu/models/feature_flag/model.py
+msgid "feature flag"
+msgstr "feature flag"
+
+#: tilavarauspalvelu/models/feature_flag/model.py
+msgid "feature flags"
+msgstr "feature flagit"
 
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "general role"
