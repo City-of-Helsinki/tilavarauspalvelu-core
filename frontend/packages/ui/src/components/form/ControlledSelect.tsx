@@ -18,11 +18,14 @@ const StyledControlledSelect = styled(Select)<{ $strongLabel?: boolean }>`
   }
 `;
 
+/** A disabled option is shown, but can't be selected. */
+type SelectOption = { label: string; value: string | number; disabled?: boolean };
+
 interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   label: string;
-  options: Readonly<Array<{ label: string; value: string | number }>>;
+  options: Readonly<SelectOption[]>;
   required?: boolean;
   placeholder?: string;
   error?: string;
@@ -41,7 +44,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
 }
 
 const toHDSValue = (
-  opts: Readonly<Array<{ label: string; value: string | number }>>,
+  opts: Readonly<SelectOption[]>,
   val: string | number | Array<string | number> | undefined
 ): Array<Partial<Option>> => {
   if (val == null) {

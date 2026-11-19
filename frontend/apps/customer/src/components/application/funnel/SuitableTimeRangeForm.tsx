@@ -12,6 +12,7 @@ import {
 } from "@ui/components/WeeklyPatternCalendar/styles";
 import { fontBold } from "@ui/styled";
 import { ControlledSelect } from "ui/src/components/form";
+import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
 import { priorityKey, toAvailability } from "ui/src/modules/suitableTimes";
 import { formatClock, formatClockRange } from "ui/src/modules/time-helpers";
@@ -184,9 +185,16 @@ export function SuitableTimeRangeForm({
   // eslint-disable-next-line react-hooks/exhaustive-deps -- runs only when the opening hours change, not on each pick
   useEffect(syncPicker, [openingHoursKey]);
 
+  // Every day is listed, so that none seems to be missing, but the days without open times can't be picked.
+  const openWeekdayList = useMemo(() => listOpenWeekdays(openingHours), [openingHours]);
   const dayOptionList = useMemo(
-    () => listOpenWeekdays(openingHours).map((day) => ({ value: day, label: t(`common:weekdayLongEnum.${day}`) })),
-    [openingHours, t]
+    () =>
+      WEEKDAYS_SORTED.map((day) => ({
+        value: day,
+        label: t(`common:weekdayLongEnum.${day}`),
+        disabled: !openWeekdayList.includes(day),
+      })),
+    [openWeekdayList, t]
   );
   const fromOptionList =
     weekday == null ? [] : listStartOptions(openingHours, weekday).map((minutes) => toClockOption(minutes));
@@ -258,6 +266,7 @@ export function SuitableTimeRangeForm({
           control={picker.control}
           label={t("application:TimeSelector.form.day")}
           options={dayOptionList}
+          disabled={openWeekdayList.length === 0}
           afterChange={syncPicker}
         />
         <ControlledSelect
