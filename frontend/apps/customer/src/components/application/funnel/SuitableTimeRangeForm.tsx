@@ -10,9 +10,10 @@ import {
   secondaryFill,
   secondaryIndicator,
 } from "@ui/components/WeeklyPatternCalendar/styles";
-import { fontBold } from "@ui/styled";
+import { convertWeekday } from "@ui/modules/conversion";
+import { Flex, fontBold, H5, truncatedText } from "@ui/styled";
 import { ControlledSelect } from "ui/src/components/form";
-import { WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { breakpoints, WEEKDAYS_SORTED } from "ui/src/modules/const";
 import type { ReservableTimeSlots } from "ui/src/modules/suitableTimes";
 import { priorityKey, toAvailability } from "ui/src/modules/suitableTimes";
 import { formatClock, formatClockRange } from "ui/src/modules/time-helpers";
@@ -29,51 +30,62 @@ import {
   removeTimeRange,
 } from "./timeSelectorModule";
 
-const Fieldset = styled.fieldset`
+const StyledFieldset = styled.fieldset`
   min-inline-size: 0; /* fieldsets default to min-content, which would overflow the grid column */
-  display: grid;
-  gap: var(--spacing-s);
   margin: 0;
-  padding: var(--spacing-s);
-  border: 1px solid var(--color-black-50);
+  padding: var(--spacing-s) 0;
+  border: none;
+`;
+
+const FormControls = styled.div`
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--spacing-3-xs);
 `;
 
 const Fields = styled.div`
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--spacing-s);
 
-  > :not(button) {
-    flex: 1 1 10rem;
-  }
+  align-items: flex-end;
+  gap: var(--spacing-3-xs);
 `;
 
-const TimeList = styled.ul`
+const TimeList = styled.ul<{ $columnCount: number }>`
   display: grid;
   gap: var(--spacing-3-xs);
   margin: var(--spacing-xs) 0 0;
   padding: 0;
   list-style: none;
-
-  li {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-s);
+  grid-template-columns: 1fr;
+  grid-auto-flow: column;
+  @media (min-width: ${breakpoints.s}) {
+    grid-template-columns: repeat(${({ $columnCount }) => $columnCount}, minmax(var(--spacing-2-xl), auto));
   }
 `;
 
-const TimeListItem = styled.li<{ $priority?: "primary" | "secondary" }>`
+const EmptyList = styled.div`
+  font-style: italic;
+  margin: var(--spacing-m) 0 0;
+`;
+
+const TimeListItem = styled.li<{ $priority?: "primary" | "secondary"; $weekday?: number }>`
   position: relative;
   display: flex;
+  flex-flow: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  width: stretch;
   gap: var(--spacing-s);
-  padding-left: var(--spacing-m);
+  font-size: var(--fontsize-body-m);
+  line-height: var(--lineheight-m);
+  padding: var(--spacing-3-xs) 0 var(--spacing-3-xs) var(--spacing-m);
   border-radius: var(--spacing-3-xs);
+  grid-column: 1;
   ${({ $priority }) => $priority === "primary" && primaryFill}
   ${({ $priority }) => $priority === "primary" && primaryIndicator}
   ${({ $priority }) => $priority === "secondary" && secondaryFill}
@@ -82,21 +94,36 @@ const TimeListItem = styled.li<{ $priority?: "primary" | "secondary" }>`
   /* A too short time, drawn as in the calendar: primary in solid error red with white text, secondary in light error
      red with an error red outline and black text. */
   &[data-invalid] {
-    background: ${({ $priority }) => ($priority === "secondary" ? "var(--color-error-light)" : "rgb(from var(--color-error) r g b / .7)")};
+    background: ${({ $priority }) => ($priority === "secondary" ? "var(--color-error-light)" : "var(--color-error)")};
     color: ${({ $priority }) => ($priority === "secondary" ? "var(--color-black)" : "var(--color-white)")};
     ${({ $priority }) => $priority === "secondary" && "box-shadow: inset 0 0 0 1px var(--color-error);"}
+  }
+  @media (min-width: ${breakpoints.s}) {
+    grid-column: ${({ $weekday }) => $weekday};
+  }
+`;
+
+const Ellipsis = styled.span`
+  display: inline-block;
+  width: 100%;
+  max-width: 100%;
+  ${truncatedText}
+  @media (min-width: ${breakpoints.s}) {
+    max-width: calc(100% - var(--spacing-s));
   }
 `;
 
 const RemoveButton = styled(Button)`
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 0;
   line-height: 1;
   padding: 0 0 2px;
-  height: 30px;
-  width: 30px;
+  --min-size: calc(var(--spacing-s) + var(--spacing-3-xs));
   font-size: var(--fontsize-heading-s);
   font-family: var(--font-bold), sans-serif;
   background-color: transparent;
@@ -113,9 +140,21 @@ const RemoveButton = styled(Button)`
   }
 `;
 
+const Status = styled.div`
+  width: 0;
+  height: 0;
+  overflow: hidden;
+`;
+
 /** A time as the list (and the calendar's error message) names it, e.g. "Tuesday 14:00–15:00". */
-export function describeTime(t: TFunction, day: Weekday, begin: number, end: number): string {
-  const dayName = t(`common:weekdayLongEnum.${day}`);
+export function describeTime(
+  t: TFunction,
+  day: Weekday,
+  begin: number,
+  end: number,
+  variant?: "short" | "long"
+): string {
+  const dayName = t(`common:weekday${variant === "short" ? "Short" : "Long"}Enum.${day}`);
   return `${dayName} ${formatClockRange(begin, end)}`;
 }
 
@@ -210,20 +249,30 @@ export function SuitableTimeRangeForm({
   const priority = watch(`applicationSections.${index}.priority`);
   const listed = listTimeRanges(ranges);
   const minDuration = watch(`applicationSections.${index}.minDuration`);
-  const tooShort = findTooShortListed(listed, minDuration);
-  const outside = findOutsideListed(listed, openingHours);
+  // Unique weekdays in the listed user selections, used to place the times in columns in the list.
+  const selectedWeekdayList = [...new Set(listed.map(({ weekday }) => convertWeekday(weekday)))];
+
   // Outside the opening hours is the more basic problem: such a time can't be applied for at all, whatever its length.
   const problemOf = (position: number) => {
-    if (outside[position]) {
+    if (findOutsideListed(listed, openingHours)[position]) {
       return t("application:TimeSelector.form.outsideOpeningHours");
     }
-    if (tooShort[position]) {
+    if (findTooShortListed(listed, minDuration)[position]) {
       return t("application:TimeSelector.form.tooShort");
     }
     return null;
   };
 
-  const describe = (day: Weekday, begin: number, end: number) => describeTime(t, day, begin, end);
+  const getTimeRangeContent = (day: Weekday, begin: number, end: number, variant?: "short" | "long") => {
+    const timeString = describeTime(t, day, begin, end, variant === "short" ? "short" : "long");
+    const [weekDay, timeRange] = timeString.split(" ");
+    return (
+      <>
+        <Ellipsis>{weekDay}</Ellipsis>
+        <span>{timeRange}</span>
+      </>
+    );
+  };
 
   const save = (next: SuitableTimeRangeFormValues[]) => {
     setValue(fieldName, next, { shouldDirty: true, shouldValidate: true, shouldTouch: true });
@@ -242,7 +291,7 @@ export function SuitableTimeRangeForm({
       return;
     }
     save(next);
-    setStatus(`${t("application:TimeSelector.announcements.painted")}: ${describe(weekday, from, to)}`);
+    setStatus(`${t("application:TimeSelector.announcements.painted")}: ${describeTime(t, weekday, from, to)}`);
   };
 
   const handleRemove = (position: number) => {
@@ -252,84 +301,86 @@ export function SuitableTimeRangeForm({
     }
     save(removeTimeRange(getValues(fieldName), position));
     setStatus(
-      `${t("application:TimeSelector.announcements.erased")}: ${describe(removed.weekday, removed.beginMinutes, removed.endMinutes)}`
+      `${t("application:TimeSelector.announcements.erased")}: ${describeTime(t, removed.weekday, removed.beginMinutes, removed.endMinutes)}`
     );
   };
 
   return (
-    <Fieldset id={id} data-testid={`time-selector__form-${index}`}>
-      <p>{t("application:TimeSelector.form.priorityNote")}</p>
-      <Fields>
-        <ControlledSelect
-          id={`${id}-day`}
-          name="weekday"
-          control={picker.control}
-          label={t("application:TimeSelector.form.day")}
-          options={dayOptionList}
-          disabled={openWeekdayList.length === 0}
-          afterChange={syncPicker}
-        />
-        <ControlledSelect
-          id={`${id}-from`}
-          name="from"
-          control={picker.control}
-          label={t("application:TimeSelector.form.from")}
-          options={fromOptionList}
-          afterChange={syncPicker}
-        />
-        <ControlledSelect
-          id={`${id}-to`}
-          name="to"
-          control={picker.control}
-          label={t("application:TimeSelector.form.to")}
-          options={toOptionList}
-        />
+    <StyledFieldset id={id} data-testid={`time-selector__form-${index}`}>
+      <FormControls>
+        <Fields>
+          <ControlledSelect
+            id={`${id}-day`}
+            name="weekday"
+            control={picker.control}
+            label={t("application:TimeSelector.form.day")}
+            options={dayOptionList}
+            disabled={openWeekdayList.length === 0}
+            afterChange={syncPicker}
+          />
+          <ControlledSelect
+            id={`${id}-from`}
+            name="from"
+            control={picker.control}
+            label={t("application:TimeSelector.form.from")}
+            options={fromOptionList}
+            afterChange={syncPicker}
+          />
+          <ControlledSelect
+            id={`${id}-to`}
+            name="to"
+            control={picker.control}
+            label={t("application:TimeSelector.form.to")}
+            options={toOptionList}
+          />
+        </Fields>
         <Button
           type="button"
-          size={ButtonSize.Small}
+          size={ButtonSize.Medium}
           variant={ButtonVariant.Secondary}
           onClick={handleAdd}
           disabled={weekday == null || from == null || to == null}
         >
           {t("application:TimeSelector.form.add")}
         </Button>
-      </Fields>
-      <div>
-        <p id={`${id}-list-label`}>{t("application:TimeSelector.form.listLabel")}</p>
+      </FormControls>
+      <Flex $gap="3-xs" $direction="column">
         {listed.length === 0 ? (
-          <p>{t("application:TimeSelector.form.empty")}</p>
+          <EmptyList>{t("application:TimeSelector.form.empty")}</EmptyList>
         ) : (
-          <TimeList aria-labelledby={`${id}-list-label`}>
-            {listed.map(({ weekday: day, beginMinutes, endMinutes, data }, position) => (
-              <TimeListItem
-                key={`${day}-${beginMinutes}`}
-                $priority={priorityKey(data.priority)}
-                data-invalid={problemOf(position) ? "" : undefined}
-              >
-                <span>
-                  {describe(day, beginMinutes, endMinutes)},{" "}
-                  {t(`application:TimeSelector.legend.${priorityKey(data.priority)}`)}
-                  {problemOf(position) && ` - (${problemOf(position)}!)`}
-                </span>
-                <RemoveButton
-                  type="button"
-                  size={ButtonSize.Small}
-                  variant={ButtonVariant.Secondary}
-                  onClick={() => handleRemove(position)}
-                  aria-label={t("application:TimeSelector.form.removeTime", {
-                    time: describe(day, beginMinutes, endMinutes),
-                  })}
+          <>
+            <H5 id={`${id}-list-label`}>{t("application:TimeSelector.form.listLabel")}</H5>
+            <TimeList aria-labelledby={`${id}-list-label`} $columnCount={selectedWeekdayList.length}>
+              {listed.map(({ weekday: day, beginMinutes, endMinutes, data }, position) => (
+                <TimeListItem
+                  key={`${day}-${beginMinutes}`}
+                  $priority={priorityKey(data.priority)}
+                  $weekday={selectedWeekdayList.indexOf(convertWeekday(day)) + 1}
+                  data-invalid={problemOf(position) ? "" : undefined}
+                  aria-invalid={problemOf(position) ? "true" : undefined}
+                  aria-errormessage="#time-selector__error-summary"
                 >
-                  ×
-                </RemoveButton>
-              </TimeListItem>
-            ))}
-          </TimeList>
+                  {getTimeRangeContent(day, beginMinutes, endMinutes, listed.length > 5 ? "short" : undefined)}
+                  <RemoveButton
+                    type="button"
+                    size={ButtonSize.Small}
+                    variant={ButtonVariant.Secondary}
+                    onClick={() => handleRemove(position)}
+                    aria-label={t("application:TimeSelector.form.removeTime", {
+                      time: describeTime(t, day, beginMinutes, endMinutes),
+                    })}
+                  >
+                    ×
+                  </RemoveButton>
+                </TimeListItem>
+              ))}
+            </TimeList>
+          </>
         )}
-      </div>
-      <div role="status" aria-live="polite">
+      </Flex>
+      <Status role="status" aria-live="polite">
         {status}
-      </div>
-    </Fieldset>
+      </Status>
+    </StyledFieldset>
   );
 }
