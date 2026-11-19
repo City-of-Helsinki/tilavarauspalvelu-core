@@ -25,7 +25,7 @@ import {
   toPattern,
 } from "ui/src/modules/suitableTimes";
 import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
-import { Flex, HR } from "ui/src/styled";
+import { Flex } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
 import type { ApplicationPage2FormValues } from "./form";

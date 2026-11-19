@@ -351,8 +351,15 @@ describe("TimeSelector render single section", () => {
   });
 
   test("should have a copy buttons if more than one section", () => {
-    const view = customRender({ nSections: 2 });
+    // The page2 mock has a time on Wednesday to copy.
+    const view = customRender({ page: "page2", nSections: 2 });
     expect(view.getByRole("button", { name: "application:Page2.copyTimes" })).toBeInTheDocument();
+  });
+
+  test("should not have a copy button if there are no times to copy", () => {
+    // The page1 mock has no times.
+    const view = customRender({ nSections: 2 });
+    expect(view.queryByRole("button", { name: "application:Page2.copyTimes" })).not.toBeInTheDocument();
   });
 });
 
@@ -752,16 +759,15 @@ describe("TimeSelector copy times", () => {
 });
 
 describe("TimeSelector times outside the opening hours", () => {
-  test("are marked in the list, before being too short", async () => {
+  test("are marked in the list", async () => {
     // The mock section has a time on Wednesday, 08:00-16:00, long enough but outside these hours.
     const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
     const view = customRender({ page: "page2", reservationUnitOpeningHours: mondayOnly });
 
     const item = within(await openFormTab(view)).getByRole("listitem");
-    expect(item).toHaveTextContent(
-      "application:TimeSelector.legend.primary - (application:TimeSelector.form.outsideOpeningHours!)"
-    );
+    expect(item).toHaveTextContent(`${weekdayLabel(Weekday.Wednesday)}08:00–16:00`);
     expect(item).toHaveAttribute("data-invalid");
+    expect(item).toHaveAttribute("aria-invalid", "true");
   });
 
   test("are shown as invalid", () => {
@@ -779,6 +785,33 @@ describe("TimeSelector error summary", () => {
   function findError(view: ReturnType<typeof render>) {
     return view.findByTestId("application__page2--error-summary");
   }
+
+  test("gives a general reason for an error that has no known message", async () => {
+    // An error of one time in the list, not of the whole list, has no message of its own.
+    function WrapWithItemError() {
+      const form = useForm<ApplicationPage2FormValues>({
+        defaultValues: convertApplicationPage2(createMockApplicationFragment({ page: "page2" })),
+        resolver: () =>
+          Promise.resolve({
+            values: {},
+            errors: { applicationSections: [{ suitableTimeRanges: [{ dayOfTheWeek: { type: "invalid_value" } }] }] },
+          }),
+      });
+      return (
+        <FormProvider {...form}>
+          <TimesErrorSummary
+            allSectionsOpeningHours={[OPEN_ALL_WEEK]}
+            onShowSection={vi.fn()}
+            getSectionId={(i) => `s-${i}`}
+          />
+        </FormProvider>
+      );
+    }
+    const view = render(<WrapWithItemError />);
+
+    const error = await findError(view);
+    expect(within(error).getByRole("link")).toHaveAccessibleName("foobar: errors:general_error");
+  });
 
   test("is shown on load for the errors already in the saved times", async () => {
     // The mock's Wednesday 08:00-16:00 fits four reservations of 2 h, not the five applied for.
@@ -821,7 +854,8 @@ describe("TimeSelector error summary", () => {
       expect(item).toHaveTextContent(
         'application:validation.calendar.At least as many suitable time ranges as applied reservations per week {"applied":5,"fitting":4}'
       );
-      const link = within(item).getByRole("link", { name: "foobar" });
+      // The link names the section and the error: "{section name}: {error title}"
+      const link = within(item).getByRole("link", { name: "foobar: application:validation.calendar.title" });
       expect(link).toHaveAttribute("href", `#timeSelector-${index}`);
 
       await user.click(link);
@@ -1138,15 +1172,14 @@ describe("TimeSelector with several reservation units", () => {
     await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
 
     const items = within(await openFormTab(view)).getAllByRole("listitem");
-    const item = (day: Weekday) =>
-      items.find((li) => li.textContent?.startsWith(`common:weekdayLongEnum.${day}`)) ?? null;
-    expect(item(Weekday.Tuesday)).toHaveTextContent(
-      "application:TimeSelector.legend.primary - (application:TimeSelector.form.tooShort!)"
-    );
+    // An item shows both the short and the long weekday name, so look for the long one anywhere in it.
+    const item = (day: Weekday) => items.find((li) => li.textContent?.includes(weekdayLabel(day))) ?? null;
+    expect(item(Weekday.Tuesday)).toHaveTextContent("14:00–14:15");
     expect(item(Weekday.Tuesday)).toHaveAttribute("data-invalid");
+    expect(item(Weekday.Tuesday)).toHaveAttribute("aria-invalid", "true");
     // Wednesday's 8 h primary time is long enough.
-    expect(item(Weekday.Wednesday)).not.toHaveTextContent("application:TimeSelector.form.tooShort");
     expect(item(Weekday.Wednesday)).not.toHaveAttribute("data-invalid");
+    expect(item(Weekday.Wednesday)).not.toHaveAttribute("aria-invalid");
   });
 
   test("the legend explains closed and unavailable times apart", () => {
