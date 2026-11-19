@@ -25,8 +25,28 @@ jobs:
       }}
 
     steps:
+      # The prff action uses 'actions/setup-python@v5' inside it.
+      # The repository only allows actions pinned to a full commit SHA, so the action fails to load.
+      # Thus we get the prff code at a pinned SHA and run it with pinned actions here.
+      - name: "Checkout prff"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: MrThearMan/prff
+          ref: 9a178be62c1917a66de423e2dc1342a98578a952 # v1
+          path: prff-action
+          persist-credentials: false
+
+      - name: "Set up Python"
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
       - name: "Fast forwarding"
-        uses: MrThearMan/prff@9a178be62c1917a66de423e2dc1342a98578a952 # v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PYTHONUNBUFFERED: "1"
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python prff-action/main.py
 
       - name: "Trigger additional pipelines for bots"
         # Only run if one of the defined bots is the pull request author.
