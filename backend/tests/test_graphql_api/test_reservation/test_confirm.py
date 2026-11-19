@@ -30,6 +30,7 @@ from tests.factories import (
     OrderFactory,
     PaymentMerchantFactory,
     PaymentOrderFactory,
+    PaymentProductFactory,
     ReservationFactory,
     ReservationPriceLineFactory,
     SalesItemFactory,
@@ -458,6 +459,42 @@ def test_reservation__confirm__default_payment_type__online(graphql):
     assert orders[0].payment_type == PaymentType.ONLINE
 
     assert VerkkokauppaAPIClient.create_order.called is True
+
+
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__order_row_for_each_price_line_with_its_product(graphql):
+    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_type=PaymentType.ONLINE)
+    reservation_unit = reservation.reservation_unit
+    first_product = reservation_unit.payment_products.get()
+    second_sales_item = SalesItemFactory.create()
+    second_product = PaymentProductFactory.create(
+        reservation_unit=reservation_unit,
+        sales_item=second_sales_item,
+        merchant=first_product.merchant,
+    )
+    first_line = reservation.price_lines.get()
+    second_line = ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal(10),
+        sales_item=second_sales_item,
+        tax_level=second_sales_item.tax_level,
+    )
+
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    assert [item.product_id for item in order_params.items] == [first_product.pk, second_product.pk]
+
+    first_line.refresh_from_db()
+    second_line.refresh_from_db()
+    assert first_line.payment_product == first_product
+    assert second_line.payment_product == second_product
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
