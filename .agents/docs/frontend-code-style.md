@@ -4,6 +4,7 @@
 
 ## General
 
+- Never use prettier, since this project uses `oxfmt` instead.
 - `oxlint` with type checks is the linter. Use it via `just fe lint-fix`. Its rules are in `.oxlintrc.json`.
 - CSS is linted separately with `stylelint`. Use it via `just fe lint-css`. Its rules are in `.stylelintrc.json`.
 - `oxfmt` is the formatter. Use it via `just fe format`. Its rules are in `.oxfmtrc.json`.
