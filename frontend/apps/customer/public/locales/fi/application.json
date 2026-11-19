@@ -110,7 +110,7 @@
   "Page2": {
     "subHeading": "Valitse hakemuksen aikatoiveet",
     "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Ilmoitathan kaikki sinulle sopivat tila- ja aikatoiveet, sillä vuoro voidaan myöntää vain valitsemiisi tiloihin ja ajankohtiin.",
-    "copyTimes": "Kopioi ajat kaikille varaustoiveille",
+    "copyTimes": "Kopioi ajat kaikille hakemuksille",
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",
     "prioritySelectLabel": "Valitse aikatoiveen tyyppi",
@@ -120,12 +120,12 @@
       "secondary": "Vaihtoehtoiset aikatoiveet"
     },
     "notification": {
-      "copyCells": "Ajat kopioitu kaikille varaustoiveille",
-      "copyCellsOutsideOpeningHours": "Osa kopioiduista ajoista on aukioloaikojen ulkopuolella varaustoiveissa {{names}}. Ne on merkitty kalenteriin virheellisiksi."
+      "copyCells": "Ajat kopioitu kaikille hakemuksille",
+      "copyCellsOutsideOpeningHours": "Osa kopioiduista ajoista on aukioloaikojen ulkopuolella hakemuksissa {{names}}. Ne on merkitty kalenteriin virheellisiksi."
     },
     "copyConfirm": {
       "heading": "Korvataanko valitut ajat?",
-      "text": "Varaustoiveissa {{names}} on jo valittuja aikoja. Kopiointi korvaa ne.",
+      "text": "Hakemuksissa {{names}} on jo valittuja aikoja. Kopiointi korvaa ne.",
       "accept": "Kopioi ja korvaa"
     },
     "multipleReservationsPerDayWish": "Lisätietoja aikatoiveista",
