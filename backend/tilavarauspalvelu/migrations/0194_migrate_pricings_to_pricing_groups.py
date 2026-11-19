@@ -70,6 +70,10 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
             )
             continue
 
+        # Archived reservation units are hidden and cannot be reserved, so their prices need no sales item.
+        if reservation_unit.is_archived:
+            continue
+
         accounting = reservation_unit.payment_accounting
         if accounting is None and reservation_unit.unit is not None:
             accounting = reservation_unit.unit.payment_accounting
@@ -238,7 +242,7 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
         for pricing, valid_until in zip(unit_pricings, valid_until_dates, strict=True):
             # A past pricing gets a sales item only if one exists with the same tax level.
             sales_item = None
-            if _is_paid_online(pricing) and accounting is not None:
+            if _is_paid_online(pricing) and accounting is not None and not reservation_unit.is_archived:
                 if accounting.product_invoicing_material:
                     sales_item = sales_items_by_material.get(accounting.product_invoicing_material)
                 else:
