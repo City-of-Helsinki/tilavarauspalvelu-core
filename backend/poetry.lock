@@ -3752,18 +3752,18 @@ doc = ["furo", "sphinx"]
 
 [[package]]
 name = "stamina"
-version = "26.1.0"
+version = "26.2.0"
 description = "Production-grade retries made easy."
 optional = false
-python-versions = ">=3.10"
+python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "stamina-26.1.0-py3-none-any.whl", hash = "sha256:62e06829bec87c06d4cafde520b32a6097d1017c378a9eb63253c5bf5ebbbb88"},
-    {file = "stamina-26.1.0.tar.gz", hash = "sha256:0214d05fdf5102c518194a4aac7520ce53cf660550ae3b940701aad88cf50c17"},
+    {file = "stamina-26.2.0-py3-none-any.whl", hash = "sha256:4c9688f204d90544cd0c5bdd2a66fd82c6e7cb8248d70687ac69da3e7f5434f6"},
+    {file = "stamina-26.2.0.tar.gz", hash = "sha256:c81efa445d6cd6f898584faa7556df09f6e4d25c16e219914b6422eeb3372985"},
 ]
 
 [package.dependencies]
-tenacity = "*"
+tenacity = ">=8.3.0"
 
 [[package]]
 name = "svglib"
@@ -4076,4 +4076,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "b9eb2aa66cceff90943869a9d08d13a7cd4d1cc660aec1ffc015f10a445bb85d"
+content-hash = "ea2daff3ff015cfb108a5652793250309bc734274f4474c7252508dbc2947a62"
