@@ -2,6 +2,7 @@ import { describe, test, expect, it } from "vitest";
 import type { TFunction } from "i18next";
 import type { AgeGroupNode } from "../../gql/gql-types";
 import {
+  cleanHtmlContent,
   formatWhitespace,
   formatApiTimeInterval,
   formatListToCSV,
@@ -206,6 +207,18 @@ describe("stripHtml", () => {
 
   it("should decode entities and remove tags in one pass", () => {
     expect(stripHtml('<a href="test">Link &amp; text &lt;here&gt;</a>')).toBe("Link & text <here>");
+  });
+});
+
+describe("cleanHtmlContent", () => {
+  it("should keep &nbsp; as an entity", () => {
+    expect(cleanHtmlContent("<p>a&nbsp;b&nbsp;&nbsp;</p>")).toBe("<p>a&nbsp;b&nbsp;&nbsp;</p>");
+  });
+  it("should write a raw non-breaking space as &nbsp;", () => {
+    expect(cleanHtmlContent("<p>a\u00A0b</p>")).toBe("<p>a&nbsp;b</p>");
+  });
+  it("should keep other escaped characters", () => {
+    expect(cleanHtmlContent("<p>a &amp; b &lt;c&gt;</p>")).toBe("<p>a &amp; b &lt;c&gt;</p>");
   });
 });
 

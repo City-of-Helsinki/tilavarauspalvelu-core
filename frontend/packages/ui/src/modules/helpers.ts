@@ -394,7 +394,9 @@ export function cleanHtmlContent(html: string): string {
   if (sanitizeHtml(html, { allowedTags: [] }) === "") {
     return "";
   }
-  return sanitizeHtml(html, sanitizeConfig);
+  // sanitize-html decodes &nbsp; to U+00A0. The backend stores it as &nbsp;, so the raw character would show
+  // as a change in the audit log on every save.
+  return sanitizeHtml(html, sanitizeConfig).replaceAll("\u00A0", "&nbsp;");
 }
 
 export function charCount(value: string, maxLength = 0) {
