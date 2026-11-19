@@ -20,5 +20,7 @@ class PaymentProductFactory(GenericDjangoModelFactory[PaymentProduct]):
     id = factory.LazyFunction(uuid.uuid4)
 
     merchant = ForeignKeyFactory("tests.factories.PaymentMerchantFactory")
+    reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory", required=True)
+    sales_item = ForeignKeyFactory("tests.factories.SalesItemFactory")
 
-    reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitFactory")
+    reservation_price_lines = ReverseForeignKeyFactory("tests.factories.ReservationPriceLineFactory")

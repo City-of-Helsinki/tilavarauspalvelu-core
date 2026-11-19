@@ -66,6 +66,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models.application_round_time_slot.queryset import ApplicationRoundTimeSlotQuerySet
     from tilavarauspalvelu.models.equipment.queryset import EquipmentQuerySet
     from tilavarauspalvelu.models.intended_use.queryset import IntendedUseQuerySet
+    from tilavarauspalvelu.models.payment_product.queryset import PaymentProductQuerySet
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.models.reservation_series.queryset import ReservationSeriesQuerySet
     from tilavarauspalvelu.models.reservation_unit_access_type.queryset import ReservationUnitAccessTypeQuerySet
@@ -248,13 +249,6 @@ class ReservationUnit(models.Model):
         null=True,
         limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.PAYMENT),
     )
-    payment_product: PaymentProduct | None = models.ForeignKey(
-        "tilavarauspalvelu.PaymentProduct",
-        related_name="reservation_units",
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-    )
     payment_merchant: PaymentMerchant | None = models.ForeignKey(
         "tilavarauspalvelu.PaymentMerchant",
         related_name="reservation_units",
@@ -333,6 +327,7 @@ class ReservationUnit(models.Model):
     access_types: OneToManyRelatedManager[ReservationUnitAccessType, ReservationUnitAccessTypeQuerySet]
     reservation_series: OneToManyRelatedManager[ReservationSeries, ReservationSeriesQuerySet]
     reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
+    payment_products: OneToManyRelatedManager[PaymentProduct, PaymentProductQuerySet]
     application_round_time_slots: OneToManyRelatedManager[ApplicationRoundTimeSlot, ApplicationRoundTimeSlotQuerySet]
     application_rounds: ManyToManyRelatedManager[ApplicationRound, ApplicationRoundQuerySet]
 
