@@ -9,6 +9,7 @@
   "eventDuration": "Vuoron kesto",
   "purpose": "Vuoron käyttötarkoitus",
   "dates": "Kausi",
+  "priceOption": "Asiakasryhmä",
   "eventsPerWeek": "Vuorojen määrä / viikko",
   "biweekly": "Vakiovuorot vain joka toinen viikko",
   "requestedTimes": "Toivotut ajat",
