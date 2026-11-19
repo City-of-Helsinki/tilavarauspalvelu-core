@@ -192,6 +192,7 @@
       "ageGroup": "Åldersgrupp",
       "purpose": "Användningsändamål",
       "additionalInfo": "Tilläggsuppgifter om bokningen",
+      "priceOption": "Kundgrupp",
       "period": "Bokningsperiod",
       "duration": "Säsongbokningens varaktighet",
       "eventsPerWeek": "Bokningar per vecka",
