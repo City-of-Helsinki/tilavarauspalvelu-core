@@ -177,8 +177,9 @@ async function sweepDown(
   await user.keyboard(`{Shift>}${"{ArrowDown}".repeat(steps)}{/Shift}`);
 }
 
-// The error summary's title, and the section's error title, message, and the label of its list of too short times.
-const ERROR_TEXTS = 4;
+// The error summary's title, the section's link "{name}: {error title}", and the label of its list of too short times.
+// A too short error lists the times instead of showing a message.
+const ERROR_TEXTS = 3;
 
 // errors require form context so have to test on this level
 describe("Application page2 validation errors", () => {
@@ -192,13 +193,15 @@ describe("Application page2 validation errors", () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
     await user.click(tuesdayCell(view, "14:00"));
-    expect(view.getByText("application:validation.calendar.title")).toBeInTheDocument();
-    // The mocked t() appends the message's options.
     expect(
-      view.getByText(
+      view.getByRole("link", { name: "foobar: application:validation.calendar.tooShortTitle" })
+    ).toBeInTheDocument();
+    // The too short times are listed, so there is no separate message.
+    expect(
+      view.queryByText(
         /^application:validation\.calendar\.Suitable time range must be at least as long as the minimum duration/
       )
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
     const tooShort = view.getByRole("list", { name: "application:validation.calendar.tooShortTimes" });
     expect(
       within(tooShort)
@@ -206,7 +209,7 @@ describe("Application page2 validation errors", () => {
         .map((li) => li.textContent)
     ).toEqual([`${TUESDAY} 14:00–14:15, application:TimeSelector.legend.primary`]);
     const validationErrors = view.getAllByText(/application:validation/);
-    // summary title + section's title + message + the too short times' label, nothing else
+    // summary title + section's link + the too short times' label, nothing else
     expect(validationErrors).toHaveLength(ERROR_TEXTS);
   });
 

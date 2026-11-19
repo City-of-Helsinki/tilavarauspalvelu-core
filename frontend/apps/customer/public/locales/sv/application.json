@@ -28,12 +28,14 @@
     "calendar": {
       "summaryTitle": "Korrigera tidsönskemålen i dina bokningsönskemål innan du fortsätter",
       "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
-      "Suitable time range must be at least as long as the minimum duration": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
-      "At least as many suitable time ranges as applied reservations per week": "Antal bokningar per vecka du ansöker om: {{applied}}. Bokningar som ryms i dina tidsönskemål: {{fitting}}. Ange flera tidsönskemål i kalendern eller minska antalet bokningar per vecka i föregående steg.",
-      "Required": "Ange minst en tid för alla säsongbokningar",
-      "outsideOpeningHoursTitle": "En del av tidsönskemålen ligger utanför öppettiderna",
+      "Suitable time range must be at least as long as the minimum duration": "Förläng tidsönskemålen eller förkorta den minsta varaktigheten du valt i föregående steg.",
+      "At least as many suitable time ranges as applied reservations per week": "Antal bokningar per vecka du ansöker om: {{applied}}. Bokningar som ryms i dina tidsönskemål: {{fitting}}.\nAnge flera tidsönskemål i kalendern eller minska antalet bokningar per vecka i föregående steg.",
+      "requiredTitle": "Inga tidsönskemål valda",
+      "Required": "Ange tidsönskemål för ansökningen",
       "Suitable time range must be inside the opening hours": "Ta bort tiderna som markerats som ogiltiga i kalendern eller flytta dem till öppettiderna för den här bokningsönskans lokaler.",
+      "tooShortTitle": "För kort tidsönskemål",
       "tooShortTimes": "För korta tidsönskemål:",
+      "outsideOpeningHoursTitle": "En del av tidsönskemålen ligger utanför öppettiderna",
       "outsideOpeningHoursTimes": "Tidsönskemål utanför öppettiderna:"
     },
     "previewError": "Sidan {{ page }} har ett fel.",
