@@ -10,6 +10,7 @@ import { basename, dirname, join } from "node:path";
 import { errors } from "@playwright/test";
 import { mkdir, readdir, readFile, rm, utimes, writeFile } from "node:fs/promises";
 import { setTimeout as delay } from "node:timers/promises";
+import { describeAppVersions, readAppVersions } from "../lib/app-versions-reporter";
 import { BackendErrors } from "../lib/backend-errors";
 import { readEnv } from "../lib/env";
 import { reachesState } from "../lib/locators";
@@ -161,6 +162,42 @@ test.describe("Runtime", () => {
     await expect(retry(3, 10, alwaysFail)).rejects.toThrow("nope 3");
     expect(attempts).toBe(3);
     expect(await retry(3, 10, () => Promise.resolve("first"))).toBe("first");
+  });
+
+  test("The app versions are read from the apps, and an app that doesn't answer with one is unknown", async () => {
+    // The customer app answers, the staff app is behind a proxy that fails, and the backend isn't ready
+    const server = createServer((request, response) => {
+      if (request.url === "/healthcheck") {
+        response.writeHead(200, { "content-type": "application/json" });
+        response.end(JSON.stringify({ message: "Healthcheck", version: "v1.75.1" }));
+      } else if (request.url === "/monitoring/readiness/") {
+        response.writeHead(503, { "content-type": "application/json" });
+        response.end(JSON.stringify({ status: "NOT_READY", version: "3a4f1c2d", error: "no database" }));
+      } else {
+        response.writeHead(502, { "content-type": "text/html" });
+        response.end("<h1>502 Bad Gateway</h1>");
+      }
+    });
+    await once(server.listen(0, "127.0.0.1"), "listening");
+    const { port } = server.address() as AddressInfo;
+    try {
+      expect(await readAppVersions(`http://127.0.0.1:${port}/`)).toEqual({
+        customer: "v1.75.1",
+        staff: "unknown",
+        backend: "3a4f1c2d",
+      });
+    } finally {
+      server.closeAllConnections();
+      server.close();
+    }
+  });
+
+  test("The app versions are shown once, with the version at the end of each app that changed", () => {
+    const start = { customer: "v1.75.1", staff: "v1.75.1", backend: "unknown" };
+    expect(describeAppVersions(start, start)).toBe("customer v1.75.1, staff v1.75.1, backend unknown");
+    expect(describeAppVersions(start, { customer: "v1.75.1", staff: "3a4f1c2d", backend: "v1.75.1" })).toBe(
+      "customer v1.75.1, staff v1.75.1 (3a4f1c2d at the end of the run), backend unknown (v1.75.1 at the end of the run)"
+    );
   });
 
   test("Secrets are hidden in the errors keywords fail with", async () => {

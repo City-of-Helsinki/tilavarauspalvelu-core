@@ -1,6 +1,6 @@
-"""Summarizes a Playwright HTML report as text or Markdown: the run's totals, warnings, and each failed or flaky test
-with its error, the keyword path to the failing step, the attachments and the backend errors of each attempt
-(lib/backend-errors.ts).
+"""Summarizes a Playwright HTML report as text or Markdown: the run's totals, the versions of the apps in the test
+environment (lib/app-versions-reporter.ts), warnings, and each failed or flaky test with its error, the keyword path to
+the failing step, the attachments and the backend errors of each attempt (lib/backend-errors.ts).
 
 The HTML report keeps its data as a zip of JSON files inside index.html (`<template id="playwrightReportBase64">`).
 This reads it with the standard library, so a report downloaded from CI can be read without a browser.
@@ -28,6 +28,8 @@ ANSI = re.compile(r"\x1b\[[0-9;]*m")
 # The labels of an assertion's values: "Expected:", "Received:", "Expected pattern:", "Received string:" and so on
 ASSERTION_VALUE = re.compile(r"(Expected|Received)( [a-z]+)*:")
 BACKEND_ERROR = "backend error"
+# The key of the app versions in the report's metadata
+APP_VERSIONS = "App versions"
 # Failed tests first, then flaky, skipped and passed ones
 ORDER = {"unexpected": 0, "flaky": 1, "skipped": 2, "expected": 3}
 ICONS = {"unexpected": "❌", "flaky": "⚠️", "skipped": "⏭️", "expected": "✅"}
@@ -79,6 +81,11 @@ def started(summary: dict) -> str:  # type: ignore[type-arg]
     return start.astimezone().strftime("%Y-%m-%d %H:%M")
 
 
+def app_versions(summary: dict) -> str:  # type: ignore[type-arg]
+    """The versions of the apps in the test environment, or "" in a report without them."""
+    return str(summary.get("metadata", {}).get(APP_VERSIONS, ""))
+
+
 def warnings_of(tests: list[dict]) -> Counter[str]:  # type: ignore[type-arg]
     warnings: Counter[str] = Counter()
     for test in tests:
@@ -113,6 +120,9 @@ def print_text(report: Path, summary: dict, tests: list[dict], show_all: bool) -
         f"Run {started(summary)}, {summary.get('duration', 0) / 60_000:.0f} min: {stats['total']} tests, "
         f"{stats['expected']} passed, {stats['unexpected']} failed, {stats['flaky']} flaky, {stats['skipped']} skipped"
     )
+    versions = app_versions(summary)
+    if versions:
+        print(f"{APP_VERSIONS}: {versions}")
     # The run's errors are texts, unlike the errors of a test's results
     for error in summary.get("errors", []):
         print(f"Run error: {first_line(error)}")
@@ -152,6 +162,9 @@ def print_markdown(report: Path, summary: dict, tests: list[dict], show_all: boo
     # A skipped test fails the run too (lib/skips-fail-run-reporter.ts)
     passed = stats["unexpected"] == 0 and stats["skipped"] == 0 and not summary.get("errors")
     print(f"### {'✅' if passed else '❌'} Run {started(summary)}, {summary.get('duration', 0) / 60_000:.0f} min\n")
+    versions = app_versions(summary)
+    if versions:
+        print(f"**{APP_VERSIONS}:** {code(versions)}\n")
     print("| Project | ✅ Passed | ❌ Failed | ⚠️ Flaky | ⏭️ Skipped |")
     print("| --- | ---: | ---: | ---: | ---: |")
     projects: dict[str, Counter[str]] = {}

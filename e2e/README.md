@@ -59,14 +59,15 @@ Add `--headed` to watch the browser, `--ui` for the UI mode or `--debug` for the
 ## Results
 
 - **HTML report:** `pnpm report`. It shows each test's keyword steps with their arguments, and under "Before Hooks"
-  the users that the test's tags chose.
+  the users that the test's tags chose. Its title has the versions of the customer app, the staff app and the backend
+  in the test environment.
 - **Backend errors:** the report lists them at the top of each attempt: 5xx responses, failed or slow requests,
   GraphQL errors, the apps' error pages and errors in the page. They show whether a failure came from the backend.
 - **Failed tests** keep a full-page screenshot of each open page, a video and an `error-context.md` (the page's
   accessibility snapshot) in `test-results/`.
-- **Text summary:** `python3 tools/report_summary.py [report folder]` prints the totals, the warnings and each failed
-  or flaky test with its error, failing step, attachments and backend errors. It reads reports downloaded from CI too.
-  `--all` adds the passed tests.
+- **Text summary:** `python3 tools/report_summary.py [report folder]` prints the totals, the app versions, the warnings
+  and each failed or flaky test with its error, failing step, attachments and backend errors. It reads reports
+  downloaded from CI too. `--all` adds the passed tests.
 - **After `pnpm test:all`**, the notification suite has a report of its own:
   `pnpm exec playwright show-report playwright-report/notifications`. Its files are in `test-results/notifications/`.
 
@@ -161,8 +162,9 @@ shared users) and the workers of a parallel run (3, 4 or 5).
 
 - One run goes at a time.
 - The secrets are repository secrets with the same names.
-- The job summary links the reports and lists the results. The HTML reports open in the browser, without the
-  screenshots and videos. The `e2e-reports-<run number>-attempt-<attempt>` zip has everything. All are kept 30 days.
+- The job summary links the reports and lists the app versions and the results. The HTML reports open in the
+  browser, without the screenshots and videos. The `e2e-reports-<run number>-attempt-<attempt>` zip has everything.
+  All are kept 30 days.
 - "Re-run all jobs" deletes the reports of the earlier attempts. "Re-run failed jobs" and a new run keep them.
 - Both e2e workflows (E2E checks and E2E tests) run in the official Playwright image of the `@playwright/test` version
   in `package.json`, which has the browsers. Keep that version exact, without `^`.

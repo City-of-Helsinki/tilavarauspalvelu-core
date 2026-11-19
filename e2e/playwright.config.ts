@@ -78,6 +78,8 @@ export default defineConfig({
   outputDir: "test-results",
   reporter: [
     ["list"],
+    // The versions of the apps in the test environment. Before the html reporter, which writes them into the report.
+    ["./lib/app-versions-reporter.ts"],
     ["html", { open: "never", outputFolder: "playwright-report" }],
     ["junit", { outputFile: "test-results/junit.xml" }],
     // A skipped test fails the run: it checked nothing
