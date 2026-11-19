@@ -447,9 +447,13 @@ class ReservationActions:
         if not accounting.actions.supports_invoicing():
             return False
 
-        # The product accounting in Talpa has the material of the sales item of today.
-        sales_item = reservation_unit.actions.get_sales_item_today()
-        return sales_item is not None and bool(sales_item.material)
+        # An invoice needs a material in the product accounting, and the material comes from the sales item.
+        paid_lines = [
+            line
+            for line in self.reservation.price_lines.select_related("sales_item")
+            if (line.amount if line.override_amount is None else line.override_amount) > 0
+        ]
+        return all(line.sales_item is not None and line.sales_item.material for line in paid_lines)
 
     def get_applying_reservation_unit_access_type(self) -> ReservationUnitAccessType | None:
         """Get the reservation unit access type that is currently being applied to the reservation."""
