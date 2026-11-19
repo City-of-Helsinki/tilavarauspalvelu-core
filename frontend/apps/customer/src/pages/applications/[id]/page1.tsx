@@ -8,10 +8,21 @@ import { serverSideTranslations } from "next-i18next/pages/serverSideTranslation
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { parseApiDate } from "ui/src/modules/date-utils";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import {
+  createNodeId,
+  filterNonNullable,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  toNumber,
+} from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
 import { ApplicationPage1Document, useUpdateApplicationMutation } from "@gql/gql-types";
-import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql/gql-types";
+import type {
+  ApplicationPage1Query,
+  ApplicationPage1QueryVariables,
+  ApplicationRoundPriceOptionsQuery,
+  ApplicationRoundPriceOptionsQueryVariables,
+} from "@gql/gql-types";
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
   ApplicationPage1SchemaRefined,
@@ -21,13 +32,14 @@ import {
 import type { ApplicationPage1FormValues } from "@/components/application/funnel/form";
 import { useReservationUnitList } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getSearchOptions } from "@/modules/search";
+import { getSearchOptions, translateOption } from "@/modules/search";
 import { getApplicationPath } from "@/modules/urls";
 
 function Page1({
   application,
   options: optionsOrig,
-}: Pick<PropsNarrowed, "application" | "options">): React.ReactElement {
+  priceOptions,
+}: Pick<PropsNarrowed, "application" | "options" | "priceOptions">): React.ReactElement {
   const router = useRouter();
   const dislayError = useDisplayError();
   const [mutate, { loading: isSaving }] = useUpdateApplicationMutation();
@@ -62,7 +74,9 @@ function Page1({
   const form = useForm<ApplicationPage1FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage1(application, getReservationUnits()),
-    resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end })),
+    resolver: zodResolver(
+      ApplicationPage1SchemaRefined({ begin, end }, { isPriceOptionRequired: priceOptions.length > 0 })
+    ),
   });
 
   const { handleSubmit } = form;
@@ -77,6 +91,7 @@ function Page1({
             applicationRound={applicationRound}
             isSaving={isSaving || form.formState.isSubmitting}
             options={options}
+            priceOptions={priceOptions}
           />
         </ApplicationFunnelWrapper>
       </Flex>
@@ -113,13 +128,26 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (application == null) {
     return notFound;
   }
+  const { data: priceOptionsData } = await client.query<
+    ApplicationRoundPriceOptionsQuery,
+    ApplicationRoundPriceOptionsQueryVariables
+  >({
+    query: APPLICATION_PAGE1_PRICE_OPTIONS_QUERY,
+    variables: {
+      applicationRound: application.applicationRound.pk ?? 0,
+    },
+  });
+  const { applicationRoundPriceOptions } = priceOptionsData;
 
   const options = await getSearchOptions(client, "seasonal", locale ?? "fi");
-
+  const priceOptions = filterNonNullable(applicationRoundPriceOptions).map((option) =>
+    translateOption(option, getLocalizationLang(locale) ?? "fi")
+  );
   return {
     props: {
       application,
       options,
+      priceOptions,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -131,6 +159,21 @@ export const APPLICATION_PAGE1_QUERY = gql`
   query ApplicationPage1($id: ID!) {
     application(id: $id) {
       ...ApplicationForm
+    }
+  }
+`;
+
+export const APPLICATION_PAGE1_PRICE_OPTIONS_QUERY = gql`
+  query ApplicationRoundPriceOptions($applicationRound: Int!) {
+    applicationRoundPriceOptions(applicationRound: $applicationRound) {
+      pk
+      nameFi
+      nameSv
+      nameEn
+      descriptionFi
+      descriptionSv
+      descriptionEn
+      isActive
     }
   }
 `;

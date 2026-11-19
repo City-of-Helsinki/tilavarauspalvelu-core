@@ -47,6 +47,7 @@
     "groupSize": "Group size",
     "ageGroup": "Age group",
     "purpose": "Booking purpose",
+    "priceOption": "Customer group",
     "spacesSubHeading": "Requested spaces",
     "defaultPeriodPrefix": "Use the default booking period",
     "applicationRoundSubHeading": "Period",
