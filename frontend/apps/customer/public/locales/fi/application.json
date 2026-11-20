@@ -62,7 +62,14 @@
     "deleteDialog": {
       "heading": "Oletko varma, että haluat poistaa varauksen?",
       "content": "Kun varaus on peruttu, sen tietoja ei ole mahdollista palauttaa."
-    }
+    },
+    "participantGender": "Kenelle varaus on tarkoitettu?",
+    "sportSubHeading": "Laji",
+    "sport": "Laji",
+    "sportOtherOption": "Muu laji",
+    "sportOther": "Kirjoita laji",
+    "leagueLevel": "Sarjataso",
+    "leagueLevelHelper": "Esim. 3. divisioona. Jätä tyhjäksi, jos ryhmä ei pelaa sarjaa."
   },
   "TimeSelector": {
     "calendarLabel": "Valitse aikatoiveet kalenterista",
@@ -121,7 +128,9 @@
       "heading": "Korvataanko valitut ajat?",
       "text": "Varaustoiveissa {{names}} on jo valittuja aikoja. Kopiointi korvaa ne.",
       "accept": "Kopioi ja korvaa"
-    }
+    },
+    "multipleReservationsPerDayWish": "Toive useammasta vuorosta päivässä",
+    "multipleReservationsPerDayWishHelper": "Kerro, jos ryhmä tarvitsee useamman vuoron saman päivän aikana."
   },
   "Page3": {
     "subHeading": "Täytä hakijan tiedot",
@@ -163,7 +172,9 @@
     "organisationStreetAddress": "Katuosoite",
     "organisationPostCode": "Postinumero",
     "organisationCity": "Postitoimipaikka",
-    "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta"
+    "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta",
+    "organisationActiveMembers": "Aktiiviharrastajien määrä",
+    "organisationActiveMembersHelper": "Harrastajat, jotka osallistuvat toimintaan säännöllisesti"
   },
   "preview": {
     "subHeading": "Tarkista ja lähetä hakemus",
@@ -183,7 +194,8 @@
       "name": "Yhdistyksen tai yhteisön virallinen nimi",
       "coreBusiness": "Ydintoiminta",
       "registrationNumber": "Y-tunnus",
-      "billingAddress": "Laskutusosoite"
+      "billingAddress": "Laskutusosoite",
+      "activeMembers": "Aktiiviharrastajien määrä"
     },
     "applicationEvent": {
       "applicationInfo": "Hakemuksen tiedot",
@@ -196,7 +208,11 @@
       "eventsPerWeek": "Varausten määrä viikossa",
       "appliedSpaces": "Tilatoiveet",
       "schedules": "Aikatoiveet",
-      "scheduleTooltip": "Toissijaiset aikatoiveet merkitty sulkumerkeillä ( )"
+      "scheduleTooltip": "Toissijaiset aikatoiveet merkitty sulkumerkeillä ( )",
+      "participantGender": "Kenelle varaus on tarkoitettu",
+      "sport": "Laji",
+      "leagueLevel": "Sarjataso",
+      "multipleReservationsPerDayWish": "Toive useammasta vuorosta päivässä"
     },
     "applicationEventSchedules": "Aikatoiveet",
     "notification": {

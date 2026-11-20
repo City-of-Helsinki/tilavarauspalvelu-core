@@ -544,7 +544,8 @@ def test_frontend_queries__customer_ui__ApplicationPage1__regular(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationPage1"]
 
-    assert len(factories) == 1
+    # The application, and the sports and participant genders of the sports form.
+    assert len(factories) == 3
     query_info_1 = factories[0]
 
     user = graphql.login_with_regular_user()

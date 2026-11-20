@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
-import { ApplicationStatusChoice } from "@gql/gql-types";
+import { ApplicationFormType, ApplicationStatusChoice } from "@gql/gql-types";
 import type { ApplicationViewFragment } from "@gql/gql-types";
 import { ApplicationSection, ApplicationSectionHeader, StyledNotification } from "@/styled/application";
 import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
@@ -15,12 +15,13 @@ type ViewApplicationProps = {
 export function ViewApplication({ application, children }: ViewApplicationProps): React.ReactElement {
   const { t } = useTranslation();
   const shouldShowNotification = application.status !== ApplicationStatusChoice.ResultsSent;
+  const isSportsForm = application.applicationRound.applicationForm === ApplicationFormType.SportsForm;
   return (
     <>
       <div>
         <ApplicationSection>
           <ApplicationSectionHeader>{t("application:preview.basicInfoSubHeading")}</ApplicationSectionHeader>
-          <ApplicantInfoPreview application={application} />
+          <ApplicantInfoPreview application={application} isSportsForm={isSportsForm} />
         </ApplicationSection>
         <ApplicationSectionList application={application} />
       </div>

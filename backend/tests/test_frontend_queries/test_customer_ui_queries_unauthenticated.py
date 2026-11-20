@@ -498,7 +498,8 @@ def test_frontend_queries__customer_ui__ApplicationPage1__unauthenticated(graphq
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationPage1"]
 
-    assert len(factories) == 1
+    # The application, and the sports and participant genders of the sports form.
+    assert len(factories) == 3
     query_info_1 = factories[0]
 
     arts_key = "application_sections__reservation_unit_options__reservation_unit__application_round_time_slots"
