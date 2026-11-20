@@ -41,7 +41,7 @@
     "npkill": "^0.12.2",
     "oxfmt": "^0.78.0",
     "oxlint": "^1.93.0",
-    "oxlint-tsgolint": "^7.0.2006",
+    "oxlint-tsgolint": "^7.0.2007",
     "ts-node": "^10.9.2"
   },
   "engines": {
