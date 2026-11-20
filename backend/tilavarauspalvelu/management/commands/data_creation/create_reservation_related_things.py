@@ -18,7 +18,6 @@ from tilavarauspalvelu.models import (
     OriginHaukiResource,
     ParticipantGender,
     PaymentAccounting,
-    PaymentMerchant,
     ReservableTimeSpan,
     ReservationDenyReason,
     ReservationPurpose,
@@ -52,9 +51,15 @@ from tests.factories import (
 from .utils import IntendedUseData, fetch_image, get_image_path, with_logs
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit, ReservationUnitImage, TaxLevel
+    from tilavarauspalvelu.models import PaymentMerchant, ReservationUnit, ReservationUnitImage, TaxLevel
 
     from .utils import TaxLevelKey
+
+
+# This merchant exists in the Verkkokauppa test environment in the namespace of the dev environment.
+# See the 'refresh_test_verkkokauppa_products' management command.
+TEST_PAYMENT_MERCHANT_ID = "6ae76a5a-664a-43f4-8a26-ebdc3ebae162"
+TEST_PAYMENT_MERCHANT_NAME = "Varaamo dev test merchant"
 
 
 @with_logs
@@ -429,12 +434,11 @@ def _create_participant_genders() -> list[ParticipantGender]:
 
 
 @with_logs
-def _create_payment_merchants() -> list[PaymentMerchant]:
-    merchants = [
-        PaymentMerchantFactory.build()  #
-        for _ in range(10)
-    ]
-    return PaymentMerchant.objects.bulk_create(merchants)
+def _create_payment_merchant() -> PaymentMerchant:
+    return PaymentMerchantFactory.create(
+        id=TEST_PAYMENT_MERCHANT_ID,
+        name=TEST_PAYMENT_MERCHANT_NAME,
+    )
 
 
 @with_logs
