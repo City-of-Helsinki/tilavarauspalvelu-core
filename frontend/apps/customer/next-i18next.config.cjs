@@ -18,4 +18,7 @@ module.exports = {
         require("node:path").resolve("./public/locales")
       : "/public/locales",
   reloadOnPrerender,
+  // i18next v27 treats an empty translation as missing by default.
+  // Some of our translations are empty on purpose, so that nothing is shown.
+  returnEmptyString: true,
 };
