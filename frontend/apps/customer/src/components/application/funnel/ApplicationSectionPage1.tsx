@@ -21,7 +21,7 @@ type Props = Readonly<{
   index: number;
   applicationRound: ApplicationRoundForApplicationFragment;
   options: Readonly<OptionsListT>;
-  priceOptions: Readonly<OptionT[]>;
+  priceOptionList?: Readonly<OptionT[]>;
   onDeleteEvent: () => void;
 }>;
 
@@ -29,7 +29,7 @@ function ApplicationSectionInner({
   index,
   applicationRound,
   options,
-  priceOptions,
+  priceOptionList,
   onDeleteEvent,
 }: Props): React.ReactElement {
   const { t, i18n } = useTranslation();
@@ -138,10 +138,10 @@ function ApplicationSectionInner({
           required
           error={getTranslatedError("purpose")}
         />
-        {priceOptions.length > 0 && (
+        {priceOptionList?.length && (
           <ControlledSelect
             control={control}
-            options={priceOptions}
+            options={priceOptionList}
             name={`applicationSections.${index}.priceOption`}
             label={t("application:Page1.priceOption")}
             required
