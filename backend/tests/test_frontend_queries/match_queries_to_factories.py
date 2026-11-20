@@ -393,11 +393,13 @@ def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR09
         case models.UUIDField():
             return uuid.uuid4()
 
+        # Start from 1. Some fields have a check constraint that needs a positive value,
+        # for example the quantity of a reservation price line.
         case models.DecimalField():
-            return Decimal(random.randint(0, 100))
+            return Decimal(random.randint(1, 100))
 
         case models.FloatField():
-            return float(random.randint(0, 100))
+            return float(random.randint(1, 100))
 
         case _:
             msg = f"Field type not implemented: {field}"
