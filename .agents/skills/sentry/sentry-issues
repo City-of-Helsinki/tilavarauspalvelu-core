@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# List the issues of the Sentry projects of this service through the Sentry REST API.
+# The token is read from the secret file or from 1Password. See lib.sh.
+# Usage: sentry-issues [--project <name>] [--query <search>] [--period <period>] [--sort <sort>] [--limit <count>]
+#   e.g. sentry-issues --project core --query 'is:unresolved Hauki' --period 90d
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: sentry-issues [--project <name>] [--query <search>] [--period <period>] [--sort <sort>] [--limit <count>]
+  --project <name>    core, customer-ui or staff-ui. Repeat for more. Default all three.
+  --query <search>    Sentry search, as in the web UI. Default 'is:unresolved'.
+  --period <period>   Time window, for example 24h, 14d or 90d. Default 14d.
+  --sort <sort>       freq (events), date (last seen), new (first seen), user (users). Default freq.
+  --limit <count>     Most issues to print, 1 to 1000. Default 100.
+EOF
+  exit 2
+}
+
+projects=()
+query="is:unresolved"
+period="14d"
+sort="freq"
+limit=100
+while (( $# > 0 )); do
+  case "$1" in
+    --project | --query | --period | --sort | --limit)
+      (( $# >= 2 )) || usage
+      case "$1" in
+        --project) projects+=("$2") ;;
+        --query) query="$2" ;;
+        --period) period="$2" ;;
+        --sort) sort="$2" ;;
+        --limit) limit="$2" ;;
+      esac
+      shift 2
+      ;;
+    *) echo "Unknown argument: $1" >&2; usage ;;
+  esac
+done
+
+(( ${#projects[@]} > 0 )) || projects=(core customer-ui staff-ui)
+for project in "${projects[@]}"; do
+  case "$project" in
+    core | customer-ui | staff-ui) ;;
+    *) echo "Unknown project: $project" >&2; usage ;;
+  esac
+done
+[[ "$period" =~ ^[1-9][0-9]*[mhdw]$ ]] || { echo "Not a period: $period" >&2; usage; }
+[[ "$sort" =~ ^(freq|date|new|user)$ ]] || { echo "Unknown sort: $sort" >&2; usage; }
+[[ "$limit" =~ ^[1-9][0-9]*$ ]] && (( limit <= 1000 )) || { echo "Not a limit from 1 to 1000: $limit" >&2; usage; }
+
+load_token
+
+project_params=""
+for project in "${projects[@]}"; do
+  slug="tilavarauspalvelu-$project"
+  project_id="$(api "projects/?query=slug:$slug" | jq --raw-output --arg slug "$slug" '.[] | select(.slug == $slug) | .id')"
+  [[ -n "$project_id" ]] || { echo "Sentry project not found: $slug" >&2; exit 1; }
+  project_params+="&project=$project_id"
+done
+query_param="$(jq --raw-output --null-input --arg query "$query" '$query | @uri')"
+
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "$tmp_dir"' EXIT
+
+# Sentry gives at most 100 issues on a page. The Link header has the next cursor.
+per_page=$(( limit < 100 ? limit : 100 ))
+cursor=""
+page=0
+fetched=0
+truncated=false
+while :; do
+  page=$((page + 1))
+  api "issues/?query=$query_param&statsPeriod=$period&sort=$sort&limit=$per_page$project_params${cursor:+&cursor=$cursor}" \
+    --dump-header "$tmp_dir/headers" >"$tmp_dir/page-$(printf '%03d' "$page").json"
+  fetched=$(( fetched + $(jq 'length' "$tmp_dir/page-$(printf '%03d' "$page").json") ))
+  next="$(grep -io 'rel="next"; *results="true"; *cursor="[^"]*"' "$tmp_dir/headers" || true)"
+  [[ -n "$next" ]] || break
+  if (( fetched >= limit )); then
+    truncated=true
+    break
+  fi
+  cursor="$(sed -E 's/.*cursor="([^"]*)".*/\1/' <<<"$next")"
+done
+
+jq --slurp --argjson limit "$limit" --argjson truncated "$truncated" '
+  [.[][]][:$limit] as $issues | {
+    count: ($issues | length),
+    truncated: $truncated,
+    issues: [$issues[] | {
+      id,
+      short_id: .shortId,
+      project: .project.slug,
+      level,
+      status,
+      # count and user_count are for the period, not for the whole life of the issue.
+      count: (.count | tonumber),
+      user_count: .userCount,
+      first_seen: .firstSeen,
+      last_seen: .lastSeen,
+      title: (.title | gsub("[\\r\\n]+"; " ")),
+      culprit,
+      url: .permalink
+    }]
+  }' "$tmp_dir"/page-*.json
