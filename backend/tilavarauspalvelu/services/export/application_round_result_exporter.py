@@ -90,10 +90,8 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter[ApplicationSection]):
                 ),
                 Prefetch(
                     "reservation_unit_options__allocated_time_slots",
-                    AllocatedTimeSlot.objects.alias(
-                        day_of_the_week_number=L("day_of_the_week_number"),
-                    ).order_by(
-                        "day_of_the_week_number",
+                    AllocatedTimeSlot.objects.order_by(
+                        L("day_of_the_week_number").order_by(),
                         "begin_time",
                         "end_time",
                     ),
