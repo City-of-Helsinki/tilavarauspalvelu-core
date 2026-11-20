@@ -863,6 +863,8 @@ def _create_reservations_for_series(
     reservations: list[Reservation] = []
     occurrences: list[RejectedOccurrence] = []
 
+    assert series.recurrence_in_days is not None, "Reservation series must have a recurrence interval"
+
     for weekday in weekdays:
         begin_date = next_date_matching_weekday(series.begin_date, weekday)
 

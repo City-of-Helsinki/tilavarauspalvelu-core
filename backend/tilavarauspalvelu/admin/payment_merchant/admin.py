@@ -121,7 +121,7 @@ class PaymentMerchantForm(forms.ModelForm):
         instance: PaymentMerchant | None = self.instance
 
         if instance:
-            params = {
+            merchant_data = {
                 "name": self.cleaned_data.get("name", ""),
                 "street": self.cleaned_data.get("street", ""),
                 "zip": self.cleaned_data.get("zip", ""),
@@ -135,15 +135,15 @@ class PaymentMerchantForm(forms.ModelForm):
             }
 
             if instance.id is None:
-                params = CreateMerchantParams(
-                    **params,
+                create_params = CreateMerchantParams(
+                    **merchant_data,
                     paytrail_merchant_id=self.cleaned_data.get("shop_id", ""),
                 )
-                created_merchant = VerkkokauppaAPIClient.create_merchant(params=params)
+                created_merchant = VerkkokauppaAPIClient.create_merchant(params=create_params)
                 instance.id = created_merchant.id
             else:
-                params = UpdateMerchantParams(**params)
-                VerkkokauppaAPIClient.update_merchant(merchant_uuid=instance.id, params=params)
+                update_params = UpdateMerchantParams(**merchant_data)
+                VerkkokauppaAPIClient.update_merchant(merchant_uuid=instance.id, params=update_params)
 
         return super().save(commit=commit)
 

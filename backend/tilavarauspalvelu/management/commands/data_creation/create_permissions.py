@@ -25,8 +25,8 @@ def _set_user_roles() -> None:
     unit_groups = list(UnitGroup.objects.all())
 
     for user in users:
-        kind, user_role = user.last_name.split("-")
-        user_role: UserRoleChoice = UserRoleChoice(user_role)
+        kind, role_name = user.last_name.split("-")
+        user_role = UserRoleChoice(role_name)
 
         if kind == "Unit":
             UnitRoleFactory.create(

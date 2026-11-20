@@ -114,7 +114,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer[Reservation, Reserv
         )
 
         had_access_code = instance.access_type == AccessType.ACCESS_CODE
-        instance: Reservation = super().update(instance=instance, validated_data=validated_data)
+        super().update(instance=instance, validated_data=validated_data)
         has_access_code = instance.access_type == AccessType.ACCESS_CODE
 
         # After rescheduling the reservation, check for overlapping reservations again.

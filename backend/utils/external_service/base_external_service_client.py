@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 import stamina
 from requests import request
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class BaseExternalServiceClient:
     """Base class for creating external service clients"""
 
-    SERVICE_NAME: str | None = None
+    SERVICE_NAME: ClassVar[str]
     REQUEST_TIMEOUT_SECONDS: int | None = None
 
     ##################
@@ -62,7 +62,7 @@ class BaseExternalServiceClient:
         return cls._get_headers(headers)
 
     @classmethod
-    def response_json(cls, response: Response) -> dict[str, Any] | list[dict[str, Any]]:
+    def response_json(cls, response: Response) -> Any:
         """
         Parse a response from an API as json
         Raises an appropriate error if parsing fails or response is not ok

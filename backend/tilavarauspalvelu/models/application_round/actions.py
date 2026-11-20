@@ -40,6 +40,8 @@ from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import local_end_of_day, local_start_of_day
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from tilavarauspalvelu.models import ApplicationRound
 
 
@@ -163,10 +165,11 @@ class ApplicationRoundActions:
                 if pricing_data is not None:
                     reservation_details["price_option"] = price_option
 
-                hauki_resource_id = getattr(series.reservation_unit.origin_hauki_resource, "id", None)
+                hauki_resource = series.reservation_unit.origin_hauki_resource
+                closed_hours = closed_time_spans.get(hauki_resource.id, []) if hauki_resource is not None else []
                 slots = series.actions.pre_calculate_slots(
                     check_start_interval=True,
-                    closed_hours=closed_time_spans.get(hauki_resource_id, []),
+                    closed_hours=closed_hours,
                 )
 
                 reservations = series.actions.build_reservations_for_periods(
@@ -208,7 +211,7 @@ class ApplicationRoundActions:
             create_statistics_for_reservations_task.delay(reservation_pks=list(reservation_pks))
 
     def _get_series_override_closed_time_spans(
-        self, allocations: list[AllocatedTimeSlot]
+        self, allocations: Iterable[AllocatedTimeSlot]
     ) -> dict[int, list[TimeSpanElement]]:
         """
         Find all closed opening hours for all reservation units where allocations were made.

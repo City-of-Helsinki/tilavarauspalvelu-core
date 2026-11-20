@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import models, transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
-from graphene_django_extensions.serializers import NotProvided
+from graphene_django_extensions.serializers import NotProvidedType
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -131,7 +131,7 @@ class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
         user: AnyUser = self.context["request"].user
 
         with transaction.atomic():
-            instance = super().update(instance, validated_data)
+            super().update(instance, validated_data)
             instance.application.actions.reset_sent_at_if_changed_by_applicant(user=user)
 
         return instance
@@ -162,9 +162,9 @@ class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
         option_errors: list[str] = []
 
         # Fetch current ordering for existing event reservation units
-        current_ordering: dict[str, int] = {}
+        current_ordering: dict[int, int] = {}
         if self.instance is not None:
-            current_ordering: dict[str, int] = {
+            current_ordering = {
                 option["pk"]: option["preferred_order"]
                 for option in ReservationUnitOption.objects.filter(application_section=self.instance).values(
                     "preferred_order", "pk"
@@ -210,10 +210,10 @@ class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
         reservations_begin_date: datetime.date = self.get_or_default("reservations_begin_date", data)
         reservations_end_date: datetime.date = self.get_or_default("reservations_end_date", data)
 
-        application: Application | NotProvided = self.get_or_default("application", data)
+        application: Application | NotProvidedType = self.get_or_default("application", data)
 
         # Creating/updating application with application section
-        if application is NotProvided:
+        if isinstance(application, NotProvidedType):
             parent_serializer = self.parent.parent
             application_round = parent_serializer.get_or_default("application_round", parent_serializer.initial_data)
             if isinstance(application_round, ApplicationRound):
@@ -292,8 +292,8 @@ class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
             raise ValidationError(msg, code=error_codes.APPLICATION_SECTION_SPORT_AND_SPORT_OTHER_BOTH_SET)
 
     def find_application_round(self, data: dict[str, Any]) -> ApplicationRound:
-        application: Application | NotProvided = self.get_or_default("application", data)
-        if application is not NotProvided:
+        application: Application | NotProvidedType = self.get_or_default("application", data)
+        if not isinstance(application, NotProvidedType):
             return application.application_round
 
         # Creating/updating application with application section

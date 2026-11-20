@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import (
@@ -729,7 +730,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             can_apply_for_discount=True,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=40.0,
+            amount=Decimal(40),
             tax_level=tax_levels["general"],
         )
     ])
@@ -823,7 +824,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             reservation_unit=maksuton_mankeli,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=0.0,
+            amount=Decimal(0),
             tax_level=tax_levels["tax_free"],
         )
     ])
@@ -951,7 +952,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             reservation_unit=aina_maksullinen_aitio,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=40.0,
+            amount=Decimal(40),
             tax_level=tax_levels["general"],
         )
     ])
@@ -1063,7 +1064,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             can_apply_for_discount=True,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=30.0,
+            amount=Decimal(30),
             tax_level=tax_levels["general"],
         )
     ])
@@ -1150,7 +1151,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             reservation_unit=perumiskelvoton_parveke,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=0.0,
+            amount=Decimal(0),
             tax_level=tax_levels["tax_free"],
         )
     ])
@@ -1248,7 +1249,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             reservation_unit=perumiskelvoton_patio,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=30.0,
+            amount=Decimal(30),
             tax_level=tax_levels["general"],
         )
     ])
@@ -1352,7 +1353,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             reservation_unit=toistuvien_varausten_toimisto,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=0.0,
+            amount=Decimal(0),
             tax_level=tax_levels["tax_free"],
         )
     ])
@@ -1443,7 +1444,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             reservation_unit=tauotettu_takkahuone,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=0.0,
+            amount=Decimal(0),
             tax_level=tax_levels["tax_free"],
         )
     ])
@@ -1545,7 +1546,7 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
             reservation_unit=aina_kasiteltava_kammio,
             begins=datetime.date(2023, 1, 1),
             price_unit=PriceUnit.PER_HOUR,
-            amount=0.0,
+            amount=Decimal(0),
             tax_level=tax_levels["tax_free"],
         )
     ])

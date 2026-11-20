@@ -49,7 +49,7 @@ __all__ = [
 
 
 class ApplicationCreateSerializer(NestingModelSerializer[Application]):
-    user = serializers.HiddenField(default=CurrentUserDefaultNullable())
+    user: serializers.Field = serializers.HiddenField(default=CurrentUserDefaultNullable())
 
     application_sections = ApplicationSectionForApplicationSerializer(required=False, many=True)
 
@@ -157,7 +157,7 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
         user: AnyUser = self.context["request"].user
 
         with transaction.atomic():
-            instance = super().update(instance, validated_data)
+            super().update(instance, validated_data)
             instance.actions.reset_sent_at_if_changed_by_applicant(user=user)
 
         return instance

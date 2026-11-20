@@ -6,6 +6,7 @@ import graphene
 from django.db.models import Value
 from django.db.models.functions import Concat, Trim
 from graphene_django_extensions import DjangoNode
+from graphene_django_extensions.permissions import BasePermission
 from lookup_property import L
 from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
 
@@ -123,4 +124,4 @@ class ApplicantNode(UserNode):
         skip_registry = True
         # No need to check permissions, since permissions for the
         # `ApplicationNode` are enough to access the `ApplicantNode`.
-        permission_classes = []
+        permission_classes: list[type[BasePermission]] = []
