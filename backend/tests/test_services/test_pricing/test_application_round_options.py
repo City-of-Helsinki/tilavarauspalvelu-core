@@ -101,7 +101,7 @@ def test_round_price_options__shared_group__ordered_by_name():
     assert application_round_price_options(application_round) == [adults, juniors]
 
 
-def test_round_price_options__inactive_option_is_offered():
+def test_round_price_options__inactive_option_is_not_offered():
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group, is_active=False)
@@ -109,7 +109,7 @@ def test_round_price_options__inactive_option_is_offered():
 
     application_round = create_round([create_unit_using(pricing_group)])
 
-    assert application_round_price_options(application_round) == [adults]
+    assert application_round_price_options(application_round) == []
 
 
 def test_round_price_options__component_without_option_offers_active_unit_group_options():
@@ -555,6 +555,20 @@ def test_price_option_change__deactivated_implicit_option_is_checked():
     adults = PriceOptionFactory.create(unit_group=unit_group)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     PriceComponentFactory.create(pricing_group=pricing_group, price_option=None, valid_from=JAN_1)
+    create_round([create_unit_using(pricing_group)])
+
+    adults.is_active = False
+
+    errors = check_price_option_change_keeps_round_options(adults)
+
+    assert [error.code for error in errors] == [error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED]
+
+
+def test_price_option_change__deactivated_explicit_option_is_checked():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group)
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=adults, valid_from=JAN_1)
     create_round([create_unit_using(pricing_group)])
 
     adults.is_active = False
