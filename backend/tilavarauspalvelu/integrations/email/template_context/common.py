@@ -411,7 +411,8 @@ def params_for_access_type_change_section(*, section: ApplicationSection) -> Acc
                 "access_types",
                 queryset=(
                     # Access types that are valid from now until the end of the reservation period of the section
-                    ReservationUnitAccessType.objects
+                    # The annotations use the lookup property names, so that the properties read the annotated values.
+                    ReservationUnitAccessType.objects  # type: ignore[no-redef]
                     .all()
                     .annotate(end_date=L("end_date"))
                     .on_period(

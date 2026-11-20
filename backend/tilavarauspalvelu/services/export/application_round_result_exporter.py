@@ -59,7 +59,8 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter[ApplicationSection]):
     @property
     def queryset(self) -> ApplicationSectionQuerySet:
         return (
-            ApplicationSection.objects
+            # The annotations use the lookup property names, so that the properties read the annotated values.
+            ApplicationSection.objects  # type: ignore[no-redef]
             .annotate(
                 # Annotate statuses for performance
                 application_status=L("application__status"),
