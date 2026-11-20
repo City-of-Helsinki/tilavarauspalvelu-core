@@ -218,7 +218,8 @@ class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
 
         # Creating/updating application with application section
         if isinstance(application, NotProvidedType):
-            parent_serializer = self.parent.parent
+            # The parent of the list serializer is the application serializer.
+            parent_serializer: NestingModelSerializer = self.parent.parent  # type: ignore[assignment]
             application_round = parent_serializer.get_or_default("application_round", parent_serializer.initial_data)
             if isinstance(application_round, ApplicationRound):
                 application_round = application_round.pk
@@ -231,7 +232,7 @@ class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
             )
 
         else:
-            reservation_period: dict[str, datetime.date] = (
+            reservation_period = (
                 Application.objects
                 .select_related("application_round")
                 .filter(pk=application.pk)
@@ -302,8 +303,9 @@ class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
         if not isinstance(application, NotProvidedType):
             return application.application_round
 
-        # Creating/updating application with application section
-        parent_serializer = self.parent.parent
+        # Creating/updating application with application section.
+        # The parent of the list serializer is the application serializer.
+        parent_serializer: NestingModelSerializer = self.parent.parent  # type: ignore[assignment]
         application_round = parent_serializer.get_or_default("application_round", parent_serializer.initial_data)
         if isinstance(application_round, ApplicationRound):
             return application_round

@@ -26,7 +26,8 @@ __all__ = [
 ]
 
 
-class Space(MPTTModel):
+# django-mptt has no types, so the Django plugin cannot find the type of the tree manager that MPTT adds.
+class Space(MPTTModel):  # type: ignore[django-manager-missing]
     name = models.CharField(max_length=255)
     surface_area = models.IntegerField(blank=True, null=True)
     max_persons = models.PositiveIntegerField(null=True, blank=True)

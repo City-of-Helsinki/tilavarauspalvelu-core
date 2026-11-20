@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NotRequired, TypedDict
+from typing import TYPE_CHECKING, NotRequired, TypedDict, final
 
 if TYPE_CHECKING:
     import datetime
@@ -69,6 +69,8 @@ class PindoraAccessCodePeriod(TypedDict):
     access_code_ends_at: datetime.datetime
 
 
+# Final, so that mypy can tell the validities apart with a check for the 'reservation_unit_id' key.
+@final
 class PindoraSeasonalBookingAccessCodeValidity(PindoraAccessCodeValidity):
     reservation_unit_id: uuid.UUID
 
@@ -84,6 +86,7 @@ class PindoraSeasonalBookingResponse(TypedDict):
     reservation_unit_code_validity: list[PindoraSeasonalBookingAccessCodeValidity]
 
 
+@final
 class PindoraReservationSeriesAccessCodeValidity(PindoraAccessCodeValidity): ...
 
 

@@ -319,7 +319,8 @@ class ReservationUnitManager(ModelManager[ReservationUnit, ReservationUnitQueryS
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
-        return self._constructor_args == other._constructor_args
+        # 'BaseManager.__new__' sets '_constructor_args', but the Django stubs do not include it.
+        return self._constructor_args == other._constructor_args  # type: ignore[attr-defined]
 
     # Copied from 'BaseManager.__hash__'
     def __hash__(self) -> int:

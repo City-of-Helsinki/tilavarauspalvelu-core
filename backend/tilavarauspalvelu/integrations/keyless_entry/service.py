@@ -701,7 +701,10 @@ class PindoraService:
 
         access_code_validity: list[PindoraValidityInfoData] = []
         for validity in validities:
-            reservation_unit_uuid = validity.get("reservation_unit_id", series.reservation_unit.ext_uuid)
+            if "reservation_unit_id" in validity:
+                reservation_unit_uuid = validity["reservation_unit_id"]
+            else:
+                reservation_unit_uuid = series.reservation_unit.ext_uuid
             key = (validity["begin"], validity["end"], reservation_unit_uuid)
             reservation_id = reservations_by_period.get(key)
 

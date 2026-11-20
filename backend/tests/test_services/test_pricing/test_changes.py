@@ -52,7 +52,12 @@ def freeze_today():
 def error_details(error: ValidationError) -> list[ErrorDetail]:
     details = error.detail
     assert isinstance(details, list)
-    return details
+
+    error_details: list[ErrorDetail] = []
+    for detail in details:
+        assert isinstance(detail, ErrorDetail)
+        error_details.append(detail)
+    return error_details
 
 
 # ── Price change ──

@@ -505,7 +505,10 @@ def _send_with_monday_range(graphql, begin_time: datetime.time, end_time: dateti
         application_sections__suitable_time_ranges__end_time=end_time,
     )
     section = application.application_sections.first()
-    reservation_unit = section.reservation_unit_options.first().reservation_unit
+    assert section is not None
+    option = section.reservation_unit_options.first()
+    assert option is not None
+    reservation_unit = option.reservation_unit
     _set_opening_hours(reservation_unit, Weekday.MONDAY, *opening_hours)
 
     graphql.login_with_superuser()
