@@ -31,7 +31,9 @@ describe("Stepper when starting application", () => {
     ["page4", "application:preview.subHeading"],
   ] as const)("application %s title", ([page, subtitle]) => {
     const application = createMockApplicationFragment({ page });
-    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    const view = render(
+      <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page={page} />
+    );
     expect(view.getByRole("heading", { name: "application:heading" })).toBeInTheDocument();
     expect(view.getByText(subtitle)).toBeInTheDocument();
     expect(view.getByRole("heading", { name: subtitle })).toBeInTheDocument();
@@ -39,7 +41,9 @@ describe("Stepper when starting application", () => {
 
   test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)("application %s breadcrumb", ([page]) => {
     const application = createMockApplicationFragment({ page });
-    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    const view = render(
+      <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page={page} />
+    );
     expect(view.getByRole("link", { name: "breadcrumb:frontpage" })).toBeInTheDocument();
     expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     // current not a link
@@ -55,27 +59,35 @@ describe("Stepper when starting application", () => {
     ["page4", "RECEIVED"],
   ] as const)("application %s status = %s", ([page, status]) => {
     const application = createMockApplicationFragment({ page });
-    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    const view = render(
+      <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page={page} />
+    );
     const statusLabel = `application:status.${status}`;
     expect(view.getByText(statusLabel)).toBeInTheDocument();
   });
 
   test("application page2 info notification", () => {
     const application = createMockApplicationFragment({ page: "page2" });
-    const view = render(<ApplicationFunnelWrapper application={application} page="page2" />);
+    const view = render(
+      <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page="page2" />
+    );
     // HDS notification has invisible label with same text
     expect(view.getAllByText("application:Page2.info")).toHaveLength(2);
   });
 
   test.for([["page1"], ["page3"], ["page4"]] as const)("application %s NO info notification", ([page]) => {
     const application = createMockApplicationFragment({ page });
-    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    const view = render(
+      <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page={page} />
+    );
     expect(view.queryByText("application:Page2.info")).not.toBeInTheDocument();
   });
 
   test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)("application %s notes when applying", ([page]) => {
     const application = createMockApplicationFragment({ page });
-    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    const view = render(
+      <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page={page} />
+    );
     expect(
       view.getByRole("heading", {
         name: "applicationRound:notesWhenApplying",
@@ -89,7 +101,9 @@ describe("Stepper when starting application", () => {
       page,
       notesWhenApplying: null,
     });
-    const view = render(<ApplicationFunnelWrapper application={application} page={page} />);
+    const view = render(
+      <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page={page} />
+    );
     expect(view.queryByText("applicationRound:notesWhenApplying")).not.toBeInTheDocument();
   });
 });

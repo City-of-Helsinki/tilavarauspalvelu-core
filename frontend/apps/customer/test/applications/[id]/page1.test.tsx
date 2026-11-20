@@ -88,7 +88,7 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
   const options: OptionsListT = createOptionMock();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <Page1 application={application} options={options} priceOptionList={[]} />
+      <Page1 application={application} options={options} priceOptionList={[]} offeredPriceOptionPkList={[]} />
     </MockedGraphQLProvider>
   );
 }

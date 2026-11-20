@@ -17,13 +17,17 @@ import { ApplicationTerms } from "@/components/application";
 import { validateApplication, PAGES_WITH_STEPPER, ApplicationFunnelWrapper } from "@/components/application/funnel";
 import { ViewApplication } from "@/components/application/view";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getGenericTerms } from "@/modules/serverUtils";
+import { getApplicationRoundPriceOptions, getGenericTerms, toPriceOptionPkList } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
-function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">): React.ReactElement {
+function Page4({
+  application,
+  tos,
+  offeredPriceOptionPkList,
+}: Pick<PropsNarrowed, "application" | "tos" | "offeredPriceOptionPkList">): React.ReactElement {
   const router = useRouter();
   const dislayError = useDisplayError();
   const { t } = useTranslation();
@@ -40,10 +44,11 @@ function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">)
   const [send, { loading: isMutationLoading }] = useSendApplicationMutation();
 
   const hasTermsAccepted = isTermsAccepted.general && isTermsAccepted.specific;
+  const isValid = validateApplication(application, { offeredPriceOptionPkList });
 
   const onSubmit = async (evt: React.FormEvent) => {
     evt.preventDefault();
-    if (!hasTermsAccepted) {
+    if (!hasTermsAccepted || !isValid.valid) {
       return;
     }
     try {
@@ -71,10 +76,12 @@ function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">)
     }
   };
 
-  const isValid = validateApplication(application);
-
   return (
-    <ApplicationFunnelWrapper page="page4" application={application}>
+    <ApplicationFunnelWrapper
+      page="page4"
+      application={application}
+      offeredPriceOptionPkList={offeredPriceOptionPkList}
+    >
       <Flex as="form" onSubmit={onSubmit}>
         <ViewApplication application={application}>
           <ApplicationTerms
@@ -87,7 +94,7 @@ function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">)
         {!isValid.valid && (
           <ErrorText>
             {t("application:validation.previewError", {
-              page: t(`application:navigation.${PAGES_WITH_STEPPER[isValid.page]}`),
+              page: t(`application:navigation.${PAGES_WITH_STEPPER[isValid.page - 1]}`),
             })}{" "}
             <Link href={getApplicationPath(application.pk, `page${isValid.page}`)}>
               {t("application:validation.fix")}
@@ -105,7 +112,7 @@ function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">)
             variant={isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
             iconStart={isMutationLoading ? <LoadingSpinner small /> : undefined}
             size={ButtonSize.Small}
-            disabled={!hasTermsAccepted || isMutationLoading}
+            disabled={!hasTermsAccepted || !isValid.valid || isMutationLoading}
           >
             {t("common:submit")}
           </Button>
@@ -147,10 +154,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
+  const priceOptionList = await getApplicationRoundPriceOptions(apolloClient, application.applicationRound.pk);
+
   return {
     props: {
       application,
       tos,
+      offeredPriceOptionPkList: toPriceOptionPkList(priceOptionList),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

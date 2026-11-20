@@ -40,7 +40,7 @@ describe("Stepper when starting application", () => {
     "stepper step $label should render and be disabled = $isDisabled",
     ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({ page: "page0" });
-      const view = render(<ApplicationStepper application={application} />);
+      const view = render(<ApplicationStepper application={application} offeredPriceOptionPkList={[]} />);
       checkStepperStep(view, label, isDisabled);
     }
   );
@@ -54,7 +54,7 @@ describe("Stepper when page 1 is valid", () => {
     }))
   )("stepper step $label should render and be disabled = $isDisabled", ({ label, isDisabled }) => {
     const application = createMockApplicationFragment({ page: "page1" });
-    const view = render(<ApplicationStepper application={application} />);
+    const view = render(<ApplicationStepper application={application} offeredPriceOptionPkList={[]} />);
     checkStepperStep(view, label, isDisabled);
   });
 });
@@ -67,7 +67,7 @@ describe("Stepper when page 2 is valid", () => {
     }))
   )("stepper step $label should render and be disabled = $isDisabled", ({ label, isDisabled }) => {
     const application = createMockApplicationFragment({ page: "page2" });
-    const view = render(<ApplicationStepper application={application} />);
+    const view = render(<ApplicationStepper application={application} offeredPriceOptionPkList={[]} />);
     checkStepperStep(view, label, isDisabled);
   });
 });
@@ -77,7 +77,7 @@ describe("Stepper when page 3 is valid", () => {
     "stepper step $label should render and be disabled = $isDisabled",
     ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({ page: "page3" });
-      const view = render(<ApplicationStepper application={application} />);
+      const view = render(<ApplicationStepper application={application} offeredPriceOptionPkList={[]} />);
       checkStepperStep(view, label, isDisabled);
     }
   );
@@ -90,7 +90,7 @@ describe("Stepper when application has been sent", () => {
       const application = createMockApplicationFragment({
         page: "page4",
       });
-      const view = render(<ApplicationStepper application={application} />);
+      const view = render(<ApplicationStepper application={application} offeredPriceOptionPkList={[]} />);
       checkStepperStep(view, label, isDisabled, true);
     }
   );
