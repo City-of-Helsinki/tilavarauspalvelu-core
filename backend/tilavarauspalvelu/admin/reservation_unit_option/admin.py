@@ -9,8 +9,7 @@ from tilavarauspalvelu.models import ReservationUnitOption
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 __all__ = [
@@ -61,7 +60,7 @@ class ReservationUnitOptionAdmin(admin.ModelAdmin):
     def application(self, obj: ReservationUnitOption) -> str:
         return str(obj.application_section.application)
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return (
             super()
             .get_queryset(request)

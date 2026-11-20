@@ -25,8 +25,7 @@ from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 class ApplicationSectionInline(admin.TabularInline):
@@ -36,13 +35,13 @@ class ApplicationSectionInline(admin.TabularInline):
     show_change_link = True
     can_delete = False
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return super().get_queryset(request).annotate(status=L("status")).prefetch_related("suitable_time_ranges")
 
-    def has_add_permission(self, request: WSGIRequest, obj: ApplicationSection | None = None) -> bool:
+    def has_add_permission(self, request: HttpRequest, obj: ApplicationSection | None = None) -> bool:
         return False
 
-    def has_change_permission(self, request: WSGIRequest, obj: ApplicationSection | None = None) -> bool:
+    def has_change_permission(self, request: HttpRequest, obj: ApplicationSection | None = None) -> bool:
         return False
 
     def suitable_days_of_the_week(self, obj: ApplicationSection) -> str:
@@ -55,7 +54,7 @@ class ReservationUnitOptionInline(admin.TabularInline):
     extra = 0
     autocomplete_fields = ["reservation_unit"]
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return super().get_queryset(request).select_related("reservation_unit__unit")
 
 
@@ -152,7 +151,7 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         ReservationUnitOptionInline,
     ]
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return (
             super()
             .get_queryset(request)

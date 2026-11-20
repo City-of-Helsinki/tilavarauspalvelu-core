@@ -14,8 +14,7 @@ from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 class ReservationSeriesAdminForm(forms.ModelForm):
@@ -119,5 +118,5 @@ class ReservationInline(admin.TabularInline):
     )
     readonly_fields = fields
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet[Reservation]:
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Reservation]:
         return super().get_queryset(request).prefetch_related("price_lines")

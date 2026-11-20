@@ -35,6 +35,7 @@ from .form import PaymentOrderInline, ReservationAdminForm, ReservationPriceLine
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
+    from django.http import HttpRequest
 
     from tilavarauspalvelu.models import PaymentOrder
     from tilavarauspalvelu.typing import WSGIRequest
@@ -201,11 +202,11 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     inlines = [PaymentOrderInline, ReservationPriceLineInline]
 
     @button(label=_("Open in staff UI"), change_form=True)
-    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def open_in_staff_ui(self, request: HttpRequest, pk: str) -> HttpResponseRedirect:
         url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
         return HttpResponseRedirect(f"{url_base}/kasittely/reservations/{pk}")
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet[Reservation]:
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Reservation]:
         return (
             super()
             .get_queryset(request)
@@ -215,7 +216,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
 
     def get_search_results(
         self,
-        request: WSGIRequest,
+        request: HttpRequest,
         queryset: QuerySet,
         search_term: Any,
     ) -> tuple[QuerySet, bool]:

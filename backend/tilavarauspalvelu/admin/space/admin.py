@@ -11,8 +11,7 @@ from tilavarauspalvelu.models import Space
 
 if TYPE_CHECKING:
     from django.db import models
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 class SpaceInline(admin.StackedInline):
@@ -28,10 +27,10 @@ class SpaceInline(admin.StackedInline):
     extra = 0
     show_change_link = True
 
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("unit", "parent__unit")
 
-    def formfield_for_foreignkey(self, db_field: models.ForeignKey, request: WSGIRequest, **kwargs: Any) -> Any:
+    def formfield_for_foreignkey(self, db_field: models.ForeignKey, request: HttpRequest, **kwargs: Any) -> Any:
         # The option label includes the unit name, so fetch the units in the same query.
         if db_field.name == "parent":
             kwargs["queryset"] = Space.objects.select_related("unit")
@@ -68,16 +67,16 @@ class SpaceAdmin(TranslationAdmin, MPTTModelAdmin):
         SpaceInline,
     ]
 
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("unit", "parent__unit")
 
-    def formfield_for_foreignkey(self, db_field: models.ForeignKey, request: WSGIRequest, **kwargs: Any) -> Any:
+    def formfield_for_foreignkey(self, db_field: models.ForeignKey, request: HttpRequest, **kwargs: Any) -> Any:
         # The option label includes the unit name, so fetch the units in the same query.
         if db_field.name == "parent":
             kwargs["queryset"] = Space.objects.select_related("unit")
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-    def has_delete_permission(self, request: WSGIRequest, obj: Space | None = None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj: Space | None = None) -> bool:
         if obj is not None and obj.reservation_units.exists():
             return False
 

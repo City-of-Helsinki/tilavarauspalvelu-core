@@ -19,8 +19,7 @@ from tilavarauspalvelu.models import AllocatedTimeSlot
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 @admin.register(AllocatedTimeSlot)
@@ -75,7 +74,7 @@ class AllocatedTimeSlotAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     def application(self, obj: AllocatedTimeSlot) -> str:
         return str(obj.reservation_unit_option.application_section.application)
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return (
             super()
             .get_queryset(request)

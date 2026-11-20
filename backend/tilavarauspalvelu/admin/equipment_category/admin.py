@@ -10,7 +10,7 @@ from modeltranslation.admin import TranslationAdmin
 from tilavarauspalvelu.models import EquipmentCategory
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 @admin.register(EquipmentCategory)
@@ -27,7 +27,7 @@ class EquipmentCategoryAdmin(SortableAdminMixin, TranslationAdmin):
     def number_of_equipment(self, obj: EquipmentCategory) -> int:
         return getattr(obj, "number_of_equipment", -1)
 
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         return (
             super()
             .get_queryset(request)

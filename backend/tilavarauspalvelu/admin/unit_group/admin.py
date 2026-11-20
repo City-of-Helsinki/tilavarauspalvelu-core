@@ -10,7 +10,8 @@ from modeltranslation.admin import TranslationAdmin
 from tilavarauspalvelu.models import UnitGroup
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
+
 
 __all__ = [
     "UnitGroupAdmin",
@@ -37,7 +38,7 @@ class UnitGroupAdmin(TranslationAdmin):
     ]
     filter_horizontal = ["units"]
 
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         return (
             super()
             .get_queryset(request)

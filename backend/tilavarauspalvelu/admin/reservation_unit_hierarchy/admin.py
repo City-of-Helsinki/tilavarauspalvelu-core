@@ -9,7 +9,7 @@ from django.contrib import admin
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 @admin.register(ReservationUnitHierarchy)
@@ -24,15 +24,15 @@ class ReservationUnitHierarchyAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     ]
 
     @button(label="Refresh reservation unit hierarchy", change_list=True)
-    def refresh_data(self, request: WSGIRequest) -> None:
+    def refresh_data(self, request: HttpRequest) -> None:
         ReservationUnitHierarchy.refresh()
         self.message_user(request, "Reservation unit hierarchy was refreshed successfully.")
 
-    def has_add_permission(self, request: WSGIRequest) -> bool:
+    def has_add_permission(self, request: HttpRequest) -> bool:
         return False
 
-    def has_delete_permission(self, request: WSGIRequest, obj=None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj=None) -> bool:
         return False
 
-    def has_change_permission(self, request: WSGIRequest, obj=None) -> bool:
+    def has_change_permission(self, request: HttpRequest, obj=None) -> bool:
         return True

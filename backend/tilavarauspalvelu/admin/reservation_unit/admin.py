@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from django import forms
     from django.db import models
     from django.db.models import QuerySet
-    from django.http import FileResponse
+    from django.http import FileResponse, HttpRequest
     from django_stubs_ext import StrOrPromise
 
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
@@ -45,7 +45,7 @@ class CurrentAccessTypeFilter(admin.SimpleListFilter):
     def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return AccessType.choices
 
-    def queryset(self, request: WSGIRequest, queryset: ReservationUnitQuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         value = self.value()
         if value is None:
             return queryset
@@ -232,14 +232,14 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
         return obj.current_access_type
 
     @button(label=_("Reservations"), change_form=True)
-    def show_reservations(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def show_reservations(self, request: HttpRequest, pk: str) -> HttpResponseRedirect:
         changelist_url = reverse("admin:tilavarauspalvelu_reservation_changelist")
         # The reservation unit filter of the reservation list uses this parameter.
         query_string = urlencode({"reservation_unit__id__in": pk})
         return HttpResponseRedirect(f"{changelist_url}?{query_string}")
 
     @button(label=_("Open in staff UI"), change_form=True)
-    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def open_in_staff_ui(self, request: HttpRequest, pk: str) -> HttpResponseRedirect:
         unit_pk = ReservationUnit.objects.values_list("unit", flat=True).get(pk=pk)
         url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
         return HttpResponseRedirect(f"{url_base}/kasittely/units/{unit_pk}/reservation-units/{pk}")
@@ -247,7 +247,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
     def formfield_for_manytomany(
         self,
         db_field: models.ManyToManyField,
-        request: WSGIRequest,
+        request: HttpRequest,
         **kwargs: Any,
     ) -> Any:
         # The option labels include the unit name, so fetch the units in the same query.
@@ -257,7 +257,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
             kwargs["queryset"] = Resource.objects.select_related("space__unit")
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet[ReservationUnit]:
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet[ReservationUnit]:
         return (
             super()
             .get_queryset(request)
@@ -271,7 +271,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
 
     def get_search_results(
         self,
-        request: WSGIRequest,
+        request: HttpRequest,
         queryset: models.QuerySet,
         search_term: Any,
     ) -> tuple[models.QuerySet, bool]:
@@ -299,7 +299,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
 
         return response
 
-    def save_model(self, request: WSGIRequest, obj: ReservationUnit, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
+    def save_model(self, request: HttpRequest, obj: ReservationUnit, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
         super().save_model(request, obj, form, change)
 
         # Update ReservableTimeSpans for HaukiResource when ReservationUnit is saved.

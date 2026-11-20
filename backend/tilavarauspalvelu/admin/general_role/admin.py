@@ -11,8 +11,8 @@ from tilavarauspalvelu.models import GeneralRole
 if TYPE_CHECKING:
     from django import forms
     from django.db import models
+    from django.http import HttpRequest
 
-    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "GeneralRoleAdmin",
@@ -60,7 +60,7 @@ class GeneralRoleAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "user",
     ]
 
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         return (
             super()
             .get_queryset(request)
@@ -70,7 +70,7 @@ class GeneralRoleAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             )
         )
 
-    def save_model(self, request: WSGIRequest, obj: GeneralRole, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
+    def save_model(self, request: HttpRequest, obj: GeneralRole, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
         # The admin site only lets logged in staff users in.
         obj.assigner = request.user  # type: ignore[assignment]
         return super().save_model(request, obj, form, change)

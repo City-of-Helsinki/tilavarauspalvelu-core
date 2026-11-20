@@ -16,10 +16,9 @@ if TYPE_CHECKING:
 
     from django.db import models
     from django.db.models import QuerySet
+    from django.http import HttpRequest
     from django_stubs_ext import StrOrPromise
 
-    from tilavarauspalvelu.models.payment_order.queryset import PaymentOrderQuerySet
-    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "PaymentOrderAdmin",
@@ -69,7 +68,7 @@ class ReservationUnitFilter(admin.SimpleListFilter):
             .values_list("id", "name")
         )
 
-    def queryset(self, request: WSGIRequest, queryset: PaymentOrderQuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         value: str | None = self.value()
         if value is None:
             return queryset
@@ -133,18 +132,18 @@ class PaymentOrderAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "reservation_unit",
     ]
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return super().get_queryset(request).select_related("reservation__reservation_unit__unit")
 
     # The payment flow and the Verkkokauppa webhooks keep payment orders in sync with Verkkokauppa.
     # A change by hand would make the states differ, so the admin only shows payment orders.
-    def has_add_permission(self, request: WSGIRequest) -> bool:
+    def has_add_permission(self, request: HttpRequest) -> bool:
         return False
 
-    def has_change_permission(self, request: WSGIRequest, obj: PaymentOrder | None = None) -> bool:
+    def has_change_permission(self, request: HttpRequest, obj: PaymentOrder | None = None) -> bool:
         return False
 
-    def has_delete_permission(self, request: WSGIRequest, obj: PaymentOrder | None = None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj: PaymentOrder | None = None) -> bool:
         return False
 
     def reservation_unit(self, obj: PaymentOrder) -> ReservationUnit | str:
@@ -152,7 +151,7 @@ class PaymentOrderAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
 
     def get_search_results(
         self,
-        request: WSGIRequest,
+        request: HttpRequest,
         queryset: models.QuerySet,
         search_term: Any,
     ) -> tuple[models.QuerySet, bool]:

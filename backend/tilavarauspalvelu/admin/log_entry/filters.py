@@ -12,9 +12,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.db.models import QuerySet
+    from django.http import HttpRequest
     from django_stubs_ext import StrOrPromise
-
-    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class LogEntryResourceTypeFilter(admin.SimpleListFilter):
@@ -23,7 +22,7 @@ class LogEntryResourceTypeFilter(admin.SimpleListFilter):
 
     def lookups(
         self,
-        request: WSGIRequest,
+        request: HttpRequest,
         model_admin: admin.ModelAdmin,  # noqa: ARG002
     ) -> Iterable[tuple[Any, StrOrPromise]]:
         # Check the few content types against the 'content_type_id' index.
@@ -32,7 +31,7 @@ class LogEntryResourceTypeFilter(admin.SimpleListFilter):
         content_types = ContentType.objects.filter(Exists(log_entries)).order_by("model")
         return list(content_types.values_list("pk", "model"))
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         value: str | None = self.value()
         if value is None:
             return queryset

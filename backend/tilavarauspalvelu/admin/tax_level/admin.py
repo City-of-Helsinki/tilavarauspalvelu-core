@@ -17,8 +17,7 @@ if TYPE_CHECKING:
     import datetime
 
     from django.db.models import QuerySet
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 __all__ = [
@@ -32,7 +31,7 @@ class TaxLevelRateInline(admin.TabularInline):
     formset = TaxLevelRateFormSet
     ordering = ["-begins"]
 
-    def get_extra(self, request: WSGIRequest, obj: TaxLevel | None = None, **kwargs: Any) -> int:
+    def get_extra(self, request: HttpRequest, obj: TaxLevel | None = None, **kwargs: Any) -> int:
         # A new tax level needs a rate in effect today.
         if obj is None:
             return 1
@@ -55,7 +54,7 @@ class TaxLevelAdmin(TVPAuditlogHistoryAdminMixin, TranslationAdmin):
     ]
     inlines = [TaxLevelRateInline]
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         next_rates = TaxLevelRate.objects.filter(tax_level=models.OuterRef("pk"), begins__gt=local_date()).order_by(
             "begins"
         )

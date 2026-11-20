@@ -23,8 +23,8 @@ from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
+    from django.http import HttpRequest
 
-    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "OriginHaukiResourceAdmin",
@@ -101,7 +101,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         "latest_fetched_date",
     ]
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return (
             super()
             .get_queryset(request)
@@ -114,7 +114,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             .prefetch_related("reservation_units")
         )
 
-    def get_readonly_fields(self, request: WSGIRequest, obj: OriginHaukiResource | None = None) -> list[str]:
+    def get_readonly_fields(self, request: HttpRequest, obj: OriginHaukiResource | None = None) -> list[str]:
         if obj:
             return ["id", *self.readonly_fields]
         return self.readonly_fields
@@ -130,7 +130,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return ", ".join(name for name in reservation_unit_names if name)
 
     @button(label=_("Update all reservable time spans"), change_list=True)
-    def update_all_hauki_resources_reservable_time_spans(self, request: WSGIRequest) -> None:
+    def update_all_hauki_resources_reservable_time_spans(self, request: HttpRequest) -> None:
         try:
             HaukiResourceHashUpdater().run(force_refetch=True)
         except ExternalServiceError as error:
@@ -142,7 +142,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         self.message_user(request, _("Reservable Time Spans updated."))
 
     @button(label=_("Update reservable time spans"), change_form=True)
-    def update_single_hauki_resource_reservable_times_pans(self, request: WSGIRequest, pk: str) -> None:
+    def update_single_hauki_resource_reservable_times_pans(self, request: HttpRequest, pk: str) -> None:
         try:
             hauki_resource_id = int(pk)
             HaukiResourceHashUpdater([hauki_resource_id]).run(force_refetch=True)

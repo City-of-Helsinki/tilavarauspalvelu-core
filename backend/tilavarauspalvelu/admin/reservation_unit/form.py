@@ -31,7 +31,8 @@ from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
+
 
 # Access type
 
@@ -141,13 +142,13 @@ class PricingGroupOfReservationUnitInline(admin.TabularInline):
     ordering = ["begins"]
     extra = 0
 
-    def has_add_permission(self, request: WSGIRequest, obj: ReservationUnit | None = None) -> bool:
+    def has_add_permission(self, request: HttpRequest, obj: ReservationUnit | None = None) -> bool:
         return False
 
-    def has_change_permission(self, request: WSGIRequest, obj: ReservationUnit | None = None) -> bool:
+    def has_change_permission(self, request: HttpRequest, obj: ReservationUnit | None = None) -> bool:
         return False
 
-    def has_delete_permission(self, request: WSGIRequest, obj: ReservationUnit | None = None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj: ReservationUnit | None = None) -> bool:
         return False
 
     @admin.display(description=PricingGroup._meta.verbose_name)

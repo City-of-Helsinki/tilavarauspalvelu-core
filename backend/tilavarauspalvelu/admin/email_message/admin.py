@@ -12,7 +12,7 @@ __all__ = [
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 @admin.register(EmailMessage)
@@ -56,11 +56,11 @@ class EmailMessageAdmin(admin.ModelAdmin):
         ),
     ]
 
-    def has_add_permission(self, request: WSGIRequest) -> bool:
+    def has_add_permission(self, request: HttpRequest) -> bool:
         return False
 
-    def has_delete_permission(self, request: WSGIRequest, obj: EmailMessage | None = None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj: EmailMessage | None = None) -> bool:
         return False
 
-    def has_change_permission(self, request: WSGIRequest, obj: EmailMessage | None = None) -> bool:
+    def has_change_permission(self, request: HttpRequest, obj: EmailMessage | None = None) -> bool:
         return False

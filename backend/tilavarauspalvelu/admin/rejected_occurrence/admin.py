@@ -9,8 +9,7 @@ from tilavarauspalvelu.models import RejectedOccurrence
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 __all__ = [
@@ -53,5 +52,5 @@ class RejectedOccurrenceAdmin(admin.ModelAdmin):
         "reservation_series",
     ]
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return super().get_queryset(request).select_related("reservation_series")

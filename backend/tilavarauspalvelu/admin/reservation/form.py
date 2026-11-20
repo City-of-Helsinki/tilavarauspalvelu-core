@@ -13,7 +13,7 @@ from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationPrice
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 class ReservationAdminForm(forms.ModelForm):
@@ -166,7 +166,7 @@ class PaymentOrderInline(admin.TabularInline):
     )
     readonly_fields = fields
 
-    def has_add_permission(self, request: WSGIRequest, obj: Reservation | None = None) -> bool:
+    def has_add_permission(self, request: HttpRequest, obj: Reservation | None = None) -> bool:
         return False
 
 
@@ -189,5 +189,5 @@ class ReservationPriceLineInline(admin.TabularInline):
     ]
     readonly_fields = fields
 
-    def has_add_permission(self, request: WSGIRequest, obj: Reservation | None = None) -> bool:
+    def has_add_permission(self, request: HttpRequest, obj: Reservation | None = None) -> bool:
         return False

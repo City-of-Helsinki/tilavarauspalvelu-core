@@ -22,8 +22,7 @@ from .form import UnitAdminForm
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 # The TPREK import overwrites these fields, so a change by hand would not last.
@@ -153,13 +152,13 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
         UnitGroupInlineAdmin,
     ]
 
-    def get_readonly_fields(self, request: WSGIRequest, obj: Unit | None = None) -> list[str]:
+    def get_readonly_fields(self, request: HttpRequest, obj: Unit | None = None) -> list[str]:
         readonly_fields = list(super().get_readonly_fields(request, obj))
         if obj is not None and obj.tprek_id:
             readonly_fields += self.replace_orig_field(TPREK_FIELDS)
         return readonly_fields
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet[Unit]:
+    def get_queryset(self, request: HttpRequest) -> QuerySet[Unit]:
         return (
             super()
             .get_queryset(request)
@@ -174,7 +173,7 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
         )
 
     @admin.action
-    def update_from_tprek(self, request: WSGIRequest, queryset: QuerySet[Unit]) -> None:
+    def update_from_tprek(self, request: HttpRequest, queryset: QuerySet[Unit]) -> None:
         """
         Update selected units from TPREK data.
 
@@ -206,5 +205,5 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
                 self.message_user(request, msg, level=messages.SUCCESS)
 
     @button(label=_("Update from TPREK"), change_form=True)
-    def update_from_tprek_button(self, request: WSGIRequest, pk: int) -> None:
+    def update_from_tprek_button(self, request: HttpRequest, pk: str) -> None:
         self.update_from_tprek(request, Unit.objects.filter(pk=pk))
