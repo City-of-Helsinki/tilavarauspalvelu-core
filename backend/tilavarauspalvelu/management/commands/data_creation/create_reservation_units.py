@@ -48,7 +48,6 @@ from .create_reservation_related_things import (
     _create_equipments,
     _create_intended_uses,
     _create_payment_accountings,
-    _create_payment_merchants,
     _fetch_and_build_reservation_unit_image,
 )
 from .create_seasonal_booking import _create_application_round_time_slots
@@ -120,10 +119,10 @@ def _create_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
     tax_levels: dict[TaxLevelKey, TaxLevel],
+    payment_merchant: PaymentMerchant,
 ) -> list[ReservationUnit]:
     # --- Create dependencies for the reservation units  ------------------------------------------------------------
 
-    merchants = _create_payment_merchants()
     accountings = _create_payment_accountings()
 
     # --- Create reservation units ----------------------------------------------------------------------------------
@@ -140,7 +139,7 @@ def _create_reservation_units(
         hauki_resources,
         terms_of_use,
         tax_levels,
-        merchants,
+        payment_merchant,
         accountings,
     )
 
@@ -453,7 +452,7 @@ def _create_paid_reservation_units(
     hauki_resources: list[OriginHaukiResource],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     tax_levels: dict[TaxLevelKey, TaxLevel],
-    merchants: list[PaymentMerchant],
+    payment_merchant: PaymentMerchant,
     accountings: list[PaymentAccounting],
 ) -> None:
     """
@@ -555,7 +554,6 @@ def _create_paid_reservation_units(
         ],
         output_type=PaidReservationUnitData,
     ):
-        merchant = random.choice(merchants)
         accounting = random.choice(accountings)
 
         set_name: SetName = random.choice(SetName.applying_free_of_charge())
@@ -575,7 +573,7 @@ def _create_paid_reservation_units(
             name_sv=f"Toalett plats #{number}",
             tprek_id=None,
             tprek_department_id=None,
-            payment_merchant=merchant,
+            payment_merchant=payment_merchant,
             payment_accounting=accounting,
         )
         units.append(unit)
@@ -589,7 +587,7 @@ def _create_paid_reservation_units(
         )
         spaces.append(space)
 
-        payment_product = PaymentProductFactory.build(merchant=merchant)
+        payment_product = PaymentProductFactory.build(merchant=payment_merchant)
         payment_products.append(payment_product)
 
         reservation_unit = (
@@ -601,7 +599,7 @@ def _create_paid_reservation_units(
                 name_sv=f"Betalad toalett #{number}",
                 unit=unit,
                 payment_product=payment_product,
-                payment_merchant=merchant,
+                payment_merchant=payment_merchant,
                 payment_accounting=accounting,
                 origin_hauki_resource=random.choice(hauki_resources),
                 reservations_min_days_before=0,

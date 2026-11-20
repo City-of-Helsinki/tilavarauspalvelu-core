@@ -21,7 +21,6 @@ from tests.factories import (
     EquipmentFactory,
     OriginHaukiResourceFactory,
     PaymentAccountingFactory,
-    PaymentMerchantFactory,
     PaymentProductFactory,
     ReservableTimeSpanFactory,
     ReservationUnitAccessTypeFactory,
@@ -38,13 +37,13 @@ from .create_reservation_related_things import _fetch_and_build_reservation_unit
 from .utils import SetName, with_logs
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import TaxLevel
+    from tilavarauspalvelu.models import PaymentMerchant, TaxLevel
 
     from .utils import TaxLevelKey
 
 
 @with_logs
-def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
+def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel], payment_merchant: PaymentMerchant) -> None:
     """Create the caisa unit from testing server"""
     caisa = UnitFactory.create(
         tprek_id="7256",
@@ -309,19 +308,6 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         name_fi="Työpiste",
         name_en="Workstation",
         name_sv="Arbetsstation",
-    )
-
-    ###########################################################################################################
-    # Create payment merchants
-    ###########################################################################################################
-
-    payment_merchant_library_ita = PaymentMerchantFactory.create(
-        id="418a4349-a561-4e0f-aee7-57947a77de6e",
-        name="Itäkeskuksen kirjasto",
-    )
-    payment_merchant_library_pih = PaymentMerchantFactory.create(
-        id="c9acaa73-b582-471c-b002-b038a8c00fb1",
-        name="Pihlajasaarten testikirjasto",
     )
 
     ###########################################################################################################
@@ -694,12 +680,12 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         pricing_terms=pricing_terms_youth,
         cancellation_rule=cancel_rule_14_days,
         reservation_form=SetName.set_4.reservation_form,
-        payment_merchant=payment_merchant_library_pih,
+        payment_merchant=payment_merchant,
         payment_accounting=payment_accounting_library_pih,
         origin_hauki_resource=aina_kasiteltava_kellarikerros_hauki,
         payment_product=PaymentProductFactory.create(
             id="31382206-6783-3868-aa1b-85545823edd8",
-            merchant=payment_merchant_library_pih,
+            merchant=payment_merchant,
         ),
     )
     aina_kasiteltava_kellarikerros.spaces.add(
@@ -921,12 +907,12 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         service_specific_terms=service_terms_oodi,
         cancellation_rule=cancel_rule_until_begin,
         reservation_form=SetName.set_3.reservation_form,
-        payment_merchant=payment_merchant_library_ita,
+        payment_merchant=payment_merchant,
         payment_accounting=payment_accounting_library_ita,
         origin_hauki_resource=aina_maksullinen_aitio_hauki,
         payment_product=PaymentProductFactory.create(
             id="2d01d6ec-a235-32cd-91a5-850d6f22c821",
-            merchant=payment_merchant_library_ita,
+            merchant=payment_merchant,
         ),
     )
     aina_maksullinen_aitio.spaces.add(
@@ -1031,12 +1017,12 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         pricing_terms=pricing_terms_youth,
         cancellation_rule=cancel_rule_14_days,
         reservation_form=SetName.set_6.reservation_form,
-        payment_merchant=payment_merchant_library_pih,
+        payment_merchant=payment_merchant,
         payment_accounting=payment_accounting_library_pih,
         origin_hauki_resource=alennuskelpoinen_aula_hauki,
         payment_product=PaymentProductFactory.create(
             id="e32855cc-13a8-32a9-8e80-8f67b8286698",
-            merchant=payment_merchant_library_pih,
+            merchant=payment_merchant,
         ),
     )
     alennuskelpoinen_aula.spaces.add(
@@ -1214,11 +1200,11 @@ def _create_caisa(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
         reservation_form=SetName.set_3.reservation_form,
-        payment_merchant=payment_merchant_library_pih,
+        payment_merchant=payment_merchant,
         origin_hauki_resource=perumiskelvoton_patio_hauki,
         payment_product=PaymentProductFactory.create(
             id="459a183b-a55d-39f3-80d0-23f3e458b93d",
-            merchant=payment_merchant_library_pih,
+            merchant=payment_merchant,
         ),
     )
     perumiskelvoton_patio.spaces.add(
