@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.14.1",
-    "@hookform/resolvers": "7.0.5",
+    "@hookform/resolvers": "7.0.6",
     "@sentry/core": "^10.78.0",
     "@sentry/nextjs": "^10.78.0",
     "apollo-upload-client": "18.0.1",
@@ -38,7 +38,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-error-boundary": "^6.1.6",
-    "react-hook-form": "7.91.0",
+    "react-hook-form": "7.92.0",
     "react-use": "^17.6.1",
     "roarr": "^7.21.7",
     "sass": "^1.105.0",
