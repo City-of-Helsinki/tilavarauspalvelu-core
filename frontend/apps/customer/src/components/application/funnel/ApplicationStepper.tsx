@@ -20,11 +20,15 @@ function getStep(slug: (typeof PAGES_WITH_STEPPER)[number]) {
   return index;
 }
 
-function calculateAvailableStep(application: ReadonlyDeep<ApplicationFormFragment>, step: number) {
+function calculateAvailableStep(
+  application: ReadonlyDeep<ApplicationFormFragment>,
+  offeredPriceOptionPks: ReadonlyArray<number>,
+  step: number
+) {
   if (isSent(application?.status)) {
     return StepState.completed;
   }
-  const isValid = validateApplication(application);
+  const isValid = validateApplication(application, { offeredPriceOptionPks });
   if (isValid.valid) {
     // Last step depends only on the application being Sent (any saves will set it back to Draft)
     if (step === PAGES_WITH_STEPPER.length - 1) {
@@ -42,15 +46,16 @@ function calculateAvailableStep(application: ReadonlyDeep<ApplicationFormFragmen
 
 type StepperProps = {
   application: ReadonlyDeep<ApplicationFormFragment>;
+  offeredPriceOptionPks: ReadonlyArray<number>;
 };
-export function ApplicationStepper({ application }: Readonly<StepperProps>): React.ReactElement {
+export function ApplicationStepper({ application, offeredPriceOptionPks }: Readonly<StepperProps>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
   const { pathname, push } = router;
   const steps = PAGES_WITH_STEPPER.map((x, i) => ({
     label: t(`application:navigation.${x}`),
-    state: calculateAvailableStep(application, i),
+    state: calculateAvailableStep(application, offeredPriceOptionPks, i),
   }));
 
   const handleStepClick = async (i: number) => {
