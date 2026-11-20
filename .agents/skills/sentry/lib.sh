@@ -22,6 +22,23 @@ parse_issue() {
   fi
 }
 
+# A short ID such as TILAVARAUSPALVELU-CORE-5.
+short_id_pattern='^[A-Z][A-Z0-9-]*-[0-9A-Z]+$'
+
+# Return 1 if the argument is not an issue ID, URL or short ID. Call this before load_token.
+is_issue_ref() {
+  [[ "$1" =~ $short_id_pattern ]] || parse_issue "$1" 2>/dev/null
+}
+
+# Set issue_id from an issue ID, URL or short ID. A short ID needs a request, so call this after load_token.
+lookup_issue() {
+  if [[ "$1" =~ $short_id_pattern ]]; then
+    issue_id="$(api "shortids/$1/" | jq --raw-output '.groupId')"
+  else
+    parse_issue "$1"
+  fi
+}
+
 # Read the token from the secret file, or from 1Password if the secret directory does not exist.
 # Call this after the arguments are validated.
 load_token() {

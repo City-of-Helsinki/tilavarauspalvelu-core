@@ -30,9 +30,8 @@ done
 (( ${#args[@]} > 0 )) || usage
 
 # Validate all arguments before the first request.
-short_id_pattern='^[A-Z][A-Z0-9-]*-[0-9A-Z]+$'
 for arg in "${args[@]}"; do
-  if ! [[ "$arg" =~ $short_id_pattern ]] && ! parse_issue "$arg" 2>/dev/null; then
+  if ! is_issue_ref "$arg"; then
     echo "Not a Sentry issue ID, URL or short ID: $arg" >&2
     usage
   fi
@@ -51,11 +50,7 @@ fi
 # Look up each issue first, so a wrong argument stops the run before any change.
 issues=()
 for arg in "${args[@]}"; do
-  if [[ "$arg" =~ $short_id_pattern ]]; then
-    issue_id="$(api "shortids/$arg/" | jq --raw-output '.groupId')"
-  else
-    parse_issue "$arg"
-  fi
+  lookup_issue "$arg"
   issues+=("$(api "issues/$issue_id/" | jq --compact-output '{id, shortId, title: (.title | gsub("[\\r\\n]+"; " ")), status, count, lastSeen}')")
 done
 

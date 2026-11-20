@@ -1,15 +1,17 @@
 ---
 name: sentry
 description: >-
-  Fetch a Sentry issue and its events, resolve issues, and drive a Seer autofix run up to the code changes,
-  list or delete releases, and list, create or delete alerts, through the Sentry REST API.
-  Use when the user references a Sentry issue with a URL or an issue ID, asks to resolve Sentry issues,
+  Fetch a Sentry issue and its events, list or search issues, resolve issues, link issues to Jira,
+  and drive a Seer autofix run up to the code changes, list or delete releases, and list, create or delete alerts,
+  through the Sentry REST API.
+  Use when the user references a Sentry issue with a URL or an issue ID, asks to list or search Sentry issues,
+  asks to resolve Sentry issues or link them to a Jira issue,
   asks to run or continue Seer or autofix on an issue, asks to list or delete releases,
   or asks to list, create or delete alerts.
 ---
 
-How to fetch a Sentry issue to find the cause of an error, how to take it through Seer,
-how to list and delete releases, and how to manage alerts.
+How to fetch a Sentry issue to find the cause of an error, how to list issues, how to link them to Jira,
+how to take an issue through Seer, how to list and delete releases, and how to manage alerts.
 
 ## 1. Authentication
 
@@ -25,7 +27,7 @@ If the directory does not exist, the scripts read the token from 1Password with 
 The token is a personal token from https://city-of-helsinki.sentry.io/settings/account/api/auth-tokens/.
 Set "Issue & Event" to Read & Write, "Organization" to Read, "Project" to Read, "Release" to Admin
 and "Alerts" to Read & Write.
-Only `sentry-autofix` and `sentry-resolve` need the write permission of "Issue & Event".
+Only `sentry-autofix`, `sentry-resolve` and `sentry-link` need the write permission of "Issue & Event".
 Only `sentry-releases delete` needs the admin permission of "Release".
 Only `sentry-alerts create` and `sentry-alerts delete` need the write permission of "Alerts".
 
@@ -90,6 +92,32 @@ Without tag keys, the script shows `environment`, `url`, `transaction` and `rele
 `exception` is the outermost exception that has a message. It often has the ID of the failed request.
 The script stops after 2000 events and then sets `truncated` to true.
 
+### List and search issues
+
+```bash
+.agents/skills/sentry/sentry-issues
+.agents/skills/sentry/sentry-issues --project core --period 90d --limit 200
+.agents/skills/sentry/sentry-issues --project customer-ui --project staff-ui --query 'is:unresolved level:error' --sort date
+```
+
+| Option              | Value                                                                              |
+|---------------------|------------------------------------------------------------------------------------|
+| `--project <name>`  | `core`, `customer-ui` or `staff-ui`. Repeat for more. Default all three.           |
+| `--query <search>`  | Sentry search, the same as in the web UI. Default `is:unresolved`.                 |
+| `--period <period>` | Time window, for example `24h`, `14d` or `90d`. Default `14d`.                     |
+| `--sort <sort>`     | `freq` (events), `date` (last seen), `new` (first seen) or `user`. Default `freq`. |
+| `--limit <count>`   | Most issues to print, 1 to 1000. Default 100.                                      |
+
+The script prints JSON with a list of `issues`. Each issue has its ID, short ID, project, level, status,
+event and user counts, first and last seen, title, culprit and URL.
+If more issues match than the limit, `truncated` is true.
+
+`count`, `user_count` and `first_seen` are for the period only, not for the whole life of the issue.
+An issue that started a month ago shows a `first_seen` inside a `24h` period.
+To get the totals of one issue, use `sentry-issue`.
+
+Free text in `--query` also matches the culprit and other fields, so check the titles in the result.
+
 ### Resolve issues
 
 ```bash
@@ -111,6 +139,25 @@ Show the preview to the user. Run the same command without `--dry-run` only afte
 
 To resolve an issue from a pull request instead, put `Fixes <short ID>` in the pull request description.
 The GitHub integration of Sentry then links the issue and resolves it when the release comes in.
+
+### Link issues to a Jira issue
+
+```bash
+.agents/skills/sentry/sentry-link --dry-run TILA-123 TILAVARAUSPALVELU-CORE-5 162563421
+.agents/skills/sentry/sentry-link --dry-run 'https://helsinkisolutionoffice.atlassian.net/browse/TILA-123' TILAVARAUSPALVELU-CORE-5
+```
+
+Give the Jira issue first, as a key or a URL. Then give one or more Sentry issues, in the same forms as for `sentry-resolve`.
+The script links each Sentry issue to the Jira issue through the Jira integration of the Sentry organization.
+This is "Link Jira issue" in the web UI. The Jira issue must exist. To create one, use the `jira-issue` skill.
+
+The script looks up all issues before it changes any, so a wrong argument changes nothing.
+It skips an issue that is already linked to the Jira issue and prints a "Skipped" line for it.
+If an issue is also linked to another Jira issue, the script prints a note. It does not remove that link.
+If the organization has no active Jira integration, or more than one, the script stops.
+
+`sentry-link` writes to Sentry. Run it with `--dry-run` first.
+Show the preview to the user. Run the same command without `--dry-run` only after the user approves it.
 
 ### Run Seer autofix
 

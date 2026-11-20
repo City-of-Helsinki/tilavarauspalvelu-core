@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# Link Sentry issues to an existing Jira issue through the Jira integration of the Sentry organization.
+# The token is read from the secret file or from 1Password. See lib.sh.
+# Usage: sentry-link [--dry-run] <Jira key or URL> <issue ID, URL or short ID> ...
+#   e.g. sentry-link --dry-run TILA-4739 TILAVARAUSPALVELU-CORE-5 162563421
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: sentry-link [--dry-run] <Jira key or URL> <issue ID, URL or short ID> ...
+  --dry-run   Print the issues and the requests. Change nothing in Sentry.
+EOF
+  exit 2
+}
+
+dry_run=false
+args=()
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) dry_run=true ;;
+    --*) echo "Unknown option: $arg" >&2; usage ;;
+    *) args+=("$arg") ;;
+  esac
+done
+(( ${#args[@]} >= 2 )) || usage
+
+# The Jira issue is a key such as TILA-123, or a browse URL that ends with the key.
+jira_arg="${args[0]}"
+if [[ "$jira_arg" =~ ^([A-Z][A-Z0-9]+-[0-9]+)$ ]] \
+  || [[ "$jira_arg" =~ ^https://[a-z0-9-]+\.atlassian\.net/browse/([A-Z][A-Z0-9]+-[0-9]+)/?([?#].*)?$ ]]; then
+  jira_key="${BASH_REMATCH[1]}"
+else
+  echo "Not a Jira issue key or URL: $jira_arg" >&2
+  usage
+fi
+
+# Validate all Sentry issues before the first request.
+for arg in "${args[@]:1}"; do
+  if ! is_issue_ref "$arg"; then
+    echo "Not a Sentry issue ID, URL or short ID: $arg" >&2
+    usage
+  fi
+done
+
+load_token
+
+# The organization has one active Jira integration. Stop if it has none or many, so a link never goes to a wrong site.
+integrations="$(api "integrations/?provider_key=jira" | jq --compact-output '[.[] | select(.status == "active") | {id, name, domainName}]')"
+if [[ "$(jq 'length' <<<"$integrations")" != 1 ]]; then
+  echo "Expected one active Jira integration in Sentry, found: $integrations" >&2
+  exit 1
+fi
+integration_id="$(jq --raw-output '.[0].id' <<<"$integrations")"
+integration_label="$(jq --raw-output '.[0] | "\(.name) (\(.domainName))"' <<<"$integrations")"
+
+# Look up each issue and its Jira links first, so a wrong argument stops the run before any change.
+issues=()
+for arg in "${args[@]:1}"; do
+  lookup_issue "$arg"
+  issue="$(api "issues/$issue_id/" | jq --compact-output '{id, shortId, title: (.title | gsub("[\\r\\n]+"; " ")), count, lastSeen}')"
+  linked="$(api "issues/$issue_id/integrations/" \
+    | jq --compact-output --arg id "$integration_id" '[.[] | select(.id == $id) | .externalIssues[].key]')"
+  issues+=("$(jq --compact-output --argjson linked "$linked" '. + {linked: $linked}' <<<"$issue")")
+done
+
+body="$(jq --compact-output --null-input --arg key "$jira_key" '{externalIssue: $key}')"
+
+if [[ "$dry_run" == true ]]; then
+  echo "Dry run. Nothing is changed in Sentry."
+fi
+echo "Jira integration: $integration_label"
+for issue in "${issues[@]}"; do
+  id="$(jq --raw-output '.id' <<<"$issue")"
+  label="$(jq --raw-output '"\(.shortId) (\(.count) events, last seen \(.lastSeen[0:10])): \(.title)"' <<<"$issue")"
+  if jq --exit-status --arg key "$jira_key" '.linked | index($key)' <<<"$issue" >/dev/null; then
+    echo "Skipped: $label is already linked to $jira_key."
+    continue
+  fi
+  others="$(jq --raw-output '.linked | join(", ")' <<<"$issue")"
+  if [[ "$dry_run" == true ]]; then
+    echo "PUT $base_url/issues/$id/integrations/$integration_id/ $body"
+    echo "Change: Linked to $jira_key: $label"
+    [[ -z "$others" ]] || echo "Note: the issue is also linked to $others."
+    continue
+  fi
+  # Print each change after its request succeeds, so a failure shows what is already done.
+  api "issues/$id/integrations/$integration_id/" --request PUT --header "Content-Type: application/json" \
+    --data "$body" >/dev/null
+  echo "- Linked to $jira_key: $label"
+  [[ -z "$others" ]] || echo "  Note: the issue is also linked to $others."
+done
