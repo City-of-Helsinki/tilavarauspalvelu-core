@@ -15,7 +15,7 @@ jobs:
 
     # Only run if one of the defined bots is the pull request author,
     # and the same bot triggered the event (e.g. not a human pushing to a bot's branch).
-    # https://github.com/City-of-Helsinki/tilavarauspalvelu-core/settings/variables/actions
+    # https://github.com/City-of-Helsinki/tilavarauspalvelu/settings/variables/actions
     if: >-
       contains(fromJSON(vars.BOTS), github.event.pull_request.user.login) &&
       github.actor == github.event.pull_request.user.login
