@@ -54,7 +54,7 @@ class ReservationPriceLine(models.Model):
 
     # Minutes in a part of a day can give a fraction, so four decimals keep `quantity * unit_amount` close to `amount`.
     quantity = models.DecimalField(max_digits=12, decimal_places=4)
-    price_unit: PriceUnit = TextChoicesField(enum=PriceUnit)
+    price_unit = TextChoicesField(enum=PriceUnit)
 
     # Gross amounts, VAT included
     unit_amount = models.DecimalField(max_digits=10, decimal_places=2)
