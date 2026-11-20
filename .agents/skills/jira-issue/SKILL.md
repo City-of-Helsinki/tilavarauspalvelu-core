@@ -55,7 +55,9 @@ Issues are often in Finnish. Descriptions and comments are Jira wiki markup.
 .agents/skills/jira-issue/jira-issue 'https://helsinkisolutionoffice.atlassian.net/browse/TILA-123'
 ```
 
-Prints the issue with all its comments as JSON.
+Prints the issue with all its comments and attachments as JSON.
+Each attachment has the id, filename, MIME type, size, author and creation time.
+An image in the description, such as `!diagram.png|width=500!`, is an attachment with that filename.
 
 ### List the child issues of an epic
 
@@ -65,8 +67,9 @@ Prints the issue with all its comments as JSON.
 ```
 
 Prints a JSON list with one object for each child issue, sorted by key.
-Each object has the key, URL, summary, type, status, assignee, labels and links.
+Each object has the key, URL, summary, type, status, assignee, labels, links and attachments.
 Each link has the link type, the direction from the child issue (for example "is blocked by") and the other issue key.
+Each attachment has the id and filename.
 
 Add `--with-description` to also get each description. The output is much longer with descriptions.
 To read one child issue with its comments, use `jira-issue`.

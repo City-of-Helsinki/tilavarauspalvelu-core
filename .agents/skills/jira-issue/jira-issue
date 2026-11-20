@@ -15,7 +15,7 @@ key="$(parse_key "$1")"
 
 load_credentials
 
-fields="summary,status,issuetype,priority,assignee,reporter,labels,parent,created,updated,description,comment"
+fields="summary,status,issuetype,priority,assignee,reporter,labels,parent,created,updated,description,comment,attachment"
 issue="$(api "rest/api/2/issue/$key?fields=$fields")"
 
 # The issue has only the first page of comments. Fetch the rest.
@@ -41,5 +41,6 @@ jq --slurp --arg base "$base_url" '.[0] as $issue | .[1] as $comments | $issue |
   created: .fields.created,
   updated: .fields.updated,
   description: .fields.description,
+  attachments: [.fields.attachment[]? | {id, filename, mimeType, size, author: .author.displayName, created}],
   comments: [$comments[] | {author: .author.displayName, at: .created, body}]
 }' <(printf '%s' "$issue") <(printf '%s' "$comments")
