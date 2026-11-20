@@ -15,7 +15,7 @@ class TaxLevelFilterSet(ModelFilterSet):
 
     class Meta:
         model = TaxLevel
-        fields = []
+        fields: list[str] = []
         order_by = [
             "pk",
         ]

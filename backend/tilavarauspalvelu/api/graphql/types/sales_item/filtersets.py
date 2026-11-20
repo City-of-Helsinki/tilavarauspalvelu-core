@@ -15,7 +15,7 @@ class SalesItemFilterSet(ModelFilterSet):
 
     class Meta:
         model = SalesItem
-        fields = []
+        fields: list[str] = []
         order_by = [
             "pk",
             "name",

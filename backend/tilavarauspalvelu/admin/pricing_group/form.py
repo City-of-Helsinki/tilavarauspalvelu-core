@@ -30,7 +30,7 @@ class PriceComponentForm(forms.ModelForm):
 
     class Meta:
         model = PriceComponent
-        fields = []  # Use fields from Inline
+        fields: list[str] = []  # Use fields from Inline
         widgets = {
             "material_price_description": TinyMCE(mce_attrs={"height": "150px"}),
         }
