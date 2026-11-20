@@ -14,7 +14,7 @@ from tilavarauspalvelu.models import PaymentOrder
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 __all__ = [
     "MockVerkkokauppaView",
@@ -49,7 +49,7 @@ class MockVerkkokauppaView(TemplateView):
         # Update the reservation state to CONFIRMED
         payment_order.actions.complete_payment()
 
-    def get(self, request: WSGIRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         payment_order = self.get_payment_order(order_uuid=kwargs.get("order_uuid"))
 
         context = {
@@ -58,7 +58,7 @@ class MockVerkkokauppaView(TemplateView):
         }
         return super().get(request, *args, **kwargs, **context)
 
-    def post(self, request: WSGIRequest, *args: Any, **kwargs: Any) -> HttpResponseRedirect | HttpResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponseRedirect | HttpResponse:
         payment_order = self.get_payment_order(order_uuid=kwargs.get("order_uuid"))
         frontend_url = settings.MOCK_VERKKOKAUPPA_FRONTEND_URL.strip("/")
 
