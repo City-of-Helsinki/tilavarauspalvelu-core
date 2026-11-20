@@ -40,7 +40,7 @@ class ProfileDataParser:
         self.data = data
 
     def parse_reservation_prefill_data(self) -> ReservationPrefillInfo:
-        address = self.get_address() or {}
+        address: ProfileLocalAddress | ProfileForeignAddress | dict[str, str | None] = self.get_address() or {}
         return ReservationPrefillInfo(
             reservee_first_name=self.get_first_name(),
             reservee_last_name=self.get_last_name(),
@@ -60,7 +60,9 @@ class ProfileDataParser:
         )
 
     def parse_user_profile_info(self, *, user: User) -> UserProfileInfo:
-        address = self.get_address(prefer_verified=True) or {}
+        address: ProfileLocalAddress | ProfileForeignAddress | dict[str, str | None] = (
+            self.get_address(prefer_verified=True) or {}
+        )
         return UserProfileInfo(
             pk=user.pk,
             first_name=self.get_first_name(prefer_verified=True),
