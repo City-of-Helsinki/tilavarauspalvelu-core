@@ -6,6 +6,7 @@ from django.db import transaction
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 from rest_framework.exceptions import ValidationError
 
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.models import ApplicationSection
 from tilavarauspalvelu.typing import AnyUser
 
@@ -55,7 +56,10 @@ class ApplicationSectionDeleteMutation(DeleteMutation[ApplicationSection, AnyUse
 
     @classmethod
     def delete(cls, info: GQLInfo, input_data: dict[str, Any]) -> Self:
-        section: ApplicationSection = cls.get_instance(input_data)
+        section = cls.get_instance(input_data)
+        if section is None:
+            msg = "A delete mutation always gets its instance."
+            raise MissingValueError(msg)
         application = section.application
 
         with transaction.atomic():

@@ -13,6 +13,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
@@ -135,6 +136,9 @@ class ReservationApproveSerializer(NestingModelSerializer[Reservation, Reservati
 
         reservation_unit = self.instance.reservation_unit
         reservation_unit.validators.validate_has_payment_type()
+        if reservation_unit.payment_type is None:
+            msg = "The reservation unit is validated to have a payment type."
+            raise MissingValueError(msg)
         payment_type = PaymentType(reservation_unit.payment_type)
 
         begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)

@@ -20,6 +20,7 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializer
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.enums import AccessType, PriceUnit, ReservationStartInterval, Weekday
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -297,7 +298,7 @@ class ReservationUnitSerializer(NestingModelSerializer[ReservationUnit]):
 
         self.instance.validators.validate_has_price_today()
 
-    def _validate_access_types(self, *, access_types: list[dict[str, Any]], is_draft: bool) -> None:  # noqa: PLR0912
+    def _validate_access_types(self, *, access_types: list[dict[str, Any]], is_draft: bool) -> None:  # noqa: PLR0912, PLR0915
         existing_reservation_unit: ReservationUnit | None = None
         if self.instance is not None and self.instance.pk is not None:
             existing_reservation_unit = self.instance
@@ -363,8 +364,11 @@ class ReservationUnitSerializer(NestingModelSerializer[ReservationUnit]):
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)
 
         if need_to_check_pindora:
+            if existing_reservation_unit is None:
+                msg = "Only an existing reservation unit can get the access code access type."
+                raise MissingValueError(msg)
             try:
-                PindoraClient.get_reservation_unit(self.instance)
+                PindoraClient.get_reservation_unit(existing_reservation_unit)
             except PindoraNotFoundError as error:
                 raise ValidationError(str(error), code=error_codes.RESERVATION_UNIT_NOT_FOUND_IN_PINDORA) from error
             except ExternalServiceError as error:

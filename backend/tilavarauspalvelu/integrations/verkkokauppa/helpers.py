@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 
 from django.conf import settings
 from django.urls import reverse
@@ -22,6 +22,14 @@ from utils.date_utils import DEFAULT_TIMEZONE, from_iso_format, local_datetime, 
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
+
+
+@overload
+def parse_datetime(string: str) -> datetime.datetime: ...
+
+
+@overload
+def parse_datetime(string: None) -> None: ...
 
 
 def parse_datetime(string: str | None) -> datetime.datetime | None:
