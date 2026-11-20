@@ -15,8 +15,7 @@ from .form import ReservationInline, ReservationSeriesAdminForm
 
 if TYPE_CHECKING:
     from django.db import models
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 __all__ = [
@@ -109,7 +108,7 @@ class ReservationSeriesAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     ]
     inlines = [ReservationInline]
 
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         return (
             super()
             .get_queryset(request)

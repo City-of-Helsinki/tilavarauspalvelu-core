@@ -14,9 +14,8 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 from tilavarauspalvelu.models import PaymentMerchant
 
 if TYPE_CHECKING:
-    from django.http import HttpResponse
+    from django.http import HttpRequest, HttpResponse
 
-    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "PaymentMerchantAdmin",
@@ -164,7 +163,7 @@ class PaymentMerchantAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
 
     def render_change_form(
         self,
-        request: WSGIRequest,
+        request: HttpRequest,
         context: dict[str, Any],
         add: bool = False,  # noqa: FBT001 FBT002
         change: bool = False,  # noqa: FBT001 FBT002

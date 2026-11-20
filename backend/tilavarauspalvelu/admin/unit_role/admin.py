@@ -12,8 +12,8 @@ from tilavarauspalvelu.models import UnitRole
 if TYPE_CHECKING:
     from django import forms
     from django.db import models
+    from django.http import HttpRequest
 
-    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "UnitRoleAdmin",
@@ -77,7 +77,7 @@ class UnitRoleAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "unit_groups",
     ]
 
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         return (
             super()
             .get_queryset(request)
@@ -91,7 +91,7 @@ class UnitRoleAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             )
         )
 
-    def save_model(self, request: WSGIRequest, obj: UnitRole, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
+    def save_model(self, request: HttpRequest, obj: UnitRole, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
         # The admin site only lets logged in staff users in.
         obj.assigner = request.user  # type: ignore[assignment]
         super().save_model(request, obj, form, change)

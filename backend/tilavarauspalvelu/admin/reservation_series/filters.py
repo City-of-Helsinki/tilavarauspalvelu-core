@@ -10,9 +10,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.db.models import QuerySet
+    from django.http import HttpRequest
     from django_stubs_ext import StrOrPromise
-
-    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ShouldHaveActiveAccessCodeFilter(admin.SimpleListFilter):
@@ -25,7 +24,7 @@ class ShouldHaveActiveAccessCodeFilter(admin.SimpleListFilter):
             ("0", _("No")),
         ]
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         if self.value() == "1":
             return queryset.filter(L(should_have_active_access_code=True))
         if self.value() == "0":

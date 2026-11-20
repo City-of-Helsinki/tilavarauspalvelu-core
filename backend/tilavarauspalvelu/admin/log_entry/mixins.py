@@ -10,12 +10,12 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 class TVPAuditlogHistoryAdminMixin(AuditlogHistoryAdminMixin, ExtraButtonsMixin):
     @button(label=_("Audit logs"), change_form=True)
-    def link_to_object_auditlog_view(self, request: WSGIRequest, pk: int) -> HttpResponseRedirect | None:
+    def link_to_object_auditlog_view(self, request: HttpRequest, pk: str) -> HttpResponseRedirect | None:
         for url in self.get_urls():
             if url.name.endswith("_auditlog"):
                 return HttpResponseRedirect(reverse(f"admin:{url.name}", args=[pk]))

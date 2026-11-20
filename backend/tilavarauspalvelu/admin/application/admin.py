@@ -25,6 +25,7 @@ from tilavarauspalvelu.models import Application
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
+    from django.http import HttpRequest
 
     from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
     from tilavarauspalvelu.typing import WSGIRequest
@@ -164,11 +165,11 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     ]
 
     @button(label=_("Open in staff UI"), change_form=True)
-    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+    def open_in_staff_ui(self, request: HttpRequest, pk: str) -> HttpResponseRedirect:
         url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
         return HttpResponseRedirect(f"{url_base}/kasittely/applications/{pk}")
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return (
             super()
             .get_queryset(request)

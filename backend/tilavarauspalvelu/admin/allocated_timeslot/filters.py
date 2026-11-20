@@ -19,9 +19,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.db.models import QuerySet
+    from django.http import HttpRequest
     from django_stubs_ext import StrOrPromise
-
-    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ApplicationRoundFilter(admin.SimpleListFilter):
@@ -33,7 +32,7 @@ class ApplicationRoundFilter(admin.SimpleListFilter):
             Q(sent_at__isnull=True) | Q(handled_at__isnull=True),
         ).values_list("id", "name")
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         value: str | None = self.value()
         if value is None:
             return queryset
@@ -47,7 +46,7 @@ class ApplicationRoundStatusFilter(admin.SimpleListFilter):
     def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationRoundStatusChoice.choices
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         value: str | None = self.value()
         if value is None:
             return queryset
@@ -63,7 +62,7 @@ class ApplicationStatusFilter(admin.SimpleListFilter):
     def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationStatusChoice.choices
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         value: str | None = self.value()
         if value is None:
             return queryset
@@ -77,7 +76,7 @@ class ApplicationSectionStatusFilter(admin.SimpleListFilter):
     def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationSectionStatusChoice.choices
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         value: str | None = self.value()
         if value is None:
             return queryset
@@ -91,7 +90,7 @@ class DayOfTheWeekFilter(admin.SimpleListFilter):
     def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return Weekday.choices
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
+    def queryset(self, request: HttpRequest, queryset: QuerySet) -> QuerySet:
         value: str | None = self.value()
         if value is None:
             return queryset

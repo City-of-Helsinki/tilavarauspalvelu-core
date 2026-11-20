@@ -20,7 +20,7 @@ from tilavarauspalvelu.services.export import ApplicationRoundApplicationsCSVExp
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-    from django.http import FileResponse
+    from django.http import FileResponse, HttpRequest
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -93,7 +93,7 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
         "purposes",
     ]
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return (
             super()
             .get_queryset(request)
@@ -107,7 +107,7 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
         return obj.status
 
     @button(label=_("Export applications to CSV"), change_form=True)
-    def export_applications_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:
+    def export_applications_to_csv(self, request: HttpRequest, pk: int) -> FileResponse | None:
         try:
             exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=pk)
             response = exporter.to_file_response()
@@ -120,7 +120,7 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
         return response
 
     @button(label=_("Export results to CSV"), change_form=True)
-    def export_results_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:
+    def export_results_to_csv(self, request: HttpRequest, pk: int) -> FileResponse | None:
         try:
             exporter = ApplicationRoundResultCSVExporter(application_round_id=pk)
             response = exporter.to_file_response()

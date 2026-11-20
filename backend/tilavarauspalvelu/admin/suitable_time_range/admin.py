@@ -10,8 +10,7 @@ from tilavarauspalvelu.models import SuitableTimeRange
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 class SuitableTimeRangeInline(admin.TabularInline):
@@ -19,5 +18,5 @@ class SuitableTimeRangeInline(admin.TabularInline):
     form = SuitableTimeRangeInlineAdminForm
     extra = 0
 
-    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         return super().get_queryset(request).annotate(fulfilled=L("fulfilled"))

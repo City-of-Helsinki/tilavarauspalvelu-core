@@ -8,7 +8,7 @@ from modeltranslation.admin import TranslationAdmin
 from tilavarauspalvelu.models import Resource
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
 
 
 @admin.register(Resource)
@@ -23,7 +23,7 @@ class ResourceAdmin(TranslationAdmin):
     list_select_related = ["space__unit"]
     autocomplete_fields = ["space"]
 
-    def has_delete_permission(self, request: WSGIRequest, obj: Resource | None = None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj: Resource | None = None) -> bool:
         if obj is not None and obj.reservation_units.exists():
             return False
 

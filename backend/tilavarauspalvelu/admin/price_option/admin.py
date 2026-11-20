@@ -12,7 +12,8 @@ from tilavarauspalvelu.models import PriceOption
 from .form import PriceOptionAdminForm
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import WSGIRequest
+    from django.http import HttpRequest
+
 
 __all__ = [
     "PriceOptionAdmin",
@@ -45,7 +46,7 @@ class PriceOptionAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslationAdmin):
         "is_active",
     ]
 
-    def get_readonly_fields(self, request: WSGIRequest, obj: PriceOption | None = None) -> list[str]:
+    def get_readonly_fields(self, request: HttpRequest, obj: PriceOption | None = None) -> list[str]:
         # Price components must use an option of their pricing group's unit group.
         if obj is not None and obj.price_components.exists():
             return ["unit_group"]
