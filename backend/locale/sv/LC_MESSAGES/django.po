@@ -1230,6 +1230,12 @@ msgid "Reservable Time Spans updated."
 msgstr ""
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid ""
+"Could not update the reservable time spans from Hauki. The error was "
+"reported to Sentry."
+msgstr ""
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid "Update reservable time spans"
 msgstr ""
 
