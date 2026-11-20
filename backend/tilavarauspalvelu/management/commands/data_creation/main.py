@@ -4,6 +4,8 @@ import os
 
 from django.core.management import call_command
 
+from tilavarauspalvelu.models import Unit
+
 from .create_caisa import _create_caisa
 from .create_misc import _create_banner_notifications, _create_general_terms_of_use, _create_periodic_tasks
 from .create_permissions import _create_unit_groups, _set_user_group_permissions, _set_user_roles
@@ -13,6 +15,7 @@ from .create_reservation_related_things import (
     _create_cancellation_rules,
     _create_hauki_resources,
     _create_participant_genders,
+    _create_payment_merchant,
     _create_reservation_purposes,
     _create_specific_terms_of_use,
     _create_sports,
@@ -38,12 +41,14 @@ def create_test_data(*, flush: bool = True, number_of_days_that_have_reservation
     terms_of_use = _create_specific_terms_of_use()
     cancellation_rules = _create_cancellation_rules()
     tax_levels = _create_tax_levels()
+    payment_merchant = _create_payment_merchant()
 
     _create_reservation_units(
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,
         tax_levels=tax_levels,
+        payment_merchant=payment_merchant,
     )
 
     reservation_purposes = _create_reservation_purposes()
@@ -79,10 +84,13 @@ def create_test_data(*, flush: bool = True, number_of_days_that_have_reservation
     _create_banner_notifications()
     _create_periodic_tasks()
 
-    _create_caisa(tax_levels=tax_levels)
+    _create_caisa(tax_levels=tax_levels, payment_merchant=payment_merchant)
 
     _create_shared_pricing_group(tax_levels=tax_levels)
     _create_reservation_price_lines()
+
+    # One merchant for every unit, so that one merchant in Verkkokauppa is enough for all paid reservation units.
+    Unit.objects.update(payment_merchant=payment_merchant)
 
 
 @with_logs
