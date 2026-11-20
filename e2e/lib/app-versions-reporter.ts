@@ -13,13 +13,18 @@ const APPS = ["customer", "staff", "backend"] as const;
 
 export type AppVersions = Record<(typeof APPS)[number], string>;
 
-/** The version that an app answers with at a path, or "unknown" when it doesn't answer with one */
+/**
+ * The version that an app answers with at a path, or "unknown" when it doesn't answer with one. An error response gets
+ * its status after the version, like "v1.75.1 - 503" or "unknown - 502", because it can come from a gateway, and the
+ * backend answers with its version also when it isn't ready.
+ */
 async function readVersion(baseURL: string, path: string): Promise<string> {
   try {
-    // The backend answers with its version also when it isn't ready (503)
     const response = await fetch(new URL(path, baseURL), { signal: AbortSignal.timeout(10_000) });
-    const { version } = (await response.json()) as { version?: unknown };
-    return typeof version === "string" && version !== "" ? version : "unknown";
+    // A body that isn't JSON, like a gateway's error page, has no version
+    const body = ((await response.json().catch(() => null)) ?? {}) as { version?: unknown };
+    const version = typeof body.version === "string" && body.version !== "" ? body.version : "unknown";
+    return response.ok ? version : `${version} - ${response.status}`;
   } catch {
     return "unknown";
   }
