@@ -174,7 +174,7 @@ class ReservationUnit(models.Model):
         db_index=True,
     )
     # The payment type is separate from the pricing, because prices and payment types change independently.
-    payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
+    payment_type = TextChoicesField(enum=PaymentType, null=True, blank=True)
 
     # List fields
 

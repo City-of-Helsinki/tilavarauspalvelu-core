@@ -31,7 +31,7 @@ class PriceComponent(models.Model):
         related_name="components",
         on_delete=models.CASCADE,
     )
-    kind: PriceComponentKind = TextChoicesField(enum=PriceComponentKind, default=PriceComponentKind.BASE)
+    kind = TextChoicesField(enum=PriceComponentKind, default=PriceComponentKind.BASE)
 
     valid_from = models.DateField()
     valid_until = models.DateField(null=True, blank=True)  # Exclusive
@@ -47,7 +47,7 @@ class PriceComponent(models.Model):
 
     # Gross amount, VAT included
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    price_unit: PriceUnit = TextChoicesField(enum=PriceUnit)
+    price_unit = TextChoicesField(enum=PriceUnit)
 
     can_apply_for_discount = models.BooleanField(default=False)
 
