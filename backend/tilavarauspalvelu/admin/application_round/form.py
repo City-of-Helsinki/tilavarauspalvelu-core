@@ -47,7 +47,8 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
     def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
+        super().clean()
+        cleaned_data = self.cleaned_data
 
         if self.instance.pk is not None and "application_form" in self.changed_data:
             self.validate_application_form_can_change()

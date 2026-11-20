@@ -171,7 +171,8 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             pindora_field.initial = self.get_pindora_response()
 
     def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
+        super().clean()
+        cleaned_data = self.cleaned_data
 
         if self.instance.pk is not None:
             self.validate_sports_data(cleaned_data)

@@ -112,7 +112,8 @@ class PaymentMerchantForm(forms.ModelForm):
         self.fields["business_id"].initial = merchant_info.business_id
 
     def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
+        super().clean()
+        cleaned_data = self.cleaned_data
         if self.merchant_info_missing:
             raise forms.ValidationError(MERCHANT_INFO_MISSING_MESSAGE)
         return cleaned_data

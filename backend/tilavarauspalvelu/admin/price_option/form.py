@@ -18,10 +18,11 @@ class PriceOptionAdminForm(forms.ModelForm):
 
     class Meta:
         model = PriceOption
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
 
     def clean(self) -> dict[str, Any]:
-        cleaned_data = super().clean()
+        super().clean()
+        cleaned_data = self.cleaned_data
 
         round_option_fields = {"unit_group", "is_active"}
         if self.instance.pk is not None and not round_option_fields.intersection(self.changed_data):

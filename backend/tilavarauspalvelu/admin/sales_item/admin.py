@@ -14,7 +14,7 @@ __all__ = [
 class SalesItemForm(forms.ModelForm):
     class Meta:
         model = SalesItem
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         # Labels are intentionally left untranslated, like in the payment accounting admin (TILA-3425)
         labels = {
             "name": "Sales item name",
