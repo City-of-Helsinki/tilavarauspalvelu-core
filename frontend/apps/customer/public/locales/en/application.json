@@ -3,6 +3,7 @@
     "saveFailed": "Application could not be saved"
   },
   "validation": {
+    "priceOptionNotOffered": "The customer group you chose is no longer available. Choose a new customer group.",
     "Required": "Required",
     "Expected number, received null": "Required",
     "noReservationUnits": "Add one or more spaces to the application",
