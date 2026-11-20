@@ -9,6 +9,7 @@
 /.pre-commit-config.yaml    @matti-lamppu @ranta
 /AGENTS.md                  @joonatank @matti-lamppu
 /backend/                   @matti-lamppu @ranta @tuomas777
+/backend/tests/test_frontend_queries/ @joonatank @ranta @vincit-matu
 /docker-compose.yml         @joonatank @matti-lamppu
 /e2e/                       @joonatank @RQbo
 /frontend/                  @joonatank @ranta @vincit-matu
