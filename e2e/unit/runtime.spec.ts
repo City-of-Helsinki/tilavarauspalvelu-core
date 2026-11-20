@@ -164,7 +164,7 @@ test.describe("Runtime", () => {
     expect(await retry(3, 10, () => Promise.resolve("first"))).toBe("first");
   });
 
-  test("The app versions are read from the apps, and an app that doesn't answer with one is unknown", async () => {
+  test("The app versions are read from the apps, and an error response gets its status after the version", async () => {
     // The customer app answers, the staff app is behind a proxy that fails, and the backend isn't ready
     const server = createServer((request, response) => {
       if (request.url === "/healthcheck") {
@@ -183,8 +183,8 @@ test.describe("Runtime", () => {
     try {
       expect(await readAppVersions(`http://127.0.0.1:${port}/`)).toEqual({
         customer: "v1.75.1",
-        staff: "unknown",
-        backend: "3a4f1c2d",
+        staff: "unknown - 502",
+        backend: "3a4f1c2d - 503",
       });
     } finally {
       server.closeAllConnections();
