@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Download attachments of a Jira issue from the Jira Cloud REST API.
+# Usage: jira-attachment <key or URL> <filename or id>..., e.g. jira-attachment TILA-123 'diagram.png'
+# Saves the files into a new, empty directory under /tmp and prints the path of each file.
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  echo "Usage: jira-attachment <key or URL> <filename or id>..., e.g. jira-attachment TILA-123 'diagram.png'" >&2
+  exit 2
+}
+[[ $# -ge 2 ]] || usage
+
+key="$(parse_key "$1")"
+shift
+
+load_credentials
+
+attachments="$(api "rest/api/2/issue/$key?fields=attachment" | jq '[.fields.attachment[]? | {id, filename}]')"
+
+# Find the id for each argument before the download, so that a wrong name changes nothing.
+ids=()
+for wanted in "$@"; do
+  matches="$(jq --raw-output --arg w "$wanted" '[.[] | select(.id == $w or .filename == $w) | .id] | unique | .[]' <<<"$attachments")"
+  count="$(grep -c . <<<"$matches" || true)"
+  if [[ "$count" -eq 0 ]]; then
+    echo "No attachment '$wanted' in $key. The attachments are:" >&2
+    jq --raw-output '.[] | "  \(.id)  \(.filename)"' <<<"$attachments" >&2
+    exit 2
+  elif [[ "$count" -gt 1 ]]; then
+    echo "More than one attachment is named '$wanted' in $key. Give the id instead:" >&2
+    jq --raw-output --arg w "$wanted" '.[] | select(.filename == $w) | "  \(.id)  \(.filename)"' <<<"$attachments" >&2
+    exit 2
+  fi
+  ids+=("$matches")
+done
+
+# Attachments are untrusted data. Keep them in their own new directory.
+output_dir="$(mktemp -d /tmp/jira-attachment.XXXXXX)"
+
+for id in "${ids[@]}"; do
+  filename="$(jq --raw-output --arg i "$id" '.[] | select(.id == $i) | .filename' <<<"$attachments")"
+  # Keep only the last path part, and add the id so that two files with the same name do not collide.
+  filename="${filename##*/}"
+  [[ -n "$filename" && "$filename" != "." && "$filename" != ".." ]] || filename="attachment"
+  target="$output_dir/$id-$filename"
+  # The content URL redirects to the Atlassian media host with a short-lived token in the URL.
+  # Curl does not send the credentials to the other host.
+  printf 'user = "%s"\n' "$credentials" \
+    | curl --silent --show-error --fail --location --max-time 300 --config - \
+      --output "$target" "$base_url/rest/api/2/attachment/content/$id"
+  echo "$target"
+done
