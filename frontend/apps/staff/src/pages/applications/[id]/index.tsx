@@ -363,15 +363,17 @@ function ReservationUnitOptionsSection({
   return (
     <TableWrapper>
       <ReservationUnitOptionsTable>
-        {rows.map((row) => (
-          <ReservationUnitOptionRow key={row.pk}>
-            {cols.map((col) => (
-              <ReservationUnitOptionElem key={`${col.key}-${row.pk}`} $hideOnMobile={col.key === "status"}>
-                {col.transform(row)}
-              </ReservationUnitOptionElem>
-            ))}
-          </ReservationUnitOptionRow>
-        ))}
+        <tbody>
+          {rows.map((row) => (
+            <ReservationUnitOptionRow key={row.pk}>
+              {cols.map((col) => (
+                <ReservationUnitOptionElem key={`${col.key}-${row.pk}`} $hideOnMobile={col.key === "status"}>
+                  {col.transform(row)}
+                </ReservationUnitOptionElem>
+              ))}
+            </ReservationUnitOptionRow>
+          ))}
+        </tbody>
       </ReservationUnitOptionsTable>
     </TableWrapper>
   );
