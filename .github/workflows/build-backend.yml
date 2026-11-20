@@ -31,7 +31,7 @@ jobs:
   build-and-push:
     name: "Build and push Backend Docker image to GitHub Packages"
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.skip-backend != 'true' }}
     runs-on: ubuntu-latest
 
     permissions:

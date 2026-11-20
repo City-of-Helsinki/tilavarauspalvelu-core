@@ -30,7 +30,7 @@ jobs:
   lint-staff-ui:
     name: Staff ui lint
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.skip-frontend != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -63,7 +63,7 @@ jobs:
   test-staff-ui:
     name: Staff ui unit test
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.skip-frontend != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -102,7 +102,7 @@ jobs:
   lint-customer-ui:
     name: Customer ui lint
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.skip-frontend != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -135,7 +135,7 @@ jobs:
   test-customer-ui:
     name: Customer ui unit tests
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.skip-frontend != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -174,7 +174,7 @@ jobs:
   test-ui-package:
     name: Shared ui package unit tests
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.skip-frontend != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
