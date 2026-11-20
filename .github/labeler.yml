@@ -32,6 +32,20 @@ docker:
           - "**/.dockerignore"
           - "docker-compose.yml"
 
+# A release with new migrations has downtime. The deploy pipeline makes its own check with `migrate --check`.
+# This label only tells people.
+migrations:
+  - changed-files:
+      - all-globs-to-any-file:
+          - "backend/**/migrations/*.py"
+          - "!backend/**/migrations/__init__.py"
+
+# The UIs use this schema. A removed or changed field breaks an old UI against the new backend.
+graphql-schema:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tilavaraus.graphql"
+
 infra:
   - changed-files:
       - any-glob-to-any-file:
