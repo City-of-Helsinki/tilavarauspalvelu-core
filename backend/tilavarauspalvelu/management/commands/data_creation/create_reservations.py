@@ -19,6 +19,7 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
     Weekday,
 )
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.models import (
     PaymentOrder,
     PriceComponent,
@@ -281,6 +282,11 @@ def _create_payment_orders(*, handled_payment_due_by_by_pk: dict[int, datetime.d
     payment_orders: list[PaymentOrder] = []
     for reservation in reservations:
         if reservation.total_price > 0:
+            # The test data gives a payment type to every reservation unit with a price.
+            if reservation.reservation_unit.payment_type is None:
+                msg = "A reservation unit with a price has a payment type."
+                raise MissingValueError(msg)
+
             payment_type = PaymentType(reservation.reservation_unit.payment_type)
             handled_payment_due_by = handled_payment_due_by_by_pk[reservation.pk]
             payment_order = _build_payment_order(reservation, payment_type, handled_payment_due_by)

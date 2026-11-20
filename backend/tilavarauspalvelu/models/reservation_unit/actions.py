@@ -549,6 +549,10 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         payment_merchant = self.get_merchant()
 
         if self.requires_product_mapping_update():
+            if payment_merchant is None:
+                msg = "A product mapping update requires a merchant."
+                raise MissingValueError(msg)
+
             params = CreateProductParams(
                 namespace=settings.VERKKOKAUPPA_NAMESPACE,
                 namespace_entity_id=str(self.reservation_unit.pk),

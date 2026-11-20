@@ -130,7 +130,7 @@ def _check_date_range(
     offered_options = {
         component.price_option_id: component.price_option
         for component in active_components
-        if component.price_option_id is not None
+        if component.price_option is not None
     }
 
     if not offered_options and len(components_for_all_options) > 1:

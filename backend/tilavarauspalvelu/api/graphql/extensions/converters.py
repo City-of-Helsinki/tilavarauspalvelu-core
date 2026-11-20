@@ -8,6 +8,7 @@ from graphene_django.forms.converter import convert_form_field, get_form_field_d
 from graphene_django.registry import Registry
 from lookup_property.field import LookupPropertyField
 
+from tilavarauspalvelu.exceptions import MissingValueError
 from utils.fields.forms import TextChoicesFormField
 from utils.fields.model import TextChoicesField
 
@@ -22,6 +23,11 @@ def _(field: LookupPropertyField, registry: Registry | None = None) -> graphene.
     model = field.model
 
     def dynamic_type() -> graphene.Field | None:
+        # Graphene passes the registry of the object type to every field converter.
+        if registry is None:
+            msg = "Graphene gives the field converter a registry."
+            raise MissingValueError(msg)
+
         _type = registry.get_type_for_model(model)
         if not _type:
             return None

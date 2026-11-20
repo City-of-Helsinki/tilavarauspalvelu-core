@@ -198,7 +198,8 @@ def get_translated[**P, R](func: Callable[P, R]) -> Callable[P, R]:
 
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        language = kwargs.get("language", settings.LANGUAGE_CODE)
+        # The wrapped functions take the language as a 'Lang' string.
+        language: str = kwargs.get("language", settings.LANGUAGE_CODE)  # type: ignore[assignment]
         with translation.override(language=language):
             return func(*args, **kwargs)
 
