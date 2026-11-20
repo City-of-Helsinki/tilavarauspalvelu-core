@@ -90,12 +90,14 @@ function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCard
   const infos = [];
   if (reservationUnitTypeName) {
     infos.push({
+      key: "reservationUnitType",
       icon: <IconHome />,
       value: reservationUnitTypeName,
     });
   }
   if (reservationUnit.maxPersons) {
     infos.push({
+      key: "maxPersons",
       icon: <IconGroup />,
       value: t("reservationUnitCard:maxPersons", {
         count: reservationUnit.maxPersons,
@@ -104,6 +106,7 @@ function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCard
   }
   if (unitPrice) {
     infos.push({
+      key: "price",
       icon: <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} aria-hidden="false" />,
       value: unitPrice,
     });
