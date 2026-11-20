@@ -218,28 +218,27 @@ class Application(SerializableModelMixin, models.Model):
         from tilavarauspalvelu.models import ApplicationSection
 
         return ~models.Exists(  # type: ignore[return-value]
-            ApplicationSection.objects.alias(status=L("status")).filter(
+            ApplicationSection.objects.filter(
+                L(
+                    status__in=[
+                        ApplicationSectionStatusChoice.UNALLOCATED.value,
+                        ApplicationSectionStatusChoice.IN_ALLOCATION.value,
+                    ]
+                ),
                 application=models.OuterRef("pk"),
-                status__in=[
-                    ApplicationSectionStatusChoice.UNALLOCATED.value,
-                    ApplicationSectionStatusChoice.IN_ALLOCATION.value,
-                ],
             )
         )
 
     @all_sections_allocated.override
     def _(self) -> bool:
-        return (
-            not self.application_sections
-            .alias(status=L("status"))
-            .filter(
+        return not self.application_sections.filter(
+            L(
                 status__in=[
                     ApplicationSectionStatusChoice.UNALLOCATED.value,
                     ApplicationSectionStatusChoice.IN_ALLOCATION.value,
                 ]
             )
-            .exists()
-        )
+        ).exists()
 
     @lookup_property
     def applicant() -> str:
