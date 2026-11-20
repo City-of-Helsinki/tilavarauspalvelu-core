@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -15,10 +15,6 @@ from tilavarauspalvelu.models import ReservationSeries
 from tilavarauspalvelu.typing import ReservationSeriesAddData
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation
-
 
 __all__ = [
     "ReservationSeriesAddReservationSerializer",
@@ -52,7 +48,10 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer[Reservati
         self.instance.validators.validate_has_reservations()
 
         reservation_unit = self.instance.reservation_unit
-        first_reservation: Reservation = self.instance.reservations.first()
+        first_reservation = self.instance.reservations.first()
+        if first_reservation is None:
+            msg = "The series is validated to have reservations."
+            raise MissingValueError(msg)
         reservation_type = first_reservation.type
 
         begins_at: datetime.datetime = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
@@ -91,7 +90,10 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer[Reservati
         #
         # This retains data from many-to-one relationships, but not for many-to-many or one-to-many relationships.
         # One-to-one relationships to or from the model would cause an error.
-        reservation: Reservation = instance.reservations.last()
+        reservation = instance.reservations.last()
+        if reservation is None:
+            msg = "The series is validated to have reservations."
+            raise MissingValueError(msg)
 
         # A little trick for making a copy of an existing instance
         # See: https://docs.djangoproject.com/en/dev/topics/db/queries/#copying-model-instances

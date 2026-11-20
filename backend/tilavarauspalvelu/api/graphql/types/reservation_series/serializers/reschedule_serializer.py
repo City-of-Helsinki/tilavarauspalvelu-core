@@ -12,6 +12,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, Weekday
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries, ReservationStatistic
@@ -94,7 +95,10 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer[ReservationSe
 
         # We know there is at least one future reservation, so we can safely assume
         # that we will have at least one reservation in the series
-        first_reservation: Reservation = self.instance.reservations.order_by("begins_at").first()
+        first_reservation = self.instance.reservations.order_by("begins_at").first()
+        if first_reservation is None:
+            msg = "The series is validated to have future reservations."
+            raise MissingValueError(msg)
         if begin_date != self.instance.begin_date and first_reservation.begins_at < now:
             msg = (
                 "Reservation series' begin date cannot be changed after its "
@@ -229,7 +233,10 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer[ReservationSe
         # Use reservation details from the next reservation relative to the current time that is going to occur.
         # We validated previously that there is at least one future reservation in the series,
         # so we can safely assume that we will have at least one reservation to get details from.
-        next_reservation: Reservation = instance.reservations.future().order_by("begins_at").first()
+        next_reservation = instance.reservations.future().order_by("begins_at").first()
+        if next_reservation is None:
+            msg = "The series is validated to have future reservations."
+            raise MissingValueError(msg)
 
         return ReservationDetails(
             name=next_reservation.name,

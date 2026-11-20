@@ -5,6 +5,7 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -55,6 +56,9 @@ class ReservationConfirmSerializer(NestingModelSerializer[Reservation, Reservati
 
         reservation_unit = self.instance.reservation_unit
         reservation_unit.validators.validate_has_payment_type()
+        if reservation_unit.payment_type is None:
+            msg = "The reservation unit is validated to have a payment type."
+            raise MissingValueError(msg)
 
         data["payment_type"] = PaymentType(reservation_unit.payment_type)
 
@@ -74,7 +78,11 @@ class ReservationConfirmSerializer(NestingModelSerializer[Reservation, Reservati
             set_price_line_taxes(reservation=self.instance, on_date=local_date())
 
         if self.instance.total_price_net > 0 and state.should_create_payment_order:
-            self.instance.actions.create_payment_order_paid_immediately(payment_type=validated_data["payment_type"])
+            payment_type = validated_data["payment_type"]
+            if payment_type is None:
+                msg = "The validation sets the payment type."
+                raise MissingValueError(msg)
+            self.instance.actions.create_payment_order_paid_immediately(payment_type=payment_type)
 
         super().update(instance=instance, validated_data=validated_data)
 

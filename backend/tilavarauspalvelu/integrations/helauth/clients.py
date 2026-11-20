@@ -9,6 +9,7 @@ from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
 from config.auth import ProxyTunnistamoOIDCAuthBackend
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, utc_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
@@ -77,6 +78,9 @@ class KeyCloakClient(BaseExternalServiceClient):
             # The OAuth backend types the response as a plain dict.
             response: RefreshResponse = cls.oidc_backend.refresh_token(token=keycloak_refresh_token)  # type: ignore[assignment]
         except HTTPError as error:
+            if error.response is None:
+                msg = "An HTTP error from 'raise_for_status' always has a response."
+                raise MissingValueError(msg) from error
             try:
                 # Catch known error for expired keycloak refresh token. This cannot be solved without a
                 # logging out and back in again. Set a flag in the session which is used by the

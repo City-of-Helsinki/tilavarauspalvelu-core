@@ -17,7 +17,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReserveeType,
 )
-from tilavarauspalvelu.exceptions import ApplicationRoundResetError
+from tilavarauspalvelu.exceptions import ApplicationRoundResetError, MissingValueError
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
@@ -161,7 +161,11 @@ class ApplicationRoundActions:
             for series in reservation_series:
                 reservation_details = self._get_reservation_series_details(series)
 
-                price_option = series.allocated_time_slot.reservation_unit_option.application_section.price_option
+                allocated_time_slot = series.allocated_time_slot
+                if allocated_time_slot is None:
+                    msg = "The series is created from an allocated time slot."
+                    raise MissingValueError(msg)
+                price_option = allocated_time_slot.reservation_unit_option.application_section.price_option
                 if pricing_data is not None:
                     reservation_details["price_option"] = price_option
 
@@ -260,7 +264,11 @@ class ApplicationRoundActions:
         return closed_time_spans
 
     def _get_reservation_series_details(self, series: ReservationSeries) -> ReservationDetails:
-        application_section = series.allocated_time_slot.reservation_unit_option.application_section
+        allocated_time_slot = series.allocated_time_slot
+        if allocated_time_slot is None:
+            msg = "The series is created from an allocated time slot."
+            raise MissingValueError(msg)
+        application_section = allocated_time_slot.reservation_unit_option.application_section
         application = application_section.application
 
         reservee_type = ReserveeType(application.applicant_type)

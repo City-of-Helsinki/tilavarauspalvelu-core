@@ -13,6 +13,7 @@ from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
 from config.auth import ProxyTunnistamoOIDCAuthBackend
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.helauth.clients import KeyCloakClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, utc_datetime
@@ -149,6 +150,9 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 # Last resort, try keycloak refresh
                 access_token = KeyCloakClient.refresh_token(user=user, session=session)
                 if access_token is None:
+                    if error.response is None:
+                        msg = "An HTTP error from 'raise_for_status' always has a response."
+                        raise MissingValueError(msg) from error
                     msg = "Unable to refresh Helsinki profile token"
                     details = {"user": user.pk, "error": error.response.text}
                     SentryLogger.log_message(msg, details=details, level="warning")
@@ -158,6 +162,9 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             # Fetch new profile tokens.
             response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
         except HTTPError as error:
+            if error.response is None:
+                msg = "An HTTP error from 'raise_for_status' always has a response."
+                raise MissingValueError(msg) from error
             msg = "Unable to get Helsinki profile token"
             details = {"user": user.pk, "error": error.response.text}
             SentryLogger.log_message(msg, details=details, level="warning")

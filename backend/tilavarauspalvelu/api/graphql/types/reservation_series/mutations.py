@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions import CreateMutation, UpdateMutation
 
 from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.models import ReservationSeries
 from tilavarauspalvelu.typing import AnyUser
 from utils.date_utils import local_datetime
@@ -20,9 +21,6 @@ from .serializers import (
     ReservationSeriesUpdateSerializer,
 )
 from .serializers.repair_access_code import ReservationSeriesRepairAccessCodeSerializer
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation
 
 __all__ = [
     "ReservationSeriesAddMutation",
@@ -81,7 +79,10 @@ class ReservationSeriesChangeAccessCodeMutation(UpdateMutation[ReservationSeries
 
     @classmethod
     def get_serializer_output(cls, instance: ReservationSeries) -> dict[str, Any]:
-        last_reservation: Reservation = instance.reservations.requires_active_access_code().last()
+        last_reservation = instance.reservations.requires_active_access_code().last()
+        if last_reservation is None:
+            msg = "The serializer validates that the series has reservations that require an access code."
+            raise MissingValueError(msg)
         return {
             "access_code_generated_at": last_reservation.access_code_generated_at,
             "access_code_is_active": last_reservation.access_code_is_active,
@@ -95,7 +96,10 @@ class ReservationSeriesRepairAccessCodeMutation(UpdateMutation[ReservationSeries
 
     @classmethod
     def get_serializer_output(cls, instance: ReservationSeries) -> dict[str, Any]:
-        last_reservation: Reservation = instance.reservations.requires_active_access_code().last()
+        last_reservation = instance.reservations.requires_active_access_code().last()
+        if last_reservation is None:
+            msg = "The serializer validates that the series has reservations that require an access code."
+            raise MissingValueError(msg)
         return {
             "access_code_generated_at": last_reservation.access_code_generated_at,
             "access_code_is_active": last_reservation.access_code_is_active,

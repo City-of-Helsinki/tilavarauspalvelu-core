@@ -27,6 +27,10 @@ class HaukiConfigurationError(ExternalServiceError):
     """Hauki API settings are not configured correctly"""
 
 
+class MissingValueError(Exception):
+    """Error when a value is missing, although earlier code ensures that it exists"""
+
+
 class PDFRenderingError(Exception):
     """Error when rendering PDF"""
 

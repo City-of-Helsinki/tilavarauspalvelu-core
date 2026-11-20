@@ -15,7 +15,7 @@ from tilavarauspalvelu.enums import (
     PriceComponentKind,
     ReservationStartInterval,
 )
-from tilavarauspalvelu.exceptions import HaukiAPIError
+from tilavarauspalvelu.exceptions import HaukiAPIError, MissingValueError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -150,7 +150,11 @@ class ReservationUnitHaukiExporter:
 
     def _update_hauki_resource(self, hauki_resource_data: dict[str, Any]) -> None:
         """Update the Hauki Resource in Hauki API with ReservationUnits data."""
-        hauki_resource_data["id"] = self.reservation_unit.origin_hauki_resource.id
+        origin_hauki_resource = self.reservation_unit.origin_hauki_resource
+        if origin_hauki_resource is None:
+            msg = "The caller updates only a reservation unit that has a Hauki resource."
+            raise MissingValueError(msg)
+        hauki_resource_data["id"] = origin_hauki_resource.id
 
         # Existing Hauki Resource, update it in Hauki API
         HaukiAPIClient.update_resource(data=hauki_resource_data)
