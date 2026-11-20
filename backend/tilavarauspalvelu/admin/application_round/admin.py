@@ -107,9 +107,10 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
         return obj.status
 
     @button(label=_("Export applications to CSV"), change_form=True)
-    def export_applications_to_csv(self, request: HttpRequest, pk: int) -> FileResponse | None:
+    def export_applications_to_csv(self, request: HttpRequest, pk: str) -> FileResponse | None:
         try:
-            exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=pk)
+            application_round_id = int(pk)
+            exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round_id)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
             message = _("Could not export the applications.")
@@ -120,9 +121,10 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
         return response
 
     @button(label=_("Export results to CSV"), change_form=True)
-    def export_results_to_csv(self, request: HttpRequest, pk: int) -> FileResponse | None:
+    def export_results_to_csv(self, request: HttpRequest, pk: str) -> FileResponse | None:
         try:
-            exporter = ApplicationRoundResultCSVExporter(application_round_id=pk)
+            application_round_id = int(pk)
+            exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round_id)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
             message = _("Could not export the results.")
