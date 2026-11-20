@@ -138,7 +138,7 @@ function ApplicationSectionInner({
           required
           error={getTranslatedError("purpose")}
         />
-        {priceOptionList?.length && (
+        {priceOptionList != null && priceOptionList.length > 0 && (
           <ControlledSelect
             control={control}
             options={priceOptionList}

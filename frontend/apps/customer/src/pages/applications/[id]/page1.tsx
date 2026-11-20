@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { gql } from "@apollo/client";
@@ -21,6 +21,7 @@ import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
   ApplicationPage1SchemaRefined,
+  clearPriceOptionsIfNoneOffered,
   transformApplicationPage1,
   convertApplicationPage1,
 } from "@/components/application/funnel/form";
@@ -70,11 +71,26 @@ function Page1({
   const end = parseApiDate(applicationRound.reservationPeriodEndDate) ?? new Date();
   const form = useForm<ApplicationPage1FormValues>({
     mode: "onChange",
-    defaultValues: convertApplicationPage1(application, getReservationUnits()),
+    defaultValues: clearPriceOptionsIfNoneOffered(
+      convertApplicationPage1(application, getReservationUnits()),
+      offeredPriceOptionPks
+    ),
     resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end }, { offeredPriceOptionPks })),
   });
 
-  const { handleSubmit } = form;
+  const { handleSubmit, trigger, getValues } = form;
+
+  // Show at once why a section's saved price option is empty: the round no longer offers it.
+  useEffect(() => {
+    const unofferedFields = (getValues("applicationSections") ?? []).flatMap((section, index) =>
+      section?.priceOption != null && !offeredPriceOptionPks.includes(section.priceOption)
+        ? [`applicationSections.${index}.priceOption` as const]
+        : []
+    );
+    if (unofferedFields.length > 0) {
+      void trigger(unofferedFields);
+    }
+  }, [getValues, trigger, offeredPriceOptionPks]);
 
   const onSubmit = (values: ApplicationPage1FormValues) => saveAndNavigate(values);
 
@@ -127,9 +143,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const priceOptionsPromise = getApplicationRoundPriceOptions(client, application.applicationRound.pk);
 
   const [searchOptionsList, priceOptions] = await Promise.all([searchOptionsPromise, priceOptionsPromise]);
-  const priceOptionList = priceOptions
-    .filter((option) => option.isActive)
-    .map((option) => translateOption(option, getLocalizationLang(locale)));
+  // All offered options, also inactive ones: the backend accepts every offered option, so the select must show them.
+  const priceOptionList = priceOptions.map((option) => translateOption(option, getLocalizationLang(locale)));
   return {
     props: {
       application,
