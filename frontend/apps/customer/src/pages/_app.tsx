@@ -78,32 +78,32 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps & ErrorPageProps): React.Reac
 
   return (
     <>
-      {/* The cookie consent provider renders nothing on the server, so the head has to be outside it */}
       <Head>
         <title>Tilavarauspalvelu</title>
         <meta name="version" content={envConfig.version} />
       </Head>
-      <CookieConsentContextProvider
-        siteSettings={sitesettings}
-        options={{
-          language,
-        }}
-        onChange={recheck}
-      >
-        <TrackingWrapper matomoEnabled={enableMatomo}>
-          <EnvContextProvider env={envConfig}>
-            <ApolloProvider client={client}>
-              <PageWrapper profileLink={envConfig.profileLink} feedbackUrl={envConfig.feedbackUrl}>
-                <Component {...pageProps} />
+      <TrackingWrapper matomoEnabled={enableMatomo}>
+        <EnvContextProvider env={envConfig}>
+          <ApolloProvider client={client}>
+            <PageWrapper profileLink={envConfig.profileLink} feedbackUrl={envConfig.feedbackUrl}>
+              <Component {...pageProps} />
+              {/* The provider renders nothing on the server, so it wraps only the banner and not the page */}
+              <CookieConsentContextProvider
+                siteSettings={sitesettings}
+                options={{
+                  language,
+                }}
+                onChange={recheck}
+              >
                 <CookieBanner />
-                <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} isErrorPage={props.err != null} />
-              </PageWrapper>
-              <ToastContainer />
-            </ApolloProvider>
-          </EnvContextProvider>
-        </TrackingWrapper>
-        <ExternalScripts enableMatomo={enableMatomo} enableHotjar={enableHotjar} />
-      </CookieConsentContextProvider>
+              </CookieConsentContextProvider>
+              <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} isErrorPage={props.err != null} />
+            </PageWrapper>
+            <ToastContainer />
+          </ApolloProvider>
+        </EnvContextProvider>
+      </TrackingWrapper>
+      <ExternalScripts enableMatomo={enableMatomo} enableHotjar={enableHotjar} />
     </>
   );
 }
