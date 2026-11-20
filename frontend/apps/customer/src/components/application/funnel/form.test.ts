@@ -40,7 +40,7 @@ describe("ApplicationPage1SchemaRefined", () => {
   };
 
   test("requires at least one section", () => {
-    const result = ApplicationPage1SchemaRefined(round).safeParse({
+    const result = ApplicationPage1SchemaRefined(round, { offeredPriceOptionPkList: [] }).safeParse({
       pk: 1,
       applicantType: ReserveeType.Company,
       applicationSections: [],
@@ -51,7 +51,7 @@ describe("ApplicationPage1SchemaRefined", () => {
   });
 
   test("validates section dates against the application round", () => {
-    const result = ApplicationPage1SchemaRefined(round).safeParse({
+    const result = ApplicationPage1SchemaRefined(round, { offeredPriceOptionPkList: [] }).safeParse({
       pk: 1,
       applicantType: ReserveeType.Company,
       applicationSections: [
@@ -675,33 +675,73 @@ describe("page 3 conversions", () => {
 });
 
 describe("validateApplication", () => {
+  const noPriceOptions = { offeredPriceOptionPkList: [] };
+
   test("returns the first invalid page and accepts a complete application", () => {
     expect(
-      validateApplication({
-        ...createMockApplicationFragment({ page: "page3" }),
-        applicationRound: {
-          ...createMockApplicationFragment({ page: "page3" }).applicationRound,
-          reservationPeriodBeginDate: "not-a-date",
+      validateApplication(
+        {
+          ...createMockApplicationFragment({ page: "page3" }),
+          applicationRound: {
+            ...createMockApplicationFragment({ page: "page3" }).applicationRound,
+            reservationPeriodBeginDate: "not-a-date",
+          },
         },
-      })
+        noPriceOptions
+      )
     ).toEqual({
       valid: false,
       page: 1,
     });
-    expect(validateApplication(createMockApplicationFragment({ page: "page0" }))).toEqual({
+    expect(validateApplication(createMockApplicationFragment({ page: "page0" }), noPriceOptions)).toEqual({
       valid: false,
       page: 1,
     });
-    expect(validateApplication(createMockApplicationFragment({ page: "page1" }))).toEqual({
+    expect(validateApplication(createMockApplicationFragment({ page: "page1" }), noPriceOptions)).toEqual({
       valid: false,
       page: 2,
     });
-    expect(validateApplication(createMockApplicationFragment({ page: "page2" }))).toEqual({
+    expect(validateApplication(createMockApplicationFragment({ page: "page2" }), noPriceOptions)).toEqual({
       valid: false,
       page: 3,
     });
-    expect(validateApplication(createMockApplicationFragment({ page: "page3" }))).toEqual({
+    expect(validateApplication(createMockApplicationFragment({ page: "page3" }), noPriceOptions)).toEqual({
       valid: true,
     });
   });
+
+  // A draft saved before the round had price options has no price option in its sections.
+  test("sends the user back to page 1 when the round offers price options but a section has none", () => {
+    const application = createMockApplicationFragment({ page: "page3" });
+    expect(validateApplication(application, { offeredPriceOptionPkList: [1, 2] })).toEqual({
+      valid: false,
+      page: 1,
+    });
+  });
+
+  test("sends the user back to page 1 when a section has a price option that the round does not offer", () => {
+    const application = withPriceOption(createMockApplicationFragment({ page: "page3" }), 3);
+    expect(validateApplication(application, { offeredPriceOptionPkList: [1, 2] })).toEqual({
+      valid: false,
+      page: 1,
+    });
+  });
+
+  test("accepts sections with an offered price option", () => {
+    const application = withPriceOption(createMockApplicationFragment({ page: "page3" }), 2);
+    expect(validateApplication(application, { offeredPriceOptionPkList: [1, 2] })).toEqual({ valid: true });
+  });
 });
+
+function withPriceOption(
+  application: ReturnType<typeof createMockApplicationFragment>,
+  pk: number
+): ReturnType<typeof createMockApplicationFragment> {
+  return {
+    ...application,
+    applicationSections: (application.applicationSections ?? []).map((section) => ({
+      ...section,
+      priceOption: { id: `PriceOptionNode:${pk}`, pk, nameFi: "Aikuiset", nameEn: null, nameSv: null },
+    })),
+  };
+}

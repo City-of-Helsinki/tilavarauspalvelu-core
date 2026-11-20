@@ -313,9 +313,11 @@ function checkApplicationRoundDates(
   }
 }
 
+/// @param offeredPriceOptionPkList the price options of the application round (applicationRoundPriceOptions).
+/// Same rules as the backend's send validation: if the round offers any, every section must select one of them.
 export function ApplicationPage1SchemaRefined(
   round: { begin: Date; end: Date },
-  { isPriceOptionRequired = false }: { isPriceOptionRequired?: boolean } = {}
+  { offeredPriceOptionPkList }: { offeredPriceOptionPkList: ReadonlyArray<number> }
 ) {
   return ApplicationPage1Schema.superRefine((val, ctx) => {
     if (val.applicationSections == null || val.applicationSections.length === 0) {
@@ -333,7 +335,10 @@ export function ApplicationPage1SchemaRefined(
       }
       const pathRoot = `applicationSections.${i}`;
       checkApplicationRoundDates(round, section, pathRoot, ctx);
-      if (isPriceOptionRequired && section.priceOption == null) {
+      const isPriceOptionValid =
+        offeredPriceOptionPkList.length === 0 ||
+        (section.priceOption != null && offeredPriceOptionPkList.includes(section.priceOption));
+      if (!isPriceOptionValid) {
         ctx.addIssue({
           code: "custom",
           path: [`${pathRoot}.priceOption`],
@@ -643,7 +648,8 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
 }
 
 export function validateApplication(
-  application: ApplicationFormFragment
+  application: ApplicationFormFragment,
+  { offeredPriceOptionPkList }: { offeredPriceOptionPkList: ReadonlyArray<number> }
 ): { valid: true } | { valid: false; page: 1 | 2 | 3 } {
   const { applicationRound } = application;
   const begin = parseApiDate(applicationRound.reservationPeriodBeginDate);
@@ -651,7 +657,7 @@ export function validateApplication(
   if (begin == null || end == null) {
     return { valid: false, page: 1 };
   }
-  const schema = ApplicationPage1SchemaRefined({ begin, end });
+  const schema = ApplicationPage1SchemaRefined({ begin, end }, { offeredPriceOptionPkList });
   const page1 = schema.safeParse(convertApplicationPage1(application, []));
   if (!page1.success) {
     return { valid: false, page: 1 };

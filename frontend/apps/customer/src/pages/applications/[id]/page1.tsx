@@ -17,12 +17,7 @@ import {
 } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
 import { ApplicationPage1Document, useUpdateApplicationMutation } from "@gql/gql-types";
-import type {
-  ApplicationPage1Query,
-  ApplicationPage1QueryVariables,
-  ApplicationRoundPriceOptionsQuery,
-  ApplicationRoundPriceOptionsQueryVariables,
-} from "@gql/gql-types";
+import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql/gql-types";
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
   ApplicationPage1SchemaRefined,
@@ -33,13 +28,18 @@ import type { ApplicationPage1FormValues } from "@/components/application/funnel
 import { useReservationUnitList } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, translateOption } from "@/modules/search";
+import { getApplicationRoundPriceOptions, toPriceOptionPkList } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 
 function Page1({
   application,
   options: optionsOrig,
   priceOptionList,
-}: Pick<PropsNarrowed, "application" | "options" | "priceOptionList">): React.ReactElement {
+  offeredPriceOptionPkList,
+}: Pick<
+  PropsNarrowed,
+  "application" | "options" | "priceOptionList" | "offeredPriceOptionPkList"
+>): React.ReactElement {
   const router = useRouter();
   const dislayError = useDisplayError();
   const [mutate, { loading: isSaving }] = useUpdateApplicationMutation();
@@ -74,9 +74,7 @@ function Page1({
   const form = useForm<ApplicationPage1FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage1(application, getReservationUnits()),
-    resolver: zodResolver(
-      ApplicationPage1SchemaRefined({ begin, end }, { isPriceOptionRequired: priceOptionList.length > 0 })
-    ),
+    resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end }, { offeredPriceOptionPkList })),
   });
 
   const { handleSubmit } = form;
@@ -86,7 +84,11 @@ function Page1({
   return (
     <FormProvider {...form}>
       <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
-        <ApplicationFunnelWrapper page="page1" application={application}>
+        <ApplicationFunnelWrapper
+          page="page1"
+          application={application}
+          offeredPriceOptionPkList={offeredPriceOptionPkList}
+        >
           <Page1Impl
             applicationRound={applicationRound}
             isSaving={isSaving || form.formState.isSubmitting}
@@ -129,27 +131,18 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
   const searchOptionsPromise = getSearchOptions(client, "seasonal", locale ?? "fi");
-  const pricingOptionsPromise = application.applicationRound.pk != null ? client.query<
-    ApplicationRoundPriceOptionsQuery,
-    ApplicationRoundPriceOptionsQueryVariables
-  >({
-    query: APPLICATION_PAGE1_PRICE_OPTIONS_QUERY,
-    variables: {
-      applicationRound: application.applicationRound.pk,
-    },
-  }) : null;
+  const priceOptionsPromise = getApplicationRoundPriceOptions(client, application.applicationRound.pk);
 
-  const [searchOptionsList, pricingOptionsRaw] = await Promise.all([searchOptionsPromise, pricingOptionsPromise]);
-  const priceOptionList = filterNonNullable(pricingOptionsRaw?.data?.applicationRoundPriceOptions ?? []).map((option) => {
-    if (option.isActive) {
-      return translateOption(option, getLocalizationLang(locale));
-    }
-  });
+  const [searchOptionsList, priceOptions] = await Promise.all([searchOptionsPromise, priceOptionsPromise]);
+  const priceOptionList = priceOptions
+    .filter((option) => option.isActive)
+    .map((option) => translateOption(option, getLocalizationLang(locale)));
   return {
     props: {
       application,
       options: searchOptionsList,
       priceOptionList,
+      offeredPriceOptionPkList: toPriceOptionPkList(priceOptions),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -161,18 +154,6 @@ export const APPLICATION_PAGE1_QUERY = gql`
   query ApplicationPage1($id: ID!) {
     application(id: $id) {
       ...ApplicationForm
-    }
-  }
-`;
-
-export const APPLICATION_PAGE1_PRICE_OPTIONS_QUERY = gql`
-  query ApplicationRoundPriceOptions($applicationRound: Int!) {
-    applicationRoundPriceOptions(applicationRound: $applicationRound) {
-      pk
-      nameFi
-      nameSv
-      nameEn
-      isActive
     }
   }
 `;

@@ -27,6 +27,7 @@ import {
 import type { ApplicationPage3FormValues } from "@/components/application/funnel/form";
 import { useUnsavedChangesWarning } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
+import { getApplicationRoundPriceOptions, toPriceOptionPkList } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 import { FormSubHeading } from "@/styled/application";
 
@@ -74,7 +75,10 @@ function Page3Form(): React.ReactElement | null {
   }
 }
 
-export default function Page3({ application }: Pick<PropsNarrowed, "application">): React.ReactElement {
+export default function Page3({
+  application,
+  offeredPriceOptionPkList,
+}: Pick<PropsNarrowed, "application" | "offeredPriceOptionPkList">): React.ReactElement {
   const router = useRouter();
 
   const form = useForm<ApplicationPage3FormValues>({
@@ -113,7 +117,11 @@ export default function Page3({ application }: Pick<PropsNarrowed, "application"
 
   return (
     <FormProvider {...form}>
-      <ApplicationFunnelWrapper page="page3" application={application}>
+      <ApplicationFunnelWrapper
+        page="page3"
+        application={application}
+        offeredPriceOptionPkList={offeredPriceOptionPkList}
+      >
         <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)} data-testid="application__page3--form">
           <ApplicantTypeSelector />
           <AutoGrid>
@@ -173,9 +181,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
+  const priceOptionList = await getApplicationRoundPriceOptions(apolloClient, application.applicationRound.pk);
+
   return {
     props: {
       application,
+      offeredPriceOptionPkList: toPriceOptionPkList(priceOptionList),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
