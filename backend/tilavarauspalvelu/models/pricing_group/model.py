@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.price_component.queryset import PriceComponentQuerySet
     from tilavarauspalvelu.models.reservation_unit_pricing_group.queryset import ReservationUnitPricingGroupQuerySet
+    from tilavarauspalvelu.services.export.reservation_unit_exporter import ExportedPriceComponent
 
     from .actions import PricingGroupActions
     from .queryset import PricingGroupManager
@@ -54,7 +55,7 @@ class PricingGroup(models.Model):
     ]
 
     # Set only by the queryset of 'ReservationUnitExporter'.
-    components_today: list[PriceComponent]
+    components_today: list[ExportedPriceComponent]
 
     class Meta:
         db_table = "pricing_group"

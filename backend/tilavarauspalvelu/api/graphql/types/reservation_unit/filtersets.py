@@ -372,7 +372,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         # Annotate all ReservationUnits with `first_reservable_datetime` since we need the info in the GraphQL object.
         # If the GQL field is not selected for the query, then this is unnecessary, but if we do not annotate the info
         # here, the object type we would need to fetch this info one item at a time, which is inefficient.
-        qs = qs.with_first_reservable_time(
+        annotated_qs = qs.with_first_reservable_time(
             filter_date_start=date_start,
             filter_date_end=date_end,
             filter_time_start=time_start,
@@ -384,9 +384,9 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         )
 
         if not show_only_reservable:
-            return qs
+            return annotated_qs
 
-        return qs.exclude(first_reservable_datetime=None)
+        return annotated_qs.exclude(first_reservable_datetime=None)
 
 
 class ReservationUnitAllFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
