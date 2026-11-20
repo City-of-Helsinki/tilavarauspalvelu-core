@@ -25,7 +25,9 @@ if TYPE_CHECKING:
 BATCH_SIZE = 5_000
 
 # The migrations 0194 and 0195 create rows of these models with bulk writes, which make no audit log.
-CREATED_MODELS: list[type[models.Model]] = [
+type CreatedModel = SalesItem | PricingGroup | ReservationUnitPricingGroup | PriceComponent | ReservationPriceLine
+
+CREATED_MODELS: list[type[CreatedModel]] = [
     SalesItem,
     PricingGroup,
     ReservationUnitPricingGroup,
@@ -65,7 +67,7 @@ class Command(BaseCommand):
 # Internals
 
 
-def _backfill_created_rows(*, model: type[models.Model]) -> int:
+def _backfill_created_rows(*, model: type[CreatedModel]) -> int:
     """Write a create entry for each row of the model that has no audit entry at all."""
     content_type = ContentType.objects.get_for_model(model)
     has_entry = models.Exists(

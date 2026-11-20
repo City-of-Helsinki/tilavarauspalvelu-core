@@ -162,7 +162,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
             )
         )
 
-        ApplicationRoundReservationUnit: type[models.Model] = ApplicationRound.reservation_units.through
+        ApplicationRoundReservationUnit = ApplicationRound.reservation_units.through
 
         sections: list[ApplicationSection] = []
         options: list[ReservationUnitOption] = []

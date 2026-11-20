@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import Collection, Iterable, Iterator, Mapping, Sequence
-from typing import Any, Generic, Literal, Self, TypeVar
+from typing import Any, ClassVar, Generic, Literal, Self, TypeVar
 
 from django.db.models import Combinable, Model, OrderBy, QuerySet
 from django.db.models.manager import Manager
@@ -214,8 +214,12 @@ class OneToManyRelatedManager(ModelManager[_TModel, _TQuerySet]):
         clear: bool = ...,
     ) -> None: ...
 
+class _ThroughModel(Model):
+    # Django creates the through models at runtime, so their fields are not known here.
+    objects: ClassVar[Manager[Any]]
+
 class ManyToManyRelatedManager(ModelManager[_TModel, _TQuerySet]):
-    through: type[Model]
+    through: type[_ThroughModel]
 
     def __get__(self, instance: Any, owner: Any = None) -> Self: ...
     def add(

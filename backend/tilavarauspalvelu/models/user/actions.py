@@ -266,7 +266,7 @@ class UserActions:
             for role in self.user.unit_roles.filter(is_from_ad_group=True).prefetch_related("units")
         }
 
-        UnitRoleUnit: type[models.Model] = UnitRole.units.through  # noqa: N806
+        UnitRoleUnit = UnitRole.units.through  # noqa: N806
 
         roles_to_add: list[UnitRole] = []
         role_units_to_add: list[UnitRoleUnit] = []
