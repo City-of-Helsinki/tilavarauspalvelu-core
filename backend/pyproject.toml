@@ -103,6 +103,8 @@ tilavarauspalvelu = "tests.plugins"
 [tool.mypy]
 plugins = [
     "mypy_django_plugin.main",
+    # Types the queryset methods that the model managers copy at runtime.
+    "utils/mypy_plugin.py",
 ]
 exclude = [
     "/migrations/",
