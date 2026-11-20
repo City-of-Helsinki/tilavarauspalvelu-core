@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypeVar
 
 from tilavarauspalvelu.models import PriceOption
-from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import TranslatedModelManager, TranslatedModelQuerySet
 
 __all__ = [
     "PriceOptionManager",
@@ -18,4 +18,4 @@ _TRow_co = TypeVar("_TRow_co", covariant=True, default=PriceOption)
 class PriceOptionQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]): ...
 
 
-class PriceOptionManager(ModelManager[PriceOption, PriceOptionQuerySet]): ...
+class PriceOptionManager(TranslatedModelManager[PriceOption, PriceOptionQuerySet]): ...
