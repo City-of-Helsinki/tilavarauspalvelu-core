@@ -202,7 +202,6 @@ class ReservationUnitNode(DjangoNode):
             "service_specific_terms",
             "pricing_terms",
             "payment_terms",
-            "payment_product",
             "payment_merchant",
             #
             # Forward many-to-many related
@@ -234,7 +233,6 @@ class ReservationUnitNode(DjangoNode):
         restricted_fields = {
             "cancellation_rule": lambda user: user.is_authenticated,
             "payment_merchant": lambda user, ru: user.permissions.can_manage_unit(ru.unit),
-            "payment_product": lambda user, ru: user.permissions.can_manage_unit(ru.unit),
             "hauki_url": lambda user, ru: user.permissions.can_manage_unit(ru.unit),
         }
         max_complexity = 30

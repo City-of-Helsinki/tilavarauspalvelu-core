@@ -838,7 +838,6 @@ type ReservationUnitNode implements Node {
   serviceSpecificTerms: TermsOfUseNode
   pricingTerms: TermsOfUseNode
   paymentTerms: TermsOfUseNode
-  paymentProduct: PaymentProductNode
   paymentMerchant: PaymentMerchantNode
   spaces(
     nameFi: String
@@ -1424,14 +1423,6 @@ enum TermsOfUseTypeChoices {
 
   """Pricing terms"""
   PRICING
-}
-
-type PaymentProductNode implements Node {
-  merchant: PaymentMerchantNode
-
-  """The ID of the object"""
-  id: ID!
-  pk: UUID!
 }
 
 type IntendedUseNode implements Node {

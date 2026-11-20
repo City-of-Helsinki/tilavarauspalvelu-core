@@ -143,7 +143,6 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     minReservationDuration: null, // Maybe<Scalars["Duration"]["output"]>;
     numActiveUserReservations: 0, // Scalars["Int"]["output"];
     paymentMerchant: null, //Maybe<PaymentMerchantNode>;
-    paymentProduct: null, //Maybe<PaymentProductNode>;
     paymentTerms: null, // Maybe<TermsOfUseNode>;
     pricingTerms: null, //Maybe<TermsOfUseNode>;
     publishBeginsAt: null, // Maybe<Scalars["DateTime"]["output"]>;

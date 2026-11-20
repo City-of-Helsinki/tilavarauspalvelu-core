@@ -173,13 +173,14 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     def create_for_confirmation(cls, **kwargs: Any) -> Reservation:
         """Create a Reservation for a single ReservationUnit in the necessary state for confirmation."""
         from .payment_accounting import PaymentAccountingFactory
-        from .payment_product import PaymentProductFactory
         from .reservable_time_span import ReservableTimeSpanFactory
         from .reservation_unit import ReservationUnitFactory
 
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         sub_kwargs.setdefault("origin_hauki_resource__id", "987")
-        sub_kwargs.setdefault("payment_product", PaymentProductFactory.create())
+        # Give `reservation_unit__payment_product=None` to create the reservation unit without a payment product.
+        if "payment_product" not in sub_kwargs:
+            sub_kwargs.setdefault("payment_product__id", uuid.uuid4())
         sub_kwargs.setdefault("payment_accounting", PaymentAccountingFactory.create())
         sub_kwargs.setdefault("own_price__amount", Decimal(20))
         sub_kwargs.setdefault("payment_type", PaymentType.ON_SITE)
@@ -199,6 +200,10 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("reservation_unit", reservation_unit)
         kwargs.setdefault("price_lines__amount", Decimal("12.4"))
         kwargs.setdefault("price_lines__tax_percentage", Decimal("25.5"))
+
+        payment_product = reservation_unit.payment_products.first()
+        if payment_product is not None:
+            kwargs.setdefault("price_lines__sales_item", payment_product.sales_item)
         kwargs.setdefault("price_lines__tax_level__rates__percentage", Decimal("25.5"))
         return cls.create(**kwargs)
 
@@ -337,6 +342,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("payment_order__handled_payment_due_by", due_by)
         kwargs.setdefault("price_lines__amount", Decimal("12.4"))
         kwargs.setdefault("price_lines__tax_percentage", Decimal("24.0"))
+        kwargs.setdefault("price_lines__sales_item", reservation_unit.payment_products.get().sales_item)
         kwargs.setdefault("price_lines__tax_level__rates__percentage", Decimal("25.5"))
 
         return cls.create(**kwargs)

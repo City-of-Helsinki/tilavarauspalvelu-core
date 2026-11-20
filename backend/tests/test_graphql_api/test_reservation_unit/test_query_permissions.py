@@ -10,7 +10,6 @@ from tilavarauspalvelu.models import PersonalInfoViewLog
 from tests.factories import (
     ApplicationRoundTimeSlotFactory,
     PaymentMerchantFactory,
-    PaymentProductFactory,
     ReservationDenyReasonFactory,
     ReservationFactory,
     ReservationUnitFactory,
@@ -196,15 +195,3 @@ def test_reservation_unit__query__payment_merchant__without_permissions(graphql)
     response = graphql(query)
 
     assert response.error_message("paymentMerchant") == "No permission to access field."
-
-
-def test_reservation_unit__query__payment_product__without_permissions(graphql):
-    merchant = PaymentMerchantFactory.create()
-    product = PaymentProductFactory.create(merchant=merchant)
-    ReservationUnitFactory.create(payment_merchant=merchant, payment_product=product)
-
-    graphql.login_with_regular_user()
-    query = reservation_units_query(fields="paymentProduct { pk merchant { pk } }")
-    response = graphql(query)
-
-    assert response.error_message("paymentProduct") == "No permission to access field."

@@ -32,7 +32,11 @@ from tilavarauspalvelu.enums import (
     UserRoleChoice,
     Weekday,
 )
-from tilavarauspalvelu.management.commands.data_creation.create_pricing_groups import OwnPrice, create_own_prices
+from tilavarauspalvelu.management.commands.data_creation.create_pricing_groups import (
+    OwnPrice,
+    create_own_prices,
+    create_payment_product,
+)
 from tilavarauspalvelu.management.commands.data_creation.utils import get_image_path, turn_off_signal_updates
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
@@ -47,7 +51,6 @@ from tilavarauspalvelu.models import (
     OriginHaukiResource,
     PaymentAccounting,
     PaymentMerchant,
-    PaymentProduct,
     PricingGroup,
     Reservation,
     ReservationPurpose,
@@ -941,37 +944,6 @@ def create_reservation_units() -> None:
         },
     )
 
-    kellarikerros_payment_product, _ = PaymentProduct.objects.get_or_create(
-        id="630dcc27-1ff1-3e12-b1ea-9df2571a36bc",
-        defaults={
-            "merchant": kellarikerros_payment_merchant,
-        },
-    )
-    aitio_payment_product, _ = PaymentProduct.objects.get_or_create(
-        id="eee7a1a4-b309-3919-aa7b-6d7eb675f9f4",
-        defaults={
-            "merchant": harakka_merchant,
-        },
-    )
-    aula_payment_product, _ = PaymentProduct.objects.get_or_create(
-        id="19161df6-9f1c-3a0f-a953-d013ca2e3c0c",
-        defaults={
-            "merchant": harakka_merchant,
-        },
-    )
-    kalevi_payment_product, _ = PaymentProduct.objects.get_or_create(
-        id="3cc8c05f-78cc-391c-b442-4f1b251697d3",
-        defaults={
-            "merchant": harakka_merchant,
-        },
-    )
-    piitu_payment_product, _ = PaymentProduct.objects.get_or_create(
-        id="db9cb2d4-0a72-3e5e-a5b6-9479ef59e256",
-        defaults={
-            "merchant": harakka_merchant,
-        },
-    )
-
     pihlajasarten_accounting, _ = PaymentAccounting.objects.get_or_create(
         name="Pihlajasaarten testikirjasto",
         defaults={
@@ -1149,7 +1121,6 @@ def create_reservation_units() -> None:
         service_specific_terms=laitteet_palveluehto,
         pricing_terms=None,
         payment_terms=maksuton_maksuehto,
-        payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -1333,7 +1304,6 @@ def create_reservation_units() -> None:
         service_specific_terms=maksulliset_palveluehto,
         pricing_terms=None,
         payment_terms=verkkokauppa_vain_maksuehto,
-        payment_product=aitio_payment_product,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -1370,6 +1340,7 @@ def create_reservation_units() -> None:
             can_apply_for_discount=False,
         ),
     ])
+    create_payment_product(reservation_unit=_aina_maksullinen_aitio, product_id="eee7a1a4-b309-3919-aa7b-6d7eb675f9f4")
     _aina_maksullinen_aitio_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_aina_maksullinen_aitio,
         begin_date=local_date(2025, 6, 6),
@@ -1516,7 +1487,6 @@ def create_reservation_units() -> None:
         service_specific_terms=nupa_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_kasittely_maksuehto,
-        payment_product=kellarikerros_payment_product,
         payment_merchant=kellarikerros_payment_merchant,
         payment_accounting=pihlajasarten_accounting,
     )
@@ -1556,6 +1526,9 @@ def create_reservation_units() -> None:
             can_apply_for_discount=True,
         ),
     ])
+    create_payment_product(
+        reservation_unit=_aina_kasiteltava_kellarikerros, product_id="630dcc27-1ff1-3e12-b1ea-9df2571a36bc"
+    )
     _aina_kasiteltava_kellarikerros_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_aina_kasiteltava_kellarikerros,
         begin_date=local_date(2025, 5, 28),
@@ -1702,7 +1675,6 @@ def create_reservation_units() -> None:
         service_specific_terms=nupa_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_alennus_maksuehto,
-        payment_product=aula_payment_product,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -1737,6 +1709,7 @@ def create_reservation_units() -> None:
             can_apply_for_discount=True,
         ),
     ])
+    create_payment_product(reservation_unit=_alennuskelpoinen_aula, product_id="19161df6-9f1c-3a0f-a953-d013ca2e3c0c")
     _alennuskelpoinen_aula_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_alennuskelpoinen_aula,
         begin_date=local_date(2025, 7, 15),
@@ -1813,7 +1786,6 @@ def create_reservation_units() -> None:
         service_specific_terms=nupa_palveluehto,
         pricing_terms=None,
         payment_terms=maksuton_maksuehto,
-        payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -1918,7 +1890,6 @@ def create_reservation_units() -> None:
         service_specific_terms=nupa_palveluehto,
         pricing_terms=None,
         payment_terms=maksuton_maksuehto,
-        payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -2141,7 +2112,6 @@ def create_reservation_units() -> None:
         service_specific_terms=nupa_palveluehto,
         pricing_terms=None,
         payment_terms=maksuton_maksuehto,
-        payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -2246,7 +2216,6 @@ def create_reservation_units() -> None:
         service_specific_terms=nupa_palveluehto,
         pricing_terms=None,
         payment_terms=maksuton_maksuehto,
-        payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -2357,7 +2326,6 @@ def create_reservation_units() -> None:
         service_specific_terms=None,
         pricing_terms=None,
         payment_terms=None,
-        payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -2475,7 +2443,6 @@ def create_reservation_units() -> None:
         service_specific_terms=None,
         pricing_terms=None,
         payment_terms=None,
-        payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -2594,7 +2561,6 @@ def create_reservation_units() -> None:
         service_specific_terms=maksuton_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_vain_maksuehto,
-        payment_product=None,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -2748,7 +2714,6 @@ def create_reservation_units() -> None:
         service_specific_terms=kausi_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_vain_maksuehto,
-        payment_product=kalevi_payment_product,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -2789,6 +2754,9 @@ def create_reservation_units() -> None:
             can_apply_for_discount=True,
         ),
     ])
+    create_payment_product(
+        reservation_unit=_kausivarausyksikko_kalevi, product_id="3cc8c05f-78cc-391c-b442-4f1b251697d3"
+    )
     _kausivarausyksikko_kalevi_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_kalevi,
         begin_date=local_date(2025, 8, 1),
@@ -2901,7 +2869,6 @@ def create_reservation_units() -> None:
         service_specific_terms=kausi_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
         payment_terms=verkkokauppa_vain_maksuehto,
-        payment_product=piitu_payment_product,
         payment_merchant=None,
         payment_accounting=None,
     )
@@ -2944,6 +2911,9 @@ def create_reservation_units() -> None:
             can_apply_for_discount=True,
         ),
     ])
+    create_payment_product(
+        reservation_unit=_kausivarausyksikko_piitu, product_id="db9cb2d4-0a72-3e5e-a5b6-9479ef59e256"
+    )
     _kausivarausyksikko_piitu_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_kausivarausyksikko_piitu,
         begin_date=local_date(2025, 8, 1),

@@ -89,7 +89,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
             reservation_unit.validators.validate_has_payment_type()
 
             if reservation_unit.payment_type != PaymentType.ON_SITE:
-                reservation_unit.validators.validate_has_payment_product()
+                reservation_unit.validators.validate_has_payment_products(price_lines=self.price_lines.lines)
 
         data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
         data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)

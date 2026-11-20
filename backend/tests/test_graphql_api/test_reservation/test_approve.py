@@ -112,6 +112,7 @@ def test_reservation__approve__paid__in_webshop(graphql):
         begins_at=local_datetime(2024, 1, 10, 12),
         ends_at=local_datetime(2024, 1, 10, 13),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     graphql.login_with_superuser()
@@ -165,6 +166,7 @@ def test_reservation__approve__paid__in_webshop__uses_tax_rate_of_approval_date(
         begins_at=local_datetime(2024, 1, 10, 12),
         ends_at=local_datetime(2024, 1, 10, 13),
         price_lines__tax_level=tax_level,
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     graphql.login_with_superuser()
@@ -191,6 +193,7 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     graphql.login_with_superuser()
@@ -222,6 +225,7 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date__over_dayli
         begins_at=local_datetime(2026, 3, 29, 4),
         ends_at=local_datetime(2026, 3, 29, 5),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     graphql.login_with_superuser()
@@ -249,6 +253,7 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
         ends_at=local_datetime(2024, 1, 1, 14),
         price_lines__tax_percentage=Decimal("24.0"),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     graphql.login_with_superuser()
@@ -288,6 +293,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
         ends_at=local_datetime(2024, 1, 2, 13),
         price_lines__tax_percentage=Decimal("24.0"),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     payment_order = PaymentOrderFactory.create(
@@ -329,6 +335,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__refun
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     PaymentOrderFactory.create(
@@ -363,6 +370,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__diffe
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     PaymentOrderFactory.create(
@@ -393,6 +401,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
         begins_at=local_datetime(2024, 1, 2, 12),
         ends_at=local_datetime(2024, 1, 2, 13),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     old_payment_order = PaymentOrderFactory.create(
@@ -442,6 +451,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__p
         begins_at=local_datetime(2024, 1, 5, 12),
         ends_at=local_datetime(2024, 1, 5, 13),
         price_lines__tax_level__rates__percentage=Decimal("25.5"),
+        price_lines__sales_item=reservation_unit.payment_products.get().sales_item,
     )
 
     PaymentOrderFactory.create(
@@ -828,8 +838,9 @@ def test_reservation__approve__price_lines__all_lines_free(graphql):
         begins_at=local_datetime(2024, 1, 10, 12),
         ends_at=local_datetime(2024, 1, 10, 13),
     )
-    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
-    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20))
+    sales_item = reservation_unit.payment_products.get().sales_item
+    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10), sales_item=sales_item)
+    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20), sales_item=sales_item)
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
@@ -862,8 +873,9 @@ def test_reservation__approve__price_lines__paid__in_webshop(graphql):
         begins_at=local_datetime(2024, 1, 10, 12),
         ends_at=local_datetime(2024, 1, 10, 13),
     )
-    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10))
-    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20))
+    sales_item = reservation_unit.payment_products.get().sales_item
+    first_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10), sales_item=sales_item)
+    second_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20), sales_item=sales_item)
 
     graphql.login_with_superuser()
     data = get_approve_data(reservation)
@@ -886,6 +898,73 @@ def test_reservation__approve__price_lines__paid__in_webshop(graphql):
     assert payment_order.price_net == Decimal("15.94")
     assert payment_order.price_vat == Decimal("4.06")
     assert payment_order.price_total == Decimal(20)
+
+
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__price_lines__paid__in_webshop__line_without_product_overridden_to_zero(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
+    )
+    sales_item = reservation_unit.payment_products.get().sales_item
+    paid_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20), sales_item=sales_item)
+    line_without_product = ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal(10),
+        sales_item=None,
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data["priceLines"] = [
+        {"pk": paid_line.pk, "overrideAmount": None},
+        {"pk": line_without_product.pk, "overrideAmount": "0"},
+    ]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.total_price == Decimal(20)
+    assert reservation.payment_order.payment_type == PaymentType.ONLINE
+    assert reservation.payment_order.price_total == Decimal(20)
+
+
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__price_lines__paid__in_webshop__line_without_product(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
+    )
+    sales_item = reservation_unit.payment_products.get().sales_item
+    paid_line = ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(20), sales_item=sales_item)
+    line_without_product = ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal(10),
+        sales_item=None,
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data["priceLines"] = [
+        {"pk": paid_line.pk, "overrideAmount": None},
+        {"pk": line_without_product.pk, "overrideAmount": None},
+    ]
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit is missing payment product"]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
 @pytest.mark.parametrize("case", ["other_reservation", "missing_line", "duplicate_line"])

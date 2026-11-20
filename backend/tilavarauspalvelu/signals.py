@@ -38,6 +38,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
     IntendedUse,
     PaymentAccounting,
+    PaymentProduct,
     Reservation,
     ReservationUnit,
     ReservationUnitImage,
@@ -49,8 +50,7 @@ from tilavarauspalvelu.models import (
 from tilavarauspalvelu.tasks import (
     create_statistics_for_reservations_task,
     purge_image_cache_task,
-    refresh_reservation_unit_accounting_task,
-    refresh_reservation_unit_product_mapping_task,
+    refresh_reservation_unit_payment_products_task,
     update_reservation_unit_hierarchy_task,
     update_reservation_unit_image_urls_task,
     update_reservation_unit_search_vectors_task,
@@ -128,7 +128,7 @@ def _reservation_unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Res
     using = kwargs["using"]
 
     if settings.UPDATE_PRODUCT_MAPPING:
-        refresh_reservation_unit_product_mapping_task.delay(instance.pk)
+        refresh_reservation_unit_payment_products_task.delay_on_commit(instance.pk)
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
         update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
@@ -162,7 +162,7 @@ def _payment_accounting_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[P
         reservation_units_from_units = ReservationUnit.objects.filter(unit__in=instance.units.all())
         reservation_units = reservation_units_from_units.union(instance.reservation_units.all())
         for reservation_unit in reservation_units:
-            refresh_reservation_unit_accounting_task.delay(reservation_unit.pk)
+            refresh_reservation_unit_payment_products_task.delay(reservation_unit.pk)
 
 
 @receiver(post_save, sender=SalesItem, dispatch_uid="sales_item_post_save")
@@ -171,14 +171,14 @@ def _sales_item_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[SalesItem
 
     if settings.UPDATE_ACCOUNTING:
         reservation_unit_pks = (
-            ReservationUnitPricingGroup.objects
-            .filter(pricing_group__components__sales_item=instance)
+            PaymentProduct.objects
+            .filter(sales_item=instance)
             .order_by("reservation_unit_id")
             .values_list("reservation_unit_id", flat=True)
             .distinct()
         )
         for reservation_unit_pk in reservation_unit_pks:
-            refresh_reservation_unit_accounting_task.delay_on_commit(reservation_unit_pk)
+            refresh_reservation_unit_payment_products_task.delay_on_commit(reservation_unit_pk)
 
 
 @receiver(post_save, sender=ReservationUnitPricingGroup, dispatch_uid="reservation_unit_pricing_group_post_save")
@@ -189,7 +189,7 @@ def _reservation_unit_pricing_group_post_save(
     instance = kwargs["instance"]
 
     if settings.UPDATE_ACCOUNTING:
-        refresh_reservation_unit_accounting_task.delay_on_commit(instance.reservation_unit_id)
+        refresh_reservation_unit_payment_products_task.delay_on_commit(instance.reservation_unit_id)
 
 
 # --- Post delete signals -----------------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ def _reservation_unit_pricing_group_post_delete(
     instance = kwargs["instance"]
 
     if settings.UPDATE_ACCOUNTING:
-        refresh_reservation_unit_accounting_task.delay_on_commit(instance.reservation_unit_id)
+        refresh_reservation_unit_payment_products_task.delay_on_commit(instance.reservation_unit_id)
 
 
 @receiver(post_delete, sender=Space, dispatch_uid="space_post_delete")
