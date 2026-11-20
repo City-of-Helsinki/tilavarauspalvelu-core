@@ -1,23 +1,36 @@
-# Find out if a pull request changes only files that the backend and frontend tests do not cover.
-# These are the e2e suite and the agent files (AGENTS.md and CLAUDE.md in any directory, .agents/, .claude/).
-# The e2e suite is a separate project, and the agent files are not part of the service.
-# Their changes cannot break the backend or the frontend.
-# So the backend and frontend workflows skip their jobs for such a pull request.
+# Find out if a pull request changes only files that the backend tests or the frontend tests do not cover.
+#
+# Some files are not part of the service. These are the e2e suite and the agent files
+# (AGENTS.md and CLAUDE.md in any directory, .agents/, .claude/). Their changes cannot break the backend or the frontend.
+#
+# The backend and the frontend are separate projects. They share only the graphql schema file "tilavaraus.graphql".
+# A frontend change cannot break the backend, and a backend change cannot break the frontend unit tests.
+# The frontend unit tests mock the API, so they do not test the backend.
+# A backend change that changes the API also changes the schema file. The backend tests fail if the schema file is outdated.
+#
+# The backend skips its jobs if all changed files are frontend files or files that are not part of the service.
+# The frontend skips its jobs if all changed files are backend files or files that are not part of the service.
+# The schema file and the files in the root directory are not in either list, so they run both.
+# A new file that is not in a list also runs both. Add a file to a list only if the other side cannot use it.
+# The frontend query tests test the frontend queries against the backend. So they skip only if both sides skip.
 # pre-commit.ci is not a workflow here. It still runs for all pull requests.
 #
 # GitHub counts a skipped required check as passed, but a required check that never starts blocks the merge.
 # This is why the workflows skip their jobs, and do not use "paths-ignore" to skip the whole workflow.
 #
 # Pushes, tags and manual runs always give "false".
-# If this job fails, the output is empty. The callers use "!cancelled()", so they run all their jobs.
+# If this job fails, the outputs are empty. The callers use "!cancelled()", so they run all their jobs.
 name: "Detect changes that skip tests"
 
 on:
   workflow_call:
     outputs:
-      skip-tests:
-        description: "'true' if the pull request changes only the e2e suite, the e2e workflows or the agent files."
-        value: ${{ jobs.detect.outputs.skip-tests }}
+      skip-backend:
+        description: "'true' if the pull request changes only frontend files or files that are not part of the service."
+        value: ${{ jobs.detect.outputs.skip-backend }}
+      skip-frontend:
+        description: "'true' if the pull request changes only backend files or files that are not part of the service."
+        value: ${{ jobs.detect.outputs.skip-frontend }}
 
 jobs:
   detect:
@@ -28,29 +41,37 @@ jobs:
     permissions:
       pull-requests: read
 
-    # "other" is "false" when no changed file is outside the skip paths.
-    # The API lists at most 3000 files. A larger pull request can have more files outside the skip paths, so it runs all jobs.
+    # A filter is "false" when no changed file is outside its paths.
+    # The API lists at most 3000 files. A larger pull request can have more files outside the paths, so it runs all jobs.
     # Do not compare the file count of the pull request to the file count of the filter.
     # The filter counts a renamed file two times, once for the old path and once for the new path.
     outputs:
-      skip-tests: >-
+      skip-backend: >-
         ${{
           github.event_name == 'pull_request'
-          && steps.filter.outputs.other == 'false'
+          && steps.filter.outputs.backend == 'false'
+          && github.event.pull_request.changed_files <= 3000
+        }}
+      skip-frontend: >-
+        ${{
+          github.event_name == 'pull_request'
+          && steps.filter.outputs.frontend == 'false'
           && github.event.pull_request.changed_files <= 3000
         }}
 
     steps:
       # For a pull request, the action gets the changed files from the GitHub API. It needs no checkout.
+      # The filter names tell which side must run. "backend" is "true" if a changed file can break the backend.
+      # The two filters have the same paths for the files that are not part of the service. Keep them the same.
       - name: "Compare changed files to the skip paths"
         id: filter
         if: github.event_name == 'pull_request'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         with:
-          # A file matches "other" if it matches "**" and none of the negated patterns
+          # A file matches a filter if it matches "**" and none of the negated patterns
           predicate-quantifier: some-with-excludes
           filters: |
-            other:
+            backend:
               - '**'
               - '!e2e/**'
               - '!.github/workflows/test-e2e.yml'
@@ -59,3 +80,21 @@ jobs:
               - '!.claude/**'
               - '!**/AGENTS.md'
               - '!**/CLAUDE.md'
+              - '!frontend/**'
+              - '!.github/workflows/test-frontend.yml'
+              - '!.github/workflows/build-frontend.yml'
+              - '!.github/workflows/build-ui-docker.yml'
+            frontend:
+              - '**'
+              - '!e2e/**'
+              - '!.github/workflows/test-e2e.yml'
+              - '!.github/workflows/run-e2e.yml'
+              - '!.agents/**'
+              - '!.claude/**'
+              - '!**/AGENTS.md'
+              - '!**/CLAUDE.md'
+              - '!backend/**'
+              - '!.github/actions/poetry/**'
+              - '!.github/workflows/test-backend.yml'
+              - '!.github/workflows/build-backend.yml'
+              - '!.github/workflows/build-ci-image.yml'

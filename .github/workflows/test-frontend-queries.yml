@@ -2,8 +2,11 @@ name: "Frontend query tests"
 
 on:
   push:
+    # The tests read the queries from the frontend and run them against the backend. A change to either side can break them.
     paths:
       - backend/**
+      - frontend/**
+      - tilavaraus.graphql
     branches:
       - main
   pull_request:
@@ -20,6 +23,7 @@ env:
 
 jobs:
   # Skip the jobs when a pull request changes only files that the tests do not cover. See detect-skip-tests.yml.
+  # The tests cover the backend and the frontend, so they skip only if both sides skip.
   changes:
     uses: ./.github/workflows/detect-skip-tests.yml
     permissions:
@@ -29,7 +33,11 @@ jobs:
   ci-image:
     uses: ./.github/workflows/build-ci-image.yml
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.skip-tests != 'true' }}
+    if: >-
+      ${{
+        !cancelled()
+        && !(needs.changes.outputs.skip-backend == 'true' && needs.changes.outputs.skip-frontend == 'true')
+      }}
     permissions:
       contents: read
       packages: write

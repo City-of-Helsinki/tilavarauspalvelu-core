@@ -40,7 +40,7 @@ jobs:
       app-name: "customer"
       sentry-project: "tilavarauspalvelu-customer-ui"
       base-url: ""
-      skip: ${{ needs.changes.outputs.skip-tests == 'true' }}
+      skip: ${{ needs.changes.outputs.skip-frontend == 'true' }}
     secrets: inherit
 
   build-admin-ui-docker:
@@ -55,5 +55,5 @@ jobs:
       app-name: "staff"
       sentry-project: "tilavarauspalvelu-staff-ui"
       base-url: "/kasittely"
-      skip: ${{ needs.changes.outputs.skip-tests == 'true' }}
+      skip: ${{ needs.changes.outputs.skip-frontend == 'true' }}
     secrets: inherit
