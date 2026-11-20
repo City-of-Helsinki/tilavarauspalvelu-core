@@ -126,7 +126,7 @@ class PriceComponentFormSet(BaseInlineFormSet):
         ]
 
 
-def _with_changes(saved_component: PriceComponent, form: PriceComponentForm) -> PriceComponent:
+def _with_changes(saved_component: PriceComponent, form: forms.ModelForm[PriceComponent]) -> PriceComponent:
     """
     Copy the saved component with only the fields that the user changed.
     The form gives None for an empty translated text, and the saved component can have "" for it.

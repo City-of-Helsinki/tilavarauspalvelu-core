@@ -15,6 +15,7 @@ from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan, ReservationUnit
@@ -51,14 +52,20 @@ class OriginHaukiResourceAdminForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if self.instance.opening_hours_hash == NEVER_ANY_OPENING_HOURS_HASH:
+            help_texts = self._meta.help_texts
+            if help_texts is None:
+                msg = "OriginHaukiResourceAdminForm.Meta has no help texts"
+                raise MissingValueError(msg)
+
             # The admin reads the help texts of read-only fields from the form options, which all forms share.
             # Give this form its own options, so that the note is not added to the shared help texts.
             self._meta = copy.copy(self._meta)
             self._meta.help_texts = {
-                **self._meta.help_texts,
-                "opening_hours_hash": format_lazy(
+                **help_texts,
+                # The Django stubs allow only 'str' help texts, but Django also accepts lazy strings.
+                "opening_hours_hash": format_lazy(  # type: ignore[dict-item]
                     "{} {}",
-                    self._meta.help_texts["opening_hours_hash"],
+                    help_texts["opening_hours_hash"],
                     _("OriginHaukiResources with this specific hash never have any opening hours."),
                 ),
             }

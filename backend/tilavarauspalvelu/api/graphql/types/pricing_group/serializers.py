@@ -44,7 +44,8 @@ class PricingGroupComponentsSerializer(NestingModelSerializer[PricingGroup]):
 
         components: list[PriceComponent] = []
         for data in component_data:
-            saved_component = saved_components.get(data.get("pk"))
+            pk: int | None = data.get("pk")
+            saved_component = saved_components.get(pk) if pk is not None else None
 
             # A field that is left out of an update keeps its saved value.
             if saved_component is not None:
@@ -76,7 +77,7 @@ class PricingGroupComponentsSerializer(NestingModelSerializer[PricingGroup]):
 
             else:
                 component = PriceComponent(
-                    pk=data.get("pk"),
+                    pk=pk,
                     pricing_group=instance,
                     kind=PriceComponentKind.BASE,
                     valid_from=data.get("valid_from"),

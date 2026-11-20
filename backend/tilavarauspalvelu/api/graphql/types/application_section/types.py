@@ -144,7 +144,8 @@ class ApplicationSectionNode(DjangoNode[ApplicationSection, AnyUser]):
                 parent=optimizer,
             ),
         )
-        application_optimizer.manual_optimizers["units_for_permissions"] = cls._add_units_for_permissions
+        # The optimizer passes the default queryset of the model, which has the custom queryset methods.
+        application_optimizer.manual_optimizers["units_for_permissions"] = cls._add_units_for_permissions  # type: ignore[assignment]
 
         # Add user id for permission checks
         user_optimizer = application_optimizer.get_or_set_child_optimizer(
@@ -160,7 +161,12 @@ class ApplicationSectionNode(DjangoNode[ApplicationSection, AnyUser]):
         return queryset
 
     @classmethod
-    def _add_units_for_permissions(cls, queryset: ApplicationQuerySet, *args: Any) -> models.QuerySet:
+    def _add_units_for_permissions(
+        cls,
+        queryset: ApplicationQuerySet,
+        optimizer: QueryOptimizer,  # noqa: ARG003
+        **kwargs: Any,
+    ) -> models.QuerySet:
         return queryset.with_permissions()
 
     @staticmethod
