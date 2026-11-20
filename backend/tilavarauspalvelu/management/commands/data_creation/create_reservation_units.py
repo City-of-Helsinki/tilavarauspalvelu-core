@@ -276,7 +276,7 @@ def _create_free_reservation_units(
         uuid.UUID("10f76e0b-d751-44e2-896c-09c32bc8865d"),
     }
 
-    ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+    ReservationUnitSpacesThoughModel = ReservationUnit.spaces.through  # noqa: N806
 
     spaces: list[Space] = []
     reservation_units: list[ReservationUnit] = []
@@ -522,7 +522,7 @@ def _create_paid_reservation_units(
         ),
     ]
 
-    ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+    ReservationUnitSpacesThoughModel = ReservationUnit.spaces.through  # noqa: N806
 
     units: list[Unit] = []
     reservation_units: list[ReservationUnit] = []
@@ -735,7 +735,7 @@ def _create_seasonal_bookable_reservation_units(
         uuid.UUID("c2dadb1c-4538-4d53-a3a9-1b0d704e6634"),
     }
 
-    ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+    ReservationUnitSpacesThoughModel = ReservationUnit.spaces.through  # noqa: N806
 
     units: list[Unit] = []
     reservation_units: list[ReservationUnit] = []
@@ -1107,7 +1107,7 @@ def _create_full_day_reservation_units(
         name_sv="Hela dagen",
     )
 
-    ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+    ReservationUnitSpacesThoughModel = ReservationUnit.spaces.through  # noqa: N806
 
     reservation_units: list[ReservationUnit] = []
     spaces: list[Space] = []
@@ -1209,7 +1209,7 @@ def _create_reservation_units_in_space_hierarchies(
     """
     # --- Setup  ---------------------------------------------------------------------------------------------------
 
-    SpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+    SpacesThoughModel = ReservationUnit.spaces.through  # noqa: N806
 
     reservation_units: list[ReservationUnit] = []
     reservation_unit_spaces: list[models.Model] = []
@@ -1590,8 +1590,8 @@ def _create_reservation_units_in_resource_hierarchies(
     """
     # --- Setup  ---------------------------------------------------------------------------------------------------
 
-    SpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
-    ResourceThoughModel: type[models.Model] = ReservationUnit.resources.through  # noqa: N806
+    SpacesThoughModel = ReservationUnit.spaces.through  # noqa: N806
+    ResourceThoughModel = ReservationUnit.resources.through  # noqa: N806
 
     reservation_unit_type = ReservationUnitTypeFactory.create(
         name="Resurssihierarkia",
