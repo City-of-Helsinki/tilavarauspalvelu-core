@@ -53,16 +53,16 @@ export function ControlledDateRangeFilter<T extends FieldValues>({
       <DateInput
         language="fi"
         id={names.begin}
-        label={t(`label.${names.begin}`)}
-        placeholder={t(`placeholder.${names.begin}`)}
+        label={t(`label.${names.begin.toString()}`)}
+        placeholder={t(`placeholder.${names.begin.toString()}`)}
         onChange={(val: string) => handleChange(val, names.begin)}
         value={beginFilter ?? ""}
       />
       <DateInput
         language="fi"
         id={names.end}
-        label={t(`label.${names.end}`)}
-        placeholder={t(`placeholder.${names.end}`)}
+        label={t(`label.${names.end.toString()}`)}
+        placeholder={t(`placeholder.${names.end.toString()}`)}
         onChange={(val: string) => handleChange(val, names.end)}
         value={endFilter ?? ""}
       />

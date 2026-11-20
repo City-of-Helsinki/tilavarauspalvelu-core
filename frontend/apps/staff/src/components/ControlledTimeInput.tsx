@@ -30,7 +30,7 @@ export function ControlledTimeInput<T extends FieldValues>({
   return (
     <TimeInput
       id={id ?? `TimeInput.${field.name}`}
-      label={label ?? t(`common:${field.name}`)}
+      label={label ?? t(`common:${field.name.toString()}`)}
       hoursLabel={t("common:hoursLabel")}
       minutesLabel={t("common:minutesLabel")}
       required={required}

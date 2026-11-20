@@ -19,7 +19,7 @@ const mockT = ((key: string, options?: Record<string, unknown>) => {
     return `${key} (${JSON.stringify(options)})`;
   }
   return key;
-}) as TFunction;
+}) as unknown as TFunction;
 
 const mockOptions: TagOptionsList = {
   stateChoices: [
