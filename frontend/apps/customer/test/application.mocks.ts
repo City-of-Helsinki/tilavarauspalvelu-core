@@ -298,6 +298,7 @@ export function createMockApplicationRound({
     criteriaSv: null, // Maybe<Scalars["String"]["output"]>;
     handledAt: null, // Maybe<Scalars["DateTime"]["output"]>;
     isSettingHandledAllowed: false, // Scalars["Boolean"]["output"];
+    priceOptions: [],
     purposes: [1, 2, 3, 4, 5].map((x) => ({
       id: createNodeId("PurposeNode", x),
       pk: x,

@@ -6,16 +6,19 @@ import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import AnnotatedField
+from query_optimizer import AnnotatedField, MultiField
 
+from tilavarauspalvelu.api.graphql.types.price_option.types import PriceOptionNode
 from tilavarauspalvelu.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
+from tilavarauspalvelu.services.pricing.application_round_options import application_round_price_options
 from utils.db import SubqueryCount
 
 from .filtersets import ApplicationRoundFilterSet
 from .permissions import ApplicationRoundPermission
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import PriceOption
     from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
     from tilavarauspalvelu.typing import Any, AnyUser, GQLInfo
 
@@ -60,6 +63,15 @@ class ApplicationRoundNode(DjangoNode):
         ),
         required=True,
     )
+    price_options = MultiField(
+        graphene.List(graphene.NonNull(PriceOptionNode)),
+        fields=["reservation_period_begin_date", "reservation_period_end_date"],
+        required=True,
+        description=(
+            "Price options that the applicant can select for the application sections of the round. "
+            "Makes a few queries for each round, so avoid it in long lists of rounds."
+        ),
+    )
 
     class Meta:
         model = ApplicationRound
@@ -86,6 +98,7 @@ class ApplicationRoundNode(DjangoNode):
             "reservation_unit_count",
             "reservation_creation_status",
             "is_setting_handled_allowed",
+            "price_options",
         ]
         filterset_class = ApplicationRoundFilterSet
         permission_classes = [ApplicationRoundPermission]
@@ -96,6 +109,9 @@ class ApplicationRoundNode(DjangoNode):
             return False
 
         return root.is_setting_handled_allowed
+
+    def resolve_price_options(root: ApplicationRound, info: GQLInfo) -> list[PriceOption]:
+        return application_round_price_options(root)
 
     @classmethod
     def pre_optimization_hook(cls, queryset: ApplicationRoundQuerySet, *args: Any) -> models.QuerySet:

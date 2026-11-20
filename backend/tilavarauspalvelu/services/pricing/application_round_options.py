@@ -34,12 +34,13 @@ class RoundOptionError:
 
 def application_round_price_options(application_round: ApplicationRound) -> list[PriceOption]:
     """
-    Return the price options that the application round offers, ordered by name.
+    Return the active price options that the application round offers, ordered by name.
 
     A round offers an option if the pricing groups of all its reservation units offer it
     on every day of the reservation period. A group offers an option on a date if it has
     an active base component for that option. An active base component without an option
-    offers every active option of the group's unit group.
+    offers every active option of the group's unit group. A deactivated option is not offered,
+    even when a component points to it.
     """
     reservation_unit_pks = list(application_round.reservation_units.values_list("pk", flat=True))
     round_pricing = _load_round_pricing(
@@ -49,7 +50,7 @@ def application_round_price_options(application_round: ApplicationRound) -> list
     )
     option_sets = _option_sets_by_reservation_unit(round_pricing)
     option_pks = _offered_option_pks(option_sets)
-    return list(PriceOption.objects.filter(pk__in=option_pks).order_by("name"))
+    return list(PriceOption.objects.filter(pk__in=option_pks, is_active=True).order_by("name"))
 
 
 def check_application_round_change(

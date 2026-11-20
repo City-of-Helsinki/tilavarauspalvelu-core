@@ -752,6 +752,11 @@ type ApplicationRoundNode implements Node {
   isSettingHandledAllowed: Boolean!
   applicationsCount: Int!
   reservationUnitCount: Int!
+
+  """
+  Price options that the applicant can select for the application sections of the round. Makes a few queries for each round, so avoid it in long lists of rounds.
+  """
+  priceOptions: [PriceOptionNode!]!
   pk: Int
 }
 
