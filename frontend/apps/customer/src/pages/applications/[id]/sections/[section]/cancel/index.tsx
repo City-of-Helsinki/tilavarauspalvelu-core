@@ -191,14 +191,17 @@ function ApplicationSectionInfoCard({
 
   const icons = [
     {
+      key: "reservationCount",
       icon: <IconCalendarEvent aria-hidden="true" />,
       value: `${getNReservations(applicationSection)} ${t("reservation:cancelSection.reservations")}`,
     },
     {
+      key: "times",
       icon: <IconClock aria-hidden="true" />,
       value: times.join(", "),
     },
     {
+      key: "location",
       icon: <IconLocation aria-hidden="true" />,
       value: locationString,
     },

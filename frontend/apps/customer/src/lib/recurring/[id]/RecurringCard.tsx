@@ -51,12 +51,14 @@ export function RecurringCard({
   const infos: CardInfoItem[] = [];
   if (reservationUnitTypeName) {
     infos.push({
+      key: "reservationUnitType",
       icon: <IconHome size={IconSize.Small} data-testid="reservation-unit-card__icon--home" />,
       value: reservationUnitTypeName,
     });
   }
   if (reservationUnit.maxPersons) {
     infos.push({
+      key: "maxPersons",
       icon: <IconGroup size={IconSize.Small} />,
       value: t("reservationUnitCard:maxPersons", {
         count: reservationUnit.maxPersons,
@@ -65,6 +67,7 @@ export function RecurringCard({
   }
   if (reservationUnit.effectiveAccessType) {
     infos.push({
+      key: "accessType",
       icon: <IconLock aria-hidden="false" aria-label={t("reservationUnit:accessType")} size={IconSize.Small} />,
       value: t(`reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`),
     });

@@ -74,10 +74,12 @@ function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelec
   const imgSrc = getImageSource(img, "small");
   const infos = [
     {
+      key: "reservationUnitType",
       icon: <IconInfoCircle />,
       value: reservationUnitTypeName ?? "",
     },
     {
+      key: "maxPersons",
       icon: <IconGroup />,
       value: reservationUnit.maxPersons?.toString() ?? "",
     },
