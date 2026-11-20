@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import datetime
 import itertools
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 from django.conf import settings
 from django.db import models
@@ -414,6 +414,12 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if self.reservation_unit.unit:
             return self.reservation_unit.unit.payment_accounting
         return None
+
+    @overload
+    def get_access_type_at(self, moment: datetime.datetime, *, default: AccessType) -> AccessType: ...
+
+    @overload
+    def get_access_type_at(self, moment: datetime.datetime, *, default: None = None) -> AccessType | None: ...
 
     def get_access_type_at(self, moment: datetime.datetime, *, default: AccessType | None = None) -> AccessType | None:
         on_date = local_date_of(moment)

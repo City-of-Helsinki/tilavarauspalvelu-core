@@ -83,7 +83,7 @@ class SuitableTimeRangeInlineAdminForm(forms.ModelForm):
 
 
 class ApplicationSectionAdminForm(forms.ModelForm):
-    instance: ApplicationSection | None
+    instance: ApplicationSection
 
     status = forms.CharField(
         widget=forms.TextInput(attrs={"class": "readonly", "disabled": True, "required": False}),

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, TypedDict
+from typing import TYPE_CHECKING, Literal, NotRequired, TypedDict
 
 if TYPE_CHECKING:
     import datetime
@@ -80,12 +80,18 @@ class ProfileLocalAddress(TypedDict):
     address: str | None
     postalCode: str | None
     city: str | None
+    # Only in a foreign address. Declared here, so that code can read any address with `.get()`.
+    countryCode: NotRequired[str | None]
+    additionalAddress: NotRequired[str | None]
 
 
 class ProfileForeignAddress(TypedDict):
     address: str | None
     countryCode: str | None
     additionalAddress: str | None
+    # Only in a local address. Declared here, so that code can read any address with `.get()`.
+    postalCode: NotRequired[str | None]
+    city: NotRequired[str | None]
 
 
 class ReservationPrefillInfo(TypedDict):
