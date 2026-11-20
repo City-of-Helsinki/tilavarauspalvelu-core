@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models import OuterRef
 from django.urls import reverse
 from django.utils.html import format_html
@@ -16,8 +16,10 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan, ReservationUnit
 from utils.db import SubqueryCount
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -129,15 +131,36 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
     @button(label=_("Update all reservable time spans"), change_list=True)
     def update_all_hauki_resources_reservable_time_spans(self, request: WSGIRequest) -> None:
-        HaukiResourceHashUpdater().run(force_refetch=True)
+        try:
+            HaukiResourceHashUpdater().run(force_refetch=True)
+        except ExternalServiceError as error:
+            SentryLogger.log_exception(error, details="Hauki resources: all")
+            message = _("Could not update the reservable time spans from Hauki. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
+            return
+
         self.message_user(request, _("Reservable Time Spans updated."))
 
     @button(label=_("Update reservable time spans"), change_form=True)
     def update_single_hauki_resource_reservable_times_pans(self, request: WSGIRequest, pk: int) -> None:
-        HaukiResourceHashUpdater([pk]).run(force_refetch=True)
+        try:
+            HaukiResourceHashUpdater([pk]).run(force_refetch=True)
+        except ExternalServiceError as error:
+            SentryLogger.log_exception(error, details=f"Hauki resources: {pk}")
+            message = _("Could not update the reservable time spans from Hauki. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
+            return
+
         self.message_user(request, _("Reservable Time Spans updated."))
 
     def update_reservable_time_spans_action(self, request, queryset: QuerySet[OriginHaukiResource]) -> None:
-        ids = list(queryset.values_list("id", flat=True))
-        HaukiResourceHashUpdater(ids).run(force_refetch=True)
+        ids: list[int] = list(queryset.values_list("id", flat=True))
+        try:
+            HaukiResourceHashUpdater(ids).run(force_refetch=True)
+        except ExternalServiceError as error:
+            SentryLogger.log_exception(error, details=f"Hauki resources: {ids}")
+            message = _("Could not update the reservable time spans from Hauki. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
+            return
+
         self.message_user(request, _("Reservable Time Spans updated."))
