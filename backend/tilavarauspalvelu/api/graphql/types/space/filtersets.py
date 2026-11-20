@@ -60,8 +60,10 @@ class SpaceFilterSet(ModelFilterSet):
 
     @staticmethod
     def order_by_name_sv(qs: SpaceQuerySet, desc: bool) -> models.QuerySet:
-        return qs.order_by_translated(field="name", language="sv", desc=desc)
+        # Not in `Meta.order_by`, so the API cannot use this ordering. `SpaceQuerySet` has no translated ordering.
+        return qs.order_by_translated(field="name", language="sv", desc=desc)  # type: ignore[attr-defined]
 
     @staticmethod
     def order_by_name_en(qs: SpaceQuerySet, desc: bool) -> models.QuerySet:
-        return qs.order_by_translated(field="name", language="en", desc=desc)
+        # Not in `Meta.order_by`, so the API cannot use this ordering. `SpaceQuerySet` has no translated ordering.
+        return qs.order_by_translated(field="name", language="en", desc=desc)  # type: ignore[attr-defined]
