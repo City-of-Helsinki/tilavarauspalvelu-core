@@ -21,6 +21,7 @@ from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater im
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnit, Resource, Space
 from tilavarauspalvelu.services.export import ReservationUnitExporter
+from utils.external_service.errors import ExternalServiceError
 
 from .form import PricingGroupOfReservationUnitInline, ReservationUnitAccessTypeInline, ReservationUnitAdminForm
 
@@ -298,6 +299,16 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
     def save_model(self, request: WSGIRequest, obj: ReservationUnit, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
         super().save_model(request, obj, form, change)
 
-        # Update ReservableTimeSpans for HaukiResource when ReservationUnit is saved
+        # Update ReservableTimeSpans for HaukiResource when ReservationUnit is saved.
+        # The changes are already saved here, so a failed Hauki call must not fail the save.
+        # The periodic opening hours task updates the resource when its hash in Hauki changes.
         if obj.origin_hauki_resource_id:
-            HaukiResourceHashUpdater(hauki_resource_ids=[obj.origin_hauki_resource.id]).run(force_refetch=True)
+            try:
+                HaukiResourceHashUpdater(hauki_resource_ids=[obj.origin_hauki_resource.id]).run(force_refetch=True)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation unit: {obj.pk}")
+                message = _(
+                    "The reservation unit was saved, but its opening hours could not be updated from Hauki. "
+                    "The error was reported to Sentry."
+                )
+                self.message_user(request, message, level=messages.WARNING)
