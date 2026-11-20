@@ -462,10 +462,32 @@ class ReservationUnitSerializer(NestingModelSerializer):
     @staticmethod
     def handle_access_types(access_types: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
         """Update access types for a reservation unit."""
-        access_type_pks = [access_type.get("pk") for access_type in access_types if "pk" in access_type]
         today = local_date()
 
         with transaction.atomic():
+            # The access types are committed before the Hauki export, which can still fail the mutation.
+            # The client then sends the saved access types again without a pk, so match them by begin date.
+            payload_pks = [access_type["pk"] for access_type in access_types if access_type.get("pk") is not None]
+            new_access_types = [access_type for access_type in access_types if access_type.get("pk") is None]
+
+            existing_access_types = (
+                ReservationUnitAccessType.objects
+                .filter(
+                    reservation_unit=reservation_unit,
+                    begin_date__in=[access_type["begin_date"] for access_type in new_access_types],
+                )
+                .exclude(pk__in=payload_pks)
+                .values_list("begin_date", "pk")
+            )
+            existing_pks_by_begin_date: dict[datetime.date, int] = dict(existing_access_types)
+
+            for access_type in new_access_types:
+                existing_pk = existing_pks_by_begin_date.get(access_type["begin_date"])
+                if existing_pk is not None:
+                    access_type["pk"] = existing_pk
+
+            access_type_pks = [access_type["pk"] for access_type in access_types if access_type.get("pk") is not None]
+
             # Delete future access types that are not in the payload.
             # Past or active access types should not be deleted.
             ReservationUnitAccessType.objects.filter(
