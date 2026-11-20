@@ -564,6 +564,20 @@ def test_price_option_change__deactivated_implicit_option_is_checked():
     assert [error.code for error in errors] == [error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED]
 
 
+def test_price_option_change__deactivated_explicit_option_is_checked():
+    unit_group = UnitGroupFactory.create()
+    adults = PriceOptionFactory.create(unit_group=unit_group)
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=adults, valid_from=JAN_1)
+    create_round([create_unit_using(pricing_group)])
+
+    adults.is_active = False
+
+    errors = check_price_option_change_keeps_round_options(adults)
+
+    assert [error.code for error in errors] == [error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED]
+
+
 def test_price_option_change__round_with_ended_reservation_period_is_not_checked():
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
