@@ -1869,6 +1869,12 @@ msgstr ""
 msgid "Could not export the reservation units."
 msgstr ""
 
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid ""
+"The reservation unit was saved, but its opening hours could not be updated "
+"from Hauki. The error was reported to Sentry."
+msgstr ""
+
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Access type begin date"
 msgstr ""
