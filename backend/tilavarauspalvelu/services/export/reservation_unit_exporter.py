@@ -136,7 +136,8 @@ class ReservationUnitExporter(BaseCSVExporter[ReservationUnit]):
         )
 
         return (
-            self._queryset
+            # The annotations use the lookup property names, so that the properties read the annotated values.
+            self._queryset  # type: ignore[no-redef]
             .select_related(
                 "unit",
                 "origin_hauki_resource",
