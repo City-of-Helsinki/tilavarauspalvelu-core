@@ -59,6 +59,14 @@ github_actions:
       - any-glob-to-any-file:
           - ".github/**"
 
+agents:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".agents/**"
+          - ".claude/**"
+          - "**/AGENTS.md"
+          - "**/CLAUDE.md"
+
 dependencies:
   - changed-files:
       - any-glob-to-any-file:

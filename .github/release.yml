@@ -16,6 +16,13 @@ changelog:
     - title: Dependencies
       labels:
         - dependencies
+    - title: Infra and CI
+      labels:
+        - infra
+        - github_actions
+    - title: Agents
+      labels:
+        - agents
     - title: Other
       labels:
         - "*"
