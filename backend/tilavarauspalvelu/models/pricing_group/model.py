@@ -53,6 +53,9 @@ class PricingGroup(models.Model):
         ReservationUnitPricingGroup, ReservationUnitPricingGroupQuerySet
     ]
 
+    # Set only by the queryset of 'ReservationUnitExporter'.
+    components_today: list[PriceComponent]
+
     class Meta:
         db_table = "pricing_group"
         base_manager_name = "objects"

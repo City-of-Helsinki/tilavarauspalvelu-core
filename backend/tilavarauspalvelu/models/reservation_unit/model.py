@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -338,6 +338,13 @@ class ReservationUnit(models.Model):
     reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
     application_round_time_slots: OneToManyRelatedManager[ApplicationRoundTimeSlot, ApplicationRoundTimeSlotQuerySet]
     application_rounds: ManyToManyRelatedManager[ApplicationRound, ApplicationRoundQuerySet]
+
+    # Set only by 'ReservationUnitNode.optimize_reservable_time_spans'. The datetimes are ISO 8601 strings.
+    reservable_time_spans_in_period: list[dict[str, str]]
+    # Set only by 'ReservationUnitNode.optimize_price_summary'.
+    price_summary_components: list[dict[str, Any]]
+    # Set only by 'ReservationUnitNode.optimize_next_price_change'.
+    scheduled_pricing_groups: list[dict[str, Any]]
 
     class Meta:
         db_table = "reservation_unit"
