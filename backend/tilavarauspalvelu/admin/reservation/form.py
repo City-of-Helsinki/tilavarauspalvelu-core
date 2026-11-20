@@ -174,7 +174,7 @@ class ReservationPriceLineInline(admin.TabularInline):
     model = ReservationPriceLine
     extra = 0
     can_delete = False
-    fields = [
+    fields = (
         "description",
         "quantity",
         "price_unit",
@@ -186,7 +186,7 @@ class ReservationPriceLineInline(admin.TabularInline):
         "tax_percentage",
         "vat_code",
         "price_component",
-    ]
+    )
     readonly_fields = fields
 
     def has_add_permission(self, request: HttpRequest, obj: Reservation | None = None) -> bool:
