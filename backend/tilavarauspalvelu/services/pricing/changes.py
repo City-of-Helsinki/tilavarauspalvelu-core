@@ -17,6 +17,8 @@ if TYPE_CHECKING:
     from collections.abc import Collection
 
     from .application_round_options import RoundOptionError
+    from .coverage import CoverageError
+    from .sales_items import SalesItemError
 
 __all__ = [
     "save_price_component_changes",
@@ -181,7 +183,11 @@ def _validate_pricing_group(*, pricing_group: PricingGroup, components: list[Pri
             reservation_unit_rows=None,
         )
 
-    errors = [*coverage_errors, *sales_item_errors, *round_errors]
+    errors: list[CoverageError | SalesItemError | RoundOptionError] = [
+        *coverage_errors,
+        *sales_item_errors,
+        *round_errors,
+    ]
     if errors:
         details = [ErrorDetail(error.message, code=error.code) for error in errors]
         raise ValidationError(details)

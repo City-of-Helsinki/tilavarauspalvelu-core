@@ -254,7 +254,7 @@ class User(AbstractUser):
 
     @property
     def id_token(self) -> IDToken | None:
-        raw_id_token: str | None = self.current_id_token  # type: ignore[assignment]
+        raw_id_token: str | None = self.current_id_token
         if raw_id_token is None:
             return None
 

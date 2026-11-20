@@ -62,7 +62,7 @@ class PriceComponentFormSet(BaseInlineFormSet):
             component = form.instance
             saved_component = saved_components.get(component.pk)
 
-            if self._should_delete_form(form):
+            if self._should_delete_form(form):  # type: ignore[attr-defined]  # Not in the Django stubs.
                 if saved_component is not None:
                     with only_django_validation_errors():
                         saved_component.validators.validate_can_delete()
@@ -122,7 +122,7 @@ class PriceComponentFormSet(BaseInlineFormSet):
         return [
             form.instance
             for form in reservation_unit_formset.forms
-            if form.cleaned_data and not reservation_unit_formset._should_delete_form(form)  # noqa: SLF001
+            if form.cleaned_data and not reservation_unit_formset._should_delete_form(form)  # type: ignore[attr-defined]  # noqa: SLF001
         ]
 
 
@@ -167,7 +167,7 @@ class ReservationUnitPricingGroupFormSet(BaseInlineFormSet):
         reservation_unit_ids = [
             form.cleaned_data["reservation_unit"].pk
             for form in self.forms
-            if form.cleaned_data and not self._should_delete_form(form)
+            if form.cleaned_data and not self._should_delete_form(form)  # type: ignore[attr-defined]
         ]
         with only_django_validation_errors():
             self.instance.validators.validate_own_group_has_one_reservation_unit(reservation_unit_ids)
