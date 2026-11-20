@@ -433,9 +433,9 @@ class ReservationPeriod(TypedDict):
 class ReservationDetails(TypedDict, total=False):
     name: str
     description: str
-    num_persons: int
+    num_persons: int | None
     state: ReservationStateChoice
-    type: ReservationTypeChoice | ReservationTypeStaffChoice
+    type: ReservationTypeChoice | ReservationTypeStaffChoice | None
     municipality: str | None  # MunicipalityChoice
     working_memo: str
 
@@ -454,7 +454,7 @@ class ReservationDetails(TypedDict, total=False):
     reservee_phone: str
     reservee_organisation_name: str
     reservee_address_zip: str
-    reservee_type: ReserveeType
+    reservee_type: ReserveeType | None
 
     user: int | User | None
     purpose: int | ReservationPurpose | None

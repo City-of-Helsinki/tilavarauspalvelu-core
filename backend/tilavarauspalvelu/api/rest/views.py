@@ -23,6 +23,7 @@ from import_export.formats.base_formats import JSON
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
@@ -404,7 +405,7 @@ def append_payment_method_to_checkout_url(checkout_url: str, request: WSGIReques
 
 @require_GET
 @redirect_back_on_error
-def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:  # noqa: PLR0915
+def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:  # noqa: PLR0912, PLR0915
     """Redirect user to verkkokauppa for paying pending reservations."""
     reservation: Reservation | None = Reservation.objects.filter(pk=pk).first()
     if reservation is None:
@@ -432,6 +433,11 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     if payment_order.status != OrderStatus.PENDING:
         msg = "Payment for reservation is not in status 'PENDING'"
         raise ValidationError(msg, code="RESERVATION_PAYMENT_ORDER_NOT_PENDING")
+
+    # A pending order is created with a due date.
+    if payment_order.handled_payment_due_by is None:
+        msg = "A pending order has a due date."
+        raise MissingValueError(msg)
 
     due_by = payment_order.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE)
     leeway = datetime.timedelta(seconds=3)

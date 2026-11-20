@@ -402,8 +402,8 @@ def _option_sets_by_reservation_unit(round_pricing: _RoundPricing) -> dict[int, 
         daily_options: list[frozenset[int]] = []
 
         for day in days:
-            row = _row_on_day(rows=rows, day=day)
-            components = [] if row is None else components_by_pricing_group.get(row.pricing_group_id, [])
+            day_row = _row_on_day(rows=rows, day=day)
+            components = [] if day_row is None else components_by_pricing_group.get(day_row.pricing_group_id, [])
             active_components = [
                 component
                 for component in components
@@ -416,7 +416,12 @@ def _option_sets_by_reservation_unit(round_pricing: _RoundPricing) -> dict[int, 
                         options.add(component.price_option_id)
                     continue
 
-                unit_group_options = round_pricing.implicit_options.get(component.pricing_group.unit_group_id, [])
+                # A pricing group without a unit group has no implicit options.
+                unit_group_id = component.pricing_group.unit_group_id
+                if unit_group_id is None:
+                    continue
+
+                unit_group_options = round_pricing.implicit_options.get(unit_group_id, [])
                 options.update(option.pk for option in unit_group_options)
 
             daily_options.append(frozenset(options))
@@ -445,7 +450,7 @@ def _option_names(round_pricing: _RoundPricing) -> dict[int, str]:
     option_names = {option.pk: option.name for options in round_pricing.implicit_options.values() for option in options}
     for component in round_pricing.components:
         if component.price_option is not None:
-            option_names[component.price_option_id] = component.price_option.name
+            option_names[component.price_option.pk] = component.price_option.name
     return option_names
 
 

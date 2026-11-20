@@ -8,6 +8,7 @@ from lookup_property import L
 
 from tilavarauspalvelu.dataclasses import ReservationSeriesCalculationResults
 from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice, Weekday
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import ReservationPeriod
@@ -96,12 +97,18 @@ class ReservationSeriesActions:
             if begin_date > self.reservation_series.end_date:
                 continue
 
+            # The callers validate the interval, or create the series with one.
+            recurrence_in_days = self.reservation_series.recurrence_in_days
+            if recurrence_in_days is None:
+                msg = "The series has a recurrence interval."
+                raise MissingValueError(msg)
+
             periods = get_periods_between(
                 start_date=begin_date,
                 end_date=end_date,
                 start_time=begin_time,
                 end_time=end_time,
-                interval=self.reservation_series.recurrence_in_days,
+                interval=recurrence_in_days,
                 tzinfo=DEFAULT_TIMEZONE,
             )
             for begin, end in periods:

@@ -271,6 +271,17 @@ class ApplicationRoundActions:
         application_section = allocated_time_slot.reservation_unit_option.application_section
         application = application_section.application
 
+        # Sending the application requires an applicant type.
+        if application.applicant_type is None:
+            msg = "A sent application has an applicant type."
+            raise MissingValueError(msg)
+
+        # Setting the round handled sets the handled time before it starts this task.
+        handled_at = application.application_round.handled_at
+        if handled_at is None:
+            msg = "A handled application round has a handled time."
+            raise MissingValueError(msg)
+
         reservee_type = ReserveeType(application.applicant_type)
 
         reservation_details = ReservationDetails(
@@ -279,7 +290,7 @@ class ApplicationRoundActions:
             reservee_type=reservee_type,
             state=ReservationStateChoice.CONFIRMED,
             user=series.user,
-            handled_at=application.application_round.handled_at,
+            handled_at=handled_at,
             num_persons=application_section.num_persons,
             buffer_time_before=datetime.timedelta(0),
             buffer_time_after=datetime.timedelta(0),
