@@ -17,7 +17,7 @@ shift
 
 load_credentials
 
-attachments="$(api "rest/api/2/issue/$key?fields=attachment" | jq '[.fields.attachment[]? | {id, filename}]')"
+attachments="$(api "rest/api/2/issue/$key?fields=attachment" | jq '[.fields.attachment[]? | {id: (.id | tostring), filename}]')"
 
 # Find the id for each argument before the download, so that a wrong name changes nothing.
 ids=()
