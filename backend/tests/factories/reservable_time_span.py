@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
+from tilavarauspalvelu.models import ReservableTimeSpan
 
 from ._base import ForeignKeyFactory, GenericDjangoModelFactory
 
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class ReservableTimeSpanFactory(GenericDjangoModelFactory[OriginHaukiResource]):
+class ReservableTimeSpanFactory(GenericDjangoModelFactory[ReservableTimeSpan]):
     class Meta:
         model = ReservableTimeSpan
 
@@ -24,7 +24,7 @@ class ReservableTimeSpanFactory(GenericDjangoModelFactory[OriginHaukiResource]):
     end_datetime = None  # datetime.datetime
 
     @classmethod
-    def create(
+    def create(  # type: ignore[override]
         cls,
         start_datetime: datetime.datetime,
         end_datetime: datetime.datetime,
@@ -35,7 +35,7 @@ class ReservableTimeSpanFactory(GenericDjangoModelFactory[OriginHaukiResource]):
         return super().create(**kwargs)
 
     @classmethod
-    def build(
+    def build(  # type: ignore[override]
         cls,
         start_datetime: datetime.datetime,
         end_datetime: datetime.datetime,

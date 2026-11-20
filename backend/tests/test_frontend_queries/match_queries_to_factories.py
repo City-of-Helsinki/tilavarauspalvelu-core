@@ -43,8 +43,6 @@ from tests.factories._base import GenericDjangoModelFactory
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from graphene.types.objecttype import ObjectTypeOptions
-
 
 type ModelField = models.Field | models.ForeignObjectRel
 type FactoryMap = dict[type[GenericDjangoModelFactory], dict[str, ModelField]]
@@ -91,6 +89,7 @@ def match_queries_to_factories(file: Path) -> dict[str, list[QueryInfo]]:
             msg = f"Unhandled definition type: ({type(operation)}) {operation}. Did you forget to defragment first?"
             raise NotImplementedError(msg)
 
+        assert operation.name is not None, f"Operation has no name: {operation}"
         factory_map[operation.name.value] = get_factory_info_for_definition(operation)
 
     return factory_map
@@ -122,11 +121,13 @@ def get_factory_info_for_definition(operation: OperationDefinitionNode) -> list[
 
         factory_args: dict[str, Any] = {}
 
+        factory: type[GenericDjangoModelFactory] | None
         try:
             factory = get_factory(root_type, selection)
         except Exception:  # noqa: BLE001
             factory = None
-        else:
+
+        if factory is not None:
             for selection_node in selection.selection_set.selections:
                 factory_args |= get_factory_arguments(selection_node, model=factory._meta.model)
 
@@ -193,16 +194,16 @@ def get_factory(root_type: GraphQLObjectType, field_node: FieldNode) -> type[Gen
         msg = f"No graphene type found for '{name}'"
         raise TypeError(msg)
 
-    options: ObjectTypeOptions = graphene_type._meta
+    model: type[models.Model]
 
     match root_type.name:
         case "Query":
-            options: DjangoObjectTypeOptions
-            model: type[models.Model] = options.model
+            query_options: DjangoObjectTypeOptions = graphene_type._meta
+            model = query_options.model
 
         case "Mutation":
-            options: SerializerMutationOptions
-            model: type[models.Model] = options.model_class
+            mutation_options: SerializerMutationOptions = graphene_type._meta
+            model = mutation_options.model_class
 
         case _:
             msg = f"Root type '{root_type.name}' is not a valid root type"
@@ -298,7 +299,9 @@ def get_factory_arguments(
             return {lookup: value}
 
         if isinstance(model_field, RelatedField | ForeignObjectRel):
-            model: type[models.Model] = model_field.related_model  # type: ignore[assignment]
+            model = model_field.related_model  # type: ignore[assignment]
+
+    assert selection_node.selection_set is not None
 
     factory_args: dict[str, Any] = {}
     for selection in selection_node.selection_set.selections:
@@ -347,7 +350,7 @@ chars = string.ascii_letters + string.digits
 
 
 def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR0912
-    if field.default != NOT_PROVIDED:
+    if isinstance(field, models.Field) and field.default != NOT_PROVIDED:
         if callable(field.default):
             return field.default()
         return field.default

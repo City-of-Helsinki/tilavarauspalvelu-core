@@ -136,62 +136,62 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
     **parametrize_helper(
         {
             "Anonymous user should see notification meant for all": TargetParams(
-                target=BannerNotificationTarget.ALL.value,
+                target=BannerNotificationTarget.ALL,
                 user_type=UserType.ANONYMOUS,
                 expected=1,
             ),
             "Anonymous user should see notification meant for users": TargetParams(
-                target=BannerNotificationTarget.USER.value,
+                target=BannerNotificationTarget.USER,
                 user_type=UserType.ANONYMOUS,
                 expected=1,
             ),
             "Anonymous user should not see notification meant for staff": TargetParams(
-                target=BannerNotificationTarget.STAFF.value,
+                target=BannerNotificationTarget.STAFF,
                 user_type=UserType.ANONYMOUS,
                 expected=0,
             ),
             "Regular user should see notification meant for all": TargetParams(
-                target=BannerNotificationTarget.ALL.value,
+                target=BannerNotificationTarget.ALL,
                 user_type=UserType.REGULAR,
                 expected=1,
             ),
             "Regular user should see notification meant for users": TargetParams(
-                target=BannerNotificationTarget.USER.value,
+                target=BannerNotificationTarget.USER,
                 user_type=UserType.REGULAR,
                 expected=1,
             ),
             "Regular user should not see notification meant for staff": TargetParams(
-                target=BannerNotificationTarget.STAFF.value,
+                target=BannerNotificationTarget.STAFF,
                 user_type=UserType.REGULAR,
                 expected=0,
             ),
             "Staff user should see notification meant for all": TargetParams(
-                target=BannerNotificationTarget.ALL.value,
+                target=BannerNotificationTarget.ALL,
                 user_type=UserType.STAFF,
                 expected=1,
             ),
             "Staff user should not see notification meant for users": TargetParams(
-                target=BannerNotificationTarget.USER.value,
+                target=BannerNotificationTarget.USER,
                 user_type=UserType.STAFF,
                 expected=0,
             ),
             "Staff user should see notification meant for staff": TargetParams(
-                target=BannerNotificationTarget.STAFF.value,
+                target=BannerNotificationTarget.STAFF,
                 user_type=UserType.STAFF,
                 expected=1,
             ),
             "Notification manager should see notification meant for all": TargetParams(
-                target=BannerNotificationTarget.ALL.value,
+                target=BannerNotificationTarget.ALL,
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected=1,
             ),
             "Notification manager should see notification meant for users": TargetParams(
-                target=BannerNotificationTarget.USER.value,
+                target=BannerNotificationTarget.USER,
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected=1,
             ),
             "Notification manager should see notification meant for staff": TargetParams(
-                target=BannerNotificationTarget.STAFF.value,
+                target=BannerNotificationTarget.STAFF,
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected=1,
             ),
