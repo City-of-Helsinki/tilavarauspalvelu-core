@@ -29,5 +29,6 @@ class ReservationUnitPricingGroupNode(DjangoNode[ReservationUnitPricingGroup, An
         ]
 
     @classmethod
-    def filter_queryset(cls, queryset: ReservationUnitPricingGroupQuerySet, info: GQLInfo) -> models.QuerySet:
+    def filter_queryset(cls, queryset: ReservationUnitPricingGroupQuerySet, info: GQLInfo) -> models.QuerySet:  # type: ignore[override]
+        # The optimizer passes the default queryset of the model, which has the custom queryset methods.
         return queryset.exclude_past()

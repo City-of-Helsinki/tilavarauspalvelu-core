@@ -255,7 +255,8 @@ class ReservationNode(DjangoNode[Reservation, AnyUser]):
         permission_classes = [ReservationPermission]
 
     @classmethod
-    def pre_optimization_hook(cls, queryset: ReservationQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+    def pre_optimization_hook(cls, queryset: ReservationQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:  # type: ignore[override]
+        # The optimizer passes the default queryset of the model, which has the custom queryset methods.
         queryset = queryset.with_permissions()
 
         # Add user id for permission checks

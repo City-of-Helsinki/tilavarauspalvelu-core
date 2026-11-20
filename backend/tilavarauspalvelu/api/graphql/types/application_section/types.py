@@ -132,7 +132,8 @@ class ApplicationSectionNode(DjangoNode[ApplicationSection, AnyUser]):
         ).distinct()
 
     @classmethod
-    def pre_optimization_hook(cls, queryset: ApplicationSectionQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+    def pre_optimization_hook(cls, queryset: ApplicationSectionQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:  # type: ignore[override]
+        # The optimizer passes the default queryset of the model, which has the custom queryset methods.
         # Fetch the application and its units for permission checks
         application_optimizer = optimizer.get_or_set_child_optimizer(
             "application",

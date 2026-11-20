@@ -94,7 +94,7 @@ class ApplicationSectionReservationCancellationMutation(UpdateMutation[Applicati
         permission_classes = [ApplicationSectionReservationCancellationPermission]
 
     @classmethod
-    def get_serializer_output(cls, instance: CancellationOutput) -> dict[str, Any]:
+    def get_serializer_output(cls, instance: CancellationOutput) -> dict[str, Any]:  # type: ignore[override]
         # `instance` take from serializer.save() return value, so overriding it "works"
         return {
             "future": instance["expected_cancellations"],
