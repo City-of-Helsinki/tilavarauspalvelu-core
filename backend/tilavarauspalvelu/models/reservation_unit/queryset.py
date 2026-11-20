@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from itertools import islice
-from typing import TYPE_CHECKING, Any, Protocol, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Protocol, Self, TypedDict, TypeVar
 
 from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
@@ -19,9 +19,17 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Mapping
     from decimal import Decimal
 
+    from django_stubs_ext import WithAnnotations
     from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.enums import AccessType
+
+    class FirstReservableTimeAnnotations(TypedDict):
+        is_closed: bool
+        first_reservable_datetime: datetime.datetime | None
+        effective_access_type: str | None
+
+    type ReservationUnitWithFirstReservableTime = WithAnnotations[ReservationUnit, FirstReservableTimeAnnotations]
 
     class _TranslatedName(Protocol):
         name_fi: str | None
@@ -69,7 +77,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
         show_only_reservable: bool = False,
         pagination_args: PaginationArgs | None = None,
         cache_key: str = "",
-    ) -> ReservationUnitQuerySet:
+    ) -> ReservationUnitQuerySet[ReservationUnitWithFirstReservableTime, ReservationUnitWithFirstReservableTime]:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
         helper = FirstReservableTimeHelper(
             reservation_unit_queryset=self,

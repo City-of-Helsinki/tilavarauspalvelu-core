@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, TypedDict
 
 from django.db import models
 from lookup_property import L
@@ -21,8 +21,20 @@ from ._base_exporter import BaseCSVExporter, BaseExportRow
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from decimal import Decimal
+
+    from django_stubs_ext import WithAnnotations
 
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+
+    class ExportedReservationUnitAnnotations(TypedDict):
+        past_pricing_group_rows: list[ReservationUnitPricingGroup]
+
+    class ExportedPriceComponentAnnotations(TypedDict):
+        tax_percentage: Decimal | None
+
+    type ExportedReservationUnit = WithAnnotations[ReservationUnit, ExportedReservationUnitAnnotations]
+    type ExportedPriceComponent = WithAnnotations[PriceComponent, ExportedPriceComponentAnnotations]
 
 __all__ = [
     "ReservationUnitExporter",
@@ -101,7 +113,7 @@ class ReservationUnitExportRow(BaseExportRow):
     updated_at: str | None = ""
 
 
-class ReservationUnitExporter(BaseCSVExporter[ReservationUnit]):
+class ReservationUnitExporter(BaseCSVExporter["ExportedReservationUnit"]):
     """Exports reservation units to a CSV file."""
 
     def __init__(
@@ -114,7 +126,7 @@ class ReservationUnitExporter(BaseCSVExporter[ReservationUnit]):
         super().__init__(datetime_format=datetime_format)
 
     @property
-    def queryset(self) -> ReservationUnitQuerySet:
+    def queryset(self) -> ReservationUnitQuerySet[ExportedReservationUnit, ExportedReservationUnit]:
         today = local_date()
         components_today = (
             PriceComponent.objects
@@ -266,10 +278,10 @@ class ReservationUnitExporter(BaseCSVExporter[ReservationUnit]):
             ),
         ]
 
-    def get_data_rows(self, instance: ReservationUnit) -> Iterable[ReservationUnitExportRow]:
+    def get_data_rows(self, instance: ExportedReservationUnit) -> Iterable[ReservationUnitExportRow]:
         # The base prices in effect today, from the lowest to the highest. There are many with price options.
         pricing_group_rows: list[ReservationUnitPricingGroup] = instance.past_pricing_group_rows
-        components: list[PriceComponent] = (
+        components: list[ExportedPriceComponent] = (
             pricing_group_rows[0].pricing_group.components_today if pricing_group_rows else []
         )
         lowest_component = components[0] if components else None

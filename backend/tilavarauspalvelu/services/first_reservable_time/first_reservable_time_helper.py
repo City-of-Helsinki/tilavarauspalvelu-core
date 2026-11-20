@@ -36,7 +36,10 @@ if TYPE_CHECKING:
     from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.models import ReservationUnit
-    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+    from tilavarauspalvelu.models.reservation_unit.queryset import (
+        ReservationUnitQuerySet,
+        ReservationUnitWithFirstReservableTime,
+    )
 
 type ReservationUnitPK = int
 
@@ -405,7 +408,9 @@ class FirstReservableTimeHelper:
 
         cache.set(self.cache_key, json.dumps(cached_data), timeout=120)
 
-    def get_annotated_queryset(self) -> ReservationUnitQuerySet:
+    def get_annotated_queryset(
+        self,
+    ) -> ReservationUnitQuerySet[ReservationUnitWithFirstReservableTime, ReservationUnitWithFirstReservableTime]:
         """Annotate the queryset with `first_reservable_datetime` and `is_closed` fields."""
         # Create When statements for the queryset annotation
         is_closed_whens: list[When] = [
