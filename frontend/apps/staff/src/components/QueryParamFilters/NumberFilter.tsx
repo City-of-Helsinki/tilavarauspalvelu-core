@@ -23,7 +23,7 @@ export function ControlledNumberFilter<T extends FieldValues>({
       label=" "
       value={value?.toString() ?? ""}
       onChange={(e) => onChange(e.target.value)}
-      placeholder={t(`filters:placeholder.${name}`)}
+      placeholder={t(`filters:placeholder.${name.toString()}`)}
       errorText={value != null && value !== "" && Number.isNaN(Number(value)) ? t("common:notANumber") : undefined}
     />
   );

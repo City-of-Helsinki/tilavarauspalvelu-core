@@ -25,7 +25,7 @@ export function ControlledSearchFilter<T extends FieldValues>({
 
   const { t } = useTranslation();
   const label = t(`filters:label.${labelKey ?? name}`);
-  const placeholder = t(`filters:placeholder.${name}`);
+  const placeholder = t(`filters:placeholder.${name.toString()}`);
   return (
     <TextInput
       label={label}
