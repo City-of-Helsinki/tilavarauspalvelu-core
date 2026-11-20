@@ -26,7 +26,7 @@ __all__ = [
 def fetch_additional_info_for_user_from_helsinki_profile(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
     user = kwargs["user"]
     response = kwargs["response"]
-    request = kwargs["request"]
+    request = kwargs["strategy"].request
 
     if user is None:
         return {"user": user}
