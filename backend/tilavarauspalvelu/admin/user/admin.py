@@ -280,25 +280,25 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return user.uuid
 
     @admin.display(description=_("Issuer (iss)"))
-    def issuer(self, user: User) -> str:
+    def issuer(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.iss
 
     @admin.display(description=_("Audience (aud)"))
-    def audience(self, user: User) -> str:
+    def audience(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.aud
 
     @admin.display(description=_("JWT ID (jti)"))
-    def jwt_id(self, user: User) -> str:
+    def jwt_id(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.jti
 
     @admin.display(description=_("Token type (typ)"))
-    def token_type(self, user: User) -> str:
+    def token_type(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.typ
@@ -328,19 +328,19 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return datetime.datetime.fromtimestamp(id_token.auth_time).astimezone(DEFAULT_TIMEZONE).isoformat()
 
     @admin.display(description=_("Nonce (nonce)"))
-    def nonce(self, user: User) -> str:
+    def nonce(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.nonce
 
     @admin.display(description=_("Access token hash (at_hash)"))
-    def access_token_hash(self, user: User) -> str:
+    def access_token_hash(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.at_hash
 
     @admin.display(description=_("Preferred username (preferred_username)"))
-    def preferred_username(self, user: User) -> str:
+    def preferred_username(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.preferred_username
@@ -352,19 +352,19 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return str(user.id_token.email_verified)
 
     @admin.display(description=_("Authorized party (azp)"))
-    def authorized_party(self, user: User) -> str:
+    def authorized_party(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.azp
 
     @admin.display(description=_("Session identifier (sid)"))
-    def session_identifier(self, user: User) -> str:
+    def session_identifier(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.sid
 
     @admin.display(description=_("Session state (session_state)"))
-    def session_state(self, user: User) -> str:
+    def session_state(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.session_state
@@ -376,7 +376,7 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return str(user.id_token.amr)
 
     @admin.display(description=_("Level of assurance (loa)"))
-    def level_of_assurance(self, user: User) -> str:
+    def level_of_assurance(self, user: User) -> str | None:
         if user.id_token is None:
             return "-"
         return user.id_token.loa

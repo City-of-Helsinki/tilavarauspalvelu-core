@@ -104,6 +104,7 @@ def migrate_user_from_tunnistamo_to_keycloak(**kwargs: Unpack[PipelineArgs]) -> 
     id_token = IDToken.from_string(response["id_token"])
     if (
         id_token is not None  # There is an id token.
+        and id_token.iss is not None
         and id_token.iss.endswith("helsinki-tunnistus")  # Issuer is keycloak.
         and id_token.is_ad_login  # It is an AD login.
         and id_token.email not in {"", None}  # User has an email.
