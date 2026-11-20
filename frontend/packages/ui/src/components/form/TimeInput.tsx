@@ -68,7 +68,7 @@ const isValid = (value: string): boolean => {
 };
 
 type TimeInputProps = {
-  value: string;
+  value?: string;
   label: string;
   error?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
