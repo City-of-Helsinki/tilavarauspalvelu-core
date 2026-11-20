@@ -6,6 +6,7 @@ import {
   getApplicationRoundPath,
   getApplicationSectionPath,
   getFeedbackUrl,
+  getLocalizedRedirectPath,
   getReservationInProgressPath,
   getReservationPath,
   getReservationUnitPath,
@@ -52,5 +53,22 @@ describe("urls", () => {
       "https://feedback.example/form?lang=sv"
     );
     expect(getFeedbackUrl("not a url", { language: "fi" })).toBeNull();
+  });
+
+  test("adds the locale prefix to a redirect path when the locale is not the default", () => {
+    const path = "/reservation-unit/8/reservation/99";
+    expect(getLocalizedRedirectPath(path, { locale: "en", defaultLocale: "fi" })).toBe(
+      "/en/reservation-unit/8/reservation/99"
+    );
+    expect(getLocalizedRedirectPath(path, { locale: "sv", defaultLocale: "fi" })).toBe(
+      "/sv/reservation-unit/8/reservation/99"
+    );
+  });
+
+  test("keeps the redirect path when the locale is the default or missing", () => {
+    const path = "/reservations/5/";
+    expect(getLocalizedRedirectPath(path, { locale: "fi", defaultLocale: "fi" })).toBe("/reservations/5/");
+    expect(getLocalizedRedirectPath(path, { locale: undefined, defaultLocale: undefined })).toBe("/reservations/5/");
+    expect(getLocalizedRedirectPath("", { locale: "en", defaultLocale: "fi" })).toBe("");
   });
 });

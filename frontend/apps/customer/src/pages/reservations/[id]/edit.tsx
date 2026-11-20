@@ -19,7 +19,7 @@ import { queryOptions } from "@/modules/queryOptions";
 import { isReservationEditable, transformReservation } from "@/modules/reservation";
 import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { getReservationPath, reservationsPrefix } from "@/modules/urls";
+import { getLocalizedRedirectPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
 import { StyledStepper } from "@/styled/utils";
 
@@ -151,7 +151,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return {
         redirect: {
           permanent: false,
-          destination: getReservationPath(reservation.pk),
+          destination: getLocalizedRedirectPath(getReservationPath(reservation.pk), ctx),
         },
         props: {
           notFound: true, // for prop narrowing

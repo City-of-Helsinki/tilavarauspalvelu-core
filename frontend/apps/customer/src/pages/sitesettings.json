@@ -105,6 +105,21 @@
             "en": "365 days"
           },
           "storageType": 1
+        },
+        {
+          "name": "logoutReturnPath",
+          "host": "varaamo.hel.fi",
+          "description": {
+            "fi": "Eväste tallentaa sivun, jolle palataan uloskirjautumisen jälkeen.",
+            "sv": "Cookien sparar sidan som du återvänder till efter utloggningen.",
+            "en": "Cookie that saves the page to return to after logging out."
+          },
+          "expiration": {
+            "fi": "10 minuuttia",
+            "sv": "10 minuter",
+            "en": "10 minutes"
+          },
+          "storageType": 1
         }
       ]
     }

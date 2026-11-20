@@ -42,7 +42,7 @@ import { useSearchModify } from "@/hooks/useSearchValues";
 import { StartApplicationBar, RecurringCard } from "@/lib/recurring/[id]";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
-import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
+import { getApplicationPath, getLocalizedRedirectPath, seasonalPrefix } from "@/modules/urls";
 
 type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" | "options">>;
 
@@ -156,7 +156,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return {
       redirect: {
         permanent: false,
-        destination: seasonalPrefix,
+        destination: getLocalizedRedirectPath(seasonalPrefix, ctx),
       },
       props: {
         notFound: true, // for prop narrowing
@@ -194,7 +194,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return {
         redirect: {
           permanent: false,
-          destination: url,
+          destination: getLocalizedRedirectPath(url, ctx),
         },
         props: {
           notFound: true, // for prop narrowing
