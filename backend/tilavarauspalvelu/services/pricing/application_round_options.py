@@ -34,12 +34,13 @@ class RoundOptionError:
 
 def application_round_price_options(application_round: ApplicationRound) -> list[PriceOption]:
     """
-    Return the price options that the application round offers, ordered by name.
+    Return the active price options that the application round offers, ordered by name.
 
     A round offers an option if the pricing groups of all its reservation units offer it
     on every day of the reservation period. A group offers an option on a date if it has
     an active base component for that option. An active base component without an option
-    offers every active option of the group's unit group.
+    offers every active option of the group's unit group. A deactivated option is not offered,
+    even when a component points to it.
     """
     reservation_unit_pks = list(application_round.reservation_units.values_list("pk", flat=True))
     round_pricing = _load_round_pricing(
@@ -156,6 +157,7 @@ def check_pricing_change_keeps_round_options(
             rows=[*other_group_rows, *changed_group_rows],
             components=new_components,
             implicit_options=_load_implicit_options(new_components),
+            active_explicit_option_pks=_load_active_explicit_option_pks(new_components),
         )
 
         errors += _check_round_change(
@@ -171,7 +173,8 @@ def check_price_option_change_keeps_round_options(price_option: PriceOption) -> 
     """
     Check a new or changed price option against the application rounds whose reservations are not made yet.
 
-    A base component without an option offers every active option of its unit group.
+    A base component without an option offers every active option of its unit group,
+    and a base component with an option offers it only while it is active.
     So a new, deactivated or moved option can change the options of a round.
     Each such round must stay consistent and must not lose any of the options it offers.
 
@@ -210,7 +213,15 @@ def check_price_option_change_keeps_round_options(price_option: PriceOption) -> 
         if price_option.is_active and price_option.unit_group_id in implicit_options:
             implicit_options[price_option.unit_group_id].append(price_option)
 
-        new_pricing = dataclasses.replace(saved_pricing, implicit_options=implicit_options)
+        active_explicit_option_pks = saved_pricing.active_explicit_option_pks - {price_option.pk}
+        if price_option.is_active and price_option.pk is not None:
+            active_explicit_option_pks |= {price_option.pk}
+
+        new_pricing = dataclasses.replace(
+            saved_pricing,
+            implicit_options=implicit_options,
+            active_explicit_option_pks=active_explicit_option_pks,
+        )
 
         errors += _check_round_change(
             round_name=application_round.name,
@@ -232,6 +243,7 @@ class _RoundPricing:
     rows: list[ReservationUnitPricingGroup]
     components: list[PriceComponent]  # Base components
     implicit_options: dict[int, list[PriceOption]]  # Active options by unit group, for components without an option
+    active_explicit_option_pks: frozenset[int]  # Active options that components point to
 
 
 def _load_round_pricing(
@@ -261,6 +273,7 @@ def _load_round_pricing(
         rows=rows,
         components=components,
         implicit_options=_load_implicit_options(components),
+        active_explicit_option_pks=_load_active_explicit_option_pks(components),
     )
 
 
@@ -275,6 +288,12 @@ def _load_implicit_options(components: Iterable[PriceComponent]) -> dict[int, li
     for option in PriceOption.objects.filter(unit_group__in=unit_group_pks, is_active=True):
         implicit_options.setdefault(option.unit_group_id, []).append(option)
     return implicit_options
+
+
+def _load_active_explicit_option_pks(components: Iterable[PriceComponent]) -> frozenset[int]:
+    option_pks = {component.price_option_id for component in components if component.price_option_id is not None}
+    active_option_pks = PriceOption.objects.filter(pk__in=option_pks, is_active=True).values_list("pk", flat=True)
+    return frozenset(active_option_pks)
 
 
 def _reservations_are_pending(application_round: ApplicationRound) -> bool:
@@ -393,7 +412,8 @@ def _option_sets_by_reservation_unit(round_pricing: _RoundPricing) -> dict[int, 
             options: set[int] = set()
             for component in active_components:
                 if component.price_option_id is not None:
-                    options.add(component.price_option_id)
+                    if component.price_option_id in round_pricing.active_explicit_option_pks:
+                        options.add(component.price_option_id)
                     continue
 
                 unit_group_options = round_pricing.implicit_options.get(component.pricing_group.unit_group_id, [])
