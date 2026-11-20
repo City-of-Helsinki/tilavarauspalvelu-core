@@ -13,52 +13,52 @@ if TYPE_CHECKING:
 
 @dataclasses.dataclass
 class IDToken:
-    iss: str
+    iss: str | None
     """token issuer: tunnistamo url"""
-    sub: str
+    sub: str | None
     """token subject: uuid"""
-    aud: str
+    aud: str | None
     """token audience: tilavaraus-{env}"""
-    jti: str
+    jti: str | None
     """JWT ID: uuid"""
-    typ: Literal["ID"]
+    typ: Literal["ID"] | None
     """token type: ID"""
-    exp: int
+    exp: int | None
     """token expiration date: unix epoch timestamp"""
-    iat: int
+    iat: int | None
     """token issued-at: unix epoch timestamp"""
-    auth_time: int
+    auth_time: int | None
     """when end-user auth occurred: unix epoch timestamp"""
-    nonce: str
+    nonce: str | None
     """random string"""
-    at_hash: str
+    at_hash: str | None
     """access token hash: sha256"""
-    name: str
+    name: str | None
     """user name"""
-    preferred_username: str
+    preferred_username: str | None
     """user preferred username"""
-    given_name: str
+    given_name: str | None
     """user given name"""
-    family_name: str
+    family_name: str | None
     """user family name"""
-    email: str
+    email: str | None
     """user email"""
-    email_verified: bool
+    email_verified: bool | None
     """Whether the is email verified or not"""
-    ad_groups: list[str]
+    ad_groups: list[str] | None
     """list of ad groups the user belongs to"""
-    azp: str
+    azp: str | None
     """authorized party: tilavaraus-{env}"""
-    sid: str
+    sid: str | None
     """session id: uuid"""
-    session_state: str
+    session_state: str | None
     """session state: uuid"""
-    amr: str | list[str]
+    amr: str | list[str] | None
     """
     authentication methods reference:
     suomi_fi | heltunnistussuomifi | helsinki_adfs | helsinkiad | helsinkiazuread | eduad
     """
-    loa: Literal["substantial", "high", "low"]
+    loa: Literal["substantial", "high", "low"] | None
     """level of authentication"""
 
     @classmethod
