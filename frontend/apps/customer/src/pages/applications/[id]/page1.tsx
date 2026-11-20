@@ -38,8 +38,8 @@ import { getApplicationPath } from "@/modules/urls";
 function Page1({
   application,
   options: optionsOrig,
-  priceOptions,
-}: Pick<PropsNarrowed, "application" | "options" | "priceOptions">): React.ReactElement {
+  priceOptionList,
+}: Pick<PropsNarrowed, "application" | "options" | "priceOptionList">): React.ReactElement {
   const router = useRouter();
   const dislayError = useDisplayError();
   const [mutate, { loading: isSaving }] = useUpdateApplicationMutation();
@@ -75,7 +75,7 @@ function Page1({
     mode: "onChange",
     defaultValues: convertApplicationPage1(application, getReservationUnits()),
     resolver: zodResolver(
-      ApplicationPage1SchemaRefined({ begin, end }, { isPriceOptionRequired: priceOptions.length > 0 })
+      ApplicationPage1SchemaRefined({ begin, end }, { isPriceOptionRequired: priceOptionList.length > 0 })
     ),
   });
 
@@ -91,7 +91,7 @@ function Page1({
             applicationRound={applicationRound}
             isSaving={isSaving || form.formState.isSubmitting}
             options={options}
-            priceOptions={priceOptions}
+            priceOptionList={filterNonNullable(priceOptionList)}
           />
         </ApplicationFunnelWrapper>
       </Flex>
@@ -128,26 +128,28 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (application == null) {
     return notFound;
   }
-  const { data: priceOptionsData } = await client.query<
+  const searchOptionsPromise = getSearchOptions(client, "seasonal", locale ?? "fi");
+  const pricingOptionsPromise = application.applicationRound.pk != null ? client.query<
     ApplicationRoundPriceOptionsQuery,
     ApplicationRoundPriceOptionsQueryVariables
   >({
     query: APPLICATION_PAGE1_PRICE_OPTIONS_QUERY,
     variables: {
-      applicationRound: application.applicationRound.pk ?? 0,
+      applicationRound: application.applicationRound.pk,
     },
-  });
-  const { applicationRoundPriceOptions } = priceOptionsData;
+  }) : null;
 
-  const options = await getSearchOptions(client, "seasonal", locale ?? "fi");
-  const priceOptions = filterNonNullable(applicationRoundPriceOptions).map((option) =>
-    translateOption(option, getLocalizationLang(locale) ?? "fi")
-  );
+  const [searchOptionsList, pricingOptionsRaw] = await Promise.all([searchOptionsPromise, pricingOptionsPromise]);
+  const priceOptionList = filterNonNullable(pricingOptionsRaw?.data?.applicationRoundPriceOptions ?? []).map((option) => {
+    if (option.isActive) {
+      return translateOption(option, getLocalizationLang(locale));
+    }
+  });
   return {
     props: {
       application,
-      options,
-      priceOptions,
+      options: searchOptionsList,
+      priceOptionList,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -170,9 +172,6 @@ export const APPLICATION_PAGE1_PRICE_OPTIONS_QUERY = gql`
       nameFi
       nameSv
       nameEn
-      descriptionFi
-      descriptionSv
-      descriptionEn
       isActive
     }
   }
