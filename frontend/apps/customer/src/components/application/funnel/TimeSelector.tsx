@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from "react";
 import type { Control } from "react-hook-form";
-import { Controller, useController, useFormContext, useFormState, useWatch } from "react-hook-form";
+import { Controller, useController, useFormContext, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
-import { Button, ButtonSize, ButtonVariant, NotificationSize, RadioButton } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, RadioButton, Tabs } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { arrow, WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar/styles";
@@ -10,13 +10,11 @@ import type { WeeklyPatternCellInfo, WeeklyPatternValue } from "@ui/components/W
 import { WeeklyPatternCalendar } from "@ui/components/WeeklyPatternCalendar/WeeklyPatternCalendar";
 import { breakpoints } from "@ui/modules/const";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
-import { ErrorText } from "ui/src/components/ErrorText";
 import { ControlledSelect } from "ui/src/components/form";
-import { errorToast, successToast } from "ui/src/components/toast";
+import { successToast, toast } from "ui/src/components/toast";
 import { formatDuration } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import {
-  countFittingReservations,
   findTooShortReasons,
   fromPattern,
   isInsideOpeningHours,
@@ -30,11 +28,9 @@ import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
 import { Flex } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
-import { TimePreview } from "@/components/application/funnel/TimePreview";
-import { OUTSIDE_OPENING_HOURS_ERROR, TOO_SHORT_ERROR } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
-import { describeTime, SuitableTimeRangeForm } from "./SuitableTimeRangeForm";
-import { findOutsideListed, findTooShortListed, hasSameTimes, listTimeRanges } from "./timeSelectorModule";
+import { SuitableTimeRangeForm } from "./SuitableTimeRangeForm";
+import { hasSameTimes } from "./timeSelectorModule";
 
 export type TimeSelectorProps = {
   index: number;
@@ -52,6 +48,15 @@ export type TimeSelectorProps = {
 function sectionNames(sections: ReadonlyArray<{ section: { name: string } }>): string {
   return sections.map(({ section }) => section.name).join(", ");
 }
+
+const TimeSelectorRoot = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
+  padding-bottom: var(--spacing-m);
+  border-bottom: 1px solid var(--color-black-50);
+`;
 
 export function TimeSelectorForm({
   index,
@@ -100,9 +105,10 @@ export function TimeSelectorForm({
     // fix them in that section rather than lose them silently.
     const outside = otherSections().filter(({ i }) => !isInsideOpeningHours(times, allSectionsOpeningHours[i] ?? []));
     if (outside.length > 0) {
-      errorToast({
+      toast({
         text: t("application:Page2.notification.copyCellsOutsideOpeningHours", { names: sectionNames(outside) }),
         dataTestId: "application__page2--notification-error",
+        type: "alert",
       });
       return;
     }
@@ -114,7 +120,7 @@ export function TimeSelectorForm({
 
   const formId = `time-selector__form-${index}`;
 
-  const enableCopyCells = filterNonNullable(applicationSections).length > 1;
+  const enableCopyCells = filterNonNullable(applicationSections).length > 1 && getCopiedTimes().length > 0;
   const onChange = (pattern: WeeklyPatternValue<SuitableTimeData>) => {
     setValue(`applicationSections.${index}.suitableTimeRanges`, fromPattern(pattern), {
       shouldDirty: true,
@@ -175,58 +181,64 @@ export function TimeSelectorForm({
   const getStateLabel = (cell: WeeklyPatternCellInfo<SuitableTimeData>) =>
     t(`application:TimeSelector.legend.${cell.data ? priorityKey(cell.data.priority) : cell.availability}`);
   return (
-    // minmax(0, 1fr) instead of the implicit auto column: an auto track grows to its widest child's min-content
-    // (e.g. a long reservation unit name in the select), which would push the whole accordion wider than the viewport.
-    <Flex style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)" }} $marginTop="m">
+    <TimeSelectorRoot>
       <PrioritySelector index={index} control={control} />
-      <ControlledSelect
-        name={`applicationSections.${index}.reservationUnitPk`}
-        label={t("application:Page2.reservationUnitSelectLabel")}
-        control={control}
-        options={reservationUnitOptions}
-      />
-      <Controller
-        control={control}
-        name={`applicationSections.${index}.suitableTimeRanges`}
-        render={({ field }) => (
-          <WeeklyPatternCalendar<SuitableTimeData>
-            ref={field.ref}
-            name={field.name}
-            value={toPattern(field.value)}
-            onChange={(pattern) => onChange(pattern)}
-            onBlur={field.onBlur}
-            step={SUITABLE_TIME_STEP_MINUTES}
-            availability={availability}
-            paintable={paintable}
-            visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
-            brush={{ priority }}
-            getStateLabel={(cell) => getStateLabel(cell)}
-            getRunError={(cell, dayRuns) => getRunError(cell, dayRuns)}
-            getCellAppearance={({ priority: cellPriority }) =>
-              cellPriority === Priority.Primary ? "primary" : "secondary"
-            }
-            announcements={{
-              painted: t("application:TimeSelector.announcements.painted"),
-              erased: t("application:TimeSelector.announcements.erased"),
-            }}
-            alternative={{ id: formId, label: t("application:TimeSelector.skipToForm") }}
-            aria-label={t("application:TimeSelector.calendarLabel")}
-          />
-        )}
-      />
-      <WeeklyPatternLegend
-        items={[
-          { state: "open", label: t("application:TimeSelector.legend.open") },
-          { state: "closed", label: t("application:TimeSelector.legend.closed") },
-          { state: "unavailable", label: t("application:TimeSelector.legend.unavailable") },
-          { state: "invalid", label: t("application:TimeSelector.legend.invalid") },
-        ]}
-      />
+      <Tabs>
+        <Tabs.TabList>
+          <Tabs.Tab>{t("application:TimeSelector.calendarLabel")}</Tabs.Tab>
+          <Tabs.Tab>{t("application:TimeSelector.formLabel")}</Tabs.Tab>
+        </Tabs.TabList>
+        <Tabs.TabPanel>
+          <Flex style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)" }} $marginTop="m">
+            <ControlledSelect
+              name={`applicationSections.${index}.reservationUnitPk`}
+              label={t("application:Page2.reservationUnitSelectLabel")}
+              control={control}
+              options={reservationUnitOptions}
+            />
+            <Controller
+              control={control}
+              name={`applicationSections.${index}.suitableTimeRanges`}
+              render={({ field }) => (
+                <WeeklyPatternCalendar<SuitableTimeData>
+                  ref={field.ref}
+                  name={field.name}
+                  value={toPattern(field.value)}
+                  onChange={(pattern) => onChange(pattern)}
+                  onBlur={field.onBlur}
+                  step={SUITABLE_TIME_STEP_MINUTES}
+                  availability={availability}
+                  paintable={paintable}
+                  visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
+                  brush={{ priority }}
+                  getStateLabel={(cell) => getStateLabel(cell)}
+                  getRunError={(cell, dayRuns) => getRunError(cell, dayRuns)}
+                  getCellAppearance={({ priority: cellPriority }) =>
+                    cellPriority === Priority.Primary ? "primary" : "secondary"
+                  }
+                  announcements={{
+                    painted: t("application:TimeSelector.announcements.painted"),
+                    erased: t("application:TimeSelector.announcements.erased"),
+                  }}
+                  aria-label={t("application:TimeSelector.calendarLabel")}
+                />
+              )}
+            />
+            <WeeklyPatternLegend
+              items={[
+                { state: "open", label: t("application:TimeSelector.legend.open") },
+                { state: "closed", label: t("application:TimeSelector.legend.closed") },
+                { state: "unavailable", label: t("application:TimeSelector.legend.unavailable") },
+                { state: "invalid", label: t("application:TimeSelector.legend.invalid") },
+              ]}
+            />
+          </Flex>
+        </Tabs.TabPanel>
+        <Tabs.TabPanel>
+          <SuitableTimeRangeForm id={formId} index={index} openingHours={sectionOpeningHours} />
+        </Tabs.TabPanel>
+      </Tabs>
 
-      <SuitableTimeRangeForm id={formId} index={index} openingHours={sectionOpeningHours} />
-      <div data-testid={`time-selector__preview-${index}`}>
-        <TimePreview index={index} openingHours={sectionOpeningHours} />
-      </div>
       {enableCopyCells && (
         <div>
           <Button
@@ -248,8 +260,7 @@ export function TimeSelectorForm({
           />
         </div>
       )}
-      <ErrorMessage index={index} openingHours={sectionOpeningHours} />
-    </Flex>
+    </TimeSelectorRoot>
   );
 }
 
@@ -344,91 +355,6 @@ function PrioritySelector({
         />
       ))}
     </RadioGroup>
-  );
-}
-
-/** Which of the listed times an error message is about, position for position. None for the other errors. */
-function flagListedTimes(
-  errorMsg: string | undefined,
-  listed: WeeklyPatternValue<SuitableTimeData>,
-  minDuration: number,
-  openingHours: Readonly<TimeSelectorFragment[]>
-): boolean[] {
-  if (errorMsg === TOO_SHORT_ERROR) {
-    return findTooShortListed(listed, minDuration);
-  }
-  if (errorMsg === OUTSIDE_OPENING_HOURS_ERROR) {
-    return findOutsideListed(listed, openingHours);
-  }
-  return [];
-}
-
-function ErrorMessage({
-  index,
-  openingHours,
-}: Readonly<{
-  index: number;
-  openingHours: Readonly<TimeSelectorFragment[]>;
-}>): React.ReactElement | null {
-  const { t } = useTranslation();
-  const fieldName = `applicationSections.${index}.suitableTimeRanges` as const;
-  const { control, getFieldState } = useFormContext<ApplicationPage2FormValues>();
-  const ranges = useWatch({ name: fieldName, control }) ?? [];
-  const minDuration = useWatch({ name: `applicationSections.${index}.minDuration`, control });
-  const applied = useWatch({ name: `applicationSections.${index}.appliedReservationsPerWeek`, control });
-  // Subscribes to the field's validation, which finishes after the change that re-rendered this.
-  const formState = useFormState({ control, name: fieldName });
-  const state = getFieldState(fieldName, formState);
-  if (!state.invalid) {
-    return null;
-  }
-  const errorMsg = state.error?.message;
-  const msg = errorMsg
-    ? t(`application:validation.calendar.${errorMsg}`, {
-        applied,
-        fitting: countFittingReservations(ranges, minDuration),
-      })
-    : t("errors:general_error");
-
-  // The times an error is about, named as in the time list, by the same rules that flag them there.
-  const listed = listTimeRanges(ranges);
-  const flags = flagListedTimes(errorMsg, listed, minDuration, openingHours);
-  const invalidTimes = listed
-    .filter((_, position) => flags[position])
-    .map(({ weekday, beginMinutes, endMinutes, data }) => {
-      const time = describeTime(t, weekday, beginMinutes, endMinutes);
-      const priorityLabel = t(`application:TimeSelector.legend.${priorityKey(data.priority)}`);
-      return `${time}, ${priorityLabel}`;
-    });
-
-  return (
-    <ErrorText
-      size={NotificationSize.Medium}
-      title={
-        errorMsg === OUTSIDE_OPENING_HOURS_ERROR
-          ? t("application:validation.calendar.outsideOpeningHoursTitle")
-          : t("application:validation.calendar.title")
-      }
-      data-testid="application__page2--notification-min-duration"
-    >
-      {msg}
-      {invalidTimes.length > 0 && (
-        <>
-          <p id={`time-selector__invalid-times-${index}`}>
-            {t(
-              errorMsg === TOO_SHORT_ERROR
-                ? "application:validation.calendar.tooShortTimes"
-                : "application:validation.calendar.outsideOpeningHoursTimes"
-            )}
-          </p>
-          <ul aria-labelledby={`time-selector__invalid-times-${index}`}>
-            {invalidTimes.map((time) => (
-              <li key={time}>{time}</li>
-            ))}
-          </ul>
-        </>
-      )}
-    </ErrorText>
   );
 }
 

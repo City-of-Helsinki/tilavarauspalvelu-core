@@ -15,6 +15,7 @@ type Props = {
   title?: string;
   className?: string;
   style?: React.CSSProperties;
+  id?: string;
   [key: `data-${string}`]: string;
   [key: `aria-${string}`]: string;
 };

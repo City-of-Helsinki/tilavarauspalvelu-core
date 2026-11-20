@@ -10,13 +10,19 @@ import { Priority, Weekday } from "@gql/gql-types";
 import type { ApplicationPage2Query, TimeSelectorFragment } from "@gql/gql-types";
 import { createMockApplicationFragment } from "@test/application.mocks";
 import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { getSelectOptionLabels, getSelectOptions, selectOption } from "@test/test.utils";
 import { ApplicationPage2SchemaRefined, convertApplicationPage2 } from "./form";
 import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from "./TimeSelector";
 import type { TimeSelectorProps } from "./TimeSelector";
+import { TimesErrorSummary } from "./TimesErrorSummary";
 
-const { errorToast, successToast } = vi.hoisted(() => ({ errorToast: vi.fn(), successToast: vi.fn() }));
-vi.mock("ui/src/components/toast", () => ({ errorToast, successToast }));
+const { errorToast, successToast, toast } = vi.hoisted(() => ({
+  errorToast: vi.fn(),
+  successToast: vi.fn(),
+  toast: vi.fn(),
+}));
+vi.mock("ui/src/components/toast", () => ({ errorToast, successToast, toast }));
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 
@@ -45,6 +51,8 @@ interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   appliedReservationsPerWeek?: number;
   /** Defaults to `sectionOpeningHours` for every section. */
   allSectionsOpeningHours?: TimeSelectorProps["allSectionsOpeningHours"];
+  /** Called when a section's link in the error summary is followed. */
+  onShowSection?: (index: number) => void;
 }
 
 function customRender(props: TimeSelectorMockProps = {}): ReturnType<typeof render> {
@@ -62,6 +70,7 @@ function WrapTimeSelector({
   allSectionsOpeningHours,
   validate = false,
   appliedReservationsPerWeek,
+  onShowSection = vi.fn(),
   ...props
 }: TimeSelectorMockProps) {
   const application: ApplicationPage2 = createMockApplicationFragment(props);
@@ -104,9 +113,16 @@ function WrapTimeSelector({
         />
         <button type="submit">submit</button>
         {validate && (
-          <button type="button" onClick={() => void form.trigger()}>
-            validate
-          </button>
+          <>
+            <TimesErrorSummary
+              allSectionsOpeningHours={sectionsOpeningHours}
+              onShowSection={onShowSection}
+              getSectionId={(i) => `timeSelector-${i}`}
+            />
+            <button type="button" onClick={() => void form.trigger()}>
+              validate
+            </button>
+          </>
         )}
       </FormProvider>
     </form>
@@ -164,7 +180,19 @@ function cellName(
 }
 
 function getGrid(view: ReturnType<typeof render>) {
-  return view.getByLabelText("application:TimeSelector.calendarLabel");
+  return view.getByRole("grid", { name: "application:TimeSelector.calendarLabel" });
+}
+
+/** Shows the form tab, where only one tab panel is rendered at a time, and returns the form. */
+async function openFormTab(view: ReturnType<typeof render>): Promise<HTMLElement> {
+  await userEvent.setup().click(view.getByRole("tab", { name: "application:TimeSelector.formLabel" }));
+  return view.getByTestId("time-selector__form-0");
+}
+
+/** Shows the calendar tab again and returns the calendar. */
+async function openCalendarTab(view: ReturnType<typeof render>): Promise<HTMLElement> {
+  await userEvent.setup().click(view.getByRole("tab", { name: "application:TimeSelector.calendarLabel" }));
+  return getGrid(view);
 }
 
 describe("TimeSelector render single section", () => {
@@ -322,8 +350,15 @@ describe("TimeSelector render single section", () => {
   });
 
   test("should have a copy buttons if more than one section", () => {
-    const view = customRender({ nSections: 2 });
+    // The page2 mock has a time on Wednesday to copy.
+    const view = customRender({ page: "page2", nSections: 2 });
     expect(view.getByRole("button", { name: "application:Page2.copyTimes" })).toBeInTheDocument();
+  });
+
+  test("should not have a copy button if there are no times to copy", () => {
+    // The page1 mock has no times.
+    const view = customRender({ nSections: 2 });
+    expect(view.queryByRole("button", { name: "application:Page2.copyTimes" })).not.toBeInTheDocument();
   });
 });
 
@@ -654,6 +689,7 @@ describe("TimeSelector copy times", () => {
   beforeEach(() => {
     errorToast.mockClear();
     successToast.mockClear();
+    toast.mockClear();
   });
 
   test("copies the selection to every section without carrying primary keys over", async () => {
@@ -707,31 +743,30 @@ describe("TimeSelector copy times", () => {
     expect(successToast).toHaveBeenCalledOnce();
   });
 
-  test("shows an error when the copied times are outside another section's opening hours", async () => {
+  test("warns when the copied times are outside another section's opening hours", async () => {
     const user = userEvent.setup();
     const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
     const view = customRender({ page: "page2", nSections: 2, allSectionsOpeningHours: [OPEN_ALL_WEEK, mondayOnly] });
 
     await user.click(view.getByRole("button", { name: "application:Page2.copyTimes" }));
 
-    expect(errorToast).toHaveBeenCalledWith(
-      expect.objectContaining({ text: expect.stringContaining("copyCellsOutsideOpeningHours") })
+    expect(toast).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "alert", text: expect.stringContaining("copyCellsOutsideOpeningHours") })
     );
     expect(successToast).not.toHaveBeenCalled();
   });
 });
 
 describe("TimeSelector times outside the opening hours", () => {
-  test("are marked in the list, before being too short", () => {
+  test("are marked in the list", async () => {
     // The mock section has a time on Wednesday, 08:00-16:00, long enough but outside these hours.
     const mondayOnly = OPEN_ALL_WEEK.filter(({ weekday }) => weekday === Weekday.Monday);
     const view = customRender({ page: "page2", reservationUnitOpeningHours: mondayOnly });
 
-    const item = within(view.getByTestId("time-selector__form-0")).getByRole("listitem");
-    expect(item).toHaveTextContent(
-      "application:TimeSelector.legend.primary - (application:TimeSelector.form.outsideOpeningHours!)"
-    );
+    const item = within(await openFormTab(view)).getByRole("listitem");
+    expect(item).toHaveTextContent(`${weekdayLabel(Weekday.Wednesday)}08:00–16:00`);
     expect(item).toHaveAttribute("data-invalid");
+    expect(item).toHaveAttribute("aria-invalid", "true");
   });
 
   test("are shown as invalid", () => {
@@ -745,24 +780,59 @@ describe("TimeSelector times outside the opening hours", () => {
   });
 });
 
-describe("TimeSelector preview", () => {
-  test("shows the invalid times in the error colour, and says so", async () => {
-    const user = userEvent.setup();
-    const view = customRender({ page: "page2" });
-    await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
-
-    const preview = view.getByTestId("time-selector__preview-0");
-    const invalid = [...preview.querySelectorAll("[data-invalid]")].map((el) => el.textContent);
-    // Tuesday's 15 min is too short. Wednesday's 8 h is fine.
-    expect(invalid).toEqual(["14–14:15 (application:TimeSelector.legend.invalid)"]);
-    expect(preview).toHaveTextContent("8–16");
-  });
-});
-
-describe("TimeSelector error message", () => {
+describe("TimeSelector error summary", () => {
   function findError(view: ReturnType<typeof render>) {
-    return view.findByTestId("application__page2--notification-min-duration");
+    return view.findByTestId("application__page2--error-summary");
   }
+
+  test("is shown on load for the errors already in the saved times", async () => {
+    // The mock's Wednesday 08:00-16:00 fits four reservations of 2 h, not the five applied for.
+    const view = customRender({ page: "page2", validate: true, nSections: 2, appliedReservationsPerWeek: 5 });
+
+    const error = await findError(view);
+    for (const index of [0, 1]) {
+      expect(within(error).getByTestId(`application__page2--error-summary-section-${index}`)).toHaveTextContent(
+        'application:validation.calendar.At least as many suitable time ranges as applied reservations per week {"applied":5,"fitting":4}'
+      );
+    }
+  });
+
+  test("is not shown while every section is valid", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2", validate: true });
+    await user.click(view.getByRole("button", { name: "validate" }));
+
+    expect(view.queryByTestId("application__page2--error-summary")).not.toBeInTheDocument();
+  });
+
+  test("lists the errors of every invalid section, with a link to it", async () => {
+    const user = userEvent.setup();
+    const onShowSection = vi.fn();
+    const view = customRender({
+      page: "page2",
+      validate: true,
+      nSections: 2,
+      appliedReservationsPerWeek: 5,
+      onShowSection,
+    });
+    await user.click(view.getByRole("button", { name: "validate" }));
+
+    const error = await findError(view);
+    for (const index of [0, 1]) {
+      const item = within(error).getByTestId(`application__page2--error-summary-section-${index}`);
+      expect(item).toHaveTextContent(
+        'application:validation.calendar.At least as many suitable time ranges as applied reservations per week {"applied":5,"fitting":4}'
+      );
+      // The link names the section and the error: "{section name}: {error title}"
+      const link = within(item).getByRole("link", { name: "foobar: application:validation.calendar.title" });
+      expect(link).toHaveAttribute("href", `#timeSelector-${index}`);
+    }
+
+    await user.click(
+      within(within(error).getByTestId("application__page2--error-summary-section-1")).getByRole("link")
+    );
+    expect(onShowSection).toHaveBeenCalledWith(1);
+  });
 
   test("tells how many reservations per week were applied for, and how many fit", async () => {
     const user = userEvent.setup();
@@ -774,7 +844,7 @@ describe("TimeSelector error message", () => {
     expect(error).toHaveTextContent(
       'application:validation.calendar.At least as many suitable time ranges as applied reservations per week {"applied":5,"fitting":4}'
     );
-    expect(within(error).queryByRole("list")).not.toBeInTheDocument();
+    expect(within(error).getAllByRole("list")).toHaveLength(1); // only the list of sections, no list of times
   });
 
   test("lists the too short times", async () => {
@@ -865,35 +935,50 @@ describe("TimeSelector priority select", () => {
   });
 });
 
-describe("TimeSelector form alternative", () => {
-  function getForm(view: ReturnType<typeof render>) {
-    return view.getByTestId("time-selector__form-0");
+const FORM_DAY = "application:TimeSelector.form.day";
+const FORM_FROM = "application:TimeSelector.form.from";
+const FORM_TO = "application:TimeSelector.form.to";
+
+/** Picks a time in the time selector form, leaving out the fields not given. */
+async function pickTime(
+  form: HTMLElement,
+  { day, from, to }: { day?: Weekday; from?: number; to?: number }
+): Promise<void> {
+  if (day != null) {
+    await selectOption(within(form), FORM_DAY, weekdayLabel(day));
   }
+  if (from != null) {
+    await selectOption(within(form), FORM_FROM, hhmm(from));
+  }
+  if (to != null) {
+    await selectOption(within(form), FORM_TO, hhmm(to));
+  }
+}
 
-  test("has a skip link from the calendar to the form", () => {
-    const view = customRender();
-    expect(view.getByRole("link", { name: "application:TimeSelector.skipToForm" })).toHaveAttribute(
-      "href",
-      "#time-selector__form-0"
-    );
-    expect(getForm(view)).toHaveAttribute("id", "time-selector__form-0");
-  });
+/** The options a select in the time selector form offers, by their labels. */
+function getOptionLabels(form: HTMLElement, label: string): Promise<string[]> {
+  return getSelectOptionLabels(within(form), label);
+}
 
+/** The label of the option a select in the time selector form shows as picked. */
+function getPickedLabel(form: HTMLElement, label: string): string {
+  return within(form).getByLabelText(label, { selector: "button" }).textContent ?? "";
+}
+
+describe("TimeSelector form alternative", () => {
   test("a time can be added with the form and shows in the calendar", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     const view = customRender({ onSubmit });
-    const form = getForm(view);
+    const form = await openFormTab(view);
 
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.day"), Weekday.Thursday);
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(10 * 60));
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(12 * 60));
+    await pickTime(form, { day: Weekday.Thursday, from: 10 * 60, to: 12 * 60 });
     await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
 
-    expect(
-      within(getGrid(view)).getByLabelText(cellName("primary", Weekday.Thursday, 10 * 60, 12 * 60))
-    ).toHaveAttribute("aria-selected", "true");
     expect(within(form).getByRole("status")).toHaveTextContent("application:TimeSelector.announcements.painted");
+    expect(
+      within(await openCalendarTab(view)).getByLabelText(cellName("primary", Weekday.Thursday, 10 * 60, 12 * 60))
+    ).toHaveAttribute("aria-selected", "true");
 
     await user.click(view.getByRole("button", { name: "submit" }));
     expect(onSubmit).toHaveBeenCalledWith(
@@ -905,7 +990,7 @@ describe("TimeSelector form alternative", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     const view = customRender({ page: "page2", onSubmit });
-    const form = getForm(view);
+    const form = await openFormTab(view);
 
     await user.click(within(form).getByRole("button", { name: /application:TimeSelector\.form\.removeTime/ }));
     expect(within(form).getByText("application:TimeSelector.form.empty")).toBeInTheDocument();
@@ -914,34 +999,73 @@ describe("TimeSelector form alternative", () => {
     expect(onSubmit).toHaveBeenCalledWith(createMockSubmitValues([]));
   });
 
-  test("a time that ends before it starts is refused", async () => {
-    const user = userEvent.setup();
-    const view = customRender();
-    const form = getForm(view);
+  // Tuesday opens 10:00-12:00 and Thursday 14:00-15:00, every other day is closed.
+  const twoDays: TimeSelectorFragment[] = [
+    {
+      id: createNodeId("TimeSelector", 0),
+      weekday: Weekday.Tuesday,
+      isClosed: false,
+      reservableTimes: [{ begin: "10:00:00", end: "12:00:00" }],
+    },
+    {
+      id: createNodeId("TimeSelector", 1),
+      weekday: Weekday.Thursday,
+      isClosed: false,
+      reservableTimes: [{ begin: "14:00:00", end: "15:00:00" }],
+    },
+  ];
+  const quarters = (from: number, to: number) =>
+    Array.from({ length: (to - from) / STEP + 1 }, (_, i) => hhmm(from + i * STEP));
 
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(12 * 60));
-    await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(11 * 60));
-    await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
+  test("lists every day, but only the open days can be picked", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
 
-    expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.endAfterStart");
+    const options = await getSelectOptions(within(await openFormTab(view)), FORM_DAY);
+    expect(options).toEqual(
+      WEEKDAYS_SORTED.map((day) => ({
+        label: weekdayLabel(day),
+        disabled: day !== Weekday.Tuesday && day !== Weekday.Thursday,
+      }))
+    );
   });
 
-  test("a time outside the opening hours is refused", async () => {
-    const user = userEvent.setup();
-    const openTimes: TimeSelectorFragment[] = [
-      {
-        id: createNodeId("TimeSelector", 0),
-        weekday: Weekday.Tuesday,
-        isClosed: false,
-        reservableTimes: [{ begin: "10:00:00", end: "12:00:00" }],
-      },
-    ];
-    const view = customRender({ reservationUnitOpeningHours: openTimes });
-    const form = getForm(view);
+  test("offers only the open start times of the day, and the end times the start reaches", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
+    const form = await openFormTab(view);
 
-    await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
+    expect(await getOptionLabels(form, FORM_FROM)).toEqual(quarters(10 * 60, 11 * 60 + 45));
+    await pickTime(form, { from: 11 * 60 });
+    expect(await getOptionLabels(form, FORM_TO)).toEqual(quarters(11 * 60 + 15, 12 * 60));
+  });
 
-    expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.outsideReservable");
+  test("starts on the first open time, an hour long", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
+    const form = await openFormTab(view);
+
+    expect(getPickedLabel(form, FORM_DAY)).toContain(weekdayLabel(Weekday.Tuesday));
+    expect(getPickedLabel(form, FORM_FROM)).toContain("10:00");
+    expect(getPickedLabel(form, FORM_TO)).toContain("11:00");
+  });
+
+  test("moves the times onto the opening hours of a newly picked day", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
+    const form = await openFormTab(view);
+
+    await pickTime(form, { day: Weekday.Thursday });
+
+    expect(getPickedLabel(form, FORM_FROM)).toContain("14:00");
+    expect(getPickedLabel(form, FORM_TO)).toContain("15:00");
+    expect(await getOptionLabels(form, FORM_FROM)).toEqual(quarters(14 * 60, 14 * 60 + 45));
+  });
+
+  test("keeps an end time that the new start time still reaches", async () => {
+    const view = customRender({ reservationUnitOpeningHours: twoDays, sectionOpeningHours: twoDays });
+    const form = await openFormTab(view);
+
+    await pickTime(form, { to: 12 * 60 });
+    await pickTime(form, { from: 11 * 60 });
+
+    expect(getPickedLabel(form, FORM_TO)).toContain("12:00");
   });
 });
 
@@ -996,24 +1120,21 @@ describe("TimeSelector with several reservation units", () => {
     expect(onSubmit).toHaveBeenCalledWith(createMockSubmitValues([]));
   });
 
-  test("the form adds a time only another unit opens, and refuses one no unit opens", async () => {
+  test("the form offers and adds times only another unit opens, but not ones no unit opens", async () => {
     const user = userEvent.setup();
     const view = customRender({ reservationUnitOpeningHours: shownUnit, sectionOpeningHours: sectionUnits });
-    const form = view.getByTestId("time-selector__form-0");
-    const add = async (from: number, to: number) => {
-      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.day"), Weekday.Tuesday);
-      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.from"), String(from));
-      await user.selectOptions(within(form).getByLabelText("application:TimeSelector.form.to"), String(to));
-      await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
-    };
+    const form = await openFormTab(view);
 
-    await add(12 * 60, 13 * 60);
+    await pickTime(form, { from: 13 * 60 });
+    expect((await getOptionLabels(form, FORM_TO)).at(-1)).toBe("14:00");
+
+    await pickTime(form, { from: 12 * 60, to: 13 * 60 });
+    await user.click(within(form).getByRole("button", { name: "application:TimeSelector.form.add" }));
     expect(
-      within(getGrid(view)).getByLabelText(cellName("primary", Weekday.Tuesday, 12 * 60, 13 * 60, { tooShort: true }))
+      within(await openCalendarTab(view)).getByLabelText(
+        cellName("primary", Weekday.Tuesday, 12 * 60, 13 * 60, { tooShort: true })
+      )
     ).toBeInTheDocument();
-
-    await add(13 * 60, 15 * 60);
-    expect(within(form).getByRole("alert")).toHaveTextContent("application:TimeSelector.form.errors.outsideReservable");
   });
 
   test("a too short time is marked in the list too", async () => {
@@ -1021,16 +1142,15 @@ describe("TimeSelector with several reservation units", () => {
     const view = customRender({ page: "page2" });
     await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Tuesday, 14 * 60)));
 
-    const items = within(view.getByTestId("time-selector__form-0")).getAllByRole("listitem");
-    const item = (day: Weekday) =>
-      items.find((li) => li.textContent?.startsWith(`common:weekdayLongEnum.${day}`)) ?? null;
-    expect(item(Weekday.Tuesday)).toHaveTextContent(
-      "application:TimeSelector.legend.primary - (application:TimeSelector.form.tooShort!)"
-    );
+    const items = within(await openFormTab(view)).getAllByRole("listitem");
+    // An item shows both the short and the long weekday name, so look for the long one anywhere in it.
+    const item = (day: Weekday) => items.find((li) => li.textContent?.includes(weekdayLabel(day))) ?? null;
+    expect(item(Weekday.Tuesday)).toHaveTextContent("14:00–14:15");
     expect(item(Weekday.Tuesday)).toHaveAttribute("data-invalid");
+    expect(item(Weekday.Tuesday)).toHaveAttribute("aria-invalid", "true");
     // Wednesday's 8 h primary time is long enough.
-    expect(item(Weekday.Wednesday)).not.toHaveTextContent("application:TimeSelector.form.tooShort");
     expect(item(Weekday.Wednesday)).not.toHaveAttribute("data-invalid");
+    expect(item(Weekday.Wednesday)).not.toHaveAttribute("aria-invalid");
   });
 
   test("the legend explains closed and unavailable times apart", () => {

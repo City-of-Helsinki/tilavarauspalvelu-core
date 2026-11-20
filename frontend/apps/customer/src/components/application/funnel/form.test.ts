@@ -362,6 +362,11 @@ describe("page 2 conversions", () => {
     test("is checked alongside the section's other errors", () => {
       expect(messages(valuesWith(Weekday.Tuesday, "10:00", "10:30"))).toContain(outside);
     });
+
+    // The form shows only the first error of a field, so it must not be hidden behind the others.
+    test("comes before the section's other errors of the times", () => {
+      expect(messages(valuesWith(Weekday.Tuesday, "10:00", "10:30"))[0]).toBe(outside);
+    });
   });
 
   test("page 2 validation accepts midnight end times as full-day ranges", () => {

@@ -25,13 +25,16 @@
     "Too big. expected string to have <=80 characters": "Maksimissaan 80 merkkiä",
     "Too big. expected string to have <=32 characters": "Maksimissaan 32 merkkiä",
     "calendar": {
-      "title": "Ilmoitetut aikatoiveet eivät vastaa varauksen kestoa",
-      "Suitable time range must be at least as long as the minimum duration": "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
-      "At least as many suitable time ranges as applied reservations per week": "Haettu varausmäärä viikossa: {{applied}}. Valittuihin aikatoiveisiin mahtuvat varaukset: {{fitting}}. Valitse kalenterista lisää aikatoiveita tai vähennä hakemuksen edellisessä vaiheessa valittua varausten määrää viikossa.",
-      "Required": "Valitse kalenterista aikatoiveita",
-      "outsideOpeningHoursTitle": "Osa aikatoiveista on aukioloaikojen ulkopuolella",
+      "summaryTitle": "Varaustoiveissa on virheitä",
+      "title": "Valitut aikatoiveet eivät vastaa haettua varausmäärää",
+      "Suitable time range must be at least as long as the minimum duration": "Pidennä aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
+      "At least as many suitable time ranges as applied reservations per week": "Haettu varausmäärä viikossa: {{applied}}. Valittuihin aikatoiveisiin mahtuvat varaukset: {{fitting}}.\nValitse kalenterista lisää aikatoiveita tai vähennä hakemuksen edellisessä vaiheessa valittua varausten määrää viikossa.",
+      "requiredTitle": "Ei valittuja aikatoiveita",
+      "Required": "Valitse hakemukseen aikatoiveita",
       "Suitable time range must be inside the opening hours": "Poista tai siirrä kalenterissa virheellisiksi merkityt ajat varaustoiveen tilojen aukioloajoille.",
+      "tooShortTitle": "Liian lyhyt aikatoive",
       "tooShortTimes": "Liian lyhyet aikatoiveet:",
+      "outsideOpeningHoursTitle": "Osa aikatoiveista on aukioloaikojen ulkopuolella",
       "outsideOpeningHoursTimes": "Aukioloaikojen ulkopuolella olevat aikatoiveet:"
     },
     "previewError": "Sivu {{ page }} on virheellinen.",
@@ -66,6 +69,7 @@
   },
   "TimeSelector": {
     "calendarLabel": "Valitse aikatoiveet kalenterista",
+    "formLabel": "Valitse aikatoiveet lomakkeella",
     "legend": {
       "unavailable": "Ei varattavissa missään hakemukselle valituista tiloista",
       "invalid": "Virheellinen aikatoive",
@@ -74,15 +78,12 @@
       "secondary": "Vaihtoehtoinen toive",
       "open": "Varattavissa tässä tilassa"
     },
-    "skipToForm": "Siirry lomakkeeseen, jolla voit lisätä aikoja",
     "announcements": {
       "painted": "Lisätty",
       "erased": "Poistettu"
     },
     "form": {
       "tooShort": "liian lyhyt",
-      "legend": "Lisää aikoja lomakkeella",
-      "priorityNote": "Uudet ajat saavat yllä valitun toiveen tyypin.",
       "day": "Päivä",
       "from": "Alkaa",
       "to": "Päättyy",
@@ -91,10 +92,6 @@
       "empty": "Ei valittuja aikoja.",
       "remove": "Poista",
       "removeTime": "Poista {{time}}",
-      "errors": {
-        "endAfterStart": "Päättymisajan täytyy olla alkamisajan jälkeen.",
-        "outsideReservable": "Aika ei ole varattavissa missään hakemukselle valitussa tilassa."
-      },
       "outsideOpeningHours": "aukioloaikojen ulkopuolella"
     },
     "tooShort": "Aikatoive ({{duration}}) on lyhyempi kuin varauksen vähimmäiskesto ({{minDuration}}). Pidennä aikatoivetta tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
@@ -103,12 +100,12 @@
   },
   "Page2": {
     "subHeading": "Valitse hakemuksen aikatoiveet",
-    "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Useamman tila- ja aikatoiveen ilmoittaminen parantaa mahdollisuuksiasi saada toiveidesi mukaiset tilat ja ajat.",
+    "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Ilmoitathan kaikki sinulle sopivat tila- ja aikatoiveet, sillä vuoro voidaan myöntää vain valitsemiisi tiloihin ja ajankohtiin.",
     "copyTimes": "Kopioi ajat kaikille varaustoiveille",
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",
     "prioritySelectLabel": "Valitse aikatoiveen tyyppi",
-    "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
+    "reservationUnitSelectLabel": "Näytä kalenterissa kausivarattavat ajankohdat tilalle",
     "priorityLabels": {
       "primary": "Ensisijaiset aikatoiveet",
       "secondary": "Vaihtoehtoiset aikatoiveet"

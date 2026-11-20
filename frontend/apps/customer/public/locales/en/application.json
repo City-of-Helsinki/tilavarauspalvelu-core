@@ -25,13 +25,16 @@
     "Too big. expected string to have <=80 characters": "Maximum of 80 characters",
     "Too big. expected string to have <=32 characters": "Maximum of 32 characters",
     "calendar": {
+      "summaryTitle": "Fix the time slots of your requests before continuing",
       "title": "Your selected time slots do not correspond to the duration of your booking",
-      "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
-      "At least as many suitable time ranges as applied reservations per week": "Bookings per week applied for: {{applied}}. Bookings that fit your selected time slots: {{fitting}}. Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
-      "Required": "Select time slots from the calendar",
-      "outsideOpeningHoursTitle": "Some of your time slots are outside the opening hours",
+      "Suitable time range must be at least as long as the minimum duration": "Lengthen the time slots or shorten the minimum duration selected in the previous step of the application.",
+      "At least as many suitable time ranges as applied reservations per week": "Bookings per week applied for: {{applied}}. Bookings that fit your selected time slots: {{fitting}}.\nSelect more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
+      "requiredTitle": "No time slots selected",
+      "Required": "Select time slots for the application",
       "Suitable time range must be inside the opening hours": "Remove the times marked as invalid in the calendar, or move them within the opening hours of this request's spaces.",
+      "tooShortTitle": "Too short time slot",
       "tooShortTimes": "Time slots that are too short:",
+      "outsideOpeningHoursTitle": "Some of your time slots are outside the opening hours",
       "outsideOpeningHoursTimes": "Time slots outside the opening hours:"
     },
     "previewError": "Page {{ page }} has an error.",
@@ -66,6 +69,7 @@
   },
   "TimeSelector": {
     "calendarLabel": "Select time slots from the calendar",
+    "formLabel": "Select time slots with a form",
     "legend": {
       "unavailable": "Not available in any space on this application",
       "invalid": "Invalid time slot",
@@ -74,14 +78,12 @@
       "secondary": "Other suitable time slots",
       "open": "Reservable in this space"
     },
-    "skipToForm": "Skip to the form for adding times",
     "announcements": {
       "painted": "Added",
       "erased": "Removed"
     },
     "form": {
       "tooShort": "too short",
-      "legend": "Add times with a form",
       "priorityNote": "New times use the type of booking request selected above.",
       "day": "Day",
       "from": "From",
@@ -91,10 +93,6 @@
       "empty": "No times selected.",
       "remove": "Remove",
       "removeTime": "Remove {{time}}",
-      "errors": {
-        "endAfterStart": "The end time must be after the start time.",
-        "outsideReservable": "The time is not available in any space on this application."
-      },
       "outsideOpeningHours": "outside opening hours"
     },
     "tooShort": "The slot ({{duration}}) is shorter than the minimum booking duration ({{minDuration}}). Lengthen the slot or shorten the minimum booking duration in the previous step of the application.",
@@ -103,12 +101,12 @@
   },
   "Page2": {
     "subHeading": "Select booking dates",
-    "info": "Please select both preferred times and also select other times that suit you. Providing more space and time options will improve your chances of getting spaces and times you like.",
+    "info": "You can select both preferred times and other suitable times. Please provide all space and time options that suit you, as the booking can only be granted for the spaces and times you select.",
     "copyTimes": "Copy times for all booking requests",
     "resetTimes": "Clear calendar",
     "summary": "Summary",
     "prioritySelectLabel": "Select type of booking request",
-    "reservationUnitSelectLabel": "Available seasonal booking times for",
+    "reservationUnitSelectLabel": "Show available seasonal booking times in the calendar for",
     "priorityLabels": {
       "primary": "Preferred time slots",
       "secondary": "Other suitable time slots"

@@ -25,13 +25,16 @@
     "Too big. expected string to have <=80 characters": "Max 80 tecken",
     "Too big. expected string to have <=32 characters": "Max 32 tecken",
     "calendar": {
+      "summaryTitle": "Korrigera tidsönskemålen i dina bokningsönskemål innan du fortsätter",
       "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
-      "Suitable time range must be at least as long as the minimum duration": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
-      "At least as many suitable time ranges as applied reservations per week": "Antal bokningar per vecka du ansöker om: {{applied}}. Bokningar som ryms i dina tidsönskemål: {{fitting}}. Ange flera tidsönskemål i kalendern eller minska antalet bokningar per vecka i föregående steg.",
-      "Required": "Ange minst en tid för alla säsongbokningar",
-      "outsideOpeningHoursTitle": "En del av tidsönskemålen ligger utanför öppettiderna",
+      "Suitable time range must be at least as long as the minimum duration": "Förläng tidsönskemålen eller förkorta den minsta varaktigheten du valt i föregående steg.",
+      "At least as many suitable time ranges as applied reservations per week": "Antal bokningar per vecka du ansöker om: {{applied}}. Bokningar som ryms i dina tidsönskemål: {{fitting}}.\nAnge flera tidsönskemål i kalendern eller minska antalet bokningar per vecka i föregående steg.",
+      "requiredTitle": "Inga tidsönskemål valda",
+      "Required": "Ange tidsönskemål för ansökningen",
       "Suitable time range must be inside the opening hours": "Ta bort tiderna som markerats som ogiltiga i kalendern eller flytta dem till öppettiderna för den här bokningsönskans lokaler.",
+      "tooShortTitle": "För kort tidsönskemål",
       "tooShortTimes": "För korta tidsönskemål:",
+      "outsideOpeningHoursTitle": "En del av tidsönskemålen ligger utanför öppettiderna",
       "outsideOpeningHoursTimes": "Tidsönskemål utanför öppettiderna:"
     },
     "previewError": "Sidan {{ page }} har ett fel.",
@@ -65,7 +68,8 @@
     }
   },
   "TimeSelector": {
-    "calendarLabel": "Välj önskade tider",
+    "calendarLabel": "Välj önskade tider i kalendern",
+    "formLabel": "Välj önskade tider med ett formulär",
     "legend": {
       "unavailable": "Kan inte bokas i någon av ansökningens lokaler",
       "invalid": "Felaktigt önskemål",
@@ -74,14 +78,12 @@
       "secondary": "Alternativt önskemål",
       "open": "Kan reserveras i denna lokal"
     },
-    "skipToForm": "Hoppa till formuläret för att lägga till tider",
     "announcements": {
       "painted": "Tillagd",
       "erased": "Borttagen"
     },
     "form": {
       "tooShort": "för kort",
-      "legend": "Lägg till tider med ett formulär",
       "priorityNote": "Nya tider får den typ av önskemål som valts ovan.",
       "day": "Dag",
       "from": "Från",
@@ -91,10 +93,6 @@
       "empty": "Inga valda tider.",
       "remove": "Ta bort",
       "removeTime": "Ta bort {{time}}",
-      "errors": {
-        "endAfterStart": "Sluttiden måste vara efter starttiden.",
-        "outsideReservable": "Tiden kan inte bokas i någon av ansökningens lokaler."
-      },
       "outsideOpeningHours": "utanför öppettiderna"
     },
     "tooShort": "Tidsönskemålet ({{duration}}) är kortare än bokningens minsta varaktighet ({{minDuration}}). Förläng önskemålet eller minska på den minsta varaktigheten som valdes i ansökans föregående steg.",
@@ -103,12 +101,12 @@
   },
   "Page2": {
     "subHeading": "Välj bokningens tidpunkt",
-    "info": "Välj både de tider som du i första hand önskar och också tider som alternativt passar för dig. Att ange flera önskemål om lokaler och tider förbättrar dina chanser att få de lokaler och tider du vill ha.",
+    "info": "Välj både de tider som du i första hand önskar och också tider som alternativt passar för dig. Var god och ange alla utrymme- och tidsalternativ som passar dig, eftersom bokningen endast kan beviljas för de utrymmen och tider som du väljer.",
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
     "summary": "Sammanfattning",
     "prioritySelectLabel": "Välj typ av tidsönskemål",
-    "reservationUnitSelectLabel": "Visa säsongbokningstider för lokalen",
+    "reservationUnitSelectLabel": "Visa säsongbokningstider i kalendern för lokalen",
     "priorityLabels": {
       "primary": "Prioriterade tidsönskemål",
       "secondary": "Alternativa tidsönskemål"
