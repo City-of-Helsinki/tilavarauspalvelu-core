@@ -313,8 +313,40 @@ function checkApplicationRoundDates(
   }
 }
 
+/// Same rules as the backend's send validation (APPLICATION_SECTION_PRICE_OPTION_MISSING / _NOT_OFFERED).
+/// A saved option can stop being offered after the draft was saved (e.g. the round's pricing changes).
+function getPriceOptionError(
+  priceOption: number | undefined,
+  offeredPriceOptionPkList: ReadonlyArray<number>
+): "Required" | "priceOptionNotOffered" | null {
+  if (priceOption != null && !offeredPriceOptionPkList.includes(priceOption)) {
+    return "priceOptionNotOffered";
+  }
+  if (priceOption == null && offeredPriceOptionPkList.length > 0) {
+    return "Required";
+  }
+  return null;
+}
+
+/// A round that offers no price options has no price option select, so a saved option
+/// could not be seen nor changed. Clear it instead (saving sends null, which clears it in the backend).
+export function clearPriceOptionsIfNoneOffered(
+  values: ApplicationPage1FormValues,
+  offeredPriceOptionPkList: ReadonlyArray<number>
+): ApplicationPage1FormValues {
+  if (offeredPriceOptionPkList.length > 0) {
+    return values;
+  }
+  return {
+    ...values,
+    applicationSections: values.applicationSections?.map((section) =>
+      section == null ? section : { ...section, priceOption: undefined }
+    ),
+  };
+}
+
 /// @param offeredPriceOptionPkList the price options of the application round (applicationRoundPriceOptions).
-/// Same rules as the backend's send validation: if the round offers any, every section must select one of them.
+/// A section must select one of them if there are any, and must not have an option the round does not offer.
 export function ApplicationPage1SchemaRefined(
   round: { begin: Date; end: Date },
   { offeredPriceOptionPkList }: { offeredPriceOptionPkList: ReadonlyArray<number> }
@@ -335,14 +367,12 @@ export function ApplicationPage1SchemaRefined(
       }
       const pathRoot = `applicationSections.${i}`;
       checkApplicationRoundDates(round, section, pathRoot, ctx);
-      const isPriceOptionValid =
-        offeredPriceOptionPkList.length === 0 ||
-        (section.priceOption != null && offeredPriceOptionPkList.includes(section.priceOption));
-      if (!isPriceOptionValid) {
+      const priceOptionError = getPriceOptionError(section.priceOption, offeredPriceOptionPkList);
+      if (priceOptionError != null) {
         ctx.addIssue({
           code: "custom",
           path: [`${pathRoot}.priceOption`],
-          message: "Required",
+          message: priceOptionError,
         });
       }
     }
@@ -456,7 +486,8 @@ function transformApplicationSection(
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) => transformEventReservationUnit(ruo, ruoIndex)),
-    ...(ae.priceOption != null ? { priceOption: ae.priceOption } : {}),
+    // Always sent, so that null clears a saved option
+    priceOption: ae.priceOption ?? null,
   };
   if (ae.pk != null) {
     return {

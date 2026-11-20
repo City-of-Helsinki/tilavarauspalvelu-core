@@ -6,6 +6,7 @@ import {
   ApplicationPage2SchemaRefined,
   ApplicationPage3Schema,
   ApplicationPage1SchemaRefined,
+  clearPriceOptionsIfNoneOffered,
   convertApplicationPage1,
   convertApplicationPage2,
   convertApplicationPage3,
@@ -71,6 +72,43 @@ describe("ApplicationPage1SchemaRefined", () => {
       ])
     );
   });
+
+  function priceOptionIssues(priceOption: number | undefined, offeredPriceOptionPkList: number[]) {
+    const result = ApplicationPage1SchemaRefined(round, { offeredPriceOptionPkList }).safeParse({
+      pk: 1,
+      applicantType: ReserveeType.Company,
+      applicationSections: [{ ...createValidPage1Section(), priceOption }],
+    });
+    return (result.error?.issues ?? [])
+      .filter((issue) => issue.path.join(".") === "applicationSections.0.priceOption")
+      .map((issue) => issue.message);
+  }
+
+  test.for([
+    { name: "no options offered, none selected", priceOption: undefined, offered: [], expected: [] },
+    { name: "offered option selected", priceOption: 2, offered: [1, 2], expected: [] },
+    { name: "options offered, none selected", priceOption: undefined, offered: [1, 2], expected: ["Required"] },
+    { name: "option no longer offered", priceOption: 3, offered: [1, 2], expected: ["priceOptionNotOffered"] },
+    { name: "round offers no options anymore", priceOption: 3, offered: [], expected: ["priceOptionNotOffered"] },
+  ])("price option: $name", ({ priceOption, offered, expected }) => {
+    expect(priceOptionIssues(priceOption, offered)).toEqual(expected);
+  });
+});
+
+describe("clearPriceOptionsIfNoneOffered", () => {
+  const values = {
+    pk: 1,
+    applicantType: ReserveeType.Company,
+    applicationSections: [{ ...createValidPage1Section(), priceOption: 3 }],
+  };
+
+  test("clears saved options when the round offers none", () => {
+    expect(clearPriceOptionsIfNoneOffered(values, []).applicationSections?.[0]?.priceOption).toBeUndefined();
+  });
+
+  test("keeps saved options when the round offers some, so the validation can tell the user to choose again", () => {
+    expect(clearPriceOptionsIfNoneOffered(values, [1, 2]).applicationSections?.[0]?.priceOption).toBe(3);
+  });
 });
 
 describe("page 1 conversions", () => {
@@ -105,6 +143,7 @@ describe("page 1 conversions", () => {
             { preferredOrder: 0, reservationUnit: 9 },
             { preferredOrder: 1, reservationUnit: 7 },
           ],
+          priceOption: null,
         },
       ],
     });
@@ -140,6 +179,7 @@ describe("page 1 conversions", () => {
             { preferredOrder: 0, reservationUnit: 7 },
             { preferredOrder: 1, reservationUnit: 9 },
           ],
+          priceOption: null,
         },
       ],
     });
