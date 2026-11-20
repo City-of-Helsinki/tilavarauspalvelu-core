@@ -15,7 +15,6 @@ from ._base import (
     ManyToManyFactory,
     ModelFactoryBuilder,
     ReverseForeignKeyFactory,
-    ReverseOneToOneFactory,
 )
 
 __all__ = [
@@ -41,7 +40,7 @@ class SpaceFactory(GenericDjangoModelFactory[Space]):
     parent = ForeignKeyFactory("tests.factories.SpaceFactory")
     unit = ForeignKeyFactory("tests.factories.UnitFactory", required=True)
 
-    children = ReverseOneToOneFactory("tests.factories.SpaceFactory")
+    children = ReverseForeignKeyFactory("tests.factories.SpaceFactory")
 
     resources = ReverseForeignKeyFactory("tests.factories.ResourceFactory")
     reservation_units = ManyToManyFactory("tests.factories.ReservationUnitFactory")
