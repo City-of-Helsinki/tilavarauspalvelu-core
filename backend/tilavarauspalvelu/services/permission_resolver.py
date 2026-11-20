@@ -331,7 +331,7 @@ class PermissionResolver:
         A shared pricing group is managed through its unit group.
         A reservation unit's own pricing group is managed through the units of the reservation units that use it.
         """
-        if self.is_user_anonymous_or_inactive():
+        if self.user.is_anonymous or not self.user.is_active:
             return False
         if self.user.is_superuser:
             return True
