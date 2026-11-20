@@ -3016,6 +3016,8 @@ def copy_reservation_unit(original: ReservationUnit, *, kind: Literal["android",
     android_version.id = None
 
     android_version.ext_uuid = uuid.uuid4()
+    assert android_version.name_en is not None
+    assert android_version.name_sv is not None
     android_version.name += f" ({kind})"
     android_version.name_en += f" ({kind})"
     android_version.name_sv += f" ({kind})"
@@ -3037,6 +3039,8 @@ def copy_reservation_unit(original: ReservationUnit, *, kind: Literal["android",
         space.rght = None  # type: ignore[assignment]
         space.level = None  # type: ignore[assignment]
 
+        assert space.name_en is not None
+        assert space.name_sv is not None
         space.name += f" ({kind})"
         space.name_en += f" ({kind})"
         space.name_sv += f" ({kind})"

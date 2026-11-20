@@ -64,6 +64,7 @@ def _create_application_rounds(
     # --- Setup ----------------------------------------------------------------------------------------------------
 
     terms_of_use = TermsOfUse.objects.filter(terms_type=TermsOfUseTypeChoices.RECURRING).first()
+    assert terms_of_use is not None, "No recurring terms of use available for creating application rounds."
     users = list(User.objects.all())
 
     reservation_units: list[ReservationUnit] = list(
@@ -654,7 +655,7 @@ def _create_open_sports_application_round(
 @with_logs
 def _create_application_round_time_slots(reservation_units: list[ReservationUnit]) -> list[ApplicationRoundTimeSlot]:
     time_slots: list[ApplicationRoundTimeSlot] = []
-    weekdays: list[int] = random_subset(Weekday.values, min_size=1)
+    weekdays: list[str] = random_subset(Weekday.values, min_size=1)
 
     for reservation_unit in reservation_units:
         for weekday in weekdays:

@@ -28,7 +28,7 @@ __all__ = [
 
 
 @get_translated
-def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
+def get_mock_params(*, language: Lang, **kwargs: Any) -> dict[str, Any]:
     """
     Return mock parameters that can be used for creating ANY email template context.
 

@@ -61,7 +61,12 @@ __all__ = [
 ]
 
 
-class permission(classmethod): ...  # noqa: N801
+if TYPE_CHECKING:
+    # The type checker treats only 'classmethod' itself as a class method decorator, not its subclasses.
+    permission = classmethod
+else:
+
+    class permission(classmethod): ...  # noqa: N801
 
 
 type AnyUser = User | AnonymousUser
@@ -241,7 +246,7 @@ class ReservationAdjustTimeData(TypedDict):
 
 class ReservationApproveData(TypedDict):
     pk: int
-    price_lines: list[ReservationPriceLineOverrideData]
+    price_lines: NotRequired[list[ReservationPriceLineOverrideData]]  # Required but removed in validation
     handling_details: str
 
     state: NotRequired[ReservationStateChoice]

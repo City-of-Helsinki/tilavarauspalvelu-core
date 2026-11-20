@@ -19,7 +19,7 @@ class ReservationCancelReasonType(graphene.ObjectType):
 
 
 class CancelReasonDict(TypedDict):
-    value: ReservationCancelReasonChoice
+    value: str
     reason_fi: str
     reason_en: str
     reason_sv: str

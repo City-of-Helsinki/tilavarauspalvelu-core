@@ -32,7 +32,7 @@ from utils.date_utils import (
 if TYPE_CHECKING:
     from decimal import Decimal
 
-    from django.db.models import QuerySet, When
+    from django.db.models import When
     from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.models import ReservationUnit
@@ -148,7 +148,7 @@ class FirstReservableTimeHelper:
     reservation_unit_closed_statuses: dict[ReservationUnitPK, bool]
     # Contains a list of the first reservable time for each ReservationUnit.
     first_reservable_times: dict[ReservationUnitPK, datetime.datetime | None]
-    first_reservable_times_access_type: dict[ReservationUnitPK, AccessType]
+    first_reservable_times_access_type: dict[ReservationUnitPK, AccessType | None]
     # Contains a list of hard closed time spans that are shared by all ReservationUnits.
     shared_hard_closed_time_spans: list[TimeSpanElement]
 
@@ -233,8 +233,15 @@ class FirstReservableTimeHelper:
         ##############
 
         if pagination_args is not None:
-            pagination_args["size"] = reservation_unit_queryset.count()
-            qs_slice = calculate_queryset_slice(**pagination_args)
+            queryset_size = reservation_unit_queryset.count()
+            pagination_args["size"] = queryset_size
+            qs_slice = calculate_queryset_slice(
+                after=pagination_args["after"],
+                before=pagination_args["before"],
+                first=pagination_args["first"],
+                last=pagination_args["last"],
+                size=queryset_size,
+            )
             self.start_offset = qs_slice.start
             self.stop_offset = qs_slice.stop
             self.needed_reservation_units = self.stop_offset - self.start_offset
@@ -398,7 +405,7 @@ class FirstReservableTimeHelper:
 
         cache.set(self.cache_key, json.dumps(cached_data), timeout=120)
 
-    def get_annotated_queryset(self) -> ReservationUnitQuerySet | QuerySet[ReservationUnit]:
+    def get_annotated_queryset(self) -> ReservationUnitQuerySet:
         """Annotate the queryset with `first_reservable_datetime` and `is_closed` fields."""
         # Create When statements for the queryset annotation
         is_closed_whens: list[When] = [
@@ -435,7 +442,7 @@ class FirstReservableTimeHelper:
             ),
         )
 
-    def _get_reservation_unit_queryset_for_calculation(self) -> ReservationUnitQuerySet | QuerySet[ReservationUnit]:
+    def _get_reservation_unit_queryset_for_calculation(self) -> ReservationUnitQuerySet:
         """
         Queryset with required information for calculating first reservable time.
         - Prefetch ReservableTimeSpans and ApplicationRounds for each ReservationUnit and filter them by date range
