@@ -148,9 +148,9 @@ class PindoraReservationUnitClient(BasePindoraClient):
         if settings.PINDORA_MOCK_ENABLED:
             return cls._mock_get_reservation_unit(reservation_unit_uuid)
 
-        response = cls._get_cached_reservation_unit_response(ext_uuid=reservation_unit_uuid)
-        if response is not None:
-            return response
+        cached_response = cls._get_cached_reservation_unit_response(ext_uuid=reservation_unit_uuid)
+        if cached_response is not None:
+            return cached_response
 
         url = cls._build_url(f"reservation-unit/{reservation_unit_uuid}")
 
@@ -243,9 +243,9 @@ class PindoraReservationClient(BasePindoraClient):
         """Fetch a reservation from Pindora."""
         reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
 
-        response = cls._get_cached_reservation_response(ext_uuid=reservation_uuid)
-        if response is not None:
-            return response
+        cached_response = cls._get_cached_reservation_response(ext_uuid=reservation_uuid)
+        if cached_response is not None:
+            return cached_response
 
         if settings.PINDORA_MOCK_ENABLED:
             raise PindoraNotFoundError(entity="Reservation", uuid=reservation_uuid)
@@ -580,9 +580,9 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
         """Fetch a seasonal booking from Pindora."""
         section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
 
-        response = cls._get_cached_seasonal_booking_response(ext_uuid=section_uuid)
-        if response is not None:
-            return response
+        cached_response = cls._get_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        if cached_response is not None:
+            return cached_response
 
         if settings.PINDORA_MOCK_ENABLED:
             raise PindoraNotFoundError(entity="Seasonal booking", uuid=section_uuid)
@@ -957,9 +957,9 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         """Fetch a reservation series from Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
 
-        response = cls._get_cached_reservation_series_response(ext_uuid=series_uuid)
-        if response is not None:
-            return response
+        cached_response = cls._get_cached_reservation_series_response(ext_uuid=series_uuid)
+        if cached_response is not None:
+            return cached_response
 
         if settings.PINDORA_MOCK_ENABLED:
             raise PindoraNotFoundError(entity="Reservation series", uuid=series_uuid)

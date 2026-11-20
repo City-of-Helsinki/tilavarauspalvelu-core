@@ -161,6 +161,9 @@ def _create_reservation_price_lines() -> None:
     default_options: dict[int, PriceOption] = {}
     for component in PriceComponent.objects.filter(price_option__isnull=False).select_related("price_option"):
         option = component.price_option
+        if option is None:  # The query excludes these.
+            continue
+
         current_option = default_options.get(component.pricing_group_id)
         if current_option is None or option.name < current_option.name:
             default_options[component.pricing_group_id] = option

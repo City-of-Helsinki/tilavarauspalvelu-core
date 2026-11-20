@@ -21,8 +21,9 @@ class ExternalServiceRequestError(ExternalServiceError):
     """Exception for when a request to an external service fails with a 5xx status code."""
 
     def __init__(self, response: Response, service_name: str) -> None:
+        method = response.request.method or "UNKNOWN"
         error_message = (
-            f"{response.request.method.upper()} request to {service_name.upper()} ({response.url}) "
+            f"{method.upper()} request to {service_name.upper()} ({response.url}) "
             f"failed with status {response.status_code}."
         )
 

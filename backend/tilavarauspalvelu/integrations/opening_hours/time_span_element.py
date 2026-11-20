@@ -19,8 +19,8 @@ class TimeSpanElement:
     start_datetime: datetime.datetime
     end_datetime: datetime.datetime
     is_reservable: bool
-    buffer_time_after: datetime.timedelta = field(default_factory=datetime.timedelta)
-    buffer_time_before: datetime.timedelta = field(default_factory=datetime.timedelta)
+    buffer_time_after: datetime.timedelta | None = field(default_factory=datetime.timedelta)
+    buffer_time_before: datetime.timedelta | None = field(default_factory=datetime.timedelta)
 
     def __setattr__(self, name: str, value: Any) -> None:
         # Store the times in UTC. Python compares and subtracts two times in the Helsinki zone on the wall clock,

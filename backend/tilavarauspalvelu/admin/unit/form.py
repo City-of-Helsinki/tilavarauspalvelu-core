@@ -25,7 +25,7 @@ class UnitAdminForm(forms.ModelForm):
 
     class Meta:
         model = Unit
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         widgets = {
             "short_description": Textarea(),
         }

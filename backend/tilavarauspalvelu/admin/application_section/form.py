@@ -114,7 +114,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
 
     class Meta:
         model = ApplicationSection
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         labels = {
             "ext_uuid": _("External UUID"),
             "name": _("Name"),

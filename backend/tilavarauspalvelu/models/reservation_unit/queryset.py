@@ -69,7 +69,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
         show_only_reservable: bool = False,
         pagination_args: PaginationArgs | None = None,
         cache_key: str = "",
-    ) -> Self:
+    ) -> ReservationUnitQuerySet:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
         helper = FirstReservableTimeHelper(
             reservation_unit_queryset=self,
@@ -106,7 +106,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
             .distinct()
         )
 
-    def reservation_units_with_common_hierarchy(self) -> Self:
+    def reservation_units_with_common_hierarchy(self) -> ReservationUnitQuerySet:
         """
         Get a new queryset of reservation units that share a common hierarchy
         with any reservation unit in the original queryset.
@@ -123,10 +123,10 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
         """A `QuerySet.iterator()` that calls the given hook for each chunk of results before yielding them."""
         chunked_fetch = not connections[self.db].settings_dict.get("DISABLE_SERVER_SIDE_CURSORS")
         iterable = self._iterable_class(self, chunked_fetch=chunked_fetch, chunk_size=chunk_size)
-        iterator = iter(iterable)
+        iterator = iter(iterable)  # type: ignore[call-overload]
 
         while results := list(islice(iterator, chunk_size)):
-            prefetch_related_objects(results, *self._prefetch_related_lookups)
+            prefetch_related_objects(results, *self._prefetch_related_lookups)  # type: ignore[attr-defined]
             hook(results)
             yield from results
 

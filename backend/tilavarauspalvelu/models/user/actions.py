@@ -269,7 +269,7 @@ class UserActions:
         UnitRoleUnit = UnitRole.units.through  # noqa: N806
 
         roles_to_add: list[UnitRole] = []
-        role_units_to_add: list[UnitRoleUnit] = []
+        role_units_to_add: list[models.Model] = []
         role_unit_remove_conditions: list[models.Q] = []
 
         for user_role, current_unit_ids in current_ad_roles.items():

@@ -44,9 +44,9 @@ class ReservableTimeSpanQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
              │          │----- # No
              │          │  --- # No
         """
-        start: datetime = normalize_as_datetime(start)
-        end: datetime = normalize_as_datetime(end, timedelta_days=1)
-        return self.filter(start_datetime__lt=end, end_datetime__gt=start)
+        period_start = normalize_as_datetime(start)
+        period_end = normalize_as_datetime(end, timedelta_days=1)
+        return self.filter(start_datetime__lt=period_end, end_datetime__gt=period_start)
 
     def fully_fill_period(
         self,
@@ -71,9 +71,9 @@ class ReservableTimeSpanQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
              │          │----- # No
              │          │  --- # No
         """
-        start: datetime = normalize_as_datetime(start)
-        end: datetime = normalize_as_datetime(end, timedelta_days=1)
-        return self.filter(start_datetime__lte=start, end_datetime__gte=end)
+        period_start = normalize_as_datetime(start)
+        period_end = normalize_as_datetime(end, timedelta_days=1)
+        return self.filter(start_datetime__lte=period_start, end_datetime__gte=period_end)
 
 
 class ReservableTimeSpanManager(ModelManager[ReservableTimeSpan, ReservableTimeSpanQuerySet]): ...
