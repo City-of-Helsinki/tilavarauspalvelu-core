@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from sentry_sdk.envelope import Envelope
+    from sentry_sdk.types import Event
 
 # ── Helpers ──
 
@@ -110,7 +111,7 @@ def test_sentry_traces_sampler_excludes_health_checks(path: str) -> None:
 
 
 def test_sentry_before_send_transaction_copies_allowlisted_headers_to_trace_data() -> None:
-    event = {
+    event: Event = {
         "request": {
             "headers": {
                 "Accept-Language": "fi",

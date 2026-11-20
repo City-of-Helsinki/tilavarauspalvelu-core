@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import factory
 from factory import LazyFunction
@@ -18,6 +19,9 @@ from tilavarauspalvelu.integrations.verkkokauppa.payment.types import (
 from utils.date_utils import local_datetime
 
 from ._base import GenericFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.verkkokauppa.order.types import OrderItem
 
 __all__ = [
     "OrderCustomerFactory",
@@ -36,7 +40,7 @@ class OrderFactory(GenericFactory[Order]):
     namespace = "tilavaraus"
     user = LazyFunction(lambda: str(uuid.uuid4()))
     created_at = LazyFunction(local_datetime)
-    items = []
+    items: list[OrderItem] = []
     price_net = Decimal("10.0")
     price_vat = Decimal("2.4")
     price_total = price_net + price_vat
