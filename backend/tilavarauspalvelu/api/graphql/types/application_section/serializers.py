@@ -390,7 +390,8 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
 
         return data
 
-    def save(self, **kwargs: Any) -> CancellationOutput:
+    def save(self, **kwargs: Any) -> CancellationOutput:  # type: ignore[override]
+        # The cancellation returns its output and not the saved instance.
         future_reservations = Reservation.objects.future_reservations_in_section(self.instance).filter(
             user=self.instance.application.user,
         )

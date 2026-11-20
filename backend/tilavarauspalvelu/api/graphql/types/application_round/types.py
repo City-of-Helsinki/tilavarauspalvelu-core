@@ -99,5 +99,6 @@ class ApplicationRoundNode(DjangoNode[ApplicationRound, AnyUser]):
         return root.is_setting_handled_allowed
 
     @classmethod
-    def pre_optimization_hook(cls, queryset: ApplicationRoundQuerySet, *args: Any) -> models.QuerySet:
+    def pre_optimization_hook(cls, queryset: ApplicationRoundQuerySet, *args: Any) -> models.QuerySet:  # type: ignore[override]
+        # The optimizer passes the default queryset of the model, which has the custom queryset methods.
         return queryset.with_permissions()
