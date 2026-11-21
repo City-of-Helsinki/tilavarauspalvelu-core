@@ -118,10 +118,12 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
 
   const icons = [
     {
+      key: "time",
       icon: <IconClock aria-hidden="true" />,
       value: time,
     },
     {
+      key: "reservationUnit",
       icon: <IconLocation aria-hidden="true" />,
       value: reservationUnitName,
     },

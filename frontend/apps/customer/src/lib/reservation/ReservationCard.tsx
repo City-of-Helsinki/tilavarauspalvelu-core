@@ -75,10 +75,12 @@ export function ReservationCard({ reservation, type }: Readonly<PropsT>): React.
 
   const infos = [
     {
+      key: "price",
       icon: <IconEuroSign aria-label={t("common:price")} aria-hidden="false" />,
       value: price ?? "",
     },
     {
+      key: "accessType",
       icon: <IconLock aria-label={t("reservationUnit:accessType")} aria-hidden="false" />,
       value: t(`reservationUnit:accessTypes.${reservation.accessType}`),
     },

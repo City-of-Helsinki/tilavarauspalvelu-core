@@ -25,6 +25,7 @@ export function ReservationUnitCard({ reservationUnit, unitPk }: Readonly<IProps
   const infos = [];
   if (hasPurposes) {
     infos.push({
+      key: "purposes",
       icon: <IconLayers />,
       value: t("reservationUnitCard:purpose", {
         count: reservationUnit.intendedUses?.length,
@@ -33,12 +34,14 @@ export function ReservationUnitCard({ reservationUnit, unitPk }: Readonly<IProps
   }
   if (reservationUnit.reservationUnitType) {
     infos.push({
+      key: "reservationUnitType",
       icon: <IconHome />,
       value: reservationUnit.reservationUnitType.nameFi ?? "",
     });
   }
   if (reservationUnit.maxPersons) {
     infos.push({
+      key: "maxPersons",
       icon: <IconGroup />,
       value: `${t("reservationUnit:headings.maxPersons")} ${reservationUnit.maxPersons}`,
     });

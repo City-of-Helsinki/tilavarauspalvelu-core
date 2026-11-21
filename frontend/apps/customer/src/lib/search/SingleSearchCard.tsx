@@ -88,18 +88,21 @@ export function SingleSearchCard({ reservationUnit }: PropsT): React.ReactElemen
   const infos = [];
   if (reservationUnitTypeName) {
     infos.push({
+      key: "reservationUnitType",
       icon: <IconHome size={IconSize.Small} />,
       value: reservationUnitTypeName,
     });
   }
   if (unitPrice) {
     infos.push({
+      key: "price",
       icon: <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} aria-hidden="false" />,
       value: unitPrice,
     });
   }
   if (reservationUnit.maxPersons) {
     infos.push({
+      key: "maxPersons",
       icon: (
         <IconGroup
           aria-hidden="false"
@@ -116,6 +119,7 @@ export function SingleSearchCard({ reservationUnit }: PropsT): React.ReactElemen
   }
   if (reservationUnit.effectiveAccessType) {
     infos.push({
+      key: "accessType",
       icon: <IconLock aria-hidden="false" aria-label={t("reservationUnit:accessType")} size={IconSize.Small} />,
       value: t(`reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`),
     });

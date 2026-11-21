@@ -8,6 +8,8 @@ import { Flex, fontMedium } from "../styled";
 type CardVariant = "default" | "vertical";
 
 export type CardInfoItem = {
+  /** A fixed name for the item, such as "price". Two items can have the same value, so the value is not a safe key. */
+  key: string;
   value: string;
   icon?: React.ReactElement;
   testId?: string;
@@ -199,7 +201,7 @@ function WrapWithLink({
  * @param {string} [imageSrc] - The URL of the image to display in the card.
  * @param {string} [imageAlt=""] - The alt text of the image.
  * @param {Array<React.ReactElement>} [tags] - An array of JSX elements (should be either Tag or StatusLabel) to display in the card.
- * @param {Array<{ value: string; icon?: React.ReactElement, testId?: string }>} [infos] - An array of info objects (icon & text) to display in the card.
+ * @param {Array<{ key: string; value: string; icon?: React.ReactElement, testId?: string }>} [infos] - An array of info objects (icon & text) to display in the card.
  * @param {Array<React.ReactElement>} [buttons] - An array of button elements to display in the card.
  * @param {ReactNode} [children] - Additional children elements to render in the card, after the main text.
  * @param {string} [className] - Additional class names to apply to the card.
@@ -439,16 +441,12 @@ const InfoItem = styled(Flex).attrs({
   }
 `;
 
-function Infos({
-  infos,
-}: Readonly<{
-  infos?: Array<{ value: string; icon?: React.ReactElement; testId?: string }>;
-}>) {
+function Infos({ infos }: Readonly<{ infos?: CardInfoItem[] }>) {
   if (!infos) return null;
   return (
     <InfoContainer>
       {infos.map((info) => (
-        <Info key={info.value} value={info.value} icon={info.icon} data-testid={info.testId} />
+        <Info key={info.key} value={info.value} icon={info.icon} data-testid={info.testId} />
       ))}
     </InfoContainer>
   );
