@@ -44,10 +44,6 @@ that a new maintainer can read. When a pattern exists to survive a scale this se
 
 - Use plain words and plain punctuation. No dashes, no semicolons, no long sentences. Where you reach for a dash, start a new sentence. Use ASD-STE100 Simplified Technical English.
 - Never print, log, or persist the contents of a .env file or any secret value.
-- Never use anything in backend virtualenv directly. Use `poetry run` instead.
-- Never run `git checkout --`, `git restore`, `git reset --hard`, `git clean`, or any other command that discards uncommitted changes,
-  on a file or directory you have not just inspected with `git diff` for that exact path. Read the full diff of every file the command would affect first.
-  If a file has unstaged changes you did not make yourself in this session, stop and ask the user before discarding them.
 
 ## Conditional
 
