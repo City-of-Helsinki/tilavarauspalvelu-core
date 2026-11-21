@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-class ReservationSeriesRepairAccessCodeSerializer(NestingModelSerializer):
+class ReservationSeriesRepairAccessCodeSerializer(NestingModelSerializer[ReservationSeries]):
     """
     Synchronize the state of the reservation series' access code between Varaamo and Pindora
     to what Varaamo thinks is should be its correct state.

@@ -61,7 +61,7 @@ class OwnPricingInputSerializer(serializers.Serializer):
     material_price_description_sv = serializers.CharField(required=False, allow_blank=True)
 
 
-class ReservationUnitSerializer(NestingModelSerializer):
+class ReservationUnitSerializer(NestingModelSerializer[ReservationUnit]):
     instance: ReservationUnit | None
 
     images = ReservationUnitImageFieldSerializer(many=True, required=False)
@@ -298,12 +298,14 @@ class ReservationUnitSerializer(NestingModelSerializer):
         self.instance.validators.validate_has_price_today()
 
     def _validate_access_types(self, *, access_types: list[dict[str, Any]], is_draft: bool) -> None:  # noqa: PLR0912
-        editing = getattr(self.instance, "pk", None) is not None
+        existing_reservation_unit: ReservationUnit | None = None
+        if self.instance is not None and self.instance.pk is not None:
+            existing_reservation_unit = self.instance
 
         today = local_date()
         has_active: bool = False
-        if editing:
-            has_active = self.instance.access_types.filter(begin_date__lte=today).exists()
+        if existing_reservation_unit is not None:
+            has_active = existing_reservation_unit.access_types.filter(begin_date__lte=today).exists()
 
         if not access_types:
             if is_draft:
@@ -318,9 +320,10 @@ class ReservationUnitSerializer(NestingModelSerializer):
         need_to_check_pindora: bool = False
 
         existing: dict[int, ReservationUnitAccessType] = {}
-        if editing:
+        if existing_reservation_unit is not None:
             pks: set[int] = {int(at["pk"]) for at in access_types if "pk" in at}
-            existing = {at.pk: at for at in self.instance.access_types.filter(pk__in=pks).order_by("begin_date")}
+            existing_access_types = existing_reservation_unit.access_types.filter(pk__in=pks).order_by("begin_date")
+            existing = {at.pk: at for at in existing_access_types}
 
         for access_type in access_types:
             existing_access_type: ReservationUnitAccessType | None = None
@@ -335,7 +338,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             new_access_type: str = access_type["access_type"]
             begin_date: datetime.date = access_type["begin_date"]
 
-            if not editing:
+            if existing_reservation_unit is None:
                 ReservationUnitAccessType.validators.validate_not_access_code(new_access_type)
 
             if not need_to_check_pindora:
@@ -416,7 +419,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
         # Reservation Unit needs to be updated last, due to post_save signals.
         # Verkkokauppa payment product update is triggered by the post_save signal of the ReservationUnit,
         # and requires a paid pricing to already be present in the database.
-        return super().update(instance, validated_data)
+        super().update(instance, validated_data)
+        return instance
 
     @staticmethod
     def update_hauki(instance: ReservationUnit) -> None:
@@ -462,7 +466,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
     @staticmethod
     def handle_access_types(access_types: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
         """Update access types for a reservation unit."""
-        access_type_pks = [access_type.get("pk") for access_type in access_types if "pk" in access_type]
+        access_type_pks = [access_type["pk"] for access_type in access_types if "pk" in access_type]
         today = local_date()
 
         with transaction.atomic():
@@ -486,7 +490,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
         reservation_unit.actions.update_access_types_for_reservations()
 
 
-class ReservationUnitArchiveSerializer(NestingModelSerializer):
+class ReservationUnitArchiveSerializer(NestingModelSerializer[ReservationUnit]):
     instance: ReservationUnit
 
     class Meta:

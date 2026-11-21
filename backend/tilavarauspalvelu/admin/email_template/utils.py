@@ -28,7 +28,7 @@ __all__ = [
 
 
 @get_translated
-def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
+def get_mock_params(*, language: Lang, **kwargs: Any) -> dict[str, Any]:
     """
     Return mock parameters that can be used for creating ANY email template context.
 
@@ -132,7 +132,7 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
 
 
 @get_translated
-def get_mock_data(*, email_type: EmailTemplateType, language: Lang, **kwargs: Any) -> EmailContext | None:
+def get_mock_data(*, email_type: EmailTemplateType, language: Lang, **kwargs: Any) -> EmailContext:
     if email_type in EmailType.access_code_always_used and "access_code_is_used" not in kwargs:
         kwargs["access_code_is_used"] = True
 

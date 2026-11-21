@@ -42,7 +42,7 @@ from tilavarauspalvelu.services.pricing.next_price_change import (
     find_next_price_change,
 )
 from tilavarauspalvelu.services.pricing.price_summary import BasePrice, summarize_base_prices
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import AnyUser, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 from utils.db import SubqueryCount
 
@@ -92,7 +92,7 @@ class PriceChangeType(graphene.ObjectType):
     summary = graphene.Field(PriceSummaryType, required=True)
 
 
-class ReservationUnitNode(DjangoNode):
+class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
     publishing_state = AnnotatedField(
         graphene.Enum.from_enum(ReservationUnitPublishingState),
         expression=L("publishing_state"),
@@ -367,6 +367,9 @@ class ReservationUnitNode(DjangoNode):
         if root.origin_hauki_resource is None:
             return None
 
+        if info.context.user.is_anonymous:
+            return None
+
         return generate_hauki_link(
             reservation_unit_uuid=root.ext_uuid,
             user_email=info.context.user.email,
@@ -511,7 +514,7 @@ class ReservationUnitNode(DjangoNode):
         return getattr(root, "num_active_user_reservations", 0)
 
 
-class ReservationUnitAllNode(DjangoNode):
+class ReservationUnitAllNode(DjangoNode[ReservationUnit, AnyUser]):
     """This Node should be kept to the bare minimum and never expose any relations to avoid performance issues."""
 
     class Meta:

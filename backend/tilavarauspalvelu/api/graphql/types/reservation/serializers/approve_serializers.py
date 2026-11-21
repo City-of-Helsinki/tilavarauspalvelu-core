@@ -19,13 +19,12 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFo
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import ReservationApproveData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationPriceLine
-    from tilavarauspalvelu.typing import ReservationApproveData
 
 __all__ = [
     "ReservationApproveSerializer",
@@ -45,7 +44,7 @@ class ReservationPriceLineOverrideSerializer(serializers.Serializer):
     )
 
 
-class ReservationApproveSerializer(NestingModelSerializer):
+class ReservationApproveSerializer(NestingModelSerializer[Reservation, ReservationApproveData]):
     """Approve a reservation during handling."""
 
     instance: Reservation
@@ -173,7 +172,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
             if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
                 self.create_payment_order_if_required(validated_data)
 
-            instance = super().update(instance=instance, validated_data=validated_data)
+            super().update(instance=instance, validated_data=validated_data)
 
         if instance.access_type == AccessType.ACCESS_CODE:
             # Allow activation in Pindora to fail, will be handled by a background task.

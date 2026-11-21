@@ -12,10 +12,7 @@ from tilavarauspalvelu.enums import ReservationUnitImageType
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    from easy_thumbnails.files import ThumbnailerImageFieldFile
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import ReservationUnit
 
     from .actions import ReservationUnitImageActions
     from .queryset import ReservationUnitImageManager
@@ -27,20 +24,18 @@ __all__ = [
 
 
 class ReservationUnitImage(models.Model):
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="images",
         on_delete=models.CASCADE,
     )
 
-    image: ThumbnailerImageFieldFile | None = ThumbnailerImageField(
-        upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True, blank=True
-    )
-    image_type: ReservationUnitImageType = TextChoicesField(enum=ReservationUnitImageType)
+    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True, blank=True)
+    image_type = TextChoicesField(enum=ReservationUnitImageType)
 
-    large_url: str = models.URLField(max_length=255, default="", blank=True)
-    medium_url: str = models.URLField(max_length=255, default="", blank=True)
-    small_url: str = models.URLField(max_length=255, default="", blank=True)
+    large_url = models.URLField(max_length=255, default="", blank=True)
+    medium_url = models.URLField(max_length=255, default="", blank=True)
+    small_url = models.URLField(max_length=255, default="", blank=True)
 
     objects: ClassVar[ReservationUnitImageManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservationUnitImageActions] = LazyModelAttribute.new()

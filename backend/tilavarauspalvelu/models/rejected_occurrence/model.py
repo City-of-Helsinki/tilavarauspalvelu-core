@@ -11,11 +11,7 @@ from tilavarauspalvelu.enums import RejectionReadinessChoice
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import ReservationSeries
 
     from .actions import RejectedOccurrenceActions
     from .queryset import RejectedOccurrenceManager
@@ -28,12 +24,12 @@ __all__ = [
 
 
 class RejectedOccurrence(models.Model):
-    begin_datetime: datetime.datetime = models.DateTimeField()
-    end_datetime: datetime.datetime = models.DateTimeField()
-    rejection_reason: RejectionReadinessChoice = TextChoicesField(enum=RejectionReadinessChoice)
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    begin_datetime = models.DateTimeField()
+    end_datetime = models.DateTimeField()
+    rejection_reason = TextChoicesField(enum=RejectionReadinessChoice)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    reservation_series: ReservationSeries = models.ForeignKey(
+    reservation_series = models.ForeignKey(
         "tilavarauspalvelu.ReservationSeries",
         related_name="rejected_occurrences",
         on_delete=models.CASCADE,

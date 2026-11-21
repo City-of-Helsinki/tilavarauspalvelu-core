@@ -14,8 +14,6 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ApplicationSection
-
     from .actions import SuitableTimeRangeActions
     from .queryset import SuitableTimeRangeManager
     from .validators import SuitableTimeRangeValidator
@@ -29,12 +27,12 @@ __all__ = [
 class SuitableTimeRange(models.Model):
     """Represent a time range that the applicant has marked as suitable for their application section."""
 
-    priority: Priority = TextChoicesField(enum=Priority)
-    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)
-    begin_time: datetime.time = models.TimeField()
-    end_time: datetime.time = models.TimeField()
+    priority = TextChoicesField(enum=Priority)
+    day_of_the_week = TextChoicesField(enum=Weekday)
+    begin_time = models.TimeField()
+    end_time = models.TimeField()
 
-    application_section: ApplicationSection = models.ForeignKey(
+    application_section = models.ForeignKey(
         "tilavarauspalvelu.ApplicationSection",
         related_name="suitable_time_ranges",
         on_delete=models.CASCADE,

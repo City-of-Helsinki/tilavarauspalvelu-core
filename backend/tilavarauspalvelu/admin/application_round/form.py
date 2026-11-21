@@ -42,7 +42,8 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationRoundStatusChoice(instance.status).label
-        self.base_fields["reservation_units"].queryset = ReservationUnit.objects.select_related("unit").all()
+        reservation_units_field: forms.ModelMultipleChoiceField = self.base_fields["reservation_units"]  # type: ignore[assignment]
+        reservation_units_field.queryset = ReservationUnit.objects.select_related("unit").all()
         self.base_fields["terms_of_use"].required = True
         super().__init__(*args, **kwargs)
 
@@ -102,7 +103,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
 
     class Meta:
         model = ApplicationRound
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         widgets = {
             "criteria": TinyMCE(),
             "notes_when_applying": TinyMCE(),

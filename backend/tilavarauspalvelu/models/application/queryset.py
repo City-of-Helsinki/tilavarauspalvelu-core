@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Literal, Self
+from typing import Literal, Self, TypeVar
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -22,7 +22,11 @@ __all__ = [
 ]
 
 
-class ApplicationQuerySet(ModelQuerySet[Application]):
+_TModel_co = TypeVar("_TModel_co", bound=Application, covariant=True, default=Application)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=Application)
+
+
+class ApplicationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def has_status_in(self, statuses: list[str]) -> Self:
         return self.filter(L(status__in=statuses))
 
@@ -53,13 +57,13 @@ class ApplicationQuerySet(ModelQuerySet[Application]):
         )
 
     def order_by_status(self, *, desc: bool = False) -> Self:
-        return self.order_by(models.OrderBy(L("status_sort_order"), descending=desc))
+        return self.order_by(L("status_sort_order").order_by(descending=desc))
 
     def order_by_applicant(self, *, desc: bool = False) -> Self:
-        return self.order_by(models.OrderBy(L("applicant"), descending=desc))
+        return self.order_by(L("applicant").order_by(descending=desc))
 
     def order_by_applicant_type(self, *, desc: bool = False) -> Self:
-        return self.order_by(models.OrderBy(L("applicant_type_sort_order"), descending=desc))
+        return self.order_by(L("applicant_type_sort_order").order_by(descending=desc))
 
     def _fetch_all(self) -> None:
         super()._fetch_all()
@@ -77,7 +81,8 @@ class ApplicationQuerySet(ModelQuerySet[Application]):
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
 
-        items = list(self._result_cache)
+        # Only `with_permissions` sets the flag that runs this, and it is used on model querysets.
+        items: list[Application] = list(self._result_cache or [])  # type: ignore[arg-type]
         if not items:
             return
 

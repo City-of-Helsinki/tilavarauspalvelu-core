@@ -3,13 +3,14 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import PriceComponent
+from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "PriceComponentNode",
 ]
 
 
-class PriceComponentNode(DjangoNode):
+class PriceComponentNode(DjangoNode[PriceComponent, AnyUser]):
     class Meta:
         model = PriceComponent
         fields = [

@@ -37,7 +37,7 @@ class ReservationSeriesAdminForm(forms.ModelForm):
 
     class Meta:
         model = ReservationSeries
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         labels = {
             "ext_uuid": _("External UUID"),
             "name": _("Name"),
@@ -106,7 +106,7 @@ class ReservationInline(admin.TabularInline):
     max_num = 0
     show_change_link = True
     can_delete = False
-    fields = [
+    fields = (
         "id",
         "name",
         "begins_at",
@@ -116,7 +116,7 @@ class ReservationInline(admin.TabularInline):
         "total_price",
         "total_price_net",
         "access_type",
-    ]
+    )
     readonly_fields = fields
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet[Reservation]:

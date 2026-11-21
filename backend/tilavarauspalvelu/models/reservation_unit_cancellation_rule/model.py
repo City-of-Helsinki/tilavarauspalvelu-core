@@ -24,8 +24,8 @@ __all__ = [
 
 
 class ReservationUnitCancellationRule(models.Model):
-    name: str = models.CharField(max_length=255)
-    can_be_cancelled_time_before: datetime.timedelta | None = models.DurationField(
+    name = models.CharField(max_length=255)
+    can_be_cancelled_time_before = models.DurationField(
         default=datetime.timedelta(hours=24),
         blank=True,
         null=True,

@@ -31,7 +31,7 @@ __all__ = [
 
 class ReservationUnitInline(admin.TabularInline):
     model = ReservationUnit
-    fields = ["id", "reservation_unit_link"]
+    fields = ("id", "reservation_unit_link")
     readonly_fields = fields
     can_delete = False
     extra = 0
@@ -63,7 +63,7 @@ class OriginHaukiResourceAdminForm(forms.ModelForm):
 
     class Meta:
         model = OriginHaukiResource
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         help_texts = {
             "id": _("ID of the resource in Hauki."),
             "opening_hours_hash": _("Hash of the opening hours. Used to determine if the opening hours have changed."),

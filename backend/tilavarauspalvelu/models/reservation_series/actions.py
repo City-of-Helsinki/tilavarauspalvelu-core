@@ -92,7 +92,7 @@ class ReservationSeriesActions:
             if delta < 0:
                 delta += 7
 
-            begin_date: datetime.date = self.reservation_series.begin_date + datetime.timedelta(days=delta)
+            begin_date = self.reservation_series.begin_date + datetime.timedelta(days=delta)
             if begin_date > self.reservation_series.end_date:
                 continue
 
@@ -174,7 +174,7 @@ class ReservationSeriesActions:
         end = datetime.datetime.combine(end_date, datetime.time(), tzinfo=DEFAULT_TIMEZONE)
         end += end_time_as_timedelta(end_time)
 
-        timespans: ReservableTimeSpanQuerySet = hauki_resource.reservable_time_spans.all()  # type: ignore[assignment]
+        timespans: ReservableTimeSpanQuerySet = hauki_resource.reservable_time_spans.all()
         timespans = timespans.overlapping_with_period(start=start, end=end)
 
         return [timespan.as_time_span_element() for timespan in timespans]

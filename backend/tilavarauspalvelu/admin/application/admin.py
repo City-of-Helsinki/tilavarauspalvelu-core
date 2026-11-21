@@ -85,7 +85,7 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = ApplicationAdminForm
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -98,8 +98,8 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "results_ready_notification_sent_at",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Applicant"),
             {
                 "fields": [
@@ -107,8 +107,8 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "applicant_type",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Contact person"),
             {
                 "fields": [
@@ -118,8 +118,8 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "contact_person_phone_number",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Organisation"),
             {
                 "fields": [
@@ -135,8 +135,8 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "municipality",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Billing address"),
             {
                 "fields": [
@@ -145,8 +145,8 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "billing_city",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Notes"),
             {
                 "fields": [
@@ -154,7 +154,7 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "working_memo",
                 ],
             },
-        ],
+        ),
     ]
     inlines = [ApplicationSectionInline]
     readonly_fields = [

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from typing import TypeVar
+
 from tilavarauspalvelu.models import UnitGroup
-from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import TranslatedModelManager, TranslatedModelQuerySet
 
 __all__ = [
     "UnitGroupManager",
@@ -9,7 +11,11 @@ __all__ = [
 ]
 
 
-class UnitGroupQuerySet(TranslatedModelQuerySet[UnitGroup]): ...
+_TModel_co = TypeVar("_TModel_co", bound=UnitGroup, covariant=True, default=UnitGroup)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=UnitGroup)
 
 
-class UnitGroupManager(ModelManager[UnitGroup, UnitGroupQuerySet]): ...
+class UnitGroupQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]): ...
+
+
+class UnitGroupManager(TranslatedModelManager[UnitGroup, UnitGroupQuerySet]): ...

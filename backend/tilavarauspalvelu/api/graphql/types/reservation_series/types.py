@@ -19,6 +19,7 @@ from tilavarauspalvelu.models import (
     ReservationSeries,
     ReservationUnitOption,
 )
+from tilavarauspalvelu.typing import AnyUser
 from utils.date_utils import local_date
 
 from .filtersets import ReservationSeriesFilterSet
@@ -54,7 +55,7 @@ class PindoraSeriesInfoType(graphene.ObjectType):
     access_code_validity = graphene.List(graphene.NonNull(PindoraSeriesValidityInfoType), required=True)
 
 
-class ReservationSeriesNode(DjangoNode):
+class ReservationSeriesNode(DjangoNode[ReservationSeries, AnyUser]):
     access_type = AnnotatedField(
         graphene.Enum.from_enum(AccessTypeWithMultivalued),
         expression=L("access_type"),

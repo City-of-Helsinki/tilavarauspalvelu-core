@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TypeVar
+
 from easy_thumbnails.exceptions import InvalidImageFormatError
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -12,8 +14,12 @@ __all__ = [
 ]
 
 
-class ReservationUnitImageQuerySet(ModelQuerySet[ReservationUnitImage]):
-    def update_thumbnail_urls(self) -> None:
+_TModel_co = TypeVar("_TModel_co", bound=ReservationUnitImage, covariant=True, default=ReservationUnitImage)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationUnitImage)
+
+
+class ReservationUnitImageQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
+    def update_thumbnail_urls(self: ReservationUnitImageQuerySet) -> None:
         reservation_unit_images = self.filter(image__isnull=False)
 
         images: list[ReservationUnitImage] = list(reservation_unit_images)
@@ -21,6 +27,9 @@ class ReservationUnitImageQuerySet(ModelQuerySet[ReservationUnitImage]):
             return
 
         for image in images:
+            if image.image is None:
+                continue
+
             try:
                 image.large_url = image.image["large"].url
                 image.medium_url = image.image["medium"].url

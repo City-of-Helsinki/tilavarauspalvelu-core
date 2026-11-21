@@ -41,7 +41,7 @@ __all__ = [
 
 
 class TaxLevel(models.Model):
-    name: str = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True)
 
     # Translated field hints
     name_fi: str | None

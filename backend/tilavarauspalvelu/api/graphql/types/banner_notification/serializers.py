@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class BannerNotificationSerializer(NestingModelSerializer):
+class BannerNotificationSerializer(NestingModelSerializer[BannerNotification]):
     class Meta:
         model = BannerNotification
         fields = [

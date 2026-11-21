@@ -13,6 +13,7 @@ from query_optimizer.optimizer import QueryOptimizer
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, UserRoleChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Application, ApplicationSection, Reservation, User
+from tilavarauspalvelu.typing import AnyUser
 from utils.date_utils import local_date
 
 from .filtersets import ApplicationSectionFilterSet
@@ -48,7 +49,7 @@ class PindoraSectionInfoType(graphene.ObjectType):
     access_code_validity = graphene.List(graphene.NonNull(PindoraSectionValidityInfoType), required=True)
 
 
-class ApplicationSectionNode(DjangoNode):
+class ApplicationSectionNode(DjangoNode[ApplicationSection, AnyUser]):
     status = AnnotatedField(
         graphene.Enum.from_enum(ApplicationSectionStatusChoice),
         expression=L("status"),

@@ -16,8 +16,6 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ReservationUnit
-
     from .actions import ReservationUnitAccessTypeActions
     from .queryset import ReservationUnitAccessTypeManager
     from .validators import ReservationUnitAccessTypeValidator
@@ -29,13 +27,13 @@ __all__ = [
 
 
 class ReservationUnitAccessType(models.Model):
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="access_types",
         on_delete=models.CASCADE,
     )
-    access_type: AccessType = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)
-    begin_date: datetime.date = models.DateField()
+    access_type = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)
+    begin_date = models.DateField()
 
     objects: ClassVar[ReservationUnitAccessTypeManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservationUnitAccessTypeActions] = LazyModelAttribute.new()

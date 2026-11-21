@@ -11,8 +11,6 @@ from utils.auditlog_util import AuditLogger
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import UnitGroup
-
     from .actions import PriceOptionActions
     from .queryset import PriceOptionManager
     from .validators import PriceOptionValidator
@@ -24,11 +22,11 @@ __all__ = [
 
 
 class PriceOption(models.Model):
-    name: str = models.CharField(max_length=255)
-    description: str = models.TextField(blank=True, default="")
-    is_active: bool = models.BooleanField(default=True)
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, default="")
+    is_active = models.BooleanField(default=True)
 
-    unit_group: UnitGroup = models.ForeignKey(
+    unit_group = models.ForeignKey(
         "tilavarauspalvelu.UnitGroup",
         related_name="price_options",
         on_delete=models.PROTECT,

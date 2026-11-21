@@ -14,24 +14,21 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ReservationUnit
-    from tilavarauspalvelu.typing import TimeSlotDB
-
     from .actions import ApplicationRoundTimeSlotActions
     from .queryset import ApplicationRoundTimeSlotManager
     from .validators import ApplicationRoundTimeSlotValidator
 
 
 class ApplicationRoundTimeSlot(models.Model):
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="application_round_time_slots",
         on_delete=models.CASCADE,
     )
 
-    weekday: Weekday = TextChoicesField(enum=Weekday)
-    is_closed: bool = models.BooleanField(default=False)
-    reservable_times: list[TimeSlotDB] = ArrayField(
+    weekday = TextChoicesField(enum=Weekday)
+    is_closed = models.BooleanField(default=False)
+    reservable_times = ArrayField(
         base_field=HStoreField(),
         blank=True,
         default=list,

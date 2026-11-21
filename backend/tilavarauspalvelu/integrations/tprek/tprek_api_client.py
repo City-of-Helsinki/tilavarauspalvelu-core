@@ -33,9 +33,9 @@ class TprekUnitData:
 
     @classmethod
     def from_response_json(cls, response_json: dict[str, Any]) -> TprekUnitData:
+        modified_time = response_json.get("modified_time")
         try:
-            modified_time = response_json.get("modified_time")
-            tprek_last_modified = datetime.datetime.fromisoformat(modified_time)
+            tprek_last_modified = datetime.datetime.fromisoformat(modified_time) if modified_time else None
         except (TypeError, ValueError):
             tprek_last_modified = None
 

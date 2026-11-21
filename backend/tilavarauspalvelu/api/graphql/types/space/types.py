@@ -7,6 +7,7 @@ from graphene_django_extensions.fields import RelatedField
 from query_optimizer import DjangoListField
 
 from tilavarauspalvelu.models import Space
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import SpaceFilterSet
 from .permissions import SpacePermission
@@ -21,7 +22,7 @@ __all__ = [
 ]
 
 
-class SpaceNode(DjangoNode):
+class SpaceNode(DjangoNode[Space, AnyUser]):
     parent = RelatedField(lambda: SpaceNode)
     children = DjangoListField(lambda: SpaceNode)
 

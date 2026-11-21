@@ -11,11 +11,7 @@ from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import User
 
     from .actions import GeneralRoleActions
     from .queryset import GeneralRoleManager
@@ -28,10 +24,10 @@ __all__ = [
 
 
 class GeneralRole(models.Model):
-    user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="general_roles", on_delete=models.CASCADE)
-    role: UserRoleChoice = TextChoicesField(enum=UserRoleChoice)
+    user = models.ForeignKey("tilavarauspalvelu.User", related_name="general_roles", on_delete=models.CASCADE)
+    role = TextChoicesField(enum=UserRoleChoice)
 
-    assigner: User | None = models.ForeignKey(
+    assigner = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="assigned_general_roles",
         on_delete=models.SET_NULL,
@@ -39,10 +35,10 @@ class GeneralRole(models.Model):
         null=True,
     )
 
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
-    updated_at: datetime.datetime = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    is_role_active: bool = models.BooleanField(default=True)
+    is_role_active = models.BooleanField(default=True)
 
     objects: ClassVar[GeneralRoleManager] = LazyModelManager.new()
     actions: LazyAttribute[GeneralRoleActions] = LazyModelAttribute.new()

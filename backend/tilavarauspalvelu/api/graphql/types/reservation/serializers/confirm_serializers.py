@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.fields import IntegerField
@@ -12,18 +10,16 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
+from tilavarauspalvelu.typing import ReservationConfirmData
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import ReservationConfirmData
 
 __all__ = [
     "ReservationConfirmSerializer",
 ]
 
 
-class ReservationConfirmSerializer(NestingModelSerializer):
+class ReservationConfirmSerializer(NestingModelSerializer[Reservation, ReservationConfirmData]):
     """Confirm a tentative reservation. Reservation might still require handling and/or payment."""
 
     instance: Reservation
@@ -80,7 +76,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         if self.instance.total_price_net > 0 and state.should_create_payment_order:
             self.instance.actions.create_payment_order_paid_immediately(payment_type=validated_data["payment_type"])
 
-        instance = super().update(instance=instance, validated_data=validated_data)
+        super().update(instance=instance, validated_data=validated_data)
 
         if instance.state == ReservationStateChoice.CONFIRMED:
             if instance.access_type == AccessType.ACCESS_CODE:

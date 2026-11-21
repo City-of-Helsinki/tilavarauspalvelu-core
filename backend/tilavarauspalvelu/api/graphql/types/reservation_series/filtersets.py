@@ -113,7 +113,7 @@ class ReservationSeriesFilterSet(ModelFilterSet):
         self,
         qs: QuerySet[ReservationSeries],
         name: str,
-        value: list[str],
+        value: list[ReservationUnitType],
     ) -> QuerySet[ReservationSeries]:
         if not value:
             return qs

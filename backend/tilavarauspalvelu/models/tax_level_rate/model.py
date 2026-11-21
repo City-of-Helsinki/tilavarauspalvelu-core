@@ -10,12 +10,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
-    import datetime
-    from decimal import Decimal
-
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import TaxLevel
 
     from .actions import TaxLevelRateActions
     from .queryset import TaxLevelRateManager
@@ -27,14 +22,14 @@ __all__ = [
 
 
 class TaxLevelRate(models.Model):
-    tax_level: TaxLevel = models.ForeignKey(
+    tax_level = models.ForeignKey(
         "tilavarauspalvelu.TaxLevel",
         related_name="rates",
         on_delete=models.CASCADE,
     )
-    begins: datetime.date = models.DateField()
-    percentage: Decimal = models.DecimalField(max_digits=5, decimal_places=2)
-    vat_code: str = models.CharField(max_length=2, blank=True, default="", validators=[MinLengthValidator(2)])
+    begins = models.DateField()
+    percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    vat_code = models.CharField(max_length=2, blank=True, default="", validators=[MinLengthValidator(2)])
 
     objects: ClassVar[TaxLevelRateManager] = LazyModelManager.new()
     actions: LazyAttribute[TaxLevelRateActions] = LazyModelAttribute.new()

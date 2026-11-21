@@ -41,7 +41,7 @@ class ReservationUnitAccessTypeForm(forms.ModelForm):
 
     class Meta:
         model = ReservationUnitAccessType
-        fields = []  # Use fields from Inline
+        fields: list[str] = []  # Use fields from Inline
         labels = {
             "access_type": _("Access type"),
             "begin_date": _("Access type begin date"),
@@ -111,7 +111,7 @@ class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
 
     def _should_delete_form(self, form: ReservationUnitAccessTypeForm) -> bool:
         # Required so errors from `validate_deletion` are not ignored.
-        return (not form.errors) and super()._should_delete_form(form)
+        return (not form.errors) and super()._should_delete_form(form)  # type: ignore[misc]
 
 
 class ReservationUnitAccessTypeInline(admin.TabularInline):
@@ -133,10 +133,10 @@ class PricingGroupOfReservationUnitInline(admin.TabularInline):
     """The pricing groups that the reservation unit uses. The prices are edited on the page of the pricing group."""
 
     model = ReservationUnitPricingGroup
-    fields = [
+    fields = (
         "pricing_group_link",
         "begins",
-    ]
+    )
     readonly_fields = fields
     ordering = ["begins"]
     extra = 0
@@ -181,7 +181,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
 
     class Meta:
         model = ReservationUnit
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         widgets = {
             "description": TinyMCE(),
             "notes_when_applying": TinyMCE(),

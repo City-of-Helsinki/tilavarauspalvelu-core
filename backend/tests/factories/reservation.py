@@ -437,6 +437,9 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         allow_overnight: bool = False,
     ) -> Self:
         """Add begin datetime and end datetime based on given reservation unit's allowed durations."""
+        assert reservation_unit.min_reservation_duration is not None
+        assert reservation_unit.max_reservation_duration is not None
+
         min_hours = math.ceil(reservation_unit.min_reservation_duration.total_seconds() / 3600)
         max_hours = math.ceil(reservation_unit.max_reservation_duration.total_seconds() / 3600)
 

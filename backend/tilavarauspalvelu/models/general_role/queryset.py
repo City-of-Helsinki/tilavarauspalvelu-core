@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TypeVar
 
 from django.conf import settings
 
@@ -14,7 +15,11 @@ __all__ = [
 ]
 
 
-class GeneralRoleQuerySet(ModelQuerySet[GeneralRole]):
+_TModel_co = TypeVar("_TModel_co", bound=GeneralRole, covariant=True, default=GeneralRole)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=GeneralRole)
+
+
+class GeneralRoleQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def deactivate_old_permissions(self) -> None:
         today = local_date()
         cutoff = today - datetime.timedelta(days=settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS)

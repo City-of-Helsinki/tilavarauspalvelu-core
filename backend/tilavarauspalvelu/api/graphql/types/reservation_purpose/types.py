@@ -3,6 +3,7 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import ReservationPurpose
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import ReservationPurposeFilterSet
 from .permissions import ReservationPurposePermission
@@ -12,7 +13,7 @@ __all__ = [
 ]
 
 
-class ReservationPurposeNode(DjangoNode):
+class ReservationPurposeNode(DjangoNode[ReservationPurpose, AnyUser]):
     class Meta:
         model = ReservationPurpose
         fields = [

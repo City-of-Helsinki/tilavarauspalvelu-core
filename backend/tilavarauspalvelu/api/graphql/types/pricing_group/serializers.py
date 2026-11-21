@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class PricingGroupComponentsSerializer(NestingModelSerializer):
+class PricingGroupComponentsSerializer(NestingModelSerializer[PricingGroup]):
     """Change the components of a pricing group as one batch."""
 
     instance: PricingGroup

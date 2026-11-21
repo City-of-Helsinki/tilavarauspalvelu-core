@@ -74,7 +74,8 @@ class KeyCloakClient(BaseExternalServiceClient):
 
         try:
             # Delegate refresh to OAuth backend.
-            response: RefreshResponse = cls.oidc_backend.refresh_token(token=keycloak_refresh_token)
+            # The OAuth backend types the response as a plain dict.
+            response: RefreshResponse = cls.oidc_backend.refresh_token(token=keycloak_refresh_token)  # type: ignore[assignment]
         except HTTPError as error:
             try:
                 # Catch known error for expired keycloak refresh token. This cannot be solved without a

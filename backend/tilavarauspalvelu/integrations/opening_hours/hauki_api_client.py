@@ -85,7 +85,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
 
         # In case of multiple pages, keep fetching resources until there are no more pages
         while next_page_url := response_json.get("next"):
-            response_json = cls.response_json(cls.get(url=next_page_url))  # type: ignore[assignment]
+            response_json = cls.response_json(cls.get(url=next_page_url))
             fetched_hauki_resources.extend(response_json["results"])
 
         return fetched_hauki_resources
@@ -105,7 +105,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
         }
 
         response = cls.get(url=url, params=query_params)
-        return cls.response_json(response)  # type: ignore[return-value]
+        return cls.response_json(response)
 
     @classmethod
     def get_resource(cls, *, hauki_resource_id: str) -> HaukiAPIResource:

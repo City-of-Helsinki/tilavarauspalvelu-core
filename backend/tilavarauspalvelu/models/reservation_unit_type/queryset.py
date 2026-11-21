@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from typing import TypeVar
+
 from tilavarauspalvelu.models import ReservationUnitType
-from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import TranslatedModelManager, TranslatedModelQuerySet
 
 __all__ = [
     "ReservationUnitTypeManager",
@@ -9,7 +11,11 @@ __all__ = [
 ]
 
 
-class ReservationUnitTypeQuerySet(TranslatedModelQuerySet[ReservationUnitType]): ...
+_TModel_co = TypeVar("_TModel_co", bound=ReservationUnitType, covariant=True, default=ReservationUnitType)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=ReservationUnitType)
 
 
-class ReservationUnitTypeManager(ModelManager[ReservationUnitType, ReservationUnitTypeQuerySet]): ...
+class ReservationUnitTypeQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]): ...
+
+
+class ReservationUnitTypeManager(TranslatedModelManager[ReservationUnitType, ReservationUnitTypeQuerySet]): ...

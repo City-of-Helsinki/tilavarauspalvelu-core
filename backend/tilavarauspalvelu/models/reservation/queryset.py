@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import itertools
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, TypeVar
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -29,6 +29,8 @@ from utils.db import Now
 from utils.mixins import SerializableModelManagerMixin
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection
     from tilavarauspalvelu.typing import AnyUser
 
@@ -39,7 +41,11 @@ __all__ = [
 ]
 
 
-class ReservationQuerySet(ModelQuerySet[Reservation]):
+_TModel_co = TypeVar("_TModel_co", bound=Reservation, covariant=True, default=Reservation)
+_TRow_co = TypeVar("_TRow_co", covariant=True, default=Reservation)
+
+
+class ReservationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
     def _fetch_all(self) -> None:
         super()._fetch_all()
         if "FETCH_UNITS_FOR_PERMISSIONS_FLAG" in self._hints:
@@ -56,7 +62,8 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
 
-        items = list(self._result_cache)
+        # Only `with_permissions` sets the flag that runs this, and it is used on model querysets.
+        items: list[Reservation] = list(self._result_cache or [])  # type: ignore[arg-type]
         if not items:
             return
 
@@ -187,7 +194,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
     def unconfirmed(self) -> Self:
         return self.exclude(state=ReservationStateChoice.CONFIRMED)
 
-    def affecting_reservations(self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
+    def affecting_reservations(self, units: Sequence[int] = (), reservation_units: Sequence[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
         qs = ReservationUnit.objects.all()
         if units:
@@ -265,7 +272,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
             ),
         )
 
-    def upsert_statistics(self) -> None:
+    def upsert_statistics(self: ReservationQuerySet) -> None:
         reservations = self.select_related(
             "user",
             "reservation_series",

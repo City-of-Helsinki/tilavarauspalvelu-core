@@ -15,20 +15,19 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.models import Reservation, ReservationDenyReason
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import ReservationDenyData, error_codes
 from utils.date_utils import local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder
-    from tilavarauspalvelu.typing import ReservationDenyData
 
 __all__ = [
     "ReservationDenySerializer",
 ]
 
 
-class ReservationDenySerializer(NestingModelSerializer):
+class ReservationDenySerializer(NestingModelSerializer[Reservation, ReservationDenyData]):
     """Deny a reservation during handling."""
 
     instance: Reservation
@@ -80,7 +79,7 @@ class ReservationDenySerializer(NestingModelSerializer):
 
     def update(self, instance: Reservation, validated_data: ReservationDenyData) -> Reservation:
         with transaction.atomic():
-            instance = super().update(instance=instance, validated_data=validated_data)
+            super().update(instance=instance, validated_data=validated_data)
 
             if instance.access_type == AccessType.ACCESS_CODE:
                 with (

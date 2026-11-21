@@ -90,7 +90,7 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = ApplicationSectionAdminForm
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -105,8 +105,8 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "price_option",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Sports application form"),
             {
                 "fields": [
@@ -117,8 +117,8 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "multiple_reservations_per_day_wish",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Time"),
             {
                 "fields": [
@@ -129,8 +129,8 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "applied_reservations_per_week",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Pindora information"),
             {
                 "fields": [
@@ -138,7 +138,7 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "pindora_response",
                 ],
             },
-        ],
+        ),
     ]
     readonly_fields = [
         "id",
@@ -178,4 +178,4 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
 
     @admin.display(ordering=L("application__status"))
     def application_status(self, obj: ApplicationSection) -> str:
-        return obj.application_status
+        return obj.application_status  # type: ignore[attr-defined]

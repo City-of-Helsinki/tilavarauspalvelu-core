@@ -9,11 +9,14 @@ from query_optimizer import MultiField
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType
 from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.typing import AnyUser
 from utils.date_utils import datetime_difference, utc_datetime
 
 from .permissions import PaymentOrderPermission
 
 if TYPE_CHECKING:
+    import uuid
+
     from tilavarauspalvelu.typing import GQLInfo
 
 
@@ -22,7 +25,7 @@ __all__ = [
 ]
 
 
-class PaymentOrderNode(DjangoNode):
+class PaymentOrderNode(DjangoNode[PaymentOrder, AnyUser]):
     order_uuid = MultiField(graphene.UUID, fields=["remote_id"])
     refund_uuid = MultiField(graphene.UUID, fields=["refund_id"])
 
@@ -50,10 +53,10 @@ class PaymentOrderNode(DjangoNode):
         ]
         permission_classes = [PaymentOrderPermission]
 
-    def resolve_order_uuid(root: PaymentOrder, info: GQLInfo) -> str | None:
+    def resolve_order_uuid(root: PaymentOrder, info: GQLInfo) -> uuid.UUID | None:
         return root.remote_id
 
-    def resolve_refund_uuid(root: PaymentOrder, info: GQLInfo) -> str | None:
+    def resolve_refund_uuid(root: PaymentOrder, info: GQLInfo) -> uuid.UUID | None:
         return root.refund_id
 
     def resolve_reservation_pk(root: PaymentOrder, info: GQLInfo) -> str | None:

@@ -11,7 +11,7 @@ from mptt.models import MPTTModel
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ReservationUnit, Resource, Unit
+    from tilavarauspalvelu.models import ReservationUnit, Resource
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
     from tilavarauspalvelu.models.resource.queryset import ResourceQuerySet
@@ -27,19 +27,19 @@ __all__ = [
 
 
 class Space(MPTTModel):
-    name: str = models.CharField(max_length=255)
-    surface_area: int | None = models.IntegerField(blank=True, null=True)
-    max_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
-    code: str = models.CharField(max_length=255, db_index=True, blank=True, default="")
+    name = models.CharField(max_length=255)
+    surface_area = models.IntegerField(blank=True, null=True)
+    max_persons = models.PositiveIntegerField(null=True, blank=True)
+    code = models.CharField(max_length=255, db_index=True, blank=True, default="")
 
-    parent: Space | None = TreeForeignKey(
+    parent = TreeForeignKey(
         "self",
         related_name="children",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
-    unit: Unit = models.ForeignKey(
+    unit = models.ForeignKey(
         "tilavarauspalvelu.Unit",
         related_name="spaces",
         on_delete=models.PROTECT,
