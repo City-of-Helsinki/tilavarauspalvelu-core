@@ -10,6 +10,7 @@ Sources:
 - GitHub workflows and the `azure-pipelines-*.yml` triggers in `tilavarauspalvelu-core`.
 - Jira epic [TILA-4513](https://helsinkisolutionoffice.atlassian.net/browse/TILA-4513) and its child issues.
 - Answers from the team (Joonatan, 17.11.2026). See section 5.
+- Check against the code, 20.11.2026: labeler, Azure triggers, `release-check.sh`, `run-e2e.yml`. The fixes are in 1.1, 2.1, 3.1, 3.2, 3.4, 3.6, 3.7, 4.1, 5 and 6.
 
 ## 1. Current process
 
@@ -28,6 +29,11 @@ Details that matter for the plan:
 - The tag suffix selects the apps: `-core`, `-ui`, `-customer`, `-staff`. No suffix builds all three.
 - The release triggers have path filters (for example `backend/**`). A tag with no change in an app still gets an image:
   the GitHub build is cached and only retags it. So each app gets the new tag to deploy. (Team view. Verify once.)
+  Update 20.11.: the GitHub build (`build-backend.yml`) has no path filter. The Azure release triggers have one
+  (`paths: include: backend` in `backend/azure-pipelines-release.yml`). Not verified: does Azure apply it to a tag push?
+  If yes, a UI-only tag never deploys core. Then `release-check --wait` for all three apps always times out (see 3.1).
+- The Azure release triggers have `batch: true`. When two tags come close together, Azure can batch them.
+  Then the first tag never reaches test. Example: v1.76.0 and v1.76.1 were both tagged on 20.11.2026. Not verified for tags.
 - A deploy with reference `latest` uses the tag stored in the Azure `common` variable group. The build pipeline writes it.
 - The approval gate is an Azure DevOps "environment" check. The deploy job in `job-templates/rollout-dc.yml` names the environment.
   Checks are set in the Azure UI, not in the repo. The dev team approves and can change the checks.
@@ -57,6 +63,7 @@ Details that matter for the plan:
 
 Total for a full release: about 20 manual actions plus the testing. Releases happen about twice a week
 (8 tags from 5.11. to 17.11.2026, many of them patches).
+There are no numbers yet for the time from the tag to production. See 2.1.
 
 Why step 2 is manual: the e2e run must wait for the Azure test deploy. GitHub does not know when Azure is done,
 so nobody can start the run from the tag directly.
@@ -86,6 +93,18 @@ Update the page after the new process is agreed. Ask the user before editing it.
 | 8 | Check | Now `just infra release-check`. Manual. | Run it as the last step of the release pipeline (TILA-4669). Post the result to Slack. |
 | 9 | Pre-release flag | Easy to forget. | A GitHub workflow removes it with `GITHUB_TOKEN` when `release-check production` sees the version. No token for Azure needed (see 3.6). |
 | 10 | Confluence logs | Left over from an older process that needed more release planning. | Stop. Use the GitHub release notes as the record. Optionally a Jira fix version. |
+
+### 2.1 Baseline
+
+The goal is faster releases. The table above counts clicks, not waiting time. Measure the waiting time before the work starts.
+
+- For the last 10 releases, measure the time from the tag to production. The tag date is in git.
+  The production time is in the Platta Slack post or the Azure run.
+- Split the time into: wait for the test deploy and e2e, manual testing, PO approval, and the production deploy.
+- Measure the same again after each step in section 6.
+
+The long waits are probably manual testing, PO approval and the e2e wait, not the 7 Azure clicks.
+Use the numbers to check the order in section 6.
 
 ## 3. Target shape (proposal)
 
@@ -146,6 +165,16 @@ A Slack post or a "simple" check must see only the runs for a release. So the re
   a Job 3 posts the result with the run link to the release thread (see 3.5).
 - Manual "E2E tests" runs do not change and do not post. "E2E checks" (`test-e2e.yml`) is a different workflow and is not affected.
 - Azure and the "simple" check read the result of the "Release e2e" run for the tag, not of any e2e run.
+- Before the e2e run, read the probe results of test and stage ([nightly checks plan](../nightly-integration-checks/plan.md)).
+  A red run then shows if the tag or an external service is the cause. An external outage does not block the release.
+- Job 1 waits only for the apps that the tag deploys. With suffix tags, pass `--targets` from the suffix. A `-ui` tag never reaches core.
+  If Azure path filters skip an app with no changes (see 1.1), the wait for all three apps always times out.
+  Verify the path filters on the next UI-only tag, before this PR. The simple fix is to remove the path filters
+  from the Azure release triggers, so each tag deploys all three apps. This matches 3.4.
+- If test already runs a newer tag, report "replaced by vX.Y.Z", not "failed" or "timed out". Azure `batch: true` can skip a tag (see 1.1).
+- `run-e2e.yml` has `concurrency: group: ${{ github.workflow }}`. In a called workflow this is the name of the caller.
+  So "Release e2e" and the manual runs get two groups and can overlap on the shared test data.
+  Use a fixed group name in `run-e2e.yml` until the e2e tests can run in parallel (nightly checks plan, part 5).
 
 The tag must come from a person or a GitHub App. A tag pushed with `GITHUB_TOKEN` does not start this workflow (3.6).
 
@@ -173,6 +202,9 @@ A release is "simple" only when all of these are true. The agent proposes it. A 
 - No downtime. Until TILA-4662 lands, this means UI-only releases.
 - No GraphQL schema change that removes or changes a field.
 - No change in payments, access codes, personal data or the double booking guards.
+  A fixed list of paths in the gate A script decides this. The agent can add to it, but it must not be the only check.
+  Start the list with the Verkkokauppa and `keyless_entry` integrations, the reservation and payment mutations, and the checkout pages of the UIs.
+  Until TILA-4662 lands, simple means UI-only. So the UI payment pages matter most.
 - The test plan has no item that e2e does not cover.
 
 #### Flagging migrations and schema changes
@@ -197,7 +229,7 @@ Both changes are easy to find from the files:
 
 GitHub side:
 
-1. **PR labels.** Add `migrations` and `graphql-schema` rules to `.github/labeler.yml`. Config only. The `pr-labeler.yml` workflow exists.
+1. **PR labels.** Done: `migrations` and `graphql-schema` are in `.github/labeler.yml` (commit `55429bc81`).
 2. **Release body.** The gate A script writes one line for each flag, for example "Migrations: yes (downtime)".
    Do not add a category for these in `.github/release.yml`. GitHub puts a PR in only the first category that matches,
    so these PRs would leave Features and Fixes.
@@ -229,6 +261,7 @@ Keep it as a later step. It is not needed for the first version of the pipeline.
 Tag suffixes do not fit well with one pipeline and rolling updates. Proposal:
 
 - Drop the suffixes. Each tag builds all three apps. Unchanged apps get a cached retag, so this is cheap.
+  This needs Azure release triggers that let each tag through. See the path filters in 1.1.
 - The combined pipeline has one boolean toggle per app (`deployCore`, `deployCustomerUi`, `deployStaffUi`), all on by default.
   Turn one off for a hotfix that must not touch the others.
 - Keep the per-app pipelines for single hotfixes (as TILA-4670 says).
@@ -328,8 +361,10 @@ It is not elegant, but it needs no tokens, no PAT approval and no person's accou
 - **Azure waits for GitHub.** Only needed if simple releases skip gate B. `tilavarauspalvelu-core` is a public repo,
   so Azure can read the e2e run result and the "simple" flag from the GitHub API without a new token.
   Two ways: a script step in the release pipeline that polls, or the built-in "Invoke REST API" check on the production environment.
-  The check retries on an interval until it passes or times out. Unauthenticated GitHub API calls have a low rate limit (60 per hour per IP),
-  so poll every few minutes, not every few seconds. The existing Azure GitHub service connection can raise the limit if needed.
+  The check retries on an interval until it passes or times out. Unauthenticated GitHub API calls have a low rate limit (60 per hour per IP).
+  The agentless check probably runs from Azure DevOps IPs that other customers share, so their calls use the same budget.
+  Use the existing Azure GitHub service connection from the start, not only if needed. Check whose identity it uses.
+  If it is a personal PAT, it has the problem in the table above. Poll every few minutes, not every few seconds.
 - **Where to store "simple".** It must be a thing both sides can read. For example a line in the GitHub release body, or a label on the release.
   The gate A script writes it. A developer can change it by hand.
 
@@ -362,6 +397,17 @@ Proposal: start with A. It works today with TILA-4670. Try B when simple release
 
 - The "Invoke REST API" check can call GitHub with no credentials (Generic connection with no auth), and the check timeout fits a release (hours to days).
 - Who can run the approve job. Only the dev team, through the GitHub environment reviewers.
+
+### 3.7 Rollback
+
+Simple releases that skip gate B reach production with no person in between. So the runbook needs one rollback step:
+
+- Run the production pipeline again with the previous tag as the reference, not `latest`. A developer of the team does it.
+  The Platta notice and `release-check` run as for any release.
+- This is safe for UI-only releases. Until TILA-4662 lands, only these can be simple.
+- A release with migrations cannot roll back this way. Fix forward with a new tag. These releases always have gate B.
+
+Write the step in the Confluence release page when it is updated. Do this before simple releases skip gate B.
 
 ## 4. Related tickets in TILA-4513
 
@@ -419,10 +465,12 @@ New tickets for the epic, with their blockers:
 
 | Candidate | Blocked by |
 |---|---|
-| "Release e2e" workflow: automatic e2e on test after a tag, with a Slack result (3.1) | TILA-4705 in production (version endpoints) |
+| Baseline: time from the tag to production for the last 10 releases (2.1) | none |
+| "Release e2e" workflow: automatic e2e on test after a tag, with a Slack result (3.1) | TILA-4705 on test (version endpoints). Verify the Azure path filters first (1.1). |
 | Gate A release script: tag, pre-release, test plan, simple flag, Slack post | none. Relates to TILA-4687. |
-| PR labels for migrations and GraphQL schema changes (3.2) | none |
-| Skip gate B for simple releases (auto deploy after e2e) | TILA-4670 and the e2e ticket. Azure polls GitHub, no token (3.6). |
+| PR labels for migrations and GraphQL schema changes (3.2). Done in `55429bc81`. | none |
+| Rollback step in the runbook (3.7) | none |
+| Skip gate B for simple releases (auto deploy after e2e) | TILA-4670, the e2e ticket and the rollback step. Azure polls GitHub (3.6). |
 | Process change: PO only for downtime, stop the Confluence logs | none (PO decision) |
 | Remove the pre-release flag with a GitHub workflow | TILA-4705 in production |
 | Migration check against a production copy | TILA-4620 (which is blocked by TILA-4619) |
@@ -433,16 +481,7 @@ Dry runs done 17.11.2026, nothing changed in Jira:
 - `jira-create --type Epic` with a Finnish description and `--relates TILA-4513`: the type is valid, and the request is a plain issue create plus one link.
 - `jira-update TILA-4670 --parent <epic>`: the request changes only the parent, from TILA-4513 to the new epic.
 
-Missing tickets (candidates, not created):
-
-- "Release e2e" workflow: automatic e2e run on the test env after a tag, with a Slack result (step 2, 3.1).
-- Gate A release script: tag, pre-release, test plan, simple flag, Slack post (steps 1 and 3).
-- PR labels for migrations and GraphQL schema changes in `.github/labeler.yml` (3.2). Config only.
-- Skip gate B for simple releases (steps 4 and 7).
-- Process change: PO only for downtime or major changes. Stop the Confluence release logs (steps 5 and 10).
-- Remove the pre-release flag with a GitHub workflow (step 9). No Azure token needed.
-- Migration check against a production copy (3.3). Later, after TILA-4620.
-- Update the Confluence release page.
+The candidate table above is the only list of the new tickets. None of them is created yet.
 
 ## 5. Decisions and open questions
 
@@ -455,6 +494,7 @@ Decided (17.11.2026):
 4. Core first, then the UIs. Independent order is possible without schema changes, but not needed.
 5. Tag suffixes: drop them or make them automatic. Use per-app toggles in Azure for hotfixes.
 6. Path filters are not a problem. Unchanged apps get a cached retag. (Verify once.)
+   Update 20.11.: the GitHub build has no path filter, but the Azure release triggers have one. See open question 6.
 7. Pre-release flag from Azure: maybe later. Waits for PAT approval (pending about a week). Find out who approves access tokens.
    Update 19.11.: a GitHub workflow can do it with `GITHUB_TOKEN`, so no Azure token is needed (3.6).
 8. e2e result: now a manual link and ✅ in the Slack release thread. Automate it.
@@ -473,20 +513,31 @@ Still open:
 3. Does the PO want a heads-up for every production release (for example the Slack post), or only for downtime?
 4. Jira fix versions instead of the Confluence log, or only GitHub release notes?
 5. Where does a person approve production: Azure UI (A), GitHub with Azure polling (B), or GitHub starting Azure with an identity (C)? See "Gate B for production" in 3.6.
+6. Does Azure apply the path filters of the release triggers to a tag push (1.1)? Verify on the next UI-only tag, or remove the path filters.
+7. Tag suffixes: drop them (3.4) or make them automatic (decision 5)? Pick one.
+8. What is the hotfix path in the new flow? Where does the tag come from, does test get it, does "Release e2e" run, and which pipeline deploys it?
+9. Whose identity does the existing Azure GitHub service connection use (3.6)?
+10. Can a GitHub runner reach production (geo block, WAF)? The pre-release flag job and gate B option A poll production from GitHub.
+    See step 0 in the [nightly checks plan](../nightly-integration-checks/plan.md).
 
 ## 6. Suggested order (for refinement)
+
+"Release e2e" and the process change do not depend on TILA-4670, and they remove waiting time.
+TILA-4670 is unprioritised and needs work in Azure. So the first two come first. Check the order with the baseline numbers (2.1).
 
 0. Move the release process to its own epic first (see 4.1). Done: TILA-4721 has the 8 tickets.
    Still to do: fix the blocker links, then create the new tickets under it.
 1. Finish TILA-4705 (release check). Already in testing.
-2. TILA-4681, then TILA-4670 with per-app toggles and staging in parallel. Add the smoke check from TILA-4669 as the last step.
-   This removes most clicks: steps 6, 7, 8.
+2. Baseline: the time from the tag to production for the last 10 releases (2.1). No code.
 3. "Release e2e" workflow after a tag, with a Slack result (new). Small, GitHub only. Removes step 2.
-   Slack first through the GitHub app subscription (3.5), a custom bot later if an admin installs one.
+   First verify the Azure path filters (1.1). Slack first through the GitHub app subscription (3.5), a custom bot later if an admin installs one.
 4. Process change: PO only for downtime, stop the Confluence logs. No code. Removes step 10, and step 5 for UI-only releases.
-5. Gate A release script with the test plan, the flags and the Slack post (new). Runs locally first, so no new tokens.
-6. TILA-4699, then TILA-4662. Core releases without migrations have no downtime, so step 5 goes away for most releases.
+5. TILA-4681, then TILA-4670 with per-app toggles and staging in parallel. Add the smoke check from TILA-4669 as the last step.
+   This removes most clicks: steps 6, 7, 8.
+6. Gate A release script with the test plan, the flags and the Slack post (new). Runs locally first, so no new tokens.
+7. TILA-4699, then TILA-4662. Core releases without migrations have no downtime, so step 5 goes away for most releases.
    Add to TILA-4662: log the path that ran (Recreate or Rolling). See 3.2.
-7. Pre-release flag from a GitHub workflow with `GITHUB_TOKEN` (new). Small, no new token.
-8. Skip gate B for simple releases, after the "simple" advice has been right for some releases.
-9. Later: migration check on a production copy (after TILA-4620).
+8. Pre-release flag from a GitHub workflow with `GITHUB_TOKEN` (new). Small, no new token.
+9. Rollback step in the runbook (3.7). No code.
+10. Skip gate B for simple releases, after the "simple" advice has been right for some releases.
+11. Later: migration check on a production copy (after TILA-4620).
