@@ -3,6 +3,7 @@
     "saveFailed": "Application could not be saved"
   },
   "validation": {
+    "priceOptionNotOffered": "The customer group you chose is no longer available. Choose a new customer group.",
     "Required": "Required",
     "Expected number, received null": "Required",
     "noReservationUnits": "Add one or more spaces to the application",
@@ -47,6 +48,7 @@
     "groupSize": "Group size",
     "ageGroup": "Age group",
     "purpose": "Booking purpose",
+    "priceOption": "Customer group",
     "spacesSubHeading": "Requested spaces",
     "defaultPeriodPrefix": "Use the default booking period",
     "applicationRoundSubHeading": "Period",
@@ -190,6 +192,7 @@
       "numPersons": "Group size",
       "ageGroup": "Age group",
       "purpose": "Booking purpose",
+      "priceOption": "Customer group",
       "duration": "Duration",
       "period": "Period",
       "additionalInfo": "",

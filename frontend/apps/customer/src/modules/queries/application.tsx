@@ -51,6 +51,13 @@ export const APPLICATION_FORM_FRAGMENT = gql`
         nameEn
         nameSv
       }
+      priceOption {
+        id
+        pk
+        nameFi
+        nameEn
+        nameSv
+      }
     }
   }
 `;

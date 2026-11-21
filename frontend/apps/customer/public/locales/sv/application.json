@@ -3,6 +3,7 @@
     "saveFailed": "Det gick inte att spara ansökningen"
   },
   "validation": {
+    "priceOptionNotOffered": "Kundgruppen du valde är inte längre tillgänglig. Välj en ny kundgrupp.",
     "Required": "Obligatorisk",
     "Expected number, received null": "Obligatorisk",
     "noReservationUnits": "Lägg till en eller flera lokaler till ansökningen",
@@ -47,6 +48,7 @@
     "groupSize": "Gruppstorlek",
     "ageGroup": "Åldersgrupp",
     "purpose": "Användningsändamål",
+    "priceOption": "Kundgrupp",
     "spacesSubHeading": "Lokalönskemål",
     "defaultPeriodPrefix": "Använd standard bokningsperiod",
     "applicationRoundSubHeading": "Period",
@@ -191,6 +193,7 @@
       "ageGroup": "Åldersgrupp",
       "purpose": "Användningsändamål",
       "additionalInfo": "Tilläggsuppgifter om bokningen",
+      "priceOption": "Kundgrupp",
       "period": "Bokningsperiod",
       "duration": "Säsongbokningens varaktighet",
       "eventsPerWeek": "Bokningar per vecka",

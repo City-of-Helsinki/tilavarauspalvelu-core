@@ -6,6 +6,7 @@ import {
   ApplicationPage2SchemaRefined,
   ApplicationPage3Schema,
   ApplicationPage1SchemaRefined,
+  clearPriceOptionsIfNoneOffered,
   convertApplicationPage1,
   convertApplicationPage2,
   convertApplicationPage3,
@@ -40,7 +41,7 @@ describe("ApplicationPage1SchemaRefined", () => {
   };
 
   test("requires at least one section", () => {
-    const result = ApplicationPage1SchemaRefined(round).safeParse({
+    const result = ApplicationPage1SchemaRefined(round, { offeredPriceOptionPks: [] }).safeParse({
       pk: 1,
       applicantType: ReserveeType.Company,
       applicationSections: [],
@@ -51,7 +52,7 @@ describe("ApplicationPage1SchemaRefined", () => {
   });
 
   test("validates section dates against the application round", () => {
-    const result = ApplicationPage1SchemaRefined(round).safeParse({
+    const result = ApplicationPage1SchemaRefined(round, { offeredPriceOptionPks: [] }).safeParse({
       pk: 1,
       applicantType: ReserveeType.Company,
       applicationSections: [
@@ -70,6 +71,43 @@ describe("ApplicationPage1SchemaRefined", () => {
         "applicationSections.0.end:end date must be before application round end date",
       ])
     );
+  });
+
+  function priceOptionIssues(priceOption: number | undefined, offeredPriceOptionPks: number[]) {
+    const result = ApplicationPage1SchemaRefined(round, { offeredPriceOptionPks }).safeParse({
+      pk: 1,
+      applicantType: ReserveeType.Company,
+      applicationSections: [{ ...createValidPage1Section(), priceOption }],
+    });
+    return (result.error?.issues ?? [])
+      .filter((issue) => issue.path.join(".") === "applicationSections.0.priceOption")
+      .map((issue) => issue.message);
+  }
+
+  test.for([
+    { name: "no options offered, none selected", priceOption: undefined, offered: [], expected: [] },
+    { name: "offered option selected", priceOption: 2, offered: [1, 2], expected: [] },
+    { name: "options offered, none selected", priceOption: undefined, offered: [1, 2], expected: ["Required"] },
+    { name: "option no longer offered", priceOption: 3, offered: [1, 2], expected: ["priceOptionNotOffered"] },
+    { name: "round offers no options anymore", priceOption: 3, offered: [], expected: ["priceOptionNotOffered"] },
+  ])("price option: $name", ({ priceOption, offered, expected }) => {
+    expect(priceOptionIssues(priceOption, offered)).toEqual(expected);
+  });
+});
+
+describe("clearPriceOptionsIfNoneOffered", () => {
+  const values = {
+    pk: 1,
+    applicantType: ReserveeType.Company,
+    applicationSections: [{ ...createValidPage1Section(), priceOption: 3 }],
+  };
+
+  test("clears saved options when the round offers none", () => {
+    expect(clearPriceOptionsIfNoneOffered(values, []).applicationSections?.[0]?.priceOption).toBeUndefined();
+  });
+
+  test("keeps saved options when the round offers some, so the validation can tell the user to choose again", () => {
+    expect(clearPriceOptionsIfNoneOffered(values, [1, 2]).applicationSections?.[0]?.priceOption).toBe(3);
   });
 });
 
@@ -105,6 +143,7 @@ describe("page 1 conversions", () => {
             { preferredOrder: 0, reservationUnit: 9 },
             { preferredOrder: 1, reservationUnit: 7 },
           ],
+          priceOption: null,
         },
       ],
     });
@@ -140,6 +179,7 @@ describe("page 1 conversions", () => {
             { preferredOrder: 0, reservationUnit: 7 },
             { preferredOrder: 1, reservationUnit: 9 },
           ],
+          priceOption: null,
         },
       ],
     });
@@ -675,33 +715,73 @@ describe("page 3 conversions", () => {
 });
 
 describe("validateApplication", () => {
+  const noPriceOptions = { offeredPriceOptionPks: [] };
+
   test("returns the first invalid page and accepts a complete application", () => {
     expect(
-      validateApplication({
-        ...createMockApplicationFragment({ page: "page3" }),
-        applicationRound: {
-          ...createMockApplicationFragment({ page: "page3" }).applicationRound,
-          reservationPeriodBeginDate: "not-a-date",
+      validateApplication(
+        {
+          ...createMockApplicationFragment({ page: "page3" }),
+          applicationRound: {
+            ...createMockApplicationFragment({ page: "page3" }).applicationRound,
+            reservationPeriodBeginDate: "not-a-date",
+          },
         },
-      })
+        noPriceOptions
+      )
     ).toEqual({
       valid: false,
       page: 1,
     });
-    expect(validateApplication(createMockApplicationFragment({ page: "page0" }))).toEqual({
+    expect(validateApplication(createMockApplicationFragment({ page: "page0" }), noPriceOptions)).toEqual({
       valid: false,
       page: 1,
     });
-    expect(validateApplication(createMockApplicationFragment({ page: "page1" }))).toEqual({
+    expect(validateApplication(createMockApplicationFragment({ page: "page1" }), noPriceOptions)).toEqual({
       valid: false,
       page: 2,
     });
-    expect(validateApplication(createMockApplicationFragment({ page: "page2" }))).toEqual({
+    expect(validateApplication(createMockApplicationFragment({ page: "page2" }), noPriceOptions)).toEqual({
       valid: false,
       page: 3,
     });
-    expect(validateApplication(createMockApplicationFragment({ page: "page3" }))).toEqual({
+    expect(validateApplication(createMockApplicationFragment({ page: "page3" }), noPriceOptions)).toEqual({
       valid: true,
     });
   });
+
+  // A draft saved before the round had price options has no price option in its sections.
+  test("sends the user back to page 1 when the round offers price options but a section has none", () => {
+    const application = createMockApplicationFragment({ page: "page3" });
+    expect(validateApplication(application, { offeredPriceOptionPks: [1, 2] })).toEqual({
+      valid: false,
+      page: 1,
+    });
+  });
+
+  test("sends the user back to page 1 when a section has a price option that the round does not offer", () => {
+    const application = withPriceOption(createMockApplicationFragment({ page: "page3" }), 3);
+    expect(validateApplication(application, { offeredPriceOptionPks: [1, 2] })).toEqual({
+      valid: false,
+      page: 1,
+    });
+  });
+
+  test("accepts sections with an offered price option", () => {
+    const application = withPriceOption(createMockApplicationFragment({ page: "page3" }), 2);
+    expect(validateApplication(application, { offeredPriceOptionPks: [1, 2] })).toEqual({ valid: true });
+  });
 });
+
+function withPriceOption(
+  application: ReturnType<typeof createMockApplicationFragment>,
+  pk: number
+): ReturnType<typeof createMockApplicationFragment> {
+  return {
+    ...application,
+    applicationSections: (application.applicationSections ?? []).map((section) => ({
+      ...section,
+      priceOption: { id: `PriceOptionNode:${pk}`, pk, nameFi: "Aikuiset", nameEn: null, nameSv: null },
+    })),
+  };
+}

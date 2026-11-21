@@ -3,6 +3,7 @@
     "saveFailed": "Hakemuksen tallennus ei onnistunut"
   },
   "validation": {
+    "priceOptionNotOffered": "Valitsemasi asiakasryhmä ei ole enää haettavissa. Valitse uusi asiakasryhmä.",
     "Required": "Pakollinen",
     "Expected number, received null": "Pakollinen",
     "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
@@ -47,6 +48,7 @@
     "groupSize": "Ryhmän koko",
     "ageGroup": "Ikäryhmä",
     "purpose": "Varauksen käyttötarkoitus",
+    "priceOption": "Asiakasryhmä",
     "spacesSubHeading": "Toivotut tilat",
     "defaultPeriodPrefix": "Käytä oletuskestoa",
     "applicationRoundSubHeading": "Varauskausi",
@@ -190,6 +192,7 @@
       "numPersons": "Ryhmän koko",
       "ageGroup": "Ikäryhmä",
       "purpose": "Varauksen käyttötarkoitus",
+      "priceOption": "Asiakasryhmä",
       "additionalInfo": "Lisätietoja varaukseen liittyen",
       "period": "Kausi",
       "duration": "Varauksen kesto",

@@ -47,6 +47,8 @@ type ApplicationPageT = "page1" | "page2" | "page3" | "page4";
 type ApplicationPageProps = {
   application: ReadonlyDeep<ApplicationFormFragment>;
   page: ApplicationPageT;
+  // The price options of the application round, needed to validate the application for the stepper
+  offeredPriceOptionPks: ReadonlyArray<number>;
   children?: React.ReactNode;
 };
 
@@ -56,6 +58,7 @@ type ApplicationPageProps = {
 export function ApplicationFunnelWrapper({
   application,
   page,
+  offeredPriceOptionPks,
   children,
 }: Readonly<ApplicationPageProps>): React.ReactElement {
   const { t } = useTranslation();
@@ -75,7 +78,7 @@ export function ApplicationFunnelWrapper({
     <>
       <Breadcrumb routes={routes} />
       <ApplicationHead status={application.status} title={heading} />
-      <ApplicationStepper application={application} />
+      <ApplicationStepper application={application} offeredPriceOptionPks={offeredPriceOptionPks} />
       {subtitle && <StyledH2 $marginTop="none">{subtitle}</StyledH2>}
       <HR />
       <InnerContainer>

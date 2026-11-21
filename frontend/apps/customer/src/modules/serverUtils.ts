@@ -1,14 +1,22 @@
 import { gql } from "@apollo/client";
 import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 import { logError } from "@ui/modules/errors";
+import { filterNonNullable } from "@ui/modules/helpers";
 import type { CommonEnvConfig } from "@ui/types";
-import { TermsOfUseTypeChoices, TermsOfUseDocument, OrderDocument } from "@gql/gql-types";
+import {
+  TermsOfUseTypeChoices,
+  TermsOfUseDocument,
+  OrderDocument,
+  ApplicationRoundPriceOptionsDocument,
+} from "@gql/gql-types";
 import type {
   TermsOfUseQuery,
   TermsOfUseQueryVariables,
   OrderQuery,
   OrderQueryVariables,
   TermsOfUseFieldsFragment,
+  ApplicationRoundPriceOptionsQuery,
+  ApplicationRoundPriceOptionsQueryVariables,
 } from "@gql/gql-types";
 import { env } from "@/env.mjs";
 import { getVersion } from "./baseUtils";
@@ -74,6 +82,43 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
 
   return tos;
 }
+
+type ApplicationRoundPriceOption = ApplicationRoundPriceOptionsQuery["applicationRoundPriceOptions"][number];
+
+/// The price options the application round offers. If there are any, every application section must select one.
+/// Every application funnel page needs these for validating the application (the stepper and the send button).
+export async function getApplicationRoundPriceOptions(
+  apolloClient: ApolloClient<unknown>,
+  applicationRoundPk: number | null | undefined
+): Promise<ReadonlyArray<ApplicationRoundPriceOption>> {
+  if (applicationRoundPk == null) {
+    return [];
+  }
+  const { data } = await apolloClient.query<
+    ApplicationRoundPriceOptionsQuery,
+    ApplicationRoundPriceOptionsQueryVariables
+  >({
+    query: ApplicationRoundPriceOptionsDocument,
+    variables: { applicationRound: applicationRoundPk },
+  });
+  return data?.applicationRoundPriceOptions ?? [];
+}
+
+export function toPriceOptionPks(priceOptions: ReadonlyArray<ApplicationRoundPriceOption>): number[] {
+  return filterNonNullable(priceOptions.map((option) => option.pk));
+}
+
+export const APPLICATION_ROUND_PRICE_OPTIONS_QUERY = gql`
+  query ApplicationRoundPriceOptions($applicationRound: Int!) {
+    applicationRoundPriceOptions(applicationRound: $applicationRound) {
+      pk
+      nameFi
+      nameSv
+      nameEn
+      isActive
+    }
+  }
+`;
 
 export async function getReservationByOrderUuid(
   apolloClient: ApolloClient<NormalizedCacheObject>,

@@ -53,6 +53,8 @@ const ApplicationSectionPage1Schema = z
     isAccordionOpen: z.boolean(),
     // form specific: new events don't have pks and we need a unique identifier
     formKey: z.string(),
+    // required only when the application round has price options (checked in ApplicationPage1SchemaRefined)
+    priceOption: z.number().optional(),
   })
   .refine((s) => s.maxDuration >= s.minDuration, {
     path: ["maxDuration"],
@@ -212,6 +214,7 @@ export function convertApplicationSectionPage1(section: SectionType): Applicatio
     reservationUnits,
     begin: convertDate(section.reservationsBeginDate) ?? "",
     end: convertDate(section.reservationsEndDate) ?? "",
+    priceOption: section.priceOption?.pk ?? undefined,
     isAccordionOpen: false,
   };
 }
@@ -310,7 +313,44 @@ function checkApplicationRoundDates(
   }
 }
 
-export function ApplicationPage1SchemaRefined(round: { begin: Date; end: Date }) {
+/// Same rules as the backend's send validation (APPLICATION_SECTION_PRICE_OPTION_MISSING / _NOT_OFFERED).
+/// A saved option can stop being offered after the draft was saved (e.g. the round's pricing changes).
+function getPriceOptionError(
+  priceOption: number | undefined,
+  offeredPriceOptionPks: ReadonlyArray<number>
+): "Required" | "priceOptionNotOffered" | null {
+  if (priceOption != null && !offeredPriceOptionPks.includes(priceOption)) {
+    return "priceOptionNotOffered";
+  }
+  if (priceOption == null && offeredPriceOptionPks.length > 0) {
+    return "Required";
+  }
+  return null;
+}
+
+/// A round that offers no price options has no price option select, so a saved option
+/// could not be seen nor changed. Clear it instead (saving sends null, which clears it in the backend).
+export function clearPriceOptionsIfNoneOffered(
+  values: ApplicationPage1FormValues,
+  offeredPriceOptionPks: ReadonlyArray<number>
+): ApplicationPage1FormValues {
+  if (offeredPriceOptionPks.length > 0) {
+    return values;
+  }
+  return {
+    ...values,
+    applicationSections: values.applicationSections?.map((section) =>
+      section == null ? section : { ...section, priceOption: undefined }
+    ),
+  };
+}
+
+/// @param offeredPriceOptionPks the price options of the application round (applicationRoundPriceOptions).
+/// A section must select one of them if there are any, and must not have an option the round does not offer.
+export function ApplicationPage1SchemaRefined(
+  round: { begin: Date; end: Date },
+  { offeredPriceOptionPks }: { offeredPriceOptionPks: ReadonlyArray<number> }
+) {
   return ApplicationPage1Schema.superRefine((val, ctx) => {
     if (val.applicationSections == null || val.applicationSections.length === 0) {
       ctx.addIssue({
@@ -327,6 +367,14 @@ export function ApplicationPage1SchemaRefined(round: { begin: Date; end: Date })
       }
       const pathRoot = `applicationSections.${i}`;
       checkApplicationRoundDates(round, section, pathRoot, ctx);
+      const priceOptionError = getPriceOptionError(section.priceOption, offeredPriceOptionPks);
+      if (priceOptionError != null) {
+        ctx.addIssue({
+          code: "custom",
+          path: [`${pathRoot}.priceOption`],
+          message: priceOptionError,
+        });
+      }
     }
   });
 }
@@ -438,6 +486,8 @@ function transformApplicationSection(
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) => transformEventReservationUnit(ruo, ruoIndex)),
+    // Always sent, so that null clears a saved option
+    priceOption: ae.priceOption ?? null,
   };
   if (ae.pk != null) {
     return {
@@ -629,7 +679,8 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
 }
 
 export function validateApplication(
-  application: ApplicationFormFragment
+  application: ApplicationFormFragment,
+  { offeredPriceOptionPks }: { offeredPriceOptionPks: ReadonlyArray<number> }
 ): { valid: true } | { valid: false; page: 1 | 2 | 3 } {
   const { applicationRound } = application;
   const begin = parseApiDate(applicationRound.reservationPeriodBeginDate);
@@ -637,7 +688,7 @@ export function validateApplication(
   if (begin == null || end == null) {
     return { valid: false, page: 1 };
   }
-  const schema = ApplicationPage1SchemaRefined({ begin, end });
+  const schema = ApplicationPage1SchemaRefined({ begin, end }, { offeredPriceOptionPks });
   const page1 = schema.safeParse(convertApplicationPage1(application, []));
   if (!page1.success) {
     return { valid: false, page: 1 };

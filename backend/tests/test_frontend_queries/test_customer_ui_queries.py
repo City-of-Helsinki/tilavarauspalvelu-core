@@ -15,7 +15,9 @@ from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import local_date, local_datetime, local_time, next_hour
 
 from tests.factories import (
+    ApplicationRoundFactory,
     PriceComponentFactory,
+    PriceOptionFactory,
     PricingGroupFactory,
     ReservationFactory,
     ReservationUnitFactory,
@@ -347,6 +349,31 @@ def test_frontend_queries__customer_ui__ApplicationRoundCriteria(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
+
+
+def test_frontend_queries__customer_ui__ApplicationRoundPriceOptions(graphql):
+    customer_factories = get_customer_query_info()
+    factories = customer_factories["ApplicationRoundPriceOptions"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+
+    application_round = ApplicationRoundFactory.create_in_status_open(
+        reservation_units=[ReservationUnitFactory.create()],
+    )
+    price_option = PriceOptionFactory.create_for_application_round(application_round)
+
+    variables = deepcopy(query_info.variables)
+    variables["applicationRound"] = application_round.pk
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_superuser()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+    assert [option["pk"] for option in response.first_query_object] == [price_option.pk]
 
 
 def test_frontend_queries__customer_ui__ApplicationRoundsUi(graphql):

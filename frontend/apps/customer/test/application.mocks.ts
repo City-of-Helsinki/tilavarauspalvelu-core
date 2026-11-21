@@ -135,6 +135,7 @@ function createMockApplicationSection({
     appliedReservationsPerWeek: 1,
     ageGroup: createMockAgeGroupNode(),
     purpose: createMockIntendedUseNode(),
+    priceOption: null,
     reservationUnitOptions,
     ...page2Data,
   };

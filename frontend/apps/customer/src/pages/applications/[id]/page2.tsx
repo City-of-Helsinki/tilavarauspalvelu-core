@@ -20,9 +20,13 @@ import {
 import type { ApplicationPage2FormValues } from "@/components/application/funnel/form";
 import { useUnsavedChangesWarning } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
+import { getApplicationRoundPriceOptions, toPriceOptionPks } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 
-function Page2({ application }: Pick<PropsNarrowed, "application">): React.ReactElement {
+function Page2({
+  application,
+  offeredPriceOptionPks,
+}: Pick<PropsNarrowed, "application" | "offeredPriceOptionPks">): React.ReactElement {
   const router = useRouter();
   const [mutate] = useUpdateApplicationMutation();
   const displayError = useDisplayError();
@@ -80,7 +84,7 @@ function Page2({ application }: Pick<PropsNarrowed, "application">): React.React
 
   return (
     <FormProvider {...form}>
-      <ApplicationFunnelWrapper page="page2" application={application}>
+      <ApplicationFunnelWrapper page="page2" application={application} offeredPriceOptionPks={offeredPriceOptionPks}>
         <Page2Impl application={application} onNext={saveAndNavigate} />
       </ApplicationFunnelWrapper>
     </FormProvider>
@@ -117,9 +121,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
+  const priceOptions = await getApplicationRoundPriceOptions(client, application.applicationRound.pk);
+
   return {
     props: {
       application,
+      offeredPriceOptionPks: toPriceOptionPks(priceOptions),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

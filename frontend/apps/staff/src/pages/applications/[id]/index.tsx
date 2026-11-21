@@ -419,6 +419,9 @@ function ApplicationSectionDetails({
             <ValueBox label={t("applicationSection:eventDuration")} value={duration} />
             <ValueBox label={t("applicationSection:eventsPerWeek")} value={`${section.appliedReservationsPerWeek}`} />
             <ValueBox label={t("applicationSection:dates")} value={dates} />
+            {section.priceOption && (
+              <ValueBox label={t("applicationSection:priceOption")} value={section.priceOption?.nameFi ?? undefined} />
+            )}
           </ApplicationDatas>
           <Flex $justifyContent="space-between" $direction="row" $alignItems="center">
             <H4 as="h3">{t("applicationSection:requestedReservationUnits")}</H4>
@@ -697,6 +700,11 @@ export const APPLICATION_PAGE_SECTION_FRAGMENT = gql`
       ...SuitableTime
     }
     purpose {
+      id
+      pk
+      nameFi
+    }
+    priceOption {
       id
       pk
       nameFi
