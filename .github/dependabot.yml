@@ -86,6 +86,12 @@ updates:
       sentry:
         patterns:
           - "@sentry/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
       react-hook-form:
         patterns:
           - "react-hook-form"
