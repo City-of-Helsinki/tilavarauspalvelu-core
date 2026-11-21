@@ -323,8 +323,9 @@ end_watch() {
 }
 
 # Sleeps until the rate limit resets, plus a margin for clock skew.
+# jq reads the time, because `date -d` is only in GNU date and macOS does not have it.
 sleep_until() {
-  local seconds=$(( $(date -d "$1" +%s) - $(date +%s) + 10 ))
+  local seconds=$(( $(jq -rn --arg at "$1" '$at | fromdateiso8601') - $(date +%s) + 10 ))
   (( seconds > 0 )) && sleep "$seconds"
   return 0
 }
