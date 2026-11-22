@@ -90,6 +90,24 @@ Without tag keys, the script shows `environment`, `url`, `transaction` and `rele
 `exception` is the outermost exception that has a message. It often has the ID of the failed request.
 The script stops after 2000 events and then sets `truncated` to true.
 
+### Use only one environment
+
+An issue can have events from many environments, for example `testing` and `production`.
+To use only the events of one environment, add `--environment` before the issue:
+
+```bash
+.agents/skills/sentry/sentry-issue --environment production 153768154 release
+.agents/skills/sentry/sentry-issue --events --environment production 153768154
+```
+
+The option works with one event, with tag counts and with `--events`.
+The script does not read `environment=` from a URL. Use the option instead.
+
+- The latest event, the tag counts, `first_seen` and `last_seen` are for that environment only.
+- `event_count` and `user_count` stay the totals over all environments, because Sentry does not filter them.
+  To get the count in the environment, add the tag key `environment`.
+- An event ID in the URL selects that event, also when it is from another environment.
+
 ### Resolve issues
 
 ```bash
