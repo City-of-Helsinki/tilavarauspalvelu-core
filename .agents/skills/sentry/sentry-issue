@@ -3,23 +3,46 @@
 # The event is the one in the URL, or the latest event if the URL has none.
 # Tag keys after the issue add the top values of each tag over all events of the issue.
 # With --events, the script lists all events of the issue instead. Each event has the values of the tag keys.
+# With --environment, the script uses only the events of that environment, for example production.
 # The token is read from the secret file or from 1Password. See lib.sh.
-# Usage: sentry-issue [--events] <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name
+# Usage: sentry-issue [--events] [--environment <name>] <issue ID or URL> [tag key ...],
+#   e.g. sentry-issue --environment production 153768154 browser.name os.name
 set -euo pipefail
 
 source "$(dirname "$0")/lib.sh"
 
 usage() {
-  echo "Usage: sentry-issue [--events] <issue ID or URL> [tag key ...], e.g. sentry-issue 153768154 browser.name os.name" >&2
+  cat >&2 <<'EOF'
+Usage: sentry-issue [--events] [--environment <name>] <issue ID or URL> [tag key ...]
+  --events              List all events of the issue, not one event.
+  --environment <name>  Use only the events of this environment, for example production.
+e.g. sentry-issue --environment production 153768154 browser.name os.name
+EOF
   exit 2
 }
 
 list_events=false
-if [[ "${1:-}" == "--events" ]]; then
-  list_events=true
-  shift
-fi
+environment=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --events) list_events=true; shift ;;
+    --environment)
+      [[ $# -ge 2 ]] || usage
+      environment="$2"
+      shift 2
+      ;;
+    --*) echo "Unknown option: $1" >&2; usage ;;
+    *) break ;;
+  esac
+done
 [[ $# -ge 1 ]] || usage
+
+if [[ -n "$environment" && ! "$environment" =~ ^[A-Za-z0-9_.-]+$ ]]; then
+  echo "Not a Sentry environment name: $environment" >&2
+  usage
+fi
+# The query parameter for the API calls. It is empty without --environment.
+env_param="${environment:+environment=$environment}"
 
 parse_issue "$1" || usage
 shift
@@ -47,7 +70,7 @@ if $list_events; then
   truncated=false
   while :; do
     page=$((page + 1))
-    api "issues/$issue_id/events/?full=true${cursor:+&cursor=$cursor}" \
+    api "issues/$issue_id/events/?full=true${env_param:+&$env_param}${cursor:+&cursor=$cursor}" \
       --dump-header "$tmp_dir/headers" >"$tmp_dir/page-$(printf '%03d' "$page").json"
     # The Link header has the next cursor. results="true" tells that the next page has events.
     next="$(grep -io 'rel="next"; *results="true"; *cursor="[^"]*"' "$tmp_dir/headers" || true)"
@@ -78,9 +101,12 @@ if $list_events; then
   exit 0
 fi
 
-issue="$(api "issues/$issue_id/")"
-event="$(api "issues/$issue_id/events/$event_id/")"
-tags="$(for key in "$@"; do api "issues/$issue_id/tags/$key/"; done | jq --slurp '.')"
+# With --environment, the first and last seen times, the latest event and the tag counts are for that environment.
+# Sentry does not filter event_count and user_count. They stay the totals over all environments.
+# An event ID from the URL selects that event, also when it is from another environment.
+issue="$(api "issues/$issue_id/${env_param:+?$env_param}")"
+event="$(api "issues/$issue_id/events/$event_id/${env_param:+?$env_param}")"
+tags="$(for key in "$@"; do api "issues/$issue_id/tags/$key/${env_param:+?$env_param}"; done | jq --slurp '.')"
 
 jq --slurp '.[0] as $issue | .[1] as $event | .[2] as $tags | {
   id: $issue.id,
