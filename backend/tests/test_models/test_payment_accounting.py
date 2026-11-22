@@ -31,19 +31,27 @@ def mock_refresh_reservation_unit_accounting_task() -> Generator[NonCallableMock
         yield mock
 
 
-def test_payment_accounting__webshop_sync_is_not_triggered_when_accounting_is_not_used(settings):
+def test_payment_accounting__webshop_sync_is_not_triggered_when_accounting_is_not_used(
+    settings, django_capture_on_commit_callbacks
+):
     settings.UPDATE_ACCOUNTING = True
 
-    with mock_refresh_reservation_unit_accounting_task() as mock:
+    with (
+        mock_refresh_reservation_unit_accounting_task() as mock,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         PaymentAccountingFactory.create()
 
     assert mock.call_count == 0
 
 
-def test_payment_accounting__webshop_sync_trigger_reservation_units(settings):
+def test_payment_accounting__webshop_sync_trigger_reservation_units(settings, django_capture_on_commit_callbacks):
     settings.UPDATE_ACCOUNTING = True
 
-    with mock_refresh_reservation_unit_accounting_task() as mock:
+    with (
+        mock_refresh_reservation_unit_accounting_task() as mock,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         payment_accounting = PaymentAccountingFactory.create()
 
     assert mock.call_count == 0
@@ -51,17 +59,25 @@ def test_payment_accounting__webshop_sync_trigger_reservation_units(settings):
     reservation_unit = ReservationUnitFactory.create(payment_accounting=payment_accounting)
 
     payment_accounting.refresh_from_db()
-    with mock_refresh_reservation_unit_accounting_task() as mock:
+    with (
+        mock_refresh_reservation_unit_accounting_task() as mock,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         payment_accounting.save()
 
     assert mock.call_count == 1
     assert mock.call_args.args == (reservation_unit.pk,)
 
 
-def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(settings):
+def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
+    settings, django_capture_on_commit_callbacks
+):
     settings.UPDATE_ACCOUNTING = True
 
-    with mock_refresh_reservation_unit_accounting_task() as mock:
+    with (
+        mock_refresh_reservation_unit_accounting_task() as mock,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         payment_accounting = PaymentAccountingFactory.create()
 
     assert mock.call_count == 0
@@ -69,17 +85,25 @@ def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
     reservation_unit = ReservationUnitFactory.create(unit__payment_accounting=payment_accounting)
 
     payment_accounting.refresh_from_db()
-    with mock_refresh_reservation_unit_accounting_task() as mock:
+    with (
+        mock_refresh_reservation_unit_accounting_task() as mock,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         payment_accounting.save()
 
     assert mock.call_count == 1
     assert mock.call_args.args == (reservation_unit.pk,)
 
 
-def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(settings):
+def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(
+    settings, django_capture_on_commit_callbacks
+):
     settings.UPDATE_ACCOUNTING = True
 
-    with mock_refresh_reservation_unit_accounting_task() as mock:
+    with (
+        mock_refresh_reservation_unit_accounting_task() as mock,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         payment_accounting = PaymentAccountingFactory.create()
 
     assert mock.call_count == 0
@@ -88,11 +112,34 @@ def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(s
     reservation_unit_2 = ReservationUnitFactory.create(unit__payment_accounting=payment_accounting)
 
     payment_accounting.refresh_from_db()
-    with mock_refresh_reservation_unit_accounting_task() as mock:
+    with (
+        mock_refresh_reservation_unit_accounting_task() as mock,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         payment_accounting.save()
 
     assert mock.call_count == 2
     assert sorted(call.args[0] for call in mock.call_args_list) == [reservation_unit_1.pk, reservation_unit_2.pk]
+
+
+def test_payment_accounting__webshop_sync_waits_for_commit(settings, django_capture_on_commit_callbacks):
+    settings.UPDATE_ACCOUNTING = True
+
+    payment_accounting = PaymentAccountingFactory.create()
+    reservation_unit = ReservationUnitFactory.create(payment_accounting=payment_accounting)
+
+    payment_accounting.refresh_from_db()
+    with mock_refresh_reservation_unit_accounting_task() as mock:
+        with django_capture_on_commit_callbacks() as callbacks:
+            payment_accounting.save()
+
+        assert mock.call_count == 0
+
+        for callback in callbacks:
+            callback()
+
+    assert mock.call_count == 1
+    assert mock.call_args.args == (reservation_unit.pk,)
 
 
 def test_payment_accounting__one_of_the_fields_is_required(settings):

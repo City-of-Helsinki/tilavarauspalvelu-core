@@ -55,7 +55,7 @@ def mock_create_product():
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
-def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save():
+def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save(django_capture_on_commit_callbacks):
     tax_level = TaxLevelFactory.create(rates__vat_code="48")
     sales_item = SalesItemFactory.create(tax_level=tax_level, material="10000116", main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(
@@ -70,7 +70,8 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
         main_ledger_account="340025",
         product_invoicing_material="12345678",
     )
-    reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is not None
@@ -100,7 +101,9 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
-def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_does_not_exist():
+def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_does_not_exist(
+    django_capture_on_commit_callbacks,
+):
     sales_item = create_sales_item(vat_code="48")
     reservation_unit = ReservationUnitFactory.create(
         is_draft=False,
@@ -111,7 +114,8 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_doe
 
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
     reservation_unit.payment_accounting = None
-    reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is not None
@@ -121,11 +125,14 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_doe
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
-def test_refresh_reservation_unit_accounting__api_not_called_when_product_mapping_is_not_needed():
+def test_refresh_reservation_unit_accounting__api_not_called_when_product_mapping_is_not_needed(
+    django_capture_on_commit_callbacks,
+):
     reservation_unit = ReservationUnitFactory.create(is_draft=True, own_price__amount=Decimal(10))
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
     reservation_unit.payment_accounting = PaymentAccountingFactory.create()
-    reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is None
@@ -188,7 +195,7 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting, side_effect=CreateOrUpdateAccountingError("test"))
 @patch_method(SentryLogger.log_exception)
-def test_refresh_reservation_unit_accounting__capture_error__api_errors():
+def test_refresh_reservation_unit_accounting__capture_error__api_errors(django_capture_on_commit_callbacks):
     sales_item = create_sales_item(vat_code="48")
     reservation_unit = ReservationUnitFactory.create(
         is_draft=False,
@@ -198,7 +205,8 @@ def test_refresh_reservation_unit_accounting__capture_error__api_errors():
     )
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
     reservation_unit.payment_accounting = PaymentAccountingFactory.create()
-    reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     assert VerkkokauppaAPIClient.create_product.called is True
     assert VerkkokauppaAPIClient.create_or_update_accounting.called is True
