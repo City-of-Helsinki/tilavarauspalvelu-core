@@ -128,7 +128,7 @@ def _reservation_unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Res
     using = kwargs["using"]
 
     if settings.UPDATE_PRODUCT_MAPPING:
-        refresh_reservation_unit_product_mapping_task.delay(instance.pk)
+        refresh_reservation_unit_product_mapping_task.delay_on_commit(instance.pk)
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
         update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
@@ -162,7 +162,7 @@ def _payment_accounting_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[P
         reservation_units_from_units = ReservationUnit.objects.filter(unit__in=instance.units.all())
         reservation_units = reservation_units_from_units.union(instance.reservation_units.all())
         for reservation_unit in reservation_units:
-            refresh_reservation_unit_accounting_task.delay(reservation_unit.pk)
+            refresh_reservation_unit_accounting_task.delay_on_commit(reservation_unit.pk)
 
 
 @receiver(post_save, sender=SalesItem, dispatch_uid="sales_item_post_save")
