@@ -1,4 +1,5 @@
 ci:
+  autofix_prs: false
   skip:
     # Cannot access poetry on pre-commit.ci
     - poetry-lock
