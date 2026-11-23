@@ -158,7 +158,8 @@ function SectionErrors({
 
   let title;
   let message;
-  switch (errorMessage) {
+  // An empty message, like an unknown one, gets the general title.
+  switch (errorMessage ?? "") {
     case OUTSIDE_OPENING_HOURS_ERROR:
       title = t("application:validation.calendar.outsideOpeningHoursTitle");
       break;
@@ -167,14 +168,14 @@ function SectionErrors({
       break;
     case PER_WEEK_ERROR:
       title = t("application:validation.calendar.title");
-      message = t(`application:validation.calendar.${errorMessage}`, {
+      message = t(`application:validation.calendar.${PER_WEEK_ERROR}`, {
         applied,
         fitting: countFittingReservations(timeRangeList, minDuration),
       });
       break;
     case "Required":
       title = t("application:validation.calendar.requiredTitle");
-      message = t(`application:validation.calendar.${errorMessage}`);
+      message = t("application:validation.calendar.Required");
       break;
     default:
       title = t("errors:general_error");
