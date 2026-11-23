@@ -25,7 +25,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   label: string;
-  options: Readonly<SelectOption[]>;
+  options: ReadonlyArray<Readonly<SelectOption>>;
   required?: boolean;
   placeholder?: string;
   error?: string;
@@ -44,7 +44,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
 }
 
 const toHDSValue = (
-  opts: Readonly<SelectOption[]>,
+  opts: ReadonlyArray<Readonly<SelectOption>>,
   val: string | number | Array<string | number> | undefined
 ): Array<Partial<Option>> => {
   if (val == null) {
