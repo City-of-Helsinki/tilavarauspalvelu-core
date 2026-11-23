@@ -307,8 +307,5 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                 HaukiResourceHashUpdater(hauki_resource_ids=[obj.origin_hauki_resource.id]).run(force_refetch=True)
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Reservation unit: {obj.pk}")
-                message = _(
-                    "The reservation unit was saved, but its opening hours could not be updated from Hauki. "
-                    "The error was reported to Sentry."
-                )
+                message = _("The reservation unit was saved, but its opening hours could not be updated from Hauki.")
                 self.message_user(request, message, level=messages.WARNING)

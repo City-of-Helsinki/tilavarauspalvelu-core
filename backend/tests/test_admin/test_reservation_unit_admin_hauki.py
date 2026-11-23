@@ -61,8 +61,5 @@ def test_reservation_unit_admin__hauki_refetch_error_does_not_fail_save(api_clie
 
     warnings = [str(message) for message in get_messages(response.wsgi_request) if message.level_tag == "warning"]
     assert warnings == [
-        (
-            "The reservation unit was saved, but its opening hours could not be updated from Hauki. "
-            "The error was reported to Sentry."
-        ),
+        "The reservation unit was saved, but its opening hours could not be updated from Hauki.",
     ]

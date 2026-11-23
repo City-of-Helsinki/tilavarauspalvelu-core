@@ -135,7 +135,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             HaukiResourceHashUpdater().run(force_refetch=True)
         except ExternalServiceError as error:
             SentryLogger.log_exception(error, details="Hauki resources: all")
-            message = _("Could not update the reservable time spans from Hauki. The error was reported to Sentry.")
+            message = _("Could not update the reservable time spans from Hauki.")
             self.message_user(request, message, level=messages.ERROR)
             return
 
@@ -147,7 +147,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             HaukiResourceHashUpdater([pk]).run(force_refetch=True)
         except ExternalServiceError as error:
             SentryLogger.log_exception(error, details=f"Hauki resources: {pk}")
-            message = _("Could not update the reservable time spans from Hauki. The error was reported to Sentry.")
+            message = _("Could not update the reservable time spans from Hauki.")
             self.message_user(request, message, level=messages.ERROR)
             return
 
@@ -159,7 +159,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             HaukiResourceHashUpdater(ids).run(force_refetch=True)
         except ExternalServiceError as error:
             SentryLogger.log_exception(error, details=f"Hauki resources: {ids}")
-            message = _("Could not update the reservable time spans from Hauki. The error was reported to Sentry.")
+            message = _("Could not update the reservable time spans from Hauki.")
             self.message_user(request, message, level=messages.ERROR)
             return
 
