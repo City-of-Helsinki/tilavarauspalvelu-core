@@ -1,7 +1,8 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, expect, test, describe, beforeEach } from "vitest";
-import type { OptionsListT } from "ui/src/modules/search";
+import { createNodeId } from "ui/src/modules/helpers";
+import type { OptionsListT, OptionT } from "ui/src/modules/search";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import Page1 from "@/pages/applications/[id]/page1";
 import { createMockApplicationFragment } from "@test/application.mocks";
@@ -82,15 +83,60 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
+type PriceOptionRenderProps = {
+  priceOptionList?: OptionT[];
+  savedPriceOptionPk?: number;
+};
+
+function customRender(
+  props: CreateMockApplicationFragmentProps = {},
+  { priceOptionList = [], savedPriceOptionPk }: PriceOptionRenderProps = {}
+): ReturnType<typeof render> {
   const mocks = createGraphQLMocks();
-  const application = createMockApplicationFragment(props);
+  const mockApplication = createMockApplicationFragment(props);
+  const application =
+    savedPriceOptionPk == null
+      ? mockApplication
+      : {
+          ...mockApplication,
+          applicationSections:
+            mockApplication.applicationSections?.map((section) => ({
+              ...section,
+              priceOption: {
+                id: createNodeId("PriceOptionNode", savedPriceOptionPk),
+                pk: savedPriceOptionPk,
+                nameFi: "Poistettu asiakasryhmä",
+                nameEn: null,
+                nameSv: null,
+              },
+            })) ?? null,
+        };
   const options: OptionsListT = createOptionMock();
+  const offeredPriceOptionPkList = priceOptionList.map((priceOption) => priceOption.value);
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <Page1 application={application} options={options} priceOptionList={[]} offeredPriceOptionPkList={[]} />
+      <Page1
+        application={application}
+        options={options}
+        priceOptionList={priceOptionList}
+        offeredPriceOptionPkList={offeredPriceOptionPkList}
+      />
     </MockedGraphQLProvider>
   );
+}
+
+async function fillSectionWithoutPriceOption(section: HTMLElement): Promise<void> {
+  const user = userEvent.setup();
+  await user.type(within(section).getByLabelText(/application:Page1.name/), "Test section name");
+  await selectFirstOption(within(section), /application:Page1.ageGroup/);
+  await selectFirstOption(within(section), /application:Page1.purpose/);
+  await user.type(within(section).getByLabelText(/application:Page1.groupSize/, { selector: "input" }), "1");
+  await user.click(within(section).getByRole("checkbox", { name: /application:Page1.defaultPeriodPrefix/ }));
+  await selectFirstOption(within(section), /application:Page1.minDuration/);
+  await selectFirstOption(within(section), /application:Page1.maxDuration/);
+  const eventsPerWeek = within(section).getByLabelText(/application:Page1.eventsPerWeek/, { selector: "input" });
+  await user.clear(eventsPerWeek);
+  await user.type(eventsPerWeek, "1");
 }
 
 beforeEach(() => {
@@ -269,6 +315,67 @@ describe("Page1", () => {
   test.todo("should update application on submit");
   test.todo("should not allow saving for invalid form");
   test.todo("mutation should toast on error");
+});
+
+describe("Page1: price option", () => {
+  const priceOptionList: OptionT[] = [
+    { label: "Aikuiset", value: 11 },
+    { label: "Lapset ja nuoret", value: 12 },
+  ];
+
+  beforeEach(() => {
+    const params = new URLSearchParams();
+    params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
+    mockedSearchParams.mockReturnValue(params);
+  });
+
+  test("does not render the select when the round offers no price options", () => {
+    const view = customRender();
+    const section = view.getByTestId("application__applicationSection_0");
+    expect(within(section).queryByLabelText(/application:Page1.priceOption/, { selector: "button" })).toBeNull();
+  });
+
+  test("renders the select with the offered price options", async () => {
+    const view = customRender({}, { priceOptionList });
+    const user = userEvent.setup();
+    const section = view.getByTestId("application__applicationSection_0");
+    await user.click(within(section).getByLabelText(/application:Page1.priceOption/, { selector: "button" }));
+    const optionList = within(view.getByRole("listbox")).getAllByRole("option");
+    expect(optionList.map((option) => option.textContent)).toStrictEqual(["Aikuiset", "Lapset ja nuoret"]);
+  });
+
+  test("requires a price option before saving", async () => {
+    const view = customRender({}, { priceOptionList });
+    const user = userEvent.setup();
+    const section = view.getByTestId("application__applicationSection_0");
+    await fillSectionWithoutPriceOption(section);
+
+    await user.click(view.getByRole("button", { name: "common:next" }));
+
+    // every other field is filled, so the only missing value is the price option
+    expect(within(section).queryAllByText("application:validation.Required")).not.toHaveLength(0);
+    expect(mutateFn).not.toHaveBeenCalled();
+  }, 20_000);
+
+  test("sends the selected price option in the mutation input", async () => {
+    const view = customRender({}, { priceOptionList });
+    const user = userEvent.setup();
+    const section = view.getByTestId("application__applicationSection_0");
+    await fillSectionWithoutPriceOption(section);
+    await selectFirstOption(within(section), /application:Page1.priceOption/);
+
+    await user.click(view.getByRole("button", { name: "common:next" }));
+
+    expect(view.queryAllByText(/application:validation/)).toStrictEqual([]);
+    expect(mutateFn).toHaveBeenCalledTimes(1);
+    expect(mutateFn.mock.calls[0]?.[0].variables.input.applicationSections[0].priceOption).toBe(11);
+  }, 20_000);
+
+  test("shows at once that a saved price option is no longer offered", async () => {
+    const view = customRender({ page: "page1" }, { priceOptionList, savedPriceOptionPk: 99 });
+    const section = view.getByTestId("application__applicationSection_0");
+    expect(await within(section).findAllByText("application:validation.priceOptionNotOffered")).not.toHaveLength(0);
+  });
 });
 
 describe("Page1: multiple sections", () => {
