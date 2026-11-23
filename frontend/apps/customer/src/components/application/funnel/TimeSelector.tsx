@@ -11,7 +11,7 @@ import { WeeklyPatternCalendar } from "@ui/components/WeeklyPatternCalendar/Week
 import { breakpoints } from "@ui/modules/const";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ControlledSelect } from "ui/src/components/form";
-import { successToast, toast } from "ui/src/components/toast";
+import { successToast, warningToast } from "ui/src/components/toast";
 import { formatDuration } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import {
@@ -105,10 +105,9 @@ export function TimeSelectorForm({
     // fix them in that section rather than lose them silently.
     const outside = otherSections().filter(({ i }) => !isInsideOpeningHours(times, allSectionsOpeningHours[i] ?? []));
     if (outside.length > 0) {
-      toast({
+      warningToast({
         text: t("application:Page2.notification.copyCellsOutsideOpeningHours", { names: sectionNames(outside) }),
         dataTestId: "application__page2--notification-alert",
-        type: "alert",
       });
       return;
     }
