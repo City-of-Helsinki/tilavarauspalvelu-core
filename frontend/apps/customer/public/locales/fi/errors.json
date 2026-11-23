@@ -60,6 +60,8 @@
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Hakijan tyyppi puuttuu.",
       "APPLICATION_SECTIONS_MISSING": "Hakemusosio puuttuu.",
+      "APPLICATION_SECTION_RESERVATIONS_BEGIN_DATE_BEFORE_ROUND": "Aloituspäivä ei voi olla ennen hakukierroksen alkamispäivää.",
+      "APPLICATION_SECTION_RESERVATIONS_END_DATE_AFTER_ROUND": "Päättymispäivä ei voi olla hakukierroksen päättymispäivän jälkeen.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Sopivat ajat puuttuvat.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_OUTSIDE_OPENING_HOURS": "Toivottu aika on aukioloaikojen ulkopuolella.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Toivottu aika on liian lyhyt.",
