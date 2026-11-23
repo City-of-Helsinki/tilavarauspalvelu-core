@@ -625,16 +625,16 @@ msgid "Export applications to CSV"
 msgstr "Vie hakemukset CSV-tiedostoon"
 
 #: tilavarauspalvelu/admin/application_round/admin.py
-msgid "Could not export the applications. The error was reported to Sentry."
-msgstr "Hakemusten vienti epäonnistui. Virhe raportoitiin Sentryyn."
+msgid "Could not export the applications."
+msgstr "Hakemusten vienti epäonnistui."
 
 #: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Export results to CSV"
 msgstr "Vie tulokset CSV-tiedostoon"
 
 #: tilavarauspalvelu/admin/application_round/admin.py
-msgid "Could not export the results. The error was reported to Sentry."
-msgstr "Tulosten vienti epäonnistui. Virhe raportoitiin Sentryyn."
+msgid "Could not export the results."
+msgstr "Tulosten vienti epäonnistui."
 
 #: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Reset application round"
@@ -1901,9 +1901,8 @@ msgid "Export selected reservation units to CSV"
 msgstr "Vie valitut varausyksiköt CSV-tiedostoon"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
-msgid ""
-"Could not export the reservation units. The error was reported to Sentry."
-msgstr "Varausyksiköiden vienti epäonnistui. Virhe raportoitiin Sentryyn."
+msgid "Could not export the reservation units."
+msgstr "Varausyksiköiden vienti epäonnistui."
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Access type begin date"
@@ -2428,10 +2427,8 @@ msgid "Location"
 msgstr "Sijainti"
 
 #: tilavarauspalvelu/admin/unit/admin.py
-msgid ""
-"Could not import the units from TPREK. The error was reported to Sentry."
-msgstr ""
-"Toimipisteiden tuonti TPRekistä epäonnistui. Virhe raportoitiin Sentryyn."
+msgid "Could not import the units from TPREK."
+msgstr "Toimipisteiden tuonti TPRekistä epäonnistui."
 
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "No units were updated."

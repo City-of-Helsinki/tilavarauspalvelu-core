@@ -288,7 +288,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
             exporter = ReservationUnitExporter(queryset=queryset)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
-            message = _("Could not export the reservation units. The error was reported to Sentry.")
+            message = _("Could not export the reservation units.")
             self.message_user(request, message, level=messages.ERROR)
             SentryLogger.log_exception(error, "Error while exporting ReservationUnits")
             return None
