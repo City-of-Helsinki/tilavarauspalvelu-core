@@ -130,10 +130,14 @@ def remove_existing_data() -> None:
     series = ReservationSeries.objects.filter(reservation_unit__in=sq)
     allocation = AllocatedTimeSlot.objects.filter(reservation_unit_option__reservation_unit__in=sq)
     options = ReservationUnitOption.objects.filter(reservation_unit__in=sq)
+
+    # The applications that chose a Harakka reservation unit, and the applications of the e2e test round.
+    # Collected before the options are deleted, since the filter goes through them.
     applications = Application.objects.filter(
-        models.Q(application_round__reservation_units__in=sq)
+        models.Q(application_sections__reservation_unit_options__reservation_unit__in=sq)
         | models.Q(application_round__name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)")
     )
+    application_ids = list(applications.values_list("id", flat=True).distinct())
 
     own_pricing_groups = PricingGroup.objects.filter(
         unit_group__isnull=True,
@@ -146,7 +150,7 @@ def remove_existing_data() -> None:
     series.delete()
     allocation.delete()
     options.delete()
-    applications.delete()
+    Application.objects.filter(id__in=application_ids).delete()
     application_round.delete()
     reservation_units.delete()
     PricingGroup.objects.filter(id__in=own_pricing_group_ids).delete()

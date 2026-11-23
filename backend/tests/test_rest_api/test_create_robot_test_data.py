@@ -48,8 +48,10 @@ from utils.db import advisory_lock_is_held, advisory_transaction_lock
 from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
+    ApplicationSectionFactory,
     ReservationFactory,
     ReservationUnitFactory,
+    ReservationUnitOptionFactory,
     UnitFactory,
     UserFactory,
 )
@@ -304,6 +306,33 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
 
     # Reservations in other application rounds are not deleted
     assert Application.objects.filter(pk=other_application.pk).exists()
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
+def test_create_robot_test_data__remove_only_applications_that_chose_e2e_reservation_units():
+    harakka = UnitFactory.create(name="Harakka, piilokoju", tprek_id="71677")
+    e2e_reservation_unit = ReservationUnitFactory.create(
+        name="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        unit=harakka,
+    )
+    other_reservation_unit = ReservationUnitFactory.create()
+    application_round = ApplicationRoundFactory.create(
+        reservation_units=[e2e_reservation_unit, other_reservation_unit],
+    )
+
+    e2e_application = ApplicationFactory.create(application_round=application_round)
+    e2e_section = ApplicationSectionFactory.create(application=e2e_application)
+    ReservationUnitOptionFactory.create(application_section=e2e_section, reservation_unit=e2e_reservation_unit)
+
+    other_application = ApplicationFactory.create(application_round=application_round)
+    other_section = ApplicationSectionFactory.create(application=other_application)
+    ReservationUnitOptionFactory.create(application_section=other_section, reservation_unit=other_reservation_unit)
+
+    create_robot_test_data_task.delay()
+
+    assert Application.objects.filter(pk=e2e_application.pk).exists() is False
+    assert Application.objects.filter(pk=other_application.pk).exists() is True
 
 
 @pytest.mark.slow
