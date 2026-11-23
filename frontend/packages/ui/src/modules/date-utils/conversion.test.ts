@@ -45,6 +45,18 @@ describe("conversion", () => {
       const result = parseApiDate("2026-01-15");
       expect(result).toEqual(new Date(2026, 0, 15));
     });
+
+    // The test scripts force Helsinki. There, Helsinki midnight and local midnight are the same instant.
+    // Use a zone west of Helsinki, so that a return to Helsinki midnight fails this test.
+    it("interprets date-only strings as local midnight outside Helsinki", () => {
+      const originalTz = process.env.TZ;
+      process.env.TZ = "America/New_York";
+      try {
+        expect(parseApiDate("2026-01-15")?.toISOString()).toBe("2026-01-15T05:00:00.000Z");
+      } finally {
+        process.env.TZ = originalTz;
+      }
+    });
   });
 
   describe("fromUIDate", () => {
