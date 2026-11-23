@@ -37,7 +37,7 @@
     "glob": "^14.0.6",
     "graphql-config": "^6.0.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.6.0",
+    "lint-staged": "^17.6.1",
     "npkill": "^0.12.2",
     "oxfmt": "^0.78.0",
     "oxlint": "^1.93.0",
