@@ -758,7 +758,7 @@ describe("TimeSelector times outside the opening hours", () => {
     const item = within(await openFormTab(view)).getByRole("listitem");
     expect(item).toHaveTextContent(`${weekdayLabel(Weekday.Wednesday)}08:00–16:00`);
     expect(item).toHaveAttribute("data-invalid");
-    expect(item).toHaveAttribute("aria-invalid", "true");
+    expect(item).toHaveTextContent("application:TimeSelector.form.outsideOpeningHours");
   });
 
   test("are shown as invalid", () => {
@@ -986,6 +986,51 @@ function getPickedLabel(form: HTMLElement, label: string): string {
 }
 
 describe("TimeSelector form alternative", () => {
+  test("names the priority and the problem of each listed time in text, not only in colour", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    // The mock has a long enough primary time on Wednesday. Add a too short secondary one on Friday.
+    await user.click(view.getByRole("radio", { name: "application:Page2.priorityLabels.secondary" }));
+    await user.click(within(getGrid(view)).getByLabelText(cellName("open", Weekday.Friday, 12 * 60)));
+
+    const form = await openFormTab(view);
+    const itemList = within(form).getAllByRole("listitem");
+    const item = (day: Weekday) => itemList.find((li) => li.textContent?.includes(weekdayLabel(day))) ?? null;
+    expect(item(Weekday.Wednesday)).toHaveTextContent("application:TimeSelector.form.priority.primary");
+    expect(item(Weekday.Wednesday)).not.toHaveTextContent("application:TimeSelector.form.tooShort");
+    expect(item(Weekday.Friday)).toHaveTextContent("application:TimeSelector.form.priority.secondary");
+    expect(item(Weekday.Friday)).toHaveTextContent("application:TimeSelector.form.tooShort");
+
+    // The remove button is reached out of the list context, so it names the priority too.
+    expect(
+      within(form).getByRole("button", {
+        name: new RegExp(`removeTime.*${weekdayLabel(Weekday.Friday)}.*form\\.priority\\.secondary`),
+      })
+    ).toBeInTheDocument();
+  });
+
+  test("gives screen readers the long weekday name when the list shows the short one", async () => {
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    // With the mock's Wednesday time, these make six times, so the list shows short weekday names.
+    const addedDayList = [Weekday.Monday, Weekday.Tuesday, Weekday.Thursday, Weekday.Friday, Weekday.Saturday];
+    for (const day of addedDayList) {
+      await user.click(within(getGrid(view)).getByLabelText(cellName("open", day, 12 * 60)));
+    }
+
+    const form = await openFormTab(view);
+    expect(within(form).getAllByRole("listitem")).toHaveLength(6);
+    for (const day of addedDayList) {
+      const shortName = within(form).getByText(`common:weekdayShortEnum.${day}`);
+      expect(shortName).toHaveAttribute("aria-hidden", "true");
+      const item = shortName.closest("li");
+      expect(item).not.toBeNull();
+      expect(
+        within(item as HTMLElement).getByText(new RegExp(`^${weekdayLabel(day)} 12:00–12:15, `))
+      ).not.toHaveAttribute("aria-hidden");
+    }
+  });
+
   test("a time can be added with the form and shows in the calendar", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -1167,10 +1212,10 @@ describe("TimeSelector with several reservation units", () => {
     const item = (day: Weekday) => items.find((li) => li.textContent?.includes(weekdayLabel(day))) ?? null;
     expect(item(Weekday.Tuesday)).toHaveTextContent("14:00–14:15");
     expect(item(Weekday.Tuesday)).toHaveAttribute("data-invalid");
-    expect(item(Weekday.Tuesday)).toHaveAttribute("aria-invalid", "true");
+    expect(item(Weekday.Tuesday)).toHaveTextContent("application:TimeSelector.form.tooShort");
     // Wednesday's 8 h primary time is long enough.
     expect(item(Weekday.Wednesday)).not.toHaveAttribute("data-invalid");
-    expect(item(Weekday.Wednesday)).not.toHaveAttribute("aria-invalid");
+    expect(item(Weekday.Wednesday)).not.toHaveTextContent("application:TimeSelector.form.tooShort");
   });
 
   test("the legend explains closed and unavailable times apart", () => {

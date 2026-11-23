@@ -101,6 +101,10 @@
       "empty": "Ei valittuja aikoja.",
       "remove": "Poista",
       "removeTime": "Poista {{time}}",
+      "priority": {
+        "primary": "ensisijainen",
+        "secondary": "vaihtoehtoinen"
+      },
       "outsideOpeningHours": "aukioloaikojen ulkopuolella"
     },
     "tooShort": "Aikatoive ({{duration}}) on lyhyempi kuin varauksen vähimmäiskesto ({{minDuration}}). Pidennä aikatoivetta tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",

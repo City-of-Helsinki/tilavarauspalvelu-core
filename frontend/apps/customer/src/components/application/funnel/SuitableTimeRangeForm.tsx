@@ -4,6 +4,7 @@ import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
+import { visuallyHidden } from "@ui/components/CalendarGrid/styles";
 import {
   primaryFill,
   primaryIndicator,
@@ -140,10 +141,12 @@ const RemoveButton = styled(Button)`
   }
 `;
 
+const HiddenText = styled.span`
+  ${visuallyHidden}
+`;
+
 const Status = styled.div`
-  width: 0;
-  height: 0;
-  overflow: hidden;
+  ${visuallyHidden}
 `;
 
 /** A time as the list (and the calendar's error message) names it, e.g. "Tuesday 14:00–15:00". */
@@ -268,8 +271,8 @@ export function SuitableTimeRangeForm({
     const [weekDay, timeRange] = timeString.split(" ");
     return (
       <>
-        <Ellipsis>{weekDay}</Ellipsis>
-        <span>{timeRange}</span>
+        <Ellipsis aria-hidden>{weekDay}</Ellipsis>
+        <span aria-hidden>{timeRange}</span>
       </>
     );
   };
@@ -351,29 +354,39 @@ export function SuitableTimeRangeForm({
           <>
             <H5 id={`${id}-list-label`}>{t("application:TimeSelector.form.listLabel")}</H5>
             <TimeList aria-labelledby={`${id}-list-label`} $columnCount={selectedWeekdayList.length}>
-              {listed.map(({ weekday: day, beginMinutes, endMinutes, data }, position) => (
-                <TimeListItem
-                  key={`${day}-${beginMinutes}`}
-                  $priority={priorityKey(data.priority)}
-                  $weekday={selectedWeekdayList.indexOf(convertWeekday(day)) + 1}
-                  data-invalid={problemOf(position) ? "" : undefined}
-                  aria-invalid={problemOf(position) ? "true" : undefined}
-                  aria-errormessage="#time-selector__error-summary"
-                >
-                  {getTimeRangeContent(day, beginMinutes, endMinutes, listed.length > 5 ? "short" : undefined)}
-                  <RemoveButton
-                    type="button"
-                    size={ButtonSize.Small}
-                    variant={ButtonVariant.Secondary}
-                    onClick={() => handleRemove(position)}
-                    aria-label={t("application:TimeSelector.form.removeTime", {
-                      time: describeTime(t, day, beginMinutes, endMinutes),
-                    })}
+              {listed.map(({ weekday: day, beginMinutes, endMinutes, data }, position) => {
+                const priority = priorityKey(data.priority);
+                const priorityLabel = t(`application:TimeSelector.form.priority.${priority}`);
+                const problem = problemOf(position);
+                const time = describeTime(t, day, beginMinutes, endMinutes);
+                return (
+                  <TimeListItem
+                    key={`${day}-${beginMinutes}`}
+                    $priority={priority}
+                    $weekday={selectedWeekdayList.indexOf(convertWeekday(day)) + 1}
+                    data-invalid={problem ? "" : undefined}
                   >
-                    ×
-                  </RemoveButton>
-                </TimeListItem>
-              ))}
+                    {getTimeRangeContent(day, beginMinutes, endMinutes, listed.length > 5 ? "short" : undefined)}
+                    {/* The visible text can use a short weekday name, and the fill and the triangle show the
+                        priority and the problem only to the eye. Screen readers get all of it from this text. */}
+                    <HiddenText>
+                      {time}, {priorityLabel}
+                      {problem && `, ${problem}`}
+                    </HiddenText>
+                    <RemoveButton
+                      type="button"
+                      size={ButtonSize.Small}
+                      variant={ButtonVariant.Secondary}
+                      onClick={() => handleRemove(position)}
+                      aria-label={t("application:TimeSelector.form.removeTime", {
+                        time: `${time}, ${priorityLabel}`,
+                      })}
+                    >
+                      ×
+                    </RemoveButton>
+                  </TimeListItem>
+                );
+              })}
             </TimeList>
           </>
         )}
