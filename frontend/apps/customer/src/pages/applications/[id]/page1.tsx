@@ -109,7 +109,7 @@ function Page1({
             applicationRound={applicationRound}
             isSaving={isSaving || form.formState.isSubmitting}
             options={options}
-            priceOptionList={filterNonNullable(priceOptionList)}
+            priceOptionList={priceOptionList}
           />
         </ApplicationFunnelWrapper>
       </Flex>
@@ -147,17 +147,19 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
   const searchOptionsPromise = getSearchOptions(client, "seasonal", locale ?? "fi");
-  const priceOptionsPromise = getApplicationRoundPriceOptions(client, application.applicationRound.pk);
+  const roundPriceOptionListPromise = getApplicationRoundPriceOptions(client, application.applicationRound.pk);
 
-  const [searchOptionsList, priceOptions] = await Promise.all([searchOptionsPromise, priceOptionsPromise]);
-  // All offered options, also inactive ones: the backend accepts every offered option, so the select must show them.
-  const priceOptionList = priceOptions.map((option) => translateOption(option, getLocalizationLang(locale)));
+  const [searchOptionsList, roundPriceOptionList] = await Promise.all([
+    searchOptionsPromise,
+    roundPriceOptionListPromise,
+  ]);
+  const lang = getLocalizationLang(locale);
   return {
     props: {
       application,
       options: searchOptionsList,
-      priceOptionList,
-      offeredPriceOptionPkList: toPriceOptionPkList(priceOptions),
+      priceOptionList: roundPriceOptionList.map((priceOption) => translateOption(priceOption, lang)),
+      offeredPriceOptionPkList: toPriceOptionPkList(roundPriceOptionList),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

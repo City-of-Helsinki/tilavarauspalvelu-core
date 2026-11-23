@@ -419,8 +419,8 @@ function ApplicationSectionDetails({
             <ValueBox label={t("applicationSection:eventDuration")} value={duration} />
             <ValueBox label={t("applicationSection:eventsPerWeek")} value={`${section.appliedReservationsPerWeek}`} />
             <ValueBox label={t("applicationSection:dates")} value={dates} />
-            {section.priceOption && (
-              <ValueBox label={t("applicationSection:priceOption")} value={section.priceOption?.nameFi ?? undefined} />
+            {section.priceOption != null && (
+              <ValueBox label={t("applicationSection:priceOption")} value={section.priceOption.nameFi} />
             )}
           </ApplicationDatas>
           <Flex $justifyContent="space-between" $direction="row" $alignItems="center">

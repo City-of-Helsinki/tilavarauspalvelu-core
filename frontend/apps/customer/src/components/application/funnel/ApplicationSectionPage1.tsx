@@ -21,7 +21,7 @@ type Props = Readonly<{
   index: number;
   applicationRound: ApplicationRoundForApplicationFragment;
   options: Readonly<OptionsListT>;
-  priceOptionList?: Readonly<OptionT[]>;
+  priceOptionList: Readonly<OptionT[]>;
   onDeleteEvent: () => void;
 }>;
 
@@ -138,7 +138,7 @@ function ApplicationSectionInner({
           required
           error={getTranslatedError("purpose")}
         />
-        {priceOptionList != null && priceOptionList.length > 0 && (
+        {priceOptionList.length > 0 && (
           <ControlledSelect
             control={control}
             options={priceOptionList}
