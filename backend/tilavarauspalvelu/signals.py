@@ -20,6 +20,7 @@ from django.db.models.signals import m2m_changed, post_delete, post_save, pre_sa
 from django.dispatch import receiver
 from easy_thumbnails.files import get_thumbnailer
 from graphene_django_extensions.errors import (
+    GQLCodeError,
     GQLCreatePermissionDeniedError,
     GQLDeletePermissionDeniedError,
     GQLFieldPermissionDeniedError,
@@ -55,6 +56,7 @@ from tilavarauspalvelu.tasks import (
     update_reservation_unit_image_urls_task,
     update_reservation_unit_search_vectors_task,
 )
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
@@ -360,6 +362,15 @@ if sentry_disconnected:
             # No need to log these as they are handled errors
             return
 
+        if (
+            isinstance(exception, GQLCodeError)
+            and exception.extensions.get("code")
+            == error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED
+        ):
+            # This code indicates incorrect API usage. The query requests calculated fields
+            # without enabling their calculation.
+            return
+
         # Permission errors
 
         if isinstance(
@@ -385,4 +396,3 @@ if sentry_disconnected:
             return
 
         _got_request_exception(request, **kwargs)
-        return
