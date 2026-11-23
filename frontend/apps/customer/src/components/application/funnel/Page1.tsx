@@ -15,7 +15,7 @@ type Page1Props = Readonly<{
   applicationRound: Readonly<ApplicationRoundForApplicationFragment>;
   isSaving: boolean;
   options: Readonly<OptionsListT>;
-  priceOptionList?: Readonly<OptionT[]>;
+  priceOptionList: Readonly<OptionT[]>;
 }>;
 
 export function Page1({ applicationRound, isSaving, options, priceOptionList }: Page1Props): React.ReactElement | null {
@@ -49,7 +49,7 @@ export function Page1({ applicationRound, isSaving, options, priceOptionList }: 
           index={index}
           applicationRound={applicationRound}
           options={options}
-          priceOptionList={priceOptionList ?? undefined}
+          priceOptionList={priceOptionList}
           onDeleteEvent={() => handleDeleteEvent(index)}
         />
       ))}

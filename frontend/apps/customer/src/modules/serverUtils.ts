@@ -115,7 +115,6 @@ export const APPLICATION_ROUND_PRICE_OPTIONS_QUERY = gql`
       nameFi
       nameSv
       nameEn
-      isActive
     }
   }
 `;
