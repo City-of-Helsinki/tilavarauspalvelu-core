@@ -1,6 +1,8 @@
 import { describe, expect, it, test } from "vitest";
 import {
   parseApiDate,
+  parseApiDateAsHelsinkiEndOfDay,
+  parseApiDateAsHelsinkiStartOfDay,
   parseUIDate,
   parseUIDateUnsafe,
   dateForInput,
@@ -12,6 +14,18 @@ import {
   setMondayFirst,
   setSundayFirst,
 } from "./conversion";
+
+function withTimeZone(timeZone: string, callback: () => void) {
+  const originalTz = process.env.TZ;
+  process.env.TZ = timeZone;
+  try {
+    callback();
+  } finally {
+    // Assigning undefined stores the string "undefined", which Node reads as UTC.
+    if (originalTz === undefined) delete process.env.TZ;
+    else process.env.TZ = originalTz;
+  }
+}
 
 describe("conversion", () => {
   describe("fromApiDate", () => {
@@ -49,14 +63,54 @@ describe("conversion", () => {
     // The test scripts force Helsinki. There, Helsinki midnight and local midnight are the same instant.
     // Use a zone west of Helsinki, so that a return to Helsinki midnight fails this test.
     it("interprets date-only strings as local midnight outside Helsinki", () => {
-      const originalTz = process.env.TZ;
-      process.env.TZ = "America/New_York";
-      try {
+      withTimeZone("America/New_York", () => {
         expect(parseApiDate("2026-01-15")?.toISOString()).toBe("2026-01-15T05:00:00.000Z");
-      } finally {
-        process.env.TZ = originalTz;
-      }
+      });
     });
+  });
+
+  describe("parseApiDateAsHelsinkiStartOfDay", () => {
+    it("returns Helsinki midnight in summer time", () => {
+      expect(parseApiDateAsHelsinkiStartOfDay("2026-05-31")?.toISOString()).toBe("2026-05-30T21:00:00.000Z");
+    });
+
+    it("returns Helsinki midnight in winter time", () => {
+      expect(parseApiDateAsHelsinkiStartOfDay("2026-01-15")?.toISOString()).toBe("2026-01-14T22:00:00.000Z");
+    });
+
+    // The test scripts force Helsinki. Use zones west and east of Helsinki, so that local midnight fails this test.
+    test.each(["Europe/London", "Asia/Tokyo"])("returns Helsinki midnight in %s", (timeZone) => {
+      withTimeZone(timeZone, () => {
+        expect(parseApiDateAsHelsinkiStartOfDay("2026-05-31")?.toISOString()).toBe("2026-05-30T21:00:00.000Z");
+      });
+    });
+
+    test.each(["", "invalid-date", "2023-13-45", "2023-02-30", "2026-03-12T10:30:00Z"])(
+      "returns null for %j",
+      (date) => {
+        expect(parseApiDateAsHelsinkiStartOfDay(date)).toBeNull();
+      }
+    );
+  });
+
+  describe("parseApiDateAsHelsinkiEndOfDay", () => {
+    it("returns the last moment of the day in Helsinki", () => {
+      expect(parseApiDateAsHelsinkiEndOfDay("2026-05-31")?.toISOString()).toBe("2026-05-31T20:59:59.999Z");
+    });
+
+    // The test scripts force Helsinki. Use zones west and east of Helsinki, so that local end of day fails this test.
+    test.each(["Europe/London", "Asia/Tokyo"])("returns the last moment of the day in Helsinki in %s", (timeZone) => {
+      withTimeZone(timeZone, () => {
+        expect(parseApiDateAsHelsinkiEndOfDay("2026-05-31")?.toISOString()).toBe("2026-05-31T20:59:59.999Z");
+      });
+    });
+
+    test.each(["", "invalid-date", "2023-13-45", "2023-02-30", "2026-03-12T10:30:00Z"])(
+      "returns null for %j",
+      (date) => {
+        expect(parseApiDateAsHelsinkiEndOfDay(date)).toBeNull();
+      }
+    );
   });
 
   describe("fromUIDate", () => {
