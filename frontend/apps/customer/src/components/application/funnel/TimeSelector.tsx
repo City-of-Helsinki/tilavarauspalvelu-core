@@ -120,7 +120,7 @@ export function TimeSelectorForm({
 
   const formId = `time-selector__form-${index}`;
 
-  const enableCopyCells = filterNonNullable(applicationSections).length > 1 && getCopiedTimes().length > 0;
+  const isCopyTimesEnabled = filterNonNullable(applicationSections).length > 1 && getCopiedTimes().length > 0;
   const onChange = (pattern: WeeklyPatternValue<SuitableTimeData>) => {
     setValue(`applicationSections.${index}.suitableTimeRanges`, fromPattern(pattern), {
       shouldDirty: true,
@@ -239,7 +239,7 @@ export function TimeSelectorForm({
         </Tabs.TabPanel>
       </Tabs>
 
-      {enableCopyCells && (
+      {isCopyTimesEnabled && (
         <div>
           <Button
             id={`time-selector__button--copy-cells-${index}`}

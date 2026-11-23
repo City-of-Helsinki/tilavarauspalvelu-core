@@ -16,8 +16,8 @@
 
 ## Readability
 
-The `Readability` rules in [backend code style](./backend-code-style.md) apply here too,
-except for the rules about Python keyword arguments, `getattr`, and `setattr`. In TypeScript:
+The `Readability` rules in [backend code style](./backend-code-style.md) apply here too, except for the rules about
+Python keyword arguments, `getattr`, and `setattr` and passing mode flags to a helper. In TypeScript:
 
 - Write out each prop by name at the call site. Do not build an object only to spread it into props.
   Spreads are fine where a library gives the object, such as `{...register("name")}`,

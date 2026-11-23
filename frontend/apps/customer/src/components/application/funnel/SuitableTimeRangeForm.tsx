@@ -121,8 +121,8 @@ const RemoveButton = styled(Button)`
   align-items: center;
   justify-content: center;
   min-height: 0;
-  line-height: 1;
-  padding: 0 0 2px;
+  line-height: var(--lineheight-s);
+  padding: 0 0 var(--spacing-4-xs);
   --min-size: calc(var(--spacing-s) + var(--spacing-3-xs));
   font-size: var(--fontsize-heading-s);
   font-family: var(--font-bold), sans-serif;
@@ -245,9 +245,9 @@ export function SuitableTimeRangeForm({
   const [status, setStatus] = useState("");
 
   const fieldName = `applicationSections.${index}.suitableTimeRanges` as const;
-  const ranges = watch(fieldName) ?? [];
+  const timeRangeList = watch(fieldName) ?? [];
   const priority = watch(`applicationSections.${index}.priority`);
-  const listed = listTimeRanges(ranges);
+  const listed = listTimeRanges(timeRangeList);
   const minDuration = watch(`applicationSections.${index}.minDuration`);
   // Unique weekdays in the listed user selections, used to place the times in columns in the list.
   const selectedWeekdayList = [...new Set(listed.map(({ weekday }) => convertWeekday(weekday)))];
