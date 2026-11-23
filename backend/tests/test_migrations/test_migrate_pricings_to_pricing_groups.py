@@ -378,7 +378,7 @@ def test_migrate_pricings_to_pricing_groups__sales_item_from_accounting_material
     PriceComponent = apps.get_model("tilavarauspalvelu", "PriceComponent")
 
     sales_items = SalesItem.objects.values_list("name", "material", "main_ledger_account", "tax_level__name")
-    assert list(sales_items) == [("10000116", "10000116", "350080", "Yleinen")]
+    assert list(sales_items) == [("10000116, 350080", "10000116", "350080", "Yleinen")]
 
     components = PriceComponent.objects.order_by("valid_from").values_list("valid_from", "sales_item__material")
     assert list(components) == [(past, None), (today, "10000116")]
@@ -433,6 +433,35 @@ def test_migrate_pricings_to_pricing_groups__no_sales_item_when_not_paid_online(
     PriceComponent = apps.get_model("tilavarauspalvelu", "PriceComponent")
     assert SalesItem.objects.exists() is False
     assert list(PriceComponent.objects.values_list("sales_item", flat=True)) == [None]
+
+
+def test_migrate_pricings_to_pricing_groups__sales_item_for_each_main_ledger_account_of_material():
+    accounting_1 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340025")
+    accounting_2 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340100")
+    reservation_unit_1 = ReservationUnitFactory.create(payment_accounting=accounting_1)
+    reservation_unit_2 = ReservationUnitFactory.create(payment_accounting=accounting_2)
+    today = local_date()
+
+    apps = migrate_to(BEFORE_MIGRATION)
+    tax_level = create_tax_level(apps, name="Yleinen", percentage=Decimal("25.50"))
+    create_pricing(apps, reservation_unit=reservation_unit_1, tax_level=tax_level, begins=today, payment_type="ONLINE")
+    create_pricing(apps, reservation_unit=reservation_unit_2, tax_level=tax_level, begins=today, payment_type="ONLINE")
+
+    apps = migrate_to(AFTER_MIGRATION)
+
+    SalesItem = apps.get_model("tilavarauspalvelu", "SalesItem")
+    PriceComponent = apps.get_model("tilavarauspalvelu", "PriceComponent")
+
+    sales_items = SalesItem.objects.order_by("main_ledger_account").values_list(
+        "name", "material", "main_ledger_account"
+    )
+    assert list(sales_items) == [
+        ("10000116, 340025", "10000116", "340025"),
+        ("10000116, 340100", "10000116", "340100"),
+    ]
+
+    components = PriceComponent.objects.order_by("pricing_group__reservation_unit_pricing_groups__reservation_unit")
+    assert list(components.values_list("sales_item__main_ledger_account", flat=True)) == ["340025", "340100"]
 
 
 def test_migrate_pricings_to_pricing_groups__uses_existing_sales_item():
@@ -664,9 +693,8 @@ def test_migrate_pricings_to_pricing_groups__error_when_material_has_two_tax_lev
 
     msg = (
         "Cannot move the pricings to pricing groups:\n"
-        "- Material 10000116 has more than one tax level or main ledger account: "
-        f"tax level {general.pk} with main ledger account 350080, "
-        f"tax level {reduced.pk} with main ledger account 350080. Used by:\n"
+        "- Material 10000116 with main ledger account 350080 has more than one tax level: "
+        f"{general.pk}, {reduced.pk}. Used by:\n"
         f"    Reservation unit {reservation_unit_1.pk} 'Sali', pricing {pricing_1.pk}, "
         f"payment accounting {accounting.pk} 'Tili'\n"
         f"    Reservation unit {reservation_unit_2.pk} 'Sauna', pricing {pricing_2.pk}, "
@@ -676,39 +704,24 @@ def test_migrate_pricings_to_pricing_groups__error_when_material_has_two_tax_lev
         migrate_to(AFTER_MIGRATION)
 
 
-def test_migrate_pricings_to_pricing_groups__error_when_material_has_two_main_ledger_accounts():
-    accounting_1 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350080")
-    accounting_2 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350090")
-    reservation_unit_1 = ReservationUnitFactory.create(payment_accounting=accounting_1)
-    reservation_unit_2 = ReservationUnitFactory.create(payment_accounting=accounting_2)
-    today = local_date()
-
-    apps = migrate_to(BEFORE_MIGRATION)
-    tax_level = create_tax_level(apps, name="Yleinen", percentage=Decimal("25.50"))
-    create_pricing(apps, reservation_unit=reservation_unit_1, tax_level=tax_level, begins=today, payment_type="ONLINE")
-    create_pricing(apps, reservation_unit=reservation_unit_2, tax_level=tax_level, begins=today, payment_type="ONLINE")
-
-    with pytest.raises(migration.PricingMigrationError, match="Material 10000116 has more than one tax level"):
-        migrate_to(AFTER_MIGRATION)
-
-    SalesItem = apps.get_model("tilavarauspalvelu", "SalesItem")
-    assert SalesItem.objects.exists() is False
-
-
-def test_migrate_pricings_to_pricing_groups__error_when_existing_sales_item_differs():
+def test_migrate_pricings_to_pricing_groups__error_when_existing_sales_item_has_other_tax_level():
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
 
     apps = migrate_to(BEFORE_MIGRATION)
-    tax_level = create_tax_level(apps, name="Yleinen", percentage=Decimal("25.50"))
+    general = create_tax_level(apps, name="Yleinen", percentage=Decimal("25.50"))
+    reduced = create_tax_level(apps, name="Alennettu", percentage=Decimal("13.50"))
     create_pricing(
-        apps, reservation_unit=reservation_unit, tax_level=tax_level, begins=local_date(), payment_type="ONLINE"
+        apps, reservation_unit=reservation_unit, tax_level=general, begins=local_date(), payment_type="ONLINE"
     )
 
     SalesItem = apps.get_model("tilavarauspalvelu", "SalesItem")
-    SalesItem.objects.create(name="Salivuokra", material="10000116", main_ledger_account="350090", tax_level=tax_level)
+    SalesItem.objects.create(name="Salivuokra", material="10000116", main_ledger_account="350080", tax_level=reduced)
 
-    with pytest.raises(migration.PricingMigrationError, match="Material 10000116 has more than one tax level"):
+    with pytest.raises(
+        migration.PricingMigrationError,
+        match="Material 10000116 with main ledger account 350080 has more than one tax level",
+    ):
         migrate_to(AFTER_MIGRATION)
 
 

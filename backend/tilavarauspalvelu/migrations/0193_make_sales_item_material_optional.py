@@ -15,8 +15,10 @@ class Migration(migrations.Migration):
             name='material',
             field=models.CharField(blank=True, default='', max_length=8, validators=[django.core.validators.MinLengthValidator(8), tilavarauspalvelu.validators.is_numeric]),
         ),
+        # Some environments ran this migration with the constraint on the material only.
+        # Migration 0198 replaces it with the same constraint in every environment.
         migrations.AddConstraint(
             model_name='salesitem',
-            constraint=models.UniqueConstraint(condition=models.Q(('material', ''), _negated=True), fields=('material',), name='sales_item_unique_material', violation_error_message='Another sales item already has this material'),
+            constraint=models.UniqueConstraint(condition=models.Q(('material', ''), _negated=True), fields=('material', 'main_ledger_account'), name='sales_item_unique_material', violation_error_message='Another sales item already has this material and main ledger account'),
         ),
     ]

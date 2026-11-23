@@ -139,6 +139,25 @@ def test_fix_pricing_migration_conflicts__made_up_material_skips_used_materials(
 # ── Not fixed ──
 
 
+def test_fix_pricing_migration_conflicts__material_with_other_main_ledger_account_is_not_changed(tax_free_tax_level):
+    tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
+    accounting_1 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340025")
+    accounting_2 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340100")
+    reservation_unit_1 = ReservationUnitFactory.create(payment_accounting=accounting_1)
+    reservation_unit_2 = ReservationUnitFactory.create(payment_accounting=accounting_2)
+    create_pricing(reservation_unit=reservation_unit_1, tax_level=tax_level)
+    create_pricing(reservation_unit=reservation_unit_2, tax_level=tax_level)
+
+    output = run_command()
+
+    reservation_unit_1 = ReservationUnit.objects.get(pk=reservation_unit_1.pk)
+    reservation_unit_2 = ReservationUnit.objects.get(pk=reservation_unit_2.pk)
+    assert reservation_unit_1.payment_accounting_id == accounting_1.pk
+    assert reservation_unit_2.payment_accounting_id == accounting_2.pk
+
+    assert output == "Made 0 changes.\nNo conflicts. The pricing migrations can run.\n"
+
+
 def test_fix_pricing_migration_conflicts__first_pricing_in_the_future_is_not_fixed(tax_free_tax_level):
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     future = local_date() + datetime.timedelta(days=10)

@@ -64,10 +64,10 @@ def test_sales_item_admin__material_is_optional(api_client):
     assert list(SalesItem.objects.values_list("material", flat=True)) == ["", ""]
 
 
-def test_sales_item_admin__material_is_unique(api_client):
+def test_sales_item_admin__material_is_unique_for_main_ledger_account(api_client):
     api_client.force_login(UserFactory.create_superuser())
     tax_level = TaxLevelFactory.create()
-    SalesItemFactory.create(material="10000116")
+    SalesItemFactory.create(material="10000116", main_ledger_account="340025")
 
     url = reverse("admin:tilavarauspalvelu_salesitem_add")
     data = sales_item_form_data(tax_level=tax_level, material="10000116")
@@ -80,7 +80,22 @@ def test_sales_item_admin__material_is_unique(api_client):
     assert errors == [
         {
             "code": "",
-            "message": "Another sales item already has this material",
+            "message": "Another sales item already has this material and main ledger account",
         },
     ]
     assert SalesItem.objects.count() == 1
+
+
+def test_sales_item_admin__material_with_other_main_ledger_account(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    tax_level = TaxLevelFactory.create()
+    SalesItemFactory.create(material="10000116", main_ledger_account="340100")
+
+    url = reverse("admin:tilavarauspalvelu_salesitem_add")
+    data = sales_item_form_data(tax_level=tax_level, material="10000116")
+    response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 302, response.content
+
+    sales_items = SalesItem.objects.order_by("main_ledger_account").values_list("material", "main_ledger_account")
+    assert list(sales_items) == [("10000116", "340025"), ("10000116", "340100")]

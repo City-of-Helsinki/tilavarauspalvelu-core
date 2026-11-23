@@ -74,7 +74,7 @@ def _pricing_group_errors() -> list[str]:
         pricings_by_unit.setdefault(pricing.reservation_unit_id, []).append(pricing)
 
     errors: list[str] = []
-    sources_by_material: dict[str, list[SalesItemSource]] = {}
+    sources_by_material: dict[tuple[str, str], list[SalesItemSource]] = {}
     sources_without_material: dict[tuple[int, str], list[SalesItemSource]] = {}
 
     for reservation_unit in reservation_units:
@@ -110,7 +110,8 @@ def _pricing_group_errors() -> list[str]:
                 description=f"{description}, payment accounting {accounting.pk} '{accounting.name}'",
             )
             if source.material:
-                sources_by_material.setdefault(source.material, []).append(source)
+                key = (source.material, source.main_ledger_account)
+                sources_by_material.setdefault(key, []).append(source)
             else:
                 key = (source.tax_level_id, source.main_ledger_account)
                 sources_without_material.setdefault(key, []).append(source)
@@ -142,30 +143,30 @@ def _pricing_group_errors() -> list[str]:
 
 def _sales_item_material_errors(
     *,
-    sources_by_material: dict[str, list[SalesItemSource]],
+    sources_by_material: dict[tuple[str, str], list[SalesItemSource]],
     existing_sales_items: list[SalesItem],
 ) -> list[str]:
-    """Errors for the materials that have more than one tax level or main ledger account."""
+    """Errors for the pairs of material and main ledger account that have more than one tax level."""
     existing_by_material = {
-        sales_item.material: sales_item for sales_item in existing_sales_items if sales_item.material
+        (sales_item.material, sales_item.main_ledger_account): sales_item
+        for sales_item in existing_sales_items
+        if sales_item.material
     }
 
     errors: list[str] = []
-    for material, sources in sorted(sources_by_material.items()):
-        values = {(source.tax_level_id, source.main_ledger_account) for source in sources}
-        existing = existing_by_material.get(material)
+    for key, sources in sorted(sources_by_material.items()):
+        tax_level_ids = {source.tax_level_id for source in sources}
+        existing = existing_by_material.get(key)
         if existing is not None:
-            values.add((existing.tax_level_id, existing.main_ledger_account))
+            tax_level_ids.add(existing.tax_level_id)
 
-        if len(values) > 1:
+        if len(tax_level_ids) > 1:
+            material, main_ledger_account = key
             source_texts = "\n    ".join(source.description for source in sources)
-            value_texts = ", ".join(
-                f"tax level {tax_level_id} with main ledger account {main_ledger_account}"
-                for tax_level_id, main_ledger_account in sorted(values)
-            )
+            tax_level_texts = ", ".join(str(tax_level_id) for tax_level_id in sorted(tax_level_ids))
             errors.append(
-                f"Material {material} has more than one tax level or main ledger account: {value_texts}. "
-                f"Used by:\n    {source_texts}"
+                f"Material {material} with main ledger account {main_ledger_account} "
+                f"has more than one tax level: {tax_level_texts}. Used by:\n    {source_texts}"
             )
 
     return errors

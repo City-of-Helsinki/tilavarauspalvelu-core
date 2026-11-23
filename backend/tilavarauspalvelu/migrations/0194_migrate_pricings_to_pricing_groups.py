@@ -56,7 +56,8 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
         pricings_by_unit.setdefault(pricing.reservation_unit_id, []).append(pricing)
 
     errors: list[str] = []
-    sources_by_material: dict[str, list[SalesItemSource]] = {}
+    # One material can be booked to many main ledger accounts, so each pair gets its own sales item.
+    sources_by_material: dict[tuple[str, str], list[SalesItemSource]] = {}
     # Accountings without invoicing have no material.
     # Their sales items are found by the tax level and the main ledger account instead.
     sources_without_material: dict[tuple[int, str], list[SalesItemSource]] = {}
@@ -94,7 +95,8 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
                 description=f"{description}, payment accounting {accounting.pk} '{accounting.name}'",
             )
             if source.material:
-                sources_by_material.setdefault(source.material, []).append(source)
+                key = (source.material, source.main_ledger_account)
+                sources_by_material.setdefault(key, []).append(source)
             else:
                 key = (source.tax_level_id, source.main_ledger_account)
                 sources_without_material.setdefault(key, []).append(source)
@@ -102,7 +104,9 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
     existing_sales_items = list(SalesItem.objects.order_by("pk"))
     existing_names = {sales_item.name for sales_item in existing_sales_items}
     existing_by_material = {
-        sales_item.material: sales_item for sales_item in existing_sales_items if sales_item.material
+        (sales_item.material, sales_item.main_ledger_account): sales_item
+        for sales_item in existing_sales_items
+        if sales_item.material
     }
     existing_without_material: dict[tuple[int, str], object] = {}
     for sales_item in existing_sales_items:
@@ -110,21 +114,19 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
             key = (sales_item.tax_level_id, sales_item.main_ledger_account)
             existing_without_material.setdefault(key, sales_item)
 
-    for material, sources in sorted(sources_by_material.items()):
-        values = {(source.tax_level_id, source.main_ledger_account) for source in sources}
-        existing = existing_by_material.get(material)
+    for key, sources in sorted(sources_by_material.items()):
+        tax_level_ids = {source.tax_level_id for source in sources}
+        existing = existing_by_material.get(key)
         if existing is not None:
-            values.add((existing.tax_level_id, existing.main_ledger_account))
+            tax_level_ids.add(existing.tax_level_id)
 
-        if len(values) > 1:
+        if len(tax_level_ids) > 1:
+            material, main_ledger_account = key
             source_texts = "\n    ".join(source.description for source in sources)
-            value_texts = ", ".join(
-                f"tax level {tax_level_id} with main ledger account {main_ledger_account}"
-                for tax_level_id, main_ledger_account in sorted(values)
-            )
+            tax_level_texts = ", ".join(str(tax_level_id) for tax_level_id in sorted(tax_level_ids))
             errors.append(
-                f"Material {material} has more than one tax level or main ledger account: {value_texts}. "
-                f"Used by:\n    {source_texts}"
+                f"Material {material} with main ledger account {main_ledger_account} "
+                f"has more than one tax level: {tax_level_texts}. Used by:\n    {source_texts}"
             )
 
     tax_level_names = dict(TaxLevel.objects.values_list("pk", "name"))
@@ -152,14 +154,14 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
         raise PricingMigrationError(msg)
 
     new_sales_items_by_material = {
-        material: SalesItem(
-            name=material,
-            material=material,
-            main_ledger_account=sources[0].main_ledger_account,
+        key: SalesItem(
+            name=f"{key[0]}, {key[1]}",
+            material=key[0],
+            main_ledger_account=key[1],
             tax_level_id=sources[0].tax_level_id,
         )
-        for material, sources in sorted(sources_by_material.items())
-        if material not in existing_by_material
+        for key, sources in sorted(sources_by_material.items())
+        if key not in existing_by_material
     }
     new_sales_items_without_material = {
         key: SalesItem(
@@ -244,7 +246,8 @@ def migrate_pricings_to_pricing_groups(apps, schema_editor):
             sales_item = None
             if _is_paid_online(pricing) and accounting is not None and not reservation_unit.is_archived:
                 if accounting.product_invoicing_material:
-                    sales_item = sales_items_by_material.get(accounting.product_invoicing_material)
+                    key = (accounting.product_invoicing_material, accounting.main_ledger_account)
+                    sales_item = sales_items_by_material.get(key)
                 else:
                     key = (pricing.tax_level_id, accounting.main_ledger_account)
                     sales_item = sales_items_without_material.get(key)

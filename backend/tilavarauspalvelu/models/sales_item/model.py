@@ -66,10 +66,10 @@ class SalesItem(models.Model):
         ordering = ["pk"]
         constraints = [
             models.UniqueConstraint(
-                fields=["material"],
+                fields=["material", "main_ledger_account"],
                 condition=~models.Q(material=""),
-                name="sales_item_unique_material",
-                violation_error_message="Another sales item already has this material",
+                name="sales_item_unique_material_main_ledger_account",
+                violation_error_message="Another sales item already has this material and main ledger account",
             ),
         ]
 

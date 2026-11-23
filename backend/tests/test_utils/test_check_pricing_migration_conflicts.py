@@ -113,6 +113,18 @@ def test_check_pricing_migration_conflicts__skips_sales_items_of_archived_reserv
     assert run_command() == "No conflicts. The pricing migrations can run.\n"
 
 
+def test_check_pricing_migration_conflicts__material_with_two_main_ledger_accounts():
+    tax_level = TaxLevelFactory.create(name="Veroton", rates__percentage=Decimal(0))
+    accounting_1 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340025")
+    accounting_2 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340100")
+    reservation_unit_1 = ReservationUnitFactory.create(payment_accounting=accounting_1)
+    reservation_unit_2 = ReservationUnitFactory.create(payment_accounting=accounting_2)
+    create_pricing(reservation_unit=reservation_unit_1, tax_level=tax_level, begins=local_date())
+    create_pricing(reservation_unit=reservation_unit_2, tax_level=tax_level, begins=local_date())
+
+    assert run_command() == "No conflicts. The pricing migrations can run.\n"
+
+
 # ── Conflicts ──
 
 
@@ -154,9 +166,8 @@ def test_check_pricing_migration_conflicts__material_with_existing_sales_item_of
 
     msg = (
         "The pricing migrations would stop:\n"
-        "- Material 10000116 has more than one tax level or main ledger account: "
-        f"tax level {general.pk} with main ledger account 350080, "
-        f"tax level {reduced.pk} with main ledger account 350080. Used by:\n"
+        "- Material 10000116 with main ledger account 350080 has more than one tax level: "
+        f"{general.pk}, {reduced.pk}. Used by:\n"
         f"    Reservation unit {reservation_unit.pk} 'Sali', pricing {pricing.pk}, "
         f"payment accounting {accounting.pk} 'Tili'"
     )
