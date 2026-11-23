@@ -206,8 +206,8 @@
       "processing": "Käsittely",
       "body": "Hakemusten käsittely aloitetaan, kun hakuaika on päättynyt. Ilmoitamme antamaasi sähköpostiosoitteeseen eri vaiheista."
     },
-    "userAcceptsGeneralTerms": "Olen lukenut ja hyväksyn sopimusehdot. (*)",
-    "userAcceptsSpecificTerms": "Olen lukenut ja hyväksyn täydentävät varausehdot. (*)",
+    "userAcceptsGeneralTerms": "Olen lukenut ja hyväksyn peruutus- ja maksuehdot. (*)",
+    "userAcceptsSpecificTerms": "Olen lukenut ja hyväksyn sopimusehdot. (*)",
     "reservationDeleted": "Varaus peruttu.",
     "applicationSectionCancelled": "Peruttu {{ cancelled }} / {{ future }} varausta.",
     "applicationSectionCancelledAll": "Peruttu kaikki {{ cancelled }} varausta."

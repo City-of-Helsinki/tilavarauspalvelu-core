@@ -206,8 +206,8 @@
       "processing": "Behandling",
       "body": "Behandlingen av ansökningarna börjar när ansökningstiden har löpt ut. Vi skickar meddelanden till e-postadressen du har angett med information om de olika skedena."
     },
-    "userAcceptsGeneralTerms": "Jag har läst och godkänner avtalsvillkoren. (*)",
-    "userAcceptsSpecificTerms": "Jag har läst och godkänner de kompletterande bokningsvillkoren. (*)",
+    "userAcceptsGeneralTerms": "Jag har läst och godkänner villkoren för betalning och avbokning. (*)",
+    "userAcceptsSpecificTerms": "Jag har läst och godkänner avtalsvillkoren. (*)",
     "reservationDeleted": "Bokning avbruten.",
     "applicationSectionCancelled": "Avbruten {{ cancelled }} / {{ future }} bokning.",
     "applicationSectionCancelledAll": "Avbruten alla {{ cancelled }} bokning."
