@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create a Jira issue with labels and links through the Jira Cloud REST API.
+# Create a Jira issue with labels, links and an assignee through the Jira Cloud REST API.
 # Usage: jira-create --summary <text> <options>, e.g. jira-create --summary 'Fix login' --parent TILA-123
 set -euo pipefail
 
@@ -18,6 +18,7 @@ Options marked with * can be repeated.
   --blocks <key>              * Add a link: the new issue blocks <key>.
   --blocked-by <key>          * Add a link: the new issue is blocked by <key>.
   --relates <key>             * Add a link: the new issue relates to <key>.
+  --assignee <user>             Assign the new issue: me or the Jira name of a team member.
   --dry-run                     Print the write requests and change nothing in Jira.
 EOF
   exit 2
@@ -32,6 +33,7 @@ description_file=""
 labels=()
 link_options=()
 link_keys=()
+assignee=""
 dry_run=false
 
 while [[ $# -gt 0 ]]; do
@@ -72,6 +74,12 @@ while [[ $# -gt 0 ]]; do
       link_options+=("$option")
       link_keys+=("$(parse_key "$value")")
       ;;
+    --assignee)
+      [[ -z "$assignee" ]] || { echo "Give --assignee only once." >&2; usage; }
+      assignee="$(parse_assignee "$value")"
+      # Leave out --assignee for an issue without an assignee. Use jira-update to remove a default assignee.
+      [[ "$assignee" != none ]] || { echo "jira-create does not take --assignee none. Leave out --assignee instead." >&2; exit 2; }
+      ;;
     *)
       echo "Unknown option: $option" >&2
       usage
@@ -92,6 +100,12 @@ type_names=()
 while IFS= read -r name; do type_names+=("$name"); done < <(jq --raw-output '(.issueTypes // .values)[].name' <<<"$types")
 contains "$issue_type" ${type_names[@]+"${type_names[@]}"} \
   || { echo "Not an issue type in $project: $issue_type. Use one of: $(printf '%s, ' ${type_names[@]+"${type_names[@]}"} | sed 's/, $//')" >&2; exit 2; }
+
+# Find the account before the issue is created, so an unknown user changes nothing in Jira.
+if [[ -n "$assignee" ]]; then
+  resolve_assignee "$assignee" "project=$project"
+  assignee_body="$(jq --null-input --compact-output --arg id "$account_id" '{accountId: $id}')"
+fi
 
 # The REST API v2 stores the description as wiki markup.
 body="$(
@@ -135,6 +149,12 @@ if [[ "$dry_run" == true ]]; then
     jq . <<<"${link_requests[$i]}"
     echo "Change: Added link: ${link_texts[$i]}."
   done
+  if [[ -n "$assignee" ]]; then
+    echo
+    echo "PUT $base_url/rest/api/2/issue/NEW-ISSUE/assignee"
+    jq . <<<"$assignee_body"
+    echo "Change: Assigned the issue to $assignee_name."
+  fi
   exit 0
 fi
 
@@ -148,3 +168,7 @@ for i in ${link_requests[@]+"${!link_requests[@]}"}; do
   send POST rest/api/2/issueLink "${link_requests[$i]}" >/dev/null
   echo "- Added link: ${link_texts[$i]}."
 done
+if [[ -n "$assignee" ]]; then
+  send PUT "rest/api/2/issue/$key/assignee" "$assignee_body" >/dev/null
+  echo "- Assigned the issue to $assignee_name."
+fi
