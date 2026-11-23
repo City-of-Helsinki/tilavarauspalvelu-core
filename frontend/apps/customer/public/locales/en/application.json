@@ -210,8 +210,8 @@
       "processing": "Processing",
       "body": "Processing of applications will start once the application deadline has passed. We will notify you of the different steps at the email address you provide."
     },
-    "userAcceptsGeneralTerms": "I have read and I accept the Terms of Agreement. (*)",
-    "userAcceptsSpecificTerms": "I have read and I accept the Additional booking conditions. (*)",
+    "userAcceptsGeneralTerms": "I have read and I accept the payment and cancellation terms. (*)",
+    "userAcceptsSpecificTerms": "I have read and I accept the terms of contract. (*)",
     "reservationDeleted": "Booking cancelled.",
     "applicationSectionCancelled": "Cancelled {{ cancelled }} / {{ future }} booking.",
     "applicationSectionCancelledAll": "All {{ cancelled }} bookings cancelled."
