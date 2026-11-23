@@ -23,7 +23,7 @@ const LabelValue = ({
   );
 };
 
-type ApplicantT = Omit<ApplicantFieldsFragment, "municipality" | "additionalInformation">;
+type ApplicantT = Omit<ApplicantFieldsFragment, "municipality">;
 
 export function ApplicantInfoPreview({ application }: { application: ApplicantT }): React.ReactElement {
   const { t } = useTranslation();
@@ -63,6 +63,13 @@ export function ApplicantInfoPreview({ application }: { application: ApplicantT 
           label={t("application:preview.organisation.billingAddress")}
           value={applicant.billingAddress}
           fullWidth={!!application.organisationStreetAddress}
+        />
+      )}
+      {application.applicantType === ReserveeType.Individual && application.additionalInformation && (
+        <LabelValue
+          label={t("application:preview.additionalInformation")}
+          value={application.additionalInformation}
+          fullWidth
         />
       )}
     </ApplicationInfoContainer>
