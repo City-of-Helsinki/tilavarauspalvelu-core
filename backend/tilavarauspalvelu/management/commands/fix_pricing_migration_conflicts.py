@@ -56,7 +56,7 @@ class Command(BaseCommand):
 def _fix_accountings() -> list[str]:
     """
     Give every reservation unit that is paid online today or later an accounting,
-    so that each material has one tax level and one main ledger account.
+    so that each pair of material and main ledger account has one tax level.
     A reservation unit with online pricings of more than one tax level is left as it is.
     """
     today = local_date()
@@ -81,12 +81,12 @@ def _fix_accountings() -> list[str]:
     for pricing in pricings:
         pricings_by_unit.setdefault(pricing.reservation_unit_id, []).append(pricing)
 
-    # The tax level and main ledger account that each material already has.
-    material_owners: dict[str, tuple[int, str]] = {
-        sales_item.material: (sales_item.tax_level_id, sales_item.main_ledger_account)
+    # The tax level that each pair of material and main ledger account already has.
+    material_owners: dict[tuple[str, str], int] = {
+        (sales_item.material, sales_item.main_ledger_account): sales_item.tax_level_id
         for sales_item in SalesItem.objects.all()
     }
-    used_materials = set(material_owners)
+    used_materials = {material for material, _ in material_owners}
     used_materials.update(
         PaymentAccounting.objects.exclude(product_invoicing_material="").values_list(
             "product_invoicing_material",
@@ -122,18 +122,16 @@ def _fix_accountings() -> list[str]:
         if not accounting.product_invoicing_material:
             continue
 
-        owner = material_owners.setdefault(
-            accounting.product_invoicing_material,
-            (tax_level.pk, accounting.main_ledger_account),
-        )
-        if owner == (tax_level.pk, accounting.main_ledger_account):
+        owner_key = (accounting.product_invoicing_material, accounting.main_ledger_account)
+        owner_tax_level_id = material_owners.setdefault(owner_key, tax_level.pk)
+        if owner_tax_level_id == tax_level.pk:
             continue
 
         key = (accounting.pk, tax_level.pk)
         if key not in accounting_copies:
             material = _next_test_material(used_materials=used_materials)
             accounting_copies[key] = _copy_accounting(accounting=accounting, tax_level=tax_level, material=material)
-            material_owners[material] = (tax_level.pk, accounting.main_ledger_account)
+            material_owners[material, accounting.main_ledger_account] = tax_level.pk
 
         copy = accounting_copies[key]
         reservation_unit.payment_accounting = copy
