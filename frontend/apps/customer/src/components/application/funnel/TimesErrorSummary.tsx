@@ -62,7 +62,7 @@ const timesFieldName = (index: number) => `applicationSections.${index}.suitable
 
 type TimesErrorSummaryProps = {
   /** `sectionOpeningHours` of every section, by section index, to name the times outside them. */
-  allSectionsOpeningHours: ReadonlyArray<Readonly<TimeSelectorFragment[]>>;
+  allSectionsOpeningHours: ReadonlyArray<ReadonlyArray<Readonly<TimeSelectorFragment>>>;
   /** Shows the section, e.g. opens its accordion and moves focus to it, when the user follows its link. */
   onShowSection: (index: number) => void;
   /** The id of a section's element, which its link points to. */
@@ -124,7 +124,7 @@ function flagListedTimes(
   errorMessage: string | undefined,
   listed: WeeklyPatternValue<SuitableTimeData>,
   minDuration: number,
-  openingHours: Readonly<TimeSelectorFragment[]>
+  openingHours: ReadonlyArray<Readonly<TimeSelectorFragment>>
 ): boolean[] {
   if (errorMessage === TOO_SHORT_ERROR) {
     return findTooShortListed(listed, minDuration);
@@ -142,7 +142,7 @@ function SectionErrors({
   onShow,
 }: Readonly<{
   index: number;
-  openingHours: Readonly<TimeSelectorFragment[]>;
+  openingHours: ReadonlyArray<Readonly<TimeSelectorFragment>>;
   href: string;
   onShow: () => void;
 }>): React.ReactElement | null {

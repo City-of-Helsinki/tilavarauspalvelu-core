@@ -124,7 +124,7 @@ function ApplicationSectionTimePicker({
 }: {
   index: number;
   section: NonNullable<Node["applicationSections"]>[0] | undefined;
-  allSectionsOpeningHours: ReadonlyArray<Readonly<TimeSelectorFragment[]>>;
+  allSectionsOpeningHours: ReadonlyArray<ReadonlyArray<Readonly<TimeSelectorFragment>>>;
   isSportsForm: boolean;
   isOpen: boolean;
   onToggle: () => void;

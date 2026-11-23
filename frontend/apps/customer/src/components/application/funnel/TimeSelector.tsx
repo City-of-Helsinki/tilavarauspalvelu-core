@@ -35,14 +35,14 @@ import { hasSameTimes } from "./timeSelectorModule";
 export type TimeSelectorProps = {
   index: number;
   reservationUnitOptions: Array<{ label: string; value: number }>;
-  reservationUnitOpeningHours: Readonly<TimeSelectorFragment[]>;
+  reservationUnitOpeningHours: ReadonlyArray<Readonly<TimeSelectorFragment>>;
   /**
    * The opening hours of every reservation unit in the section. A time that one of them opens can be applied for,
    * whichever unit is shown, so the calendar and the form both paint inside these.
    */
-  sectionOpeningHours: Readonly<TimeSelectorFragment[]>;
+  sectionOpeningHours: ReadonlyArray<Readonly<TimeSelectorFragment>>;
   /** `sectionOpeningHours` of every section, by section index, so copied times can be checked against them. */
-  allSectionsOpeningHours: ReadonlyArray<Readonly<TimeSelectorFragment[]>>;
+  allSectionsOpeningHours: ReadonlyArray<ReadonlyArray<Readonly<TimeSelectorFragment>>>;
 };
 
 function sectionNames(sections: ReadonlyArray<{ section: { name: string } }>): string {
