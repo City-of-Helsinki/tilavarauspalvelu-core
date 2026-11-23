@@ -9,7 +9,7 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from graphene_django_extensions.serializers import NotProvided
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ErrorDetail, ValidationError
 
 from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers import (
     ReservationUnitOptionApplicantSerializer,
@@ -72,7 +72,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        errors: list[str] = []
+        errors: list[str | ErrorDetail] = []
 
         # The parent is the list serializer of the sections. DRF validates every item of the list
         # with this same serializer, so the instance must be loaded again for each item.
@@ -136,7 +136,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
         return instance
 
-    def validate_nested_items_belong_to_section(self, data: dict[str, Any], errors: list[str]) -> None:
+    def validate_nested_items_belong_to_section(self, data: dict[str, Any], errors: list[str | ErrorDetail]) -> None:
         option_pks = {option["pk"] for option in data.get("reservation_unit_options", []) if "pk" in option}
         time_range_pks = {time_range["pk"] for time_range in data.get("suitable_time_ranges", []) if "pk" in time_range}
 
@@ -156,7 +156,11 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             f"Suitable time range {pk} does not belong to this application section." for pk in other_time_range_pks
         )
 
-    def validate_option_preferred_ordering(self, data: list[dict[str, Any]], errors: list[str]) -> None:
+    def validate_option_preferred_ordering(
+        self,
+        data: list[dict[str, Any]],
+        errors: list[str | ErrorDetail],
+    ) -> None:
         from tilavarauspalvelu.models import ReservationUnitOption
 
         option_errors: list[str] = []
@@ -206,7 +210,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
         errors.extend(option_errors)
 
-    def validate_reservation_period(self, data: dict[str, Any], errors: list[str]) -> None:
+    def validate_reservation_period(self, data: dict[str, Any], errors: list[str | ErrorDetail]) -> None:
         reservations_begin_date: datetime.date = self.get_or_default("reservations_begin_date", data)
         reservations_end_date: datetime.date = self.get_or_default("reservations_end_date", data)
 
@@ -245,11 +249,13 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
         if reservation_period["reservation_period_begin_date"] > reservations_begin_date:
             msg = "Reservations begin date cannot be before the application round's reservation period begin date."
-            errors.append(msg)
+            error = ErrorDetail(msg, code=error_codes.APPLICATION_SECTION_RESERVATIONS_BEGIN_DATE_BEFORE_ROUND)
+            errors.append(error)
 
         if reservation_period["reservation_period_end_date"] < reservations_end_date:
             msg = "Reservations end date cannot be after the application round's reservation period end date."
-            errors.append(msg)
+            error = ErrorDetail(msg, code=error_codes.APPLICATION_SECTION_RESERVATIONS_END_DATE_AFTER_ROUND)
+            errors.append(error)
 
     def validate_price_option_is_offered(self, data: dict[str, Any]) -> None:
         price_option: PriceOption | None = data.get("price_option")

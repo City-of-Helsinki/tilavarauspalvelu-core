@@ -6,6 +6,7 @@ import pytest
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
 from tilavarauspalvelu.models import Application, ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -343,6 +344,7 @@ def test_application_section__update__reservations_begin_date_not_in_round_reser
     assert response.field_error_messages() == [
         "Reservations begin date cannot be before the application round's reservation period begin date.",
     ]
+    assert response.field_error_codes() == [error_codes.APPLICATION_SECTION_RESERVATIONS_BEGIN_DATE_BEFORE_ROUND]
 
 
 def test_application_section__update__reservations_end_date_not_in_round_reservable_period(graphql):
@@ -367,3 +369,4 @@ def test_application_section__update__reservations_end_date_not_in_round_reserva
     assert response.field_error_messages() == [
         "Reservations end date cannot be after the application round's reservation period end date.",
     ]
+    assert response.field_error_codes() == [error_codes.APPLICATION_SECTION_RESERVATIONS_END_DATE_AFTER_ROUND]

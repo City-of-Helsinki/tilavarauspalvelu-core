@@ -6,6 +6,7 @@ import pytest
 
 from tilavarauspalvelu.enums import Priority, Weekday
 from tilavarauspalvelu.models import Application, ApplicationSection, SuitableTimeRange
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_time
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ApplicationSectionFactory
@@ -222,6 +223,41 @@ def test_application__update__application_sections__too_many(graphql, settings):
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
         "Cannot create more than 0 application sections in one application",
+    ]
+
+
+def test_application__update__application_sections__reservations_begin_date_before_round(graphql):
+    # given:
+    # - There is a draft application in an open application round
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.force_login(application.user)
+
+    # when:
+    # - The user adds an application section that begins one day before the round reservation period
+    application_round = application.application_round
+    begin_date = application_round.reservation_period_begin_date - datetime.timedelta(days=1)
+    input_data = {
+        "pk": application.pk,
+        "applicationSections": [
+            {
+                "name": "foo",
+                "numPersons": 1,
+                "reservationsBeginDate": begin_date.isoformat(),
+                "reservationsEndDate": application_round.reservation_period_end_date.isoformat(),
+                "reservationMinDuration": 3600,
+                "reservationMaxDuration": 3600,
+                "appliedReservationsPerWeek": 1,
+            },
+        ],
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    # then:
+    # - The error has a code that the UI can translate
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_codes("applicationSections.0.nonFieldErrors") == [
+        error_codes.APPLICATION_SECTION_RESERVATIONS_BEGIN_DATE_BEFORE_ROUND,
     ]
 
 

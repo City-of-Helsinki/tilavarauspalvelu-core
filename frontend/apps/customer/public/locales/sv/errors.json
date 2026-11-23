@@ -60,6 +60,8 @@
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Sökandens typ saknas.",
       "APPLICATION_SECTIONS_MISSING": "Ansökningsavsnitt saknas.",
+      "APPLICATION_SECTION_RESERVATIONS_BEGIN_DATE_BEFORE_ROUND": "Startdatum kan inte vara före ansökningsperiodens startdatum.",
+      "APPLICATION_SECTION_RESERVATIONS_END_DATE_AFTER_ROUND": "Slutdatum kan inte vara efter ansökningsperiodens slutdatum.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Passande tider saknas.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_OUTSIDE_OPENING_HOURS": "Önskad tid är utanför öppettiderna.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Önskad tid är för kort.",
