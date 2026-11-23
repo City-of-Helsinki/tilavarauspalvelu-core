@@ -256,11 +256,13 @@ export function SuitableTimeRangeForm({
   const selectedWeekdayList = [...new Set(listed.map(({ weekday }) => convertWeekday(weekday)))];
 
   // Outside the opening hours is the more basic problem: such a time can't be applied for at all, whatever its length.
+  const isOutsideList = findOutsideListed(listed, openingHours);
+  const isTooShortList = findTooShortListed(listed, minDuration);
   const problemOf = (position: number) => {
-    if (findOutsideListed(listed, openingHours)[position]) {
+    if (isOutsideList[position]) {
       return t("application:TimeSelector.form.outsideOpeningHours");
     }
-    if (findTooShortListed(listed, minDuration)[position]) {
+    if (isTooShortList[position]) {
       return t("application:TimeSelector.form.tooShort");
     }
     return null;
