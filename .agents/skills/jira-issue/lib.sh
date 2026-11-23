@@ -125,3 +125,70 @@ send() {
       --request "$method" "$base_url/$path"
   fi
 }
+
+# The team members that --assignee accepts, by their Jira display name.
+# The Jira user search finds hundreds of users across the City, so the scripts accept only these names.
+# Keep this list the same as the team table in SKILL.md.
+team=(
+  "Matti Lamppu"
+  "Joonatan Kuosa"
+  "Mats Eriksson"
+  "Eemeli Ranta"
+  "noora.alikirri"
+  "Juvonen Jesse"
+  "Tuomas Alahäivälä"
+  "Tuomas Haapala"
+)
+
+# Print the --assignee value as "me", "none" or the Jira name in the team list. Exit if it is none of these.
+parse_assignee() {
+  local value="$1" lower_value member
+  [[ -n "${value//[[:space:]]/}" ]] || { echo "The assignee is empty." >&2; exit 2; }
+  lower_value="$(tr '[:upper:]' '[:lower:]' <<<"$value")"
+  if [[ "$lower_value" == me || "$lower_value" == none ]]; then
+    echo "$lower_value"
+    return
+  fi
+  for member in "${team[@]}"; do
+    if [[ "$(tr '[:upper:]' '[:lower:]' <<<"$member")" == "$lower_value" ]]; then
+      echo "$member"
+      return
+    fi
+  done
+  echo "The assignee $value is not in the team list. Give me, none or one of these Jira names:" >&2
+  printf '  %s\n' "${team[@]}" >&2
+  exit 2
+}
+
+# Set account_id and assignee_name for a value from parse_assignee. Call it after load_credentials.
+# "me" is the owner of the API token. "none" gives an empty account_id and assignee_name.
+# `scope` is the query parameter for the assignable user search, e.g. issueKey=TILA-123 or project=TILA.
+resolve_assignee() {
+  local assignee="$1" scope="$2" myself query users
+  case "$assignee" in
+    none)
+      account_id=""
+      assignee_name=""
+      ;;
+    me)
+      myself="$(api "rest/api/2/myself")"
+      account_id="$(jq --raw-output '.accountId' <<<"$myself")"
+      assignee_name="$(jq --raw-output '.displayName' <<<"$myself")"
+      ;;
+    *)
+      query="$(jq --null-input --raw-output --arg q "$assignee" '$q | @uri')"
+      # The search is fuzzy, so keep only the exact display name.
+      users="$(
+        api "rest/api/2/user/assignable/search?$scope&query=$query" \
+          | jq --arg n "$assignee" '[.[] | select(.active and .displayName == $n)]'
+      )"
+      if [[ "$(jq length <<<"$users")" -ne 1 ]]; then
+        echo "Jira has no single assignable user for ${scope#*=} with the name $assignee." >&2
+        echo "If the name changed in Jira, update the team list in lib.sh and SKILL.md." >&2
+        exit 2
+      fi
+      account_id="$(jq --raw-output '.[0].accountId' <<<"$users")"
+      assignee_name="$(jq --raw-output '.[0].displayName' <<<"$users")"
+      ;;
+  esac
+}

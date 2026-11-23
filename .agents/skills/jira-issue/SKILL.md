@@ -176,7 +176,7 @@ Change the status in the Jira UI instead.
 ### Create an issue
 
 ```bash
-.agents/skills/jira-issue/jira-create --summary 'Fix the login redirect' --parent TILA-123 --label frontend --dry-run
+.agents/skills/jira-issue/jira-create --summary 'Fix the login redirect' --parent TILA-123 --label frontend --assignee me --dry-run
 ```
 
 | Option                      | Repeat | Value                                                       |
@@ -190,10 +190,12 @@ Change the status in the Jira UI instead.
 | `--blocks <key>`            | yes    | Add a link: the new issue blocks `<key>`.                   |
 | `--blocked-by <key>`        | yes    | Add a link: the new issue is blocked by `<key>`.            |
 | `--relates <key>`           | yes    | Add a link: the new issue relates to `<key>`.               |
+| `--assignee <user>`         | no     | Assign the new issue. See below for the values.             |
 | `--dry-run`                 | no     | Print the write requests. Change nothing in Jira.           |
 
 The script checks the type against the types of the project. An error lists the allowed types.
-It creates the issue first, then the links. In a dry run, `NEW-ISSUE` stands for the new key.
+`--assignee` takes the same values as in `jira-update`, but not `none`. Leave it out for an issue without an assignee.
+It creates the issue first, then the links, then the assignee. In a dry run, `NEW-ISSUE` stands for the new key.
 After a real run, it prints the new key and URL.
 
 ## 3. Rules for changes
