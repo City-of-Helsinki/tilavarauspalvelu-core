@@ -25,7 +25,6 @@ import {
   toPattern,
 } from "ui/src/modules/suitableTimes";
 import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
-import { Flex } from "ui/src/styled";
 import { Priority } from "@gql/gql-types";
 import type { TimeSelectorFragment } from "@gql/gql-types";
 import type { ApplicationPage2FormValues } from "./form";
@@ -56,6 +55,14 @@ const TimeSelectorRoot = styled.div`
   margin-top: var(--spacing-m);
   padding-bottom: var(--spacing-m);
   border-bottom: 1px solid var(--color-black-50);
+`;
+
+// A grid with one column, rather than a column flexbox, so a wide calendar can't stretch the panel.
+const CalendarPanel = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
 `;
 
 export function TimeSelectorForm({
@@ -188,7 +195,7 @@ export function TimeSelectorForm({
           <Tabs.Tab>{t("application:TimeSelector.formLabel")}</Tabs.Tab>
         </Tabs.TabList>
         <Tabs.TabPanel>
-          <Flex style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)" }} $marginTop="m">
+          <CalendarPanel>
             <ControlledSelect
               name={`applicationSections.${index}.reservationUnitPk`}
               label={t("application:Page2.reservationUnitSelectLabel")}
@@ -231,7 +238,7 @@ export function TimeSelectorForm({
                 { state: "invalid", label: t("application:TimeSelector.legend.invalid") },
               ]}
             />
-          </Flex>
+          </CalendarPanel>
         </Tabs.TabPanel>
         <Tabs.TabPanel>
           <SuitableTimeRangeForm id={formId} index={index} openingHours={sectionOpeningHours} />
