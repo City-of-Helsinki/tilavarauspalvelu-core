@@ -1,12 +1,10 @@
 import { isValid, isAfter, parse } from "date-fns";
-import { fromZonedTime } from "date-fns-tz";
 import type { DayT } from "@ui/modules/const";
 /* eslint-disable-next-line import/no-cycle */
-import { UI_DATE_FORMAT } from "@ui/modules/date-utils/formatting";
+import { API_DATE_FORMAT, UI_DATE_FORMAT } from "@ui/modules/date-utils/formatting";
 /* eslint-disable-next-line import/no-cycle */
 import { formatDate, formatTime } from "./formatting";
 
-const HELSINKI_TIMEZONE = "Europe/Helsinki";
 const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
@@ -14,7 +12,10 @@ const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
  */
 
 /**
- * Converts an API date string (yyyy-MM-dd) to Date object and ensures it is in Helsinki timezone
+ * Converts an API date string (yyyy-MM-dd) to a Date object at local midnight.
+ * A date has no time zone. The UI formats dates in the local time zone of the browser,
+ * so a date must be parsed in the same zone. If not, the UI shows and sends a different day.
+ * A string with a time component is parsed as an ISO date time.
  * @param date - API date string
  * @returns Date object or null if invalid
  * @example parseApiDate("2023-12-25") // Date object for Dec 25, 2023
@@ -23,10 +24,7 @@ export function parseApiDate(date: string): Date | null {
   if (!date) return null;
 
   try {
-    // check that there is no time component in the string, if there is, parse as ISO string
-    const parsedDate = DATE_ONLY_REGEX.test(date)
-      ? fromZonedTime(`${date}T00:00:00`, HELSINKI_TIMEZONE)
-      : new Date(date);
+    const parsedDate = DATE_ONLY_REGEX.test(date) ? parse(date, API_DATE_FORMAT, new Date()) : new Date(date);
     return isValidDate(parsedDate) ? parsedDate : null;
   } catch {
     return null;
