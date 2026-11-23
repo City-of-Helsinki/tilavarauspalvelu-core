@@ -68,6 +68,8 @@ function Page1({
     ...optionsOrig,
     units: optionsOrig.units.filter((u) => unitsInApplicationRound.includes(u.value)),
   };
+  // The reservation units selected on the round page come only from the URL, and they are saved only on submit.
+  // Do not keep them in localStorage or similar, because that state goes stale and its bugs are hard to track.
   const { getReservationUnits } = useReservationUnitList(applicationRound);
 
   const begin = parseApiDate(applicationRound.reservationPeriodBeginDate) ?? new Date();
