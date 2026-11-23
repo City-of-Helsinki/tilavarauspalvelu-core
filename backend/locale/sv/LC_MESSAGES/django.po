@@ -1226,13 +1226,11 @@ msgid "Update all reservable time spans"
 msgstr ""
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
-msgid "Reservable Time Spans updated."
+msgid "Could not update the reservable time spans from Hauki."
 msgstr ""
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
-msgid ""
-"Could not update the reservable time spans from Hauki. The error was "
-"reported to Sentry."
+msgid "Reservable Time Spans updated."
 msgstr ""
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
@@ -1878,7 +1876,7 @@ msgstr ""
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid ""
 "The reservation unit was saved, but its opening hours could not be updated "
-"from Hauki. The error was reported to Sentry."
+"from Hauki."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py

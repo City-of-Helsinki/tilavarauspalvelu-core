@@ -1246,16 +1246,12 @@ msgid "Update all reservable time spans"
 msgstr "Päivitä kaikki varattavat aikavälit"
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
-msgid "Reservable Time Spans updated."
-msgstr "Varattavat aikavälit päivitetty."
+msgid "Could not update the reservable time spans from Hauki."
+msgstr "Varattavia aikavälejä ei voitu päivittää Aukiolosovelluksesta."
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
-msgid ""
-"Could not update the reservable time spans from Hauki. The error was "
-"reported to Sentry."
-msgstr ""
-"Varattavia aikavälejä ei voitu päivittää Aukiolosovelluksesta. Virhe "
-"raportoitiin Sentryyn."
+msgid "Reservable Time Spans updated."
+msgstr "Varattavat aikavälit päivitetty."
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid "Update reservable time spans"
@@ -1915,10 +1911,10 @@ msgstr "Varausyksiköiden vienti epäonnistui."
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid ""
 "The reservation unit was saved, but its opening hours could not be updated "
-"from Hauki. The error was reported to Sentry."
+"from Hauki."
 msgstr ""
 "Varausyksikkö tallennettiin, mutta sen aukioloaikoja ei voitu päivittää "
-"Aukiolosovelluksesta. Virhe raportoitiin Sentryyn."
+"Aukiolosovelluksesta."
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Access type begin date"

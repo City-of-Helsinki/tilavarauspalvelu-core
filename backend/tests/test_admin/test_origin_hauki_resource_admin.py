@@ -18,7 +18,7 @@ pytestmark = [
 ]
 
 NEVER_ANY_OPENING_HOURS_NOTE = "OriginHaukiResources with this specific hash never have any opening hours."
-HAUKI_ERROR_MESSAGE = "Could not update the reservable time spans from Hauki. The error was reported to Sentry."
+HAUKI_ERROR_MESSAGE = "Could not update the reservable time spans from Hauki."
 
 
 # ── Linked reservation units ──
