@@ -1,5 +1,6 @@
 import { addDays, addHours, addMinutes, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
+import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId, toNumber } from "ui/src/modules/helpers";
 import { ReservationStartInterval, ReservationStateChoice } from "@gql/gql-types";
 import type { BlockingReservationFieldsFragment, IsReservableFieldsFragment } from "@gql/gql-types";
@@ -681,8 +682,8 @@ describe("isRangeReservable", () => {
       end: addHours(date, 11),
       activeApplicationRounds: [
         {
-          reservationPeriodBeginDate: addDays(date, -10).toISOString(),
-          reservationPeriodEndDate: addDays(date, 10).toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(date, -10)),
+          reservationPeriodEndDate: formatApiDateUnsafe(addDays(date, 10)),
         },
       ],
     });
@@ -695,8 +696,36 @@ describe("isRangeReservable", () => {
       end: addHours(date, 11),
       activeApplicationRounds: [
         {
-          reservationPeriodBeginDate: addDays(date, 2).toISOString(),
-          reservationPeriodEndDate: addDays(date, 20).toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(date, 2)),
+          reservationPeriodEndDate: formatApiDateUnsafe(addDays(date, 20)),
+        },
+      ],
+    });
+    expect(isRangeReservable(input)).toBe(true);
+  });
+  test("NO if the reservation is on the last day of an application round", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 22),
+      end: addHours(date, 23),
+      activeApplicationRounds: [
+        {
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(date, -10)),
+          reservationPeriodEndDate: formatApiDateUnsafe(date),
+        },
+      ],
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+  test("YES if the reservation is on the day after an application round", () => {
+    const date = startOfDay(addDays(new Date(), 2));
+    const input = createInput({
+      start: addHours(date, 0),
+      end: addHours(date, 1),
+      activeApplicationRounds: [
+        {
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(date, -10)),
+          reservationPeriodEndDate: formatApiDateUnsafe(addDays(date, -1)),
         },
       ],
     });

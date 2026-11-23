@@ -1,4 +1,6 @@
 import { isValid, isAfter, parse } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
+import { EXPECTED_TIMEZONE } from "@ui/modules/const";
 import type { DayT } from "@ui/modules/const";
 /* eslint-disable-next-line import/no-cycle */
 import { API_DATE_FORMAT, UI_DATE_FORMAT } from "@ui/modules/date-utils/formatting";
@@ -13,8 +15,11 @@ const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
  * Converts an API date string (yyyy-MM-dd) to a Date object at local midnight.
+ * Use it for a calendar day that the UI shows or sends back, such as a form value.
  * A date has no time zone. The UI formats dates in the local time zone of the browser,
  * so a date must be parsed in the same zone. If not, the UI shows and sends a different day.
+ * To compare a date with an exact time, such as a reservation slot, use
+ * `parseApiDateAsHelsinkiStartOfDay` or `parseApiDateAsHelsinkiEndOfDay` instead.
  * A string with a time component is parsed as an ISO date time.
  * @param date - API date string
  * @returns Date object or null if invalid
@@ -29,6 +34,39 @@ export function parseApiDate(date: string): Date | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Converts an API date string (yyyy-MM-dd) to the first moment of that day in Helsinki.
+ * Use it to compare a date with an exact time, such as a reservation slot.
+ * The backend checks these dates in Helsinki, so the result does not depend on the zone of the browser.
+ * @param date - API date string
+ * @returns Date object or null if invalid
+ * @example parseApiDateAsHelsinkiStartOfDay("2026-05-31") // 2026-05-30T21:00:00.000Z
+ */
+export function parseApiDateAsHelsinkiStartOfDay(date: string): Date | null {
+  return parseApiDateAtHelsinkiTime(date, "00:00:00.000");
+}
+
+/**
+ * Converts an API date string (yyyy-MM-dd) to the last moment of that day in Helsinki.
+ * Use it to compare the last day of a period with an exact time, such as a reservation slot.
+ * The backend checks these dates in Helsinki, so the result does not depend on the zone of the browser.
+ * @param date - API date string
+ * @returns Date object or null if invalid
+ * @example parseApiDateAsHelsinkiEndOfDay("2026-05-31") // 2026-05-31T20:59:59.999Z
+ */
+export function parseApiDateAsHelsinkiEndOfDay(date: string): Date | null {
+  return parseApiDateAtHelsinkiTime(date, "23:59:59.999");
+}
+
+function parseApiDateAtHelsinkiTime(date: string, time: string): Date | null {
+  if (!date || !DATE_ONLY_REGEX.test(date)) return null;
+  // Validate the day first. `fromZonedTime` moves an impossible day, such as 2023-02-30, to the next month.
+  if (!isValidDate(parse(date, API_DATE_FORMAT, new Date()))) return null;
+
+  const parsedDate = fromZonedTime(`${date}T${time}`, EXPECTED_TIMEZONE);
+  return isValidDate(parsedDate) ? parsedDate : null;
 }
 
 /**

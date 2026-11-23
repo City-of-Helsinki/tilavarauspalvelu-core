@@ -962,8 +962,8 @@ describe("getNextAvailableTime", () => {
       const end = addDays(today, 7);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBeginDate: addDays(today, -7).toISOString(),
-          reservationPeriodEndDate: end.toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(today, -7)),
+          reservationPeriodEndDate: formatApiDateUnsafe(end),
         },
       ];
       const input = createInput({
@@ -982,12 +982,12 @@ describe("getNextAvailableTime", () => {
       const end = addDays(today, 7);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBeginDate: addDays(today, -7).toISOString(),
-          reservationPeriodEndDate: end.toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(today, -7)),
+          reservationPeriodEndDate: formatApiDateUnsafe(end),
         },
         {
-          reservationPeriodBeginDate: addDays(today, -5).toISOString(),
-          reservationPeriodEndDate: addDays(end, 2).toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(today, -5)),
+          reservationPeriodEndDate: formatApiDateUnsafe(addDays(end, 2)),
         },
       ];
       const input = createInput({
@@ -1006,12 +1006,12 @@ describe("getNextAvailableTime", () => {
       const middle = addDays(today, 7);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBeginDate: addDays(today, -7).toISOString(),
-          reservationPeriodEndDate: middle.toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(today, -7)),
+          reservationPeriodEndDate: formatApiDateUnsafe(middle),
         },
         {
-          reservationPeriodBeginDate: addDays(middle, 2).toISOString(),
-          reservationPeriodEndDate: addDays(middle, 10).toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(middle, 2)),
+          reservationPeriodEndDate: formatApiDateUnsafe(addDays(middle, 10)),
         },
       ];
       const input = createInput({
@@ -1030,8 +1030,8 @@ describe("getNextAvailableTime", () => {
       const end = addDays(today, 31);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBeginDate: addDays(today, -7).toISOString(),
-          reservationPeriodEndDate: end.toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(addDays(today, -7)),
+          reservationPeriodEndDate: formatApiDateUnsafe(end),
         },
       ];
       const input = createInput({
@@ -1047,8 +1047,8 @@ describe("getNextAvailableTime", () => {
       mockOpenTimes(new Date(), 2 * 365);
       const activeApplicationRounds: RoundPeriod[] = [
         {
-          reservationPeriodBeginDate: new Date().toISOString(),
-          reservationPeriodEndDate: addDays(new Date(), 365).toISOString(),
+          reservationPeriodBeginDate: formatApiDateUnsafe(new Date()),
+          reservationPeriodEndDate: formatApiDateUnsafe(addDays(new Date(), 365)),
         },
       ];
       const today = new Date();

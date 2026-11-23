@@ -21,7 +21,11 @@ import {
 } from "date-fns";
 import type { SlotProps } from "ui/src/components/calendar/Calendar";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
-import { formatApiDateUnsafe, parseApiDate } from "ui/src/modules/date-utils";
+import {
+  formatApiDateUnsafe,
+  parseApiDateAsHelsinkiEndOfDay,
+  parseApiDateAsHelsinkiStartOfDay,
+} from "ui/src/modules/date-utils";
 import { dayMax, dayMin } from "ui/src/modules/helpers";
 import { ReservationStartInterval, ReservationStateChoice } from "@gql/gql-types";
 import type {
@@ -412,15 +416,12 @@ function doesSlotCollideWithApplicationRounds(slot: Date, rounds: ReadonlyArray<
   if (rounds.length === 0) return false;
 
   return rounds.some((round) => {
-    const start = parseApiDate(round.reservationPeriodBeginDate);
-    const end = parseApiDate(round.reservationPeriodEndDate);
+    const start = parseApiDateAsHelsinkiStartOfDay(round.reservationPeriodBeginDate);
+    const end = parseApiDateAsHelsinkiEndOfDay(round.reservationPeriodEndDate);
     if (!start || !end) {
       return false;
     }
-    return isWithinInterval(slot, {
-      start,
-      end: end.setHours(23, 59, 59),
-    });
+    return isWithinInterval(slot, { start, end });
   });
 }
 

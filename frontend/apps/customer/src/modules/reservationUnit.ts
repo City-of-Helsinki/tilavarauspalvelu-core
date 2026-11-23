@@ -14,7 +14,7 @@ import {
 import { uniq } from "lodash-es";
 import type { TFunction } from "i18next";
 import { getIntervalMinutes } from "@ui/modules/conversion";
-import { parseApiDate, timeToMinutes } from "@ui/modules/date-utils";
+import { parseApiDate, parseApiDateAsHelsinkiStartOfDay, timeToMinutes } from "@ui/modules/date-utils";
 import { getTranslation, dayMax, dayMin, filterNonNullable, formatTimeStruct } from "@ui/modules/helpers";
 import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
 import { ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
@@ -342,8 +342,8 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     if (round.reservationPeriodEndDate == null) {
       return acc;
     }
-    const end = parseApiDate(round.reservationPeriodEndDate);
-    const begin = parseApiDate(round.reservationPeriodBeginDate);
+    const end = parseApiDateAsHelsinkiStartOfDay(round.reservationPeriodEndDate);
+    const begin = parseApiDateAsHelsinkiStartOfDay(round.reservationPeriodBeginDate);
     if (end == null || begin == null) {
       return acc;
     }
