@@ -2,7 +2,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
+import { ToastContainer } from "ui/src/components/toast";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId, formatTimeStruct } from "ui/src/modules/helpers";
@@ -16,13 +17,6 @@ import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from "./TimeSelector";
 import type { TimeSelectorProps } from "./TimeSelector";
 import { TimesErrorSummary } from "./TimesErrorSummary";
-
-const { errorToast, successToast, toast } = vi.hoisted(() => ({
-  errorToast: vi.fn(),
-  successToast: vi.fn(),
-  toast: vi.fn(),
-}));
-vi.mock("ui/src/components/toast", () => ({ errorToast, successToast, toast }));
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 
@@ -112,6 +106,7 @@ function WrapTimeSelector({
           allSectionsOpeningHours={sectionsOpeningHours}
         />
         <button type="submit">submit</button>
+        <ToastContainer />
         {validate && (
           <>
             <TimesErrorSummary
@@ -687,12 +682,6 @@ describe("TimeSelector time slot selecting", () => {
 });
 
 describe("TimeSelector copy times", () => {
-  beforeEach(() => {
-    errorToast.mockClear();
-    successToast.mockClear();
-    toast.mockClear();
-  });
-
   test("copies the selection to every section without carrying primary keys over", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -710,8 +699,10 @@ describe("TimeSelector copy times", () => {
     for (const section of submitted.applicationSections) {
       expect(section.suitableTimeRanges).toEqual(copied);
     }
-    expect(successToast).toHaveBeenCalledOnce();
-    expect(errorToast).not.toHaveBeenCalled();
+    expect(await view.findByTestId("application__page2--notification-success")).toHaveTextContent(
+      "application:Page2.notification.copyCells"
+    );
+    expect(view.queryByTestId("application__page2--notification-alert")).not.toBeInTheDocument();
   });
 
   test("asks before replacing other sections' own times, and copies only when accepted", async () => {
@@ -729,7 +720,7 @@ describe("TimeSelector copy times", () => {
 
     const kept = onSubmit.mock.calls[0]?.[0] as ApplicationPage2FormValues;
     expect(kept.applicationSections[1]?.suitableTimeRanges).toHaveLength(1);
-    expect(successToast).not.toHaveBeenCalled();
+    expect(view.queryByTestId("application__page2--notification-success")).not.toBeInTheDocument();
 
     await user.click(view.getByRole("button", { name: "application:Page2.copyTimes" }));
     await user.click(
@@ -741,7 +732,7 @@ describe("TimeSelector copy times", () => {
     expect(copied.applicationSections[1]?.suitableTimeRanges).toEqual(
       copied.applicationSections[0]?.suitableTimeRanges
     );
-    expect(successToast).toHaveBeenCalledOnce();
+    expect(await view.findByTestId("application__page2--notification-success")).toBeInTheDocument();
   });
 
   test("warns when the copied times are outside another section's opening hours", async () => {
@@ -751,10 +742,10 @@ describe("TimeSelector copy times", () => {
 
     await user.click(view.getByRole("button", { name: "application:Page2.copyTimes" }));
 
-    expect(toast).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "alert", text: expect.stringContaining("copyCellsOutsideOpeningHours") })
+    expect(await view.findByRole("alert")).toHaveTextContent(
+      "application:Page2.notification.copyCellsOutsideOpeningHours"
     );
-    expect(successToast).not.toHaveBeenCalled();
+    expect(view.queryByTestId("application__page2--notification-success")).not.toBeInTheDocument();
   });
 });
 
