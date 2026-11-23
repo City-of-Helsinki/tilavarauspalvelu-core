@@ -187,7 +187,7 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
         except Exception as err:  # noqa: BLE001
             details = f"Tried to import units from TPREK: '{units.values_list('pk', flat=True)}'"
             SentryLogger.log_exception(err, details=details)
-            message = _("Could not import the units from TPREK. The error was reported to Sentry.")
+            message = _("Could not import the units from TPREK.")
             self.message_user(request, message, level=messages.ERROR)
         else:
             if not tprek_unit_importer.updated_units_count:

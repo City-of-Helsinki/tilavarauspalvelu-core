@@ -112,7 +112,7 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
             exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=pk)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
-            message = _("Could not export the applications. The error was reported to Sentry.")
+            message = _("Could not export the applications.")
             self.message_user(request, message, level=messages.ERROR)
             SentryLogger.log_exception(error, "Error while exporting ApplicationRound applications")
             return None
@@ -125,7 +125,7 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
             exporter = ApplicationRoundResultCSVExporter(application_round_id=pk)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
-            message = _("Could not export the results. The error was reported to Sentry.")
+            message = _("Could not export the results.")
             self.message_user(request, message, level=messages.ERROR)
             SentryLogger.log_exception(error, "Error while exporting ApplicationRound results")
             return None
