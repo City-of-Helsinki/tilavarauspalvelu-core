@@ -44,8 +44,12 @@ export function ApplicantInfoPreview({ application, isSportsForm }: ApplicantInf
       : null,
   };
 
+  const isOrganisation = application.applicantType != null && application.applicantType !== ReserveeType.Individual;
+  const shouldShowActiveMembers = isOrganisation && isSportsForm && application.organisationActiveMembers != null;
+
+  // The design puts the active members on the first row, next to the other organisation fields.
   return (
-    <ApplicationInfoContainer>
+    <ApplicationInfoContainer $columns={shouldShowActiveMembers ? 4 : 3}>
       {application.applicantType == null ? (
         <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>
       ) : application.applicantType !== ReserveeType.Individual ? (
@@ -59,7 +63,7 @@ export function ApplicantInfoPreview({ application, isSportsForm }: ApplicantInf
             label={t("application:preview.organisation.registrationNumber")}
             value={application.organisationIdentifier}
           />
-          {isSportsForm && application.organisationActiveMembers != null && (
+          {shouldShowActiveMembers && (
             <LabelValue
               label={t("application:preview.organisation.activeMembers")}
               value={application.organisationActiveMembers}

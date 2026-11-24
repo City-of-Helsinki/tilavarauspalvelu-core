@@ -28,9 +28,9 @@ const StyledNotesWhenApplying = styled(NotesWhenApplying)`
   grid-column-start: 1;
 `;
 
-const ChildWrapper = styled.div`
+const ChildWrapper = styled.div<{ $isFullWidth: boolean }>`
   @media (min-width: ${breakpoints.l}) {
-    grid-column: 2;
+    grid-column: ${({ $isFullWidth }) => ($isFullWidth ? "1 / -1" : "2")};
     grid-row: 1 / -1;
   }
 `;
@@ -73,6 +73,8 @@ export function ApplicationFunnelWrapper({
   ] as const;
 
   const { heading, subtitle } = getApplicationPageTitle(t, page);
+  // The preview page has no notes box in the design. The preview uses the full width of the page.
+  const isPreviewPage = page === "page4";
 
   return (
     <>
@@ -83,13 +85,13 @@ export function ApplicationFunnelWrapper({
       <HR />
       <InnerContainer>
         <>
-          <StyledNotesWhenApplying applicationRound={application.applicationRound} />
+          {!isPreviewPage && <StyledNotesWhenApplying applicationRound={application.applicationRound} />}
           {page === "page2" && (
             <Notification label={t("application:Page2.info")} size={NotificationSize.Small} type="info">
               {t("application:Page2.info")}
             </Notification>
           )}
-          <ChildWrapper>{children}</ChildWrapper>
+          <ChildWrapper $isFullWidth={isPreviewPage}>{children}</ChildWrapper>
         </>
       </InnerContainer>
     </>
