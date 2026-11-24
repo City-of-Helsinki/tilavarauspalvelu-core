@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next/pages";
 import { ControlledCheckbox } from "ui/src/components/form";
 import { ApplicationFormTextInput } from "@/components/application/funnel/ApplicationFormTextInput";
-import { FormSubHeading } from "@/styled/application";
+import { FormSubHeading, PostCodeCityRow } from "@/styled/application";
 import { BillingAddress } from "./BillingAddress";
 import type { ApplicationPage3FormValues } from "./form";
 import { OrganisationActiveMembersInput } from "./OrganisationActiveMembersInput";
@@ -23,8 +23,10 @@ export function CompanyForm({ isSportsForm }: Readonly<{ isSportsForm: boolean }
       {isSportsForm && <OrganisationActiveMembersInput />}
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisationStreetAddress" />
-      <ApplicationFormTextInput name="organisationPostCode" />
-      <ApplicationFormTextInput name="organisationCity" />
+      <PostCodeCityRow>
+        <ApplicationFormTextInput name="organisationPostCode" />
+        <ApplicationFormTextInput name="organisationCity" />
+      </PostCodeCityRow>
       <ControlledCheckbox
         control={control}
         label={t("application:Page3.organisationSeparateInvoicingAddress")}

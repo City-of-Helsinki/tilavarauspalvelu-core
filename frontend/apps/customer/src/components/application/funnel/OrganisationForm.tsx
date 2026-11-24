@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next/pages";
 import { ControlledCheckbox, ControlledSelect } from "ui/src/components/form";
 import { MunicipalityChoice } from "@gql/gql-types";
-import { FormSubHeading } from "@/styled/application";
+import { FormSubHeading, PostCodeCityRow } from "@/styled/application";
 import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
 import { BillingAddress } from "./BillingAddress";
 import { ContactPersonSection } from "./CompanyForm";
@@ -51,8 +51,10 @@ export function OrganisationForm({ isSportsForm }: Readonly<{ isSportsForm: bool
       <ApplicationFormTextInput name="organisationIdentifier" disabled={!isRegisteredAssociation} />
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisationStreetAddress" />
-      <ApplicationFormTextInput name="organisationPostCode" />
-      <ApplicationFormTextInput name="organisationCity" />
+      <PostCodeCityRow>
+        <ApplicationFormTextInput name="organisationPostCode" />
+        <ApplicationFormTextInput name="organisationCity" />
+      </PostCodeCityRow>
       <ControlledCheckbox
         control={control}
         label={t("application:Page3.organisationSeparateInvoicingAddress")}
