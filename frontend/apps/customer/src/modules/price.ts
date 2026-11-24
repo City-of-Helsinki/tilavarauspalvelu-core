@@ -20,11 +20,18 @@ export function formatPrice(price: number, isCurrency: boolean, lang: Localizati
   return formatter?.format(price) ?? "";
 }
 
+/// A currency range with an en dash, such as "0–40 €". Both ends have decimals, unless both are whole numbers.
+export function formatDecimalRange(min: number, max: number, lang: LocalizationLanguages = "fi"): string {
+  const isWhole = Number.isInteger(min) && Number.isInteger(max);
+  const formatter = getFormatters(lang)[isWhole ? "currency" : "currencyWithDecimals"];
+  return formatter?.formatRange(min, max) ?? "";
+}
+
 function getPriceUnitString(t: TFunction, priceUnit: PriceUnit): string {
   if (priceUnit === PriceUnit.Fixed) {
     return "";
   }
-  return ` / ${t(`prices:priceUnits.${priceUnit}`)}`;
+  return `/${t(`prices:priceUnits.${priceUnit}`)}`;
 }
 
 /// The material price description of the price summary, or an empty string.
@@ -55,9 +62,9 @@ export function getPriceSummaryString(
     return hasMaterialPrice ? capitalize(t("prices:materialPrice")) : t("prices:priceFree");
   }
   const priceString = priceSummary.canApplyForDiscount
-    ? `${formatPrice(0, false, lang)} - ${formatPrice(amount, true, lang)}`
+    ? formatDecimalRange(0, amount, lang)
     : formatPrice(amount, true, lang);
-  const materialPriceString = hasMaterialPrice ? ` + ${t("prices:materialPrice")}` : "";
+  const materialPriceString = hasMaterialPrice ? getMaterialPriceSuffix(t) : "";
   return `${priceString}${getPriceUnitString(t, priceSummary.priceUnit)}${materialPriceString}`;
 }
 
@@ -147,10 +154,21 @@ export function getReservationPriceString(
   if (price.total === 0) {
     return price.hasMaterialPrice ? capitalize(t("prices:materialPrice")) : t("prices:priceFree");
   }
-  const totalString = isDiscountRange
-    ? `${formatPrice(0, false, lang)} - ${formatPrice(price.total, true, lang)}`
-    : formatPrice(price.total, true, lang);
-  return price.hasMaterialPrice ? `${totalString} + ${t("prices:materialPrice")}` : totalString;
+  const totalString = getReservationTotalString(price, isDiscountRange, lang);
+  return price.hasMaterialPrice ? `${totalString}${getMaterialPriceSuffix(t)}` : totalString;
+}
+
+/// The total of a paid reservation without the material price, such as "0–40 €" or "19,00 €".
+export function getReservationTotalString(
+  price: ReservationPriceDisplay,
+  isDiscountRange: boolean,
+  lang: LocalizationLanguages
+): string {
+  return isDiscountRange ? formatDecimalRange(0, price.total, lang) : formatPrice(price.total, true, lang);
+}
+
+export function getMaterialPriceSuffix(t: TFunction): string {
+  return ` + ${t("prices:materialPrice")}`;
 }
 
 /// A reservation has one price line for now. List the lines only if there are more, so a new line is not hidden.

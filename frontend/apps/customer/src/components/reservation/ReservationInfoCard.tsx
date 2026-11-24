@@ -19,10 +19,12 @@ import { Flex, fontMedium, Strong } from "@ui/styled";
 import { AccessType, ReservationStateChoice, useAccessCodeQuery } from "@gql/gql-types";
 import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
 import {
+  getMaterialPriceSuffix,
   getPriceLineStringList,
   getReservationPriceDisplay,
   getReservationPriceDisplayFromLines,
   getReservationPriceString,
+  getReservationTotalString,
   isDiscountPending,
 } from "@/modules/price";
 import { getReservationUnitPath } from "@/modules/urls";
@@ -110,9 +112,15 @@ export function ReservationInfoCard({
     reservationPrice != null
       ? getReservationPriceDisplay(reservationPrice, lang)
       : getReservationPriceDisplayFromLines(reservation, lang);
-  const price = getReservationPriceString(t, priceDisplay, isDiscountRange ?? isDiscountPending(reservation), lang);
+  const isPriceRange = isDiscountRange ?? isDiscountPending(reservation);
   const priceLineList = getPriceLineStringList(priceDisplay, lang);
   const taxPercentage = priceDisplay.total > 0 ? priceDisplay.taxPercentage : null;
+  // The tax is for the reservation price, so it comes before the material price
+  const price =
+    taxPercentage != null
+      ? getReservationTotalString(priceDisplay, isPriceRange, lang)
+      : getReservationPriceString(t, priceDisplay, isPriceRange, lang);
+  const materialPriceSuffix = taxPercentage != null && priceDisplay.hasMaterialPrice ? getMaterialPriceSuffix(t) : "";
 
   const { state } = reservation;
 
@@ -155,6 +163,7 @@ export function ReservationInfoCard({
             `(${t("common:inclTax", {
               taxPercentage: formatters.strippedDecimal?.format(taxPercentage),
             })})`}
+          {materialPriceSuffix !== "" && <Strong>{materialPriceSuffix}</Strong>}
           {priceLineList.map((priceLine, index) => (
             // oxlint-disable-next-line react/no-array-index-key -- two lines can have the same text, and the list never changes order
             <div key={index}>{priceLine}</div>

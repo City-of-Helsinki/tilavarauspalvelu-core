@@ -140,7 +140,7 @@ describe("Head", () => {
     expect(screen.getByText("Meeting room")).toBeInTheDocument();
     expect(screen.getByLabelText("reservationUnit:maxPersons")).toBeInTheDocument();
     expect(screen.getByLabelText("reservationCalendar:eventDuration")).toBeInTheDocument();
-    expect(screen.getByText(/^0 - 20,00 € \/ prices:priceUnits.PER_HOUR/)).toBeInTheDocument();
+    expect(screen.getByText(/^0–20 €\/prices:priceUnits.PER_HOUR/)).toBeInTheDocument();
     expect(screen.getByText("Subvention")).toBeInTheDocument();
   });
 
@@ -153,7 +153,7 @@ describe("Head", () => {
       />
     );
 
-    expect(screen.getByText("20,00 € / prices:priceUnits.PER_HOUR")).toBeInTheDocument();
+    expect(screen.getByText("20,00 €/prices:priceUnits.PER_HOUR")).toBeInTheDocument();
     expect(screen.queryByText("Subvention")).not.toBeInTheDocument();
   });
 
@@ -229,7 +229,7 @@ describe("Head", () => {
       />
     );
 
-    expect(screen.getByText("20,00 € / prices:priceUnits.PER_HOUR + prices:materialPrice")).toBeInTheDocument();
+    expect(screen.getByText("20,00 €/prices:priceUnits.PER_HOUR + prices:materialPrice")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Tooltip" }));
     expect(screen.getByText("Extra fee applies")).toBeInTheDocument();
   });

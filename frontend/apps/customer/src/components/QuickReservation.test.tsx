@@ -155,7 +155,7 @@ describe("QuickReservation", () => {
   test("shows the price as a range and the subvention text when the customer can apply for a discount", async () => {
     customRender({ focusSlot: { isReservable: true }, mocks: [createPriceMock({ canApplyForDiscount: true })] });
 
-    expect(await screen.findByText("0 - 40,00 €")).toBeInTheDocument();
+    expect(await screen.findByText("0–40 €")).toBeInTheDocument();
     expect(screen.getByText("Subvention")).toBeInTheDocument();
   });
 
