@@ -231,17 +231,28 @@ class ApplicationRoundActions:
                 end_date_gte=application_round.reservation_period_begin_date.isoformat(),  # Ends after period begins
             )
 
-            # Convert periods to TimeSpanElements
-            closed_time_spans[resource.id] = [
-                TimeSpanElement(
-                    start_datetime=local_start_of_day(datetime.date.fromisoformat(period["start_date"])),
-                    end_datetime=local_end_of_day(datetime.date.fromisoformat(period["end_date"])),
+            closed_time_spans[resource.id] = []
+
+            for period in date_periods:
+                # Overriding closed date periods are exceptions to the normal opening hours
+                if not period["override"] or period["resource_state"] != HaukiResourceState.CLOSED.value:
+                    continue
+
+                # Hauki gives no start or end date for an open-ended period.
+                start_date = application_round.reservation_period_begin_date
+                if period["start_date"] is not None:
+                    start_date = datetime.date.fromisoformat(period["start_date"])
+
+                end_date = application_round.reservation_period_end_date
+                if period["end_date"] is not None:
+                    end_date = datetime.date.fromisoformat(period["end_date"])
+
+                time_span = TimeSpanElement(
+                    start_datetime=local_start_of_day(start_date),
+                    end_datetime=local_end_of_day(end_date),
                     is_reservable=False,
                 )
-                for period in date_periods
-                # Overriding closed date periods are exceptions to the normal opening hours
-                if period["override"] and period["resource_state"] == HaukiResourceState.CLOSED.value
-            ]
+                closed_time_spans[resource.id].append(time_span)
 
         return closed_time_spans
 
