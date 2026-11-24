@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Fetch the code of a GitHub pull request into local refs, without a checkout.
+# Usage: github-pr-fetch <number or URL>, e.g. github-pr-fetch 99
+# Prints JSON with the refs and the changed files. Read the code with plain git after that.
+set -euo pipefail
+
+# Use the token in the secret file if it exists, for example in a container where gh is not logged in.
+# Without the file, gh uses its own login.
+gh_token_file="/run/secrets/gh/token"
+if [[ -z "${GH_TOKEN:-}" && -f "$gh_token_file" ]]; then
+  GH_TOKEN="$(<"$gh_token_file")"
+  export GH_TOKEN
+fi
+
+usage() {
+  echo "Usage: github-pr-fetch <number or URL>, e.g. github-pr-fetch 99" >&2
+  exit 2
+}
+[[ $# -eq 1 ]] || usage
+
+repo="City-of-Helsinki/tilavarauspalvelu-core"
+
+if [[ "$1" =~ ^([0-9]+)$ ]]; then
+  number="${BASH_REMATCH[1]}"
+elif [[ "$1" =~ ^https://github\.com/City-of-Helsinki/tilavarauspalvelu-core/pull/([0-9]+)([/?#].*)?$ ]]; then
+  number="${BASH_REMATCH[1]}"
+else
+  echo "Not a pull request number or URL: $1" >&2
+  usage
+fi
+
+base_branch="$(gh api "repos/$repo/pulls/$number" --jq .base.ref)"
+
+head_ref="refs/pr/$number/head"
+base_ref="refs/pr/$number/base"
+
+# Fetch with gh as the credential helper, so that the same token works for git.
+# The refs are outside refs/heads and refs/remotes, so they do not show up as branches.
+git -c credential.helper= -c 'credential.helper=!gh auth git-credential' \
+  fetch --quiet --force --no-tags "https://github.com/$repo.git" \
+  "+refs/pull/$number/head:$head_ref" \
+  "+refs/heads/$base_branch:$base_ref"
+
+merge_base="$(git merge-base "$base_ref" "$head_ref")"
+
+files="$(git diff --numstat --no-renames "$merge_base" "$head_ref" \
+  | jq --raw-input --slurp 'split("\n") | map(select(. != "") | split("\t")
+      | {path: .[2], added: (.[0] | tonumber? // "binary"), deleted: (.[1] | tonumber? // "binary")})')"
+
+jq --null-input \
+  --argjson number "$number" \
+  --arg head_ref "$head_ref" \
+  --arg head_sha "$(git rev-parse "$head_ref")" \
+  --arg base_branch "$base_branch" \
+  --arg base_ref "$base_ref" \
+  --arg merge_base "$merge_base" \
+  --argjson files "$files" \
+  '{number: $number, head_ref: $head_ref, head_sha: $head_sha, base_branch: $base_branch,
+    base_ref: $base_ref, merge_base: $merge_base, files: $files}'
