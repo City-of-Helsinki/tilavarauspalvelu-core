@@ -43,7 +43,6 @@ def test_reservation_series__cancel_section_series__cancel_whole_remaining(graph
     reservation_series = create_reservation_series(
         user=user,
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__price=0,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
 
@@ -86,7 +85,6 @@ def test_reservation_series__cancel_section_series__update_statistics(graphql, s
     reservation_series = create_reservation_series(
         user=user,
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__price=0,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
     reservation_series.reservations.upsert_statistics()
@@ -125,7 +123,6 @@ def test_reservation_series__cancel_section_series__cancel_details_not_required(
     reservation_series = create_reservation_series(
         user=user,
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__price=0,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
 
@@ -160,7 +157,6 @@ def test_reservation_series__cancel_section_series__not_seasonal_type(graphql):
     reservation_series = create_reservation_series(
         user=user,
         reservations__type=ReservationTypeChoice.NORMAL,
-        reservations__price=0,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
 
@@ -291,7 +287,6 @@ def test_reservation_series__cancel_section_series__not_confirmed_state(graphql)
         user=user,
         reservations__type=ReservationTypeChoice.SEASONAL,
         reservations__state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservations__price=0,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
 
@@ -327,7 +322,6 @@ def test_reservation_series__cancel_section_series__cancellation_rule(graphql):
     reservation_series = create_reservation_series(
         user=user,
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__price=0,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(days=1),
     )
 
@@ -378,7 +372,6 @@ def test_reservation_series__cancel_section_series__access_codes(graphql):
         user=user,
         reservations__access_type=AccessType.ACCESS_CODE,
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__price=0,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
 
