@@ -92,7 +92,7 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         if settings.SAVE_RESERVATION_STATISTICS:
             create_statistics_for_reservations_task.delay(reservation_pks=reservation_pks)
 
-        if instance.allocated_time_slot is not None:
+        if instance.allocated_time_slot is not None and reservation_pks:
             EmailService.send_seasonal_booking_denied_series_email(instance)
 
         return instance
