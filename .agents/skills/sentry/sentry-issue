@@ -4,8 +4,10 @@
 # Tag keys after the issue add the top values of each tag over all events of the issue.
 # With --events, the script lists all events of the issue instead. Each event has the values of the tag keys.
 # With --environment, the script uses only the events of that environment, for example production.
+# With --stats, the script counts the events of the issue in time buckets instead, and groups them into bursts.
 # The token is read from the secret file or from 1Password. See lib.sh.
-# Usage: sentry-issue [--events] [--environment <name>] <issue ID or URL> [tag key ...],
+# Usage: sentry-issue [--events | --stats [--interval <i>] [--period <p> | --start <t> --end <t>]]
+#   [--environment <name>] <issue ID or URL> [tag key ...],
 #   e.g. sentry-issue --environment production 153768154 browser.name os.name
 set -euo pipefail
 
@@ -13,19 +15,37 @@ source "$(dirname "$0")/lib.sh"
 
 usage() {
   cat >&2 <<'EOF'
-Usage: sentry-issue [--events] [--environment <name>] <issue ID or URL> [tag key ...]
+Usage: sentry-issue [--events | --stats [--interval <i>] [--period <p> | --start <t> --end <t>]]
+                    [--environment <name>] <issue ID or URL> [tag key ...]
   --events              List all events of the issue, not one event.
+  --stats               Count the events in time buckets and group them into bursts. No tag keys.
+  --interval <i>        Bucket size for --stats, for example 15m, 1h or 1d. The default is 1h.
+  --period <p>          Time before now for --stats, for example 24h, 14d or 90d. The default is 14d.
+  --start <t>           Start time for --stats in UTC, for example 2026-11-17T00:00:00. Give --end with it.
+  --end <t>             End time for --stats in UTC, for example 2026-11-18T00:00:00.
   --environment <name>  Use only the events of this environment, for example production.
 e.g. sentry-issue --environment production 153768154 browser.name os.name
+e.g. sentry-issue --stats --interval 15m --start 2026-11-16T00:00:00 --end 2026-11-18T00:00:00 153768154
 EOF
   exit 2
 }
 
 list_events=false
+show_stats=false
 environment=""
+interval=""
+period=""
+start=""
+end=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --events) list_events=true; shift ;;
+    --stats) show_stats=true; shift ;;
+    --interval | --period | --start | --end)
+      [[ $# -ge 2 ]] || usage
+      declare "${1#--}=$2"
+      shift 2
+      ;;
     --environment)
       [[ $# -ge 2 ]] || usage
       environment="$2"
@@ -36,6 +56,41 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ $# -ge 1 ]] || usage
+
+if $show_stats; then
+  if $list_events; then
+    echo "Give --events or --stats, not both." >&2
+    usage
+  fi
+  interval="${interval:-1h}"
+  if [[ ! "$interval" =~ ^[0-9]+[mhd]$ ]]; then
+    echo "Not an interval: $interval" >&2
+    usage
+  fi
+  if [[ -n "$start" || -n "$end" ]]; then
+    if [[ -n "$period" || -z "$start" || -z "$end" ]]; then
+      echo "Give --start and --end together, and without --period." >&2
+      usage
+    fi
+    for t in "$start" "$end"; do
+      if [[ ! "$t" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}(:[0-9]{2})?)?$ ]]; then
+        echo "Not a UTC time: $t" >&2
+        usage
+      fi
+    done
+    time_param="start=$start&end=$end"
+  else
+    period="${period:-14d}"
+    if [[ ! "$period" =~ ^[0-9]+[mhdw]$ ]]; then
+      echo "Not a period: $period" >&2
+      usage
+    fi
+    time_param="statsPeriod=$period"
+  fi
+elif [[ -n "$interval$period$start$end" ]]; then
+  echo "--interval, --period, --start and --end work only with --stats." >&2
+  usage
+fi
 
 if [[ -n "$environment" && ! "$environment" =~ ^[A-Za-z0-9_.-]+$ ]]; then
   echo "Not a Sentry environment name: $environment" >&2
@@ -54,7 +109,46 @@ for key in "$@"; do
   fi
 done
 
+if $show_stats && [[ $# -gt 0 ]]; then
+  echo "--stats takes no tag keys." >&2
+  usage
+fi
+
 load_token
+
+if $show_stats; then
+  # The events-stats endpoint counts the error events that match the query in each bucket.
+  # Sentry can refuse a small interval over a long time. Then use a larger interval or a shorter time.
+  # A burst is a run of buckets that all have events. An empty bucket ends the burst.
+  # Each burst has the start of its first bucket and the end of its last bucket.
+  stats="$(api "events-stats/?dataset=errors&yAxis=count()&project=-1&query=issue.id:$issue_id&interval=$interval&$time_param${env_param:+&$env_param}")"
+  jq --arg issue_id "$issue_id" --arg interval "$interval" --arg environment "$environment" '
+    def iso: todate;
+    ($interval | capture("(?<n>[0-9]+)(?<u>[mhd])") | (.n | tonumber) * {m: 60, h: 3600, d: 86400}[.u]) as $step
+    | [.data[] | {at: .[0], count: ([.[1][].count] | add // 0)}] as $buckets
+    | (reduce ($buckets[] | select(.count > 0)) as $b ([];
+        if length > 0 and .[-1].last + $step == $b.at
+        then .[-1] |= (.last = $b.at | .count += $b.count | .buckets += 1 | .peak = ([.peak, $b.count] | max))
+        else . + [{first: $b.at, last: $b.at, count: $b.count, buckets: 1, peak: $b.count}]
+        end)) as $bursts
+    | {
+      issue_id: $issue_id,
+      environment: (if $environment == "" then "all" else $environment end),
+      interval: $interval,
+      from: ($buckets[0].at // null | if . then iso else null end),
+      to: ($buckets[-1].at // null | if . then (. + $step | iso) else null end),
+      total: ([$buckets[].count] | add // 0),
+      bursts: [$bursts[] | {
+        start: (.first | iso),
+        end: (.last + $step | iso),
+        hours: ((.last + $step - .first) / 3600 * 100 | round / 100),
+        count,
+        peak_bucket: .peak
+      }],
+      buckets: [$buckets[] | select(.count > 0) | {at: (.at | iso), count}]
+    }' <<<"$stats"
+  exit 0
+fi
 
 if $list_events; then
   # Sentry gives 100 events on a page. Stop after max_pages, so that a large issue does not run for long.
@@ -156,6 +250,7 @@ jq --slurp '.[0] as $issue | .[1] as $event | .[2] as $tags | {
       }]
     }],
     breadcrumbs: ([$event.entries[] | select(.type == "breadcrumbs") | .data.values[]
-      | {at: .timestamp, category, level, message}] | .[-20:])
+      # data has the details of a breadcrumb, such as the status code of an HTTP request.
+      | {at: .timestamp, category, level, message, data}] | .[-20:])
   }
 }' <(printf '%s' "$issue") <(printf '%s' "$event") <(printf '%s' "$tags")

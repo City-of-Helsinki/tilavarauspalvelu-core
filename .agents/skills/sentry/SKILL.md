@@ -90,6 +90,25 @@ Without tag keys, the script shows `environment`, `url`, `transaction` and `rele
 `exception` is the outermost exception that has a message. It often has the ID of the failed request.
 The script stops after 2000 events and then sets `truncated` to true.
 
+### Count events over time
+
+To see when an issue had events, how long a spike lasted and how many events it had, add `--stats` before the issue:
+
+```bash
+.agents/skills/sentry/sentry-issue --stats --period 45d --environment production 153768154
+.agents/skills/sentry/sentry-issue --stats --interval 15m --start 2026-11-17T09:00:00 --end 2026-11-17T13:00:00 153768154
+```
+
+- The script counts the events in buckets. `--interval` sets the bucket size. The default is `1h`.
+- `--period` sets the time before now. The default is `14d`. Or give `--start` and `--end` in UTC.
+- `bursts` has each run of buckets that all have events, with its start, end, length and event count.
+  An empty bucket ends a burst. A burst is only as exact as the interval. Use a smaller interval to zoom in.
+- `buckets` has only the buckets with events.
+- Sentry can refuse a small interval over a long time. Then use a larger interval or a shorter time.
+- `--stats` takes no tag keys. It works with `--environment`.
+
+Use this mode, not `--events`, for counts over time. `--events` stops after a number of events.
+
 ### Use only one environment
 
 An issue can have events from many environments, for example `testing` and `production`.
