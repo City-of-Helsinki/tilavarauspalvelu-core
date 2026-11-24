@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 
 import pytest
 from freezegun import freeze_time
@@ -16,7 +17,13 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationStatistic
 from utils.date_utils import local_date, local_datetime
 
-from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, UserFactory
+from tests.factories import (
+    AllocatedTimeSlotFactory,
+    ApplicationRoundFactory,
+    ReservationPriceLineFactory,
+    TaxLevelFactory,
+    UserFactory,
+)
 from tests.helpers import patch_method
 
 from .helpers import CANCEL_SECTION_SERIES_MUTATION, create_reservation_series
@@ -189,9 +196,12 @@ def test_reservation_series__cancel_section_series__paid(graphql):
     reservation_series = create_reservation_series(
         user=user,
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__price=10,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
+
+    tax_level = TaxLevelFactory.create()
+    for reservation in reservation_series.reservations.all():
+        ReservationPriceLineFactory.create(reservation=reservation, tax_level=tax_level, amount=Decimal(10))
 
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     allocation = AllocatedTimeSlotFactory.create(
@@ -215,7 +225,62 @@ def test_reservation_series__cancel_section_series__paid(graphql):
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {"cancelled": 0, "future": 5}
-    assert reservation_series.reservations.count() == 9
+    assert reservation_series.reservations.filter(state=ReservationStateChoice.CANCELLED).count() == 0
+
+
+@patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
+@patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
+@freeze_time(local_datetime(year=2024, month=1, day=1))
+def test_reservation_series__cancel_section_series__only_free_reservations(graphql):
+    user = UserFactory.create()
+
+    reservation_series = create_reservation_series(
+        user=user,
+        reservations__type=ReservationTypeChoice.SEASONAL,
+        reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
+    )
+
+    free_dates = {datetime.date(2024, 1, 8), datetime.date(2024, 1, 22)}
+    free_reservation_pks: set[int] = set()
+
+    tax_level = TaxLevelFactory.create()
+    for reservation in reservation_series.reservations.all():
+        is_free = reservation.begins_at.date() in free_dates
+        if is_free:
+            free_reservation_pks.add(reservation.pk)
+
+        ReservationPriceLineFactory.create(
+            reservation=reservation,
+            tax_level=tax_level,
+            amount=Decimal(10),
+            override_amount=Decimal(0) if is_free else None,
+        )
+
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+    allocation = AllocatedTimeSlotFactory.create(
+        reservation_unit_option__application_section__application__user=user,
+        reservation_unit_option__application_section__application__application_round=application_round,
+    )
+    section = allocation.reservation_unit_option.application_section
+
+    reservation_series.allocated_time_slot = allocation
+    reservation_series.save()
+
+    data = {
+        "pk": section.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
+        "cancelDetails": "Cancellation details",
+    }
+
+    graphql.force_login(user)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert response.first_query_object == {"cancelled": 2, "future": 5}
+
+    cancelled_reservations = reservation_series.reservations.filter(state=ReservationStateChoice.CANCELLED)
+    assert set(cancelled_reservations.values_list("pk", flat=True)) == free_reservation_pks
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
