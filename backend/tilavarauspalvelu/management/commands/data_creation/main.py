@@ -71,11 +71,6 @@ def create_test_data(*, flush: bool = True, number_of_days_that_have_reservation
         age_groups=age_groups,
     )
 
-    _create_unit_groups()
-
-    _set_user_group_permissions()
-    _set_user_roles()
-
     _create_application_rounds(
         reservation_purposes=reservation_purposes,
         age_groups=age_groups,
@@ -85,6 +80,13 @@ def create_test_data(*, flush: bool = True, number_of_days_that_have_reservation
     _create_periodic_tasks()
 
     _create_caisa(tax_levels=tax_levels, payment_merchant=payment_merchant)
+
+    # Create these after all units, so that they include every unit.
+    # The shared pricing group needs the unit groups.
+    _create_unit_groups()
+
+    _set_user_group_permissions()
+    _set_user_roles()
 
     _create_shared_pricing_group(tax_levels=tax_levels)
     _create_reservation_price_lines()
