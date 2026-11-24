@@ -131,8 +131,8 @@
       "text": "Varaustoiveissa {{names}} on jo valittuja aikoja. Kopiointi korvaa ne.",
       "accept": "Kopioi ja korvaa"
     },
-    "multipleReservationsPerDayWish": "Toive useammasta vuorosta päivässä",
-    "multipleReservationsPerDayWishHelper": "Kerro, jos ryhmä tarvitsee useamman vuoron saman päivän aikana."
+    "multipleReservationsPerDayWish": "Lisätietoja aikatoiveista",
+    "multipleReservationsPerDayWishHelper": "Kerro, jos tarpeesi eivät näy kalenterissa. Esim. \"Maanantaisin kaksi vuoroa: klo 17–18 ja 19–20.30.\""
   },
   "Page3": {
     "subHeading": "Täytä hakijan tiedot",
@@ -215,7 +215,7 @@
       "participantGender": "Kenelle varaus on tarkoitettu",
       "sport": "Laji",
       "leagueLevel": "Sarjataso",
-      "multipleReservationsPerDayWish": "Toive useammasta vuorosta päivässä"
+      "multipleReservationsPerDayWish": "Lisätietoja aikatoiveista"
     },
     "applicationEventSchedules": "Aikatoiveet",
     "notification": {
