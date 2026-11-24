@@ -131,8 +131,8 @@
       "text": "{{names}} already have selected times. Copying replaces them.",
       "accept": "Copy and replace"
     },
-    "multipleReservationsPerDayWish": "Wish for more than one booking per day",
-    "multipleReservationsPerDayWishHelper": "Tell us if the group needs more than one booking on the same day."
+    "multipleReservationsPerDayWish": "More information about the time wishes",
+    "multipleReservationsPerDayWishHelper": "Tell us if your needs do not show in the calendar. For example \"Two bookings on Mondays: 17–18 and 19–20.30.\""
   },
   "Page3": {
     "subHeading": "Customer information",
@@ -219,7 +219,7 @@
       "participantGender": "Who the booking is for",
       "sport": "Sport",
       "leagueLevel": "League level",
-      "multipleReservationsPerDayWish": "Wish for more than one booking per day"
+      "multipleReservationsPerDayWish": "More information about the time wishes"
     },
     "applicationEventSchedules": "Requested time slots",
     "notification": {

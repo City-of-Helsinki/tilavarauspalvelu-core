@@ -131,8 +131,8 @@
       "text": "{{names}} har redan valda tider. Kopieringen ersätter dem.",
       "accept": "Kopiera och ersätt"
     },
-    "multipleReservationsPerDayWish": "Önskemål om flera turer per dag",
-    "multipleReservationsPerDayWishHelper": "Berätta om gruppen behöver flera turer under samma dag."
+    "multipleReservationsPerDayWish": "Mer information om tidsönskemålen",
+    "multipleReservationsPerDayWishHelper": "Berätta om dina behov inte syns i kalendern. T.ex. \"Två turer på måndagar: kl. 17–18 och 19–20.30.\""
   },
   "Page3": {
     "subHeading": "Kontaktuppgifter",
@@ -215,7 +215,7 @@
       "participantGender": "Vem bokningen är avsedd för",
       "sport": "Idrott",
       "leagueLevel": "Serienivå",
-      "multipleReservationsPerDayWish": "Önskemål om flera turer per dag"
+      "multipleReservationsPerDayWish": "Mer information om tidsönskemålen"
     },
     "applicationEventSchedules": "Önskade tider",
     "notification": {
