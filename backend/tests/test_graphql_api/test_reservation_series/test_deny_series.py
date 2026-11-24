@@ -255,3 +255,30 @@ def test_reservation_series__deny_series__in_seasonal_booking(graphql):
     assert response.has_errors is False, response.errors
 
     assert EmailService.send_seasonal_booking_denied_series_email.called is True
+
+
+@freeze_time(local_datetime(year=2024, month=1, day=1))
+def test_reservation_series__deny_series__in_seasonal_booking__no_reservations_to_deny(graphql, settings, outbox):
+    settings.SEND_EMAILS = True
+
+    reason = ReservationDenyReasonFactory.create()
+
+    allocation = AllocatedTimeSlotFactory.create()
+    reservation_series = create_reservation_series(
+        allocated_time_slot=allocation,
+        reservations__state=ReservationStateChoice.CANCELLED,
+    )
+
+    data = {
+        "pk": reservation_series.pk,
+        "denyReason": reason.pk,
+        "handlingDetails": "Handling details",
+    }
+
+    graphql.login_with_superuser()
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object == {"denied": 0, "future": 5}
+
+    assert len(outbox) == 0

@@ -636,7 +636,7 @@ class EmailService:
         if series.allocated_time_slot is None:
             return
 
-        if not series.reservations.exists():
+        if not series.reservations.filter(state=ReservationStateChoice.DENIED).exists():
             return
 
         recipients = get_series_email_recipients(series=series)
