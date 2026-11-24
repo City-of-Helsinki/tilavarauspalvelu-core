@@ -1,9 +1,9 @@
-// Wrapper around NumberInput so it sends nulls instead of NaNs
+// Wrapper around NumberInput so it sends nulls instead of NaNs.
+// It has no step prop, because HDS then shows the -/+ buttons and they do not help the user.
 import React from "react";
 import { useController } from "react-hook-form";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { NumberInput, Tooltip } from "hds-react";
-import { useTranslation } from "next-i18next/pages";
 import { filterEmpty, toNumber } from "../../modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
@@ -42,7 +42,6 @@ export function ControlledNumberInput<T extends FieldValues>({
   const {
     field: { value, onChange },
   } = useController({ control, name, rules: { required } });
-  const { t } = useTranslation();
 
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const val = toNumber(evt.target.value);
@@ -72,9 +71,6 @@ export function ControlledNumberInput<T extends FieldValues>({
       required={required}
       id={id ?? name}
       label={label}
-      minusStepButtonAriaLabel={t("common:subtract")}
-      plusStepButtonAriaLabel={t("common:add")}
-      step={1}
       type="number"
       min={min}
       max={max}
