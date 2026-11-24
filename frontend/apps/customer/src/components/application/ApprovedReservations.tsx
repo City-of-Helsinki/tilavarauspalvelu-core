@@ -938,15 +938,15 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
   }
 
   function getReservations(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
-    return r.reservations.reduce<ReservationsTableElem[]>((acc, res, idx, ar) => {
+    return r.reservations.map((elem, idx) => {
       const { isModified, ...rest } = applicationReservationDateTime({
         t,
-        reservation: res,
+        reservation: elem,
         orig: r.allocatedTimeSlot,
       });
-      const status = getReservationStatusChoice(res.state, isModified);
-      const accessTypeChanged = idx !== 0 && res.accessType !== ar[idx - 1]?.accessType;
-      const accessCodeValidThru = getAccessCodeValidThru(res.pindoraInfo);
+      const status = getReservationStatusChoice(elem.state, isModified);
+      const accessTypeChanged = idx !== 0 && elem.accessType !== r.reservations[idx - 1]?.accessType;
+      const accessCodeValidThru = getAccessCodeValidThru(elem.pindoraInfo);
       const accessCodeTime =
         accessCodeValidThru != null
           ? applicationReservationDateTime({ t, reservation: accessCodeValidThru }).time
@@ -955,14 +955,14 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
         ...rest,
         reservationUnit: r.reservationUnit,
         status,
-        isCancellableReason: isReservationCancellableReason(res),
-        pk: res.pk ?? 0,
-        accessType: res.accessType,
+        isCancellableReason: isReservationCancellableReason(elem),
+        pk: elem.pk ?? 0,
+        accessType: elem.accessType,
         accessTypeChanged,
         accessCodeTime,
       };
-      return [...acc, reservationTableElem];
-    }, []);
+      return reservationTableElem;
+    }) satisfies ReservationsTableElem[];
   }
 
   const combinedReservations: ReservationsTableElem[] = [];
