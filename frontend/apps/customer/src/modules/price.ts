@@ -57,15 +57,28 @@ export function getPriceSummaryString(
     return null;
   }
   const hasMaterialPrice = getMaterialPriceDescription(priceSummary, lang) !== "";
+  const amountString = getPriceSummaryAmountString(t, priceSummary, lang);
+  if (amountString == null) {
+    return hasMaterialPrice ? capitalize(t("prices:materialPrice")) : t("prices:priceFree");
+  }
+  return hasMaterialPrice ? `${amountString}${getMaterialPriceSuffix(t)}` : amountString;
+}
+
+/// The price of a reservation unit without the material price, such as "0–40 €/tunti".
+/// Returns null if the reservation unit is free of charge.
+export function getPriceSummaryAmountString(
+  t: TFunction,
+  priceSummary: PriceSummary,
+  lang: LocalizationLanguages
+): string | null {
   const amount = toNumber(priceSummary.lowestAmount) ?? 0;
   if (priceSummary.isFree || amount === 0) {
-    return hasMaterialPrice ? capitalize(t("prices:materialPrice")) : t("prices:priceFree");
+    return null;
   }
   const priceString = priceSummary.canApplyForDiscount
     ? formatDecimalRange(0, amount, lang)
     : formatPrice(amount, true, lang);
-  const materialPriceString = hasMaterialPrice ? getMaterialPriceSuffix(t) : "";
-  return `${priceString}${getPriceUnitString(t, priceSummary.priceUnit)}${materialPriceString}`;
+  return `${priceString}${getPriceUnitString(t, priceSummary.priceUnit)}`;
 }
 
 export const PRICE_SUMMARY_FRAGMENT = gql`
