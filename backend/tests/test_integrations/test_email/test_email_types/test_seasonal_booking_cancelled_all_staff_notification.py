@@ -11,7 +11,12 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationNotification, ReservationStateChoice
+from tilavarauspalvelu.enums import (
+    ReservationCancelReasonChoice,
+    ReservationNotification,
+    ReservationStateChoice,
+    Weekday,
+)
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import (
@@ -20,8 +25,9 @@ from tilavarauspalvelu.integrations.email.template_context import (
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
+from utils.date_utils import local_time
 
-from tests.factories import ApplicationFactory, ReservationUnitFactory, UserFactory
+from tests.factories import ApplicationFactory, ReservationSeriesFactory, ReservationUnitFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
@@ -335,6 +341,74 @@ def test_seasonal_booking_cancelled_all_staff_notification__send_email__sent_whe
 
     assert outbox[0].subject == "The customer has canceled the seasonal booking"
     assert sorted(outbox[0].bcc) == ["admin@email.com"]
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_cancelled_all_staff_notification__send_email__series_without_reservations(outbox):
+    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
+    application_section = application.application_sections.first()
+
+    reservation_unit = ReservationUnitFactory.create()
+
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit.unit],
+        email="admin@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
+    )
+
+    series = create_reservation_series(
+        user=application.user,
+        reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__state=ReservationStateChoice.CANCELLED,
+        reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
+    )
+    ReservationSeriesFactory.create(
+        user=application.user,
+        reservation_unit=reservation_unit,
+        begin_time=local_time(18),
+        end_time=local_time(20),
+        weekdays=[Weekday.TUESDAY.value],
+        allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+    )
+
+    last_reservation = series.reservations.last()
+
+    with TranslationsFromPOFiles():
+        EmailService.send_seasonal_booking_cancelled_all_staff_notification_email(
+            application_section=application_section,
+        )
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The customer has canceled the seasonal booking"
+    assert sorted(outbox[0].bcc) == ["admin@email.com"]
+    assert outbox[0].body == cleandoc(
+        f"""
+        Hi,
+
+        The customer has canceled all space reservations included in the seasonal booking.
+
+        Reason: My plans have changed
+
+        Seasonal Booking: {application_section.name}, {application.application_round.name_en}
+
+        You can view the booking at:
+
+        Monday: 10:00-12:00
+        https://fake.varaamo.hel.fi/kasittely/reservations/{last_reservation.pk}
+
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply.
+        """
+    )
 
 
 @pytest.mark.django_db
