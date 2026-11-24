@@ -142,10 +142,19 @@ export function SingleSearchCard({ reservationUnit }: PropsT): React.ReactElemen
   );
 }
 
+// The search query has the variable `$reservableDateStart`. It is set only when the customer picks a date.
 export const SINGLE_SEARCH_CARD_FRAGMENT = gql`
   fragment SingleSearchCard on ReservationUnitNode {
     ...RecurringCard
-    ...PriceSummaryFields
+    priceSummary(onDate: $reservableDateStart) {
+      isFree
+      lowestAmount
+      priceUnit
+      canApplyForDiscount
+      materialPriceDescriptionFi
+      materialPriceDescriptionEn
+      materialPriceDescriptionSv
+    }
     reservationBeginsAt
     reservationEndsAt
     isClosed
