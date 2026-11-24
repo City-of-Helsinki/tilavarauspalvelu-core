@@ -128,6 +128,29 @@ def test_origin_hauki_resource_admin__update_single__hauki_error_shows_message(a
     assert errors == [HAUKI_ERROR_MESSAGE]
 
 
+@patch_method(HaukiAPIClient.request)
+@patch_method(SentryLogger.log_exception)
+def test_origin_hauki_resource_admin__update_single__invalid_id_shows_message(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    url = reverse(
+        "admin:tilavarauspalvelu_originhaukiresource_update_single_hauki_resource_reservable_times_pans",
+        args=["invalid"],
+    )
+    response = api_client.get(path=url)
+
+    assert response.status_code == 302, response.content
+
+    assert HaukiAPIClient.request.call_count == 0
+
+    assert SentryLogger.log_exception.call_count == 1
+    assert SentryLogger.log_exception.call_args.kwargs == {"details": "Hauki resources: invalid"}
+
+    errors = [str(message) for message in get_messages(response.wsgi_request) if message.level_tag == "error"]
+    assert errors == [HAUKI_ERROR_MESSAGE]
+
+
 @patch_method(HaukiAPIClient.request, return_value=ResponseMock(status_code=503, url="https://hauki.test/resource/"))
 @patch_method(SentryLogger.log_exception)
 def test_origin_hauki_resource_admin__update_action__hauki_error_shows_message(api_client):

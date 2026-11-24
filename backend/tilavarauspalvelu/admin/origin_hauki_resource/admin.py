@@ -142,10 +142,11 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         self.message_user(request, _("Reservable Time Spans updated."))
 
     @button(label=_("Update reservable time spans"), change_form=True)
-    def update_single_hauki_resource_reservable_times_pans(self, request: WSGIRequest, pk: int) -> None:
+    def update_single_hauki_resource_reservable_times_pans(self, request: WSGIRequest, pk: str) -> None:
         try:
-            HaukiResourceHashUpdater([pk]).run(force_refetch=True)
-        except ExternalServiceError as error:
+            hauki_resource_id = int(pk)
+            HaukiResourceHashUpdater([hauki_resource_id]).run(force_refetch=True)
+        except (ValueError, ExternalServiceError) as error:
             SentryLogger.log_exception(error, details=f"Hauki resources: {pk}")
             message = _("Could not update the reservable time spans from Hauki.")
             self.message_user(request, message, level=messages.ERROR)
