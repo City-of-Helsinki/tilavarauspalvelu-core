@@ -5,8 +5,10 @@ from typing import TYPE_CHECKING
 import django.apps
 import pytest
 
+from tilavarauspalvelu.enums import ApplicationFormType
 from tilavarauspalvelu.management.commands.create_test_data import create_test_data
 from tilavarauspalvelu.models import (
+    ApplicationRound,
     EmailMessage,
     PersonalInfoViewLog,
     PriceComponent,
@@ -15,6 +17,7 @@ from tilavarauspalvelu.models import (
     ReservationUnitPricing,
     TaxPercentage,
 )
+from tilavarauspalvelu.services.pricing.application_round_options import application_round_price_options
 
 if TYPE_CHECKING:
     from django.db import models
@@ -53,3 +56,10 @@ def test_create_test_data(settings):
     )
     assert paid_components_with_material_price.exists()
     assert paid_components_with_material_price.filter(material_price_description_fi__contains="<ul>").exists()
+
+    for application_round in ApplicationRound.objects.all():
+        option_names = [option.name for option in application_round_price_options(application_round)]
+        if application_round.application_form == ApplicationFormType.SPORTS_FORM:
+            assert option_names == ["Aikuiset", "Juniorit"], application_round.name
+        else:
+            assert option_names == [], application_round.name
