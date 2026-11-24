@@ -28,7 +28,6 @@ def create_section_for_cancellation() -> ApplicationSection:
     reservation_series = create_reservation_series(
         user=user,
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__price=0,
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
     )
 
