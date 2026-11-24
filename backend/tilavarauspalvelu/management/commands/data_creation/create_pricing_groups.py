@@ -6,7 +6,13 @@ from collections import defaultdict
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    ApplicationFormType,
+    PaymentType,
+    PriceComponentKind,
+    PriceUnit,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.models import (
     PriceComponent,
     PriceOption,
@@ -118,10 +124,9 @@ def create_own_prices(prices: list[OwnPrice]) -> None:
 @with_logs
 def _create_shared_pricing_group(*, tax_levels: dict[TaxLevelKey, TaxLevel]) -> None:
     general_tax_level = tax_levels["general"]
-    _move_to_shared_pricing_group(
-        tax_level=general_tax_level,
-        sales_item=get_or_create_sales_item(tax_level=general_tax_level),
-    )
+    sales_item = get_or_create_sales_item(tax_level=general_tax_level)
+    _move_to_shared_pricing_group(tax_level=general_tax_level, sales_item=sales_item)
+    _move_sports_round_to_shared_pricing_group(tax_level=general_tax_level, sales_item=sales_item)
 
 
 def get_or_create_sales_item(*, tax_level: TaxLevel) -> SalesItem:
@@ -289,6 +294,100 @@ def _move_to_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem)
             valid_until=None,
             price_option=juniors,
             amount=Decimal(10),
+            price_unit=PriceUnit.PER_HOUR,
+            tax_level=tax_level,
+            sales_item=sales_item,
+            can_apply_for_discount=True,
+        ),
+    ])
+
+    ReservationUnitPricingGroup.objects.bulk_create([
+        ReservationUnitPricingGroup(
+            reservation_unit=reservation_unit,
+            pricing_group=pricing_group,
+            begins=begins,
+        )
+        for reservation_unit in reservation_units
+    ])
+
+
+def _move_sports_round_to_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem) -> None:
+    """
+    Make a shared pricing group with two price options for the reservation units of the sports application round,
+    and move the reservation units from their own pricing groups to it.
+    """
+    reservation_units = list(
+        ReservationUnit.objects
+        .filter(application_rounds__application_form=ApplicationFormType.SPORTS_FORM)
+        .select_related("unit")
+        .distinct()
+        .order_by("pk")
+    )
+    if not reservation_units:
+        return
+
+    first_unit = reservation_units[0].unit
+    unit_group = first_unit.unit_groups.order_by("pk").first()
+    if unit_group is None:
+        return
+
+    own_rows = ReservationUnitPricingGroup.objects.filter(reservation_unit__in=reservation_units)
+    own_pricing_group_pks = list(own_rows.values_list("pricing_group", flat=True))
+    begins = min(own_rows.values_list("begins", flat=True))
+
+    own_rows.delete()
+    PricingGroup.objects.filter(pk__in=own_pricing_group_pks).delete()
+
+    adults = PriceOption.objects.create(
+        name="Aikuiset",
+        name_fi="Aikuiset",
+        name_en="Adults",
+        name_sv="Vuxna",
+        description="Yli 20-vuotiaat",
+        description_fi="Yli 20-vuotiaat",
+        description_en="Over 20 years old",
+        description_sv="Över 20 år",
+        unit_group=unit_group,
+    )
+    juniors = PriceOption.objects.create(
+        name="Juniorit",
+        name_fi="Juniorit",
+        name_en="Juniors",
+        name_sv="Juniorer",
+        description="Alle 20-vuotiaat",
+        description_fi="Alle 20-vuotiaat",
+        description_en="Under 20 years old",
+        description_sv="Under 20 år",
+        unit_group=unit_group,
+    )
+
+    pricing_group = PricingGroup.objects.create(
+        name="Liikunta, kausivaraukset",
+        name_fi="Liikunta, kausivaraukset",
+        name_en="Sports, seasonal bookings",
+        name_sv="Idrott, säsongsbokningar",
+        unit_group=unit_group,
+    )
+
+    PriceComponent.objects.bulk_create([
+        PriceComponent(
+            pricing_group=pricing_group,
+            kind=PriceComponentKind.BASE,
+            valid_from=begins,
+            valid_until=None,
+            price_option=adults,
+            amount=Decimal(15),
+            price_unit=PriceUnit.PER_HOUR,
+            tax_level=tax_level,
+            sales_item=sales_item,
+        ),
+        PriceComponent(
+            pricing_group=pricing_group,
+            kind=PriceComponentKind.BASE,
+            valid_from=begins,
+            valid_until=None,
+            price_option=juniors,
+            amount=Decimal(8),
             price_unit=PriceUnit.PER_HOUR,
             tax_level=tax_level,
             sales_item=sales_item,

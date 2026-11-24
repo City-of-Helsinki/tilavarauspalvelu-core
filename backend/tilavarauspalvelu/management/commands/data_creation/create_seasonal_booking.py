@@ -73,15 +73,21 @@ def _create_application_rounds(
             origin_hauki_resource__isnull=False,
             reservation_kind__in={ReservationKind.SEASON, ReservationKind.DIRECT_AND_SEASON},
             reservations__isnull=True,
-        )
+        ).order_by("pk")
     )
-    assert len(reservation_units) > 0, "No reservation units available for creating application rounds."
+
+    # The sports round has reservation units of its own, because their pricing group has price options.
+    # The other rounds use reservation units without price options.
+    half = len(reservation_units) // 2
+    sports_reservation_units = reservation_units[:half]
+    other_reservation_units = reservation_units[half:]
+    assert sports_reservation_units, "Not enough reservation units available for creating application rounds."
 
     # --- Create application rounds --------------------------------------------------------------------------------
 
     _create_handled_application_rounds(
         terms_of_use,
-        reservation_units,
+        other_reservation_units,
         reservation_purposes,
         age_groups,
         users,
@@ -89,7 +95,7 @@ def _create_application_rounds(
 
     _create_application_round_in_allocations(
         terms_of_use,
-        reservation_units,
+        other_reservation_units,
         reservation_purposes,
         age_groups,
         users,
@@ -97,7 +103,7 @@ def _create_application_rounds(
 
     _create_open_application_rounds(
         terms_of_use,
-        reservation_units,
+        other_reservation_units,
         reservation_purposes,
         age_groups,
         users,
@@ -105,13 +111,13 @@ def _create_application_rounds(
 
     _create_upcoming_application_rounds(
         terms_of_use,
-        reservation_units,
+        other_reservation_units,
         reservation_purposes,
     )
 
     _create_open_sports_application_round(
         terms_of_use,
-        reservation_units,
+        sports_reservation_units,
         reservation_purposes,
     )
 
