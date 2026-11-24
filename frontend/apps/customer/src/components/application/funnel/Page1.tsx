@@ -80,7 +80,7 @@ export function Page1({
           disabled={submitDisabled || isSaving}
           type="submit"
         >
-          {t("common:next")}
+          {t("application:navigation.continue")}
         </Button>
       </ButtonContainer>
     </>

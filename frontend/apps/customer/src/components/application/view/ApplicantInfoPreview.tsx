@@ -54,13 +54,24 @@ export function ApplicantInfoPreview({ application, isSportsForm }: ApplicantInf
         <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>
       ) : application.applicantType !== ReserveeType.Individual ? (
         <>
-          <LabelValue label={t("application:preview.organisation.name")} value={application.organisationName} />
+          <LabelValue
+            label={
+              application.applicantType === ReserveeType.Company
+                ? t("application:preview.organisation.companyName")
+                : t("application:preview.organisation.name")
+            }
+            value={application.organisationName}
+          />
           <LabelValue
             label={t("application:preview.organisation.coreBusiness")}
             value={application.organisationCoreBusiness}
           />
           <LabelValue
-            label={t("application:preview.organisation.registrationNumber")}
+            label={
+              application.applicantType === ReserveeType.Nonprofit
+                ? t("application:preview.organisation.nonprofitRegistrationNumber")
+                : t("application:preview.organisation.registrationNumber")
+            }
             value={application.organisationIdentifier}
           />
           {shouldShowActiveMembers && (

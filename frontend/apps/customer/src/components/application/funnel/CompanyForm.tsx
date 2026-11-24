@@ -17,7 +17,7 @@ export function CompanyForm({ isSportsForm }: Readonly<{ isSportsForm: boolean }
 
   return (
     <>
-      <ApplicationFormTextInput name="organisationName" />
+      <ApplicationFormTextInput name="organisationName" label={t("application:Page3.companyName")} />
       <ApplicationFormTextInput name="organisationCoreBusiness" />
       <ApplicationFormTextInput name="organisationIdentifier" />
       {isSportsForm && <OrganisationActiveMembersInput />}

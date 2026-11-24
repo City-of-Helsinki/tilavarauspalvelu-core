@@ -66,7 +66,7 @@ export function Page2({ application, onNext }: Props): React.ReactElement {
           disabled={!enableSubmit}
           type="submit"
         >
-          {t("common:next")}
+          {t("application:navigation.continue")}
         </Button>
       </ButtonContainer>
     </form>

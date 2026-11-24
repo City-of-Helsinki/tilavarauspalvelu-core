@@ -145,7 +145,10 @@
       "basicInfo": "Hakijan perustiedot",
       "postalAddress": "Postiosoite",
       "billingAddress": "Laskutusosoite",
-      "contactInfo": "Yhteyshenkilön tiedot"
+      "contactInfo": "Yhteyshenkilön tiedot",
+      "basicInfoIndividual": "Varaajan perustiedot",
+      "basicInfoCompany": "Yrityksen perustiedot",
+      "basicInfoNonprofit": "Yhdistyksen perustiedot"
     },
     "as": {
       "prefix": "Luon hakemuksen",
@@ -176,7 +179,9 @@
     "organisationCity": "Postitoimipaikka",
     "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta",
     "organisationActiveMembers": "Aktiiviharrastajien määrä",
-    "organisationActiveMembersHelper": "Harrastajat, jotka osallistuvat toimintaan säännöllisesti"
+    "organisationActiveMembersHelper": "Harrastajat, jotka osallistuvat toimintaan säännöllisesti",
+    "companyName": "Yrityksen virallinen nimi",
+    "nonprofitName": "Yhdistyksen virallinen nimi"
   },
   "preview": {
     "subHeading": "Tarkista ja lähetä hakemus",
@@ -197,7 +202,9 @@
       "coreBusiness": "Ydintoiminta",
       "registrationNumber": "Y-tunnus",
       "billingAddress": "Laskutusosoite",
-      "activeMembers": "Aktiiviharrastajien määrä"
+      "activeMembers": "Aktiiviharrastajien määrä",
+      "companyName": "Yrityksen nimi",
+      "nonprofitRegistrationNumber": "Rekisterinumero"
     },
     "applicationEvent": {
       "applicationInfo": "Hakemuksen tiedot",
@@ -274,9 +281,10 @@
     "body": "Voit halutessasi muokata hakemustasi ennen hakuajan päättymistä. Vain viimeisin lähetetty hakemus huomioidaan. Poistathan aiemmin lähetetyt hakemukset.\n\nLähetetyn hakemuksen tunnistat keltaisesta Lähetetty-symbolista."
   },
   "navigation": {
-    "page1": "Varauksen tiedot",
-    "page2": "Varauksen ajankohta",
+    "page1": "Hakemuksen tiedot",
+    "page2": "Aikatoiveet",
     "page3": "Hakijan tiedot",
-    "page4": "Tarkista ja lähetä"
+    "page4": "Tarkista ja lähetä",
+    "continue": "Jatka"
   }
 }

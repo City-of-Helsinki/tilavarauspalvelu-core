@@ -22,10 +22,13 @@ type TextFields =
 
 export function ApplicationFormTextInput({
   name,
+  label,
   disabled,
   maxLength,
 }: {
   name: TextFields;
+  // The default label comes from the field name
+  label?: string;
   disabled?: boolean;
   maxLength?: number;
 }): React.ReactElement {
@@ -43,7 +46,7 @@ export function ApplicationFormTextInput({
       id={name}
       control={control}
       name={name}
-      label={t(`application:Page3.${name}`)}
+      label={label ?? t(`application:Page3.${name}`)}
       required={!disabled}
       disabled={disabled}
       invalid={state.invalid}

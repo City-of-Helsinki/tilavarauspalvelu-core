@@ -96,7 +96,7 @@ describe("Application Page2", () => {
   test("should render page properly", () => {
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page2.subHeading" })).toBeInTheDocument();
-    expect(view.getByRole("button", { name: "common:next" })).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "application:navigation.continue" })).toBeInTheDocument();
     expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
     expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
@@ -121,7 +121,7 @@ describe("Application Page2", () => {
   test("should send the form when clicking next", async () => {
     const view = customRender({ page: "page2" });
     const nextButton = await view.findByRole("button", {
-      name: "common:next",
+      name: "application:navigation.continue",
     });
     await userEvent.click(nextButton);
     expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page3"));
@@ -132,7 +132,7 @@ describe("Application Page2", () => {
     mockedRouterPush.mockReturnValueOnce(nav.promise);
     const user = userEvent.setup();
     const view = customRender({ page: "page2" });
-    const nextButton = await view.findByRole("button", { name: "common:next" });
+    const nextButton = await view.findByRole("button", { name: "application:navigation.continue" });
 
     expect(nextButton).not.toBeDisabled();
     await user.click(nextButton);
@@ -146,7 +146,7 @@ describe("Application Page2", () => {
   test("submit button is disabled without selection", async () => {
     const view = customRender({ page: "page1" });
     const nextButton = await view.findByRole("button", {
-      name: "common:next",
+      name: "application:navigation.continue",
     });
     expect(nextButton).toBeDisabled();
   });
@@ -226,10 +226,10 @@ describe("Application page2 validation errors", () => {
     const view = customRender({ page: "page1" });
     await user.click(tuesdayCell(view, "14:00"));
     expect(view.queryAllByText(/application:validation/)).toHaveLength(ERROR_TEXTS);
-    expect(view.getByRole("button", { name: "common:next" })).toBeDisabled();
+    expect(view.getByRole("button", { name: "application:navigation.continue" })).toBeDisabled();
     await sweepDown(user, view, "14:15", 6);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
-    expect(view.getByRole("button", { name: "common:next" })).not.toBeDisabled();
+    expect(view.getByRole("button", { name: "application:navigation.continue" })).not.toBeDisabled();
   });
 });
 
@@ -281,7 +281,7 @@ describe("Application page2 unsaved changes", () => {
     // 14:00 to 16:00 is two hours, so the form is valid
     await user.click(tuesdayCell(view, "14:00"));
     await sweepDown(user, view, "14:15", 6);
-    await user.click(view.getByRole("button", { name: "common:next" }));
+    await user.click(view.getByRole("button", { name: "application:navigation.continue" }));
     expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page3"));
     expect(confirm).not.toHaveBeenCalled();
   });

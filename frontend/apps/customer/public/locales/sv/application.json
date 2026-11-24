@@ -145,7 +145,10 @@
       "basicInfo": "Bokningsinformation",
       "postalAddress": "Postadress",
       "billingAddress": "Fakturaadress",
-      "contactInfo": "Kontaktinformation"
+      "contactInfo": "Kontaktinformation",
+      "basicInfoIndividual": "Bokarens grunduppgifter",
+      "basicInfoCompany": "Företagets grunduppgifter",
+      "basicInfoNonprofit": "Föreningens grunduppgifter"
     },
     "as": {
       "prefix": "Skapa ansökan",
@@ -176,7 +179,9 @@
     "organisationCity": "Postanstalt",
     "additionalInformation": "Tilläggsinformation om bokningens ändamål",
     "organisationActiveMembers": "Antal aktiva medlemmar",
-    "organisationActiveMembersHelper": "Utövare som regelbundet deltar i verksamheten"
+    "organisationActiveMembersHelper": "Utövare som regelbundet deltar i verksamheten",
+    "companyName": "Företagets officiella namn",
+    "nonprofitName": "Föreningens officiella namn"
   },
   "preview": {
     "subHeading": "Kontrollera och lämna in ansökan",
@@ -197,7 +202,10 @@
       "name": "Ansökarens namn",
       "coreBusiness": "Kärnverksamhet",
       "billingAddress": "Fakturaadress",
-      "activeMembers": "Antal aktiva medlemmar"
+      "activeMembers": "Antal aktiva medlemmar",
+      "companyName": "Företagets namn",
+      "registrationNumber": "FO-nummer",
+      "nonprofitRegistrationNumber": "Registreringsnummer"
     },
     "applicationEvent": {
       "applicationInfo": "Säsongbokningens detaljer",
@@ -274,9 +282,10 @@
     "body": "Alla uppgifter i ansökan kan vid behov ändras fram till den sista ansökningsdagen. Vänligen notera att endast den sist inlämnade ansökan kommer att beaktas. Vänligen radera tidigare inlämnade ansökningar.\n\nDen inlämnade ansökan känner du igen av den gula Skickat ikonen."
   },
   "navigation": {
-    "page1": "Bokningsuppgifter",
-    "page2": "Bokningstider",
+    "page1": "Ansökningsuppgifter",
+    "page2": "Tidsönskemål",
     "page3": "Kontaktuppgifter",
-    "page4": "Kontrollera och skicka"
+    "page4": "Kontrollera och skicka",
+    "continue": "Fortsätt"
   }
 }

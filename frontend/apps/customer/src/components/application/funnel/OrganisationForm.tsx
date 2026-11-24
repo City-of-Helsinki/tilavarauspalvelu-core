@@ -33,7 +33,7 @@ export function OrganisationForm({ isSportsForm }: OrganisationFormProps): React
 
   return (
     <>
-      <ApplicationFormTextInput name="organisationName" />
+      <ApplicationFormTextInput name="organisationName" label={t("application:Page3.nonprofitName")} />
       <ApplicationFormTextInput name="organisationCoreBusiness" />
       <ControlledSelect
         control={control}

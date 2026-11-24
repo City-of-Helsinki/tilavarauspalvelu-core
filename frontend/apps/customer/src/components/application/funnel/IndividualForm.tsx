@@ -8,8 +8,8 @@ export function IndividualForm(): React.ReactElement {
   const { t } = useTranslation();
   return (
     <>
-      <ApplicationFormTextInput name="contactPersonFirstName" />
-      <ApplicationFormTextInput name="contactPersonLastName" />
+      <ApplicationFormTextInput name="contactPersonFirstName" label={t("application:Page3.firstName")} />
+      <ApplicationFormTextInput name="contactPersonLastName" label={t("application:Page3.lastName")} />
       <BillingAddress />
       <FormSubHeading as="h2">{t("application:Page3.sectionHeadings.contactInfo")}</FormSubHeading>
       <ApplicationFormTextInput name="contactPersonPhoneNumber" />
