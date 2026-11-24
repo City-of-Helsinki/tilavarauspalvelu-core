@@ -953,9 +953,12 @@ type ReservationUnitNode implements Node {
   haukiUrl: String
 
   """
-  Summary of the base prices of the pricing group that the reservation unit uses today.
+  Summary of the base prices of the pricing group that the reservation unit uses on the date.
   """
-  priceSummary: PriceSummaryType
+  priceSummary(
+    """The date of the prices. Today if not given."""
+    onDate: Date
+  ): PriceSummaryType
 
   """
   The first future change to the price summary, on a date on which a reservation can still begin. Null if there is none.

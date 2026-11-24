@@ -113,7 +113,8 @@ class ReservationUnitNode(DjangoNode):
 
     price_summary = ManuallyOptimizedField(
         PriceSummaryType,
-        description="Summary of the base prices of the pricing group that the reservation unit uses today.",
+        on_date=graphene.Date(description="The date of the prices. Today if not given."),
+        description="Summary of the base prices of the pricing group that the reservation unit uses on the date.",
     )
     next_price_change = ManuallyOptimizedField(
         PriceChangeType,
@@ -422,12 +423,18 @@ class ReservationUnitNode(DjangoNode):
         return items
 
     @staticmethod
-    def optimize_price_summary(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+    def optimize_price_summary(
+        queryset: models.QuerySet,
+        optimizer: QueryOptimizer,
+        on_date: datetime.date | None = None,
+    ) -> models.QuerySet:
+        price_date = on_date if on_date is not None else local_date()
         # A queryset annotation is lost when the reservation unit comes through a foreign key. This one is not.
-        optimizer.annotations["price_summary_components"] = _active_base_component_data()
+        optimizer.annotations["price_summary_components"] = _base_component_data_on_date(price_date=price_date)
         return queryset
 
-    def resolve_price_summary(root: ReservationUnit, info: GQLInfo) -> PriceSummary | None:
+    def resolve_price_summary(root: ReservationUnit, info: GQLInfo, **kwargs: Any) -> PriceSummary | None:
+        # `optimize_price_summary` selects the components by the field arguments.
         components: list[dict[str, Any]] = root.price_summary_components
         base_prices = [
             BasePrice(
@@ -533,13 +540,16 @@ class ReservationUnitAllNode(DjangoNode):
 # Internals
 
 
-def _active_base_component_data() -> ArraySubquery:
-    """Base component data for the price summary of the reservation unit in the outer query, as it is today."""
+def _base_component_data_on_date(*, price_date: datetime.date) -> ArraySubquery:
+    """
+    Base component data for the price summary of the reservation unit in the outer query, as it is on the given date.
+    The tax percentage is the one of today, the same as in the price lines of a new reservation.
+    """
     today = local_date()
 
     active_pricing_group = (
         ReservationUnitPricingGroup.objects
-        .filter(reservation_unit=models.OuterRef(models.OuterRef("pk")), begins__lte=today)
+        .filter(reservation_unit=models.OuterRef(models.OuterRef("pk")), begins__lte=price_date)
         .order_by("-begins")
         .values("pricing_group")[:1]
     )
@@ -552,11 +562,11 @@ def _active_base_component_data() -> ArraySubquery:
     active_base_components = (
         PriceComponent.objects
         .filter(
-            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
+            models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=price_date),
             models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
             pricing_group=models.Subquery(active_pricing_group),
             kind=PriceComponentKind.BASE,
-            valid_from__lte=today,
+            valid_from__lte=price_date,
         )
         .order_by("amount", "pk")
         .annotate(

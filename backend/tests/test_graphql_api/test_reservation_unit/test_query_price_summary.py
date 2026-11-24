@@ -291,6 +291,129 @@ def test_reservation_unit__query__price_summary__future_pricing_group_not_includ
     assert response.first_query_object["priceSummary"]["lowestAmount"] == "20.00"
 
 
+def test_reservation_unit__query__price_summary__on_date__future_price_change(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        valid_until=today + datetime.timedelta(days=5),
+        amount=Decimal(20),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today + datetime.timedelta(days=5),
+        amount=Decimal(10),
+        material_price_description_fi="Materiaalit",
+    )
+    on_date = today + datetime.timedelta(days=5)
+
+    fields = f'priceSummary(onDate: "{on_date.isoformat()}") {{ lowestAmount materialPriceDescriptionFi }}'
+    query = reservation_unit_query(fields=fields, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "priceSummary": {"lowestAmount": "10.00", "materialPriceDescriptionFi": "Materiaalit"},
+    }
+
+
+def test_reservation_unit__query__price_summary__on_date__day_before_price_change(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        valid_until=today + datetime.timedelta(days=5),
+        amount=Decimal(20),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today + datetime.timedelta(days=5),
+        amount=Decimal(10),
+    )
+    on_date = today + datetime.timedelta(days=4)
+
+    fields = f'priceSummary(onDate: "{on_date.isoformat()}") {{ lowestAmount }}'
+    query = reservation_unit_query(fields=fields, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"priceSummary": {"lowestAmount": "20.00"}}
+
+
+def test_reservation_unit__query__price_summary__on_date__future_pricing_group(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    active_group = PricingGroupFactory.create()
+    future_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=active_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=future_group,
+        begins=today + datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=active_group,
+        valid_from=today - datetime.timedelta(days=10),
+        amount=Decimal(20),
+    )
+    PriceComponentFactory.create(
+        pricing_group=future_group,
+        valid_from=today - datetime.timedelta(days=10),
+        amount=Decimal(10),
+    )
+    on_date = today + datetime.timedelta(days=10)
+
+    fields = f'priceSummary(onDate: "{on_date.isoformat()}") {{ lowestAmount }}'
+    query = reservation_unit_query(fields=fields, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"priceSummary": {"lowestAmount": "10.00"}}
+
+
+def test_reservation_unit__query__price_summary__on_date__query_count_does_not_grow_with_list(graphql):
+    today = local_date()
+    for amount in (Decimal(10), Decimal(20), Decimal(30)):
+        reservation_unit = ReservationUnitFactory.create()
+        pricing_group = PricingGroupFactory.create()
+        ReservationUnitPricingGroupFactory.create(
+            reservation_unit=reservation_unit,
+            pricing_group=pricing_group,
+            begins=today - datetime.timedelta(days=10),
+        )
+        PriceComponentFactory.create(
+            pricing_group=pricing_group,
+            valid_from=today - datetime.timedelta(days=10),
+            amount=amount,
+        )
+    on_date = today + datetime.timedelta(days=5)
+
+    query = reservation_units_query(fields=f'pk priceSummary(onDate: "{on_date.isoformat()}") {{ lowestAmount }}')
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert [response.node(index)["priceSummary"]["lowestAmount"] for index in range(3)] == ["10.00", "20.00", "30.00"]
+    assert len(response.queries) == 2, response.query_log
+
+
 def test_reservation_unit__query__price_summary__no_pricing_group(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
