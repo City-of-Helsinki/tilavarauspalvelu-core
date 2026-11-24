@@ -171,3 +171,12 @@ export const FormSubHeading = styled(H5).attrs({ as: "h2" })`
   margin: 0;
   grid-column: 1 / -1;
 `;
+
+/** Puts the post code and the city in one cell of the page 3 form grid.
+ * The 3:5 ratio is close to the design, which has 136.5px for the post code and 224px for the city. */
+export const PostCodeCityRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 5fr);
+  align-items: baseline;
+  gap: var(--spacing-m);
+`;
