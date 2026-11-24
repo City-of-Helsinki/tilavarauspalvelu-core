@@ -2,6 +2,7 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next/pages";
 import { ControlledCheckbox, ControlledSelect } from "ui/src/components/form";
+import { Flex } from "ui/src/styled";
 import { MunicipalityChoice } from "@gql/gql-types";
 import { FormSubHeading, PostCodeCityRow } from "@/styled/application";
 import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
@@ -43,14 +44,17 @@ export function OrganisationForm({ isSportsForm }: OrganisationFormProps): React
         error={translateError(errors.municipality?.message)}
       />
       {isSportsForm && <OrganisationActiveMembersInput />}
-      <ControlledCheckbox
-        control={control}
-        label={t("application:Page3.organisationNotRegistered")}
-        id="isRegisteredAssociation"
-        name="isRegisteredAssociation"
-        inverted
-      />
-      <ApplicationFormTextInput name="organisationIdentifier" disabled={!isRegisteredAssociation} />
+      {/* The checkbox and the field it disables are in one grid cell, so the field is under the checkbox. */}
+      <Flex>
+        <ControlledCheckbox
+          control={control}
+          label={t("application:Page3.organisationNotRegistered")}
+          id="isRegisteredAssociation"
+          name="isRegisteredAssociation"
+          inverted
+        />
+        <ApplicationFormTextInput name="organisationIdentifier" disabled={!isRegisteredAssociation} />
+      </Flex>
       <FormSubHeading>{t("application:Page3.sectionHeadings.postalAddress")}</FormSubHeading>
       <ApplicationFormTextInput name="organisationStreetAddress" />
       <PostCodeCityRow>

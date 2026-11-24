@@ -25,6 +25,7 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   min?: number;
   max?: number;
   required?: boolean;
+  disabled?: boolean;
   label: string;
   tooltipText?: string;
   helperText?: string;
@@ -41,6 +42,7 @@ export function ControlledTextInput<T extends FieldValues>({
   min,
   max,
   required,
+  disabled,
   placeholder,
   label,
   tooltipText,
@@ -61,6 +63,7 @@ export function ControlledTextInput<T extends FieldValues>({
         name={name}
         label={label}
         required={required}
+        disabled={disabled}
         min={min}
         max={max}
         placeholder={placeholder}
