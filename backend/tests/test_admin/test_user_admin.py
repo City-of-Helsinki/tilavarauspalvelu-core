@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import base64
 import datetime
+import json
 
 import pytest
 from django.urls import reverse
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.models import PersonalInfoViewLog
+from utils.utils import get_jwt_payload
 
 from tests.factories import UserFactory
 
@@ -34,6 +37,31 @@ def test_user_admin__change_page__does_not_show_tokens(api_client):
     content = response.content.decode()
     assert access_token not in content
     assert refresh_token not in content
+
+
+def test_user_admin__change_page__id_token_without_time_claims(api_client):
+    admin = UserFactory.create_superuser()
+    api_client.force_login(admin)
+
+    user = UserFactory.create_profile_user()
+    social_auth = UserSocialAuth.objects.get(user=user)
+
+    id_token: str = social_auth.extra_data["id_token"]
+    header, _, signature = id_token.split(".")
+
+    claims = get_jwt_payload(id_token)
+    del claims["exp"]
+    del claims["iat"]
+    del claims["auth_time"]
+
+    payload = base64.urlsafe_b64encode(json.dumps(claims).encode()).decode()
+    social_auth.extra_data["id_token"] = f"{header}.{payload}.{signature}"
+    social_auth.save(update_fields=["extra_data"])
+
+    url = reverse("admin:tilavarauspalvelu_user_change", args=[user.pk])
+    response = api_client.get(path=url)
+
+    assert response.status_code == 200
 
 
 def test_user_admin__social_auth_change_page__not_available(api_client):
