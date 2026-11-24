@@ -14,13 +14,13 @@ from .utils import with_logs
 def _set_user_group_permissions() -> None:
     group = Group.objects.get_or_create(name="ALL")[0]
     group.permissions.add(*Permission.objects.all())
-    for user in User.objects.all():
+    for user in User.objects.exclude(username="customer"):
         user.groups.add(group)
 
 
 @with_logs
 def _set_user_roles() -> None:
-    users = User.objects.exclude(username="tvp").all()
+    users = User.objects.exclude(username__in=["tvp", "customer"]).all()
     units = list(Unit.objects.all())
     unit_groups = list(UnitGroup.objects.all())
 

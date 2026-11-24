@@ -29,6 +29,23 @@ def _create_users() -> list[User]:
             username="tvp",
             uuid="6a3a72f4-2f84-11ee-9b45-718d9db674aa",
         ),
+        # Customer user without roles or permissions.
+        # 'is_staff' is only for the Django admin login. Use it to test the customer UI.
+        UserFactory.build(
+            date_of_birth="1985-05-05",
+            department_name=None,
+            email="customer@example.com",
+            first_name="Customer",
+            is_staff=True,
+            is_superuser=False,
+            last_name="User",
+            password=make_password("customer"),  # NOSONAR
+            profile_id="",
+            reservation_notification=ReservationNotification.NONE,
+            tvp_uuid="0d4b8a3e-6f0c-4c1e-9a52-3b7f2e8c1d64",
+            username="customer",
+            uuid="7c2e5f1a-9b3d-4e8f-a6c0-2d1b4f7e9a35",
+        ),
         # General Admin (090909-900D)
         UserFactory.build(
             date_of_birth="1909-09-09",
