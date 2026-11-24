@@ -13,9 +13,13 @@ const OPTIONS = {
   cancellation: [{ value: "cancellation-1", label: "Cancellation terms 1" }],
 };
 
-function Harness() {
+function Harness({ isPaid = false }: Readonly<{ isPaid?: boolean }>) {
+  const defaultValues = convertReservationUnit(undefined);
   const form = useForm<ReservationUnitEditFormValues>({
-    defaultValues: convertReservationUnit(undefined),
+    defaultValues: {
+      ...defaultValues,
+      pricings: defaultValues.pricings.map((p) => (p.isFuture ? p : { ...p, isPaid })),
+    },
   });
   return <TermsSection form={form} options={OPTIONS} />;
 }
@@ -71,5 +75,21 @@ describe("TermsSection", () => {
     );
     const listbox = await screen.findByRole("listbox");
     expect(within(listbox).getByRole("option", { name: "Service terms 1" })).toBeInTheDocument();
+  });
+
+  // HDS adds the required text to the name of the select button
+  it.each([
+    {
+      isPaid: true,
+      name: "reservationUnitEditor:label.paymentTerms. reservationUnitEditor:termsPlaceholder. 0 valittua vaihtoehtoa. Pakollinen.",
+    },
+    {
+      isPaid: false,
+      name: "reservationUnitEditor:label.paymentTerms. reservationUnitEditor:termsPlaceholder. 0 valittua vaihtoehtoa.",
+    },
+  ])("marks the payment terms as required only for a paid price (paid: $isPaid)", async ({ isPaid, name }) => {
+    render(<Harness isPaid={isPaid} />);
+    await openAccordion();
+    expect(screen.getByRole("button", { name })).toBeInTheDocument();
   });
 });

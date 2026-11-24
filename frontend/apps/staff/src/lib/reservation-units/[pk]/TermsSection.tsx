@@ -1,10 +1,13 @@
 import React from "react";
+import { useWatch } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ControlledSelect } from "ui/src/components/form";
 import { AutoGrid } from "ui/src/styled";
+import { getTranslatedError } from "@/modules/helpers";
 import { ControlledRichTextInput } from "./ControlledRichTextInput";
+import { isShownPaidPricing } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 
@@ -28,9 +31,18 @@ export function TermsSection({
   const { t } = useTranslation();
   const { control, formState } = form;
   const { errors } = formState;
+  const pricingList = useWatch({ control, name: "pricings" });
+  const hasFuturePricing = useWatch({ control, name: "hasFuturePricing" });
+  const isSharedPricingGroup = useWatch({ control, name: "isSharedPricingGroup" });
+  // The prices of a shared pricing group are not edited here, so they do not make the payment terms required
+  const isPaymentTermsRequired =
+    !isSharedPricingGroup && pricingList.some((p) => isShownPaidPricing(p, hasFuturePricing));
 
   const hasErrors =
-    errors.notesWhenApplyingFi != null || errors.notesWhenApplyingEn != null || errors.notesWhenApplyingSv != null;
+    errors.paymentTerms != null ||
+    errors.notesWhenApplyingFi != null ||
+    errors.notesWhenApplyingEn != null ||
+    errors.notesWhenApplyingSv != null;
 
   const termsOptions = [
     {
@@ -61,6 +73,8 @@ export function TermsSection({
             placeholder={t(`reservationUnitEditor:termsPlaceholder`)}
             tooltip={t(`reservationUnitEditor:tooltip.${name}`)}
             enableSearch
+            required={name === "paymentTerms" && isPaymentTermsRequired}
+            error={getTranslatedError(t, errors[name]?.message)}
           />
         ))}
         {(["notesWhenApplyingFi", "notesWhenApplyingEn", "notesWhenApplyingSv"] as const).map((n) => (

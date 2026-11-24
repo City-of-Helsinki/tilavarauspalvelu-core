@@ -789,6 +789,14 @@ export const ReservationUnitEditSchema = z
         path: ["paymentType"],
       });
     }
+    // A material price alone does not make the reservation unit paid
+    if (isPaid && !v.isSharedPricingGroup && v.paymentTerms === "") {
+      ctx.addIssue({
+        code: "custom",
+        message: "Required",
+        path: ["paymentTerms"],
+      });
+    }
   });
 
 export type ReservationUnitEditFormValues = z.infer<typeof ReservationUnitEditSchema>;
