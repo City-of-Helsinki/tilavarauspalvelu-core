@@ -404,7 +404,7 @@ def append_payment_method_to_checkout_url(checkout_url: str, request: WSGIReques
 
 @require_GET
 @redirect_back_on_error
-def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:
+def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: int) -> HttpResponseRedirect:  # noqa: PLR0915
     """Redirect user to verkkokauppa for paying pending reservations."""
     reservation: Reservation | None = Reservation.objects.filter(pk=pk).first()
     if reservation is None:
@@ -448,6 +448,12 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     if not reservation.price_lines.exists():
         msg = "Reservation has no price lines"
         raise ValidationError(msg, code="RESERVATION_NO_PRICE_LINES")
+
+    try:
+        reservation.reservation_unit.validators.validate_has_payment_product()
+    except DRFValidationError as error:
+        msg = "Reservation unit has no payment product"
+        raise ValidationError(msg, code="RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT") from error
 
     # The tax rate can change between the approval and the payment.
     try:

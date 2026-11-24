@@ -359,6 +359,31 @@ def test_redirect_to_verkkokauppa__reservation_has_no_price_lines(api_client, se
     }
 
 
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_redirect_to_verkkokauppa__reservation_unit_has_no_payment_product(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
+    reservation = ReservationFactory.create_with_pending_payment()
+    reservation.reservation_unit.payment_product = None
+    reservation.reservation_unit.save(update_fields=["payment_product"])
+
+    url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
+    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
+
+    api_client.force_login(reservation.user)
+    response = api_client.get(url)
+
+    query_params = get_query_params(response.url)
+
+    assert response.status_code == 302
+    assert query_params == {
+        "error_message": "Reservation unit has no payment product",
+        "error_code": "RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT",
+    }
+
+    assert VerkkokauppaAPIClient.create_order.called is False
+
+
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client, settings):
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
