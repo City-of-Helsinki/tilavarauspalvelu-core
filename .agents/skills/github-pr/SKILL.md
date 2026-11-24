@@ -4,6 +4,7 @@ description: >-
   Fetch a GitHub pull request through the GitHub REST API and present its details and review
   comments with the file and line each comment references.
   Use when the user references a pull request or PR either with a URL or number.
+  Also use to fetch the code of a pull request for a review.
   Also use when the user asks which pull requests they or the whole team opened,
   merged or reviewed in a time window, for example the past two weeks.
 ---
@@ -44,7 +45,28 @@ The script validates the number. It prints the pull request with three lists of 
 
 A hook blocks the command if it is in any other form. Run it as a single command, without pipes.
 
-## 3. List your pull requests or the team's in a time window
+## 3. Fetch the code of the pull request
+
+Use this to review a pull request without a checkout. The script needs no clean working tree.
+
+```bash
+.agents/skills/github-pr/github-pr-fetch 99
+```
+
+The script fetches the head of the pull request to `refs/pr/<number>/head`
+and its base branch to `refs/pr/<number>/base`. It prints JSON with `head_ref`, `head_sha`, `base_branch`,
+`base_ref`, `merge_base` and `files`. Each file has `path`, `added` and `deleted`.
+Read the code with plain git commands after that:
+
+```bash
+git diff <merge_base> refs/pr/99/head -- <path>
+git show refs/pr/99/head:<path>
+git grep <pattern> refs/pr/99/head -- backend/
+```
+
+Run the script again to get new commits. It overwrites the refs.
+
+## 4. List your pull requests or the team's in a time window
 
 ```bash
 .agents/skills/github-pr/github-activity
