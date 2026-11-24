@@ -100,7 +100,7 @@ describe("Component: ReservationInfoCard", () => {
           state: ReservationStateChoice.RequiresHandling,
         }),
       });
-      expect(getPriceText()).toBe('common:price: 0 - 10,00 € (common:inclTax {"taxPercentage":"25,5"})');
+      expect(getPriceText()).toBe('common:price: 0–10 € (common:inclTax {"taxPercentage":"25,5"})');
     });
 
     it("adds the material price when a price line has a material price description", () => {
@@ -110,7 +110,7 @@ describe("Component: ReservationInfoCard", () => {
         }),
       });
       expect(getPriceText()).toBe(
-        'common:price: 10,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
+        'common:price: 10,00 € (common:inclTax {"taxPercentage":"25,5"}) + prices:materialPrice'
       );
     });
 
@@ -157,7 +157,7 @@ describe("Component: ReservationInfoCard", () => {
         reservationPrice: { total: "40.00", canApplyForDiscount: true, lines: [createReservationPriceLine()] },
         isDiscountRange: true,
       });
-      expect(getPriceText()).toBe('common:price: 0 - 40,00 € (common:inclTax {"taxPercentage":"25,5"})');
+      expect(getPriceText()).toBe('common:price: 0–40 € (common:inclTax {"taxPercentage":"25,5"})');
     });
 
     it("shows free of charge without the tax percentage", () => {
@@ -182,7 +182,7 @@ describe("Component: ReservationInfoCard", () => {
         },
       });
       expect(getPriceText()).toBe(
-        'common:price: 40,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
+        'common:price: 40,00 € (common:inclTax {"taxPercentage":"25,5"}) + prices:materialPrice'
       );
     });
 

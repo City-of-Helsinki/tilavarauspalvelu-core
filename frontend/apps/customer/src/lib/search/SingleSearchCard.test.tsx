@@ -95,7 +95,7 @@ describe("SingleSearchCard", () => {
     render(<SingleSearchCard reservationUnit={reservationUnit} />);
 
     expect(screen.getByText("Meeting room")).toBeInTheDocument();
-    expect(screen.getByText("0 - 20,00 € / prices:priceUnits.PER_HOUR")).toBeInTheDocument();
+    expect(screen.getByText("0–20 €/prices:priceUnits.PER_HOUR")).toBeInTheDocument();
     expect(screen.getByLabelText(/reservationUnitCard:maxPersons/)).toBeInTheDocument();
     expect(screen.getByText(/reservationUnitCard:maxPersons/)).toBeInTheDocument();
     expect(screen.getByLabelText("reservationUnit:accessType")).toBeInTheDocument();

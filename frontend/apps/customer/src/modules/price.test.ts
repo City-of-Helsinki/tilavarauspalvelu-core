@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import type { TFunction } from "i18next";
 import { PriceUnit } from "@gql/gql-types";
-import { getPriceSummaryString } from "./price";
+import { formatDecimalRange, getPriceSummaryString } from "./price";
 
 const t = ((key: string) => key) as TFunction;
 
@@ -32,13 +32,13 @@ describe("getPriceSummaryString", () => {
   });
 
   test("returns the price with its unit", () => {
-    expect(getPriceSummaryString(t, createPriceSummary(), "fi")).toBe("20,00 € / prices:priceUnits.PER_HOUR");
+    expect(getPriceSummaryString(t, createPriceSummary(), "fi")).toBe("20,00 €/prices:priceUnits.PER_HOUR");
   });
 
   test("adds the material price to a paid price", () => {
     const priceSummary = createPriceSummary({ materialPriceDescriptionFi: "<p>Materiaalit</p>" });
     expect(getPriceSummaryString(t, priceSummary, "fi")).toBe(
-      "20,00\u00A0€ / prices:priceUnits.PER_HOUR + prices:materialPrice"
+      "20,00\u00A0€/prices:priceUnits.PER_HOUR + prices:materialPrice"
     );
   });
 
@@ -53,7 +53,7 @@ describe("getPriceSummaryString", () => {
 
   test("does not add a material price that has only empty HTML", () => {
     const priceSummary = createPriceSummary({ materialPriceDescriptionFi: "<p></p>" });
-    expect(getPriceSummaryString(t, priceSummary, "fi")).toBe("20,00\u00A0€ / prices:priceUnits.PER_HOUR");
+    expect(getPriceSummaryString(t, priceSummary, "fi")).toBe("20,00\u00A0€/prices:priceUnits.PER_HOUR");
   });
 
   test("returns the price without a unit for a fixed price", () => {
@@ -75,7 +75,22 @@ describe("getPriceSummaryString", () => {
 
   test("returns a range from zero when the customer can apply for a discount", () => {
     expect(getPriceSummaryString(t, createPriceSummary({ canApplyForDiscount: true }), "fi")).toBe(
-      "0 - 20,00 € / prices:priceUnits.PER_HOUR"
+      "0–20 €/prices:priceUnits.PER_HOUR"
     );
+  });
+});
+
+describe("formatDecimalRange", () => {
+  test("leaves out the decimals when both ends are whole numbers", () => {
+    expect(formatDecimalRange(0, 40, "fi")).toBe("0–40\u00A0€");
+  });
+
+  test("shows two decimals at both ends when one end has decimals", () => {
+    expect(formatDecimalRange(0, 40.5, "fi")).toBe("0,00–40,50\u00A0€");
+  });
+
+  test("formats the range in the language of the page", () => {
+    expect(formatDecimalRange(0, 40, "sv")).toBe("0–40\u00A0€");
+    expect(formatDecimalRange(0, 40.5, "en")).toBe("€0.00 – €40.50");
   });
 });
