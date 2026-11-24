@@ -550,6 +550,9 @@ def _initialize_allocations_map(section: ApplicationSection) -> AllocationsMap:
         end_time = local_time_string(series.end_time)  # type: ignore[arg-type]
 
         reservation = series.reservations.last()
+        if reservation is None:
+            continue
+
         reservation_unit = series.reservation_unit
 
         for weekday in series.weekdays:
