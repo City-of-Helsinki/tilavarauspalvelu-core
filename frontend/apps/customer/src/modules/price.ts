@@ -27,8 +27,7 @@ function getPriceUnitString(t: TFunction, priceUnit: PriceUnit): string {
   return ` / ${t(`prices:priceUnits.${priceUnit}`)}`;
 }
 
-/// The material price description of the prices in effect today, or an empty string.
-/// It is used where there is no reservation time, so a future price change does not show here.
+/// The material price description of the price summary, or an empty string.
 export function getMaterialPriceDescription(
   priceSummary: PriceSummary | null | undefined,
   lang: LocalizationLanguages
@@ -112,11 +111,9 @@ export function getReservationPriceDisplay(
 }
 
 /// The price of a reservation from its price lines. The override of the handler replaces the amount of a line.
-/// The price lines have no material price description, so it comes from the reservation unit as it is today.
 export function getReservationPriceDisplayFromLines(
   reservation: ReservationPriceLinesFieldsFragment,
-  lang: LocalizationLanguages,
-  hasMaterialPrice: boolean
+  lang: LocalizationLanguages
 ): ReservationPriceDisplay {
   const priceLineList = reservation.priceLines ?? [];
   const lineList = priceLineList.map((line) => ({
@@ -127,7 +124,9 @@ export function getReservationPriceDisplayFromLines(
     total: toNumber(reservation.totalPrice) ?? 0,
     lineList,
     taxPercentage: getCommonTaxPercentage(priceLineList.map((line) => toNumber(line.taxPercentage) ?? 0)),
-    hasMaterialPrice,
+    hasMaterialPrice: priceLineList.some(
+      (line) => stripHtml(getTranslation(line, "materialPriceDescription", lang)) !== ""
+    ),
   };
 }
 
@@ -191,6 +190,9 @@ export const RESERVATION_PRICE_LINES_FRAGMENT = gql`
       amount
       overrideAmount
       taxPercentage
+      materialPriceDescriptionFi
+      materialPriceDescriptionEn
+      materialPriceDescriptionSv
     }
   }
 `;
