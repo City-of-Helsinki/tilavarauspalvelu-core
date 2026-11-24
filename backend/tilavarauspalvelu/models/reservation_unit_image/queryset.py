@@ -21,6 +21,9 @@ class ReservationUnitImageQuerySet(ModelQuerySet[ReservationUnitImage]):
             return
 
         for image in images:
+            if not image.image:
+                continue
+
             try:
                 image.large_url = image.image["large"].url
                 image.medium_url = image.image["medium"].url
