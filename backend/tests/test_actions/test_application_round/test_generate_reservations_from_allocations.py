@@ -422,6 +422,96 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
+def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__no_end_date():
+    user = UserFactory.create()
+    unit = UnitBuilder().with_hauki_resource().create()
+    reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
+
+    next_monday = next_date_matching_weekday(local_date(), Weekday.MONDAY)
+
+    application_round = ApplicationRoundFactory.create_with_allocations(
+        allocations=[
+            Allocation(
+                reservation_unit=reservation_unit,
+                day_of_the_week=Weekday.MONDAY,
+                begin_time=local_time(12, 0),
+                end_time=local_time(14, 0),
+            ),
+        ],
+        reservation_period_begin_date=next_monday,
+        reservation_period_end_date=next_monday + datetime.timedelta(days=7),
+        user=user,
+    )
+
+    HaukiAPIClient.get_date_periods.return_value = [
+        HaukiAPIDatePeriod(
+            start_date="2024-01-08",
+            end_date=None,
+            resource_state=HaukiResourceState.CLOSED.value,
+            override=True,
+        ),
+    ]
+
+    application_round.actions.generate_reservations_from_allocations()
+
+    reservations: list[Reservation] = list(Reservation.objects.all())
+    assert len(reservations) == 1
+
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
+
+    rejected: list[RejectedOccurrence] = list(RejectedOccurrence.objects.all())
+    assert len(rejected) == 1
+
+    assert rejected[0].rejection_reason == RejectionReadinessChoice.RESERVATION_UNIT_CLOSED
+    assert rejected[0].begin_datetime.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 12)
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
+def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__no_start_date():
+    user = UserFactory.create()
+    unit = UnitBuilder().with_hauki_resource().create()
+    reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
+
+    next_monday = next_date_matching_weekday(local_date(), Weekday.MONDAY)
+
+    application_round = ApplicationRoundFactory.create_with_allocations(
+        allocations=[
+            Allocation(
+                reservation_unit=reservation_unit,
+                day_of_the_week=Weekday.MONDAY,
+                begin_time=local_time(12, 0),
+                end_time=local_time(14, 0),
+            ),
+        ],
+        reservation_period_begin_date=next_monday,
+        reservation_period_end_date=next_monday + datetime.timedelta(days=7),
+        user=user,
+    )
+
+    HaukiAPIClient.get_date_periods.return_value = [
+        HaukiAPIDatePeriod(
+            start_date=None,
+            end_date="2024-01-01",
+            resource_state=HaukiResourceState.CLOSED.value,
+            override=True,
+        ),
+    ]
+
+    application_round.actions.generate_reservations_from_allocations()
+
+    reservations: list[Reservation] = list(Reservation.objects.all())
+    assert len(reservations) == 1
+
+    assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 8, 12)
+
+    rejected: list[RejectedOccurrence] = list(RejectedOccurrence.objects.all())
+    assert len(rejected) == 1
+
+    assert rejected[0].rejection_reason == RejectionReadinessChoice.RESERVATION_UNIT_CLOSED
+    assert rejected[0].begin_datetime.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
 def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__not_affecting():
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
