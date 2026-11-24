@@ -2,6 +2,7 @@
 // Import this file by its absolute path from a test script. It also exports Playwright,
 // so the test script does not need its own Playwright install:
 //   import { chromium, detect, newSession } from "/<repo>/.agents/skills/browser-test/lib.mjs";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -21,6 +22,16 @@ export function dockerUrls(project = DEFAULT_PROJECT) {
     staff: `http://${project}-frontend-net-1:3001`,
   };
 }
+
+// The shared environments, the same as in scripts/release-check.sh.
+// Production is left out on purpose. Never run browser tests against production.
+export const REMOTE_ENVS = {
+  dev: "https://varaamo.dev.hel.ninja",
+  test: "https://varaamo.test.hel.ninja",
+  stage: "https://varaamo.stage.hel.ninja",
+};
+const REMOTE_ALIASES = { staging: "stage" };
+const PRODUCTION_NAMES = ["prod", "production"];
 
 // Test identities in the Suomi.fi test identification. The roles come from the shared test data.
 export const USERS = {
@@ -116,7 +127,26 @@ export async function detect({ project = DEFAULT_PROJECT } = {}) {
   return { setup: "none", reason: "nothing", found };
 }
 
-export async function urls(options) {
+// The URLs of a shared environment. All parts of the service are on one domain.
+export async function remote(name) {
+  if (PRODUCTION_NAMES.includes(name)) {
+    throw new Error("Browser tests do not run against production. Use dev, test or stage.");
+  }
+  const key = REMOTE_ALIASES[name] ?? name;
+  const base = REMOTE_ENVS[key];
+  if (!base) {
+    throw new Error(`Unknown env "${name}". Use ${Object.keys(REMOTE_ENVS).join(", ")}.`);
+  }
+  const status = await probe(`${base}/healthcheck`);
+  if (status !== 200) {
+    throw new Error(`${base}/healthcheck gives ${status || "no answer"}. The env does not run or is not reachable.`);
+  }
+  return { setup: "remote", name: key, customer: base, staff: `${base}/kasittely`, api: base };
+}
+
+// Gives the URLs of the local setup, or of a shared environment with { env: "dev" | "test" | "stage" }.
+export async function urls(options = {}) {
+  if (options.env) return remote(options.env);
   const env = await detect(options);
   if (!env.customer) {
     throw new Error(`No usable setup: ${JSON.stringify(env)}. Run browser-env for help.`);
@@ -136,11 +166,12 @@ export async function login(page, env, hetu) {
   await hetuInput.pressSequentially(hetu, { delay: 20 });
   await hetuInput.blur();
   await page.locator("#tunnistaudu").click();
-  // Confirmation pages of the identification service, until the browser is back on localhost.
-  const isLocal = (u) => u.hostname === "localhost";
-  for (let i = 0; i < 6 && !isLocal(new URL(page.url())); i++) {
+  // Confirmation pages of the identification service, until the browser is back on the host of the service.
+  const appHost = new URL(env.customer).hostname;
+  const isApp = (u) => u.hostname === appHost;
+  for (let i = 0; i < 6 && !isApp(new URL(page.url())); i++) {
     await page.waitForLoadState("networkidle").catch(() => {});
-    if (isLocal(new URL(page.url()))) break;
+    if (isApp(new URL(page.url()))) break;
     const before = page.url();
     await page
       .locator("#continue-button, button[type=submit]:visible, input[type=submit]:visible")
@@ -150,7 +181,7 @@ export async function login(page, env, hetu) {
     await page.waitForURL((u) => u.href !== before, { timeout: 15000 }).catch(() => {});
   }
   // The backend handles the callback on its own paths and then redirects to the frontend.
-  const inApp = (u) => isLocal(u) && !/^\/(pysocial|helauth)\//.test(u.pathname);
+  const inApp = (u) => isApp(u) && !/^\/(pysocial|helauth)\//.test(u.pathname);
   await page.waitForURL(inApp, { timeout: 30000 });
   await page.waitForLoadState("networkidle").catch(() => {});
 }
@@ -175,7 +206,8 @@ export async function currentUser(context, env) {
 export async function newSession(browser, env, hetu, contextOptions = {}) {
   const options = { locale: "fi-FI", ...contextOptions };
   if (!hetu) return browser.newContext(options);
-  const file = path.join(STATE_DIR, `${env.setup}-${hetu}.json`);
+  const key = env.setup === "remote" ? `remote-${env.name}` : env.setup;
+  const file = path.join(STATE_DIR, `${key}-${hetu}.json`);
   if (fs.existsSync(file)) {
     const context = await browser.newContext({ ...options, storageState: file });
     if (await currentUser(context, env).catch(() => null)) return context;
@@ -194,4 +226,65 @@ export async function newSession(browser, env, hetu, contextOptions = {}) {
   fs.mkdirSync(STATE_DIR, { recursive: true, mode: 0o700 });
   await context.storageState({ path: file });
   return context;
+}
+
+// --- Stale checkout ---------------------------------------------------------------------------------------------------
+
+// The browser-proxy tells on this path if it sends the frontend paths to the stack or to "next dev" in this container.
+export const PROXY_STATUS_PATH = "/__browser-proxy";
+
+export async function proxyFrontend() {
+  try {
+    const res = await fetch(`http://localhost:8000${PROXY_STATUS_PATH}`, { signal: AbortSignal.timeout(5000) });
+    return res.ok ? (await res.json()).frontend : null;
+  } catch {
+    return null;
+  }
+}
+
+// The main checkout of the repository, also when the script runs in a worktree.
+// The stack of the user runs from there.
+export function mainCheckout() {
+  const out = execFileSync("git", ["worktree", "list", "--porcelain"], { encoding: "utf8" });
+  return out.split("\n")[0].replace(/^worktree /, "");
+}
+
+const mtime = (file) => (fs.existsSync(file) ? fs.statSync(file).mtimeMs : null);
+
+// The codegen projects in frontend/graphql.config.ts.
+const CODEGEN_DIRS = ["apps/customer", "apps/staff", "packages/ui"];
+
+// Finds generated GraphQL types in the frontend of a checkout that are older than their sources.
+// Does not check node_modules. The stack keeps them in Docker volumes, not in the checkout.
+// After a branch switch without "pnpm codegen", the frontend sends queries that the backend does not know.
+// Compares file times only, so an edit of a query that codegen does not change also counts as stale.
+export function staleCheckout(root = mainCheckout()) {
+  const frontend = path.join(root, "frontend");
+  const stale = [];
+  const schema = mtime(path.join(root, "tilavaraus.graphql")) ?? 0;
+  for (const dir of CODEGEN_DIRS) {
+    const generated = mtime(path.join(frontend, dir, "gql", "gql-types.ts"));
+    if (!generated) {
+      stale.push(`frontend/${dir}/gql/gql-types.ts is missing`);
+      continue;
+    }
+    if (schema > generated) {
+      stale.push(`frontend/${dir}/gql/gql-types.ts is older than tilavaraus.graphql`);
+      continue;
+    }
+    let documents = [];
+    try {
+      // Files with a GraphQL document. "git grep" exits with 1 when nothing matches.
+      const out = execFileSync("git", ["-C", root, "grep", "-l", "-e", "gql`", "--", `frontend/${dir}`], {
+        encoding: "utf8",
+      });
+      documents = out.split("\n").filter(Boolean);
+    } catch {}
+    const newer = documents.filter((file) => (mtime(path.join(root, file)) ?? 0) > generated);
+    if (newer.length > 0) {
+      const sample = newer.slice(0, 3).join(", ") + (newer.length > 3 ? ", ..." : "");
+      stale.push(`frontend/${dir}/gql/gql-types.ts is older than ${newer.length} document file(s): ${sample}`);
+    }
+  }
+  return stale;
 }

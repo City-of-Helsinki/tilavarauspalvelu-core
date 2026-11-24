@@ -1,21 +1,29 @@
 #!/usr/bin/env node
 // Logs in as a test identity, saves the session and prints the user that the backend sees.
-// Usage: browser-login <noaccess | admin | unit-reserver | unit-viewer | unit-handler | unit-admin | hetu>
+// Usage: browser-login [--env dev|test|stage] <noaccess | admin | unit-reserver | unit-viewer | unit-handler | unit-admin | hetu>
+//   --env   log in to a shared environment instead of the local setup. Production is not allowed.
 import { parseArgs } from "node:util";
 import { USERS, chromium, currentUser, newSession, urls } from "./lib.mjs";
 
-const { positionals } = parseArgs({ allowPositionals: true });
+const { values, positionals } = parseArgs({ allowPositionals: true, options: { env: { type: "string" } } });
 if (positionals.length !== 1) {
-  console.error(`Usage: browser-login <${Object.keys(USERS).join(" | ")} | hetu>`);
+  console.error(`Usage: browser-login [--env dev|test|stage] <${Object.keys(USERS).join(" | ")} | hetu>`);
   process.exit(2);
 }
 const hetu = USERS[positionals[0]] ?? positionals[0];
 
-const env = await urls();
+let env;
+try {
+  env = await urls({ env: values.env });
+} catch (e) {
+  console.error(e.message);
+  process.exit(1);
+}
 const browser = await chromium.launch();
 try {
   const context = await newSession(browser, env, hetu);
-  console.log(JSON.stringify({ setup: env.setup, hetu, currentUser: await currentUser(context, env) }, null, 2));
+  const user = await currentUser(context, env);
+  console.log(JSON.stringify({ setup: env.setup, name: env.name, hetu, currentUser: user }, null, 2));
 } catch (e) {
   console.error(e.message);
   process.exitCode = 1;

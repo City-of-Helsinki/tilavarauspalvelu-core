@@ -12,7 +12,7 @@
 import http from "node:http";
 import net from "node:net";
 import { parseArgs } from "node:util";
-import { DEFAULT_PROJECT, dockerUrls } from "./lib.mjs";
+import { DEFAULT_PROJECT, PROXY_STATUS_PATH, dockerUrls } from "./lib.mjs";
 
 const { values } = parseArgs({
   options: {
@@ -51,6 +51,12 @@ function target(path) {
 
 http
   .createServer((req, res) => {
+    // browser-env asks which frontend runs, for the check of the checkout of the user.
+    if (req.url === PROXY_STATUS_PATH) {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ frontend: LOCAL ? "local" : "stack" }));
+      return;
+    }
     const url = target(req.url);
     const upstream = http.request(
       { host: url.hostname, port: url.port || 80, method: req.method, path: req.url, headers: req.headers },
