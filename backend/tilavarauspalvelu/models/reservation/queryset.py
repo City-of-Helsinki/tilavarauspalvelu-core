@@ -333,9 +333,9 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
             self
             .future_reservations_in_section(ref)
             .filter(
+                L(total_price=0),
                 type=ReservationTypeChoice.SEASONAL,
                 state=ReservationStateChoice.CONFIRMED,
-                price=0,
                 reservation_unit__cancellation_rule__isnull=False,
             )
             .alias(
