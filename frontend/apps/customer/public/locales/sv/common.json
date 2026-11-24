@@ -135,7 +135,7 @@
   "fyiLabel": "Till kännedom",
   "add": "addera",
   "subtract": "subtrahera",
-  "inclTax": "inkl. moms {{taxPercentage}} %",
+  "inclTax": "inkl. moms {{taxPercentage}}\u00A0%",
   "peopleSuffixShort": "pers",
   "yearSuffixShort": "år",
   "amountSuffixShort": "st",

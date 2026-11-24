@@ -9,7 +9,7 @@
     "PER_WEEK": "vecka"
   },
   "priceFree": "Avgiftsfri",
-  "taxPercentage": "moms {{count}} %",
+  "taxPercentage": "moms {{count}}\u00A0%",
   "total": "Totalt",
   "materialPrice": "materialkostnad",
   "loading": "Priset hämtas"

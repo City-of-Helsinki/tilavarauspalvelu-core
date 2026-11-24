@@ -109,7 +109,7 @@
     "price": "Varauksen hinta",
     "clearPrice": "Aseta varaus maksuttomaksi",
     "missingPrice": "Varauksen hinta puuttuu tai on virheellinen",
-    "priceBreakdown": "Alkuperäinen hinta = {{volume}} {{units}} * {{unitPrice}}/{{unit}} sis. alv {{vatPercent}} % = {{price}}",
+    "priceBreakdown": "Alkuperäinen hinta = {{volume}} {{units}} * {{unitPrice}}/{{unit}} sis. alv {{vatPercent}}\u00A0% = {{price}}",
     "priceUnit": {
       "PER_15_MINS": "15 min",
       "PER_30_MINS": "30 min",

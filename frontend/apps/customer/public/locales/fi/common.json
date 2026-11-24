@@ -135,7 +135,7 @@
   "fyiLabel": "Tiedoksi",
   "add": "Lisää",
   "subtract": "Vähennä",
-  "inclTax": "sis. alv {{taxPercentage}} %",
+  "inclTax": "sis. alv {{taxPercentage}}\u00A0%",
   "peopleSuffixShort": "hlö",
   "yearSuffixShort": "v",
   "amountSuffixShort": "kpl",

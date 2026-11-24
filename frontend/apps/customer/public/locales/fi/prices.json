@@ -9,7 +9,7 @@
     "PER_WEEK": "viikko"
   },
   "priceFree": "Maksuton",
-  "taxPercentage": "alv {{count}} %",
+  "taxPercentage": "alv {{count}}\u00A0%",
   "total": "Yhteensä",
   "materialPrice": "materiaalimaksu",
   "loading": "Hintaa haetaan"
