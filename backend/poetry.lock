@@ -1648,14 +1648,14 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "40.54.0"
+version = "40.63.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "faker-40.54.0-py3-none-any.whl", hash = "sha256:2dd88ee8cb63a9149e19ef48bdd73879bc3854d8ba2d6c1535e902a762e603f7"},
-    {file = "faker-40.54.0.tar.gz", hash = "sha256:38fba73e32699a9f1071724d67e5a66a84bf057987cffb27c9d0c979fda3f135"},
+    {file = "faker-40.63.0-py3-none-any.whl", hash = "sha256:36627c20b575b4138f54b6c21f8703e9ab122fd487aca11319beec2aa6ca7232"},
+    {file = "faker-40.63.0.tar.gz", hash = "sha256:6c5a09bfb17b3a5fa29f349a2ea86ec5af959df95ec71adc831268adfccc9d62"},
 ]
 
 [package.dependencies]
@@ -2001,14 +2001,14 @@ lxml = ["lxml ; platform_python_implementation == \"CPython\""]
 
 [[package]]
 name = "icalendar"
-version = "7.3.0"
+version = "7.3.2"
 description = "RFC 5545 compatible parser and generator of iCalendar files"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "icalendar-7.3.0-py3-none-any.whl", hash = "sha256:8355acfe17be81b368f0b1e3740817cea9b56ea889931f8f1a87c62f2d28db0b"},
-    {file = "icalendar-7.3.0.tar.gz", hash = "sha256:7bd001c8e648205e1bde5c6a5b77096598e8d0893dcf57755c6c597635620132"},
+    {file = "icalendar-7.3.2-py3-none-any.whl", hash = "sha256:f95ce4ff8f41d8ad9ca253a676ef40c672abd3774458d197c215055a0d805cc4"},
+    {file = "icalendar-7.3.2.tar.gz", hash = "sha256:f15380927aed4318860e001c03b543c48578c73aec46e2d384c5d0802082b808"},
 ]
 
 [package.dependencies]
@@ -4076,4 +4076,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "374233926c6f6df64e25932373ad472699626c4ec03d48c3d2faa2f34006ad62"
+content-hash = "db4703c392c95ae42916d8733e8875b210b6a91b052151cf243e3fa3d3593959"
