@@ -4,16 +4,17 @@ import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Toolt
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
+import { Popover } from "ui/src/components/Popover";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
-import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
+import { capitalize, filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { Flex, H1, H3 } from "ui/src/styled";
 import { ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitHeadFragment } from "@gql/gql-types";
 import { IconWithText } from "@/components/IconWithText";
-import { getMaterialPriceDescription, getPriceSummaryString } from "@/modules/price";
+import { getMaterialPriceDescription, getPriceSummaryAmountString, getPriceSummaryString } from "@/modules/price";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { Images } from "./Images";
 
@@ -132,6 +133,74 @@ const TooltipWrapper = styled.div`
   }
 `;
 
+const MaterialPriceButton = styled.button`
+  display: inline;
+  background-color: unset;
+  border: unset;
+  padding: unset;
+  font: inherit;
+  color: var(--color-black);
+  text-decoration: underline;
+  cursor: pointer;
+`;
+
+// Same look as the HDS tooltip
+const MaterialPricePanel = styled.div`
+  max-width: 21.875rem;
+  padding: var(--spacing-s);
+  border: 1px solid var(--color-coat-of-arms);
+  background-color: var(--color-coat-of-arms-light);
+  font-size: var(--fontsize-body-s);
+  line-height: 24px;
+`;
+
+type UnitPriceProps = Readonly<{
+  priceSummary: NonNullable<ReservationUnitHeadFragment["priceSummary"]>;
+  subventionSuffix: React.ReactElement | null;
+}>;
+
+/// The price of the reservation unit. The word for the material price opens its description.
+function UnitPrice({ priceSummary, subventionSuffix }: UnitPriceProps): React.ReactElement {
+  const { t, i18n } = useTranslation();
+  const lang = getLocalizationLang(i18n.language);
+  const materialPriceDescription = getMaterialPriceDescription(priceSummary, lang);
+
+  if (materialPriceDescription === "") {
+    return (
+      <>
+        {getPriceSummaryString(t, priceSummary, lang)}
+        {subventionSuffix != null && <>: {subventionSuffix}</>}
+      </>
+    );
+  }
+
+  const amountString = getPriceSummaryAmountString(t, priceSummary, lang);
+  const materialPriceText = amountString == null ? capitalize(t("prices:materialPrice")) : t("prices:materialPrice");
+  return (
+    <>
+      {amountString != null && `${amountString} + `}
+      <Popover
+        renderTrigger={(triggerProps) => (
+          <MaterialPriceButton {...triggerProps} type="button">
+            {materialPriceText}
+          </MaterialPriceButton>
+        )}
+      >
+        <MaterialPricePanel>
+          <Sanitize html={materialPriceDescription} />
+        </MaterialPricePanel>
+      </Popover>
+      {/* A colon after the material price link reads wrong. Show the discount link on its own line. */}
+      {subventionSuffix != null && (
+        <>
+          <br />
+          {subventionSuffix}
+        </>
+      )}
+    </>
+  );
+}
+
 function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "accessTypes">): React.ReactElement {
   const { t } = useTranslation();
 
@@ -167,9 +236,8 @@ function IconList({
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(t, { seconds: minDur });
   const maxReservationDuration = formatDuration(t, { seconds: maxDur });
-  const unitPrice = getPriceSummaryString(t, reservationUnit.priceSummary, lang);
-  const materialPriceDescription = getMaterialPriceDescription(reservationUnit.priceSummary, lang);
-  const hasSubventionSuffix = reservationUnit.priceSummary?.canApplyForDiscount === true && subventionSuffix != null;
+  const { priceSummary } = reservationUnit;
+  const hasSubventionSuffix = priceSummary?.canApplyForDiscount === true && subventionSuffix != null;
 
   type IconTextType = ReadonlyArray<{
     key: string;
@@ -210,16 +278,12 @@ function IconList({
           }),
         }
       : null,
-    unitPrice != null
+    priceSummary != null
       ? {
           key: "unitPrice",
           icon: <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} aria-hidden="false" />,
           text: (
-            <>
-              {unitPrice}
-              {hasSubventionSuffix ? ": " : null}
-              {hasSubventionSuffix ? subventionSuffix : null}
-            </>
+            <UnitPrice priceSummary={priceSummary} subventionSuffix={hasSubventionSuffix ? subventionSuffix : null} />
           ),
         }
       : null,
@@ -241,17 +305,6 @@ function IconList({
                 <IconWithText icon={icon} text={text} />
                 {reservationUnit.accessTypes.length > 1 && (
                   <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />
-                )}
-              </TooltipWrapper>
-            );
-          case "unitPrice":
-            return (
-              <TooltipWrapper key={key}>
-                <IconWithText icon={icon} text={text} />
-                {materialPriceDescription !== "" && (
-                  <Tooltip>
-                    <Sanitize html={materialPriceDescription} />
-                  </Tooltip>
                 )}
               </TooltipWrapper>
             );

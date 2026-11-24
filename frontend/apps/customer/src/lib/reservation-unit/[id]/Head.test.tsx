@@ -140,8 +140,9 @@ describe("Head", () => {
     expect(screen.getByText("Meeting room")).toBeInTheDocument();
     expect(screen.getByLabelText("reservationUnit:maxPersons")).toBeInTheDocument();
     expect(screen.getByLabelText("reservationCalendar:eventDuration")).toBeInTheDocument();
-    expect(screen.getByText(/^0–20 €\/prices:priceUnits.PER_HOUR/)).toBeInTheDocument();
-    expect(screen.getByText("Subvention")).toBeInTheDocument();
+    expect(screen.getByText(/^0–20 €\/prices:priceUnits.PER_HOUR/)).toHaveTextContent(
+      "0–20 €/prices:priceUnits.PER_HOUR: Subvention"
+    );
   });
 
   test("shows a fixed price without the subvention suffix when the customer can not apply for a discount", () => {
@@ -218,7 +219,7 @@ describe("Head", () => {
     expect(screen.getByText(/common:dateGte/)).toBeInTheDocument();
   });
 
-  test("shows the material price description in a tooltip next to the price", async () => {
+  test("opens the material price description from the material price word", async () => {
     const user = userEvent.setup();
     render(
       <ReservationUnitHead
@@ -229,8 +230,49 @@ describe("Head", () => {
       />
     );
 
-    expect(screen.getByText("20,00 €/prices:priceUnits.PER_HOUR + prices:materialPrice")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Tooltip" }));
+    expect(screen.getByText(/^20,00 €\/prices:priceUnits.PER_HOUR \+/)).toHaveTextContent(
+      "20,00 €/prices:priceUnits.PER_HOUR + prices:materialPrice"
+    );
+    expect(screen.queryByRole("button", { name: "Tooltip" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Extra fee applies")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "prices:materialPrice" }));
     expect(screen.getByText("Extra fee applies")).toBeInTheDocument();
+  });
+
+  test("shows only the material price word when the unit is free of charge and has a material price", () => {
+    render(
+      <ReservationUnitHead
+        reservationUnit={createReservationUnit({
+          priceSummary: createPriceSummary({
+            isFree: true,
+            lowestAmount: "0",
+            materialPriceDescriptionFi: "<p>Extra fee applies</p>",
+          }),
+        })}
+        reservationUnitIsReservable
+      />
+    );
+
+    expect(screen.getByRole("button", { name: "Prices:materialPrice" })).toBeInTheDocument();
+    expect(screen.queryByText("prices:priceFree")).not.toBeInTheDocument();
+  });
+
+  test("shows the subvention suffix without a colon after the material price", () => {
+    render(
+      <ReservationUnitHead
+        reservationUnit={createReservationUnit({
+          priceSummary: createPriceSummary({
+            canApplyForDiscount: true,
+            materialPriceDescriptionFi: "<p>Extra fee applies</p>",
+          }),
+        })}
+        reservationUnitIsReservable
+        subventionSuffix={<span>Subvention</span>}
+      />
+    );
+
+    const price = screen.getByText(/^0–20 €\/prices:priceUnits.PER_HOUR \+/);
+    expect(price).toHaveTextContent("0–20 €/prices:priceUnits.PER_HOUR + prices:materialPriceSubvention");
+    expect(screen.getByText("Subvention")).toBeInTheDocument();
   });
 });
