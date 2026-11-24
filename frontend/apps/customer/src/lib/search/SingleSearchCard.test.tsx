@@ -77,6 +77,7 @@ describe("SingleSearchCard", () => {
       priceSummary: {
         isFree: false,
         lowestAmount: "20",
+        highestAmount: "20",
         priceUnit: PriceUnit.PerHour,
         canApplyForDiscount: true,
         materialPriceDescriptionFi: "",

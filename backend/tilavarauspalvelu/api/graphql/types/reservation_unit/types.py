@@ -73,6 +73,7 @@ class ReservableTimeSpanType(graphene.ObjectType):
 class PriceSummaryType(graphene.ObjectType):
     is_free = graphene.Boolean(required=True)
     lowest_amount = graphene.Decimal(required=True)
+    highest_amount = graphene.Decimal(required=True)
     price_unit = graphene.Field(graphene.Enum.from_enum(PriceUnit), required=True)
     varies = graphene.Boolean(required=True)
     can_apply_for_discount = graphene.Boolean(required=True)

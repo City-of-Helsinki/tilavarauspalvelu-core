@@ -33,7 +33,7 @@ pytestmark = [
 # ── Helpers ──
 
 
-FIELDS = "priceSummary { isFree lowestAmount priceUnit varies canApplyForDiscount }"
+FIELDS = "priceSummary { isFree lowestAmount highestAmount priceUnit varies canApplyForDiscount }"
 TAX_FIELDS = "priceSummary { lowestAmount taxPercentage }"
 MATERIAL_PRICE_FIELDS = (
     "priceSummary { isFree materialPriceDescriptionFi materialPriceDescriptionEn materialPriceDescriptionSv }"
@@ -67,6 +67,7 @@ def test_reservation_unit__query__price_summary__one_price(graphql):
         "priceSummary": {
             "isFree": False,
             "lowestAmount": "12.50",
+            "highestAmount": "12.50",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
             "canApplyForDiscount": False,
@@ -99,6 +100,7 @@ def test_reservation_unit__query__price_summary__can_apply_for_discount(graphql)
         "priceSummary": {
             "isFree": False,
             "lowestAmount": "12.50",
+            "highestAmount": "12.50",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
             "canApplyForDiscount": True,
@@ -139,6 +141,7 @@ def test_reservation_unit__query__price_summary__options_with_different_prices(g
         "priceSummary": {
             "isFree": False,
             "lowestAmount": "15.00",
+            "highestAmount": "30.00",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": True,
             "canApplyForDiscount": False,
@@ -179,6 +182,7 @@ def test_reservation_unit__query__price_summary__inactive_option_not_included(gr
         "priceSummary": {
             "isFree": False,
             "lowestAmount": "30.00",
+            "highestAmount": "30.00",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
             "canApplyForDiscount": False,
@@ -209,6 +213,7 @@ def test_reservation_unit__query__price_summary__free(graphql):
         "priceSummary": {
             "isFree": True,
             "lowestAmount": "0.00",
+            "highestAmount": "0.00",
             "priceUnit": PriceUnit.FIXED.value,
             "varies": False,
             "canApplyForDiscount": False,
@@ -251,6 +256,7 @@ def test_reservation_unit__query__price_summary__future_price_change_not_include
         "priceSummary": {
             "isFree": False,
             "lowestAmount": "20.00",
+            "highestAmount": "20.00",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
             "canApplyForDiscount": False,
@@ -352,6 +358,7 @@ def test_reservation_unit__query__price_summary__through_foreign_key(graphql):
         "priceSummary": {
             "isFree": False,
             "lowestAmount": "12.50",
+            "highestAmount": "12.50",
             "priceUnit": PriceUnit.PER_HOUR.value,
             "varies": False,
             "canApplyForDiscount": False,

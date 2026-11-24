@@ -45,6 +45,7 @@ function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary
   return {
     isFree: false,
     lowestAmount: "20",
+    highestAmount: "20",
     priceUnit: PriceUnit.PerHour,
     canApplyForDiscount: false,
     materialPriceDescriptionFi: "",
@@ -161,7 +162,7 @@ describe("Head", () => {
     render(
       <ReservationUnitHead
         reservationUnit={createReservationUnit({
-          priceSummary: createPriceSummary({ isFree: true, lowestAmount: "0" }),
+          priceSummary: createPriceSummary({ isFree: true, lowestAmount: "0", highestAmount: "0" }),
         })}
         reservationUnitIsReservable
         subventionSuffix={<span>Subvention</span>}

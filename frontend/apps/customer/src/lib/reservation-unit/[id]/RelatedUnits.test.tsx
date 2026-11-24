@@ -107,6 +107,7 @@ describe("RelatedUnits", () => {
           priceSummary: {
             isFree: true,
             lowestAmount: "0",
+            highestAmount: "0",
             priceUnit: PriceUnit.PerHour,
             canApplyForDiscount: false,
             materialPriceDescriptionFi: "",

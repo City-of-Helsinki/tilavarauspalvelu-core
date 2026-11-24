@@ -52,6 +52,7 @@ function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary
   return {
     isFree: false,
     lowestAmount: "20",
+    highestAmount: "20",
     priceUnit: PriceUnit.PerHour,
     canApplyForDiscount: false,
     materialPriceDescriptionFi: "",

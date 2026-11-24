@@ -11,6 +11,7 @@ function createPriceSummary(
   return {
     isFree: false,
     lowestAmount: "20.00",
+    highestAmount: "20.00",
     priceUnit: PriceUnit.PerHour,
     canApplyForDiscount: false,
     materialPriceDescriptionFi: "",
@@ -26,9 +27,9 @@ describe("getPriceSummaryString", () => {
   });
 
   test("returns free of charge for a free reservation unit", () => {
-    expect(getPriceSummaryString(t, createPriceSummary({ isFree: true, lowestAmount: "0.00" }), "fi")).toBe(
-      "prices:priceFree"
-    );
+    expect(
+      getPriceSummaryString(t, createPriceSummary({ isFree: true, lowestAmount: "0.00", highestAmount: "0.00" }), "fi")
+    ).toBe("prices:priceFree");
   });
 
   test("returns the price with its unit", () => {
@@ -46,6 +47,7 @@ describe("getPriceSummaryString", () => {
     const priceSummary = createPriceSummary({
       isFree: true,
       lowestAmount: "0.00",
+      highestAmount: "0.00",
       materialPriceDescriptionFi: "<p>Materiaalit</p>",
     });
     expect(getPriceSummaryString(t, priceSummary, "fi")).toBe("Prices:materialPrice");
@@ -77,5 +79,23 @@ describe("getPriceSummaryString", () => {
     expect(getPriceSummaryString(t, createPriceSummary({ canApplyForDiscount: true }), "fi")).toBe(
       "0 - 20,00 € / prices:priceUnits.PER_HOUR"
     );
+  });
+  test("returns a range from zero to the highest price when the customer can apply for a discount", () => {
+    const priceSummary = createPriceSummary({
+      lowestAmount: "10.00",
+      highestAmount: "20.00",
+      canApplyForDiscount: true,
+    });
+    expect(getPriceSummaryString(t, priceSummary, "fi")).toBe("0 - 20,00\u00A0€ / prices:priceUnits.PER_HOUR");
+  });
+
+  test("returns a range from the lowest to the highest price when the prices differ", () => {
+    const priceSummary = createPriceSummary({ lowestAmount: "10.00", highestAmount: "20.00" });
+    expect(getPriceSummaryString(t, priceSummary, "fi")).toBe("10,00 - 20,00\u00A0€ / prices:priceUnits.PER_HOUR");
+  });
+
+  test("returns a range from zero when only some prices are free", () => {
+    const priceSummary = createPriceSummary({ lowestAmount: "0.00", highestAmount: "20.00" });
+    expect(getPriceSummaryString(t, priceSummary, "fi")).toBe("0 - 20,00\u00A0€ / prices:priceUnits.PER_HOUR");
   });
 });

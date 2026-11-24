@@ -211,6 +211,7 @@ export function createMockReservation(
       priceSummary: {
         isFree: false,
         lowestAmount: price,
+        highestAmount: price,
         priceUnit: PriceUnit.PerHour,
         canApplyForDiscount,
         materialPriceDescriptionFi: "",
