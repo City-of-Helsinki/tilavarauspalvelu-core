@@ -15,7 +15,7 @@ def _create_users() -> list[User]:
     users: list[User] = [
         # Django admin user
         UserFactory.build(
-            date_of_birth=None,
+            date_of_birth="1980-01-01",
             department_name=None,
             email="tvp@example.com",
             first_name="Admin",
