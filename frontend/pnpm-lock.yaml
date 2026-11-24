@@ -137,8 +137,8 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
       next-i18next:
-        specifier: ^16.4.9
-        version: 16.4.9(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
+        specifier: ^16.4.10
+        version: 16.4.10(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
       nuka-carousel:
         specifier: ^7.0.0
         version: 7.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -285,8 +285,8 @@ importers:
         specifier: ^16.4.6
         version: 16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0)
       next-i18next:
-        specifier: ^16.4.9
-        version: 16.4.9(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
+        specifier: ^16.4.10
+        version: 16.4.10(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
       quill:
         specifier: ^2.0.3
         version: 2.0.3
@@ -509,8 +509,8 @@ importers:
         specifier: ^16.4.6
         version: 16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0)
       next-i18next:
-        specifier: ^16.4.9
-        version: 16.4.9(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
+        specifier: ^16.4.10
+        version: 16.4.10(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
       postcss-styled-syntax:
         specifier: ^0.7.3
         version: 0.7.3(postcss@8.5.33)
@@ -3164,6 +3164,11 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
+  baseline-browser-mapping@2.11.38:
+    resolution: {integrity: sha512-rMgy5YW7x28SMfXHLlVZDBqlWzYZ0x2rVR/6FWrNBF0chjigARK1H6nM0hKA1Um3kPOlkQFVtjJs00d2N1ezuw==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
   brace-expansion@5.0.13:
     resolution: {integrity: sha512-Vh3dmFbc4wZeox7M9I/0L9GfFd83Su4+yCck/OF9Gi/P/dAHn0RT7X4K9R7gMNMhDck3DvhR6QXsnQdjjgwNvQ==}
     engines: {node: 20 || >=22}
@@ -3179,6 +3184,11 @@ packages:
 
   browserslist@4.29.5:
     resolution: {integrity: sha512-khTmKu5NGYTotqcYo8Bew2k4RAE9PuXRSFRXG2lQBrCEQHyeQ/vX6gKMxfokwywBsLiXZMnHsmWMG1pnO8J7uQ==}
+    engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
+    hasBin: true
+
+  browserslist@4.29.6:
+    resolution: {integrity: sha512-CmVVIQ3RVc5HxYEc9X84GvxK/C8C1wH8TlKAiO7uTxF8PDwt7r8t9Qk3J9NkMOVzX5O/HbLv3yzxZg9HPrnI9w==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
@@ -3489,6 +3499,9 @@ packages:
 
   electron-to-chromium@1.5.481:
     resolution: {integrity: sha512-dNUsbAP6E2S1dHIYEuN3cQ0dViThjMtpVRheGdvv5HgHFtzLi4Cu4Mbzms85YggP3Eh2VVZTl5+XxEN8ofCbmQ==}
+
+  electron-to-chromium@1.5.486:
+    resolution: {integrity: sha512-rpybw4Ac4ak/An6G1Me2+61xzwobowDGyuJe71QHHOVpkZv4fPVobsLl7WH6zHSKusAMpaHxGKTpOvpy7+r3dQ==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -4285,8 +4298,8 @@ packages:
   next-compose-plugins@2.2.1:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
 
-  next-i18next@16.4.9:
-    resolution: {integrity: sha512-LdvTZ0+EQd9Kqqhp0G725UBkXTMkoOVTlxchhLmXifnyp5uM+VMkf1lw1M+ypSWB0S7md9lAxF6CIJtc7iShVA==}
+  next-i18next@16.4.10:
+    resolution: {integrity: sha512-3/29Df7pwDij+w6dZ9f2QwfGGcX4+rmRkn94nKhtnQ8U+N4Z0qeIttVKnxrek8showC2ylpdy0Lgji14rS4/Eg==}
     engines: {node: '>=20'}
     peerDependencies:
       '@types/react': '*'
@@ -4359,6 +4372,10 @@ packages:
 
   node-releases@2.0.63:
     resolution: {integrity: sha512-6li2QanLsAXpIH2R6j77MzRyvOyrvdTqlKtO4CgBdHGNvN99ZZfyxszHc5o5+IZBWD5u6Hzwg83JoGXmqZNG9Q==}
+    engines: {node: '>=18'}
+
+  node-releases@2.0.64:
+    resolution: {integrity: sha512-zAPCKqMcnqs2nGy6nlkm7JduFseiBJy3EXHGLh+8pFR+TxGCBxxiEN21+UROU5CKwX/f4TlUcYjiM+vs/tsyxw==}
     engines: {node: '>=18'}
 
   normalize-path@2.1.1:
@@ -5200,6 +5217,12 @@ packages:
 
   update-browserslist-db@1.3.4:
     resolution: {integrity: sha512-t8wonIOdQyOjtPd2VktlBu6QjTVTks6v8bSi7kd0r2Vll8TK1JYDZtRRdbmCHOAMphkZgrzK+L+vXK4pyZ8t4A==}
+    hasBin: true
+    peerDependencies:
+      browserslist: ^4.28.9
+
+  update-browserslist-db@1.4.0:
+    resolution: {integrity: sha512-WPJuOnjI9FWDct4fB+ej4Mz8opLaw5CDcZ2t44tFZ0vIQVYWzBhWR3mkixuUj/A7+vY4V9+ApOZ2YYLwdgq46w==}
     hasBin: true
     peerDependencies:
       browserslist: ^4.28.9
@@ -7851,6 +7874,8 @@ snapshots:
 
   baseline-browser-mapping@2.11.36: {}
 
+  baseline-browser-mapping@2.11.38: {}
+
   brace-expansion@5.0.13:
     dependencies:
       balanced-match: 4.0.4
@@ -7874,6 +7899,14 @@ snapshots:
       electron-to-chromium: 1.5.481
       node-releases: 2.0.63
       update-browserslist-db: 1.3.4(browserslist@4.29.5)
+
+  browserslist@4.29.6:
+    dependencies:
+      baseline-browser-mapping: 2.11.38
+      caniuse-lite: 1.0.30001826
+      electron-to-chromium: 1.5.486
+      node-releases: 2.0.64
+      update-browserslist-db: 1.4.0(browserslist@4.29.6)
 
   buffer-from@1.1.2: {}
 
@@ -8159,6 +8192,8 @@ snapshots:
   electron-to-chromium@1.5.457: {}
 
   electron-to-chromium@1.5.481: {}
+
+  electron-to-chromium@1.5.486: {}
 
   emoji-regex@10.6.0: {}
 
@@ -8897,7 +8932,7 @@ snapshots:
 
   next-compose-plugins@2.2.1: {}
 
-  next-i18next@16.4.9(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1):
+  next-i18next@16.4.10(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.105.0))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1):
     dependencies:
       '@types/hoist-non-react-statics': 3.3.7(@types/react@19.3.0)
       hoist-non-react-statics: 3.3.2
@@ -8965,6 +9000,8 @@ snapshots:
   node-releases@2.0.59: {}
 
   node-releases@2.0.63: {}
+
+  node-releases@2.0.64: {}
 
   normalize-path@2.1.1:
     dependencies:
@@ -9896,6 +9933,12 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
+  update-browserslist-db@1.4.0(browserslist@4.29.6):
+    dependencies:
+      browserslist: 4.29.6
+      escalade: 3.2.0
+      picocolors: 1.1.1
+
   upper-case-first@2.0.2:
     dependencies:
       tslib: 2.9.1
@@ -10002,7 +10045,7 @@ snapshots:
       '@webassemblyjs/wasm-parser': 1.14.1
       acorn: 8.19.0
       acorn-import-phases: 1.0.4(acorn@8.19.0)
-      browserslist: 4.29.5
+      browserslist: 4.29.6
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.27.0
       es-module-lexer: 2.3.2
