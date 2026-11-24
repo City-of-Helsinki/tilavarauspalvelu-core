@@ -145,7 +145,10 @@
       "basicInfo": "Basic information",
       "postalAddress": "Postal address",
       "billingAddress": "Billing address",
-      "contactInfo": "Contact information"
+      "contactInfo": "Contact information",
+      "basicInfoIndividual": "Basic information of the booker",
+      "basicInfoCompany": "Basic information of the company",
+      "basicInfoNonprofit": "Basic information of the association"
     },
     "as": {
       "prefix": "I create the application...",
@@ -176,7 +179,9 @@
     "organisationCity": "City",
     "additionalInformation": "Additional details about the purpose of the booking",
     "organisationActiveMembers": "Number of active members",
-    "organisationActiveMembersHelper": "Members who take part in the activities regularly"
+    "organisationActiveMembersHelper": "Members who take part in the activities regularly",
+    "companyName": "Official name of the company",
+    "nonprofitName": "Official name of the association"
   },
   "preview": {
     "heading": "Review and submit the application",
@@ -197,7 +202,9 @@
       "coreBusiness": "Core business",
       "registrationNumber": "Business ID",
       "billingAddress": "Billing address",
-      "activeMembers": "Number of active members"
+      "activeMembers": "Number of active members",
+      "companyName": "Company name",
+      "nonprofitRegistrationNumber": "Registration number"
     },
     "applicationEvent": {
       "applicationInfo": "Application details",
@@ -278,9 +285,10 @@
     "body": "If necessary, you can edit your application within the application round. Only the most recent application will be processed. Please delete previously submitted applications.\n\nSubmitted applications are marked with a yellow Sent icon."
   },
   "navigation": {
-    "page1": "Booking details",
-    "page2": "Booking dates",
+    "page1": "Application details",
+    "page2": "Time wishes",
     "page3": "Customer information",
-    "page4": "Preview and send"
+    "page4": "Preview and send",
+    "continue": "Continue"
   }
 }

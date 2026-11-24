@@ -80,6 +80,23 @@ function Page3Form({ isSportsForm }: Readonly<{ isSportsForm: boolean }>): React
   }
 }
 
+function BasicInfoHeading(): React.ReactElement {
+  const { t } = useTranslation();
+  const { watch } = useFormContext<ApplicationPage3FormValues>();
+  const type = watch("applicantType");
+
+  switch (type) {
+    case ReserveeType.Individual:
+      return <FormSubHeading>{t("application:Page3.sectionHeadings.basicInfoIndividual")}</FormSubHeading>;
+    case ReserveeType.Nonprofit:
+      return <FormSubHeading>{t("application:Page3.sectionHeadings.basicInfoNonprofit")}</FormSubHeading>;
+    case ReserveeType.Company:
+      return <FormSubHeading>{t("application:Page3.sectionHeadings.basicInfoCompany")}</FormSubHeading>;
+    case undefined:
+      return <FormSubHeading>{t("application:Page3.sectionHeadings.basicInfo")}</FormSubHeading>;
+  }
+}
+
 export default function Page3({
   application,
   offeredPriceOptionPkList,
@@ -131,7 +148,7 @@ export default function Page3({
         <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)} data-testid="application__page3--form">
           <ApplicantTypeSelector />
           <AutoGrid>
-            <FormSubHeading as="h2">{t("application:Page3.sectionHeadings.basicInfo")}</FormSubHeading>
+            <BasicInfoHeading />
             <Page3Form isSportsForm={isSportsForm} />
           </AutoGrid>
           <ButtonContainer>
@@ -151,7 +168,7 @@ export default function Page3({
               type="submit"
               disabled={disableNav}
             >
-              {t("common:next")}
+              {t("application:navigation.continue")}
             </Button>
           </ButtonContainer>
         </Flex>

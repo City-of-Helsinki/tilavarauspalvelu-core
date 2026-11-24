@@ -31,6 +31,22 @@ describe("ApplicantInfoPreview", () => {
     expect(screen.queryByRole("heading", { name: "application:preview.additionalInformation" })).toBeNull();
   });
 
+  test("shows the company name and business ID labels for a company", () => {
+    customRender({ applicantType: ReserveeType.Company, additionalInformation: "" });
+    expect(screen.getByRole("heading", { name: "application:preview.organisation.companyName" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "application:preview.organisation.registrationNumber" })
+    ).toBeInTheDocument();
+  });
+
+  test("shows the organisation name and registration number labels for a nonprofit", () => {
+    customRender({ applicantType: ReserveeType.Nonprofit, additionalInformation: "" });
+    expect(screen.getByRole("heading", { name: "application:preview.organisation.name" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "application:preview.organisation.nonprofitRegistrationNumber" })
+    ).toBeInTheDocument();
+  });
+
   test("hides the additional information of an organisation", () => {
     customRender({ applicantType: ReserveeType.Nonprofit, additionalInformation: "Harrastetoiminta" });
     expect(screen.queryByText("Harrastetoiminta")).toBeNull();

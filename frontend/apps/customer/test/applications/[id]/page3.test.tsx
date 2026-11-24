@@ -93,10 +93,17 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
 }
 
 describe("Application Page3", () => {
+  test("shows the nonprofit heading and name label for a nonprofit", () => {
+    const view = customRender({ page: "page3" });
+    const form = view.getByTestId("application__page3--form");
+    expect(within(form).getByText("application:Page3.sectionHeadings.basicInfoNonprofit")).toBeInTheDocument();
+    expect(within(form).getByRole("textbox", { name: /application:Page3.nonprofitName/ })).toBeInTheDocument();
+  });
+
   test("smoke: should render page with initial data", () => {
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page3.subHeading" })).toBeInTheDocument();
-    expect(view.getByRole("button", { name: "common:next" })).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "application:navigation.continue" })).toBeInTheDocument();
     expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
     expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
@@ -109,7 +116,7 @@ describe("Application Page3", () => {
   test("should send the form when clicking next", async () => {
     const view = customRender({ page: "page3" });
     const nextButton = await view.findByRole("button", {
-      name: "common:next",
+      name: "application:navigation.continue",
     });
     await userEvent.click(nextButton);
     expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page4"));
@@ -120,7 +127,7 @@ describe("Application Page3", () => {
     mockedRouterPush.mockReturnValueOnce(nav.promise);
     const user = userEvent.setup();
     const view = customRender({ page: "page3" });
-    const nextButton = await view.findByRole("button", { name: "common:next" });
+    const nextButton = await view.findByRole("button", { name: "application:navigation.continue" });
 
     expect(nextButton).not.toBeDisabled();
     await user.click(nextButton);
@@ -153,7 +160,7 @@ describe("Application page3 unsaved changes", () => {
   test("asks to confirm before the user leaves with unsaved changes", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page3" });
-    await user.type(view.getByRole("textbox", { name: /organisationName/ }), " changed");
+    await user.type(view.getByRole("textbox", { name: /application:Page3.nonprofitName/ }), " changed");
     await user.click(view.getByRole("button", { name: "common:prev" }));
     expect(confirm).toHaveBeenCalledWith("common:unsavedChangesConfirm");
     // the user did not confirm, so the route change is cancelled
@@ -163,8 +170,8 @@ describe("Application page3 unsaved changes", () => {
   test("does not ask to confirm when the user saves with next", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page3" });
-    await user.type(view.getByRole("textbox", { name: /organisationName/ }), " changed");
-    await user.click(view.getByRole("button", { name: "common:next" }));
+    await user.type(view.getByRole("textbox", { name: /application:Page3.nonprofitName/ }), " changed");
+    await user.click(view.getByRole("button", { name: "application:navigation.continue" }));
     expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page4"));
     expect(confirm).not.toHaveBeenCalled();
   });

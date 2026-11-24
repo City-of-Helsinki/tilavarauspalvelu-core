@@ -154,7 +154,7 @@ describe("Page1 common to all funnel pages", () => {
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page1.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "application:Page1.createNew" })).toBeInTheDocument();
-    expect(view.getByRole("button", { name: "common:next" })).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "application:navigation.continue" })).toBeInTheDocument();
     expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
   });
@@ -195,7 +195,7 @@ describe("Page1", () => {
   test("disables next and add-section while saving", () => {
     isSavingRef.current = true;
     const view = customRender();
-    expect(view.getByRole("button", { name: "common:next" })).toBeDisabled();
+    expect(view.getByRole("button", { name: "application:navigation.continue" })).toBeDisabled();
     expect(view.getByRole("button", { name: "application:Page1.createNew" })).toBeDisabled();
   });
 
@@ -227,7 +227,7 @@ describe("Page1", () => {
     await user.type(eventsPerWeek, "1");
 
     const addSectionBtn = view.getByRole("button", { name: "application:Page1.createNew" });
-    const submitBtn = view.getByRole("button", { name: "common:next" });
+    const submitBtn = view.getByRole("button", { name: "application:navigation.continue" });
     expect(addSectionBtn).not.toBeDisabled();
     expect(submitBtn).not.toBeDisabled();
 
@@ -243,7 +243,7 @@ describe("Page1", () => {
   // this case only happens if user manually removes the last section
   test("empty application should not allow submitting", async () => {
     const view = customRender();
-    const submitBtn = view.getByRole("button", { name: "common:next" });
+    const submitBtn = view.getByRole("button", { name: "application:navigation.continue" });
     const user = userEvent.setup();
     const removeBtn = view.getByRole("button", {
       name: "common:remove",
@@ -263,7 +263,7 @@ describe("Page1", () => {
   test("empty form should display error on submit", async () => {
     const view = customRender();
     const user = userEvent.setup();
-    const submitBtn = view.getByRole("button", { name: "common:next" });
+    const submitBtn = view.getByRole("button", { name: "application:navigation.continue" });
     expect(submitBtn).not.toBeDisabled();
     expect(view.queryAllByText("application:validation.Required")).toHaveLength(0);
     await user.click(submitBtn);
@@ -278,7 +278,7 @@ describe("Page1", () => {
     const view = customRender();
     const user = userEvent.setup();
 
-    const submitBtn = view.getByRole("button", { name: "common:next" });
+    const submitBtn = view.getByRole("button", { name: "application:navigation.continue" });
     await user.click(submitBtn);
     expect(view.queryAllByText("application:validation.noReservationUnits")).toHaveLength(0);
   });
@@ -317,7 +317,7 @@ describe("Page1", () => {
     await user.clear(eventsPerWeek);
     await user.type(eventsPerWeek, "1");
 
-    const submitBtn = view.getByRole("button", { name: "common:next" });
+    const submitBtn = view.getByRole("button", { name: "application:navigation.continue" });
     await user.click(submitBtn);
     expect(view.queryAllByText(/application:validation/)).toStrictEqual([]);
     expect(mockedRouterPush).toHaveBeenCalled();
@@ -329,7 +329,7 @@ describe("Page1", () => {
     mockedSearchParams.mockReturnValue(params);
     const view = customRender();
     const user = userEvent.setup();
-    const submitBtn = view.getByRole("button", { name: "common:next" });
+    const submitBtn = view.getByRole("button", { name: "application:navigation.continue" });
     expect(submitBtn).not.toBeDisabled();
     await user.click(submitBtn);
     const section = view.getByTestId("application__applicationSection_0");
@@ -379,7 +379,7 @@ describe("Page1: price option", () => {
     const section = view.getByTestId("application__applicationSection_0");
     await fillSectionWithoutPriceOption(section);
 
-    await user.click(view.getByRole("button", { name: "common:next" }));
+    await user.click(view.getByRole("button", { name: "application:navigation.continue" }));
 
     // every other field is filled, so the only missing value is the price option
     expect(within(section).queryAllByText("application:validation.Required")).not.toHaveLength(0);
@@ -393,7 +393,7 @@ describe("Page1: price option", () => {
     await fillSectionWithoutPriceOption(section);
     await selectFirstOption(within(section), /application:Page1.priceOption/);
 
-    await user.click(view.getByRole("button", { name: "common:next" }));
+    await user.click(view.getByRole("button", { name: "application:navigation.continue" }));
 
     expect(view.queryAllByText(/application:validation/)).toStrictEqual([]);
     expect(mutateFn).toHaveBeenCalledTimes(1);
