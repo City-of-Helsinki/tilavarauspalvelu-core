@@ -11,12 +11,7 @@ import { capitalize, getImageSource, getLocalizationLang, getTranslation, getMai
 import { ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationCardFragment } from "@gql/gql-types";
 import { usePaymentUrl } from "@/hooks/usePaymentUrl";
-import {
-  getMaterialPriceDescription,
-  getReservationPriceDisplayFromLines,
-  getReservationPriceString,
-  isDiscountPending,
-} from "@/modules/price";
+import { getReservationPriceDisplayFromLines, getReservationPriceString, isDiscountPending } from "@/modules/price";
 import { getNormalizedReservationOrderStatus, isReservationCancellable } from "@/modules/reservation";
 import { getReservationPath } from "@/modules/urls";
 
@@ -45,11 +40,7 @@ export function ReservationCard({ reservation, type }: Readonly<PropsT>): React.
     return null;
   }
 
-  const priceDisplay = getReservationPriceDisplayFromLines(
-    reservation,
-    lang,
-    getMaterialPriceDescription(reservationUnit.priceSummary, lang) !== ""
-  );
+  const priceDisplay = getReservationPriceDisplayFromLines(reservation, lang);
   const price = getReservationPriceString(t, priceDisplay, isDiscountPending(reservation), lang);
 
   const name = getTranslation(reservationUnit, "name", lang);
@@ -149,7 +140,6 @@ export const RESERVATION_CARD_FRAGMENT = gql`
       nameFi
       nameSv
       nameEn
-      ...PriceSummaryFields
       images {
         ...Image
       }

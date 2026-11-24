@@ -40,6 +40,9 @@ function createMockReservation(overrides: Partial<ReservationCardFragment> = {})
         amount: "20.00",
         overrideAmount: null,
         taxPercentage: "25.5",
+        materialPriceDescriptionFi: "",
+        materialPriceDescriptionEn: "",
+        materialPriceDescriptionSv: "",
       },
     ],
     reservationUnit: {
@@ -95,6 +98,29 @@ describe("ReservationCard", () => {
 
     expect(screen.getByLabelText("common:price")).toBeInTheDocument();
     expect(screen.getByText("20,00 €")).toBeInTheDocument();
+  });
+
+  test("adds the material price of the price line to the price", () => {
+    const mockReservation = createMockReservation({
+      priceLines: [
+        {
+          id: "line-1",
+          descriptionFi: "Tilan vuokra",
+          descriptionEn: "Space rent",
+          descriptionSv: "Hyra",
+          amount: "20.00",
+          overrideAmount: null,
+          taxPercentage: "25.5",
+          materialPriceDescriptionFi: "<p>Materiaalit</p>",
+          materialPriceDescriptionEn: "<p>Materials</p>",
+          materialPriceDescriptionSv: "<p>Material</p>",
+        },
+      ],
+    });
+
+    render(<ReservationCard reservation={mockReservation} />);
+
+    expect(screen.getByText("20,00 € + prices:materialPrice")).toBeInTheDocument();
   });
 
   test("renders access type icon with aria label", () => {

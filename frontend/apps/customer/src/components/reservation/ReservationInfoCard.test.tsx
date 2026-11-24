@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import { AccessType, PriceUnit, ReservationUnitImageType, ReservationStateChoice } from "@gql/gql-types";
+import { AccessType, ReservationUnitImageType, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationInfoCardFragment, ReservationPriceCalculationFieldsFragment } from "@gql/gql-types";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createReservationPriceLine, future1hReservation, generateDescriptionFragment } from "@test/reservation.mocks";
@@ -103,28 +103,29 @@ describe("Component: ReservationInfoCard", () => {
       expect(getPriceText()).toBe('common:price: 0 - 10,00 € (common:inclTax {"taxPercentage":"25,5"})');
     });
 
-    it("adds the material price of the reservation unit as it is today", () => {
-      const reservation = createMockReservationInfoCard("10");
+    it("adds the material price when a price line has a material price description", () => {
       customRender({
-        reservation: {
-          ...reservation,
-          reservationUnit: {
-            ...reservation.reservationUnit,
-            priceSummary: {
-              isFree: false,
-              lowestAmount: "10.00",
-              priceUnit: PriceUnit.PerHour,
-              canApplyForDiscount: false,
-              materialPriceDescriptionFi: "<p>Materiaali</p>",
-              materialPriceDescriptionEn: "<p>Material</p>",
-              materialPriceDescriptionSv: "<p>Material</p>",
-            },
-          },
-        },
+        reservation: createMockReservationInfoCard("10", {
+          priceLines: [createPriceLine({ materialPriceDescriptionFi: "<p>Materiaali</p>" })],
+        }),
       });
       expect(getPriceText()).toBe(
         'common:price: 10,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
       );
+    });
+
+    it("shows only the material price when the reservation is free and a price line has a material price", () => {
+      customRender({
+        reservation: createMockReservationInfoCard("0", {
+          priceLines: [createPriceLine({ amount: "0.00", materialPriceDescriptionFi: "<p>Materiaali</p>" })],
+        }),
+      });
+      expect(getPriceText()).toBe("common:price: Prices:materialPrice");
+    });
+
+    it("shows no material price when the price lines have no material price description", () => {
+      customRender({ reservation: createMockReservationInfoCard("10") });
+      expect(getPriceText()).toBe('common:price: 10,00 € (common:inclTax {"taxPercentage":"25,5"})');
     });
 
     it("lists the price lines when there are more than one", () => {
@@ -212,6 +213,9 @@ function createPriceLine(overrides: Partial<PriceLine> = {}): PriceLine {
     amount: "10.00",
     overrideAmount: null,
     taxPercentage: "25.5",
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
     ...overrides,
   };
 }
@@ -233,7 +237,6 @@ function createMockReservationInfoCard(
     priceLines: [createPriceLine({ amount: price ?? "10.00" })],
     reservationUnit: {
       id: createNodeId("ReservationUnitNode", 2),
-      priceSummary: null,
       images: [
         {
           id: createNodeId("ReservationUnitImageNode", 1),
