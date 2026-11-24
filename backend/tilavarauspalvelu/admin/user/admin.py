@@ -303,24 +303,27 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
     @admin.display(description=_("Expires (exp)"))
     def expires(self, user: User) -> str:
-        if user.id_token is None:
+        id_token = user.id_token
+        if id_token is None or id_token.exp is None:
             return "-"
-        expires = datetime.datetime.fromtimestamp(user.id_token.exp).astimezone(DEFAULT_TIMEZONE)
+        expires = datetime.datetime.fromtimestamp(id_token.exp).astimezone(DEFAULT_TIMEZONE)
         now = utc_datetime()
         expired = expires < now
         return expires.isoformat() + (" (expired)" if expired else " (valid)")
 
     @admin.display(description=_("Issued at (iat)"))
     def issued_at(self, user: User) -> str:
-        if user.id_token is None:
+        id_token = user.id_token
+        if id_token is None or id_token.iat is None:
             return "-"
-        return datetime.datetime.fromtimestamp(user.id_token.iat).astimezone(DEFAULT_TIMEZONE).isoformat()
+        return datetime.datetime.fromtimestamp(id_token.iat).astimezone(DEFAULT_TIMEZONE).isoformat()
 
     @admin.display(description=_("Auth time (auth_time)"))
     def auth_time(self, user: User) -> str:
-        if user.id_token is None:
+        id_token = user.id_token
+        if id_token is None or id_token.auth_time is None:
             return "-"
-        return datetime.datetime.fromtimestamp(user.id_token.auth_time).astimezone(DEFAULT_TIMEZONE).isoformat()
+        return datetime.datetime.fromtimestamp(id_token.auth_time).astimezone(DEFAULT_TIMEZONE).isoformat()
 
     @admin.display(description=_("Nonce (nonce)"))
     def nonce(self, user: User) -> str:
