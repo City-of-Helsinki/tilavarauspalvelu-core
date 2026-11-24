@@ -173,8 +173,8 @@ def create_reservation_units() -> None:
         name="Kokoustila",
         defaults={
             "name_fi": "Kokoustila",
-            "name_sv": "Meeting room",
-            "name_en": "Möteslokal",
+            "name_en": "Meeting room",
+            "name_sv": "Möteslokal",
         },
     )
 

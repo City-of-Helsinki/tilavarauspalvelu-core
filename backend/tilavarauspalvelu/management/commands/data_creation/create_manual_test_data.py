@@ -174,8 +174,8 @@ def _make_open_manual_test_round() -> ApplicationRound:
         name="Kokoustila",
         defaults={
             "name_fi": "Kokoustila",
-            "name_sv": "Meeting room",
-            "name_en": "Möteslokal",
+            "name_en": "Meeting room",
+            "name_sv": "Möteslokal",
         },
     )
     peruutus_alkuun_asti, _ = ReservationUnitCancellationRule.objects.get_or_create(
@@ -840,8 +840,8 @@ def _make_manual_test_round_in_allocation() -> ApplicationRound:
         name="Kokoustila",
         defaults={
             "name_fi": "Kokoustila",
-            "name_sv": "Meeting room",
-            "name_en": "Möteslokal",
+            "name_en": "Meeting room",
+            "name_sv": "Möteslokal",
         },
     )
     peruutus_alkuun_asti, _ = ReservationUnitCancellationRule.objects.get_or_create(
