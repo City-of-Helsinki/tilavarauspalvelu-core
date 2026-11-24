@@ -80,8 +80,8 @@ describe("Application Page4", () => {
     expect(view.getByRole("heading", { name: "application:preview.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:submit" })).toBeInTheDocument();
     expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
-    expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
-    expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
+    // The preview page has no notes box
+    expect(view.queryByRole("heading", { name: "applicationRound:notesWhenApplying" })).not.toBeInTheDocument();
   });
 
   test.todo("notes when applying should be shown if present");

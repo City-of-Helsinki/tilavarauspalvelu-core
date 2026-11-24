@@ -83,7 +83,7 @@ describe("Stepper when starting application", () => {
     expect(view.queryByText("application:Page2.info")).not.toBeInTheDocument();
   });
 
-  test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)("application %s notes when applying", ([page]) => {
+  test.for([["page1"], ["page2"], ["page3"]] as const)("application %s notes when applying", ([page]) => {
     const application = createMockApplicationFragment({ page });
     const view = render(
       <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page={page} />
@@ -94,6 +94,15 @@ describe("Stepper when starting application", () => {
       })
     ).toBeInTheDocument();
     expect(view.getByText("Notes when applying FI")).toBeInTheDocument();
+  });
+
+  test("application page4 NO notes when applying, when the round has notes", () => {
+    const application = createMockApplicationFragment({ page: "page4" });
+    const view = render(
+      <ApplicationFunnelWrapper application={application} offeredPriceOptionPkList={[]} page="page4" />
+    );
+    expect(view.queryByText("applicationRound:notesWhenApplying")).not.toBeInTheDocument();
+    expect(view.queryByText("Notes when applying FI")).not.toBeInTheDocument();
   });
 
   test.for([["page1"], ["page2"], ["page3"], ["page4"]] as const)("application %s NO notes when applying", ([page]) => {

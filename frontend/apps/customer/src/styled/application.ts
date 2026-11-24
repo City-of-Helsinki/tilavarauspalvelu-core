@@ -46,12 +46,34 @@ export const ApplicationSectionHeader = styled.h2`
   }
 `;
 
-export const ApplicationInfoContainer = styled.div`
+type ApplicationInfoContainerProps = {
+  // The number of InfoItemContainers in one row on a wide screen. The default is 3.
+  $columns?: 3 | 4;
+};
+
+const getColumns = ({ $columns }: ApplicationInfoContainerProps) => $columns ?? 3;
+
+/** Puts the InfoItemContainers in rows on a wide screen, with dashed dividers between them. */
+export const ApplicationInfoContainer = styled.div<ApplicationInfoContainerProps>`
   margin: 0 var(--spacing-m);
   display: flex;
   flex-flow: column nowrap;
   @media (min-width: ${breakpoints.m}) {
+    --application-info-columns: ${getColumns};
     flex-flow: row wrap;
+
+    /* The first row has no divider above it */
+    > :nth-child(-n + ${getColumns}) {
+      border-top: 0;
+    }
+    /* The first item in each row is aligned with the left side of the parent content */
+    > :nth-child(${getColumns}n + 1) > * {
+      padding-left: 0;
+    }
+    /* Each item that is not the last one in its row has a divider on the right */
+    > :not(:nth-child(${getColumns}n)):not(:last-child) > * {
+      border-right: var(--application-content-border);
+    }
   }
 `;
 
@@ -66,18 +88,9 @@ export const InfoItemContainer = styled(Flex).attrs({
   font-size: var(--fontsize-body-m);
   border-top: var(--application-content-border);
 
-  /* Make InfoItemContainers rows of three columns */
+  /* ApplicationInfoContainer sets the number of columns */
   @media (min-width: ${breakpoints.m}) {
-    width: ${(props) => (props.$fullWidth ? "100%" : "calc(100% / 3)")};
-    > [class^="styled__InfoItem"] {
-      padding-inline: var(--spacing-m);
-    }
-    &:first-child {
-      border-top: var(--application-content-border);
-    }
-    &:nth-child(-n + 3) {
-      border-top: 0;
-    }
+    width: ${(props) => (props.$fullWidth ? "100%" : "calc(100% / var(--application-info-columns))")};
   }
 `;
 
@@ -131,22 +144,6 @@ export const InfoItem = styled(Flex).attrs({
 
   @media (min-width: ${breakpoints.m}) {
     padding-inline: var(--spacing-m);
-    /* first child in each row should be aligned with the left side of the parent content */
-    *:nth-child(3n-2) > & {
-      padding-left: 0;
-    }
-    /* every child except the last one in each row should show application-content-border as a divider */
-    *:not(:nth-child(3n)) > & {
-      border-right: var(--application-content-border);
-    }
-    /* last child in each row */
-    *:nth-child(-n + 3) > & {
-      border-top: 0;
-    }
-
-    *:last-child > & {
-      border-right: 0;
-    }
   }
 `;
 
