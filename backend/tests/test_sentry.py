@@ -13,7 +13,7 @@ from django.core.signals import got_request_exception
 from django.db.models.signals import post_init
 from django.http import HttpRequest
 from django.test import Client, override_settings
-from graphene_django_extensions.errors import GQLCodeError
+from graphene_django_extensions.errors import GQLCodeError, GQLNotFoundError
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.transport import Transport
@@ -351,11 +351,12 @@ def test_sentry_filters_graphql_errors(
     errors = [
         (GQLCodeError("GraphQL error", code=error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED), 0),
         (GQLCodeError("GraphQL error", code=error_codes.RESERVATION_PRICE_INTERVAL_TOO_LONG), 1),
+        (GQLNotFoundError("Resource not found"), 1),
     ]
     for error, expected_event_count in errors:
         try:
             raise error
-        except GQLCodeError:
+        except (GQLCodeError, GQLNotFoundError):
             got_request_exception.send(sender=None, request=HttpRequest())
 
         assert len(sentry_transport_with_django_integration.sent_events()) == expected_event_count

@@ -391,8 +391,6 @@ if sentry_disconnected:
         # Not found errors
 
         if isinstance(exception, GQLNotFoundError):
-            msg = "Resource not found"
-            SentryLogger.log_message(msg, details=str(exception), level="info")
             return
 
         _got_request_exception(request, **kwargs)
