@@ -207,6 +207,39 @@ describe("QuickReservation", () => {
     expect(screen.getByText("50,00 €")).toHaveAttribute("aria-live", "polite");
   });
 
+  test("asks the price only of the last time when the time changes quickly", async () => {
+    const skippedStart = new Date("2026-11-10T10:00:00Z");
+    const lastStart = new Date("2026-11-10T11:00:00Z");
+    const skippedMock = createPriceMock({ total: "45.00", beginsAt: skippedStart });
+    const skippedResult = vi.fn(() => skippedMock.result as { data: Record<string, unknown> });
+    const mocks = [
+      createPriceMock(),
+      { ...skippedMock, result: skippedResult },
+      createPriceMock({ total: "50.00", beginsAt: lastStart }),
+    ];
+    const view = render(
+      <MockedProvider mocks={mocks}>
+        <QuickReservationWrapper focusSlot={{ isReservable: true }} />
+      </MockedProvider>
+    );
+    expect(await screen.findByText("40,00 €")).toHaveAttribute("aria-busy", "false");
+
+    view.rerender(
+      <MockedProvider mocks={mocks}>
+        <QuickReservationWrapper focusSlot={{ isReservable: true }} slotStart={skippedStart} />
+      </MockedProvider>
+    );
+    view.rerender(
+      <MockedProvider mocks={mocks}>
+        <QuickReservationWrapper focusSlot={{ isReservable: true }} slotStart={lastStart} />
+      </MockedProvider>
+    );
+
+    expect(screen.getByText("40,00 €")).toHaveAttribute("aria-busy", "true");
+    expect(await screen.findByText("50,00 €")).toHaveAttribute("aria-busy", "false");
+    expect(skippedResult).not.toHaveBeenCalled();
+  });
+
   test("keeps an empty price cell next to the button when the price fails to load", async () => {
     const { request } = createPriceMock();
     customRender({ focusSlot: { isReservable: true }, mocks: [{ request, error: new Error("Network error") }] });
