@@ -431,11 +431,25 @@ class ReservationUnitNode(DjangoNode):
         price_date = on_date if on_date is not None else local_date()
         # A queryset annotation is lost when the reservation unit comes through a foreign key. This one is not.
         optimizer.annotations["price_summary_components"] = _base_component_data_on_date(price_date=price_date)
+        optimizer.annotations["price_summary_date"] = models.Value(price_date, output_field=models.DateField())
         return queryset
 
-    def resolve_price_summary(root: ReservationUnit, info: GQLInfo, **kwargs: Any) -> PriceSummary | None:
-        # `optimize_price_summary` selects the components by the field arguments.
+    def resolve_price_summary(
+        root: ReservationUnit,
+        info: GQLInfo,
+        on_date: datetime.date | None = None,
+    ) -> PriceSummary | None:
+        requested_date = on_date if on_date is not None else local_date()
         components: list[dict[str, Any]] = root.price_summary_components
+
+        # The optimizer reads the field arguments by the field name, not by the alias.
+        # So an aliased field can get the components of another date. Load them again for this reservation unit.
+        if root.price_summary_date != requested_date:
+            reservation_units = ReservationUnit.objects.filter(pk=root.pk).annotate(
+                components=_base_component_data_on_date(price_date=requested_date),
+            )
+            components = reservation_units.values_list("components", flat=True).get()
+
         base_prices = [
             BasePrice(
                 amount=Decimal(component["amount"]),
