@@ -122,6 +122,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 @pytest.hookimpl()
 def pytest_collection_modifyitems(config, items):
     skip_slow = config.getoption("--skip-slow")
+    without_migrations = config.option.nomigrations
     only_frontend_query_tests = config.getoption("--only-frontend-query-tests")
     with_frontend_query_tests = config.getoption("--with-frontend-query-tests")
 
@@ -134,6 +135,13 @@ def pytest_collection_modifyitems(config, items):
 
         if skip_slow and is_slow_test:
             msg = "Skipped due to '--skip-slow' option"
+            item.add_marker(pytest.mark.skip(reason=msg))
+            continue
+
+        # A database made without migrations has no migration history to migrate back and forth.
+        is_migration_test = "test_migrations" in item.path.parts
+        if without_migrations and is_migration_test:
+            msg = "Migration test skipped due to '--no-migrations' option"
             item.add_marker(pytest.mark.skip(reason=msg))
             continue
 
