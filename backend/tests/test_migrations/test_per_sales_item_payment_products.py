@@ -191,7 +191,7 @@ def test_per_sales_item_payment_products__reverse_gives_reservation_unit_its_pro
 
 def test_per_sales_item_payment_products__reverse_prefers_product_of_current_merchant(settings):
     settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-    reservation_unit = ReservationUnitFactory.create(payment_merchant=None, unit__payment_merchant=None)
+    reservation_unit = ReservationUnitFactory.create(pk=3, payment_merchant=None, unit__payment_merchant=None)
 
     apps = migrate_to(BEFORE_MIGRATION)
     PaymentMerchant = apps.get_model("tilavarauspalvelu", "PaymentMerchant")
@@ -207,6 +207,8 @@ def test_per_sales_item_payment_products__reverse_prefers_product_of_current_mer
         entity_id=str(reservation_unit.pk),
         merchant_id=str(current_merchant.pk),
     )
+    # The reverse uses the lowest id among equal products, so the product of the earlier merchant must sort first.
+    assert earlier_product_id < current_product_id
     PaymentProduct.objects.create(id=earlier_product_id, merchant=earlier_merchant)
     PaymentProduct.objects.create(id=current_product_id, merchant=current_merchant)
     ReservationUnit.objects.filter(pk=reservation_unit.pk).update(
