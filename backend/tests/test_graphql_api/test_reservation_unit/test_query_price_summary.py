@@ -389,6 +389,42 @@ def test_reservation_unit__query__price_summary__on_date__future_pricing_group(g
     assert response.first_query_object == {"priceSummary": {"lowestAmount": "10.00"}}
 
 
+def test_reservation_unit__query__price_summary__on_date__aliases_with_different_dates(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        valid_until=today + datetime.timedelta(days=5),
+        amount=Decimal(20),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today + datetime.timedelta(days=5),
+        amount=Decimal(10),
+    )
+    on_date = today + datetime.timedelta(days=5)
+
+    fields = (
+        f"priceToday: priceSummary {{ lowestAmount }} "
+        f'priceLater: priceSummary(onDate: "{on_date.isoformat()}") {{ lowestAmount }}'
+    )
+    query = reservation_unit_query(fields=fields, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "priceToday": {"lowestAmount": "20.00"},
+        "priceLater": {"lowestAmount": "10.00"},
+    }
+
+
 def test_reservation_unit__query__price_summary__on_date__query_count_does_not_grow_with_list(graphql):
     today = local_date()
     for amount in (Decimal(10), Decimal(20), Decimal(30)):
