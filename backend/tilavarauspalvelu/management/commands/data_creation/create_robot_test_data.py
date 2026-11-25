@@ -2961,9 +2961,18 @@ def create_reservation_units() -> None:
     # ------------------------------------------------------------------------------------------------------------
 
     copy_reservation_unit(_maksuton_mankeli, kind="android")
-    copy_reservation_unit(_aina_maksullinen_aitio, kind="android")
-    copy_reservation_unit(_aina_kasiteltava_kellarikerros, kind="android")
-    copy_reservation_unit(_alennuskelpoinen_aula, kind="android")
+    _aina_maksullinen_aitio_android = copy_reservation_unit(_aina_maksullinen_aitio, kind="android")
+    create_payment_product(
+        reservation_unit=_aina_maksullinen_aitio_android, product_id="7fb81a3f-92e3-3bd2-ad58-2ecd263d6832"
+    )
+    _aina_kasiteltava_kellarikerros_android = copy_reservation_unit(_aina_kasiteltava_kellarikerros, kind="android")
+    create_payment_product(
+        reservation_unit=_aina_kasiteltava_kellarikerros_android, product_id="a30d8a51-f022-3549-b17b-1f57c7d001c9"
+    )
+    _alennuskelpoinen_aula_android = copy_reservation_unit(_alennuskelpoinen_aula, kind="android")
+    create_payment_product(
+        reservation_unit=_alennuskelpoinen_aula_android, product_id="935ddb76-3496-32e9-942a-65a407cfbbd1"
+    )
     copy_reservation_unit(_perumiskelvoton_parveke, kind="android")
 
     # ------------------------------------------------------------------------------------------------------------
@@ -2971,9 +2980,18 @@ def create_reservation_units() -> None:
     # ------------------------------------------------------------------------------------------------------------
 
     copy_reservation_unit(_maksuton_mankeli, kind="iphone")
-    copy_reservation_unit(_aina_maksullinen_aitio, kind="iphone")
-    copy_reservation_unit(_aina_kasiteltava_kellarikerros, kind="iphone")
-    copy_reservation_unit(_alennuskelpoinen_aula, kind="iphone")
+    _aina_maksullinen_aitio_iphone = copy_reservation_unit(_aina_maksullinen_aitio, kind="iphone")
+    create_payment_product(
+        reservation_unit=_aina_maksullinen_aitio_iphone, product_id="90be81be-2cf2-3b23-baa4-d10a33ca3809"
+    )
+    _aina_kasiteltava_kellarikerros_iphone = copy_reservation_unit(_aina_kasiteltava_kellarikerros, kind="iphone")
+    create_payment_product(
+        reservation_unit=_aina_kasiteltava_kellarikerros_iphone, product_id="6fd4dfb3-b279-30be-bdf6-845378c85cda"
+    )
+    _alennuskelpoinen_aula_iphone = copy_reservation_unit(_alennuskelpoinen_aula, kind="iphone")
+    create_payment_product(
+        reservation_unit=_alennuskelpoinen_aula_iphone, product_id="d15830e1-fcb8-335a-bf77-d6d019f612c9"
+    )
     copy_reservation_unit(_perumiskelvoton_parveke, kind="iphone")
 
 

@@ -190,6 +190,7 @@ def test_create_robot_test_data():
     assert ReservationUnitPricingGroup.objects.count() == 23
     assert PricingGroup.objects.count() == 23
     assert PriceComponent.objects.count() == 23
+    assert PaymentProduct.objects.count() == 11
     assert ReservationUnitAccessType.objects.count() == 23
     assert User.objects.count() == 39
     assert ApplicationRound.objects.count() == 1
