@@ -11,7 +11,6 @@ from mptt.models import MPTTModel
 from mptt.querysets import TreeQuerySet
 
 _TModel = TypeVar("_TModel", bound=Model)
-_TMPTTModel = TypeVar("_TMPTTModel", bound=MPTTModel)
 _TQuerySet = TypeVar("_TQuerySet", bound=QuerySet)
 _TModel_co = TypeVar("_TModel_co", bound=Model, covariant=True)
 _TRow_co = TypeVar("_TRow_co", covariant=True, default=_TModel_co)
@@ -273,10 +272,10 @@ class ModelTreeQuerySet(
 
 class ModelTreeManager[TMPTTModel: MPTTModel, TQuerySet: QuerySet](
     ModelManager[TMPTTModel, TQuerySet],
-    TreeManager[TMPTTModel],
+    TreeManager,
 ):
-    def get_queryset_descendants(self, queryset: _TQuerySet, include_self: bool = False) -> _TQuerySet: ...
-    def get_queryset_ancestors(self, queryset: _TQuerySet, include_self: bool = False) -> _TQuerySet: ...
+    def get_queryset_descendants(self, queryset: TQuerySet, include_self: bool = False) -> TQuerySet: ...
+    def get_queryset_ancestors(self, queryset: TQuerySet, include_self: bool = False) -> TQuerySet: ...
     @property
     def parent_attr(self) -> str: ...
     @property
@@ -289,29 +288,29 @@ class ModelTreeManager[TMPTTModel: MPTTModel, TQuerySet: QuerySet](
     def level_attr(self) -> str: ...
     def insert_node(
         self,
-        node: _TMPTTModel,
-        target: _TMPTTModel,
+        node: TMPTTModel,
+        target: TMPTTModel,
         position: TreePos = "last-child",
         save: bool = False,
         allow_existing_pk: bool = False,
         refresh_target: bool = True,
-    ) -> _TMPTTModel: ...
+    ) -> TMPTTModel: ...
     def move_node(
         self,
-        node: _TMPTTModel,
-        target: _TMPTTModel,
+        node: TMPTTModel,
+        target: TMPTTModel,
         position: TreePos = "last-child",
-    ) -> _TMPTTModel | None: ...
-    def root_node(self, tree_id: int) -> _TMPTTModel: ...
-    def root_nodes(self) -> _TQuerySet: ...
+    ) -> TMPTTModel | None: ...
+    def root_node(self, tree_id: int) -> TMPTTModel: ...
+    def root_nodes(self) -> TQuerySet: ...
     def rebuild(self, batch_size: int = 1000, **filters: Any) -> None: ...
     def partial_rebuild(self, tree_id: int, batch_size: int = 1000, **filters: Any) -> None: ...
     def build_tree_nodes(
         self,
         data: dict[str, Any],
-        target: _TMPTTModel | None = None,
+        target: TMPTTModel | None = None,
         position: TreePos = "last-child",
-    ) -> list[_TMPTTModel]: ...
+    ) -> list[TMPTTModel]: ...
 
 class TranslatedModelTreeManager[TMPTTModel: MPTTModel, TQuerySet: QuerySet](
     ModelTreeManager[TMPTTModel, TQuerySet],
