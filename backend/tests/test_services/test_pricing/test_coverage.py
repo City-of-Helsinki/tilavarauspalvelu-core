@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import pytest
 
+from tilavarauspalvelu.enums import PriceComponentKind
 from tilavarauspalvelu.services.pricing.coverage import CoverageError, check_pricing_group_coverage
 from tilavarauspalvelu.typing import error_codes
 
@@ -101,6 +102,19 @@ def test_coverage__free_and_paid_components_on_the_same_date():
     ]
 
     errors = check_pricing_group_coverage(components=components, reservation_unit_begin_dates=[])
+
+    assert errors == []
+
+
+def test_coverage__surcharges_can_overlap_each_other_and_the_base_price():
+    base = PriceComponentFactory.build(valid_from=JAN_1, valid_until=None)
+    first_surcharge = PriceComponentFactory.build(kind=PriceComponentKind.SURCHARGE, valid_from=JAN_1)
+    second_surcharge = PriceComponentFactory.build(kind=PriceComponentKind.SURCHARGE, valid_from=FEB_1)
+
+    errors = check_pricing_group_coverage(
+        components=[base, first_surcharge, second_surcharge],
+        reservation_unit_begin_dates=[JAN_1],
+    )
 
     assert errors == []
 

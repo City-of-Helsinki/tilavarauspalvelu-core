@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 from typing import TYPE_CHECKING
 
+from tilavarauspalvelu.enums import PriceComponentKind
 from tilavarauspalvelu.typing import error_codes
 
 if TYPE_CHECKING:
@@ -32,13 +33,14 @@ def check_pricing_group_coverage(
     reservation_unit_begin_dates: Iterable[datetime.date],
 ) -> list[CoverageError]:
     """
-    Check that the components of a pricing group give exactly one price on every date
-    from the earliest component onward, for every price option that is offered on that date.
+    Check that the base components of a pricing group give exactly one price on every date
+    from the earliest base component onward, for every price option that is offered on that date.
+    Other kinds of components can overlap, so they are not checked.
 
     :param components: All components of the pricing group, saved or not.
     :param reservation_unit_begin_dates: The begin dates of the reservation units that use the pricing group.
     """
-    components = list(components)
+    components = [component for component in components if component.kind == PriceComponentKind.BASE]
     reservation_unit_begin_dates = sorted(reservation_unit_begin_dates)
 
     if not components:
