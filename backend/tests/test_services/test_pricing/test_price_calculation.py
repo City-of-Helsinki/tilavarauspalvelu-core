@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tilavarauspalvelu.enums import PaymentType, PriceUnit
+from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
 from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.services.pricing.price_calculation import calculate_price_with_data, load_pricing_data
 from utils.date_utils import local_datetime
@@ -408,6 +408,164 @@ def test_calculate_price_with_data__day_unit_is_charged_at_the_price_of_its_star
     assert one_day.total == Decimal("100.00")
     assert [line.component for line in two_days.lines] == [old, new]
     assert two_days.total == Decimal("300.00")
+
+
+# ── Surcharges ──
+
+
+def test_calculate_price_with_data__surcharge_is_added_to_the_base_price():
+    row = create_pricing_group_row()
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    base = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(10),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    surcharge = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=JAN_1,
+        amount=Decimal(5),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+
+    result = calculate_price_for_one_unit(
+        reservation_unit=reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 2, 1, 10),
+        end=local_datetime(2026, 2, 1, 12),
+    )
+
+    assert [line.component for line in result.lines] == [base, surcharge]
+    assert [line.quantity for line in result.lines] == [Decimal(2), Decimal(2)]
+    assert [line.amount for line in result.lines] == [Decimal("20.00"), Decimal("10.00")]
+    assert result.total == Decimal("30.00")
+
+
+def test_calculate_price_with_data__every_matching_surcharge_is_added():
+    row = create_pricing_group_row()
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    base = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, amount=Decimal(10))
+    first_surcharge = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=JAN_1,
+        amount=Decimal(5),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    second_surcharge = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=JAN_1,
+        amount=Decimal(25),
+        price_unit=PriceUnit.FIXED,
+    )
+
+    result = calculate_price_for_one_unit(
+        reservation_unit=reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 2, 1, 10),
+        end=local_datetime(2026, 2, 1, 12),
+    )
+
+    assert [line.component for line in result.lines] == [base, first_surcharge, second_surcharge]
+    assert [line.amount for line in result.lines] == [Decimal("20.00"), Decimal("10.00"), Decimal("25.00")]
+    assert result.total == Decimal("55.00")
+
+
+def test_calculate_price_with_data__surcharge_counts_only_on_the_dates_when_it_is_valid():
+    row = create_pricing_group_row()
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(10),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    surcharge = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=MAR_2,
+        amount=Decimal(5),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+
+    result = calculate_price_for_one_unit(
+        reservation_unit=reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 3, 1, 22),
+        end=local_datetime(2026, 3, 2, 1),
+    )
+
+    assert result.lines[1].component == surcharge
+    assert result.lines[1].quantity == Decimal(1)
+    assert result.total == Decimal("35.00")
+
+
+def test_calculate_price_with_data__surcharge_of_another_option_is_not_added():
+    unit_group = UnitGroupFactory.create()
+    row = create_pricing_group_row(unit_group=unit_group)
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    adults = PriceOptionFactory.create(unit_group=unit_group)
+    juniors = PriceOptionFactory.create(unit_group=unit_group)
+    PriceComponentFactory.create(pricing_group=pricing_group, price_option=None, amount=Decimal(10))
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        price_option=adults,
+        amount=Decimal(5),
+    )
+
+    result = calculate_price_for_one_unit(
+        reservation_unit=reservation_unit,
+        price_option=juniors,
+        begin=local_datetime(2026, 2, 1, 10),
+        end=local_datetime(2026, 2, 1, 11),
+    )
+
+    assert result.total == Decimal("10.00")
+
+
+def test_calculate_price_with_data__surcharge_is_not_a_base_price():
+    row = create_pricing_group_row()
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    PriceComponentFactory.create(pricing_group=pricing_group, kind=PriceComponentKind.SURCHARGE, valid_from=JAN_1)
+
+    with pytest.raises(PriceCalculationError, match=exact("Reservation unit has no price on 2026-02-01.")):
+        calculate_price_for_one_unit(
+            reservation_unit=reservation_unit,
+            price_option=None,
+            begin=local_datetime(2026, 2, 1, 10),
+            end=local_datetime(2026, 2, 1, 11),
+        )
+
+
+def test_calculate_price_with_data__discount_only_on_the_surcharge():
+    row = create_pricing_group_row()
+    reservation_unit = row.reservation_unit
+    pricing_group = row.pricing_group
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, can_apply_for_discount=False)
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=JAN_1,
+        can_apply_for_discount=True,
+    )
+
+    result = calculate_price_for_one_unit(
+        reservation_unit=reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 2, 1, 10),
+        end=local_datetime(2026, 2, 1, 11),
+    )
+
+    assert result.can_apply_for_discount is True
 
 
 # ── Loaded pricing data ──
