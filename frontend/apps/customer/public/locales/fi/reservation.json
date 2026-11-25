@@ -141,6 +141,7 @@
   "accessTypeChanged": "Pääsy tilaan muuttuu. Katso ohjeet.",
   "contactSupport": "Ota yhteyttä asiakaspalveluun",
   "reservationNoLongerPayable": "Varausta ei voi enää maksaa",
+  "reservationAlreadyPaid": "Varaus on jo maksettu",
   "notifications": {
     "requires_handling": {
       "title": "Varauksesi on käsittelyssä",

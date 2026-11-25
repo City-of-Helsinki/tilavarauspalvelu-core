@@ -202,19 +202,25 @@ export default function Reservation({
     type: "alert",
   });
 
+  const isPaid =
+    reservation.paymentOrder?.status === OrderStatus.Paid ||
+    reservation.paymentOrder?.status === OrderStatus.PaidByInvoice;
+  // The backend refuses a second payment of a paid order with this code. Tell the user that the payment is done.
+  const isAlreadyPaidError = params.get("error_code") === "RESERVATION_PAYMENT_ORDER_NOT_PENDING" && isPaid;
   useToastIfQueryParam({
     key: "error_code",
-    message:
-      params.get("error_code") === "RESERVATION_NOT_CONFIRMED" ||
-      params.get("error_code") === "RESERVATION_NOT_FOUND" ||
-      params.get("error_code") === "CANCELLED" ||
-      params.get("error_code") === "RESERVATION_PAYMENT_ORDER_PAST_DUE_BY" ||
-      params.get("error_code") === "RESERVATION_PAYMENT_ORDER_NOT_PENDING"
+    message: isAlreadyPaidError
+      ? t("reservation:reservationAlreadyPaid")
+      : params.get("error_code") === "RESERVATION_NOT_CONFIRMED" ||
+          params.get("error_code") === "RESERVATION_NOT_FOUND" ||
+          params.get("error_code") === "CANCELLED" ||
+          params.get("error_code") === "RESERVATION_PAYMENT_ORDER_PAST_DUE_BY" ||
+          params.get("error_code") === "RESERVATION_PAYMENT_ORDER_NOT_PENDING"
         ? t("reservation:reservationNoLongerPayable")
         : params.get("error_code") === "TAX_LEVEL_HAS_NO_RATE"
           ? t("errors:api.validation.TAX_LEVEL_HAS_NO_RATE")
           : params.get("error_message") || t("error:genericError"),
-    type: "error",
+    type: isAlreadyPaidError ? "success" : "error",
   });
 
   const { beginsAt, endsAt } = reservation;

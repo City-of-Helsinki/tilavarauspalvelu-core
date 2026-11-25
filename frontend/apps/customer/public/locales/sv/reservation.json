@@ -145,6 +145,7 @@
   "accessTypeChanged": "Ändringar i tillträde till utrymmet. Se instruktioner.",
   "contactSupport": "Vänligen kontakta kundtjänsten.",
   "reservationNoLongerPayable": "Bokningen kan inte längre betalas",
+  "reservationAlreadyPaid": "Bokningen har redan betalats",
   "notifications": {
     "requires_handling": {
       "title": "Din bokning behandlas",
