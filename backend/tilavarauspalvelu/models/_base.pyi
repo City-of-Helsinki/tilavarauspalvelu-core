@@ -22,7 +22,7 @@ class ModelQuerySet(QuerySet[_TModel_co, _TRow_co], Generic[_TModel_co, _TRow_co
     model: type[_TModel_co]
     query: Query
     _hints: dict[str, Any]
-    _result_cache: list[_TModel_co] | None
+    _result_cache: list[_TRow_co] | None
 
     def __len__(self) -> int: ...
     def __iter__(self) -> Iterator[_TRow_co]: ...
