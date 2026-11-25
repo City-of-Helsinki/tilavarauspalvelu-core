@@ -232,11 +232,7 @@ def test_reservation_created_staff_notification__send_email__no_recipients(outbo
     EmailService.send_reservation_created_staff_notification_email(reservation)
 
     assert len(outbox) == 0
-
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == (
-        "No recipients for the 'Reservation created staff notification' email"
-    )
+    assert SentryLogger.log_message.call_count == 0
 
 
 @pytest.mark.django_db

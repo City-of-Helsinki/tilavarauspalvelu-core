@@ -219,10 +219,6 @@ class EmailService:
 
         recipients_by_language = get_reservation_staff_notification_recipients_by_language(reservation)
         if not recipients_by_language:
-            SentryLogger.log_message(
-                "No recipients for the 'Reservation created staff notification' email",
-                details={"reservation": reservation.pk},
-            )
             return
 
         emails: list[EmailData] = []
