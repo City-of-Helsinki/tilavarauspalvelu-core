@@ -202,6 +202,7 @@ class Migration(migrations.Migration):
             constraint=models.UniqueConstraint(
                 fields=("reservation_unit", "sales_item", "merchant"),
                 name="payment_product_unique_reservation_unit_sales_item_merchant",
+                nulls_distinct=False,
                 violation_error_message="A product already exists for this reservation unit, sales item and merchant.",
             ),
         ),
