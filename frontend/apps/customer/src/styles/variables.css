@@ -26,6 +26,8 @@
   --tilavaraus-stack-order-start-application-bar: 1010;
 
   --tilavaraus-page-max-width: 1200px;
+  /* The width of the HDS Tooltip. HDS has no token for it. */
+  --tilavaraus-tooltip-max-width: 21.875rem;
 }
 
 /* override HDS variables (components define their own variables) */
