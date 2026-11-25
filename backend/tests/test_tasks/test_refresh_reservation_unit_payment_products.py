@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import datetime
+import io
 import uuid
 from decimal import Decimal
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
+from django.core.management import call_command
 from django.test import override_settings
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -524,3 +526,21 @@ def test_refresh_payment_products__old_accounting_task__queues_refresh():
 
     assert mock.call_count == 1
     assert mock.call_args.args == (1,)
+
+
+# ── Command ──────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+def test_refresh_payment_products__command__queues_refresh_for_reservation_units_with_merchant():
+    own_merchant = PaymentMerchantFactory.create()
+    reservation_unit_with_own_merchant = ReservationUnitFactory.create(payment_merchant=own_merchant)
+    merchant_of_unit = PaymentMerchantFactory.create()
+    reservation_unit_with_merchant_of_unit = ReservationUnitFactory.create(unit__payment_merchant=merchant_of_unit)
+    ReservationUnitFactory.create(payment_merchant=None, unit__payment_merchant=None)
+
+    with patch.object(refresh_reservation_unit_payment_products_task, "delay") as mock:
+        call_command("refresh_payment_products", stdout=io.StringIO())
+
+    queued_pks = sorted(call.args[0] for call in mock.call_args_list)
+    expected_pks = sorted([reservation_unit_with_own_merchant.pk, reservation_unit_with_merchant_of_unit.pk])
+    assert queued_pks == expected_pks
