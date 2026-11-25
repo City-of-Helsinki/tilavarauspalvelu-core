@@ -45,7 +45,7 @@ def save_own_pricings(*, reservation_unit: ReservationUnit, pricings: list[OwnPr
     Save the active and future pricings of a reservation unit to its own pricing group.
 
     Each pricing is one base component that lasts until the next pricing begins.
-    Future components that are not in the given pricings are deleted.
+    Future base components that are not in the given pricings are deleted.
     If the reservation unit has no pricing group yet, an own group is made from the first pricing onward.
 
     :raises ValidationError: If the reservation unit uses a shared pricing group, or if the changes are not valid.
@@ -99,7 +99,7 @@ def save_own_pricings(*, reservation_unit: ReservationUnit, pricings: list[OwnPr
         given_pks = {pricing.pk for pricing in sorted_pricings if pricing.pk is not None}
         deleted_component_pks = list(
             PriceComponent.objects
-            .filter(pricing_group=pricing_group, valid_from__gt=today)
+            .filter(pricing_group=pricing_group, kind=PriceComponentKind.BASE, valid_from__gt=today)
             .exclude(pk__in=given_pks)
             .values_list("pk", flat=True)
         )
