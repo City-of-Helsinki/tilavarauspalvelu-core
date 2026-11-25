@@ -6,16 +6,21 @@ from typing import TYPE_CHECKING
 from mypy.checker import TypeChecker
 from mypy.errorcodes import ATTR_DEFINED
 from mypy.maptype import map_instance_to_supertype
+from mypy.nodes import Decorator, FuncBase
 from mypy.plugin import Plugin
 from mypy.types import AnyType, Instance, TypeOfAny, get_proper_type
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from mypy.nodes import TypeInfo
     from mypy.plugin import AttributeContext
     from mypy.types import Type
 
 MODEL_MANAGER = "tilavarauspalvelu.models._base.ModelManager"
+
+# Django marks these public queryset methods `queryset_only`, so the manager does not get them.
+QUERYSET_ONLY_METHODS = frozenset({"as_manager", "delete", "adelete", "resolve_expression"})
 
 
 class ModelManagerPlugin(Plugin):
@@ -45,12 +50,29 @@ def queryset_attribute_type(ctx: AttributeContext, *, name: str) -> Type:
     if not isinstance(queryset_type, Instance):
         return ctx.default_attr_type
 
-    # The manager gets only the public methods, like 'BaseManager._get_queryset_methods' does.
-    if name.startswith("_") or not queryset_type.type.has_readable_member(name):
+    if not is_copied_to_manager(queryset_type.type, name):
         ctx.api.fail(f'"{manager_type.type.name}" has no attribute "{name}"', ctx.context, code=ATTR_DEFINED)
         return AnyType(TypeOfAny.from_error)
 
     return ctx.api.expr_checker.analyze_external_member_access(name, queryset_type, ctx.context)
+
+
+def is_copied_to_manager(queryset_info: TypeInfo, name: str) -> bool:
+    """
+    Check if the manager gets this queryset member, like 'BaseManager._get_queryset_methods' does.
+
+    At runtime, the manager gets only the public plain functions that are not marked `queryset_only`.
+    Properties and classmethods are not plain functions. Staticmethods are, so the manager gets them.
+    """
+    if name.startswith("_") or name in QUERYSET_ONLY_METHODS:
+        return False
+
+    method = queryset_info.get_method(name)
+    if isinstance(method, Decorator):
+        method = method.func
+    if not isinstance(method, FuncBase):
+        return False
+    return not method.is_property and not method.is_class
 
 
 def plugin(_version: str) -> type[Plugin]:
