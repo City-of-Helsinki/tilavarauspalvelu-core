@@ -58,7 +58,9 @@ __all__ = [
     "purge_image_cache_task",
     "rebuild_space_tree_hierarchy_task",
     "refresh_expired_payments_in_verkkokauppa_task",
+    "refresh_reservation_unit_accounting_task",
     "refresh_reservation_unit_payment_products_task",
+    "refresh_reservation_unit_product_mapping_task",
     "remove_old_personal_info_view_logs_task",
     "save_personal_info_view_log_task",
     "send_application_handled_email_task",
@@ -353,6 +355,18 @@ def refresh_reservation_unit_payment_products_task(reservation_unit_pk: int) -> 
         return
 
     reservation_unit.actions.refresh_payment_products()
+
+
+# TODO: Remove in the release after the one that adds 'refresh_reservation_unit_payment_products'.
+@app.task(name="refresh_reservation_unit_product_mapping")
+def refresh_reservation_unit_product_mapping_task(reservation_unit_pk: int) -> None:
+    refresh_reservation_unit_payment_products_task.delay(reservation_unit_pk)
+
+
+# TODO: Remove in the release after the one that adds 'refresh_reservation_unit_payment_products'.
+@app.task(name="refresh_reservation_unit_accounting")
+def refresh_reservation_unit_accounting_task(reservation_unit_pk: int) -> None:
+    refresh_reservation_unit_payment_products_task.delay(reservation_unit_pk)
 
 
 @app.task(name="update_reservation_unit_image_urls")

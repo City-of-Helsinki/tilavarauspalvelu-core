@@ -4,6 +4,7 @@ import datetime
 import uuid
 from decimal import Decimal
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
 import pytest
 from django.test import override_settings
@@ -18,7 +19,11 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentProduct
-from tilavarauspalvelu.tasks import refresh_reservation_unit_payment_products_task
+from tilavarauspalvelu.tasks import (
+    refresh_reservation_unit_accounting_task,
+    refresh_reservation_unit_payment_products_task,
+    refresh_reservation_unit_product_mapping_task,
+)
 from utils.date_utils import local_date
 
 from tests.factories import (
@@ -503,3 +508,19 @@ def test_refresh_payment_products__reservation_unit_does_not_exist__logs_message
     refresh_reservation_unit_payment_products_task(0)
 
     assert SentryLogger.log_message.call_count == 1
+
+
+def test_refresh_payment_products__old_product_mapping_task__queues_refresh():
+    with patch.object(refresh_reservation_unit_payment_products_task, "delay") as mock:
+        refresh_reservation_unit_product_mapping_task(1)
+
+    assert mock.call_count == 1
+    assert mock.call_args.args == (1,)
+
+
+def test_refresh_payment_products__old_accounting_task__queues_refresh():
+    with patch.object(refresh_reservation_unit_payment_products_task, "delay") as mock:
+        refresh_reservation_unit_accounting_task(1)
+
+    assert mock.call_count == 1
+    assert mock.call_args.args == (1,)
