@@ -113,6 +113,15 @@ function getCommonTaxPercentage(taxPercentageList: ReadonlyArray<number>): numbe
   return first;
 }
 
+type MaterialPriceLine = Pick<
+  ReservationPriceCalculationFieldsFragment["lines"][number],
+  "materialPriceDescriptionFi" | "materialPriceDescriptionEn" | "materialPriceDescriptionSv"
+>;
+
+function hasMaterialPriceLine(lineList: ReadonlyArray<MaterialPriceLine>, lang: LocalizationLanguages): boolean {
+  return lineList.some((line) => stripHtml(getTranslation(line, "materialPriceDescription", lang)) !== "");
+}
+
 export function getReservationPriceDisplay(
   price: ReservationPriceCalculationFieldsFragment,
   lang: LocalizationLanguages
@@ -124,9 +133,7 @@ export function getReservationPriceDisplay(
       amount: toNumber(line.amount) ?? 0,
     })),
     taxPercentage: getCommonTaxPercentage(price.lines.map((line) => toNumber(line.taxPercentage) ?? 0)),
-    hasMaterialPrice: price.lines.some(
-      (line) => stripHtml(getTranslation(line, "materialPriceDescription", lang)) !== ""
-    ),
+    hasMaterialPrice: hasMaterialPriceLine(price.lines, lang),
   };
 }
 
@@ -144,9 +151,7 @@ export function getReservationPriceDisplayFromLines(
     total: toNumber(reservation.totalPrice) ?? 0,
     lineList,
     taxPercentage: getCommonTaxPercentage(priceLineList.map((line) => toNumber(line.taxPercentage) ?? 0)),
-    hasMaterialPrice: priceLineList.some(
-      (line) => stripHtml(getTranslation(line, "materialPriceDescription", lang)) !== ""
-    ),
+    hasMaterialPrice: hasMaterialPriceLine(priceLineList, lang),
   };
 }
 
