@@ -2509,6 +2509,9 @@ type PriceComponentNode implements Node {
 enum PriceComponentKind {
   """Base"""
   BASE
+
+  """Surcharge"""
+  SURCHARGE
 }
 
 type TaxLevelNode implements Node {

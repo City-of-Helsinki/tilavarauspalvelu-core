@@ -3053,6 +3053,11 @@ msgid "Base"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "PriceComponentKind"
+msgid "Surcharge"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
 msgctxt "PricingStatus"
 msgid "past"
 msgstr ""

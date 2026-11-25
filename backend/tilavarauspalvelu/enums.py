@@ -880,6 +880,7 @@ class PriceUnit(models.TextChoices):
 
 class PriceComponentKind(models.TextChoices):
     BASE = "BASE", pgettext_lazy("PriceComponentKind", "Base")
+    SURCHARGE = "SURCHARGE", pgettext_lazy("PriceComponentKind", "Surcharge")
 
 
 class PricingStatus(models.TextChoices):

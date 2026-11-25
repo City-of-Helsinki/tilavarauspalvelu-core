@@ -149,6 +149,7 @@ class PriceComponentInline(TranslationStackedInline):
         "tax_level",
         "sales_item",
         "can_apply_for_discount",
+        "is_adjustable",
         "material_price_description",
     ]
     form = PriceComponentForm

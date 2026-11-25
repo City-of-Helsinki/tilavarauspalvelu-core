@@ -3115,6 +3115,11 @@ msgid "Base"
 msgstr "Perushinta"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "PriceComponentKind"
+msgid "Surcharge"
+msgstr "Lisämaksu"
+
+#: tilavarauspalvelu/enums.py
 msgctxt "PricingStatus"
 msgid "past"
 msgstr "mennyt"

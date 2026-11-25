@@ -29,6 +29,7 @@ class PriceComponentFactory(GenericDjangoModelFactory[PriceComponent]):
     price_unit = PriceUnit.PER_HOUR
 
     can_apply_for_discount = False
+    is_adjustable = True
     material_price_description = ""
 
     tax_level = ForeignKeyFactory("tests.factories.TaxLevelFactory", required=True)
