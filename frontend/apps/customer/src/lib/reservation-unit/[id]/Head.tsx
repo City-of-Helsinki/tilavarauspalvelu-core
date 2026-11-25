@@ -146,12 +146,12 @@ const MaterialPriceButton = styled.button`
 
 // Same look as the HDS tooltip
 const MaterialPricePanel = styled.div`
-  max-width: 21.875rem;
+  max-width: var(--tilavaraus-tooltip-max-width);
   padding: var(--spacing-s);
   border: 1px solid var(--color-coat-of-arms);
   background-color: var(--color-coat-of-arms-light);
   font-size: var(--fontsize-body-s);
-  line-height: 24px;
+  line-height: var(--lineheight-xl);
 `;
 
 type UnitPriceProps = Readonly<{
@@ -164,6 +164,7 @@ function UnitPrice({ priceSummary, subventionSuffix }: UnitPriceProps): React.Re
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const materialPriceDescription = getMaterialPriceDescription(priceSummary, lang);
+  const materialPricePanelId = React.useId();
 
   if (materialPriceDescription === "") {
     return (
@@ -180,13 +181,18 @@ function UnitPrice({ priceSummary, subventionSuffix }: UnitPriceProps): React.Re
     <>
       {amountString != null && `${amountString} + `}
       <Popover
-        renderTrigger={(triggerProps) => (
-          <MaterialPriceButton {...triggerProps} type="button">
+        renderTrigger={(triggerProps, isOpen) => (
+          <MaterialPriceButton
+            {...triggerProps}
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls={isOpen ? materialPricePanelId : undefined}
+          >
             {materialPriceText}
           </MaterialPriceButton>
         )}
       >
-        <MaterialPricePanel>
+        <MaterialPricePanel id={materialPricePanelId} role="dialog" aria-label={capitalize(t("prices:materialPrice"))}>
           <Sanitize html={materialPriceDescription} />
         </MaterialPricePanel>
       </Popover>

@@ -54,6 +54,14 @@ function createPriceSummary(overrides: Partial<PriceSummary> = {}): PriceSummary
   };
 }
 
+/// Finds the element that has the full text, when the text is split over child elements
+function getByFullText(text: string): HTMLElement {
+  return screen.getByText(
+    (_content, element) =>
+      element?.textContent === text && [...element.children].every((child) => child.textContent !== text)
+  );
+}
+
 describe("Head", () => {
   beforeEach(() => {
     vi.mocked(getReservationUnitAccessPeriods).mockReturnValue([]);
@@ -140,9 +148,7 @@ describe("Head", () => {
     expect(screen.getByText("Meeting room")).toBeInTheDocument();
     expect(screen.getByLabelText("reservationUnit:maxPersons")).toBeInTheDocument();
     expect(screen.getByLabelText("reservationCalendar:eventDuration")).toBeInTheDocument();
-    expect(screen.getByText(/^0–20 €\/prices:priceUnits.PER_HOUR/)).toHaveTextContent(
-      "0–20 €/prices:priceUnits.PER_HOUR: Subvention"
-    );
+    expect(getByFullText("0–20\u00A0€/prices:priceUnits.PER_HOUR: Subvention")).toBeInTheDocument();
   });
 
   test("shows a fixed price without the subvention suffix when the customer can not apply for a discount", () => {
@@ -215,8 +221,8 @@ describe("Head", () => {
 
     await user.click(screen.getByRole("button", { name: "Tooltip" }));
 
-    expect(screen.getByText(new RegExp(`reservationUnit:accessTypes.${AccessType.Unrestricted}`))).toBeInTheDocument();
-    expect(screen.getByText(/common:dateGte/)).toBeInTheDocument();
+    expect(screen.getByText(`reservationUnit:accessTypes.${AccessType.Unrestricted}:`)).toBeInTheDocument();
+    expect(screen.getByText(`common:dateGte ${JSON.stringify({ value: "2.6.2024" })}`)).toBeInTheDocument();
   });
 
   test("opens the material price description from the material price word", async () => {
@@ -230,13 +236,15 @@ describe("Head", () => {
       />
     );
 
-    expect(screen.getByText(/^20,00 €\/prices:priceUnits.PER_HOUR \+/)).toHaveTextContent(
-      "20,00 €/prices:priceUnits.PER_HOUR + prices:materialPrice"
-    );
+    expect(getByFullText("20,00\u00A0€/prices:priceUnits.PER_HOUR + prices:materialPrice")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Tooltip" })).not.toBeInTheDocument();
     expect(screen.queryByText("Extra fee applies")).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "prices:materialPrice" }));
-    expect(screen.getByText("Extra fee applies")).toBeInTheDocument();
+    const trigger = screen.getByRole("button", { name: "prices:materialPrice" });
+    expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
+    await user.click(trigger);
+    const panel = screen.getByRole("dialog", { name: "Prices:materialPrice" });
+    expect(panel).toHaveTextContent("Extra fee applies");
+    expect(trigger).toHaveAttribute("aria-controls", panel.id);
   });
 
   test("shows only the material price word when the unit is free of charge and has a material price", () => {
@@ -271,8 +279,9 @@ describe("Head", () => {
       />
     );
 
-    const price = screen.getByText(/^0–20 €\/prices:priceUnits.PER_HOUR \+/);
-    expect(price).toHaveTextContent("0–20 €/prices:priceUnits.PER_HOUR + prices:materialPriceSubvention");
+    expect(
+      getByFullText("0–20\u00A0€/prices:priceUnits.PER_HOUR + prices:materialPriceSubvention")
+    ).toBeInTheDocument();
     expect(screen.getByText("Subvention")).toBeInTheDocument();
   });
 });
