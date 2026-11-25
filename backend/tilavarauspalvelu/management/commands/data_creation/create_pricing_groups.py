@@ -153,6 +153,8 @@ def create_payment_products(*, reservation_units: list[ReservationUnit]) -> None
     pairs = (
         ReservationUnitPricingGroup.objects
         .filter(reservation_unit__in=reservation_units, pricing_group__components__sales_item__isnull=False)
+        # The default ordering has 'begins', and 'distinct()' would then keep a pair once for each begin date.
+        .order_by()
         .values_list("reservation_unit_id", "pricing_group__components__sales_item_id")
         .distinct()
     )
