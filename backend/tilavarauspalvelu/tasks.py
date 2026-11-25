@@ -15,6 +15,7 @@ from django.db import transaction
 from config.celery import app
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateProductError
 from tilavarauspalvelu.management.commands.data_creation.create_robot_test_data import create_robot_test_data
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
@@ -336,7 +337,8 @@ def create_statistics_for_reservations_task(reservation_pks: list[int]) -> None:
 
 @app.task(
     name="refresh_reservation_unit_payment_products",
-    autoretry_for=(TypeError,),
+    # The refresh skips the products that exist, so a retry continues where the failed run stopped.
+    autoretry_for=(TypeError, CreateProductError),
     max_retries=5,
     retry_backoff=True,
 )
