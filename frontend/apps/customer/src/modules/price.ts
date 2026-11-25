@@ -24,7 +24,14 @@ export function formatPrice(price: number, isCurrency: boolean, lang: Localizati
 export function formatDecimalRange(min: number, max: number, lang: LocalizationLanguages = "fi"): string {
   const isWhole = Number.isInteger(min) && Number.isInteger(max);
   const formatter = getFormatters(lang)[isWhole ? "currency" : "currencyWithDecimals"];
-  return formatter?.formatRange(min, max) ?? "";
+  if (formatter == null) {
+    return "";
+  }
+  // Firefox before 116 and Safari before 15.4 do not have formatRange
+  if (typeof formatter.formatRange !== "function") {
+    return `${formatter.format(min)}–${formatter.format(max)}`;
+  }
+  return formatter.formatRange(min, max);
 }
 
 function getPriceUnitString(t: TFunction, priceUnit: PriceUnit): string {
