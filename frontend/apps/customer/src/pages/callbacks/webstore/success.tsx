@@ -5,10 +5,10 @@ import { serverSideTranslations } from "next-i18next/pages/serverSideTranslation
 import { useRouter } from "next/router";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
-import { OrderStatus, ReservationStateChoice, useReservationStateQuery } from "@gql/gql-types";
-import type { ReservationStateQuery } from "@gql/gql-types";
+import { OrderStatus, useReservationStateQuery } from "@gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { WEBSTORE_SUCCESS_POLL_INTERVAL_MS, WEBSTORE_SUCCESS_POLL_TIMEOUT_MS } from "@/modules/const";
+import { getWebstoreSuccessRedirectUrl } from "@/modules/reservation";
 import { getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
 
@@ -38,7 +38,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundValue;
   }
 
-  const destination = getRedirectUrl(reservation);
+  const destination = getWebstoreSuccessRedirectUrl(reservation);
   if (destination != null) {
     return {
       redirect: {
@@ -58,31 +58,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-}
-
-type QueryT = NonNullable<ReservationStateQuery["reservation"]>;
-type RedirectProps = Pick<QueryT, "state" | "pk" | "paymentOrder">;
-
-/// @returns the url of the reservation or null if the reservation is still waiting for payment
-/// because payments are done with webhooks, we might need to wait for it
-/// the reservation is valid (and should be payed) but wait for the backend to confirm it
-function getRedirectUrl(reservation: RedirectProps): string | null {
-  switch (reservation.state) {
-    case ReservationStateChoice.RequiresHandling:
-      return getReservationPath(reservation.pk, undefined, "requires_handling");
-    case ReservationStateChoice.Confirmed:
-      if (!reservation.paymentOrder?.handledPaymentDueBy) {
-        return getReservationPath(reservation.pk, undefined, "confirmed");
-      }
-      return getReservationPath(reservation.pk, undefined, "paid");
-    case ReservationStateChoice.WaitingForPayment:
-      return null;
-    case ReservationStateChoice.Cancelled:
-    case ReservationStateChoice.Created:
-    case ReservationStateChoice.Denied:
-    case null:
-      return "/reservations?error=order1";
-  }
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -118,7 +93,7 @@ export default function Page({ reservation }: NarrowedProps): React.ReactElement
     ) {
       return;
     }
-    const redirectUrl = getRedirectUrl(reservation);
+    const redirectUrl = getWebstoreSuccessRedirectUrl(reservation);
     if (redirectUrl != null) {
       stopPolling();
       void router.replace(redirectUrl);
