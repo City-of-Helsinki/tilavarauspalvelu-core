@@ -952,7 +952,7 @@ type ReservationUnitNode implements Node {
   haukiUrl: String
 
   """
-  Summary of the base prices of the pricing group that the reservation unit uses on the date.
+  Summary of the prices of the pricing group that the reservation unit uses on the date.
   """
   priceSummary(
     """The date of the prices. Today if not given."""
