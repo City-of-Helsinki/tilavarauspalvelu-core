@@ -2,7 +2,8 @@ import datetime
 from collections.abc import Collection, Iterable, Iterator, Mapping, Sequence
 from typing import Any, ClassVar, Generic, Literal, Self, TypeVar
 
-from django.db.models import Combinable, Model, OrderBy, QuerySet
+from django.db.models import Model, OrderBy, QuerySet
+from django.db.models.expressions import Combinable
 from django.db.models.manager import Manager
 from django.db.models.sql import Query
 from mptt.managers import TreeManager
