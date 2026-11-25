@@ -1298,14 +1298,14 @@ Django = ">=2.2"
 
 [[package]]
 name = "django-mptt"
-version = "0.21.1"
+version = "0.22.0"
 description = "Utilities for implementing Modified Preorder Tree Traversal with your Django Models and working with trees of Model instances."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "django_mptt-0.21.1-py3-none-any.whl", hash = "sha256:6f4dc3d26f0e0422fb185698a03351e7200b2a1222969af879e383adc4c292b8"},
-    {file = "django_mptt-0.21.1.tar.gz", hash = "sha256:dda7e42bce6dc77bccef44c5c58263c435bf7b7272ea8534e194c355fc73c746"},
+    {file = "django_mptt-0.22.0-py3-none-any.whl", hash = "sha256:2101e98d04230b4eeff8c7d5ed7fc3382a219ac74b5085a450cc1a3335e763d6"},
+    {file = "django_mptt-0.22.0.tar.gz", hash = "sha256:9db42a5d1af9ae732cddf3235d6af0dabf9b8ec9ff89f21147af059d61189a02"},
 ]
 
 [package.dependencies]
@@ -4076,4 +4076,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "db4703c392c95ae42916d8733e8875b210b6a91b052151cf243e3fa3d3593959"
+content-hash = "f710c2ad4a1ebe3b4f4b72c5b17399b2313ceaab1bbeef9fe15ff466637bde55"
