@@ -104,6 +104,11 @@ test-all *args:
 test-migrate *args:
     @{{ pytest }} --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
 
+# Run only migration tests, with migrations
+[positional-arguments]
+test-migrations *args:
+    @{{ pytest }} --reuse-db -n {{ pytest_workers }} tests/test_migrations "$@"
+
 # Recreate the test database with migrations, then run tests. Skips slow tests.
 [positional-arguments]
 test-fresh *args:
