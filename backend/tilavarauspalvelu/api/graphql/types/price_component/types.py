@@ -23,6 +23,7 @@ class PriceComponentNode(DjangoNode[PriceComponent, AnyUser]):
             "amount",
             "price_unit",
             "can_apply_for_discount",
+            "is_adjustable",
             "material_price_description",
             "tax_level",
             "sales_item",

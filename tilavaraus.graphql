@@ -2494,6 +2494,7 @@ type PriceComponentNode implements Node {
   amount: Decimal!
   priceUnit: PriceUnit!
   canApplyForDiscount: Boolean!
+  isAdjustable: Boolean!
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
@@ -4450,12 +4451,14 @@ input PricingGroupComponentsUpdateMutationInput {
 
 input UpdatePriceComponentInputSerializerInput {
   pk: Int
+  kind: PriceComponentKind
   validFrom: Date
   validUntil: Date
   priceOption: Int
   amount: Decimal
   priceUnit: PriceUnit
   canApplyForDiscount: Boolean
+  isAdjustable: Boolean
   materialPriceDescription: String
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String

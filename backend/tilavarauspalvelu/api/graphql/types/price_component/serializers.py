@@ -23,12 +23,14 @@ class PriceComponentInputSerializer(NestingModelSerializer[PriceComponent]):
         model = PriceComponent
         fields = [
             "pk",
+            "kind",
             "valid_from",
             "valid_until",
             "price_option",
             "amount",
             "price_unit",
             "can_apply_for_discount",
+            "is_adjustable",
             "material_price_description",
             "tax_level",
             "sales_item",

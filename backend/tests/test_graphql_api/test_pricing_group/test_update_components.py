@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import pytest
 
-from tilavarauspalvelu.enums import PriceUnit, UserRoleChoice
+from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit, UserRoleChoice
 from tilavarauspalvelu.models import PriceComponent
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
@@ -161,6 +161,109 @@ def test_pricing_group__update_components__left_out_fields_keep_saved_values(gra
     assert active.valid_until == change_date
     assert active.amount == Decimal(10)
     assert active.can_apply_for_discount is True
+
+
+# ── Surcharges ──
+
+
+def test_pricing_group__update_components__add_surcharge(graphql):
+    today = local_date()
+    change_date = today + datetime.timedelta(days=10)
+
+    pricing_group = PricingGroupFactory.create()
+    base = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=today - datetime.timedelta(days=10))
+
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": pricing_group.pk,
+        "components": [
+            {
+                "kind": PriceComponentKind.SURCHARGE,
+                "validFrom": change_date.isoformat(),
+                "amount": "5.00",
+                "priceUnit": PriceUnit.PER_HOUR,
+                "taxLevel": base.tax_level.pk,
+                "canApplyForDiscount": True,
+                "isAdjustable": False,
+            },
+        ],
+    }
+    response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+    surcharge = PriceComponent.objects.exclude(pk=base.pk).get(pricing_group=pricing_group)
+    assert surcharge.kind == PriceComponentKind.SURCHARGE
+    assert surcharge.valid_from == change_date
+    assert surcharge.amount == Decimal(5)
+    assert surcharge.can_apply_for_discount is True
+    assert surcharge.is_adjustable is False
+
+
+def test_pricing_group__update_components__new_component_is_base_and_adjustable_by_default(graphql):
+    pricing_group = PricingGroupFactory.create()
+
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": pricing_group.pk,
+        "components": [new_component_input()],
+    }
+    response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+    component = PriceComponent.objects.get(pricing_group=pricing_group)
+    assert component.kind == PriceComponentKind.BASE
+    assert component.is_adjustable is True
+
+
+def test_pricing_group__update_components__base_component_must_be_adjustable(graphql):
+    pricing_group = PricingGroupFactory.create()
+
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": pricing_group.pk,
+        "components": [{**new_component_input(), "isAdjustable": False}],
+    }
+    response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_messages() == ["A base component must be adjustable."]
+    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_BASE_NOT_ADJUSTABLE]
+
+    assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
+
+
+def test_pricing_group__update_components__surcharge_amount_cannot_be_negative(graphql):
+    today = local_date()
+
+    pricing_group = PricingGroupFactory.create()
+    base = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=today - datetime.timedelta(days=10))
+
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": pricing_group.pk,
+        "components": [
+            {
+                "kind": PriceComponentKind.SURCHARGE,
+                "validFrom": (today + datetime.timedelta(days=10)).isoformat(),
+                "amount": "-1.00",
+                "priceUnit": PriceUnit.PER_HOUR,
+                "taxLevel": base.tax_level.pk,
+            },
+        ],
+    }
+    response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_messages() == ["Amount cannot be negative."]
+    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE]
+
+    assert list(PriceComponent.objects.filter(pricing_group=pricing_group)) == [base]
 
 
 # ── Edit rules ──
