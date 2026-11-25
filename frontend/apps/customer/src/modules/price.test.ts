@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import type { TFunction } from "i18next";
 import { PriceUnit } from "@gql/gql-types";
 import { formatDecimalRange, getPriceSummaryString } from "./price";
@@ -92,5 +92,24 @@ describe("formatDecimalRange", () => {
   test("formats the range in the language of the page", () => {
     expect(formatDecimalRange(0, 40, "sv")).toBe("0–40\u00A0€");
     expect(formatDecimalRange(0, 40.5, "en")).toBe("€0.00 – €40.50");
+  });
+
+  describe("in a browser without formatRange", () => {
+    const formatRangeDescriptor = Object.getOwnPropertyDescriptor(Intl.NumberFormat.prototype, "formatRange");
+
+    beforeEach(() => {
+      // @ts-expect-error -- Firefox 115 and older Safari do not have the method
+      delete Intl.NumberFormat.prototype.formatRange;
+    });
+
+    afterEach(() => {
+      if (formatRangeDescriptor != null) {
+        Object.defineProperty(Intl.NumberFormat.prototype, "formatRange", formatRangeDescriptor);
+      }
+    });
+
+    test("formats both ends separately", () => {
+      expect(formatDecimalRange(0, 40, "fi")).toBe("0 €–40 €");
+    });
   });
 });
