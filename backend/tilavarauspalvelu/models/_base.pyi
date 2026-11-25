@@ -17,6 +17,19 @@ _TRow_co = TypeVar("_TRow_co", covariant=True, default=_TModel_co)
 _TMPTTModel_co = TypeVar("_TMPTTModel_co", bound=MPTTModel, covariant=True)
 _TTreeRow_co = TypeVar("_TTreeRow_co", covariant=True, default=_TMPTTModel_co)
 
+# Design choices of this stub. Tested with django-stubs 6.1.2 and mypy 2.4.1.
+#
+# - `values`, `values_list`, `dates` and `datetimes` return `Self`, so that the custom queryset methods stay
+#   available. django-stubs returns a plain `QuerySet`.
+# - The row type still works. The django-stubs plugin picks its `values` and `values_list` hooks by method name,
+#   and it checks only that the class has `QuerySet` as a base. If a later django-stubs version changes this,
+#   the row types break.
+# - `dates` and `datetimes` have no plugin hook, so their row type stays the model. This is a known inaccuracy.
+# - `union`, `intersection`, `difference`, `__and__` and `__or__` accept only the same queryset type.
+#   django-stubs accepts any `QuerySet`.
+# - `contains` accepts only the model of the queryset. django-stubs accepts any `Model`.
+# - The manager methods return the custom queryset type. The plugin in 'utils/mypy_plugin.py' adds the custom
+#   queryset methods to the manager.
 class ModelQuerySet(QuerySet[_TModel_co, _TRow_co], Generic[_TModel_co, _TRow_co]):  # noqa: UP046
     model: type[_TModel_co]
     query: Query
