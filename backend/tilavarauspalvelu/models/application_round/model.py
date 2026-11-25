@@ -74,7 +74,7 @@ class ApplicationRound(models.Model):
     handled_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
 
-    application_form: ApplicationFormType = TextChoicesField(  # type: ignore[assignment]
+    application_form = TextChoicesField(
         enum=ApplicationFormType,
         default=ApplicationFormType.DEFAULT_FORM,
     )
