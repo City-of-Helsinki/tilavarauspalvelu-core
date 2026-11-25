@@ -89,17 +89,17 @@ schema:
 pytest := "pytest -c pyproject.toml --disable-warnings"
 pytest_workers := env("PYTEST_WORKERS", "8")
 
-# Run tests. Skips slow tests and migrations. Reuses the test database.
+# Run tests. Skips slow tests, migrations and migration tests. Reuses the test database.
 [positional-arguments]
 test *args:
     @{{ pytest }} --no-migrations --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
 
-# Run tests, including slow tests
+# Run tests, including slow tests. Skips migrations and migration tests.
 [positional-arguments]
 test-all *args:
     @{{ pytest }} --no-migrations --reuse-db -n {{ pytest_workers }} "$@"
 
-# Run tests with migrations. Skips slow tests.
+# Run tests with migrations, including migration tests. Skips slow tests.
 [positional-arguments]
 test-migrate *args:
     @{{ pytest }} --reuse-db --skip-slow -n {{ pytest_workers }} "$@"
