@@ -125,6 +125,9 @@ def set_payment_products_of_reservation_units(apps, schema_editor):
     """
     Give each reservation unit one of its products, preferably one of its current merchant.
     Among equal products, the one with the lowest id is used.
+
+    Rollback is not supported after a refresh has made products for sales items.
+    Their ids are not made from the reservation unit pk alone, so the next upgrade cannot link them and stops.
     """
     ReservationUnit = apps.get_model("tilavarauspalvelu", "ReservationUnit")
     PaymentProduct = apps.get_model("tilavarauspalvelu", "PaymentProduct")
