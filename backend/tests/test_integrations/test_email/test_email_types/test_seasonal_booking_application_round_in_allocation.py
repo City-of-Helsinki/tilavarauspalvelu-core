@@ -225,12 +225,14 @@ def test_seasonal_booking_application_round_in_allocation__send_email__multiple_
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
+@patch_method(SentryLogger.log_message)
 def test_seasonal_booking_application_round_in_allocation__send_email__wrong_status(outbox):
     ApplicationFactory.create_in_status_expired()
 
     EmailService.send_seasonal_booking_application_round_in_allocation_emails()
 
     assert len(outbox) == 0
+    assert SentryLogger.log_message.call_count == 0
 
 
 @pytest.mark.django_db
