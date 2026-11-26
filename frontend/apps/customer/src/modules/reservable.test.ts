@@ -266,6 +266,15 @@ describe("isStartTimeValid", () => {
 });
 
 describe("isRangeReservable", () => {
+  beforeEach(() => {
+    vi.useFakeTimers({
+      now: new Date(2024, 0, 1, 9, 0, 0),
+    });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   function createInput({
     start,
     end,
