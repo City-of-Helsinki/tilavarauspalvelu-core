@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
@@ -11,13 +12,16 @@ from utils.date_utils import local_date, local_datetime
 
 from tests.factories import TaxLevelFactory, TaxLevelRateFactory
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_tax_levels__query(graphql):
+def test_tax_levels__query(graphql: GraphQLClient) -> None:
     today = local_date()
 
     tax_level_1 = TaxLevelFactory.create(name="Yleinen", rates__percentage=Decimal(24))
@@ -36,7 +40,7 @@ def test_tax_levels__query(graphql):
     assert response.node(1) == {"nameFi": "Veroton", "currentPercentage": "0.00"}
 
 
-def test_tax_levels__query__current_percentage_changes_with_date(graphql):
+def test_tax_levels__query__current_percentage_changes_with_date(graphql: GraphQLClient) -> None:
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal(24), rates__begins=datetime.date(2024, 1, 1))
     TaxLevelRateFactory.create(tax_level=tax_level, begins=datetime.date(2024, 9, 1), percentage=Decimal("25.5"))
 
@@ -55,7 +59,7 @@ def test_tax_levels__query__current_percentage_changes_with_date(graphql):
     assert response.node(0) == {"currentPercentage": "25.50"}
 
 
-def test_tax_levels__query__no_rate_in_effect(graphql):
+def test_tax_levels__query__no_rate_in_effect(graphql: GraphQLClient) -> None:
     today = local_date()
 
     tax_level = TaxLevelFactory.create(name="Uusi", rates=[])
