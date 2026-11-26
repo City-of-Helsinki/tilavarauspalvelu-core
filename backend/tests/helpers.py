@@ -4,7 +4,7 @@ import re
 from contextlib import contextmanager
 from functools import wraps
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, Self, cast
 from unittest import mock
 from unittest.mock import patch
 
@@ -27,13 +27,14 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.enums import UserRoleChoice
     from tilavarauspalvelu.models import User
-    from tilavarauspalvelu.typing import HTTPMethod, Lang
+    from tilavarauspalvelu.typing import AnonymousUser, HTTPMethod, Lang
 
 __all__ = [
     "GQLResponse",
     "GraphQLClient",
     "ResponseMock",
     "TranslationsFromPOFiles",
+    "anonymous_user",
     "as_mock",
     "exact",
 ]
@@ -282,10 +283,10 @@ class TranslationsFromPOFiles:
         raise LookupError(msg)
 
 
-def as_mock(method: Callable[..., Any]) -> mock.Mock:
+def as_mock(method: object) -> mock.Mock:
     """
-    Return the mock that a patch has put in place of the given method.
-    mypy sees the method with its original type, so use this to read the attributes of the mock.
+    Return the mock that a patch has put in place of the given method or object.
+    mypy sees the original type, so use this to read the attributes of the mock.
 
     >>> @patch_method(MyClass.my_method)
     >>> def test_something() -> None:
@@ -296,6 +297,16 @@ def as_mock(method: Callable[..., Any]) -> mock.Mock:
         msg = f"'{method}' is not patched with a mock."
         pytest.fail(msg)
     return method
+
+
+def anonymous_user() -> AnonymousUser:
+    """
+    Return an anonymous user with the type that the code expects.
+    The user model module adds the 'permissions' attribute to the Django class at import time.
+    """
+    from django.contrib.auth.models import AnonymousUser as DjangoAnonymousUser
+
+    return cast("AnonymousUser", DjangoAnonymousUser())
 
 
 def exact(msg: str) -> str:
