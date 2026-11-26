@@ -113,6 +113,7 @@ describe("Component: ReservationInfoCard", () => {
             priceSummary: {
               isFree: false,
               lowestAmount: "10.00",
+              highestAmount: "10.00",
               priceUnit: PriceUnit.PerHour,
               canApplyForDiscount: false,
               materialPriceDescriptionFi: "<p>Materiaali</p>",

@@ -36,7 +36,7 @@ pytestmark = [
 FIELDS = """
     nextPriceChange {
         begins
-        summary { isFree lowestAmount priceUnit varies canApplyForDiscount taxPercentage }
+        summary { isFree lowestAmount highestAmount priceUnit varies canApplyForDiscount taxPercentage }
     }
 """
 
@@ -72,6 +72,7 @@ def test_reservation_unit__query__next_price_change__pricing_group_changes(graph
             "summary": {
                 "isFree": False,
                 "lowestAmount": "30.00",
+                "highestAmount": "30.00",
                 "priceUnit": PriceUnit.PER_HOUR.value,
                 "varies": False,
                 "canApplyForDiscount": False,
@@ -162,6 +163,7 @@ def test_reservation_unit__query__next_price_change__component_changes(graphql):
             "summary": {
                 "isFree": False,
                 "lowestAmount": "25.00",
+                "highestAmount": "25.00",
                 "priceUnit": PriceUnit.FIXED.value,
                 "varies": False,
                 "canApplyForDiscount": True,
@@ -269,6 +271,7 @@ def test_reservation_unit__query__next_price_change__change_without_summary_chan
         begins=datetime.date(2026, 1, 1),
     )
     cheap_option = PriceOptionFactory.create(unit_group=unit_group)
+    middle_option = PriceOptionFactory.create(unit_group=unit_group)
     expensive_option = PriceOptionFactory.create(unit_group=unit_group)
     PriceComponentFactory.create(
         pricing_group=pricing_group,
@@ -280,21 +283,27 @@ def test_reservation_unit__query__next_price_change__change_without_summary_chan
         pricing_group=pricing_group,
         valid_from=datetime.date(2026, 1, 1),
         valid_until=datetime.date(2026, 2, 1),
+        price_option=middle_option,
+        amount=Decimal(20),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=datetime.date(2026, 2, 1),
+        price_option=middle_option,
+        amount=Decimal(25),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=datetime.date(2026, 1, 1),
+        valid_until=datetime.date(2026, 3, 1),
         price_option=expensive_option,
         amount=Decimal(30),
     )
     PriceComponentFactory.create(
         pricing_group=pricing_group,
-        valid_from=datetime.date(2026, 2, 1),
-        valid_until=datetime.date(2026, 3, 1),
-        price_option=expensive_option,
-        amount=Decimal(40),
-    )
-    PriceComponentFactory.create(
-        pricing_group=pricing_group,
         valid_from=datetime.date(2026, 3, 1),
         price_option=expensive_option,
-        amount=Decimal(10),
+        amount=Decimal(40),
     )
 
     query = reservation_unit_query(fields=FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
@@ -302,7 +311,7 @@ def test_reservation_unit__query__next_price_change__change_without_summary_chan
 
     assert response.has_errors is False, response
     assert response.first_query_object["nextPriceChange"]["begins"] == "2026-03-01"
-    assert response.first_query_object["nextPriceChange"]["summary"]["varies"] is False
+    assert response.first_query_object["nextPriceChange"]["summary"]["highestAmount"] == "40.00"
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))

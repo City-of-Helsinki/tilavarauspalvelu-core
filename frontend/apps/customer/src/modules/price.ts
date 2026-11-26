@@ -41,7 +41,8 @@ export function getMaterialPriceDescription(
 }
 
 /// The price of a reservation unit for search cards, lists and the reservation unit page.
-/// If the customer can apply for a discount, the price is a range from 0 to the normal price.
+/// The price is a range up to the highest price if the prices differ.
+/// If the customer can apply for a discount, the range starts from 0.
 export function getPriceSummaryString(
   t: TFunction,
   priceSummary: PriceSummary | null | undefined,
@@ -51,13 +52,15 @@ export function getPriceSummaryString(
     return null;
   }
   const hasMaterialPrice = getMaterialPriceDescription(priceSummary, lang) !== "";
-  const amount = toNumber(priceSummary.lowestAmount) ?? 0;
-  if (priceSummary.isFree || amount === 0) {
+  const highestAmount = toNumber(priceSummary.highestAmount) ?? 0;
+  if (priceSummary.isFree || highestAmount === 0) {
     return hasMaterialPrice ? capitalize(t("prices:materialPrice")) : t("prices:priceFree");
   }
-  const priceString = priceSummary.canApplyForDiscount
-    ? `${formatPrice(0, false, lang)} - ${formatPrice(amount, true, lang)}`
-    : formatPrice(amount, true, lang);
+  const lowestAmount = priceSummary.canApplyForDiscount ? 0 : (toNumber(priceSummary.lowestAmount) ?? 0);
+  const priceString =
+    lowestAmount < highestAmount
+      ? `${formatPrice(lowestAmount, false, lang)} - ${formatPrice(highestAmount, true, lang)}`
+      : formatPrice(highestAmount, true, lang);
   const materialPriceString = hasMaterialPrice ? ` + ${t("prices:materialPrice")}` : "";
   return `${priceString}${getPriceUnitString(t, priceSummary.priceUnit)}${materialPriceString}`;
 }
@@ -68,6 +71,7 @@ export const PRICE_SUMMARY_FRAGMENT = gql`
     priceSummary {
       isFree
       lowestAmount
+      highestAmount
       priceUnit
       canApplyForDiscount
       materialPriceDescriptionFi
