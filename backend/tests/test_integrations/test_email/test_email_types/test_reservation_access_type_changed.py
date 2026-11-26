@@ -21,7 +21,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationFactory, ReservationFactory, UserFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.helpers import TranslationsFromPOFiles, as_mock, patch_method
 from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
@@ -51,6 +51,9 @@ from tests.test_integrations.test_email.helpers import (
 )
 
 if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
+    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import Lang
 
 
@@ -217,7 +220,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context(lang: Lang):
+def test_reservation_access_type_changed__get_context(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
@@ -229,7 +232,7 @@ def test_reservation_access_type_changed__get_context(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context__get_mock_data(lang: Lang):
+def test_reservation_access_type_changed__get_context__get_mock_data(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
@@ -245,7 +248,7 @@ def test_reservation_access_type_changed__get_context__get_mock_data(lang: Lang)
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info())
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context__access_code(email_reservation):
+def test_reservation_access_type_changed__get_context__access_code(email_reservation: Reservation) -> None:
     expected = {
         **LANGUAGE_CONTEXT["en"],
         **KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
@@ -266,7 +269,7 @@ def test_reservation_access_type_changed__get_context__access_code(email_reserva
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info(access_code_is_active=False))
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context__access_code__inactive(email_reservation):
+def test_reservation_access_type_changed__get_context__access_code__inactive(email_reservation: Reservation) -> None:
     expected = {
         **LANGUAGE_CONTEXT["en"],
         **KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
@@ -290,7 +293,7 @@ def test_reservation_access_type_changed__get_context__access_code__inactive(ema
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info())
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context__instance__access_code(email_reservation):
+def test_reservation_access_type_changed__get_context__instance__access_code(email_reservation: Reservation) -> None:
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()
 
@@ -309,7 +312,9 @@ def test_reservation_access_type_changed__get_context__instance__access_code(ema
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info(access_code_is_active=False))
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context__instance__access_code__inactive(email_reservation):
+def test_reservation_access_type_changed__get_context__instance__access_code__inactive(
+    email_reservation: Reservation,
+) -> None:
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()
 
@@ -328,7 +333,7 @@ def test_reservation_access_type_changed__get_context__instance__access_code__in
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context__opened_by_staff(lang: Lang):
+def test_reservation_access_type_changed__get_context__opened_by_staff(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         **KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
@@ -348,7 +353,7 @@ def test_reservation_access_type_changed__get_context__opened_by_staff(lang: Lan
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context__physical_key(lang: Lang):
+def test_reservation_access_type_changed__get_context__physical_key(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         **KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
@@ -368,7 +373,7 @@ def test_reservation_access_type_changed__get_context__physical_key(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__get_context__unrestricted(lang: Lang):
+def test_reservation_access_type_changed__get_context__unrestricted(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         **KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
@@ -390,7 +395,7 @@ def test_reservation_access_type_changed__get_context__unrestricted(lang: Lang):
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__render__text():
+def test_reservation_access_type_changed__render__text() -> None:
     context = get_mock_data(
         email_type=EmailType.RESERVATION_ACCESS_TYPE_CHANGED,
         access_code_is_used=True,
@@ -438,7 +443,7 @@ def test_reservation_access_type_changed__render__text():
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__render__html():
+def test_reservation_access_type_changed__render__html() -> None:
     context = get_mock_data(
         email_type=EmailType.RESERVATION_ACCESS_TYPE_CHANGED,
         access_code_is_used=True,
@@ -488,7 +493,7 @@ def test_reservation_access_type_changed__render__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__send_email(outbox):
+def test_reservation_access_type_changed__send_email(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -512,7 +517,7 @@ def test_reservation_access_type_changed__send_email(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(SentryLogger.log_message)
-def test_reservation_access_type_changed__send_email__no_recipients(outbox):
+def test_reservation_access_type_changed__send_email__no_recipients(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         reservee_email="",
         user__email="",
@@ -528,14 +533,19 @@ def test_reservation_access_type_changed__send_email__no_recipients(outbox):
 
     assert len(outbox) == 0
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation access type changed' email"
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert (
+        as_mock(SentryLogger.log_message).call_args.args[0]
+        == "No recipients for the 'reservation access type changed' email"
+    )
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-02")
-def test_reservation_access_type_changed__send_email__reservation_in_the_past(outbox):
+def test_reservation_access_type_changed__send_email__reservation_in_the_past(
+    outbox: list[EmailMultiAlternatives],
+) -> None:
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -555,7 +565,7 @@ def test_reservation_access_type_changed__send_email__reservation_in_the_past(ou
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__send_email__behalf_reservation(outbox):
+def test_reservation_access_type_changed__send_email__behalf_reservation(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         type=ReservationTypeChoice.BEHALF,
         reservee_email="reservee@email.com",
@@ -576,7 +586,9 @@ def test_reservation_access_type_changed__send_email__behalf_reservation(outbox)
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__send_email__seasonal_reservation(outbox):
+def test_reservation_access_type_changed__send_email__seasonal_reservation(
+    outbox: list[EmailMultiAlternatives],
+) -> None:
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
         user=user,
@@ -592,6 +604,7 @@ def test_reservation_access_type_changed__send_email__seasonal_reservation(outbo
         allocated_time_slot__reservation_unit_option__application_section__application=application,
     )
     reservation = reservation_series.reservations.first()
+    assert reservation is not None
 
     EmailService.send_reservation_access_type_changed_email(reservation)
 
@@ -604,7 +617,9 @@ def test_reservation_access_type_changed__send_email__seasonal_reservation(outbo
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_access_type_changed__send_email__seasonal_reservation_without_application_section(outbox):
+def test_reservation_access_type_changed__send_email__seasonal_reservation_without_application_section(
+    outbox: list[EmailMultiAlternatives],
+) -> None:
     reservation = ReservationFactory.create(
         type=ReservationTypeChoice.SEASONAL,
         reservee_email="reservee@email.com",

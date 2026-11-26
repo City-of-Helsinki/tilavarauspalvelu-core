@@ -18,7 +18,7 @@ from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from tests.factories import ApplicationFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.helpers import TranslationsFromPOFiles, as_mock, patch_method
 from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
@@ -35,6 +35,9 @@ from tests.test_integrations.test_email.helpers import (
 )
 
 if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
+    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import Lang
 
 
@@ -73,7 +76,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__get_context(lang: Lang):
+def test_seasonal_booking_cancelled_all__get_context(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -88,7 +91,7 @@ def test_seasonal_booking_cancelled_all__get_context(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__get_context__get_mock_data(lang: Lang):
+def test_seasonal_booking_cancelled_all__get_context__get_mock_data(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -103,8 +106,9 @@ def test_seasonal_booking_cancelled_all__get_context__get_mock_data(lang: Lang):
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__get_context__instance(email_reservation):
+def test_seasonal_booking_cancelled_all__get_context__instance(email_reservation: Reservation) -> None:
     section = email_reservation.actions.get_application_section()
+    assert section is not None
     section.actions.get_reservations().update(cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS)
 
     expected = {
@@ -122,7 +126,7 @@ def test_seasonal_booking_cancelled_all__get_context__instance(email_reservation
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__render__text():
+def test_seasonal_booking_cancelled_all__render__text() -> None:
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, context=context)
     text_content = text_content.replace("&amp;", "&")
@@ -149,7 +153,7 @@ def test_seasonal_booking_cancelled_all__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__render__html():
+def test_seasonal_booking_cancelled_all__render__html() -> None:
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, language="en")
     html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_CANCELLED_ALL, context=context)
     text_content = html_email_to_text(html_content)
@@ -179,12 +183,12 @@ def test_seasonal_booking_cancelled_all__render__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__send_email(outbox):
+def test_seasonal_booking_cancelled_all__send_email(outbox: list[EmailMultiAlternatives]) -> None:
     application = ApplicationFactory.create_in_status_results_sent(
         user__email="user@email.com",
         contact_person_email="contact@email.com",
     )
-    application_section = application.application_sections.first()
+    application_section = application.application_sections.get()
 
     create_reservation_series(
         user=application_section.application.user,
@@ -203,9 +207,11 @@ def test_seasonal_booking_cancelled_all__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__send_email__sent_when_last_reservation_is_denied(outbox):
+def test_seasonal_booking_cancelled_all__send_email__sent_when_last_reservation_is_denied(
+    outbox: list[EmailMultiAlternatives],
+) -> None:
     application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
-    application_section = application.application_sections.first()
+    application_section = application.application_sections.get()
 
     series = create_reservation_series(
         user=application_section.application.user,
@@ -214,6 +220,7 @@ def test_seasonal_booking_cancelled_all__send_email__sent_when_last_reservation_
         reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
     )
     last_reservation = series.reservations.order_by("begins_at").last()
+    assert last_reservation is not None
     last_reservation.state = ReservationStateChoice.DENIED
     last_reservation.cancel_reason = None
     last_reservation.save(update_fields=["state", "cancel_reason"])
@@ -227,9 +234,9 @@ def test_seasonal_booking_cancelled_all__send_email__sent_when_last_reservation_
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__send_email__wrong_status(outbox):
+def test_seasonal_booking_cancelled_all__send_email__wrong_status(outbox: list[EmailMultiAlternatives]) -> None:
     application = ApplicationFactory.create_in_status_handled(user__email="user@email.com")
-    application_section = application.application_sections.first()
+    application_section = application.application_sections.get()
     create_reservation_series(
         user=application.user,
         allocated_time_slot__reservation_unit_option__application_section=application_section,
@@ -245,9 +252,9 @@ def test_seasonal_booking_cancelled_all__send_email__wrong_status(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__send_email__no_reservations(outbox):
+def test_seasonal_booking_cancelled_all__send_email__no_reservations(outbox: list[EmailMultiAlternatives]) -> None:
     application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
-    application_section = application.application_sections.first()
+    application_section = application.application_sections.get()
 
     EmailService.send_seasonal_booking_cancelled_all_email(application_section=application_section)
 
@@ -258,12 +265,12 @@ def test_seasonal_booking_cancelled_all__send_email__no_reservations(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_seasonal_booking_cancelled_all__send_email__no_recipients(outbox):
+def test_seasonal_booking_cancelled_all__send_email__no_recipients(outbox: list[EmailMultiAlternatives]) -> None:
     application = ApplicationFactory.create_in_status_results_sent(
         user__email="",
         contact_person_email=None,
     )
-    application_section = application.application_sections.first()
+    application_section = application.application_sections.get()
 
     create_reservation_series(
         user=application_section.application.user,
@@ -275,5 +282,8 @@ def test_seasonal_booking_cancelled_all__send_email__no_recipients(outbox):
 
     assert len(outbox) == 0
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'seasonal booking cancelled all' email"
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert (
+        as_mock(SentryLogger.log_message).call_args.args[0]
+        == "No recipients for the 'seasonal booking cancelled all' email"
+    )

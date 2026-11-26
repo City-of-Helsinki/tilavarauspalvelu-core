@@ -20,7 +20,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import PriceComponentFactory, ReservationFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.helpers import TranslationsFromPOFiles, as_mock, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -43,6 +43,9 @@ from tests.test_integrations.test_email.helpers import (
 )
 
 if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
+    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import Lang
 
 
@@ -99,7 +102,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_requires_handling__get_context__subsidised(lang: Lang):
+def test_reservation_requires_handling__get_context__subsidised(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         "price_can_be_subsidised": True,
@@ -114,7 +117,7 @@ def test_reservation_requires_handling__get_context__subsidised(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_requires_handling__get_context__not_subsidised(lang: Lang):
+def test_reservation_requires_handling__get_context__not_subsidised(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         "price_can_be_subsidised": False,
@@ -134,7 +137,7 @@ def test_reservation_requires_handling__get_context__not_subsidised(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_requires_handling__get_context__get_mock_data__subsidised(lang: Lang):
+def test_reservation_requires_handling__get_context__get_mock_data__subsidised(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         "price_can_be_subsidised": True,
@@ -149,7 +152,7 @@ def test_reservation_requires_handling__get_context__get_mock_data__subsidised(l
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_requires_handling__get_context__get_mock_data__not_subsidised(lang: Lang):
+def test_reservation_requires_handling__get_context__get_mock_data__not_subsidised(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         "price_can_be_subsidised": False,
@@ -169,7 +172,7 @@ def test_reservation_requires_handling__get_context__get_mock_data__not_subsidis
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__get_context__instance__subsidised(email_reservation):
+def test_reservation_requires_handling__get_context__instance__subsidised(email_reservation: Reservation) -> None:
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()
     price_component = PriceComponentFactory.create(can_apply_for_discount=True)
@@ -191,7 +194,7 @@ def test_reservation_requires_handling__get_context__instance__subsidised(email_
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__get_context__instance__not_subsidised(email_reservation):
+def test_reservation_requires_handling__get_context__instance__not_subsidised(email_reservation: Reservation) -> None:
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()
     price_component = PriceComponentFactory.create(can_apply_for_discount=False)
@@ -215,7 +218,7 @@ def test_reservation_requires_handling__get_context__instance__not_subsidised(em
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__render__text():
+def test_reservation_requires_handling__render__text() -> None:
     context = get_mock_data(
         email_type=EmailType.RESERVATION_REQUIRES_HANDLING,
         language="en",
@@ -261,7 +264,7 @@ def test_reservation_requires_handling__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__render__text__subsidised():
+def test_reservation_requires_handling__render__text__subsidised() -> None:
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
 
@@ -304,7 +307,7 @@ def test_reservation_requires_handling__render__text__subsidised():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__render__html():
+def test_reservation_requires_handling__render__html() -> None:
     context = get_mock_data(
         email_type=EmailType.RESERVATION_REQUIRES_HANDLING,
         language="en",
@@ -351,7 +354,7 @@ def test_reservation_requires_handling__render__html():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__render__html__subsidised():
+def test_reservation_requires_handling__render__html__subsidised() -> None:
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, language="en")
     html_content = render_html(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
     text_content = html_email_to_text(html_content)
@@ -397,7 +400,7 @@ def test_reservation_requires_handling__render__html__subsidised():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__send_email(outbox):
+def test_reservation_requires_handling__send_email(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="reservee@email.com",
@@ -419,7 +422,7 @@ def test_reservation_requires_handling__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__send_email__wrong_state(outbox):
+def test_reservation_requires_handling__send_email__wrong_state(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
@@ -438,7 +441,7 @@ def test_reservation_requires_handling__send_email__wrong_state(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_handling__send_email__behalf_reservation(outbox):
+def test_reservation_requires_handling__send_email__behalf_reservation(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         type=ReservationTypeChoice.BEHALF,
@@ -459,7 +462,7 @@ def test_reservation_requires_handling__send_email__behalf_reservation(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_reservation_requires_handling__send_email__no_recipients(outbox):
+def test_reservation_requires_handling__send_email__no_recipients(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="",
@@ -474,14 +477,19 @@ def test_reservation_requires_handling__send_email__no_recipients(outbox):
 
     assert len(outbox) == 0
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation requires handling' email"
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert (
+        as_mock(SentryLogger.log_message).call_args.args[0]
+        == "No recipients for the 'reservation requires handling' email"
+    )
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-02")
-def test_reservation_requires_handling__send_email__reservation_in_the_past(outbox):
+def test_reservation_requires_handling__send_email__reservation_in_the_past(
+    outbox: list[EmailMultiAlternatives],
+) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="reservee@email.com",

@@ -19,7 +19,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.helpers import TranslationsFromPOFiles, as_mock, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -38,6 +38,9 @@ from tests.test_integrations.test_email.helpers import (
 )
 
 if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
+    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import Lang
 
 
@@ -77,7 +80,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_rescheduled_single__get_context(lang: Lang):
+def test_seasonal_booking_rescheduled_single__get_context(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -92,7 +95,7 @@ def test_seasonal_booking_rescheduled_single__get_context(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_rescheduled_single__get_context__get_mock_data(lang: Lang):
+def test_seasonal_booking_rescheduled_single__get_context__get_mock_data(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     params = {
@@ -107,9 +110,10 @@ def test_seasonal_booking_rescheduled_single__get_context__get_mock_data(lang: L
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_rescheduled_single__get_context__instance(email_reservation):
+def test_seasonal_booking_rescheduled_single__get_context__instance(email_reservation: Reservation) -> None:
     section = email_reservation.actions.get_application_section()
 
+    assert section is not None
     expected = {
         **LANGUAGE_CONTEXT["en"],
         **get_application_details_urls(section),
@@ -125,7 +129,7 @@ def test_seasonal_booking_rescheduled_single__get_context__instance(email_reserv
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_rescheduled_single__render__text():
+def test_seasonal_booking_rescheduled_single__render__text() -> None:
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, context=context)
     text_content = text_content.replace("&amp;", "&")
@@ -155,7 +159,7 @@ def test_seasonal_booking_rescheduled_single__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_rescheduled_single__render__html():
+def test_seasonal_booking_rescheduled_single__render__html() -> None:
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, language="en")
     html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE, context=context)
     text_content = html_email_to_text(html_content)
@@ -187,7 +191,7 @@ def test_seasonal_booking_rescheduled_single__render__html():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_rescheduled_single__send_email(outbox):
+def test_seasonal_booking_rescheduled_single__send_email(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.SEASONAL,
@@ -209,7 +213,9 @@ def test_seasonal_booking_rescheduled_single__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_rescheduled_single__send_email__normal_reservation(outbox):
+def test_seasonal_booking_rescheduled_single__send_email__normal_reservation(
+    outbox: list[EmailMultiAlternatives],
+) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -228,7 +234,9 @@ def test_seasonal_booking_rescheduled_single__send_email__normal_reservation(out
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-02")
-def test_seasonal_booking_rescheduled_single__send_email__reservation_in_the_past(outbox):
+def test_seasonal_booking_rescheduled_single__send_email__reservation_in_the_past(
+    outbox: list[EmailMultiAlternatives],
+) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.SEASONAL,
@@ -248,7 +256,7 @@ def test_seasonal_booking_rescheduled_single__send_email__reservation_in_the_pas
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_seasonal_booking_rescheduled_single__send_email__no_recipients(outbox):
+def test_seasonal_booking_rescheduled_single__send_email__no_recipients(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.SEASONAL,
@@ -263,8 +271,8 @@ def test_seasonal_booking_rescheduled_single__send_email__no_recipients(outbox):
 
     assert len(outbox) == 0
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
     assert (
-        SentryLogger.log_message.call_args.args[0]
+        as_mock(SentryLogger.log_message).call_args.args[0]
         == "No recipients for the 'seasonal booking rescheduled single' email"
     )

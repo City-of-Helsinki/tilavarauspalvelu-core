@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from django.test import override_settings
 
 from tilavarauspalvelu.integrations.email.sending import (
@@ -10,9 +12,12 @@ from tilavarauspalvelu.integrations.email.typing import EmailData
 from tilavarauspalvelu.typing import EmailAttachment
 from utils.date_utils import local_datetime
 
+if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
 
 @override_settings(SEND_EMAILS=True)
-def test_send_emails_in_batches_task(outbox):
+def test_send_emails_in_batches_task(outbox: list[EmailMultiAlternatives]) -> None:
     send_emails_in_batches_task(
         EmailData(
             recipients=["user@example.com"],
@@ -32,7 +37,7 @@ def test_send_emails_in_batches_task(outbox):
 
 
 @override_settings(SEND_EMAILS=False)
-def test_send_emails_in_batches_task__send_emails_off(outbox):
+def test_send_emails_in_batches_task__send_emails_off(outbox: list[EmailMultiAlternatives]) -> None:
     send_emails_in_batches_task(
         EmailData(
             recipients=["user@example.com"],
@@ -47,7 +52,7 @@ def test_send_emails_in_batches_task__send_emails_off(outbox):
 
 
 @override_settings(SEND_EMAILS=True, EMAIL_MAX_RECIPIENTS=2)
-def test_send_emails_in_batches_task__multiple_batches(outbox):
+def test_send_emails_in_batches_task__multiple_batches(outbox: list[EmailMultiAlternatives]) -> None:
     send_emails_in_batches_task(
         EmailData(
             recipients=["user1@example.com", "user2@example.com", "user3@example.com"],
@@ -72,7 +77,7 @@ def test_send_emails_in_batches_task__multiple_batches(outbox):
 
 
 @override_settings(SEND_EMAILS=True)
-def test_send_emails_in_batches_task__attachments(outbox):
+def test_send_emails_in_batches_task__attachments(outbox: list[EmailMultiAlternatives]) -> None:
     send_emails_in_batches_task(
         EmailData(
             recipients=["user@example.com"],
@@ -90,7 +95,7 @@ def test_send_emails_in_batches_task__attachments(outbox):
 
 
 @override_settings(SEND_EMAILS=True)
-def test_send_multiple_emails_in_batches_task(outbox):
+def test_send_multiple_emails_in_batches_task(outbox: list[EmailMultiAlternatives]) -> None:
     emails = [
         EmailData(
             recipients=["user1@example.com"],

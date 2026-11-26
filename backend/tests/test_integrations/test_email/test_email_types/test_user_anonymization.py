@@ -32,6 +32,8 @@ from tests.test_integrations.test_email.helpers import (
 )
 
 if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
     from tilavarauspalvelu.typing import Lang
 
 
@@ -82,7 +84,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_user_anonymization__get_context(lang: Lang):
+def test_user_anonymization__get_context(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
@@ -93,7 +95,7 @@ def test_user_anonymization__get_context(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_user_anonymization__get_context__get_mock_data(lang: Lang):
+def test_user_anonymization__get_context__get_mock_data(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
@@ -106,7 +108,7 @@ def test_user_anonymization__get_context__get_mock_data(lang: Lang):
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_user_anonymization__render__text():
+def test_user_anonymization__render__text() -> None:
     context = get_mock_data(email_type=EmailType.USER_ANONYMIZATION, language="en")
     text_content = render_text(email_type=EmailType.USER_ANONYMIZATION, context=context)
 
@@ -133,7 +135,7 @@ def test_user_anonymization__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_user_anonymization__render__html():
+def test_user_anonymization__render__html() -> None:
     context = get_mock_data(email_type=EmailType.USER_ANONYMIZATION, language="en")
     html_content = render_html(email_type=EmailType.USER_ANONYMIZATION, context=context)
     text_content = html_email_to_text(html_content)
@@ -169,7 +171,7 @@ def test_user_anonymization__render__html():
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
     ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
 )
-def test_user_anonymization__send_email(outbox):
+def test_user_anonymization__send_email(outbox: list[EmailMultiAlternatives]) -> None:
     user = UserFactory.create(
         email="user@email.com",
         preferred_language=Language.EN.value,
@@ -194,7 +196,7 @@ def test_user_anonymization__send_email(outbox):
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
     ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
 )
-def test_user_anonymization__send_email__no_recipients(outbox):
+def test_user_anonymization__send_email__no_recipients(outbox: list[EmailMultiAlternatives]) -> None:
     UserFactory.create(
         # User has no email, so we can't notify them (but we should still anonymize)
         email="",
@@ -214,7 +216,7 @@ def test_user_anonymization__send_email__no_recipients(outbox):
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
     ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
 )
-def test_user_anonymization__send_email__logged_in_recently(outbox):
+def test_user_anonymization__send_email__logged_in_recently(outbox: list[EmailMultiAlternatives]) -> None:
     UserFactory.create(
         email="user@email.com",
         preferred_language=Language.EN.value,
@@ -233,7 +235,7 @@ def test_user_anonymization__send_email__logged_in_recently(outbox):
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
     ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
 )
-def test_user_anonymization__send_email__going_to_be_old(outbox):
+def test_user_anonymization__send_email__going_to_be_old(outbox: list[EmailMultiAlternatives]) -> None:
     UserFactory.create(
         email="user@email.com",
         preferred_language=Language.EN.value,
@@ -258,7 +260,7 @@ def test_user_anonymization__send_email__going_to_be_old(outbox):
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
     ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
 )
-def test_user_anonymization__send_email__already_anonymized(outbox):
+def test_user_anonymization__send_email__already_anonymized(outbox: list[EmailMultiAlternatives]) -> None:
     UserFactory.create(
         first_name=ANONYMIZED_FIRST_NAME,
         last_name=ANONYMIZED_LAST_NAME,
@@ -279,7 +281,7 @@ def test_user_anonymization__send_email__already_anonymized(outbox):
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
     ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
 )
-def test_user_anonymization__send_email__multiple_languages(outbox):
+def test_user_anonymization__send_email__multiple_languages(outbox: list[EmailMultiAlternatives]) -> None:
     UserFactory.create(
         email="user1@email.com",
         preferred_language=Language.EN.value,
@@ -310,7 +312,7 @@ def test_user_anonymization__send_email__multiple_languages(outbox):
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
     ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
 )
-def test_user_anonymization__send_email__email_already_sent(outbox):
+def test_user_anonymization__send_email__email_already_sent(outbox: list[EmailMultiAlternatives]) -> None:
     UserFactory.create(
         email="user@email.com",
         preferred_language=Language.EN.value,

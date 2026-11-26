@@ -17,7 +17,7 @@ from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from tests.factories import ApplicationFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.helpers import TranslationsFromPOFiles, as_mock, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -29,6 +29,8 @@ from tests.test_integrations.test_email.helpers import (
 )
 
 if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
     from tilavarauspalvelu.typing import Lang
 
 
@@ -86,7 +88,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_application_received__get_context(lang: Lang):
+def test_seasonal_booking_application_received__get_context(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
@@ -97,7 +99,7 @@ def test_seasonal_booking_application_received__get_context(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_seasonal_booking_application_received__get_context__get_mock_data(lang: Lang):
+def test_seasonal_booking_application_received__get_context__get_mock_data(lang: Lang) -> None:
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
@@ -110,7 +112,7 @@ def test_seasonal_booking_application_received__get_context__get_mock_data(lang:
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_application_received__render__text():
+def test_seasonal_booking_application_received__render__text() -> None:
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED, context=context)
 
@@ -136,7 +138,7 @@ def test_seasonal_booking_application_received__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_application_received__render__html():
+def test_seasonal_booking_application_received__render__html() -> None:
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED, language="en")
     html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED, context=context)
     text_content = html_email_to_text(html_content)
@@ -164,7 +166,7 @@ def test_seasonal_booking_application_received__render__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_seasonal_booking_application_received__send_email(outbox):
+def test_seasonal_booking_application_received__send_email(outbox: list[EmailMultiAlternatives]) -> None:
     application = ApplicationFactory.create_in_status_received()
 
     EmailService.send_seasonal_booking_application_received_email(application=application)
@@ -172,12 +174,13 @@ def test_seasonal_booking_application_received__send_email(outbox):
     assert len(outbox) == 1
 
     assert outbox[0].subject == "Your application has been received"
+    assert application.contact_person_email is not None
     assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person_email])
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_seasonal_booking_application_received__send_email__wrong_status(outbox):
+def test_seasonal_booking_application_received__send_email__wrong_status(outbox: list[EmailMultiAlternatives]) -> None:
     application = ApplicationFactory.create_in_status_draft()
 
     EmailService.send_seasonal_booking_application_received_email(application=application)
@@ -188,14 +191,14 @@ def test_seasonal_booking_application_received__send_email__wrong_status(outbox)
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
-def test_seasonal_booking_application_received__send_email__no_recipients(outbox):
+def test_seasonal_booking_application_received__send_email__no_recipients(outbox: list[EmailMultiAlternatives]) -> None:
     application = ApplicationFactory.create_in_status_received(user__email="", contact_person_email="")
 
     EmailService.send_seasonal_booking_application_received_email(application=application)
 
     assert len(outbox) == 0
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == (
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args[0] == (
         "No recipients for the 'seasonal booking application received' email"
     )
