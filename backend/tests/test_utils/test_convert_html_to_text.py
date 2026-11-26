@@ -4,14 +4,14 @@ from tilavarauspalvelu.integrations.email.template_context.common import create_
 from utils.utils import convert_html_to_text
 
 
-def test_convert_html_to_text__simple_paragraphs():
+def test_convert_html_to_text__simple_paragraphs() -> None:
     html = "<p>Foo</p><p>Bar</p>"
     text = "Foo\n\nBar"
 
     assert convert_html_to_text(html) == text
 
 
-def test_convert_html_to_text__anchor__same_text_and_link():
+def test_convert_html_to_text__anchor__same_text_and_link() -> None:
     link = "https://foo.bar"
     html = f"<p>Foo {create_anchor_tag(link=link, text=link)}</p>"
     text = f"Foo {link}"
@@ -19,7 +19,7 @@ def test_convert_html_to_text__anchor__same_text_and_link():
     assert convert_html_to_text(html) == text
 
 
-def test_convert_html_to_text__anchor__different_text_and_link():
+def test_convert_html_to_text__anchor__different_text_and_link() -> None:
     link = "http://foo.bar"
     html = f"<p>{create_anchor_tag(link=link, text='Bar')}</p>"
     text = f"Bar <{link}>"
@@ -27,7 +27,7 @@ def test_convert_html_to_text__anchor__different_text_and_link():
     assert convert_html_to_text(html) == text
 
 
-def test_convert_html_to_text__anchor__different_and_same_combined():
+def test_convert_html_to_text__anchor__different_and_same_combined() -> None:
     link = "https://foo.bar"
     html = f"<p>Foo {create_anchor_tag(link=link, text=link)}</p><p>{create_anchor_tag(link=link, text='Bar')}</p>"
     text = f"Foo {link}\n\nBar <{link}>"
@@ -35,7 +35,7 @@ def test_convert_html_to_text__anchor__different_and_same_combined():
     assert convert_html_to_text(html) == text
 
 
-def test_convert_html_to_text__anchor__space_added_between_link_and_dot():
+def test_convert_html_to_text__anchor__space_added_between_link_and_dot() -> None:
     link = "https://foo.bar"
     html = f"<p>Foo {create_anchor_tag(link=link, text=link)}.</p>"
     text = f"Foo {link} ."  # Dot would be directly after the link. Add a space.
@@ -43,7 +43,7 @@ def test_convert_html_to_text__anchor__space_added_between_link_and_dot():
     assert convert_html_to_text(html) == text
 
 
-def test_convert_html_to_text__anchor__space_not_added_between_link_and_dot():
+def test_convert_html_to_text__anchor__space_not_added_between_link_and_dot() -> None:
     link = "https://foo.bar"
     html = f"<p>{create_anchor_tag(link=link, text='Bar')}.</p>"
     text = f"Bar <{link}>."  # Dot would be after angle-brackets. No space needed.

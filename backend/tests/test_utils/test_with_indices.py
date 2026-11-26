@@ -3,7 +3,7 @@ from __future__ import annotations
 from utils.utils import with_indices
 
 
-def test_with_indices():
+def test_with_indices() -> None:
     test_list = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9]
 
     for i, item in (gen := with_indices(test_list)):

@@ -6,5 +6,5 @@ from config.hooks.translations_done import main
 
 
 @pytest.mark.slow
-def test_translations_done():
+def test_translations_done() -> None:
     assert main() in {0, 1}

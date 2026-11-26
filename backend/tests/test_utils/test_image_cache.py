@@ -8,17 +8,17 @@ from django.test import override_settings
 from tilavarauspalvelu.integrations import image_cache
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 
 @mock.patch("tilavarauspalvelu.integrations.image_cache.request")
-def test_image_cache_purge__no_action_if_disabled(mock_request):
+def test_image_cache_purge__no_action_if_disabled(mock_request: mock.MagicMock) -> None:
     image_cache.purge("foo/bar.jpg")
     assert mock_request.called is False
 
 
 @override_settings(IMAGE_CACHE_ENABLED=True, IMAGE_CACHE_VARNISH_HOST="")
-def test_image_cache_purge__error_if_cache_root_url_missing():
+def test_image_cache_purge__error_if_cache_root_url_missing() -> None:
     with pytest.raises(image_cache.ImageCacheConfigurationError) as err:
         image_cache.purge("foo/bar.jpg")
 
@@ -26,7 +26,7 @@ def test_image_cache_purge__error_if_cache_root_url_missing():
 
 
 @override_settings(IMAGE_CACHE_ENABLED=True, IMAGE_CACHE_PURGE_KEY="")
-def test_image_cache_purge__error_if_cache_purge_key_missing():  # NOSONAR python:S4144
+def test_image_cache_purge__error_if_cache_purge_key_missing() -> None:  # NOSONAR python:S4144
     with pytest.raises(image_cache.ImageCacheConfigurationError) as err:
         image_cache.purge("foo/bar.jpg")
 
@@ -36,7 +36,7 @@ def test_image_cache_purge__error_if_cache_purge_key_missing():  # NOSONAR pytho
 @override_settings(IMAGE_CACHE_ENABLED=True)
 @patch_method(SentryLogger.log_message)
 @mock.patch("tilavarauspalvelu.integrations.image_cache.request")
-def test_image_cache_purge__makes_correct_request(request):
+def test_image_cache_purge__makes_correct_request(request: mock.MagicMock) -> None:
     request.return_value = mock.MagicMock(status_code=200)
     image_cache.purge("foo/bar.jpg")
     request.assert_called_with(
@@ -45,14 +45,14 @@ def test_image_cache_purge__makes_correct_request(request):
         headers={"X-VC-Purge-Key": "test-purge-key", "Host": "test.tilavaraus.url"},
         timeout=60,
     )
-    assert SentryLogger.log_message.called is False
+    assert as_mock(SentryLogger.log_message).called is False
 
 
 @override_settings(IMAGE_CACHE_ENABLED=True)
 @patch_method(SentryLogger.log_message)
 @mock.patch("tilavarauspalvelu.integrations.image_cache.request")
-def test_image_cache_purge__logs_failed_requests(request):
+def test_image_cache_purge__logs_failed_requests(request: mock.MagicMock) -> None:
     request.return_value = mock.MagicMock(status_code=400)
 
     image_cache.purge("foo/bar.jpg")
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1

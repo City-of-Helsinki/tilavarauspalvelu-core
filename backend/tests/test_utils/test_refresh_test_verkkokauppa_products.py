@@ -4,6 +4,7 @@ import datetime
 import io
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.core.management import CommandError, call_command
@@ -20,6 +21,9 @@ from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct, Reservatio
 
 from tests.factories import PaymentMerchantFactory, PaymentProductFactory, ReservationUnitFactory
 from tests.helpers import exact, patch_method
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
 
 # Applied to all tests
 pytestmark = [
@@ -39,7 +43,7 @@ def run_command() -> str:
     return output.getvalue()
 
 
-def build_product(*args, **kwargs) -> Product:
+def build_product(*args: Any, **kwargs: Any) -> Product:
     return Product(
         product_id=uuid.uuid4(),
         namespace="tilanvaraus_dev",
@@ -88,7 +92,7 @@ def create_test_merchant() -> PaymentMerchant:
 
 
 @pytest.fixture(autouse=True)
-def dev_environment(monkeypatch, settings):
+def dev_environment(monkeypatch: pytest.MonkeyPatch, settings: Settings) -> None:
     monkeypatch.setenv("DJANGO_SETTINGS_ENVIRONMENT", "Development")
     settings.MOCK_VERKKOKAUPPA_API_ENABLED = False
 
@@ -97,7 +101,9 @@ def dev_environment(monkeypatch, settings):
 
 
 @pytest.mark.parametrize("environment", ["Testing", "Staging", "Production"])
-def test_refresh_test_verkkokauppa_products__not_dev_environment__refuses_to_run(monkeypatch, environment):
+def test_refresh_test_verkkokauppa_products__not_dev_environment__refuses_to_run(
+    monkeypatch: pytest.MonkeyPatch, environment: str
+) -> None:
     monkeypatch.setenv("DJANGO_SETTINGS_ENVIRONMENT", environment)
 
     msg = "This command changes the payment merchant of units, so it can run only in the dev environment."
@@ -105,7 +111,7 @@ def test_refresh_test_verkkokauppa_products__not_dev_environment__refuses_to_run
         run_command()
 
 
-def test_refresh_test_verkkokauppa_products__api_is_mocked__refuses_to_run(settings):
+def test_refresh_test_verkkokauppa_products__api_is_mocked__refuses_to_run(settings: Settings) -> None:
     settings.MOCK_VERKKOKAUPPA_API_ENABLED = True
 
     msg = "The Verkkokauppa API is mocked, so there is nothing to refresh."
@@ -113,7 +119,7 @@ def test_refresh_test_verkkokauppa_products__api_is_mocked__refuses_to_run(setti
         run_command()
 
 
-def test_refresh_test_verkkokauppa_products__no_test_merchant__refuses_to_run():
+def test_refresh_test_verkkokauppa_products__no_test_merchant__refuses_to_run() -> None:
     msg = f"No payment merchant '{TEST_PAYMENT_MERCHANT_NAME}'. Run 'create_test_data' first."
     with pytest.raises(CommandError, match=exact(msg)):
         run_command()
@@ -124,7 +130,7 @@ def test_refresh_test_verkkokauppa_products__no_test_merchant__refuses_to_run():
 
 @patch_method(VerkkokauppaAPIClient.get_merchant, return_value=build_merchant_info())
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=build_product)
-def test_refresh_test_verkkokauppa_products__merchant_exists__products_are_replaced():
+def test_refresh_test_verkkokauppa_products__merchant_exists__products_are_replaced() -> None:
     merchant = create_test_merchant()
     old_product = PaymentProductFactory.create(merchant=merchant)
     own_merchant = ReservationUnitFactory.create(
@@ -149,7 +155,7 @@ def test_refresh_test_verkkokauppa_products__merchant_exists__products_are_repla
 
 @patch_method(VerkkokauppaAPIClient.get_merchant, return_value=build_merchant_info())
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=build_product)
-def test_refresh_test_verkkokauppa_products__other_merchant__reservation_unit_is_not_changed():
+def test_refresh_test_verkkokauppa_products__other_merchant__reservation_unit_is_not_changed() -> None:
     create_test_merchant()
     other_merchant = PaymentMerchantFactory.create(name="Pihlajasaarten testikirjasto")
     other_product = PaymentProductFactory.create(merchant=other_merchant)
@@ -169,7 +175,7 @@ def test_refresh_test_verkkokauppa_products__other_merchant__reservation_unit_is
 
 @patch_method(VerkkokauppaAPIClient.get_merchant, return_value=build_merchant_info())
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=CreateProductError("Product creation failed"))
-def test_refresh_test_verkkokauppa_products__product_creation_fails__lists_failed_reservation_units():
+def test_refresh_test_verkkokauppa_products__product_creation_fails__lists_failed_reservation_units() -> None:
     merchant = create_test_merchant()
     reservation_unit = ReservationUnitFactory.create(payment_merchant=merchant, own_price__amount=Decimal(10))
 
@@ -184,7 +190,7 @@ def test_refresh_test_verkkokauppa_products__product_creation_fails__lists_faile
 @patch_method(VerkkokauppaAPIClient.get_merchant, return_value=None)
 @patch_method(VerkkokauppaAPIClient.create_merchant, return_value=build_merchant())
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=build_product)
-def test_refresh_test_verkkokauppa_products__merchant_missing_in_verkkokauppa__units_move_to_new_merchant():
+def test_refresh_test_verkkokauppa_products__merchant_missing_in_verkkokauppa__units_move_to_new_merchant() -> None:
     merchant = create_test_merchant()
     old_product = PaymentProductFactory.create(merchant=merchant)
     reservation_unit = ReservationUnitFactory.create(

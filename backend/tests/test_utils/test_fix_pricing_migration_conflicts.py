@@ -56,7 +56,9 @@ def tax_free_tax_level() -> TaxLevel:
 # ── Fixes ──
 
 
-def test_fix_pricing_migration_conflicts__unit_without_accounting_gets_test_accounting(tax_free_tax_level):
+def test_fix_pricing_migration_conflicts__unit_without_accounting_gets_test_accounting(
+    tax_free_tax_level: TaxLevel,
+) -> None:
     tax_level = TaxLevelFactory.create(name="Yleinen", rates__percentage=Decimal("25.5"))
     reservation_unit = ReservationUnitFactory.create(
         name="Sali", payment_accounting=None, unit__payment_accounting=None
@@ -67,6 +69,7 @@ def test_fix_pricing_migration_conflicts__unit_without_accounting_gets_test_acco
 
     reservation_unit = ReservationUnit.objects.select_related("payment_accounting").get(pk=reservation_unit.pk)
     accounting = reservation_unit.payment_accounting
+    assert accounting is not None
     assert accounting.name == "Testitiliöinti"
     assert accounting.product_invoicing_material == ""
 
@@ -77,7 +80,9 @@ def test_fix_pricing_migration_conflicts__unit_without_accounting_gets_test_acco
     )
 
 
-def test_fix_pricing_migration_conflicts__accounting_without_material_is_not_changed(tax_free_tax_level):
+def test_fix_pricing_migration_conflicts__accounting_without_material_is_not_changed(
+    tax_free_tax_level: TaxLevel,
+) -> None:
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     accounting = PaymentAccountingFactory.create(
         product_invoicing_sales_org="",
@@ -99,7 +104,9 @@ def test_fix_pricing_migration_conflicts__accounting_without_material_is_not_cha
     assert output == "Made 0 changes.\nNo conflicts. The pricing migrations can run.\n"
 
 
-def test_fix_pricing_migration_conflicts__material_of_other_tax_level_gets_copied_accounting(tax_free_tax_level):
+def test_fix_pricing_migration_conflicts__material_of_other_tax_level_gets_copied_accounting(
+    tax_free_tax_level: TaxLevel,
+) -> None:
     general = TaxLevelFactory.create(name="Yleinen", rates__percentage=Decimal("25.5"))
     reduced = TaxLevelFactory.create(name="Alennettu", rates__percentage=Decimal("13.5"))
     accounting = PaymentAccountingFactory.create(name="Kirjasto", product_invoicing_material="10003360")
@@ -112,15 +119,17 @@ def test_fix_pricing_migration_conflicts__material_of_other_tax_level_gets_copie
 
     first = ReservationUnit.objects.select_related("payment_accounting").get(pk=first.pk)
     second = ReservationUnit.objects.select_related("payment_accounting").get(pk=second.pk)
+    assert first.payment_accounting is not None
     assert first.payment_accounting.pk == accounting.pk
     assert first.payment_accounting.product_invoicing_material == "10003360"
+    assert second.payment_accounting is not None
     assert second.payment_accounting.name == "Kirjasto, Alennettu"
     assert second.payment_accounting.product_invoicing_material == "99000000"
 
     assert output.endswith("No conflicts. The pricing migrations can run.\n")
 
 
-def test_fix_pricing_migration_conflicts__made_up_material_skips_used_materials(tax_free_tax_level):
+def test_fix_pricing_migration_conflicts__made_up_material_skips_used_materials(tax_free_tax_level: TaxLevel) -> None:
     general = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     reduced = TaxLevelFactory.create(rates__percentage=Decimal("13.5"))
     PaymentAccountingFactory.create(product_invoicing_material="99000000")
@@ -133,13 +142,16 @@ def test_fix_pricing_migration_conflicts__made_up_material_skips_used_materials(
     run_command()
 
     second = ReservationUnit.objects.select_related("payment_accounting").get(pk=second.pk)
+    assert second.payment_accounting is not None
     assert second.payment_accounting.product_invoicing_material == "99000001"
 
 
 # ── Not fixed ──
 
 
-def test_fix_pricing_migration_conflicts__material_with_other_main_ledger_account_is_not_changed(tax_free_tax_level):
+def test_fix_pricing_migration_conflicts__material_with_other_main_ledger_account_is_not_changed(
+    tax_free_tax_level: TaxLevel,
+) -> None:
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     accounting_1 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340025")
     accounting_2 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340100")
@@ -158,7 +170,9 @@ def test_fix_pricing_migration_conflicts__material_with_other_main_ledger_accoun
     assert output == "Made 0 changes.\nNo conflicts. The pricing migrations can run.\n"
 
 
-def test_fix_pricing_migration_conflicts__first_pricing_in_the_future_is_not_fixed(tax_free_tax_level):
+def test_fix_pricing_migration_conflicts__first_pricing_in_the_future_is_not_fixed(
+    tax_free_tax_level: TaxLevel,
+) -> None:
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     future = local_date() + datetime.timedelta(days=10)
     reservation_unit = ReservationUnitFactory.create(
@@ -178,7 +192,7 @@ def test_fix_pricing_migration_conflicts__first_pricing_in_the_future_is_not_fix
     assert reservation_unit.payment_accounting is None
 
 
-def test_fix_pricing_migration_conflicts__refuses_to_run_in_production(monkeypatch):
+def test_fix_pricing_migration_conflicts__refuses_to_run_in_production(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("DJANGO_SETTINGS_ENVIRONMENT", "Production")
 
     msg = "This command makes up accounting data, so it cannot run in production."

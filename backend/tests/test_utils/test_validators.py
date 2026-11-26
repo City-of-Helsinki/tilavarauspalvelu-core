@@ -76,7 +76,7 @@ class TimeslotParams(NamedTuple):
         },
     )
 )
-def test_validate_reservable_times_begin_end(timeslots, errors):
+def test_validate_reservable_times_begin_end(timeslots: list[TimeSlot], errors: Collection[str]) -> None:
     try:
         validate_reservable_times_begin_end(timeslots)
     except ValidationError as error:
@@ -207,7 +207,7 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
         },
     )
 )
-def test_validate_reservable_times_overlap(timeslots, errors):
+def test_validate_reservable_times_overlap(timeslots: list[TimeSlot], errors: Collection[str]) -> None:
     try:
         validate_reservable_times_overlap(timeslots)
     except ValidationError as error:
