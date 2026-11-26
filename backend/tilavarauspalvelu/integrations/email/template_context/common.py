@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 from django.conf import settings
 from django.db.models import Prefetch
 from django.utils.translation import pgettext
-from lookup_property import L
 
 from tilavarauspalvelu.enums import AccessType, Weekday
 from tilavarauspalvelu.models import ReservationUnitAccessType
@@ -411,11 +410,7 @@ def params_for_access_type_change_section(*, section: ApplicationSection) -> Acc
                 "access_types",
                 queryset=(
                     # Access types that are valid from now until the end of the reservation period of the section
-                    # The annotations use the lookup property names, so that the properties read the annotated values.
-                    ReservationUnitAccessType.objects  # type: ignore[no-redef]
-                    .all()
-                    .annotate(end_date=L("end_date"))
-                    .on_period(
+                    ReservationUnitAccessType.objects.all().on_period(
                         begin_date=local_datetime(),
                         end_date=section.reservations_end_date,
                     )
