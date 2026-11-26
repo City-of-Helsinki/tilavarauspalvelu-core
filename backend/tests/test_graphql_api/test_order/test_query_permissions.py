@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -8,13 +9,16 @@ from tests.factories import PaymentOrderFactory, ReservationFactory, Reservation
 
 from .helpers import order_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_order__query__unauthenticated_user(graphql):
+def test_order__query__unauthenticated_user(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     order = PaymentOrderFactory.create(reservation=reservation, remote_id=str(uuid.uuid4()))
@@ -26,7 +30,7 @@ def test_order__query__unauthenticated_user(graphql):
     assert response.first_query_object is None
 
 
-def test_order__query__regular_user(graphql):
+def test_order__query__regular_user(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     order = PaymentOrderFactory.create(reservation=reservation, remote_id=str(uuid.uuid4()))
@@ -40,7 +44,7 @@ def test_order__query__regular_user(graphql):
     assert response.first_query_object is None
 
 
-def test_order__query__general_admin__can_manage_reservations(graphql):
+def test_order__query__general_admin__can_manage_reservations(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     order = PaymentOrderFactory.create(reservation=reservation, remote_id=str(uuid.uuid4()))
@@ -55,7 +59,7 @@ def test_order__query__general_admin__can_manage_reservations(graphql):
     assert response.first_query_object is not None
 
 
-def test_order__query__unit_admin__can_manage_reservations(graphql):
+def test_order__query__unit_admin__can_manage_reservations(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
     order = PaymentOrderFactory.create(reservation=reservation, remote_id=str(uuid.uuid4()))
