@@ -40,6 +40,38 @@ def test_reservation_unit__access_types__end_date():
 
 
 @freezegun.freeze_time("2025-01-01")
+def test_reservation_unit__access_types__end_date__not_annotated__other_reservation_units_ignored():
+    now = local_datetime()
+
+    reservation_unit = ReservationUnitFactory.create()
+    first_access_type = ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=now.date(),
+    )
+    last_access_type = ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.ACCESS_CODE,
+        begin_date=now.date() + datetime.timedelta(days=7),
+    )
+
+    other_reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=other_reservation_unit,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=now.date() + datetime.timedelta(days=2),
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=other_reservation_unit,
+        access_type=AccessType.ACCESS_CODE,
+        begin_date=now.date() + datetime.timedelta(days=14),
+    )
+
+    assert first_access_type.end_date == datetime.date(2025, 1, 8)
+    assert last_access_type.end_date == datetime.date.max
+
+
+@freezegun.freeze_time("2025-01-01")
 def test_reservation_unit__access_types__active():
     now = local_datetime()
 

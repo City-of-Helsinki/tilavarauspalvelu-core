@@ -79,7 +79,10 @@ class ReservationUnitAccessType(models.Model):
     @end_date.override
     def _(self) -> datetime.date:
         access_type = (
-            ReservationUnitAccessType.objects.filter(begin_date__gt=self.begin_date).order_by("begin_date").first()
+            ReservationUnitAccessType.objects
+            .filter(begin_date__gt=self.begin_date, reservation_unit=self.reservation_unit_id)
+            .order_by("begin_date")
+            .first()
         )
         if access_type is None:
             return datetime.date.max
