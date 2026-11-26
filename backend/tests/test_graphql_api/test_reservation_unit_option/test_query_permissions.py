@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
@@ -8,14 +10,17 @@ from tests.factories import ApplicationFactory
 
 from .helpers import section_options_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit_option__query__perms__superuser(graphql):
+def test_reservation_unit_option__query__perms__superuser(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_handled()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     option = section.reservation_unit_options.first()
 
     assert option is not None
@@ -31,9 +36,9 @@ def test_reservation_unit_option__query__perms__superuser(graphql):
     assert response.node(0) == {"reservationUnitOptions": [{"pk": option.pk}]}
 
 
-def test_reservation_unit_option__query__perms__general_admin(graphql):
+def test_reservation_unit_option__query__perms__general_admin(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_handled()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     option = section.reservation_unit_options.first()
 
     assert option is not None
@@ -49,9 +54,9 @@ def test_reservation_unit_option__query__perms__general_admin(graphql):
     assert response.node(0) == {"reservationUnitOptions": [{"pk": option.pk}]}
 
 
-def test_reservation_unit_option__query__perms__application_owner(graphql):
+def test_reservation_unit_option__query__perms__application_owner(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_handled()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     option = section.reservation_unit_options.first()
 
     assert option is not None
@@ -68,9 +73,11 @@ def test_reservation_unit_option__query__perms__application_owner(graphql):
 
 
 @pytest.mark.parametrize("field", ["isLocked", "isRejected"])
-def test_reservation_unit_option__query__perms__application_owner__cant_see_restricted_info(graphql, field):
+def test_reservation_unit_option__query__perms__application_owner__cant_see_restricted_info(
+    graphql: GraphQLClient, field: str
+) -> None:
     application = ApplicationFactory.create_in_status_handled()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     option = section.reservation_unit_options.first()
 
     assert option is not None
@@ -90,9 +97,9 @@ def test_reservation_unit_option__query__perms__application_owner__cant_see_rest
     assert response.error_message() == "No permission to access field."
 
 
-def test_reservation_unit_option__query__perms__regular_user(graphql):
+def test_reservation_unit_option__query__perms__regular_user(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_handled()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     option = section.reservation_unit_options.first()
 
     assert option is not None

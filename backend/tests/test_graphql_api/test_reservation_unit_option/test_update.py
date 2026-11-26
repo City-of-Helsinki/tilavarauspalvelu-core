@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import Weekday
@@ -8,13 +10,16 @@ from tests.factories import ReservationUnitOptionFactory
 
 from .helpers import UPDATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit_option__update__is_locked(graphql):
+def test_reservation_unit_option__update__is_locked(graphql: GraphQLClient) -> None:
     # given:
     # - There is a usable reservation unit option
     # - A superuser is using the system
@@ -38,7 +43,7 @@ def test_reservation_unit_option__update__is_locked(graphql):
     assert option.is_locked is True
 
 
-def test_reservation_unit_option__update__is_rejected(graphql):
+def test_reservation_unit_option__update__is_rejected(graphql: GraphQLClient) -> None:
     # given:
     # - There is a usable reservation unit option
     # - A superuser is using the system
@@ -62,7 +67,7 @@ def test_reservation_unit_option__update__is_rejected(graphql):
     assert option.is_rejected is True
 
 
-def test_reservation_unit_option__update__is_rejected__has_allocations(graphql):
+def test_reservation_unit_option__update__is_rejected__has_allocations(graphql: GraphQLClient) -> None:
     # given:
     # - There is a usable reservation unit option with allocations
     # - A superuser is using the system
