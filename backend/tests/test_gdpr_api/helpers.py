@@ -15,12 +15,14 @@ from utils.date_utils import local_datetime
 from tests.helpers import ResponseMock
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import WSGIRequest
 
 
 @contextmanager
-def patch_oidc_config():
+def patch_oidc_config() -> Generator[MagicMock]:
     issuer = api_token_auth_settings.ISSUER
     side_effects = [
         ResponseMock(json_data={"issuer": issuer, "jwks_uri": f"{issuer}/jwks"}),

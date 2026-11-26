@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -14,9 +15,13 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import ApplicationFactory, PaymentOrderFactory, ReservationFactory, UserFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import get_gdpr_auth_header, patch_oidc_config
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -27,7 +32,7 @@ pytestmark = [
 # QUERY
 
 
-def test_query_user_data__simple(api_client, settings):
+def test_query_user_data__simple(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create()
 
     settings.GDPR_API_QUERY_SCOPE = "gdprquery"
@@ -66,10 +71,10 @@ def test_query_user_data__simple(api_client, settings):
     }
 
 
-def test_query_user_data__full(api_client, settings):
+def test_query_user_data__full(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create()
     application = ApplicationFactory.create_in_status_in_allocation(user=user)
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     reservation = ReservationFactory.create(user=user)
 
     settings.GDPR_API_QUERY_SCOPE = "gdprquery"
@@ -251,7 +256,7 @@ def test_query_user_data__full(api_client, settings):
 
 
 @patch_method(SentryLogger.log_message)
-def test_query_user_data__user_not_found(api_client, settings):
+def test_query_user_data__user_not_found(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create()
 
     settings.GDPR_API_QUERY_SCOPE = "gdprquery"
@@ -265,9 +270,9 @@ def test_query_user_data__user_not_found(api_client, settings):
     assert response.status_code == 404, response.data
     assert response.data == {"detail": "No ProfileUser matches the given query."}
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API query failed.",)
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "details": {
             "detail": ErrorDetail(
                 string="No ProfileUser matches the given query.",
@@ -278,7 +283,7 @@ def test_query_user_data__user_not_found(api_client, settings):
 
 
 @patch_method(SentryLogger.log_message)
-def test_query_user_data__cannot_access_other_users_data(api_client, settings):
+def test_query_user_data__cannot_access_other_users_data(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo", uuid=uuid.uuid4())
     other_user = UserFactory.create(username="bar", uuid=uuid.uuid4())
 
@@ -293,9 +298,9 @@ def test_query_user_data__cannot_access_other_users_data(api_client, settings):
     assert response.status_code == 403, response.data
     assert response.data == {"detail": "You do not have permission to perform this action."}
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API GET request can't access data for user.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API GET request can't access data for user.",)
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "details": {
             "request_user_id": str(user.id),
             "request_user_uuid": str(user.uuid),
@@ -306,7 +311,7 @@ def test_query_user_data__cannot_access_other_users_data(api_client, settings):
 
 
 @patch_method(SentryLogger.log_message)
-def test_query_user_data__not_authenticated(api_client, settings):
+def test_query_user_data__not_authenticated(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create()
 
     settings.GDPR_API_QUERY_SCOPE = "gdprquery"
@@ -318,13 +323,13 @@ def test_query_user_data__not_authenticated(api_client, settings):
     assert response.status_code == 401, response.data
     assert response.data == {"detail": "Authentication credentials were not provided."}
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API GET request not authenticated.",)
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API GET request not authenticated.",)
 
 
 @patch_method(SentryLogger.log_message)
 @freeze_time("2024-01-01T00:00:00")
-def test_query_user_data__wrong_scope(api_client, settings):
+def test_query_user_data__wrong_scope(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create()
 
     settings.GDPR_API_QUERY_SCOPE = "gdprquery"
@@ -338,9 +343,9 @@ def test_query_user_data__wrong_scope(api_client, settings):
     assert response.status_code == 403, response.data
     assert response.data == {"detail": "You do not have permission to perform this action."}
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API GET permission check failed.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API GET permission check failed.",)
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "details": {
             "request_method": "GET",
             "allowed_loa": ["substantial", "high"],
@@ -361,7 +366,7 @@ def test_query_user_data__wrong_scope(api_client, settings):
 
 @patch_method(SentryLogger.log_message)
 @freeze_time("2024-01-01T00:00:00")
-def test_query_user_data__insufficient_loa(api_client, settings):
+def test_query_user_data__insufficient_loa(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo")
 
     settings.GDPR_API_QUERY_SCOPE = "gdprquery"
@@ -377,9 +382,9 @@ def test_query_user_data__insufficient_loa(api_client, settings):
     user.refresh_from_db()
     assert user.username == "foo"
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API GET permission check failed.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API GET permission check failed.",)
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "details": {
             "request_method": "GET",
             "allowed_loa": ["substantial", "high"],
@@ -401,7 +406,7 @@ def test_query_user_data__insufficient_loa(api_client, settings):
 # DELETE
 
 
-def test_delete_user_data__should_anonymize(api_client, settings):
+def test_delete_user_data__should_anonymize(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo")
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
@@ -418,7 +423,7 @@ def test_delete_user_data__should_anonymize(api_client, settings):
     assert user.username == f"anonymized-{user.uuid}"
 
 
-def test_delete_user_data__has_trailing_slash(api_client, settings):
+def test_delete_user_data__has_trailing_slash(api_client: APIClient, settings: Settings) -> None:
     # Makes sure that the endpoint works with or without a trailing slash
     # since delete request cannot be forwarded if the trailing slash is missing.
     user = UserFactory.create(username="foo")
@@ -437,7 +442,7 @@ def test_delete_user_data__has_trailing_slash(api_client, settings):
     assert user.username == f"anonymized-{user.uuid}"
 
 
-def test_delete_user_data__dont_anonymize_if_open_payments(api_client, settings):
+def test_delete_user_data__dont_anonymize_if_open_payments(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo")
     reservation = ReservationFactory.create(
         user=user,
@@ -472,7 +477,7 @@ def test_delete_user_data__dont_anonymize_if_open_payments(api_client, settings)
 
 
 @freeze_time("2024-06-15T12:00:00")
-def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, settings):
+def test_delete_user_data__dont_anonymize_if_open_reservations(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo")
     begin = local_datetime()
     end = begin + datetime.timedelta(hours=2)
@@ -504,7 +509,9 @@ def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, setti
 
 
 @freeze_time("2024-06-15T12:00:00")
-def test_delete_user_data__dont_anonymize_if_reservation_one_month_ago(api_client, settings):
+def test_delete_user_data__dont_anonymize_if_reservation_one_month_ago(
+    api_client: APIClient, settings: Settings
+) -> None:
     user = UserFactory.create(username="foo")
     begin = local_datetime() - relativedelta(months=1)
     end = begin + datetime.timedelta(hours=2)
@@ -535,7 +542,7 @@ def test_delete_user_data__dont_anonymize_if_reservation_one_month_ago(api_clien
     assert user.username == "foo"
 
 
-def test_delete_user_data__dont_anonymize_if_open_applications(api_client, settings):
+def test_delete_user_data__dont_anonymize_if_open_applications(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo")
     ApplicationFactory.create_in_status_in_allocation(user=user)
 
@@ -565,7 +572,7 @@ def test_delete_user_data__dont_anonymize_if_open_applications(api_client, setti
 
 
 @patch_method(SentryLogger.log_message)
-def test_delete_user_data__user_not_found(api_client, settings):
+def test_delete_user_data__user_not_found(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create()
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
@@ -579,9 +586,9 @@ def test_delete_user_data__user_not_found(api_client, settings):
     assert response.status_code == 404, response.data
     assert response.data == {"detail": "No ProfileUser matches the given query."}
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API query failed.",)
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "details": {
             "detail": ErrorDetail(
                 string="No ProfileUser matches the given query.",
@@ -592,7 +599,7 @@ def test_delete_user_data__user_not_found(api_client, settings):
 
 
 @patch_method(SentryLogger.log_message)
-def test_delete_user_data__cannot_anonymize_other_users_data(api_client, settings):
+def test_delete_user_data__cannot_anonymize_other_users_data(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo", uuid=uuid.uuid4())
     other_user = UserFactory.create(username="bar", uuid=uuid.uuid4())
 
@@ -609,9 +616,9 @@ def test_delete_user_data__cannot_anonymize_other_users_data(api_client, setting
     other_user.refresh_from_db()
     assert other_user.username == "bar"
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API DELETE request can't access data for user.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API DELETE request can't access data for user.",)
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "details": {
             "request_user_id": str(user.id),
             "request_user_uuid": str(user.uuid),
@@ -622,7 +629,7 @@ def test_delete_user_data__cannot_anonymize_other_users_data(api_client, setting
 
 
 @patch_method(SentryLogger.log_message)
-def test_delete_user_data__not_authenticated(api_client, settings):
+def test_delete_user_data__not_authenticated(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo")
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
@@ -636,13 +643,13 @@ def test_delete_user_data__not_authenticated(api_client, settings):
     user.refresh_from_db()
     assert user.username == "foo"
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API DELETE request not authenticated.",)
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API DELETE request not authenticated.",)
 
 
 @patch_method(SentryLogger.log_message)
 @freeze_time("2024-01-01T00:00:00")
-def test_delete_user_data__wrong_scope(api_client, settings):
+def test_delete_user_data__wrong_scope(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo")
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
@@ -658,9 +665,9 @@ def test_delete_user_data__wrong_scope(api_client, settings):
     user.refresh_from_db()
     assert user.username == "foo"
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API DELETE permission check failed.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API DELETE permission check failed.",)
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "details": {
             "request_method": "DELETE",
             "allowed_loa": ["substantial", "high"],
@@ -681,7 +688,7 @@ def test_delete_user_data__wrong_scope(api_client, settings):
 
 @patch_method(SentryLogger.log_message)
 @freeze_time("2024-01-01T00:00:00")
-def test_delete_user_data__insufficient_loa(api_client, settings):
+def test_delete_user_data__insufficient_loa(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create(username="foo")
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
@@ -697,9 +704,9 @@ def test_delete_user_data__insufficient_loa(api_client, settings):
     user.refresh_from_db()
     assert user.username == "foo"
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API DELETE permission check failed.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ("GDPR API DELETE permission check failed.",)
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "details": {
             "request_method": "DELETE",
             "allowed_loa": ["substantial", "high"],
@@ -719,7 +726,9 @@ def test_delete_user_data__insufficient_loa(api_client, settings):
 
 
 @pytest.mark.parametrize("dry_run", ["true", "True", "TRUE", "1", 1, True])
-def test_delete_user_data__dont_anonymize_if_dryrun(api_client, settings, dry_run):
+def test_delete_user_data__dont_anonymize_if_dryrun(
+    api_client: APIClient, settings: Settings, dry_run: str | int | bool
+) -> None:
     user = UserFactory.create(username="foo")
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
