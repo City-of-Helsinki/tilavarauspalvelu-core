@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import freezegun
 import pytest
 
@@ -8,6 +10,9 @@ from tilavarauspalvelu.models import PaymentOrder
 
 from .helpers import get_order, order_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -15,7 +20,7 @@ pytestmark = [
 
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
-def test_order__query(graphql):
+def test_order__query(graphql: GraphQLClient) -> None:
     order = get_order()
 
     graphql.login_with_superuser()
@@ -24,6 +29,7 @@ def test_order__query(graphql):
 
     assert response.has_errors is False
 
+    assert order.reservation is not None
     assert response.first_query_object == {
         "orderUuid": str(order.remote_id),
         "status": str(order.status),
@@ -37,7 +43,7 @@ def test_order__query(graphql):
 
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
-def test_order__query__checkout_url_not_visible_when_expired(graphql):
+def test_order__query__checkout_url_not_visible_when_expired(graphql: GraphQLClient) -> None:
     order = get_order()
 
     graphql.login_with_superuser()
@@ -57,7 +63,7 @@ def test_order__query__checkout_url_not_visible_when_expired(graphql):
 
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
-def test_order__query__checkout_url_not_visible_when_not_draft(graphql):
+def test_order__query__checkout_url_not_visible_when_not_draft(graphql: GraphQLClient) -> None:
     order = get_order()
 
     graphql.login_with_superuser()
@@ -76,7 +82,7 @@ def test_order__query__checkout_url_not_visible_when_not_draft(graphql):
 
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
-def test_order__query__expires_in_minutes_keeps_updating_based_on_current_time(graphql):
+def test_order__query__expires_in_minutes_keeps_updating_based_on_current_time(graphql: GraphQLClient) -> None:
     order = get_order()
 
     graphql.login_with_superuser()
@@ -107,7 +113,7 @@ def test_order__query__expires_in_minutes_keeps_updating_based_on_current_time(g
 
 # The clocks move from 04:00 back to 03:00 local time at 01:00 UTC on this night.
 @pytest.mark.parametrize("now", ["2026-10-25T00:58:00Z", "2026-10-25T01:05:00Z"])
-def test_order__query__expires_in_minutes__over_daylight_saving_time_change(graphql, now):
+def test_order__query__expires_in_minutes__over_daylight_saving_time_change(graphql: GraphQLClient, now: str) -> None:
     with freezegun.freeze_time(now):
         order = get_order()
 
@@ -121,8 +127,9 @@ def test_order__query__expires_in_minutes__over_daylight_saving_time_change(grap
 
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
-def test_order__query__reservation_is_deleted__nothing_returned(graphql):
+def test_order__query__reservation_is_deleted__nothing_returned(graphql: GraphQLClient) -> None:
     order = get_order()
+    assert order.reservation is not None
     order.reservation.delete()
 
     graphql.login_with_superuser()
