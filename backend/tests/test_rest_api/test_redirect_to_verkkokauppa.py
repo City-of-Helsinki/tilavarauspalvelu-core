@@ -14,7 +14,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 from utils.date_utils import local_date, local_datetime, next_hour
 from utils.utils import get_query_params, update_query_params
 
-from tests.factories import OrderFactory, ReservationFactory, ReservationUnitFactory
+from tests.factories import OrderFactory, PaymentMerchantFactory, ReservationFactory, ReservationUnitFactory
 from tests.helpers import patch_method
 
 pytestmark = [
@@ -364,8 +364,8 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_payment_product(api_c
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
-    reservation.reservation_unit.payment_product = None
-    reservation.reservation_unit.save(update_fields=["payment_product"])
+    reservation.reservation_unit.payment_merchant = PaymentMerchantFactory.create()
+    reservation.reservation_unit.save(update_fields=["payment_merchant"])
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
     url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
