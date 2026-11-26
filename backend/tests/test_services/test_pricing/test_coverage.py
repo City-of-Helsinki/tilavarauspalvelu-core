@@ -25,7 +25,7 @@ APR_1 = datetime.date(2026, 4, 1)
 # ── No errors ──
 
 
-def test_coverage__one_component_with_no_end():
+def test_coverage__one_component_with_no_end() -> None:
     component = PriceComponentFactory.build(valid_from=JAN_1, valid_until=None)
 
     errors = check_pricing_group_coverage(components=[component], reservation_unit_begin_dates=[JAN_1])
@@ -33,7 +33,7 @@ def test_coverage__one_component_with_no_end():
     assert errors == []
 
 
-def test_coverage__price_change_with_no_gap():
+def test_coverage__price_change_with_no_gap() -> None:
     first = PriceComponentFactory.build(valid_from=JAN_1, valid_until=FEB_1)
     second = PriceComponentFactory.build(valid_from=FEB_1, valid_until=None)
 
@@ -42,13 +42,13 @@ def test_coverage__price_change_with_no_gap():
     assert errors == []
 
 
-def test_coverage__no_components_and_no_reservation_units():
+def test_coverage__no_components_and_no_reservation_units() -> None:
     errors = check_pricing_group_coverage(components=[], reservation_unit_begin_dates=[])
 
     assert errors == []
 
 
-def test_coverage__options_with_their_own_components():
+def test_coverage__options_with_their_own_components() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group)
@@ -64,7 +64,7 @@ def test_coverage__options_with_their_own_components():
     assert errors == []
 
 
-def test_coverage__option_starts_later():
+def test_coverage__option_starts_later() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group)
@@ -80,7 +80,7 @@ def test_coverage__option_starts_later():
     assert errors == []
 
 
-def test_coverage__free_and_paid_components_on_the_same_date():
+def test_coverage__free_and_paid_components_on_the_same_date() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group)
@@ -108,7 +108,7 @@ def test_coverage__free_and_paid_components_on_the_same_date():
 # ── Gaps ──
 
 
-def test_coverage__gap_between_dates():
+def test_coverage__gap_between_dates() -> None:
     first = PriceComponentFactory.build(valid_from=JAN_1, valid_until=FEB_1)
     second = PriceComponentFactory.build(valid_from=MAR_1, valid_until=None)
 
@@ -125,7 +125,7 @@ def test_coverage__gap_between_dates():
     ]
 
 
-def test_coverage__last_component_has_an_end():
+def test_coverage__last_component_has_an_end() -> None:
     component = PriceComponentFactory.build(valid_from=JAN_1, valid_until=FEB_1)
 
     errors = check_pricing_group_coverage(components=[component], reservation_unit_begin_dates=[])
@@ -144,7 +144,7 @@ def test_coverage__last_component_has_an_end():
 # ── Overlaps ──
 
 
-def test_coverage__overlap_without_options():
+def test_coverage__overlap_without_options() -> None:
     first = PriceComponentFactory.build(valid_from=JAN_1, valid_until=MAR_1)
     second = PriceComponentFactory.build(valid_from=FEB_1, valid_until=None)
 
@@ -164,7 +164,7 @@ def test_coverage__overlap_without_options():
     ]
 
 
-def test_coverage__overlap_names_saved_components():
+def test_coverage__overlap_names_saved_components() -> None:
     first = PriceComponentFactory.create(valid_from=JAN_1, valid_until=None)
     second = PriceComponentFactory.create(pricing_group=first.pricing_group, valid_from=FEB_1, valid_until=None)
 
@@ -175,7 +175,7 @@ def test_coverage__overlap_names_saved_components():
     ]
 
 
-def test_coverage__overlap_for_one_option():
+def test_coverage__overlap_for_one_option() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
@@ -199,7 +199,7 @@ def test_coverage__overlap_for_one_option():
     ]
 
 
-def test_coverage__component_for_all_options_overlaps_an_option():
+def test_coverage__component_for_all_options_overlaps_an_option() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
@@ -226,7 +226,7 @@ def test_coverage__component_for_all_options_overlaps_an_option():
 # ── Reservation units ──
 
 
-def test_coverage__reservation_unit_begins_before_components():
+def test_coverage__reservation_unit_begins_before_components() -> None:
     component = PriceComponentFactory.build(valid_from=FEB_1, valid_until=None)
 
     errors = check_pricing_group_coverage(components=[component], reservation_unit_begin_dates=[APR_1, JAN_1])
@@ -242,7 +242,7 @@ def test_coverage__reservation_unit_begins_before_components():
     ]
 
 
-def test_coverage__reservation_unit_uses_a_group_with_no_components():
+def test_coverage__reservation_unit_uses_a_group_with_no_components() -> None:
     errors = check_pricing_group_coverage(components=[], reservation_unit_begin_dates=[JAN_1])
 
     assert errors == [
