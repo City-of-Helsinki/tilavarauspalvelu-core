@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -25,6 +26,9 @@ from tests.factories import (
 
 from .helpers import CREATE_ALLOCATION, allocation_create_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -34,13 +38,13 @@ pytestmark = [
 # ── Create ──
 
 
-def test_allocated_time_slot__create(graphql):
+def test_allocated_time_slot__create(graphql: GraphQLClient) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # At this point the application section is still in IN_ALLOCATION status
@@ -66,13 +70,13 @@ def test_allocated_time_slot__create(graphql):
     assert section.status == ApplicationSectionStatusChoice.HANDLED
 
 
-def test_allocated_time_slot__create__still_in_allocation_if_applied_not_fulfilled(graphql):
+def test_allocated_time_slot__create__still_in_allocation_if_applied_not_fulfilled(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application section with one approved time slot and two applied reservations per week
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation(applied_reservations_per_week=2)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # At this point the application section is still in IN_ALLOCATION status
@@ -101,13 +105,15 @@ def test_allocated_time_slot__create__still_in_allocation_if_applied_not_fulfill
         ("reservationUnitOption", "Int!"),
     ],
 )
-def test_allocated_time_slot__create__incomplete_data(graphql, missing_key, required_type):
+def test_allocated_time_slot__create__incomplete_data(
+    graphql: GraphQLClient, missing_key: str, required_type: str
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # when:
@@ -135,14 +141,14 @@ def test_allocated_time_slot__create__incomplete_data(graphql, missing_key, requ
     assert option.allocated_time_slots.count() == 0
 
 
-def test_allocated_time_slot__create__application_not_yet_in_allocation(graphql):
+def test_allocated_time_slot__create__application_not_yet_in_allocation(graphql: GraphQLClient) -> None:
     # given:
     # - There is an open application that has been sent, but is not allocatable yet
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_upcoming()
     application = ApplicationFactory.create_application_ready_for_allocation(application_round)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     assert application.status == ApplicationStatusChoice.RECEIVED
@@ -159,14 +165,14 @@ def test_allocated_time_slot__create__application_not_yet_in_allocation(graphql)
     ]
 
 
-def test_allocated_time_slot__create__application_not_in_allocation_anymore__HANDLED(graphql):
+def test_allocated_time_slot__create__application_not_in_allocation_anymore__HANDLED(graphql: GraphQLClient) -> None:
     # given:
     # - There is an open application that is already allocated
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_handled()
     application = ApplicationFactory.create_application_ready_for_allocation(application_round, pre_allocated=True)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     assert application.status == ApplicationStatusChoice.HANDLED
@@ -182,14 +188,14 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__HAN
     assert response.field_error_messages() == ["Cannot allocate to application section in status: 'HANDLED'"]
 
 
-def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJECTED(graphql):
+def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJECTED(graphql: GraphQLClient) -> None:
     # given:
     # - There is an open application that is already allocated
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_handled()
     application = ApplicationFactory.create_application_ready_for_allocation(application_round)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     option.is_rejected = True
     option.save()
     graphql.login_with_superuser()
@@ -211,13 +217,15 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJ
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__approve_duration_longer_than_section_maximum(graphql, force):
+def test_allocated_time_slot__create__approve_duration_longer_than_section_maximum(
+    graphql: GraphQLClient, force: bool
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # when:
@@ -239,13 +247,15 @@ def test_allocated_time_slot__create__approve_duration_longer_than_section_maxim
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__approve_duration_shorter_than_section_minimum(graphql, force):
+def test_allocated_time_slot__create__approve_duration_shorter_than_section_minimum(
+    graphql: GraphQLClient, force: bool
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # when:
@@ -266,10 +276,10 @@ def test_allocated_time_slot__create__approve_duration_shorter_than_section_mini
         ]
 
 
-def test_allocated_time_slot__create__approve_times_at_15_minute_steps(graphql):
+def test_allocated_time_slot__create__approve_times_at_15_minute_steps(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     option.reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES
     option.reservation_unit.save()
     graphql.login_with_superuser()
@@ -285,13 +295,15 @@ def test_allocated_time_slot__create__approve_times_at_15_minute_steps(graphql):
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__approve_times_not_multiple_of_15_minutes(graphql, force):
+def test_allocated_time_slot__create__approve_times_not_multiple_of_15_minutes(
+    graphql: GraphQLClient, force: bool
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # when:
@@ -309,10 +321,12 @@ def test_allocated_time_slot__create__approve_times_not_multiple_of_15_minutes(g
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__approve_begin_time_not_matching_start_interval(graphql, force):
+def test_allocated_time_slot__create__approve_begin_time_not_matching_start_interval(
+    graphql: GraphQLClient, force: bool
+) -> None:
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     option.reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
     option.reservation_unit.save()
     graphql.login_with_superuser()
@@ -342,13 +356,15 @@ def test_allocated_time_slot__create__approve_begin_time_not_matching_start_inte
         (datetime.time(22, 0), datetime.time(0, 30)),
     ],
 )
-def test_allocated_time_slot__create__approve_begin_time_after_end_time(graphql, force, begin_time, end_time):
+def test_allocated_time_slot__create__approve_begin_time_after_end_time(
+    graphql: GraphQLClient, force: bool, begin_time: datetime.time, end_time: datetime.time
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # when:
@@ -366,13 +382,13 @@ def test_allocated_time_slot__create__approve_begin_time_after_end_time(graphql,
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__approve_more_than_events_per_week(graphql, force):
+def test_allocated_time_slot__create__approve_more_than_events_per_week(graphql: GraphQLClient, force: bool) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation(pre_allocated=True)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # when:
@@ -400,13 +416,15 @@ def test_allocated_time_slot__create__approve_more_than_events_per_week(graphql,
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__approve_outside_of_suitable_time_ranges(graphql, force):
+def test_allocated_time_slot__create__approve_outside_of_suitable_time_ranges(
+    graphql: GraphQLClient, force: bool
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     # when:
@@ -432,13 +450,15 @@ def test_allocated_time_slot__create__approve_outside_of_suitable_time_ranges(gr
         ]
 
 
-def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_suitable_time_ranges(graphql):
+def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_suitable_time_ranges(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     SuitableTimeRangeFactory.create(
@@ -464,10 +484,10 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_su
     assert option.allocated_time_slots.count() == 1
 
 
-def test_allocated_time_slot__create__suitable_time_range_ends_at_midnight(graphql):
+def test_allocated_time_slot__create__suitable_time_range_ends_at_midnight(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_application_ready_for_allocation(times_slots_to_create=0)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     SuitableTimeRangeFactory.create(
@@ -484,10 +504,12 @@ def test_allocated_time_slot__create__suitable_time_range_ends_at_midnight(graph
     assert option.allocated_time_slots.count() == 1
 
 
-def test_allocated_time_slot__create__allocation_ends_at_midnight__outside_of_suitable_time_ranges(graphql):
+def test_allocated_time_slot__create__allocation_ends_at_midnight__outside_of_suitable_time_ranges(
+    graphql: GraphQLClient,
+) -> None:
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     input_data = allocation_create_data(option, begin_time=datetime.time(22, 0), end_time=datetime.time(0, 0))
@@ -499,13 +521,13 @@ def test_allocated_time_slot__create__allocation_ends_at_midnight__outside_of_su
     assert option.allocated_time_slots.count() == 0
 
 
-def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wished_times(graphql):
+def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wished_times(graphql: GraphQLClient) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     graphql.login_with_superuser()
 
     SuitableTimeRangeFactory.create(
@@ -536,14 +558,15 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wishe
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__reservation_unit_rejected(graphql, force):
+def test_allocated_time_slot__create__reservation_unit_rejected(graphql: GraphQLClient, force: bool) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     ReservationUnitOptionFactory.create(application_section=section)
     option = section.reservation_unit_options.first()
+    assert option is not None
     option.is_rejected = True
     option.save()
 
@@ -563,14 +586,15 @@ def test_allocated_time_slot__create__reservation_unit_rejected(graphql, force):
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
+def test_allocated_time_slot__create__reservation_unit_locked(graphql: GraphQLClient, force: bool) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     ReservationUnitOptionFactory.create(application_section=section)
     option = section.reservation_unit_options.first()
+    assert option is not None
     option.is_locked = True
     option.save()
 
@@ -593,14 +617,14 @@ def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, force):
+def test_allocated_time_slot__create__two_allocations_for_same_day(graphql: GraphQLClient, force: bool) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - The application section already has an allocation on Monday
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation(applied_reservations_per_week=2)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
 
     AllocatedTimeSlotFactory.create(
         reservation_unit_option=option,
@@ -632,15 +656,17 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__overlapping_with_another_allocation_for_same_reservation_unit(graphql, force):
+def test_allocated_time_slot__create__overlapping_with_another_allocation_for_same_reservation_unit(
+    graphql: GraphQLClient, force: bool
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - There is an overlapping allocation for the same reservation unit
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
     application = ApplicationFactory.create_application_ready_for_allocation(reservation_unit=reservation_unit)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
 
     ApplicationFactory.create_application_ready_for_allocation(reservation_unit=reservation_unit, pre_allocated=True)
     ReservationUnitHierarchy.refresh()
@@ -671,18 +697,18 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_sa
     ],
 )
 def test_allocated_time_slot__create__overlapping_with_another_allocation__ends_at_midnight(
-    graphql,
-    existing_begin_time,
-    existing_end_time,
-    new_begin_time,
-    new_end_time,
-):
+    graphql: GraphQLClient,
+    existing_begin_time: datetime.time,
+    existing_end_time: datetime.time,
+    new_begin_time: datetime.time,
+    new_end_time: datetime.time,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
     application = ApplicationFactory.create_application_ready_for_allocation(reservation_unit=reservation_unit)
-    option = application.application_sections.first().reservation_unit_options.first()
+    option = application.application_sections.get().reservation_unit_options.get()
 
     other_application = ApplicationFactory.create_application_ready_for_allocation(reservation_unit=reservation_unit)
-    other_option = other_application.application_sections.first().reservation_unit_options.first()
+    other_option = other_application.application_sections.get().reservation_unit_options.first()
     AllocatedTimeSlotFactory.create(
         reservation_unit_option=other_option,
         day_of_the_week=Weekday.MONDAY,
@@ -705,7 +731,9 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation__ends_
     assert option.allocated_time_slots.count() == 0
 
 
-def test_allocated_time_slot__create__overlapping_with_another_allocation__sections_share_a_date(graphql):
+def test_allocated_time_slot__create__overlapping_with_another_allocation__sections_share_a_date(
+    graphql: GraphQLClient,
+) -> None:
     shared_monday = datetime.date(2030, 1, 7)
     reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
     application = ApplicationFactory.create_application_ready_for_allocation(
@@ -713,7 +741,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation__secti
         begin_date=shared_monday,
         end_date=shared_monday + datetime.timedelta(days=7),
     )
-    option = application.application_sections.first().reservation_unit_options.first()
+    option = application.application_sections.get().reservation_unit_options.get()
 
     ApplicationFactory.create_application_ready_for_allocation(
         reservation_unit=reservation_unit,
@@ -737,14 +765,16 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation__secti
     assert option.allocated_time_slots.count() == 0
 
 
-def test_allocated_time_slot__create__overlapping_with_another_allocation_for_different_reservation_unit(graphql):
+def test_allocated_time_slot__create__overlapping_with_another_allocation_for_different_reservation_unit(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - There is an overlapping allocation for a different reservation unit
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     ApplicationFactory.create_application_ready_for_allocation(pre_allocated=True)
     graphql.login_with_superuser()
 
@@ -760,7 +790,9 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_di
 
 
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__overlapping_in_related_reservation_unit(graphql, force):
+def test_allocated_time_slot__create__overlapping_in_related_reservation_unit(
+    graphql: GraphQLClient, force: bool
+) -> None:
     # given:
     # - There are two reservation units, one being a child of the other
     # - There is an allocatable reservation unit option for the parent unit
@@ -772,8 +804,8 @@ def test_allocated_time_slot__create__overlapping_in_related_reservation_unit(gr
     child_unit = ReservationUnitFactory.create(spaces=[child_space])
 
     application = ApplicationFactory.create_application_ready_for_allocation(reservation_unit=parent_unit)
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     ApplicationFactory.create_application_ready_for_allocation(reservation_unit=child_unit, pre_allocated=True)
     ReservationUnitHierarchy.refresh()
 

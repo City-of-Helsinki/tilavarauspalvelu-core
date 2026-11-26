@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice, UserRoleChoice
@@ -9,13 +11,16 @@ from tests.test_graphql_api.test_application.helpers import applications_query
 
 from .helpers import allocations_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_allocated_time_slot__query__perms__admin_user(graphql):
+def test_allocated_time_slot__query__perms__admin_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is an allocated time slot
     # - A staff user is using the system
@@ -43,7 +48,9 @@ def test_allocated_time_slot__query__perms__admin_user(graphql):
         ApplicationStatusChoice.CANCELLED,
     ],
 )
-def test_allocated_time_slot__query__perms__application_owner__hidden(graphql, status):
+def test_allocated_time_slot__query__perms__application_owner__hidden(
+    graphql: GraphQLClient, status: ApplicationStatusChoice
+) -> None:
     application = ApplicationFactory.create_in_status(status=status)
     AllocatedTimeSlotFactory.create(reservation_unit_option__application_section__application=application)
     graphql.force_login(application.user)
@@ -54,11 +61,11 @@ def test_allocated_time_slot__query__perms__application_owner__hidden(graphql, s
     assert len(response.edges) == 0
 
 
-def test_allocated_time_slot__query__perms__application_owner__shown(graphql):
+def test_allocated_time_slot__query__perms__application_owner__shown(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_results_sent()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
-    allocation = option.allocated_time_slots.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
+    allocation = option.allocated_time_slots.get()
     graphql.force_login(application.user)
 
     response = graphql(allocations_query())
@@ -69,10 +76,10 @@ def test_allocated_time_slot__query__perms__application_owner__shown(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__query__perms__application_owner__through_application(graphql):
+def test_allocated_time_slot__query__perms__application_owner__through_application(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_handled()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     allocation = option.allocated_time_slots.first()
 
     assert allocation is not None
@@ -111,7 +118,7 @@ def test_allocated_time_slot__query__perms__application_owner__through_applicati
     }
 
 
-def test_allocated_time_slot__query__perms__regular_user(graphql):
+def test_allocated_time_slot__query__perms__regular_user(graphql: GraphQLClient) -> None:
     AllocatedTimeSlotFactory.create()
     graphql.login_with_regular_user()
 

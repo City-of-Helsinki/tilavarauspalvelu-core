@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
@@ -9,13 +11,16 @@ from tests.factories import AllocatedTimeSlotFactory, ReservationSeriesFactory, 
 
 from .helpers import allocations_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_allocated_time_slot__query__all_fields(graphql):
+def test_allocated_time_slot__query__all_fields(graphql: GraphQLClient) -> None:
     # given:
     # - There is an allocated time slot
     allocation = AllocatedTimeSlotFactory.create()
@@ -77,7 +82,7 @@ def test_allocated_time_slot__query__all_fields(graphql):
     }
 
 
-def test_allocated_time_slot__query__affecting_reservation_unit(graphql):
+def test_allocated_time_slot__query__affecting_reservation_unit(graphql: GraphQLClient) -> None:
     # given:
     # - There is a timeslot in the system
     space = SpaceFactory.create()
