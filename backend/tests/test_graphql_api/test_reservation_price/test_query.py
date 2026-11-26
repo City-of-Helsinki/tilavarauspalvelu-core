@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from graphene_django_extensions.testing import build_query
@@ -22,6 +23,9 @@ from tests.factories import (
     TaxLevelFactory,
     UnitGroupFactory,
 )
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -45,7 +49,7 @@ FIELDS = f"lines {{ {LINE_FIELDS} }} total canApplyForDiscount paymentType"
 # ── Price ──
 
 
-def test_reservation_price__hourly_price(graphql):
+def test_reservation_price__hourly_price(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(payment_type=PaymentType.ONLINE)
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -97,7 +101,7 @@ def test_reservation_price__hourly_price(graphql):
     }
 
 
-def test_reservation_price__same_as_reservation_price_lines(graphql):
+def test_reservation_price__same_as_reservation_price_lines(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -146,7 +150,7 @@ def test_reservation_price__same_as_reservation_price_lines(graphql):
 # ── Price option ──
 
 
-def test_reservation_price__with_price_option(graphql):
+def test_reservation_price__with_price_option(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -177,7 +181,7 @@ def test_reservation_price__with_price_option(graphql):
     }
 
 
-def test_reservation_price__inactive_price_option(graphql):
+def test_reservation_price__inactive_price_option(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -206,7 +210,7 @@ def test_reservation_price__inactive_price_option(graphql):
 # ── Errors ──
 
 
-def test_reservation_price__no_pricing_group(graphql):
+def test_reservation_price__no_pricing_group(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     query = build_query(
@@ -222,7 +226,7 @@ def test_reservation_price__no_pricing_group(graphql):
     assert response.error_code() == error_codes.PRICE_CALCULATION_FAILED
 
 
-def test_reservation_price__ends_before_it_begins(graphql):
+def test_reservation_price__ends_before_it_begins(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     query = build_query(
@@ -238,7 +242,7 @@ def test_reservation_price__ends_before_it_begins(graphql):
     assert response.error_code() == error_codes.PRICE_CALCULATION_FAILED
 
 
-def test_reservation_price__interval_too_long(graphql):
+def test_reservation_price__interval_too_long(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     query = build_query(
@@ -254,7 +258,7 @@ def test_reservation_price__interval_too_long(graphql):
     assert response.error_code() == error_codes.RESERVATION_PRICE_INTERVAL_TOO_LONG
 
 
-def test_reservation_price__reservation_unit_not_found(graphql):
+def test_reservation_price__reservation_unit_not_found(graphql: GraphQLClient) -> None:
     query = build_query(
         "reservationPrice",
         fields="total",
