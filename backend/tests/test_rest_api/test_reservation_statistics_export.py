@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -10,12 +11,18 @@ from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
 
+if TYPE_CHECKING:
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
+    from rest_framework.test import APIClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_statistics_export(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -92,7 +99,9 @@ def test_reservation_statistics_export(api_client, settings, django_capture_on_c
     assert data[1]["reservation_uuid"] == str(reservation_2.ext_uuid)
 
 
-def test_reservation_statistics_export__missing_auth(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__missing_auth(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -106,7 +115,9 @@ def test_reservation_statistics_export__missing_auth(api_client, settings, djang
     assert response.content.decode() == "Not authorized to export reservation statistics."
 
 
-def test_reservation_statistics_export__incorrect_auth(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__incorrect_auth(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -122,7 +133,9 @@ def test_reservation_statistics_export__incorrect_auth(api_client, settings, dja
     assert response.content.decode() == "Not authorized to export reservation statistics."
 
 
-def test_reservation_statistics_export__only_one(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__only_one(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -139,7 +152,9 @@ def test_reservation_statistics_export__only_one(api_client, settings, django_ca
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__only_two(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__only_two(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -157,7 +172,9 @@ def test_reservation_statistics_export__only_two(api_client, settings, django_ca
     assert data[1]["reservation_uuid"] == str(reservation_2.ext_uuid)
 
 
-def test_reservation_statistics_export__tprek_id(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__tprek_id(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -174,7 +191,9 @@ def test_reservation_statistics_export__tprek_id(api_client, settings, django_ca
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__begins_after(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__begins_after(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     begin_1 = local_datetime(2022, 1, 2, 12)
@@ -194,7 +213,9 @@ def test_reservation_statistics_export__begins_after(api_client, settings, djang
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__begins_before(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__begins_before(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     begin_1 = local_datetime(2022, 1, 2, 12)
@@ -214,7 +235,9 @@ def test_reservation_statistics_export__begins_before(api_client, settings, djan
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__start(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__start(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -231,7 +254,9 @@ def test_reservation_statistics_export__start(api_client, settings, django_captu
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__stop(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__stop(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -249,7 +274,9 @@ def test_reservation_statistics_export__stop(api_client, settings, django_captur
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_statistics_export__updated_after(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__updated_after(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -267,8 +294,8 @@ def test_reservation_statistics_export__updated_after(api_client, settings, djan
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation_statistics_export__updated_after__not_in_range(
-    api_client, settings, django_capture_on_commit_callbacks
-):
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -284,7 +311,9 @@ def test_reservation_statistics_export__updated_after__not_in_range(
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_statistics_export__updated_before(api_client, settings, django_capture_on_commit_callbacks):
+def test_reservation_statistics_export__updated_before(
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -302,8 +331,8 @@ def test_reservation_statistics_export__updated_before(api_client, settings, dja
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation_statistics_export__updated_before__not_in_range(
-    api_client, settings, django_capture_on_commit_callbacks
-):
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     with django_capture_on_commit_callbacks(execute=True):

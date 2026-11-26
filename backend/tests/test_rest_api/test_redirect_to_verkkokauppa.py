@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.urls import reverse
@@ -15,7 +16,11 @@ from utils.date_utils import local_date, local_datetime, next_hour
 from utils.utils import get_query_params, update_query_params
 
 from tests.factories import OrderFactory, ReservationFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -23,11 +28,11 @@ pytestmark = [
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_redirect_to_verkkokauppa__success(api_client, settings):
+def test_redirect_to_verkkokauppa__success(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     order = OrderFactory.create()
-    VerkkokauppaAPIClient.create_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = order
 
     reservation = ReservationFactory.create_with_pending_payment()
 
@@ -38,15 +43,15 @@ def test_redirect_to_verkkokauppa__success(api_client, settings):
     response = api_client.get(url)
 
     assert response.status_code == 302
-    assert response.url == "https://checkout.url/paymentmethod?lang=en"
+    assert response["Location"] == "https://checkout.url/paymentmethod?lang=en"
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_redirect_to_verkkokauppa__uses_tax_rate_of_payment_date(api_client, settings):
+def test_redirect_to_verkkokauppa__uses_tax_rate_of_payment_date(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     order = OrderFactory.create()
-    VerkkokauppaAPIClient.create_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = order
 
     reservation = ReservationFactory.create_with_pending_payment(price_lines__tax_percentage=Decimal(24))
 
@@ -67,7 +72,7 @@ def test_redirect_to_verkkokauppa__uses_tax_rate_of_payment_date(api_client, set
     assert payment_order.price_total == Decimal("12.4")
 
 
-def test_redirect_to_verkkokauppa__no_redirect_on_error(api_client, settings):
+def test_redirect_to_verkkokauppa__no_redirect_on_error(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
@@ -84,7 +89,7 @@ def test_redirect_to_verkkokauppa__no_redirect_on_error(api_client, settings):
     }
 
 
-def test_redirect_to_verkkokauppa__not_allowed_redirect_on_error(api_client, settings):
+def test_redirect_to_verkkokauppa__not_allowed_redirect_on_error(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://real.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
@@ -102,7 +107,7 @@ def test_redirect_to_verkkokauppa__not_allowed_redirect_on_error(api_client, set
     }
 
 
-def test_redirect_to_verkkokauppa__redirect_on_error_not_url(api_client, settings):
+def test_redirect_to_verkkokauppa__redirect_on_error_not_url(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
@@ -121,11 +126,11 @@ def test_redirect_to_verkkokauppa__redirect_on_error_not_url(api_client, setting
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_redirect_to_verkkokauppa__redirect_on_error_from_referer(api_client, settings):
+def test_redirect_to_verkkokauppa__redirect_on_error_from_referer(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     order = OrderFactory.create()
-    VerkkokauppaAPIClient.create_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = order
 
     reservation = ReservationFactory.create_with_pending_payment()
 
@@ -135,10 +140,10 @@ def test_redirect_to_verkkokauppa__redirect_on_error_from_referer(api_client, se
     response = api_client.get(url, headers={"Referer": "https://fake.varaamo.hel.fi"})
 
     assert response.status_code == 302
-    assert response.url == "https://checkout.url/paymentmethod"
+    assert response["Location"] == "https://checkout.url/paymentmethod"
 
 
-def test_redirect_to_verkkokauppa__reservation_not_found(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_not_found(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": 0})
@@ -146,7 +151,7 @@ def test_redirect_to_verkkokauppa__reservation_not_found(api_client, settings):
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -155,7 +160,7 @@ def test_redirect_to_verkkokauppa__reservation_not_found(api_client, settings):
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_user_not_request_user(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_user_not_request_user(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
@@ -165,7 +170,7 @@ def test_redirect_to_verkkokauppa__reservation_user_not_request_user(api_client,
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -174,7 +179,7 @@ def test_redirect_to_verkkokauppa__reservation_user_not_request_user(api_client,
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_not_confirmed(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_not_confirmed(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment(
@@ -187,7 +192,7 @@ def test_redirect_to_verkkokauppa__reservation_not_confirmed(api_client, setting
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -196,7 +201,7 @@ def test_redirect_to_verkkokauppa__reservation_not_confirmed(api_client, setting
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     begin = next_hour(plus_hours=1)
@@ -217,7 +222,7 @@ def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client, sett
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -226,7 +231,9 @@ def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client, sett
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_payment_not_in_verkkokauppa(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_payment_not_in_verkkokauppa(
+    api_client: APIClient, settings: Settings
+) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment(
@@ -239,7 +246,7 @@ def test_redirect_to_verkkokauppa__reservation_payment_not_in_verkkokauppa(api_c
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -248,7 +255,7 @@ def test_redirect_to_verkkokauppa__reservation_payment_not_in_verkkokauppa(api_c
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_payment_not_pending(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_payment_not_pending(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment(
@@ -261,7 +268,7 @@ def test_redirect_to_verkkokauppa__reservation_payment_not_pending(api_client, s
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -270,7 +277,9 @@ def test_redirect_to_verkkokauppa__reservation_payment_not_pending(api_client, s
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_handled_payment_due_by_in_past(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_handled_payment_due_by_in_past(
+    api_client: APIClient, settings: Settings
+) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment(
@@ -283,7 +292,7 @@ def test_redirect_to_verkkokauppa__reservation_handled_payment_due_by_in_past(ap
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -292,7 +301,9 @@ def test_redirect_to_verkkokauppa__reservation_handled_payment_due_by_in_past(ap
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order(
+    api_client: APIClient, settings: Settings
+) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment(
@@ -308,15 +319,17 @@ def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order(ap
     response = api_client.get(url)
 
     assert response.status_code == 302
-    assert response.url == "https://fake.varaamo.hel.fi/checkout/paymentmethod"
+    assert response["Location"] == "https://fake.varaamo.hel.fi/checkout/paymentmethod"
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__expired(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__expired(
+    api_client: APIClient, settings: Settings
+) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     order = OrderFactory.create()
-    VerkkokauppaAPIClient.create_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = order
 
     reservation = ReservationFactory.create_with_pending_payment(
         payment_order__remote_id=uuid.uuid4(),
@@ -335,10 +348,10 @@ def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__e
 
     # Current order was not valid, so a new order was created
     assert response.status_code == 302
-    assert response.url == "https://checkout.url/paymentmethod"
+    assert response["Location"] == "https://checkout.url/paymentmethod"
 
 
-def test_redirect_to_verkkokauppa__reservation_has_no_price_lines(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_has_no_price_lines(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
@@ -350,7 +363,7 @@ def test_redirect_to_verkkokauppa__reservation_has_no_price_lines(api_client, se
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -360,7 +373,9 @@ def test_redirect_to_verkkokauppa__reservation_has_no_price_lines(api_client, se
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_redirect_to_verkkokauppa__reservation_unit_has_no_payment_product(api_client, settings):
+def test_redirect_to_verkkokauppa__reservation_unit_has_no_payment_product(
+    api_client: APIClient, settings: Settings
+) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
@@ -373,7 +388,7 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_payment_product(api_c
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -381,11 +396,11 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_payment_product(api_c
         "error_code": "RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT",
     }
 
-    assert VerkkokauppaAPIClient.create_order.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_order).called is False
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client, settings):
+def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment(price_lines__tax_percentage=Decimal("25.5"))
@@ -399,7 +414,7 @@ def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client, setti
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -412,7 +427,9 @@ def test_redirect_to_verkkokauppa__tax_level_has_no_rate_today(api_client, setti
 
 
 @patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Error"))
-def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client, settings):
+def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(
+    api_client: APIClient, settings: Settings
+) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment()
@@ -423,7 +440,7 @@ def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client
     api_client.force_login(reservation.user)
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -433,7 +450,9 @@ def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client
 
 
 @patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Error"))
-def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed__tax_amounts_match(api_client, settings):
+def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed__tax_amounts_match(
+    api_client: APIClient, settings: Settings
+) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     reservation = ReservationFactory.create_with_pending_payment(price_lines__tax_percentage=Decimal(24))

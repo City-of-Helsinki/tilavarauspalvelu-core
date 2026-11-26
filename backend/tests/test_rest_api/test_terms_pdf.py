@@ -4,6 +4,7 @@ import io
 from typing import TYPE_CHECKING
 
 import pytest
+from django.http import FileResponse
 from pypdf import PdfReader
 from rest_framework.reverse import reverse
 
@@ -12,14 +13,14 @@ from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 from tests.factories import TermsOfUseFactory
 
 if TYPE_CHECKING:
-    from django.http import FileResponse, JsonResponse
+    from rest_framework.test import APIClient
 
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_terms_pdf(api_client):
+def test_terms_pdf(api_client: APIClient) -> None:
     TermsOfUseFactory.create(
         id="booking",
         name_fi="Test Terms of Use",
@@ -33,7 +34,8 @@ def test_terms_pdf(api_client):
 
     url = reverse("terms_of_use_pdf")
 
-    response: FileResponse = api_client.get(url)
+    response = api_client.get(url)
+    assert isinstance(response, FileResponse)
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "application/pdf"
@@ -41,7 +43,7 @@ def test_terms_pdf(api_client):
         'attachment; filename="Tilavarauspalvelu_yleiset_sopimusehdot.pdf"'
     )
 
-    content = io.BytesIO(b"".join(response.streaming_content))
+    content = io.BytesIO(response.getvalue())
     pdf = PdfReader(content)
 
     assert len(pdf.pages) == 3
@@ -51,7 +53,7 @@ def test_terms_pdf(api_client):
     assert "Test Terms of Use text English" in pdf.pages[2].extract_text()
 
 
-def test_terms_pdf__not_as_attachment(api_client):
+def test_terms_pdf__not_as_attachment(api_client: APIClient) -> None:
     TermsOfUseFactory.create(
         id="booking",
         name_fi="Test Terms of Use",
@@ -65,12 +67,13 @@ def test_terms_pdf__not_as_attachment(api_client):
 
     url = reverse("terms_of_use_pdf") + "?as_attachment=False"
 
-    response: FileResponse = api_client.get(url)
+    response = api_client.get(url)
+    assert isinstance(response, FileResponse)
 
     assert response.status_code == 200
     assert response.headers["Content-Disposition"] == 'inline; filename="Tilavarauspalvelu_yleiset_sopimusehdot.pdf"'
 
-    content = io.BytesIO(b"".join(response.streaming_content))
+    content = io.BytesIO(response.getvalue())
     pdf = PdfReader(content)
 
     assert len(pdf.pages) == 3
@@ -80,10 +83,10 @@ def test_terms_pdf__not_as_attachment(api_client):
     assert "Test Terms of Use text English" in pdf.pages[2].extract_text()
 
 
-def test_terms_pdf__missing_terms(api_client):
+def test_terms_pdf__missing_terms(api_client: APIClient) -> None:
     url = reverse("terms_of_use_pdf")
 
-    response: JsonResponse = api_client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Terms of use with ID 'booking' not found"}

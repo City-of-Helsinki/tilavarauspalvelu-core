@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 from django.urls import reverse
@@ -12,10 +13,14 @@ from utils.utils import get_query_params, update_query_params
 
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory, UnitFactory, UserFactory
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
+
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__single_reservation_unit(api_client, settings):
+def test_redirect_to_hauki__single_reservation_unit(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -30,7 +35,7 @@ def test_redirect_to_hauki__single_reservation_unit(api_client, settings):
 
     url = update_query_params(
         reverse("edit_opening_hours"),
-        reservation_units=reservation_unit.pk,
+        reservation_units=str(reservation_unit.pk),
         redirect_on_error="https://fake.varaamo.hel.fi",
         lang="en",
     )
@@ -40,7 +45,7 @@ def test_redirect_to_hauki__single_reservation_unit(api_client, settings):
     response = api_client.get(url)
 
     assert response.status_code == 302, response.content.decode()
-    assert response.url == (
+    assert response["Location"] == (
         "https://fake.test.hauki.admin.com/resource/test-origin%3Af08dcb9f-9765-4747-b0c8-6d472326e562/"
         "?hsa_source=test-origin"
         "&hsa_username=test.user%40varaamo.fi"
@@ -55,7 +60,7 @@ def test_redirect_to_hauki__single_reservation_unit(api_client, settings):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__multiple_reservation_units(api_client, settings):
+def test_redirect_to_hauki__multiple_reservation_units(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -86,7 +91,7 @@ def test_redirect_to_hauki__multiple_reservation_units(api_client, settings):
     response = api_client.get(url)
 
     assert response.status_code == 302
-    assert response.url == (
+    assert response["Location"] == (
         "https://fake.test.hauki.admin.com/resource/test-origin%3Ab06643c1-955f-45b3-8372-ec29fa03a778/"
         "?hsa_source=test-origin"
         "&hsa_username=test.user%40varaamo.fi"
@@ -102,7 +107,7 @@ def test_redirect_to_hauki__multiple_reservation_units(api_client, settings):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__no_redirect_on_error(api_client, settings):
+def test_redirect_to_hauki__no_redirect_on_error(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -117,7 +122,7 @@ def test_redirect_to_hauki__no_redirect_on_error(api_client, settings):
 
     url = update_query_params(
         reverse("edit_opening_hours"),
-        reservation_units=reservation_unit.pk,
+        reservation_units=str(reservation_unit.pk),
         lang="en",
     )
 
@@ -134,7 +139,7 @@ def test_redirect_to_hauki__no_redirect_on_error(api_client, settings):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__not_allowed_redirect_on_error(api_client, settings):
+def test_redirect_to_hauki__not_allowed_redirect_on_error(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://real.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -149,7 +154,7 @@ def test_redirect_to_hauki__not_allowed_redirect_on_error(api_client, settings):
 
     url = update_query_params(
         reverse("edit_opening_hours"),
-        reservation_units=reservation_unit.pk,
+        reservation_units=str(reservation_unit.pk),
         redirect_on_error="https://fake.varaamo.hel.fi",
         lang="en",
     )
@@ -167,7 +172,7 @@ def test_redirect_to_hauki__not_allowed_redirect_on_error(api_client, settings):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__not_logged_in(api_client, settings):
+def test_redirect_to_hauki__not_logged_in(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -180,14 +185,14 @@ def test_redirect_to_hauki__not_logged_in(api_client, settings):
 
     url = update_query_params(
         reverse("edit_opening_hours"),
-        reservation_units=reservation_unit.pk,
+        reservation_units=str(reservation_unit.pk),
         redirect_on_error="https://fake.varaamo.hel.fi",
         lang="en",
     )
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -198,7 +203,7 @@ def test_redirect_to_hauki__not_logged_in(api_client, settings):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__user_no_email(api_client, settings):
+def test_redirect_to_hauki__user_no_email(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -213,7 +218,7 @@ def test_redirect_to_hauki__user_no_email(api_client, settings):
 
     url = update_query_params(
         reverse("edit_opening_hours"),
-        reservation_units=reservation_unit.pk,
+        reservation_units=str(reservation_unit.pk),
         redirect_on_error="https://fake.varaamo.hel.fi",
         lang="en",
     )
@@ -222,7 +227,7 @@ def test_redirect_to_hauki__user_no_email(api_client, settings):
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -233,7 +238,7 @@ def test_redirect_to_hauki__user_no_email(api_client, settings):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__no_reservation_unit(api_client, settings):
+def test_redirect_to_hauki__no_reservation_unit(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -251,7 +256,7 @@ def test_redirect_to_hauki__no_reservation_unit(api_client, settings):
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -262,7 +267,7 @@ def test_redirect_to_hauki__no_reservation_unit(api_client, settings):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__missing_reservation_unit(api_client, settings):
+def test_redirect_to_hauki__missing_reservation_unit(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -286,7 +291,7 @@ def test_redirect_to_hauki__missing_reservation_unit(api_client, settings):
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -297,7 +302,7 @@ def test_redirect_to_hauki__missing_reservation_unit(api_client, settings):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__primary_unit_missing_department_id(api_client, settings):
+def test_redirect_to_hauki__primary_unit_missing_department_id(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -328,7 +333,7 @@ def test_redirect_to_hauki__primary_unit_missing_department_id(api_client, setti
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -339,7 +344,7 @@ def test_redirect_to_hauki__primary_unit_missing_department_id(api_client, setti
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__reservation_unit_missing_hauki_resource(api_client, settings):
+def test_redirect_to_hauki__reservation_unit_missing_hauki_resource(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -368,7 +373,7 @@ def test_redirect_to_hauki__reservation_unit_missing_hauki_resource(api_client, 
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -379,7 +384,7 @@ def test_redirect_to_hauki__reservation_unit_missing_hauki_resource(api_client, 
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__reservation_unit_permission_denied(api_client, settings):
+def test_redirect_to_hauki__reservation_unit_permission_denied(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 
     hauki_resource = OriginHaukiResourceFactory.create()
@@ -409,7 +414,7 @@ def test_redirect_to_hauki__reservation_unit_permission_denied(api_client, setti
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
@@ -422,7 +427,7 @@ def test_redirect_to_hauki__reservation_unit_permission_denied(api_client, setti
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__settings_missing(api_client, settings):
+def test_redirect_to_hauki__settings_missing(api_client: APIClient, settings: Settings) -> None:
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
     settings.HAUKI_ADMIN_UI_URL = None
 
@@ -438,7 +443,7 @@ def test_redirect_to_hauki__settings_missing(api_client, settings):
 
     url = update_query_params(
         reverse("edit_opening_hours"),
-        reservation_units=reservation_unit.pk,
+        reservation_units=str(reservation_unit.pk),
         redirect_on_error="https://fake.varaamo.hel.fi",
         lang="en",
     )
@@ -447,7 +452,7 @@ def test_redirect_to_hauki__settings_missing(api_client, settings):
 
     response = api_client.get(url)
 
-    query_params = get_query_params(response.url)
+    query_params = get_query_params(response["Location"])
 
     assert response.status_code == 302
     assert query_params == {
