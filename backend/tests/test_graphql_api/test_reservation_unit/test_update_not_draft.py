@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from freezegun import freeze_time
 
@@ -15,13 +17,16 @@ from tests.factories import (
 
 from .helpers import UPDATE_MUTATION, get_non_draft_update_input_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit__update__name(graphql):
+def test_reservation_unit__update__name(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -34,7 +39,7 @@ def test_reservation_unit__update__name(graphql):
     assert reservation_unit.name_fi == "foo"
 
 
-def test_reservation_unit__update__surface_area(graphql):
+def test_reservation_unit__update__surface_area(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -47,7 +52,7 @@ def test_reservation_unit__update__surface_area(graphql):
     assert reservation_unit.surface_area == 150
 
 
-def test_reservation_unit__update__reservation_confirmed_instructions(graphql):
+def test_reservation_unit__update__reservation_confirmed_instructions(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -67,7 +72,7 @@ def test_reservation_unit__update__reservation_confirmed_instructions(graphql):
     assert reservation_unit.reservation_confirmed_instructions_en == "baz"
 
 
-def test_reservation_unit__update__max_reservations_per_user(graphql):
+def test_reservation_unit__update__max_reservations_per_user(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -80,7 +85,7 @@ def test_reservation_unit__update__max_reservations_per_user(graphql):
     assert reservation_unit.max_reservations_per_user == 10
 
 
-def test_reservation_unit__update__cancellation_rule(graphql):
+def test_reservation_unit__update__cancellation_rule(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -94,7 +99,7 @@ def test_reservation_unit__update__cancellation_rule(graphql):
     assert reservation_unit.cancellation_rule == rule
 
 
-def test_reservation_unit__update__cancellation_rule__to_null(graphql):
+def test_reservation_unit__update__cancellation_rule__to_null(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(
@@ -110,7 +115,7 @@ def test_reservation_unit__update__cancellation_rule__to_null(graphql):
     assert reservation_unit.cancellation_rule is None
 
 
-def test_reservation_unit__update__reservation_start_interval_invalid(graphql):
+def test_reservation_unit__update__reservation_start_interval_invalid(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -124,7 +129,7 @@ def test_reservation_unit__update__reservation_start_interval_invalid(graphql):
     assert reservation_unit.reservation_start_interval != "invalid"
 
 
-def test_reservation_unit__update__empty_name_translation(graphql):
+def test_reservation_unit__update__empty_name_translation(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -138,7 +143,7 @@ def test_reservation_unit__update__empty_name_translation(graphql):
     ]
 
 
-def test_reservation_unit__update__empty_description_translation(graphql):
+def test_reservation_unit__update__empty_description_translation(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -152,7 +157,7 @@ def test_reservation_unit__update__empty_description_translation(graphql):
     ]
 
 
-def test_reservation_unit__update__empty_spaces_and_resources(graphql):
+def test_reservation_unit__update__empty_spaces_and_resources(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -166,7 +171,7 @@ def test_reservation_unit__update__empty_spaces_and_resources(graphql):
     ]
 
 
-def test_reservation_unit__update__empty_type(graphql):
+def test_reservation_unit__update__empty_type(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -178,7 +183,7 @@ def test_reservation_unit__update__empty_type(graphql):
     assert response.field_error_messages() == ["Not draft reservation unit must have a reservation unit type."]
 
 
-def test_reservation_unit__update__reservation_start_interval(graphql):
+def test_reservation_unit__update__reservation_start_interval(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -193,7 +198,7 @@ def test_reservation_unit__update__reservation_start_interval(graphql):
     assert reservation_unit.reservation_start_interval == ReservationStartInterval.INTERVAL_60_MINUTES.value
 
 
-def test_reservation_unit__update__min_persons_over_max_persons_errors(graphql):
+def test_reservation_unit__update__min_persons_over_max_persons_errors(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -205,7 +210,7 @@ def test_reservation_unit__update__min_persons_over_max_persons_errors(graphql):
     assert response.field_error_messages() == ["minPersons can't be more than maxPersons"]
 
 
-def test_reservation_unit__update__min_persons(graphql):
+def test_reservation_unit__update__min_persons(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -218,7 +223,7 @@ def test_reservation_unit__update__min_persons(graphql):
     assert reservation_unit.min_persons == 1
 
 
-def test_reservation_unit__update__pricing_terms(graphql):
+def test_reservation_unit__update__pricing_terms(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -232,7 +237,7 @@ def test_reservation_unit__update__pricing_terms(graphql):
     assert reservation_unit.pricing_terms == pricing_terms
 
 
-def test_reservation_unit__update__instructions(graphql):
+def test_reservation_unit__update__instructions(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -265,7 +270,7 @@ def test_reservation_unit__update__instructions(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_unit__update__access_type__change_future_reservations(graphql):
+def test_reservation_unit__update__access_type__change_future_reservations(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(
@@ -303,7 +308,7 @@ def test_reservation_unit__update__access_type__change_future_reservations(graph
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_unit__update__access_type__change_period(graphql):
+def test_reservation_unit__update__access_type__change_period(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(

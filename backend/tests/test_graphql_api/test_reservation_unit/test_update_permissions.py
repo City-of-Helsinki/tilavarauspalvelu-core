@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
@@ -8,13 +10,16 @@ from tests.factories import ReservationUnitFactory
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit__update__anonymous_user(graphql):
+def test_reservation_unit__update__anonymous_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - An anonymous user is using the system
@@ -30,7 +35,7 @@ def test_reservation_unit__update__anonymous_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_reservation_unit__update__regular_user(graphql):
+def test_reservation_unit__update__regular_user(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     data = get_draft_update_input_data(reservation_unit)
 
@@ -40,7 +45,7 @@ def test_reservation_unit__update__regular_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_reservation_unit__update__staff_user(graphql):
+def test_reservation_unit__update__staff_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - The given user is using the system
@@ -57,7 +62,7 @@ def test_reservation_unit__update__staff_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_reservation_unit__update__regular_user__with_timeslots(graphql):
+def test_reservation_unit__update__regular_user__with_timeslots(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -31,20 +32,23 @@ from tests.factories import (
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def setUpTestData():
+def setUpTestData() -> None:
     AuditLogger.register(ReservationUnit)
 
 
 # ── Fields ──
 
 
-def test_reservation_unit__update__name(graphql):
+def test_reservation_unit__update__name(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -57,7 +61,7 @@ def test_reservation_unit__update__name(graphql):
     assert reservation_unit.name_fi == "foo"
 
 
-def test_reservation_unit__update__reservation_form(graphql):
+def test_reservation_unit__update__reservation_form(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -70,7 +74,7 @@ def test_reservation_unit__update__reservation_form(graphql):
     assert reservation_unit.reservation_form == ReservationFormType.AGE_GROUP_FORM
 
 
-def test_reservation_unit__update__reservation_form__null(graphql):
+def test_reservation_unit__update__reservation_form__null(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -81,7 +85,7 @@ def test_reservation_unit__update__reservation_form__null(graphql):
     assert response.error_message() == "Mutation was unsuccessful."
 
 
-def test_reservation_unit__update__terms_of_use(graphql):
+def test_reservation_unit__update__terms_of_use(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
@@ -104,7 +108,7 @@ def test_reservation_unit__update__terms_of_use(graphql):
     assert reservation_unit.service_specific_terms == service_specific_terms
 
 
-def test_reservation_unit__update__instructions(graphql):
+def test_reservation_unit__update__instructions(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -136,7 +140,7 @@ def test_reservation_unit__update__instructions(graphql):
     assert reservation_unit.reservation_cancelled_instructions_en == data["reservationCancelledInstructionsEn"]
 
 
-def test_reservation_unit__update__authentication(graphql):
+def test_reservation_unit__update__authentication(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -149,7 +153,7 @@ def test_reservation_unit__update__authentication(graphql):
     assert reservation_unit.authentication == AuthenticationType.STRONG.value
 
 
-def test_reservation_unit__update__errors_with_invalid_authentication(graphql):
+def test_reservation_unit__update__errors_with_invalid_authentication(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -163,7 +167,7 @@ def test_reservation_unit__update__errors_with_invalid_authentication(graphql):
     assert reservation_unit.authentication != "invalid"
 
 
-def test_reservation_unit__update__errors_with_empty_name(graphql):
+def test_reservation_unit__update__errors_with_empty_name(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -181,7 +185,7 @@ def test_reservation_unit__update__errors_with_empty_name(graphql):
 # ── Unit ──
 
 
-def test_reservation_unit__update__unit_admin__move_to_other_unit(graphql):
+def test_reservation_unit__update__unit_admin__move_to_other_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     original_unit = reservation_unit.unit
     other_unit = UnitFactory.create()
@@ -198,7 +202,7 @@ def test_reservation_unit__update__unit_admin__move_to_other_unit(graphql):
     assert reservation_unit.unit == original_unit
 
 
-def test_reservation_unit__update__superuser__move_to_other_unit(graphql):
+def test_reservation_unit__update__superuser__move_to_other_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     original_unit = reservation_unit.unit
     other_unit = UnitFactory.create()
@@ -214,7 +218,7 @@ def test_reservation_unit__update__superuser__move_to_other_unit(graphql):
     assert reservation_unit.unit == original_unit
 
 
-def test_reservation_unit__update__unit_admin__same_unit(graphql):
+def test_reservation_unit__update__unit_admin__same_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(admin)
@@ -232,7 +236,7 @@ def test_reservation_unit__update__unit_admin__same_unit(graphql):
 # ── Spaces and resources ──
 
 
-def test_reservation_unit__update__unit_admin__space_of_own_unit(graphql):
+def test_reservation_unit__update__unit_admin__space_of_own_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     own_space = SpaceFactory.create(unit=reservation_unit.unit)
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
@@ -247,7 +251,7 @@ def test_reservation_unit__update__unit_admin__space_of_own_unit(graphql):
     assert list(reservation_unit.spaces.all()) == [own_space]
 
 
-def test_reservation_unit__update__unit_admin__space_of_other_unit(graphql):
+def test_reservation_unit__update__unit_admin__space_of_other_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     other_space = SpaceFactory.create()
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
@@ -263,7 +267,7 @@ def test_reservation_unit__update__unit_admin__space_of_other_unit(graphql):
     assert list(reservation_unit.spaces.all()) == []
 
 
-def test_reservation_unit__update__superuser__space_of_other_unit(graphql):
+def test_reservation_unit__update__superuser__space_of_other_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     other_space = SpaceFactory.create()
     graphql.login_with_superuser()
@@ -278,7 +282,7 @@ def test_reservation_unit__update__superuser__space_of_other_unit(graphql):
     assert list(reservation_unit.spaces.all()) == []
 
 
-def test_reservation_unit__update__keeps_existing_space_of_other_unit(graphql):
+def test_reservation_unit__update__keeps_existing_space_of_other_unit(graphql: GraphQLClient) -> None:
     other_space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(is_draft=True, spaces=[other_space])
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
@@ -293,7 +297,7 @@ def test_reservation_unit__update__keeps_existing_space_of_other_unit(graphql):
     assert list(reservation_unit.spaces.all()) == [other_space]
 
 
-def test_reservation_unit__update__unit_admin__resource_of_other_unit(graphql):
+def test_reservation_unit__update__unit_admin__resource_of_other_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     other_resource = ResourceFactory.create()
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
@@ -311,7 +315,7 @@ def test_reservation_unit__update__unit_admin__resource_of_other_unit(graphql):
     assert list(reservation_unit.resources.all()) == []
 
 
-def test_reservation_unit__update__unit_admin__resource_without_space(graphql):
+def test_reservation_unit__update__unit_admin__resource_without_space(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     resource = ResourceFactory.create(space=None, location_type=ResourceLocationType.MOVABLE)
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
@@ -332,7 +336,7 @@ def test_reservation_unit__update__unit_admin__resource_without_space(graphql):
 # ── Publish ──
 
 
-def test_reservation_unit__update__publish(graphql):
+def test_reservation_unit__update__publish(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(
@@ -363,7 +367,7 @@ def test_reservation_unit__update__publish(graphql):
     assert reservation_unit.is_draft is False
 
 
-def test_reservation_unit__update__publish__only_inactive_price_option(graphql):
+def test_reservation_unit__update__publish__only_inactive_price_option(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(
@@ -399,7 +403,7 @@ def test_reservation_unit__update__publish__only_inactive_price_option(graphql):
     assert reservation_unit.is_draft is True
 
 
-def test_reservation_unit__update__publish__no_price(graphql):
+def test_reservation_unit__update__publish__no_price(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(

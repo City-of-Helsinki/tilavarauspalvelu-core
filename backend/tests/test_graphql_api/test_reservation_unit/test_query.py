@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from graphql_relay import to_global_id
@@ -35,6 +36,9 @@ from tests.test_graphql_api.test_reservation.helpers import reservation_query
 
 from .helpers import reservation_unit_query, reservation_units_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -44,7 +48,7 @@ pytestmark = [
 # Single
 
 
-def test_reservation_unit__single__query(graphql):
+def test_reservation_unit__single__query(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create()
@@ -56,7 +60,7 @@ def test_reservation_unit__single__query(graphql):
     assert response.first_query_object == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__single__query__authentication(graphql):
+def test_reservation_unit__single__query__authentication(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create()
@@ -72,7 +76,7 @@ def test_reservation_unit__single__query__authentication(graphql):
     }
 
 
-def test_reservation_unit__single__query__reservation_blocks_whole_day(graphql):
+def test_reservation_unit__single__query__reservation_blocks_whole_day(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
@@ -91,7 +95,7 @@ def test_reservation_unit__single__query__reservation_blocks_whole_day(graphql):
 # Multiple
 
 
-def test_reservation_unit__query__all_fields(graphql):
+def test_reservation_unit__query__all_fields(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     fields = """
@@ -169,6 +173,12 @@ def test_reservation_unit__query__all_fields(graphql):
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
+    assert reservation_unit.reservation_begins_at is not None
+    assert reservation_unit.reservation_ends_at is not None
+    assert reservation_unit.publish_begins_at is not None
+    assert reservation_unit.publish_ends_at is not None
+    assert reservation_unit.min_reservation_duration is not None
+    assert reservation_unit.max_reservation_duration is not None
     assert response.node(0) == {
         "pk": reservation_unit.pk,
         "extUuid": str(reservation_unit.ext_uuid),
@@ -224,7 +234,7 @@ def test_reservation_unit__query__all_fields(graphql):
     }
 
 
-def test_reservation_unit__query__all_to_one_relations(graphql):
+def test_reservation_unit__query__all_to_one_relations(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     fields = """
@@ -272,6 +282,14 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
+    assert reservation_unit.reservation_unit_type is not None
+    assert reservation_unit.cancellation_rule is not None
+    assert reservation_unit.cancellation_terms is not None
+    assert reservation_unit.service_specific_terms is not None
+    assert reservation_unit.pricing_terms is not None
+    assert reservation_unit.payment_terms is not None
+    assert reservation_unit.payment_product is not None
+    assert reservation_unit.payment_merchant is not None
     assert response.node(0) == {
         "pk": reservation_unit.pk,
         "unit": {
@@ -304,7 +322,7 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
     }
 
 
-def test_reservation_unit__query__all_one_to_many_relations(graphql):
+def test_reservation_unit__query__all_one_to_many_relations(graphql: GraphQLClient) -> None:
     fields = """
         pk
         images {
@@ -339,29 +357,29 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
         "pk": reservation_unit.pk,
         "images": [
             {
-                "largeUrl": reservation_unit.images.first().large_url,
+                "largeUrl": reservation_unit.images.get().large_url,
             },
         ],
         "applicationRoundTimeSlots": [
             {
-                "isClosed": reservation_unit.application_round_time_slots.first().is_closed,
+                "isClosed": reservation_unit.application_round_time_slots.get().is_closed,
             },
         ],
         "accessTypes": [
             {
-                "accessType": reservation_unit.access_types.first().access_type,
-                "beginDate": reservation_unit.access_types.first().begin_date.isoformat(),
+                "accessType": reservation_unit.access_types.get().access_type,
+                "beginDate": reservation_unit.access_types.get().begin_date.isoformat(),
             },
         ],
         "reservations": [
             {
-                "beginsAt": reservation_unit.reservations.first().begins_at.isoformat(),
+                "beginsAt": reservation_unit.reservations.get().begins_at.isoformat(),
             },
         ],
     }
 
 
-def test_reservation_unit__query__images__image_url(graphql):
+def test_reservation_unit__query__images__image_url(graphql: GraphQLClient) -> None:
     fields = """
         pk
         images {
@@ -407,7 +425,7 @@ def test_reservation_unit__query__images__image_url(graphql):
     }
 
 
-def test_reservation_unit__query__all_many_to_many_relations(graphql):
+def test_reservation_unit__query__all_many_to_many_relations(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     fields = """
@@ -448,35 +466,35 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         # Forward
         "spaces": [
             {
-                "nameFi": reservation_unit.spaces.first().name_fi,
+                "nameFi": reservation_unit.spaces.get().name_fi,
             },
         ],
         "resources": [
             {
-                "nameFi": reservation_unit.resources.first().name_fi,
+                "nameFi": reservation_unit.resources.get().name_fi,
             },
         ],
         "intendedUses": [
             {
-                "nameFi": reservation_unit.intended_uses.first().name_fi,
+                "nameFi": reservation_unit.intended_uses.get().name_fi,
             },
         ],
         "equipments": [
             {
-                "nameFi": reservation_unit.equipments.first().name_fi,
+                "nameFi": reservation_unit.equipments.get().name_fi,
             },
         ],
         #
         # Reverse
         "applicationRounds": [
             {
-                "nameFi": reservation_unit.application_rounds.first().name_fi,
+                "nameFi": reservation_unit.application_rounds.get().name_fi,
             },
         ],
     }
 
 
-def test_reservation_unit__query__hide_archived(graphql):
+def test_reservation_unit__query__hide_archived(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     ReservationUnitFactory.create(is_archived=True)
@@ -487,7 +505,7 @@ def test_reservation_unit__query__hide_archived(graphql):
     assert len(response.edges) == 0
 
 
-def test_reservation_unit__query__state__draft(graphql):
+def test_reservation_unit__query__state__draft(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
@@ -498,7 +516,7 @@ def test_reservation_unit__query__state__draft(graphql):
     assert response.node(0) == {"publishingState": ReservationUnitPublishingState.DRAFT.value}
 
 
-def test_reservation_unit__query__state__scheduled_publishing(graphql):
+def test_reservation_unit__query__state__scheduled_publishing(graphql: GraphQLClient) -> None:
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create(
         publish_begins_at=now + datetime.timedelta(hours=1),
@@ -513,7 +531,7 @@ def test_reservation_unit__query__state__scheduled_publishing(graphql):
     assert response.node(0) == {"publishingState": ReservationUnitPublishingState.SCHEDULED_PUBLISHING.value}
 
 
-def test_reservation_unit__query__state__scheduled_hiding(graphql):
+def test_reservation_unit__query__state__scheduled_hiding(graphql: GraphQLClient) -> None:
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create(
         publish_begins_at=now - datetime.timedelta(days=1),
@@ -528,7 +546,7 @@ def test_reservation_unit__query__state__scheduled_hiding(graphql):
     assert response.node(0) == {"publishingState": ReservationUnitPublishingState.SCHEDULED_HIDING.value}
 
 
-def test_reservation_unit__query__state__hidden(graphql):
+def test_reservation_unit__query__state__hidden(graphql: GraphQLClient) -> None:
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create(
         publish_begins_at=now - datetime.timedelta(days=2),
@@ -543,7 +561,7 @@ def test_reservation_unit__query__state__hidden(graphql):
     assert response.node(0) == {"publishingState": ReservationUnitPublishingState.HIDDEN.value}
 
 
-def test_reservation_unit__query__state__scheduled_period(graphql):
+def test_reservation_unit__query__state__scheduled_period(graphql: GraphQLClient) -> None:
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create(
         publish_begins_at=now + datetime.timedelta(days=2),
@@ -558,7 +576,7 @@ def test_reservation_unit__query__state__scheduled_period(graphql):
     assert response.node(0) == {"publishingState": ReservationUnitPublishingState.SCHEDULED_PERIOD.value}
 
 
-def test_reservation_unit__query__state__published(graphql):
+def test_reservation_unit__query__state__published(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(
         publish_begins_at=None,
         publish_ends_at=None,
@@ -574,7 +592,7 @@ def test_reservation_unit__query__state__published(graphql):
     assert response.node(0) == {"publishingState": ReservationUnitPublishingState.PUBLISHED.value}
 
 
-def test_reservation_unit__query__reservation_blocks_whole_day(graphql):
+def test_reservation_unit__query__reservation_blocks_whole_day(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
     graphql.login_with_superuser()
 
@@ -589,7 +607,7 @@ def test_reservation_unit__query__reservation_blocks_whole_day(graphql):
     }
 
 
-def test_reservation_unit__query__timeslots(graphql):
+def test_reservation_unit__query__timeslots(graphql: GraphQLClient) -> None:
     # given:
     # - There is a reservation unit with timeslots
     # - A superuser is using the system
@@ -629,7 +647,7 @@ def test_reservation_unit__query__timeslots(graphql):
     }
 
 
-def test_reservation_unit__query__timeslots__not_found(graphql):
+def test_reservation_unit__query__timeslots__not_found(graphql: GraphQLClient) -> None:
     # given:
     # - There is a reservation unit without any timeslots
     # - A superuser is using the system
@@ -649,7 +667,7 @@ def test_reservation_unit__query__timeslots__not_found(graphql):
     assert response.node(0) == {"applicationRoundTimeSlots": []}
 
 
-def test_reservation_unit__query__payment_merchant__from_reservation_unit(graphql):
+def test_reservation_unit__query__payment_merchant__from_reservation_unit(graphql: GraphQLClient) -> None:
     merchant = PaymentMerchantFactory.create()
     ReservationUnitFactory.create(payment_merchant=merchant)
 
@@ -662,7 +680,7 @@ def test_reservation_unit__query__payment_merchant__from_reservation_unit(graphq
     assert response.node(0) == {"paymentMerchant": {"name": merchant.name}}
 
 
-def test_reservation_unit__query__payment_merchant__from_unit(graphql):
+def test_reservation_unit__query__payment_merchant__from_unit(graphql: GraphQLClient) -> None:
     merchant = PaymentMerchantFactory.create()
     ReservationUnitFactory.create(unit__payment_merchant=merchant)
 
@@ -675,7 +693,7 @@ def test_reservation_unit__query__payment_merchant__from_unit(graphql):
     assert response.node(0) == {"paymentMerchant": {"name": merchant.name}}
 
 
-def test_reservation_unit__query__payment_product(graphql):
+def test_reservation_unit__query__payment_product(graphql: GraphQLClient) -> None:
     merchant = PaymentMerchantFactory.create()
     product = PaymentProductFactory.create(merchant=merchant)
     ReservationUnitFactory.create(payment_merchant=merchant, payment_product=product)
@@ -696,7 +714,7 @@ def test_reservation_unit__query__payment_product(graphql):
     }
 
 
-def test_reservation_unit__query__num_active_user_reservations(graphql):
+def test_reservation_unit__query__num_active_user_reservations(graphql: GraphQLClient) -> None:
     user = graphql.login_with_regular_user()
     other_user = UserFactory.create()
 
@@ -767,7 +785,7 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
     assert response.node(0) == {"numActiveUserReservations": 1}
 
 
-def test_reservation_unit__query__num_active_user_reservations__through_reservation(graphql):
+def test_reservation_unit__query__num_active_user_reservations__through_reservation(graphql: GraphQLClient) -> None:
     user = graphql.login_with_regular_user()
 
     begin = next_hour(plus_hours=1)
@@ -786,7 +804,7 @@ def test_reservation_unit__query__num_active_user_reservations__through_reservat
     assert response.first_query_object == {"reservationUnit": {"numActiveUserReservations": 1}}
 
 
-def test_reservation_unit__query__num_active_user_reservations__user_unauthenticated(graphql):
+def test_reservation_unit__query__num_active_user_reservations__user_unauthenticated(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     begin = next_hour(plus_hours=1)

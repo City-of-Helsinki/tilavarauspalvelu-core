@@ -19,6 +19,10 @@ from .helpers import ARCHIVE_MUTATION
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -29,7 +33,7 @@ pytestmark = [
 
 
 @pytest.fixture
-def reservation_unit_audit_logging(settings) -> Generator[None]:
+def reservation_unit_audit_logging(settings: Settings) -> Generator[None]:
     """Register reservation units for audit logging, and unregister them after the test."""
     settings.AUDIT_LOGGING_ENABLED = True
     AuditLogger.register(
@@ -51,7 +55,7 @@ def reservation_unit_audit_logging(settings) -> Generator[None]:
 # ── Tests ──
 
 
-def test_reservation_unit__archive__also_sets_as_draft(graphql):
+def test_reservation_unit__archive__also_sets_as_draft(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     space = SpaceFactory.create()
@@ -66,7 +70,9 @@ def test_reservation_unit__archive__also_sets_as_draft(graphql):
     assert reservation_unit.is_draft is True
 
 
-def test_reservation_unit__archive__is_blocked_if_reservation_unit_has_future_reservations(graphql):
+def test_reservation_unit__archive__is_blocked_if_reservation_unit_has_future_reservations(
+    graphql: GraphQLClient,
+) -> None:
     graphql.login_with_superuser()
 
     space = SpaceFactory.create()
@@ -91,7 +97,9 @@ def test_reservation_unit__archive__is_blocked_if_reservation_unit_has_future_re
     assert reservation_unit.is_draft is False
 
 
-def test_reservation_unit__archive__not_blocked_if_reservation_unit_has_future_inactive_reservations(graphql):
+def test_reservation_unit__archive__not_blocked_if_reservation_unit_has_future_inactive_reservations(
+    graphql: GraphQLClient,
+) -> None:
     graphql.login_with_superuser()
 
     space = SpaceFactory.create()
@@ -114,7 +122,7 @@ def test_reservation_unit__archive__not_blocked_if_reservation_unit_has_future_i
 
 
 @pytest.mark.usefixtures("reservation_unit_audit_logging")
-def test_reservation_unit__archive__removes_contact_information_and_audit_logs(graphql):
+def test_reservation_unit__archive__removes_contact_information_and_audit_logs(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True, contact_information="foo")

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import Weekday
@@ -8,13 +10,16 @@ from tests.factories import ApplicationRoundTimeSlotFactory, ReservationUnitFact
 
 from .helpers import UPDATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit__update__timeslots__add(graphql):
+def test_reservation_unit__update__timeslots__add(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -52,7 +57,7 @@ def test_reservation_unit__update__timeslots__add(graphql):
     assert time_slots[1].weekday == Weekday.TUESDAY
 
 
-def test_reservation_unit__update__timeslots__replace(graphql):
+def test_reservation_unit__update__timeslots__replace(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -92,7 +97,7 @@ def test_reservation_unit__update__timeslots__replace(graphql):
     assert time_slots[1].weekday == Weekday.TUESDAY
 
 
-def test_reservation_unit__update__timeslots__remove_all(graphql):
+def test_reservation_unit__update__timeslots__remove_all(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -118,7 +123,7 @@ def test_reservation_unit__update__timeslots__remove_all(graphql):
     assert len(time_slots) == 0
 
 
-def test_reservation_unit__update__timeslots__weekday_required(graphql):
+def test_reservation_unit__update__timeslots__weekday_required(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -150,7 +155,7 @@ def test_reservation_unit__update__timeslots__weekday_required(graphql):
     )
 
 
-def test_reservation_unit__update__timeslots__begin_before_end(graphql):
+def test_reservation_unit__update__timeslots__begin_before_end(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -183,7 +188,7 @@ def test_reservation_unit__update__timeslots__begin_before_end(graphql):
     ]
 
 
-def test_reservation_unit__update__timeslots__overlapping_reservable_times(graphql):
+def test_reservation_unit__update__timeslots__overlapping_reservable_times(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -217,7 +222,7 @@ def test_reservation_unit__update__timeslots__overlapping_reservable_times(graph
     ]
 
 
-def test_reservation_unit__update__timeslots__two_for_same_day(graphql):
+def test_reservation_unit__update__timeslots__two_for_same_day(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -254,7 +259,7 @@ def test_reservation_unit__update__timeslots__two_for_same_day(graphql):
     ]
 
 
-def test_reservation_unit__update__timeslots__open_has_no_reservable_times(graphql):
+def test_reservation_unit__update__timeslots__open_has_no_reservable_times(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -285,7 +290,7 @@ def test_reservation_unit__update__timeslots__open_has_no_reservable_times(graph
     ]
 
 
-def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphql):
+def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -319,7 +324,7 @@ def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphq
     ]
 
 
-def test_reservation_unit__update__reservation_block_whole_day(graphql):
+def test_reservation_unit__update__reservation_block_whole_day(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True, reservation_block_whole_day=False)
     graphql.login_with_superuser()
 

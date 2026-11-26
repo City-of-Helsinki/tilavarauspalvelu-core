@@ -144,7 +144,7 @@ def get_free_own_pricing_data(*, begins: datetime.date) -> dict[str, Any]:
     }
 
 
-def get_draft_update_input_data(reservation_unit: ReservationUnit, **overrides) -> dict[str, Any]:
+def get_draft_update_input_data(reservation_unit: ReservationUnit, **overrides: Any) -> dict[str, Any]:
     return {
         "pk": reservation_unit.pk,
         "name": "name",
@@ -152,7 +152,7 @@ def get_draft_update_input_data(reservation_unit: ReservationUnit, **overrides) 
     }
 
 
-def get_non_draft_update_input_data(reservation_unit: ReservationUnit, **overrides):
+def get_non_draft_update_input_data(reservation_unit: ReservationUnit, **overrides: Any) -> dict[str, Any]:
     today = local_date()
     return {
         "pk": reservation_unit.pk,

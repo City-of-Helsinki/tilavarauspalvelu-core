@@ -17,6 +17,8 @@ from tests.test_graphql_api.test_reservation_unit.helpers import reservation_uni
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
 
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -37,7 +39,7 @@ def reservation_unit() -> ReservationUnit:
     return ReservationUnitFactory.create(origin_hauki_resource=origin_hauki_resource)
 
 
-def _get_date(*, day: int = 1, hour: int = 0, tzinfo: ZoneInfo | None = None):
+def _get_date(*, day: int = 1, hour: int = 0, tzinfo: ZoneInfo | None = None) -> datetime.datetime:
     return datetime.datetime(2023, 5, day, hour, 0, 0, tzinfo=tzinfo or DEFAULT_TIMEZONE)
 
 
@@ -48,7 +50,9 @@ reservation_unit_time_spans_query = partial(
 )
 
 
-def test_reservation_unit__reservable_time_spans__no_origin_hauki_resource(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__no_origin_hauki_resource(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     reservation_unit.origin_hauki_resource = None
     reservation_unit.save()
 
@@ -66,7 +70,9 @@ def test_reservation_unit__reservable_time_spans__no_origin_hauki_resource(graph
     }
 
 
-def test_reservation_unit__reservable_time_spans__no_start_date(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__no_start_date(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
@@ -79,7 +85,9 @@ def test_reservation_unit__reservable_time_spans__no_start_date(graphql, reserva
     assert response.error_message() == message
 
 
-def test_reservation_unit__reservable_time_spans__no_end_date(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__no_end_date(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
@@ -92,7 +100,9 @@ def test_reservation_unit__reservable_time_spans__no_end_date(graphql, reservati
     assert response.error_message() == message
 
 
-def test_reservation_unit__reservable_time_spans__no_results(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__no_results(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
@@ -105,7 +115,9 @@ def test_reservation_unit__reservable_time_spans__no_results(graphql, reservatio
     assert response.first_query_object == {"reservableTimeSpans": []}
 
 
-def test_reservation_unit__reservable_time_spans__multiple_days(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__multiple_days(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=0),
@@ -147,7 +159,9 @@ def test_reservation_unit__reservable_time_spans__multiple_days(graphql, reserva
     ]
 
 
-def test_reservation_unit__reservable_time_spans__multiple_spans_in_same_day(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__multiple_spans_in_same_day(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=10),
@@ -198,7 +212,9 @@ def test_reservation_unit__reservable_time_spans__multiple_spans_in_same_day(gra
     ]
 
 
-def test_reservation_unit__reservable_time_spans__full_day(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__full_day(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=4, hour=0),
@@ -222,7 +238,9 @@ def test_reservation_unit__reservable_time_spans__full_day(graphql, reservation_
     ]
 
 
-def test_reservation_unit__reservable_time_spans__multiple_days_long_time_span(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__multiple_days_long_time_span(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=10, hour=12),
@@ -246,7 +264,9 @@ def test_reservation_unit__reservable_time_spans__multiple_days_long_time_span(g
     ]
 
 
-def test_reservation_unit__reservable_time_spans__all_timezones_are_in_default_tz(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__all_timezones_are_in_default_tz(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     rts1 = ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=10, tzinfo=ZoneInfo("Europe/Helsinki")),
@@ -288,7 +308,7 @@ def test_reservation_unit__reservable_time_spans__all_timezones_are_in_default_t
     ]
 
 
-def test_reservation_unit__reservable_time_spans__many_reservation_units_in_one_query(graphql):
+def test_reservation_unit__reservable_time_spans__many_reservation_units_in_one_query(graphql: GraphQLClient) -> None:
     for day in [1, 2, 3]:
         origin_hauki_resource = OriginHaukiResourceFactory.create(id=day)
         ReservableTimeSpanFactory.create(

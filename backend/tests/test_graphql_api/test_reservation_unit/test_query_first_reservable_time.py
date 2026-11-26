@@ -40,6 +40,8 @@ if TYPE_CHECKING:
 
     from graphene_django_extensions.testing.client import GQLResponse
 
+    from tests.helpers import GraphQLClient
+
 
 # Applied to all tests
 pytestmark = [
@@ -62,12 +64,12 @@ reservation_units_reservable_query_access_type = partial(
 NEXT_YEAR = local_date().year + 1
 
 
-def _datetime(year=NEXT_YEAR, month=1, day=1, hour=0, minute=0) -> datetime.datetime:
+def _datetime(year: int = NEXT_YEAR, month: int = 1, day: int = 1, hour: int = 0, minute: int = 0) -> datetime.datetime:
     # Convert to UTC to match timezone returned by GQL endpoint
     return datetime.datetime(year, month, day, hour, minute).astimezone(DEFAULT_TIMEZONE).astimezone(datetime.UTC)
 
 
-def _date(year=NEXT_YEAR, month=1, day=1) -> datetime.date:
+def _date(year: int = NEXT_YEAR, month: int = 1, day: int = 1) -> datetime.date:
     return datetime.date(year, month, day)
 
 
@@ -179,7 +181,7 @@ class ReservableFilters:
         time_end: datetime.time | None = None,
         minimum_duration_minutes: int | None = None,
         show_only_reservable: bool | None = None,
-    ):
+    ) -> None:
         self.reservable_date_start = date_start.isoformat() if date_start else None
         self.reservable_date_end = date_end.isoformat() if date_end else None
         self.reservable_time_start = time_start.isoformat() if time_start else None
@@ -246,7 +248,7 @@ class BufferParams(NamedTuple):
 def apply_reservation_unit_override_settings(
     reservation_unit: ReservationUnit,
     settings: ReservationUnitOverrides,
-):
+) -> None:
     for key, value in asdict(settings).items():
         if value is not None:
             setattr(reservation_unit, key, value)
@@ -257,7 +259,9 @@ def apply_reservation_unit_override_settings(
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_exist(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_exist(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """When there are no time spans, the first reservable time should be None."""
     response = graphql(reservation_units_reservable_query())
 
@@ -321,8 +325,14 @@ def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_ex
     })
 )
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__filters__invalid_values(graphql, reservation_unit, filters, result):
+def test__reservation_unit__first_reservable_time__filters__invalid_values(
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+) -> None:
     """Invalid filter values should return an error"""
+    assert filters is not None
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is True, response
@@ -384,8 +394,11 @@ def test__reservation_unit__first_reservable_time__filters__invalid_values(graph
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no_first_reservable_time_exists(
-    graphql, reservation_unit, filters, result
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+) -> None:
     """
     Filters that are too strict and cause no results to be returned.
     Also make sure certain filters affect the isClosed value correctly.
@@ -405,10 +418,12 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
         end_datetime=_datetime(day=2, hour=19),
     )
 
+    assert filters is not None
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
     assert frt(response) is None
+    assert isinstance(result, ReservableNode)
     assert is_closed(response) is result.is_closed
 
 
@@ -499,8 +514,11 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__should_not_exclude_time_span(
-    graphql, reservation_unit, filters, result
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+) -> None:
     """
     Filters with 'basic' values, which should never exclude the correct first reservable time.
 
@@ -528,6 +546,7 @@ def test__reservation_unit__first_reservable_time__filters__should_not_exclude_t
         end_datetime=_datetime(hour=14),
     )
 
+    assert filters is not None
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
@@ -635,7 +654,12 @@ def test__reservation_unit__first_reservable_time__filters__should_not_exclude_t
     })
 )
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__filters__simple(graphql, reservation_unit, filters, result):
+def test__reservation_unit__first_reservable_time__filters__simple(
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+) -> None:
     """
     Filters with 'simple' values, which are a bit more advanced than the previous test.
 
@@ -676,9 +700,11 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
         end_datetime=_datetime(day=16, hour=2),
     )
 
+    assert filters is not None
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
+    assert isinstance(result, ReservableNode)
     assert frt(response) == result.first_reservable_datetime
     assert is_closed(response) is result.is_closed
 
@@ -728,8 +754,11 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_on_the_same_day(
-    graphql, reservation_unit, filters, result
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+) -> None:
     """
     Cases where a single day contains multiple time spans.
 
@@ -754,9 +783,11 @@ def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_
         end_datetime=_datetime(hour=20),
     )
 
+    assert filters is not None
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
+    assert isinstance(result, ReservableNode)
     assert frt(response) == result.first_reservable_datetime
     assert is_closed(response) is result.is_closed
 
@@ -807,8 +838,11 @@ def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__multiple_days_long_time_span(
-    graphql, reservation_unit, filters, result
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+) -> None:
     """
     Cases where a single time span spans multiple days.
 
@@ -832,9 +866,11 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
         end_datetime=_datetime(day=5, hour=13),
     )
 
+    assert filters is not None
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
+    assert isinstance(result, ReservableNode)
     assert frt(response) == result.first_reservable_datetime
     assert is_closed(response) is result.is_closed
 
@@ -947,8 +983,12 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservation_unit_settings(
-    graphql, reservation_unit, filters, result, reservation_unit_settings
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+    reservation_unit_settings: ReservationUnitOverrides | None,
+) -> None:
     """
     ReservationUnit settings should be respected when getting the first reservable time.
 
@@ -962,6 +1002,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
     │21 ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
+    assert reservation_unit_settings is not None
     apply_reservation_unit_override_settings(reservation_unit, reservation_unit_settings)
 
     # 12th Jan 13:00 - 14:00 (1h)
@@ -980,14 +1021,15 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
     response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
+    assert isinstance(result, ReservableNode)
     assert frt(response) == result.first_reservable_datetime
     assert is_closed(response) is result.is_closed
 
 
 @freezegun.freeze_time(_datetime(hour=10))
 def test__reservation_unit__first_reservable_time__reservations_min_days_before_counts_from_start_of_day(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     The minimum days before are counted from the start of today, not from the current time.
 
@@ -1018,8 +1060,8 @@ def test__reservation_unit__first_reservable_time__reservations_min_days_before_
 
 @freezegun.freeze_time(_datetime(hour=10))
 def test__reservation_unit__first_reservable_time__reservations_max_days_before_counts_from_now(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     The maximum days before are counted from the current time, not from the start of today.
 
@@ -1141,8 +1183,12 @@ def test__reservation_unit__first_reservable_time__reservations_max_days_before_
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_settings_combined(
-    graphql, reservation_unit, reservation_unit_settings, filters, result
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    reservation_unit_settings: ReservationUnitOverrides | None,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+) -> None:
     """
     A bit more advanced and complex test cases.
     These cases cover edge cases, combinations of filters and ReservationUnit field values.
@@ -1156,6 +1202,7 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
     │20 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
+    assert reservation_unit_settings is not None
     apply_reservation_unit_override_settings(reservation_unit, reservation_unit_settings)
 
     # 12th Jan 13:00 - 14:00 (1h)
@@ -1171,9 +1218,11 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         end_datetime=_datetime(day=20, hour=21),
     )
 
+    assert filters is not None
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
+    assert isinstance(result, ReservableNode)
     assert frt(response) == result.first_reservable_datetime
     assert is_closed(response) is result.is_closed
 
@@ -1187,8 +1236,11 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__max_duration_is_rounded_down_to_the_interval(
-    graphql, reservation_unit, max_reservation_duration, first_reservable_time
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    max_reservation_duration: datetime.timedelta,
+    first_reservable_time: str | None,
+) -> None:
     """
     The maximum duration is rounded down to a multiple of the start interval.
     With a 120 minute interval, a maximum of 200 minutes is 120 minutes, which is less than the 140 minute minimum.
@@ -1356,8 +1408,12 @@ def test__reservation_unit__first_reservable_time__max_duration_is_rounded_down_
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__application_rounds(
-    graphql, reservation_unit, application_round_params, filters, result
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    application_round_params: ApplicationStatusParams,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+) -> None:
     """
     Cases where ApplicationRounds with different statuses affect the first reservable time
 
@@ -1384,17 +1440,19 @@ def test__reservation_unit__first_reservable_time__application_rounds(
         end_datetime=_datetime(day=16, hour=1),
     )
 
+    assert filters is not None
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
+    assert isinstance(result, ReservableNode)
     assert frt(response) == result.first_reservable_datetime
     assert is_closed(response) is result.is_closed
 
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__application_rounds__start_date_at_round_last_day(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     This is a regression test for a bug that was found during manual testing.
 
@@ -1452,8 +1510,8 @@ def test__reservation_unit__first_reservable_time__filters__application_rounds__
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__own_reservation_block_reservable_time(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Make sure that reservations that belong to the reservation unit block the time span from being returned
 
@@ -1492,8 +1550,8 @@ def test__reservation_unit__first_reservable_time__reservations__own_reservation
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__unrelated_reservation_should_not_affect(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Make sure that reservations in unrelated reservation units do not affect availability.
 
@@ -1511,7 +1569,7 @@ def test__reservation_unit__first_reservable_time__reservations__unrelated_reser
     │ 1 ░░░░░░░░░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit_2: ReservationUnit = ReservationUnitFactory()
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create()
 
     # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
@@ -1556,11 +1614,11 @@ def test__reservation_unit__first_reservable_time__reservations__unrelated_reser
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__only_reservations_going_to_occur_block_time(
-    graphql,
-    reservation_unit,
-    state,
-    first_reservable_time,
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    state: ReservationStateChoice,
+    first_reservable_time: str | None,
+) -> None:
     """
     Reservations that are going to occur block the reservable time. Cancelled and denied reservations do not.
 
@@ -1608,8 +1666,8 @@ def test__reservation_unit__first_reservable_time__reservations__only_reservatio
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__date_filters_on_same_day_as_reservation(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     This is a regression test for a bug that was found during manual testing.
 
@@ -1658,9 +1716,9 @@ def test__reservation_unit__first_reservable_time__reservations__date_filters_on
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__filter_start_time_at_reservation_start(
-    graphql,
-    reservation_unit,
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+) -> None:
     """
     This is a regression test for a bug that was found during manual testing.
 
@@ -1710,8 +1768,8 @@ def test__reservation_unit__first_reservable_time__reservations__filter_start_ti
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__in_common_hierarchy__by_space(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Reservations from reservation units in the same hierarchy, connected by spaces, should block the time span from
     being returned.
@@ -1730,7 +1788,7 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     │ 1 ░░░░░░░░░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit_2: ReservationUnit = ReservationUnitFactory(
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
         spaces=[SpaceFactory.create()],
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
     )
@@ -1770,8 +1828,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__in_common_hierarchy__by_resource(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Reservations from reservation units in the same hierarchy, connected by resources, should block the time span from
     being returned.
@@ -1791,7 +1849,7 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     └────────────────────────────────────────────────────┘
     """
     reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
-        resources=[ResourceFactory()],
+        resources=[ResourceFactory.create()],
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
     )
     reservation_unit.unit = reservation_unit_2.unit
@@ -1830,8 +1888,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__in_common_hierarchy__by_resource__and_filters(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     This is a regression test for a bug that was found during manual testing.
 
@@ -1852,15 +1910,15 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     │ 1 ░░░░░░░░░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    common_resource = ResourceFactory()
+    common_resource = ResourceFactory.create()
 
     reservation_unit.resources.set([common_resource])
-    reservation_unit.spaces.set([SpaceFactory()])
+    reservation_unit.spaces.set([SpaceFactory.create()])
     reservation_unit.save()
 
     reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
         resources=[common_resource],
-        spaces=[SpaceFactory()],
+        spaces=[SpaceFactory.create()],
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
     )
 
@@ -1896,8 +1954,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__in_common_hierarchy__block_whole_day(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     A reservation unit that blocks the whole day cannot be reserved on a day that has a reservation
     in a reservation unit in the same hierarchy. A reservation that ends at midnight does not block the next day.
@@ -1965,8 +2023,8 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__in_common_hierarchy__block_whole_day__blocked_type(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     A BLOCKED-type reservation in the same hierarchy blocks only its own time from a reservation unit
     that blocks the whole day, like in the overlap check of a new reservation.
@@ -2026,7 +2084,9 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_time(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_time(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     ReservationUnits before and after buffers should not affect reservability when the buffer is in a closed time span.
 
@@ -2064,8 +2124,8 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_time_to_reservation(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     A reservation unit buffer can go over closed time, but not over a reservation on the other side of it.
 
@@ -2243,14 +2303,14 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__reservation_unit_and_reservation_buffers(
-    graphql,
-    reservation_unit,
-    buffer_time_before,
-    buffer_time_after,
-    first_reservable_time,
-    first_reservation_buffer_time_after,
-    second_reservation_buffer_time_before,
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    buffer_time_before: datetime.timedelta,
+    buffer_time_after: datetime.timedelta,
+    first_reservable_time: str,
+    first_reservation_buffer_time_after: datetime.timedelta,
+    second_reservation_buffer_time_before: datetime.timedelta,
+) -> None:
     """
     The buffers of the reservation unit and the buffers of the reservations both shorten the reservable time.
 
@@ -2323,8 +2383,12 @@ def test__reservation_unit__first_reservable_time__buffers__reservation_unit_and
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__different_length_buffers_are_overlapping(
-    graphql, reservation_unit, filters, result, reservation_unit_settings
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+    filters: ReservableFilters | None,
+    result: ReservableNode | str | None,
+    reservation_unit_settings: ReservationUnitOverrides | None,
+) -> None:
     """
     Make sure that ReservationUnit buffers and Reservation buffers of different lengths are correctly
     taken into account when calculating the first reservable time.
@@ -2358,6 +2422,7 @@ def test__reservation_unit__first_reservable_time__buffers__different_length_buf
     reservation_unit.save()
 
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
+    assert reservation_unit_settings is not None
     apply_reservation_unit_override_settings(reservation_unit_60, reservation_unit_settings)
 
     # 1st Jan 10:00 - 20:00 (10h)
@@ -2392,14 +2457,15 @@ def test__reservation_unit__first_reservable_time__buffers__different_length_buf
     assert is_closed(response, node=0) is False
 
     assert response.node(1)["pk"] == reservation_unit_60.pk
+    assert isinstance(result, ReservableNode)
     assert frt(response, node=1) == result.first_reservable_datetime
     assert is_closed(response, node=1) is False
 
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__start_and_end_same_time_different_after_buffers(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Make sure that ReservationUnit after buffers of different lengths and Reservation after buffers of different
     lengths are correctly taken into account when calculating the first reservable time.
@@ -2482,8 +2548,8 @@ def test__reservation_unit__first_reservable_time__buffers__start_and_end_same_t
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__different_before_buffers__before_reservation(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Make sure that ReservationUnit before buffers of different lengths and Reservation before buffers of different
     lengths are correctly taken into account when calculating the first reservable time.
@@ -2572,8 +2638,8 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__different_before_buffers__before_closed_time(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Make sure that ReservationUnit before buffers of different lengths and Reservation before buffers of different
     lengths are correctly taken into account when calculating the first reservable time.
@@ -2657,8 +2723,8 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_overlap_with_buffer(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Make sure that:
     - Buffers from new reservations can overlap with the BLOCKED-Type Reservation
@@ -2726,7 +2792,9 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
 
 
 @freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, hour=8, tzinfo=DEFAULT_TIMEZONE))
-def test__reservation_unit__first_reservable_time__duration_exactly_min_but_buffers_overlap(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__duration_exactly_min_but_buffers_overlap(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     This is a regression test for a bug that was found during manual testing.
 
@@ -2809,7 +2877,9 @@ def test__reservation_unit__first_reservable_time__duration_exactly_min_but_buff
 
 
 @freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, 10, microsecond=1).astimezone(DEFAULT_TIMEZONE))
-def test__reservation_unit__first_reservable_time__round_current_time_to_the_next_minute(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__round_current_time_to_the_next_minute(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     This is a regression test for a bug that was found during manual testing.
 
@@ -2838,7 +2908,9 @@ def test__reservation_unit__first_reservable_time__round_current_time_to_the_nex
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__extra_long_interval(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__extra_long_interval(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Make sure that:
     - The correct first reservable time is returned even with a long interval
@@ -2901,7 +2973,9 @@ def test__reservation_unit__first_reservable_time__extra_long_interval(graphql, 
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__extra_long_interval__after_midnight(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__extra_long_interval__after_midnight(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Make sure that on the days after the first day of the Reservable Time Span,
     the intervals start from local midnight, like in the start time check of a new reservation.
@@ -2947,8 +3021,8 @@ def test__reservation_unit__first_reservable_time__extra_long_interval__after_mi
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__interval_longer_than_min_duration_is_the_min_duration(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     A reservation must be at least as long as the start interval, even if the minimum duration is shorter.
 
@@ -3000,9 +3074,9 @@ def test__reservation_unit__first_reservable_time__interval_longer_than_min_dura
 # The clocks move from 03:00 to 04:00 on the night of 2026-03-29.
 @freezegun.freeze_time(local_datetime(2026, 3, 1, 12))
 def test__reservation_unit__first_reservable_time__duration_over_spring_daylight_saving_time_change(
-    graphql,
-    reservation_unit,
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.min_reservation_duration = datetime.timedelta(hours=4)
     reservation_unit.save()
 
@@ -3021,9 +3095,9 @@ def test__reservation_unit__first_reservable_time__duration_over_spring_daylight
 # The clocks move from 04:00 back to 03:00 on the night of 2026-10-25.
 @freezegun.freeze_time(local_datetime(2026, 10, 1, 12))
 def test__reservation_unit__first_reservable_time__duration_over_autumn_daylight_saving_time_change(
-    graphql,
-    reservation_unit,
-):
+    graphql: GraphQLClient,
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.min_reservation_duration = datetime.timedelta(hours=5)
     reservation_unit.save()
 
@@ -3043,7 +3117,9 @@ def test__reservation_unit__first_reservable_time__duration_over_autumn_daylight
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__no_bug_in_pagination_from_hauki_resource(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__no_bug_in_pagination_from_hauki_resource(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     This is a regression test for a bug that was found during manual testing.
 
@@ -3088,7 +3164,9 @@ def test__reservation_unit__first_reservable_time__no_bug_in_pagination_from_hau
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__remove_not_reservable(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Check that when 'show_only_reservable' is True, non-reservable reservation units are removed and handled
     correctly with page size.
@@ -3126,11 +3204,13 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__previous_page_cached(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__previous_page_cached(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """Checks that the page results are cached so that pagination works correctly."""
     common_space = SpaceFactory.create()
 
-    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    reservation_unit_2 = ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -3171,7 +3251,7 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     assert is_closed(response_2) is False
 
     # Check cache contents has been updated.
-    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key))
+    cached_value = json.loads(cache.get(cache_key))
     assert len(cached_value) == 2
     assert cached_value[str(reservation_unit_2.pk)]["frt"] == "None"
     assert cached_value[str(reservation_unit_2.pk)]["closed"] == "True"
@@ -3185,14 +3265,16 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__previous_page_not_cached(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__previous_page_not_cached(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Check that when we query the second page first, we calculate the first page's results so that
     pagination to work correctly for the second page.
     """
     common_space = SpaceFactory.create()
 
-    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    reservation_unit_2 = ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -3233,7 +3315,9 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__different_filters_dont_share_cache(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__different_filters_dont_share_cache(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """Checks that cached results based on different filters are not shared."""
     common_space = SpaceFactory.create()
 
@@ -3279,10 +3363,10 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
     cache_key_2 = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnLW5hbWVfZmknXQ=="
 
     # Check that we have a new cached value for the second filter's results.
-    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_2))
+    cached_value = json.loads(cache.get(cache_key_2))
     assert len(cached_value) == 1
     # Cache for the previous request is still there.
-    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_1))
+    cached_value = json.loads(cache.get(cache_key_1))
     assert len(cached_value) == 1
 
     # We couldn't use the cached results, so make database queries as usual.
@@ -3291,8 +3375,8 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
 
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__different_text_search_languages_dont_share_cache(
-    graphql, reservation_unit
-):
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     reservation_unit.name_fi = "Sauna"
     reservation_unit.name_en = "Cottage"
     reservation_unit.save()
@@ -3339,7 +3423,9 @@ def test__reservation_unit__first_reservable_time__different_text_search_languag
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__use_cached_results(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__use_cached_results(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """Check that when we query the same page twice, we use the cached results on the second query."""
     common_space = SpaceFactory.create()
 
@@ -3389,7 +3475,9 @@ def test__reservation_unit__first_reservable_time__use_cached_results(graphql, r
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__use_cached_results__not_first_page(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__use_cached_results__not_first_page(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Check that cached results are used for pages other than the first page if they exist
     for both the first AND the second page.
@@ -3444,7 +3532,9 @@ def test__reservation_unit__first_reservable_time__use_cached_results__not_first
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__cached_results_not_valid_anymore(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__cached_results_not_valid_anymore(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     """
     Check that we correctly identify that one of the cached results is not valid anymore.
     This triggers a re-calculation for all results up to the current page, since the results
@@ -3452,7 +3542,7 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
     """
     common_space = SpaceFactory.create()
 
-    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    reservation_unit_2 = ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -3529,7 +3619,9 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__access_type(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__access_type(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=1),
@@ -3578,7 +3670,9 @@ def test__reservation_unit__first_reservable_time__access_type(graphql, reservat
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__access_type__frt_after_filter_start(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__access_type__frt_after_filter_start(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=12),
@@ -3603,7 +3697,9 @@ def test__reservation_unit__first_reservable_time__access_type__frt_after_filter
 
 
 @freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__access_type__frt_at_local_midnight(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__access_type__frt_at_local_midnight(
+    graphql: GraphQLClient, reservation_unit: ReservationUnit
+) -> None:
     # Reservations open at local midnight, which is still the previous day in UTC.
     reservation_unit.reservation_begins_at = _datetime(day=10)
     reservation_unit.save()
