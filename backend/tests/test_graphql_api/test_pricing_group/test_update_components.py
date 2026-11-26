@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -22,6 +23,9 @@ from tests.factories import (
 
 from .helpers import UPDATE_COMPONENTS_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -31,7 +35,7 @@ pytestmark = [
 # ── Helpers ──
 
 
-def component_input(component: PriceComponent, **overrides) -> dict:
+def component_input(component: PriceComponent, **overrides: Any) -> dict[str, Any]:
     data = {
         "pk": component.pk,
         "validFrom": component.valid_from.isoformat(),
@@ -60,7 +64,7 @@ def new_component_input() -> dict:
 # ── Price change ──
 
 
-def test_pricing_group__update_components__price_change_from_a_future_date(graphql):
+def test_pricing_group__update_components__price_change_from_a_future_date(graphql: GraphQLClient) -> None:
     today = local_date()
     change_date = today + datetime.timedelta(days=10)
 
@@ -99,7 +103,7 @@ def test_pricing_group__update_components__price_change_from_a_future_date(graph
     assert components[1].tax_level == active.tax_level
 
 
-def test_pricing_group__update_components__delete_future_component(graphql):
+def test_pricing_group__update_components__delete_future_component(graphql: GraphQLClient) -> None:
     today = local_date()
     change_date = today + datetime.timedelta(days=10)
 
@@ -127,7 +131,7 @@ def test_pricing_group__update_components__delete_future_component(graphql):
     assert components[0].valid_until is None
 
 
-def test_pricing_group__update_components__left_out_fields_keep_saved_values(graphql):
+def test_pricing_group__update_components__left_out_fields_keep_saved_values(graphql: GraphQLClient) -> None:
     today = local_date()
     change_date = today + datetime.timedelta(days=10)
 
@@ -166,7 +170,7 @@ def test_pricing_group__update_components__left_out_fields_keep_saved_values(gra
 # ── Edit rules ──
 
 
-def test_pricing_group__update_components__past_component_cannot_change(graphql):
+def test_pricing_group__update_components__past_component_cannot_change(graphql: GraphQLClient) -> None:
     today = local_date()
 
     pricing_group = PricingGroupFactory.create()
@@ -193,7 +197,7 @@ def test_pricing_group__update_components__past_component_cannot_change(graphql)
     assert PriceComponent.objects.get(pk=past.pk).amount == Decimal(10)
 
 
-def test_pricing_group__update_components__active_component_amount_cannot_change(graphql):
+def test_pricing_group__update_components__active_component_amount_cannot_change(graphql: GraphQLClient) -> None:
     today = local_date()
 
     pricing_group = PricingGroupFactory.create()
@@ -220,7 +224,7 @@ def test_pricing_group__update_components__active_component_amount_cannot_change
     assert PriceComponent.objects.get(pk=active.pk).amount == Decimal(10)
 
 
-def test_pricing_group__update_components__component_of_another_group(graphql):
+def test_pricing_group__update_components__component_of_another_group(graphql: GraphQLClient) -> None:
     today = local_date()
 
     pricing_group = PricingGroupFactory.create()
@@ -242,7 +246,7 @@ def test_pricing_group__update_components__component_of_another_group(graphql):
     assert PriceComponent.objects.get(pk=other.pk).pricing_group != pricing_group
 
 
-def test_pricing_group__update_components__coverage_errors_are_returned(graphql):
+def test_pricing_group__update_components__coverage_errors_are_returned(graphql: GraphQLClient) -> None:
     today = local_date()
     change_date = today + datetime.timedelta(days=10)
 
@@ -266,7 +270,7 @@ def test_pricing_group__update_components__coverage_errors_are_returned(graphql)
     assert PriceComponent.objects.get(pk=active.pk).valid_until is None
 
 
-def test_pricing_group__update_components__constraint_errors_have_codes(graphql):
+def test_pricing_group__update_components__constraint_errors_have_codes(graphql: GraphQLClient) -> None:
     pricing_group = PricingGroupFactory.create()
 
     graphql.login_with_superuser()
@@ -291,7 +295,7 @@ def test_pricing_group__update_components__constraint_errors_have_codes(graphql)
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_pricing_group__update_components__required_fields(graphql):
+def test_pricing_group__update_components__required_fields(graphql: GraphQLClient) -> None:
     pricing_group = PricingGroupFactory.create()
 
     graphql.login_with_superuser()
@@ -317,7 +321,7 @@ def test_pricing_group__update_components__required_fields(graphql):
 # ── Permissions ──
 
 
-def test_pricing_group__update_components__anonymous_user(graphql):
+def test_pricing_group__update_components__anonymous_user(graphql: GraphQLClient) -> None:
     pricing_group = PricingGroupFactory.create()
 
     input_data = {"pk": pricing_group.pk, "components": [new_component_input()]}
@@ -327,7 +331,7 @@ def test_pricing_group__update_components__anonymous_user(graphql):
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_pricing_group__update_components__shared_group__unit_group_admin(graphql):
+def test_pricing_group__update_components__shared_group__unit_group_admin(graphql: GraphQLClient) -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     user = UserFactory.create_with_unit_role(unit_groups=[unit_group], role=UserRoleChoice.ADMIN)
@@ -341,7 +345,7 @@ def test_pricing_group__update_components__shared_group__unit_group_admin(graphq
     assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
 
 
-def test_pricing_group__update_components__shared_group__other_unit_group_admin(graphql):
+def test_pricing_group__update_components__shared_group__other_unit_group_admin(graphql: GraphQLClient) -> None:
     pricing_group = PricingGroupFactory.create(unit_group=UnitGroupFactory.create())
     user = UserFactory.create_with_unit_role(unit_groups=[UnitGroupFactory.create()], role=UserRoleChoice.ADMIN)
 
@@ -354,7 +358,7 @@ def test_pricing_group__update_components__shared_group__other_unit_group_admin(
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_pricing_group__update_components__shared_group__unit_group_viewer(graphql):
+def test_pricing_group__update_components__shared_group__unit_group_viewer(graphql: GraphQLClient) -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     user = UserFactory.create_with_unit_role(unit_groups=[unit_group], role=UserRoleChoice.VIEWER)
@@ -368,7 +372,7 @@ def test_pricing_group__update_components__shared_group__unit_group_viewer(graph
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_pricing_group__update_components__own_group__unit_admin(graphql):
+def test_pricing_group__update_components__own_group__unit_admin(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=None)
     ReservationUnitPricingGroupFactory.create(
@@ -387,7 +391,7 @@ def test_pricing_group__update_components__own_group__unit_admin(graphql):
     assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
 
 
-def test_pricing_group__update_components__own_group__other_unit_admin(graphql):
+def test_pricing_group__update_components__own_group__other_unit_admin(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=None)
     ReservationUnitPricingGroupFactory.create(
@@ -407,7 +411,7 @@ def test_pricing_group__update_components__own_group__other_unit_admin(graphql):
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_pricing_group__update_components__general_admin(graphql):
+def test_pricing_group__update_components__general_admin(graphql: GraphQLClient) -> None:
     pricing_group = PricingGroupFactory.create(unit_group=UnitGroupFactory.create())
     user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
 
