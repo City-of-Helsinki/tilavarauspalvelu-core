@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import TermsOfUseFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_terms_of_use__query(graphql):
+def test_terms_of_use__query(graphql: GraphQLClient) -> None:
     terms_of_use = TermsOfUseFactory.create()
     graphql.login_with_superuser()
 
