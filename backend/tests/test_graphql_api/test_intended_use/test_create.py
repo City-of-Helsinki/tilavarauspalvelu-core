@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import IntendedUse
 
 from .helpers import CREATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_intended_use__create(graphql):
+def test_intended_use__create(graphql: GraphQLClient) -> None:
     data = {"name": "foo"}
 
     graphql.login_with_superuser()
