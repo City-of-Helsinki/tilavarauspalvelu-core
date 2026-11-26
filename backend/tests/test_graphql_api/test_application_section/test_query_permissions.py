@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ApplicationSectionFactory, UnitFactory, UnitGroupFactory, UserFactory
 from tests.test_graphql_api.test_application_section.helpers import sections_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_application_sections__query__permissions__anonymous_user(graphql):
+def test_application_sections__query__permissions__anonymous_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application section
     # - An anonymous user is using the system
@@ -26,7 +31,7 @@ def test_application_sections__query__permissions__anonymous_user(graphql):
     assert response.error_message() == "No permission to access node."
 
 
-def test_application_sections__query__permissions__superuser(graphql):
+def test_application_sections__query__permissions__superuser(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -45,7 +50,7 @@ def test_application_sections__query__permissions__superuser(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_sections__query__permissions__regular_user(graphql):
+def test_application_sections__query__permissions__regular_user(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - The owner of one of those application sections is using the system
@@ -63,7 +68,7 @@ def test_application_sections__query__permissions__regular_user(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_sections__query__permissions__general_admin(graphql):
+def test_application_sections__query__permissions__general_admin(graphql: GraphQLClient) -> None:
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_unallocated()
     user = UserFactory.create_with_general_role()
@@ -76,7 +81,7 @@ def test_application_sections__query__permissions__general_admin(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_sections__query__permissions__unit_admin(graphql):
+def test_application_sections__query__permissions__unit_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections with different units
     # - A unit admin for one of those units is using the system
@@ -101,7 +106,7 @@ def test_application_sections__query__permissions__unit_admin(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_sections__query__permissions__unit_group_admin(graphql):
+def test_application_sections__query__permissions__unit_group_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections with different unit groups
     # - A unit admin for one of those unit groups is using the system

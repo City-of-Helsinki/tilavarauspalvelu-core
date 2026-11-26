@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import Weekday
@@ -7,13 +9,16 @@ from tilavarauspalvelu.enums import Weekday
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationSectionFactory
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application_section__order__by_pk__asc(graphql):
+def test_application_section__order__by_pk__asc(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -33,7 +38,7 @@ def test_application_section__order__by_pk__asc(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__order__by_pk__desc(graphql):
+def test_application_section__order__by_pk__desc(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -53,7 +58,7 @@ def test_application_section__order__by_pk__desc(graphql):
     assert response.node(1) == {"pk": section_1.pk}
 
 
-def test_application_section__order__by_application_id__asc(graphql):
+def test_application_section__order__by_application_id__asc(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -73,7 +78,7 @@ def test_application_section__order__by_application_id__asc(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__order__by_application_id__desc(graphql):
+def test_application_section__order__by_application_id__desc(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -93,7 +98,7 @@ def test_application_section__order__by_application_id__desc(graphql):
     assert response.node(1) == {"pk": section_1.pk}
 
 
-def test_application_section__order__by_name__asc(graphql):
+def test_application_section__order__by_name__asc(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -113,7 +118,7 @@ def test_application_section__order__by_name__asc(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__order__by_name__asc__case_insensitive(graphql):
+def test_application_section__order__by_name__asc__case_insensitive(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -133,7 +138,7 @@ def test_application_section__order__by_name__asc__case_insensitive(graphql):
     assert response.node(1) == {"pk": section_1.pk}
 
 
-def test_application_section__order__by_name__desc(graphql):
+def test_application_section__order__by_name__desc(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -153,7 +158,7 @@ def test_application_section__order__by_name__desc(graphql):
     assert response.node(1) == {"pk": section_1.pk}
 
 
-def test_application_section__order__by_applicant__asc(graphql):
+def test_application_section__order__by_applicant__asc(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -173,7 +178,7 @@ def test_application_section__order__by_applicant__asc(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__order__by_applicant__desc(graphql):
+def test_application_section__order__by_applicant__desc(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections
     # - A superuser is using the system
@@ -193,7 +198,7 @@ def test_application_section__order__by_applicant__desc(graphql):
     assert response.node(1) == {"pk": section_1.pk}
 
 
-def test_application_section__order__by_application_status__asc(graphql):
+def test_application_section__order__by_application_status__asc(graphql: GraphQLClient) -> None:
     # given:
     # - There are application sections in the system with different statuses
     # - A superuser is using the system
@@ -206,13 +211,13 @@ def test_application_section__order__by_application_status__asc(graphql):
     application_7 = ApplicationFactory.create_in_status_in_allocation(application_sections__name="G")
     graphql.login_with_superuser()
 
-    pk_cancelled = application_1.application_sections.first().pk
-    pk_draft = application_2.application_sections.first().pk
-    pk_received = application_3.application_sections.first().pk
-    pk_result_sent = application_4.application_sections.first().pk
-    pk_expired = application_5.application_sections.first().pk
-    pk_handled = application_6.application_sections.first().pk
-    pk_in_allocation = application_7.application_sections.first().pk
+    pk_cancelled = application_1.application_sections.get().pk
+    pk_draft = application_2.application_sections.get().pk
+    pk_received = application_3.application_sections.get().pk
+    pk_result_sent = application_4.application_sections.get().pk
+    pk_expired = application_5.application_sections.get().pk
+    pk_handled = application_6.application_sections.get().pk
+    pk_in_allocation = application_7.application_sections.get().pk
 
     # when:
     # - User tries to search for application sections ordered by application statuses ascending
@@ -231,7 +236,7 @@ def test_application_section__order__by_application_status__asc(graphql):
     assert response.node(6) == {"pk": pk_result_sent}
 
 
-def test_application_section__order__by_application_status__desc(graphql):
+def test_application_section__order__by_application_status__desc(graphql: GraphQLClient) -> None:
     # given:
     # - There are application sections in the system with different statuses
     # - A superuser is using the system
@@ -244,13 +249,13 @@ def test_application_section__order__by_application_status__desc(graphql):
     application_7 = ApplicationFactory.create_in_status_in_allocation(application_sections__name="G")
     graphql.login_with_superuser()
 
-    pk_cancelled = application_1.application_sections.first().pk
-    pk_draft = application_2.application_sections.first().pk
-    pk_received = application_3.application_sections.first().pk
-    pk_result_sent = application_4.application_sections.first().pk
-    pk_expired = application_5.application_sections.first().pk
-    pk_handled = application_6.application_sections.first().pk
-    pk_in_allocation = application_7.application_sections.first().pk
+    pk_cancelled = application_1.application_sections.get().pk
+    pk_draft = application_2.application_sections.get().pk
+    pk_received = application_3.application_sections.get().pk
+    pk_result_sent = application_4.application_sections.get().pk
+    pk_expired = application_5.application_sections.get().pk
+    pk_handled = application_6.application_sections.get().pk
+    pk_in_allocation = application_7.application_sections.get().pk
 
     # when:
     # - User tries to search for application sections ordered by application statuses descending
@@ -278,7 +283,9 @@ def test_application_section__order__by_application_status__desc(graphql):
     ],
 )
 @pytest.mark.parametrize("direction", ["asc", "desc"])
-def test_application_section__order__by_preferred_unit_name(graphql, lang, order, direction):
+def test_application_section__order__by_preferred_unit_name(
+    graphql: GraphQLClient, lang: str, order: list[int], direction: str
+) -> None:
     order = list(reversed(order)) if direction == "desc" else order
 
     sections = {
@@ -333,7 +340,7 @@ def test_application_section__order__by_preferred_unit_name(graphql, lang, order
     assert response.node(3) == {"pk": sections[order[3]].pk}
 
 
-def test_application_section__order__by_has_allocations__asc(graphql):
+def test_application_section__order__by_has_allocations__asc(graphql: GraphQLClient) -> None:
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_handled()
 
@@ -349,7 +356,7 @@ def test_application_section__order__by_has_allocations__asc(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__order__by_has_allocations__desc(graphql):
+def test_application_section__order__by_has_allocations__desc(graphql: GraphQLClient) -> None:
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_handled()
 
@@ -365,7 +372,7 @@ def test_application_section__order__by_has_allocations__desc(graphql):
     assert response.node(1) == {"pk": section_1.pk}
 
 
-def test_application_section__order__by_allocations__asc(graphql):
+def test_application_section__order__by_allocations__asc(graphql: GraphQLClient) -> None:
     section_3 = ApplicationSectionFactory.create_in_status_handled()
     AllocatedTimeSlotFactory.create(
         reservation_unit_option=section_3.reservation_unit_options.get(),
@@ -388,7 +395,7 @@ def test_application_section__order__by_allocations__asc(graphql):
     assert response.node(2) == {"pk": section_3.pk}
 
 
-def test_application_section__order__by_allocations__desc(graphql):
+def test_application_section__order__by_allocations__desc(graphql: GraphQLClient) -> None:
     section_3 = ApplicationSectionFactory.create_in_status_handled()
     AllocatedTimeSlotFactory.create(
         reservation_unit_option=section_3.reservation_unit_options.get(),

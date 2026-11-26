@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import ApplicationSection
@@ -7,13 +9,16 @@ from tilavarauspalvelu.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory
 from tests.test_graphql_api.test_application_section.helpers import DELETE_MUTATION, get_application_section_delete_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application_section__delete__permissions__application_owner(graphql):
+def test_application_section__delete__permissions__application_owner(graphql: GraphQLClient) -> None:
     # given:
     # - There is an unallocated application section
     # - The owner of the application is using the system
@@ -34,7 +39,7 @@ def test_application_section__delete__permissions__application_owner(graphql):
     assert ApplicationSection.objects.filter(pk=section.pk).exists() is False
 
 
-def test_application_section__delete__permissions__superuser(graphql):
+def test_application_section__delete__permissions__superuser(graphql: GraphQLClient) -> None:
     # given:
     # - There is an unallocated application section
     # - A superuser is using the system
@@ -55,7 +60,7 @@ def test_application_section__delete__permissions__superuser(graphql):
     assert ApplicationSection.objects.filter(pk=section.pk).exists() is False
 
 
-def test_application_section__delete__permissions__regular_user(graphql):
+def test_application_section__delete__permissions__regular_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is an unallocated application section
     # - Someone other than the owner of the application is using the system

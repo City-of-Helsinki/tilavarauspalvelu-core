@@ -31,13 +31,15 @@ from .helpers import section_query, sections_query
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, ReservationUnit
 
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application_section__query(graphql):
+def test_application_section__query(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated()
     graphql.login_with_superuser()
 
@@ -74,9 +76,9 @@ def test_application_section__query(graphql):
     }
 
 
-def test_application_section__query__relations(graphql):
+def test_application_section__query__relations(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated()
-    option = section.reservation_unit_options.first()
+    option = section.reservation_unit_options.get()
     suitable_time_range = SuitableTimeRangeFactory.create(application_section=section)
     ApplicationSectionFactory.create_in_status_unallocated()
     graphql.login_with_superuser()
@@ -109,6 +111,8 @@ def test_application_section__query__relations(graphql):
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 2, response
+    assert section.age_group is not None
+    assert section.purpose is not None
     assert response.node(0) == {
         "pk": section.pk,
         "ageGroup": {
@@ -138,7 +142,7 @@ def test_application_section__query__relations(graphql):
     }
 
 
-def test_application_section__query__sports_form_fields(graphql):
+def test_application_section__query__sports_form_fields(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated(
         sport__name="Jalkapallo",
         participant_gender__name="Naiset",
@@ -174,7 +178,7 @@ def test_application_section__query__sports_form_fields(graphql):
     }
 
 
-def test_application_section__query__statuses__query_count(graphql):
+def test_application_section__query__statuses__query_count(graphql: GraphQLClient) -> None:
     ApplicationSectionFactory.create_in_status_handled()
     ApplicationSectionFactory.create_in_status_in_allocation()
     ApplicationSectionFactory.create_in_status_unallocated()
@@ -264,7 +268,7 @@ def pindora_query(section: ApplicationSection) -> str:
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_application_section__query__pindora_info(graphql):
+def test_application_section__query__pindora_info(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__user=user,
@@ -317,7 +321,9 @@ def test_application_section__query__pindora_info(graphql):
 
 @freeze_time(local_datetime(2022, 1, 1))
 @pytest.mark.parametrize("as_reservee", [True, False])
-def test_application_section__query__pindora_info__access_code_not_active(graphql, as_reservee):
+def test_application_section__query__pindora_info__access_code_not_active(
+    graphql: GraphQLClient, as_reservee: bool
+) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__user=user,
@@ -344,10 +350,10 @@ def test_application_section__query__pindora_info__access_code_not_active(graphq
     else:
         graphql.login_with_superuser()
 
-    response = pindora_response(series.reservation_unit)
-    response["access_code_is_active"] = False
+    pindora_data = pindora_response(series.reservation_unit)
+    pindora_data["access_code_is_active"] = False
 
-    with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=pindora_data):
         response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -359,7 +365,7 @@ def test_application_section__query__pindora_info__access_code_not_active(graphq
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_application_section__query__pindora_info__as_reservee__results_sent(graphql):
+def test_application_section__query__pindora_info__as_reservee__results_sent(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__user=user,
@@ -396,7 +402,9 @@ def test_application_section__query__pindora_info__as_reservee__results_sent(gra
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_application_section__query__pindora_info__through_allocation__viewer_in_other_unit(graphql):
+def test_application_section__query__pindora_info__through_allocation__viewer_in_other_unit(
+    graphql: GraphQLClient,
+) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__user=user,
@@ -440,7 +448,7 @@ def test_application_section__query__pindora_info__through_allocation__viewer_in
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_application_section__query__pindora_info__access_type_not_access_code(graphql):
+def test_application_section__query__pindora_info__access_type_not_access_code(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__user=user,
@@ -475,7 +483,7 @@ def test_application_section__query__pindora_info__access_type_not_access_code(g
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_application_section__query__pindora_info__pindora_call_fails(graphql):
+def test_application_section__query__pindora_info__pindora_call_fails(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__user=user,
@@ -508,7 +516,7 @@ def test_application_section__query__pindora_info__pindora_call_fails(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 3))
-def test_application_section__query__pindora_info__section_past(graphql):
+def test_application_section__query__pindora_info__section_past(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__user=user,
