@@ -3,7 +3,7 @@ from __future__ import annotations
 from utils.utils import get_jwt_payload
 
 
-def test_get_jwt_payload():
+def test_get_jwt_payload() -> None:
     encoded_payload = (
         "eyJpc3MiOiJodHRwczovL3R1bm5pc3RhbW8udGVzdC5oZWwubmluamEvb3BlbmlkIiwic3ViIj"
         "oiMjgxNmQ3NmEtNGI3Mi00NTJmLThlZmYtZGUzNWY1YzIwNjJlIiwiYXVkIjoidGlsYXZhcmF1c"

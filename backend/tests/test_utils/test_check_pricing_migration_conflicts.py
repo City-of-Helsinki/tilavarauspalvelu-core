@@ -59,7 +59,7 @@ def run_command() -> str:
 # ── No conflicts ──
 
 
-def test_check_pricing_migration_conflicts__no_conflicts():
+def test_check_pricing_migration_conflicts__no_conflicts() -> None:
     tax_level = TaxLevelFactory.create(name="Veroton", rates__percentage=Decimal(0))
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
@@ -70,7 +70,7 @@ def test_check_pricing_migration_conflicts__no_conflicts():
     assert run_command() == "No conflicts. The pricing migrations can run.\n"
 
 
-def test_check_pricing_migration_conflicts__accounting_without_material():
+def test_check_pricing_migration_conflicts__accounting_without_material() -> None:
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal(0))
     accounting = PaymentAccountingFactory.create(
         product_invoicing_sales_org="",
@@ -84,7 +84,7 @@ def test_check_pricing_migration_conflicts__accounting_without_material():
     assert run_command() == "No conflicts. The pricing migrations can run.\n"
 
 
-def test_check_pricing_migration_conflicts__skips_reservation_unit_with_pricing_group():
+def test_check_pricing_migration_conflicts__skips_reservation_unit_with_pricing_group() -> None:
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal(0))
     reservation_unit = ReservationUnitFactory.create(payment_accounting=None, unit__payment_accounting=None)
     create_pricing(reservation_unit=reservation_unit, tax_level=tax_level, begins=local_date())
@@ -93,7 +93,7 @@ def test_check_pricing_migration_conflicts__skips_reservation_unit_with_pricing_
     assert run_command() == "No conflicts. The pricing migrations can run.\n"
 
 
-def test_check_pricing_migration_conflicts__skips_sales_items_of_archived_reservation_unit():
+def test_check_pricing_migration_conflicts__skips_sales_items_of_archived_reservation_unit() -> None:
     general = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     reduced = TaxLevelFactory.create(rates__percentage=Decimal("13.5"))
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116")
@@ -113,7 +113,7 @@ def test_check_pricing_migration_conflicts__skips_sales_items_of_archived_reserv
     assert run_command() == "No conflicts. The pricing migrations can run.\n"
 
 
-def test_check_pricing_migration_conflicts__material_with_two_main_ledger_accounts():
+def test_check_pricing_migration_conflicts__material_with_two_main_ledger_accounts() -> None:
     tax_level = TaxLevelFactory.create(name="Veroton", rates__percentage=Decimal(0))
     accounting_1 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340025")
     accounting_2 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340100")
@@ -128,7 +128,7 @@ def test_check_pricing_migration_conflicts__material_with_two_main_ledger_accoun
 # ── Conflicts ──
 
 
-def test_check_pricing_migration_conflicts__lists_all_conflicts():
+def test_check_pricing_migration_conflicts__lists_all_conflicts() -> None:
     tax_level = TaxLevelFactory.create(name="Yleinen", rates__percentage=Decimal("25.5"))
     TaxLevelFactory.create(name="Veroton", rates__percentage=Decimal(0))
     future = local_date() + datetime.timedelta(days=10)
@@ -152,7 +152,7 @@ def test_check_pricing_migration_conflicts__lists_all_conflicts():
         run_command()
 
 
-def test_check_pricing_migration_conflicts__material_with_existing_sales_item_of_other_tax_level():
+def test_check_pricing_migration_conflicts__material_with_existing_sales_item_of_other_tax_level() -> None:
     general = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     reduced = TaxLevelFactory.create(rates__percentage=Decimal("13.5"))
     accounting = PaymentAccountingFactory.create(
@@ -175,7 +175,7 @@ def test_check_pricing_migration_conflicts__material_with_existing_sales_item_of
         run_command()
 
 
-def test_check_pricing_migration_conflicts__name_of_sales_item_without_material_is_taken():
+def test_check_pricing_migration_conflicts__name_of_sales_item_without_material_is_taken() -> None:
     tax_level = TaxLevelFactory.create(name="Yleinen", rates__percentage=Decimal("25.5"))
     accounting = PaymentAccountingFactory.create(
         name="Tili",
@@ -200,7 +200,7 @@ def test_check_pricing_migration_conflicts__name_of_sales_item_without_material_
         run_command()
 
 
-def test_check_pricing_migration_conflicts__no_tax_free_tax_level():
+def test_check_pricing_migration_conflicts__no_tax_free_tax_level() -> None:
     ReservationUnitFactory.create()
 
     msg = (

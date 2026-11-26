@@ -20,5 +20,5 @@ from utils.decimal_utils import round_decimal
         (Decimal("1.445"), 2, Decimal("1.45")),
     ],
 )
-def test_round_decimal(value, places, expected):
+def test_round_decimal(value: Decimal, places: int, expected: Decimal) -> None:
     assert round_decimal(value, places) == expected
