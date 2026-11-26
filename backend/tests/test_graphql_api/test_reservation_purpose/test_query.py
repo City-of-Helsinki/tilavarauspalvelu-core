@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationPurposeFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_purpose__query(graphql):
+def test_reservation_purpose__query(graphql: GraphQLClient) -> None:
     res_purpose = ReservationPurposeFactory.create()
 
     graphql.login_with_superuser()
@@ -38,7 +43,7 @@ def test_reservation_purpose__query(graphql):
     }
 
 
-def test_reservation_purpose__order__by_name(graphql):
+def test_reservation_purpose__order__by_name(graphql: GraphQLClient) -> None:
     res_purpose_1 = ReservationPurposeFactory.create(name_fi="AAA")
     res_purpose_2 = ReservationPurposeFactory.create(name_fi="CCC")
     res_purpose_3 = ReservationPurposeFactory.create(name_fi="BBB")
@@ -56,7 +61,7 @@ def test_reservation_purpose__order__by_name(graphql):
     assert response.node(2) == {"pk": res_purpose_1.pk}
 
 
-def test_reservation_purpose__order__by_rank(graphql):
+def test_reservation_purpose__order__by_rank(graphql: GraphQLClient) -> None:
     res_purpose_1 = ReservationPurposeFactory.create(rank=1)
     res_purpose_2 = ReservationPurposeFactory.create(rank=3)
     res_purpose_3 = ReservationPurposeFactory.create(rank=2)
