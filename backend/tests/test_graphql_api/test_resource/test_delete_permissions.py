@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ResourceFactory
 
 from .helpers import DELETE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_resource__delete__regular_user(graphql):
+def test_resource__delete__regular_user(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
     graphql.login_with_regular_user()
 
