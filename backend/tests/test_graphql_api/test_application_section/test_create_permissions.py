@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import ApplicationSection
@@ -7,13 +9,16 @@ from tilavarauspalvelu.models import ApplicationSection
 from tests.factories import ApplicationFactory, UserFactory
 from tests.test_graphql_api.test_application_section.helpers import CREATE_MUTATION, get_application_section_create_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application_section__create__permissions__superuser(graphql):
+def test_application_section__create__permissions__superuser(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round
     # - A superuser is using the system
@@ -33,7 +38,7 @@ def test_application_section__create__permissions__superuser(graphql):
     assert ApplicationSection.objects.count() == 1
 
 
-def test_application_section__create__permissions__regular_user(graphql):
+def test_application_section__create__permissions__regular_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round
     # - Someone other than the owner of the application is using the system
@@ -52,7 +57,7 @@ def test_application_section__create__permissions__regular_user(graphql):
     assert ApplicationSection.objects.count() == 0
 
 
-def test_application_section__create__permissions__general_admin(graphql):
+def test_application_section__create__permissions__general_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round
     # - A general admin with application permissions is using the system

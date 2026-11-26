@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -17,6 +18,9 @@ from tests.factories import (
 )
 from tests.test_graphql_api.test_application_section.helpers import UPDATE_MUTATION, get_application_section_update_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -26,7 +30,7 @@ pytestmark = [
 # ── Update ──
 
 
-def test_application_section__update(graphql):
+def test_application_section__update(graphql: GraphQLClient) -> None:
     # given:
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system
@@ -70,7 +74,7 @@ def test_application_section__update(graphql):
 # ── Application sent at ──
 
 
-def test_application_section__update__resets_application_sent_at(graphql):
+def test_application_section__update__resets_application_sent_at(graphql: GraphQLClient) -> None:
     application_section = ApplicationSectionFactory.create_in_status_unallocated(application__sent_at=local_datetime())
 
     graphql.force_login(application_section.application.user)
@@ -84,7 +88,7 @@ def test_application_section__update__resets_application_sent_at(graphql):
     assert application.sent_at is None
 
 
-def test_application_section__update__staff__does_not_reset_application_sent_at(graphql):
+def test_application_section__update__staff__does_not_reset_application_sent_at(graphql: GraphQLClient) -> None:
     sent_at = local_datetime()
     application_section = ApplicationSectionFactory.create_in_status_unallocated(application__sent_at=sent_at)
 
@@ -102,7 +106,7 @@ def test_application_section__update__staff__does_not_reset_application_sent_at(
 # ── Application round ──
 
 
-def test_application_section__update__application_round_not_open(graphql):
+def test_application_section__update__application_round_not_open(graphql: GraphQLClient) -> None:
     application_section = ApplicationSectionFactory.create_in_status_in_allocation()
     original_name = application_section.name
 
@@ -121,7 +125,7 @@ def test_application_section__update__application_round_not_open(graphql):
 # ── Objects of other applications and sections ──
 
 
-def test_application_section__update__move_to_another_application(graphql):
+def test_application_section__update__move_to_another_application(graphql: GraphQLClient) -> None:
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
     own_application_pk = application_section.application.pk
     other_application = ApplicationFactory.create_in_status_draft()
@@ -139,10 +143,10 @@ def test_application_section__update__move_to_another_application(graphql):
     assert application_section.application.pk == own_application_pk
 
 
-def test_application_section__update__reservation_unit_option_of_another_section(graphql):
+def test_application_section__update__reservation_unit_option_of_another_section(graphql: GraphQLClient) -> None:
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
     other_section = ApplicationSectionFactory.create_in_status_unallocated()
-    other_option = other_section.reservation_unit_options.first()
+    other_option = other_section.reservation_unit_options.get()
 
     graphql.force_login(application_section.application.user)
 
@@ -159,7 +163,7 @@ def test_application_section__update__reservation_unit_option_of_another_section
     assert other_option.application_section.pk == other_section.pk
 
 
-def test_application_section__update__suitable_time_range_of_another_section(graphql):
+def test_application_section__update__suitable_time_range_of_another_section(graphql: GraphQLClient) -> None:
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
     other_section = ApplicationSectionFactory.create_in_status_unallocated()
     other_time_range = SuitableTimeRangeFactory.create(application_section=other_section)
@@ -182,7 +186,7 @@ def test_application_section__update__suitable_time_range_of_another_section(gra
 # ── Validation ──
 
 
-def test_application_section__update__smaller_max_duration_than_min_duration(graphql):
+def test_application_section__update__smaller_max_duration_than_min_duration(graphql: GraphQLClient) -> None:
     # given:
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system
@@ -202,7 +206,7 @@ def test_application_section__update__smaller_max_duration_than_min_duration(gra
     ], response
 
 
-def test_application_section__update__zero_reservations_per_week(graphql):
+def test_application_section__update__zero_reservations_per_week(graphql: GraphQLClient) -> None:
     application_section = ApplicationSectionFactory.create_in_status_unallocated(applied_reservations_per_week=2)
     graphql.login_with_superuser()
 
@@ -218,7 +222,7 @@ def test_application_section__update__zero_reservations_per_week(graphql):
     assert application_section.applied_reservations_per_week == 2
 
 
-def test_application_section__update__switch_reservation_unit_option_preferred_order(graphql):
+def test_application_section__update__switch_reservation_unit_option_preferred_order(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application section with two reservation unit options
     # - A superuser is using the system
@@ -254,7 +258,9 @@ def test_application_section__update__switch_reservation_unit_option_preferred_o
     assert option_2.preferred_order == 0
 
 
-def test_application_section__update__two_reservation_unit_options_with_same_preferred_order(graphql):
+def test_application_section__update__two_reservation_unit_options_with_same_preferred_order(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is an application section with two reservation unit options
     # - A superuser is using the system
@@ -290,7 +296,7 @@ def test_application_section__update__two_reservation_unit_options_with_same_pre
     ], response
 
 
-def test_application_section__update__preferred_order_must_be_consecutive(graphql):
+def test_application_section__update__preferred_order_must_be_consecutive(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application section with two event reservation units
     # - A superuser is using the system
@@ -322,7 +328,9 @@ def test_application_section__update__preferred_order_must_be_consecutive(graphq
     ], response
 
 
-def test_application_section__update__reservations_begin_date_not_in_round_reservable_period(graphql):
+def test_application_section__update__reservations_begin_date_not_in_round_reservable_period(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system
@@ -347,7 +355,9 @@ def test_application_section__update__reservations_begin_date_not_in_round_reser
     assert response.field_error_codes() == [error_codes.APPLICATION_SECTION_RESERVATIONS_BEGIN_DATE_BEFORE_ROUND]
 
 
-def test_application_section__update__reservations_end_date_not_in_round_reservable_period(graphql):
+def test_application_section__update__reservations_end_date_not_in_round_reservable_period(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system

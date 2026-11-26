@@ -26,13 +26,15 @@ from tests.test_graphql_api.test_application_section.helpers import sections_que
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnitOption
 
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application_section__filter__by_pk(graphql):
+def test_application_section__filter__by_pk(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round with two application sections
     # - The owner of the application is using the system
@@ -52,7 +54,7 @@ def test_application_section__filter__by_pk(graphql):
     assert response.node(0) == {"pk": section.pk}
 
 
-def test_application_section__filter__by_pk__multiple(graphql):
+def test_application_section__filter__by_pk__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round with two application sections
     # - The owner of the application is using the system
@@ -73,7 +75,7 @@ def test_application_section__filter__by_pk__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_name(graphql):
+def test_application_section__filter__by_name(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with three application sections
     # - A superuser is using the system
@@ -95,7 +97,7 @@ def test_application_section__filter__by_name(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_application(graphql):
+def test_application_section__filter__by_application(graphql: GraphQLClient) -> None:
     # given:
     # - There are two draft application in the same application round with one application section each
     # - A superuser is using the system
@@ -118,7 +120,7 @@ def test_application_section__filter__by_application(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_application_round(graphql):
+def test_application_section__filter__by_application_round(graphql: GraphQLClient) -> None:
     # given:
     # - There are two draft application in different application rounds with one application section each
     # - A superuser is using the system
@@ -139,7 +141,7 @@ def test_application_section__filter__by_application_round(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_unit(graphql):
+def test_application_section__filter__by_unit(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with two application sections
     # - A superuser is using the system
@@ -154,7 +156,7 @@ def test_application_section__filter__by_unit(graphql):
     )
     graphql.login_with_superuser()
 
-    section_reservation_unit: ReservationUnitOption = section_1.reservation_unit_options.first()
+    section_reservation_unit: ReservationUnitOption = section_1.reservation_unit_options.get()
 
     # when:
     # - User tries to filter application sections with a specific unit
@@ -167,7 +169,7 @@ def test_application_section__filter__by_unit(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_unit__multiple(graphql):
+def test_application_section__filter__by_unit__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with two application sections
     # - A superuser is using the system
@@ -182,8 +184,8 @@ def test_application_section__filter__by_unit__multiple(graphql):
     )
     graphql.login_with_superuser()
 
-    section_reservation_unit_1: ReservationUnitOption = section_1.reservation_unit_options.first()
-    section_reservation_unit_2: ReservationUnitOption = section_2.reservation_unit_options.first()
+    section_reservation_unit_1: ReservationUnitOption = section_1.reservation_unit_options.get()
+    section_reservation_unit_2: ReservationUnitOption = section_2.reservation_unit_options.get()
 
     # when:
     # - User tries to filter application sections with any of the given units
@@ -202,7 +204,7 @@ def test_application_section__filter__by_unit__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_unit_groups(graphql):
+def test_application_section__filter__by_unit_groups(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application sections in the system to different units groups
     # - A superuser is using the system
@@ -223,7 +225,7 @@ def test_application_section__filter__by_unit_groups(graphql):
     assert response.node(0) == {"pk": section.pk}
 
 
-def test_application_section__filter__by_reservation_unit(graphql):
+def test_application_section__filter__by_reservation_unit(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with two application sections
     # - A superuser is using the system
@@ -238,7 +240,7 @@ def test_application_section__filter__by_reservation_unit(graphql):
     )
     graphql.login_with_superuser()
 
-    section_reservation_unit: ReservationUnitOption = section_1.reservation_unit_options.first()
+    section_reservation_unit: ReservationUnitOption = section_1.reservation_unit_options.get()
 
     # when:
     # - User tries to filter application sections with a specific reservation unit
@@ -251,7 +253,7 @@ def test_application_section__filter__by_reservation_unit(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_reservation_unit__multiple(graphql):
+def test_application_section__filter__by_reservation_unit__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with two application sections
     # - A superuser is using the system
@@ -266,8 +268,8 @@ def test_application_section__filter__by_reservation_unit__multiple(graphql):
     )
     graphql.login_with_superuser()
 
-    section_reservation_unit_1: ReservationUnitOption = section_1.reservation_unit_options.first()
-    section_reservation_unit_2: ReservationUnitOption = section_2.reservation_unit_options.first()
+    section_reservation_unit_1: ReservationUnitOption = section_1.reservation_unit_options.get()
+    section_reservation_unit_2: ReservationUnitOption = section_2.reservation_unit_options.get()
 
     # when:
     # - User tries to filter application sections with any of the given reservation units
@@ -286,7 +288,7 @@ def test_application_section__filter__by_reservation_unit__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_user(graphql):
+def test_application_section__filter__by_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with three application sections
     # - A superuser is using the system
@@ -307,7 +309,7 @@ def test_application_section__filter__by_user(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_applicant_type(graphql):
+def test_application_section__filter__by_applicant_type(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with three application sections
     # - A superuser is using the system
@@ -328,7 +330,7 @@ def test_application_section__filter__by_applicant_type(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_applicant_type__multiple(graphql):
+def test_application_section__filter__by_applicant_type__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with three application sections
     # - A superuser is using the system
@@ -350,7 +352,7 @@ def test_application_section__filter__by_applicant_type__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_status(graphql):
+def test_application_section__filter__by_status(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with two application sections with different statuses
     # - A superuser is using the system
@@ -374,7 +376,7 @@ def test_application_section__filter__by_status(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_status__multiple(graphql):
+def test_application_section__filter__by_status__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an application round with two application sections with different statuses
     # - A superuser is using the system
@@ -399,7 +401,7 @@ def test_application_section__filter__by_status__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_application_status(graphql):
+def test_application_section__filter__by_application_status(graphql: GraphQLClient) -> None:
     # given:
     # - There are two applications in different statuses in the same
     #   application round with one application section each
@@ -427,7 +429,7 @@ def test_application_section__filter__by_application_status(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_application_status__multiple(graphql):
+def test_application_section__filter__by_application_status__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two applications in different statuses in the same
     #   application round with one application section each
@@ -456,7 +458,7 @@ def test_application_section__filter__by_application_status__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_priority(graphql):
+def test_application_section__filter__by_priority(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application with application sections with different priorities
     # - A superuser is using the system
@@ -484,7 +486,7 @@ def test_application_section__filter__by_priority(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_priority__multiple(graphql):
+def test_application_section__filter__by_priority__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application with application sections with different priorities
     # - A superuser is using the system
@@ -513,7 +515,7 @@ def test_application_section__filter__by_priority__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__suitable_time_range_priority(graphql):
+def test_application_section__filter__suitable_time_range_priority(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application section with suitable time ranges of different priorities
     # - A superuser is using the system
@@ -548,7 +550,7 @@ def test_application_section__filter__suitable_time_range_priority(graphql):
     ]
 
 
-def test_application_section__filter__by_preferred_order(graphql):
+def test_application_section__filter__by_preferred_order(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application with application sections with different preferred orders
     # - A superuser is using the system
@@ -580,7 +582,7 @@ def test_application_section__filter__by_preferred_order(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_preferred_order__multiple(graphql):
+def test_application_section__filter__by_preferred_order__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application with application sections with different preferred orders
     # - A superuser is using the system
@@ -613,7 +615,7 @@ def test_application_section__filter__by_preferred_order__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_include_preferred_order_10_or_higher(graphql):
+def test_application_section__filter__by_include_preferred_order_10_or_higher(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application with application sections with different preferred orders (some of which are 10+)
     # - A superuser is using the system
@@ -650,7 +652,9 @@ def test_application_section__filter__by_include_preferred_order_10_or_higher(gr
     assert response.node(1) == {"pk": section_4.pk}
 
 
-def test_application_section__filter__by_include_preferred_order_10_or_higher__with_higher(graphql):
+def test_application_section__filter__by_include_preferred_order_10_or_higher__with_higher(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is a draft application with application sections with different preferred orders (some of which are 10+)
     # - A superuser is using the system
@@ -688,7 +692,7 @@ def test_application_section__filter__by_include_preferred_order_10_or_higher__w
     assert response.node(2) == {"pk": section_4.pk}
 
 
-def test_application_section__filter__by_municipality(graphql):
+def test_application_section__filter__by_municipality(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application with different home cities, each with one application section
     # - A superuser is using the system
@@ -711,7 +715,7 @@ def test_application_section__filter__by_municipality(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_municipality__multiple(graphql):
+def test_application_section__filter__by_municipality__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application with different home cities, each with one application section
     # - A superuser is using the system
@@ -735,7 +739,7 @@ def test_application_section__filter__by_municipality__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_age_group(graphql):
+def test_application_section__filter__by_age_group(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections with different age groups
     # - A superuser is using the system
@@ -759,7 +763,7 @@ def test_application_section__filter__by_age_group(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_age_group__multiple(graphql):
+def test_application_section__filter__by_age_group__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections with different age groups
     # - A superuser is using the system
@@ -784,7 +788,7 @@ def test_application_section__filter__by_age_group__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_purpose(graphql):
+def test_application_section__filter__by_purpose(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections with different reservation purposes
     # - A superuser is using the system
@@ -808,7 +812,7 @@ def test_application_section__filter__by_purpose(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_purpose__multiple(graphql):
+def test_application_section__filter__by_purpose__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections with different reservation purposes
     # - A superuser is using the system
@@ -833,7 +837,7 @@ def test_application_section__filter__by_purpose__multiple(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_text_search__section_name(graphql):
+def test_application_section__filter__by_text_search__section_name(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -861,7 +865,7 @@ def test_application_section__filter__by_text_search__section_name(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_text_search__section_name__prefix(graphql):
+def test_application_section__filter__by_text_search__section_name__prefix(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -889,7 +893,7 @@ def test_application_section__filter__by_text_search__section_name__prefix(graph
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_text_search__section_name__has_quotes(graphql):
+def test_application_section__filter__by_text_search__section_name__has_quotes(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -917,7 +921,7 @@ def test_application_section__filter__by_text_search__section_name__has_quotes(g
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_text_search__applicant__organisation_name(graphql):
+def test_application_section__filter__by_text_search__applicant__organisation_name(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -944,7 +948,9 @@ def test_application_section__filter__by_text_search__applicant__organisation_na
     assert response.node(0) == {"pk": section.pk}
 
 
-def test_application_section__filter__by_text_search__applicant__contact_person_first_name(graphql):
+def test_application_section__filter__by_text_search__applicant__contact_person_first_name(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -971,7 +977,9 @@ def test_application_section__filter__by_text_search__applicant__contact_person_
     assert response.node(0) == {"pk": section.pk}
 
 
-def test_application_section__filter__by_text_search__applicant__contact_person_last_name(graphql):
+def test_application_section__filter__by_text_search__applicant__contact_person_last_name(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -998,7 +1006,7 @@ def test_application_section__filter__by_text_search__applicant__contact_person_
     assert response.node(0) == {"pk": section.pk}
 
 
-def test_application_section__filter__by_text_search__applicant__user_first_name(graphql):
+def test_application_section__filter__by_text_search__applicant__user_first_name(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -1025,7 +1033,7 @@ def test_application_section__filter__by_text_search__applicant__user_first_name
     assert response.node(0) == {"pk": section.pk}
 
 
-def test_application_section__filter__by_text_search__applicant__user_last_name(graphql):
+def test_application_section__filter__by_text_search__applicant__user_last_name(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -1052,7 +1060,7 @@ def test_application_section__filter__by_text_search__applicant__user_last_name(
     assert response.node(0) == {"pk": section.pk}
 
 
-def test_application_section__filter__by_text_search__section_id(graphql):
+def test_application_section__filter__by_text_search__section_id(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -1081,7 +1089,7 @@ def test_application_section__filter__by_text_search__section_id(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_text_search__application_id(graphql):
+def test_application_section__filter__by_text_search__application_id(graphql: GraphQLClient) -> None:
     # given:
     # - There are two applications with one application sections each
     # - A superuser is using the system
@@ -1118,7 +1126,7 @@ def test_application_section__filter__by_text_search__application_id(graphql):
     assert response.node(0) == {"pk": section_1.pk}
 
 
-def test_application_section__filter__by_text_search__not_found(graphql):
+def test_application_section__filter__by_text_search__not_found(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application with two application sections
     # - A superuser is using the system
@@ -1144,7 +1152,7 @@ def test_application_section__filter__by_text_search__not_found(graphql):
     assert len(response.edges) == 0, response
 
 
-def test_application_section__filter__reservation_unit_options__preferred_order(graphql):
+def test_application_section__filter__reservation_unit_options__preferred_order(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round with two application sections
     # - A superuser is using the system
@@ -1172,7 +1180,7 @@ def test_application_section__filter__reservation_unit_options__preferred_order(
     assert response.node(1) == {"pk": section_2.pk, "reservationUnitOptions": []}
 
 
-def test_application_section__filter__suitable_time_ranges__by_fulfilled(graphql):
+def test_application_section__filter__suitable_time_ranges__by_fulfilled(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application section with an allocated time slot on Monday,
     #   and two suitable time ranges for Monday and Tuesday.
@@ -1223,7 +1231,7 @@ def test_application_section__filter__suitable_time_ranges__by_fulfilled(graphql
     }
 
 
-def test_application_section__filter__by_has_allocations__true(graphql):
+def test_application_section__filter__by_has_allocations__true(graphql: GraphQLClient) -> None:
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_handled()
 
@@ -1238,7 +1246,7 @@ def test_application_section__filter__by_has_allocations__true(graphql):
     assert response.node(0) == {"pk": section_2.pk}
 
 
-def test_application_section__filter__by_has_allocations__false(graphql):
+def test_application_section__filter__by_has_allocations__false(graphql: GraphQLClient) -> None:
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_handled()
 

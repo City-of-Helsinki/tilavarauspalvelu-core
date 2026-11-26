@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphql_relay import to_global_id
 
@@ -16,6 +18,9 @@ from tests.test_graphql_api.test_application_section.helpers import (
     section_query,
 )
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -25,7 +30,7 @@ pytestmark = [
 # ── Create ──
 
 
-def test_application_section__create__with_offered_price_option(graphql):
+def test_application_section__create__with_offered_price_option(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -39,7 +44,7 @@ def test_application_section__create__with_offered_price_option(graphql):
     assert section.price_option == price_option
 
 
-def test_application_section__create__without_price_option(graphql):
+def test_application_section__create__without_price_option(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -52,7 +57,7 @@ def test_application_section__create__without_price_option(graphql):
     assert section.price_option is None
 
 
-def test_application_section__create__price_option_not_offered(graphql):
+def test_application_section__create__price_option_not_offered(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -67,7 +72,7 @@ def test_application_section__create__price_option_not_offered(graphql):
     assert not ApplicationSection.objects.filter(application=application).exists()
 
 
-def test_application_section__create_with_application__price_option_not_offered(graphql):
+def test_application_section__create_with_application__price_option_not_offered(graphql: GraphQLClient) -> None:
     application_round = ApplicationFactory.create_in_status_draft_no_sections().application_round
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -82,7 +87,7 @@ def test_application_section__create_with_application__price_option_not_offered(
     assert not Application.objects.filter(application_round=application_round, user__is_superuser=True).exists()
 
 
-def test_application_section__create_with_application__offered_price_option(graphql):
+def test_application_section__create_with_application__offered_price_option(graphql: GraphQLClient) -> None:
     application_round = ApplicationFactory.create_in_status_draft_no_sections().application_round
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -99,10 +104,10 @@ def test_application_section__create_with_application__offered_price_option(grap
 # ── Update ──
 
 
-def test_application_section__update__price_option(graphql):
+def test_application_section__update__price_option(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated()
     application_round = section.application.application_round
-    application_round.reservation_units.add(section.reservation_unit_options.first().reservation_unit)
+    application_round.reservation_units.add(section.reservation_unit_options.get().reservation_unit)
     price_option = PriceOptionFactory.create_for_application_round(application_round)
     graphql.force_login(section.application.user)
 
@@ -113,7 +118,7 @@ def test_application_section__update__price_option(graphql):
     assert section.price_option == price_option
 
 
-def test_application_section__update__price_option_not_offered(graphql):
+def test_application_section__update__price_option_not_offered(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated()
     price_option = PriceOptionFactory.create()
     graphql.force_login(section.application.user)
@@ -130,7 +135,7 @@ def test_application_section__update__price_option_not_offered(graphql):
 # ── Query ──
 
 
-def test_application_section__query__price_option(graphql):
+def test_application_section__query__price_option(graphql: GraphQLClient) -> None:
     price_option = PriceOptionFactory.create(name="Adults")
     section = ApplicationSectionFactory.create_in_status_unallocated(price_option=price_option)
     graphql.login_with_superuser()

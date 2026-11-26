@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationFormType
@@ -22,6 +24,9 @@ from tests.test_graphql_api.test_application_section.helpers import (
     get_application_section_create_data,
 )
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -31,7 +36,7 @@ pytestmark = [
 # ── Create ──
 
 
-def test_application_section__create__sports_form__all_sports_data(graphql):
+def test_application_section__create__sports_form__all_sports_data(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections(
         application_round__application_form=ApplicationFormType.SPORTS_FORM,
     )
@@ -55,7 +60,7 @@ def test_application_section__create__sports_form__all_sports_data(graphql):
     assert section.multiple_reservations_per_day_wish == "Kaksi vuoroa lauantaisin"
 
 
-def test_application_section__create__sports_form__sport_and_other_sport(graphql):
+def test_application_section__create__sports_form__sport_and_other_sport(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections(
         application_round__application_form=ApplicationFormType.SPORTS_FORM,
     )
@@ -80,7 +85,9 @@ def test_application_section__create__sports_form__sport_and_other_sport(graphql
         ("multipleReservationsPerDayWish", "Kaksi vuoroa lauantaisin"),
     ],
 )
-def test_application_section__create__default_form__sports_text_not_allowed(graphql, field, value):
+def test_application_section__create__default_form__sports_text_not_allowed(
+    graphql: GraphQLClient, field: str, value: str
+) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -94,7 +101,7 @@ def test_application_section__create__default_form__sports_text_not_allowed(grap
     assert not ApplicationSection.objects.filter(application=application).exists()
 
 
-def test_application_section__create__default_form__sport_not_allowed(graphql):
+def test_application_section__create__default_form__sport_not_allowed(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -108,7 +115,7 @@ def test_application_section__create__default_form__sport_not_allowed(graphql):
     assert not ApplicationSection.objects.filter(application=application).exists()
 
 
-def test_application_section__create__default_form__participant_gender_not_allowed(graphql):
+def test_application_section__create__default_form__participant_gender_not_allowed(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -122,7 +129,7 @@ def test_application_section__create__default_form__participant_gender_not_allow
     assert not ApplicationSection.objects.filter(application=application).exists()
 
 
-def test_application_section__create__default_form__empty_sports_data(graphql):
+def test_application_section__create__default_form__empty_sports_data(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -138,7 +145,7 @@ def test_application_section__create__default_form__empty_sports_data(graphql):
     assert ApplicationSection.objects.filter(application=application).exists()
 
 
-def test_application_section__create_with_application__sports_form__sport(graphql):
+def test_application_section__create_with_application__sports_form__sport(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open(
         application_form=ApplicationFormType.SPORTS_FORM,
     )
@@ -154,7 +161,9 @@ def test_application_section__create_with_application__sports_form__sport(graphq
     assert section.sport == sport
 
 
-def test_application_section__create_with_application__default_form__sports_data_not_allowed(graphql):
+def test_application_section__create_with_application__default_form__sports_data_not_allowed(
+    graphql: GraphQLClient,
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -171,7 +180,7 @@ def test_application_section__create_with_application__default_form__sports_data
 # ── Update ──
 
 
-def test_application_section__update__sports_form__other_sport_when_sport_is_saved(graphql):
+def test_application_section__update__sports_form__other_sport_when_sport_is_saved(graphql: GraphQLClient) -> None:
     sport = SportFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__application_round__application_form=ApplicationFormType.SPORTS_FORM,
@@ -189,7 +198,7 @@ def test_application_section__update__sports_form__other_sport_when_sport_is_sav
     assert section.sport_other == ""
 
 
-def test_application_section__update__sports_form__switch_from_sport_to_other_sport(graphql):
+def test_application_section__update__sports_form__switch_from_sport_to_other_sport(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__application_round__application_form=ApplicationFormType.SPORTS_FORM,
         sport=SportFactory.create(),
@@ -204,7 +213,9 @@ def test_application_section__update__sports_form__switch_from_sport_to_other_sp
     assert section.sport_other == "Kabaddi"
 
 
-def test_application_section__update_with_application__sports_form__each_section_uses_its_own_data(graphql):
+def test_application_section__update_with_application__sports_form__each_section_uses_its_own_data(
+    graphql: GraphQLClient,
+) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections(
         application_round__application_form=ApplicationFormType.SPORTS_FORM,
     )
@@ -231,7 +242,7 @@ def test_application_section__update_with_application__sports_form__each_section
     assert second_section.sport_other == ""
 
 
-def test_application_section__update__sports_form__free_text_is_saved_as_written(graphql):
+def test_application_section__update__sports_form__free_text_is_saved_as_written(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__application_round__application_form=ApplicationFormType.SPORTS_FORM,
     )
@@ -252,7 +263,7 @@ def test_application_section__update__sports_form__free_text_is_saved_as_written
     assert section.multiple_reservations_per_day_wish == "Kaksi vuoroa, jos 1 < 2 & 3 > 2"
 
 
-def test_application_section__update__default_form__sports_data_not_allowed(graphql):
+def test_application_section__update__default_form__sports_data_not_allowed(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated()
     graphql.force_login(section.application.user)
 

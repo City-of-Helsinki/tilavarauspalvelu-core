@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -11,13 +12,18 @@ from tilavarauspalvelu.typing import error_codes
 from tests.factories import ApplicationFactory
 from tests.test_graphql_api.test_application_section.helpers import CREATE_MUTATION, get_application_section_create_data
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application_section__create(graphql):
+def test_application_section__create(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -58,7 +64,7 @@ def test_application_section__create(graphql):
     assert section.status == ApplicationSectionStatusChoice.UNALLOCATED
 
 
-def test_application_section__create__more_than_seven_reservations_per_week(graphql):
+def test_application_section__create__more_than_seven_reservations_per_week(graphql: GraphQLClient) -> None:
     # Several time spans can be applied for on the same day,
     # so the number of applied reservations per week is no longer limited to one per weekday.
     application = ApplicationFactory.create_in_status_draft_no_sections()
@@ -74,7 +80,7 @@ def test_application_section__create__more_than_seven_reservations_per_week(grap
     assert section.applied_reservations_per_week == 10
 
 
-def test_application_section__create__zero_reservations_per_week(graphql):
+def test_application_section__create__zero_reservations_per_week(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -89,7 +95,7 @@ def test_application_section__create__zero_reservations_per_week(graphql):
     assert ApplicationSection.objects.filter(application=application).exists() is False
 
 
-def test_application_section__create__resets_application_sent_at(graphql):
+def test_application_section__create__resets_application_sent_at(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_received()
     graphql.force_login(application.user)
 
@@ -102,7 +108,7 @@ def test_application_section__create__resets_application_sent_at(graphql):
     assert application.sent_at is None
 
 
-def test_application_section__create__staff__does_not_reset_application_sent_at(graphql):
+def test_application_section__create__staff__does_not_reset_application_sent_at(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_received()
     sent_at = application.sent_at
     graphql.login_with_superuser()
@@ -113,10 +119,11 @@ def test_application_section__create__staff__does_not_reset_application_sent_at(
     assert response.has_errors is False, response
 
     application = Application.objects.get(pk=application.pk)
+    assert sent_at is not None
     assert application.sent_at == sent_at.astimezone(datetime.UTC)
 
 
-def test_application_section__create__too_many_sections(graphql, settings):
+def test_application_section__create__too_many_sections(graphql: GraphQLClient, settings: Settings) -> None:
     settings.MAXIMUM_SECTIONS_PER_APPLICATION = 1
 
     application = ApplicationFactory.create_in_status_draft()
@@ -133,7 +140,7 @@ def test_application_section__create__too_many_sections(graphql, settings):
     assert ApplicationSection.objects.filter(application=application).count() == 1
 
 
-def test_application_section__create__application_round_not_open(graphql):
+def test_application_section__create__application_round_not_open(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_in_allocation_no_sections()
     graphql.login_with_superuser()
 
@@ -146,7 +153,7 @@ def test_application_section__create__application_round_not_open(graphql):
     assert ApplicationSection.objects.filter(application=application).exists() is False
 
 
-def test_application_section__create__smaller_max_duration_than_min_duration(graphql):
+def test_application_section__create__smaller_max_duration_than_min_duration(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -166,7 +173,7 @@ def test_application_section__create__smaller_max_duration_than_min_duration(gra
     ]
 
 
-def test_application_section__create__duration_at_15_minute_steps(graphql):
+def test_application_section__create__duration_at_15_minute_steps(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -182,7 +189,7 @@ def test_application_section__create__duration_at_15_minute_steps(graphql):
     assert section.reservation_max_duration == datetime.timedelta(hours=1, minutes=15)
 
 
-def test_application_section__create__duration_not_multiple_of_15(graphql):
+def test_application_section__create__duration_not_multiple_of_15(graphql: GraphQLClient) -> None:
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -202,7 +209,7 @@ def test_application_section__create__duration_not_multiple_of_15(graphql):
     ]
 
 
-def test_application_section__create__suitable_time_range_at_15_minute_steps(graphql):
+def test_application_section__create__suitable_time_range_at_15_minute_steps(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -219,7 +226,7 @@ def test_application_section__create__suitable_time_range_at_15_minute_steps(gra
     assert time_range.end_time == datetime.time(11, 45)
 
 
-def test_application_section__create__suitable_time_range_not_multiple_of_15(graphql):
+def test_application_section__create__suitable_time_range_not_multiple_of_15(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -239,7 +246,9 @@ def test_application_section__create__suitable_time_range_not_multiple_of_15(gra
         (datetime.time(20, 0), datetime.time(0, 30)),
     ],
 )
-def test_application_section__create__suitable_time_range_begin_time_after_end_time(graphql, begin_time, end_time):
+def test_application_section__create__suitable_time_range_begin_time_after_end_time(
+    graphql: GraphQLClient, begin_time: datetime.time, end_time: datetime.time
+) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -254,7 +263,7 @@ def test_application_section__create__suitable_time_range_begin_time_after_end_t
     assert ApplicationSection.objects.exists() is False
 
 
-def test_application_section__create__suitable_time_range_ends_at_midnight(graphql):
+def test_application_section__create__suitable_time_range_ends_at_midnight(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.force_login(application.user)
 
@@ -271,7 +280,9 @@ def test_application_section__create__suitable_time_range_ends_at_midnight(graph
     assert time_range.end_time == datetime.time(0, 0)
 
 
-def test_application_section__create__two_reservation_unit_options_with_same_preferred_order(graphql):
+def test_application_section__create__two_reservation_unit_options_with_same_preferred_order(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -301,7 +312,9 @@ def test_application_section__create__two_reservation_unit_options_with_same_pre
     ]
 
 
-def test_application_section__create__reservations_begin_date_not_in_round_reservable_period(graphql):
+def test_application_section__create__reservations_begin_date_not_in_round_reservable_period(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -324,7 +337,9 @@ def test_application_section__create__reservations_begin_date_not_in_round_reser
     assert response.field_error_codes() == [error_codes.APPLICATION_SECTION_RESERVATIONS_BEGIN_DATE_BEFORE_ROUND]
 
 
-def test_application_section__create__reservations_end_date_not_in_round_reservable_period(graphql):
+def test_application_section__create__reservations_end_date_not_in_round_reservable_period(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system

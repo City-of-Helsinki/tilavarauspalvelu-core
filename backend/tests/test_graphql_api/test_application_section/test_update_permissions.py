@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ApplicationSectionFactory, UserFactory
 from tests.test_graphql_api.test_application_section.helpers import UPDATE_MUTATION, get_application_section_update_data
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_application_section__update__perms__application_owner(graphql):
+def test_application_section__update__perms__application_owner(graphql: GraphQLClient) -> None:
     # given:
     # - There is an unallocated application section in a draft application in an open application round
     # - The owner of the application is using the system
@@ -32,7 +37,7 @@ def test_application_section__update__perms__application_owner(graphql):
     assert application_section.name == data["name"]
 
 
-def test_application_section__update__perms__regular_user(graphql):
+def test_application_section__update__perms__regular_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is an unallocated application section in a draft application in an open application round
     # - Someone other than the owner of the application is using the system
@@ -49,7 +54,7 @@ def test_application_section__update__perms__regular_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_application_section__update__perms__general_admin(graphql):
+def test_application_section__update__perms__general_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There is an unallocated application section in a draft application in an open application round
     # - A general admin with application permissions is using the system
