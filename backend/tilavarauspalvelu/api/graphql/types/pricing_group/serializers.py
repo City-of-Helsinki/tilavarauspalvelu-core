@@ -4,11 +4,13 @@ from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.types.price_component.serializers import PriceComponentInputSerializer
 from tilavarauspalvelu.enums import PriceComponentKind
 from tilavarauspalvelu.models import PriceComponent, PricingGroup
 from tilavarauspalvelu.services.pricing.changes import save_price_component_changes
+from tilavarauspalvelu.typing import error_codes
 
 __all__ = [
     "PricingGroupComponentsSerializer",
@@ -46,6 +48,11 @@ class PricingGroupComponentsSerializer(NestingModelSerializer[PricingGroup]):
         for data in component_data:
             pk: int | None = data.get("pk")
             saved_component = saved_components.get(pk) if pk is not None else None
+
+            # The input validation checks the required fields only for a component without a pk.
+            if pk is not None and saved_component is None:
+                msg = f"Price component {pk} does not belong to this pricing group."
+                raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_NOT_IN_PRICING_GROUP)
 
             # A field that is left out of an update keeps its saved value.
             if saved_component is not None:
