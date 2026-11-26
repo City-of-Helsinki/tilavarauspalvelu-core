@@ -94,3 +94,16 @@ Old output from `gql-pluck` makes all of them fail. Run it again after you chang
 Mock at system boundaries only: external APIs, time, randomness, file system or databases
 when a real instance isn't practical. Never mock internal implementation details.
 If something is hard to test without mocking internals, redesign the interface.
+
+## Types
+
+mypy checks test functions like the rest of the code. Annotate every parameter and the return type.
+
+- Read the mock of a patched method with `as_mock(Class.method)` from `tests/helpers.py`.
+  mypy sees the original method, not the mock.
+- Use `anonymous_user()` from `tests/helpers.py` when the code needs an anonymous user.
+- Narrow an optional value with `assert value is not None`.
+  Read the one row that a test created with `.get()`, not `.first()`.
+- Read the redirect target from `response["Location"]`. The test client response type has no `url`.
+- To check a lookup property in the database, annotate it under its own name, such as `orm_status=L("status")`.
+  The property name itself hides the property for mypy.
