@@ -11,7 +11,11 @@ from tests.factories import ReservationUnitFactory
 from .helpers import CREATE_MUTATION
 
 if TYPE_CHECKING:
+    from django.core.files import File
+
     from tilavarauspalvelu.models import ReservationUnitImage
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -19,7 +23,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_image__create__regular_user(graphql, mock_png):
+def test_reservation_unit_image__create__regular_user(graphql: GraphQLClient, mock_png: File) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_regular_user()

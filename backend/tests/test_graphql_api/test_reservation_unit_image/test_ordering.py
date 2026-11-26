@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ReservationUnitImageType
@@ -7,13 +9,16 @@ from tilavarauspalvelu.enums import ReservationUnitImageType
 from tests.factories import ReservationUnitFactory, ReservationUnitImageFactory
 from tests.test_graphql_api.test_reservation_unit.helpers import reservation_units_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit_image__order_by_image_type_by_default(graphql):
+def test_reservation_unit_image__order_by_image_type_by_default(graphql: GraphQLClient) -> None:
     """Reservation Unit Images should always be ordered by image type"""
     ru = ReservationUnitFactory.create()
 
