@@ -14,8 +14,8 @@ pytestmark = [
 ]
 
 
-@pytest.mark.parametrize("status", ApplicationRoundStatusChoice.values)
-def test_application_round_factory_create_in_status(status):
+@pytest.mark.parametrize("status", list(ApplicationRoundStatusChoice))
+def test_application_round_factory_create_in_status(status: ApplicationRoundStatusChoice) -> None:
     application_round = ApplicationRoundBuilder().with_status(status).create()
     assert application_round.status == status
     assert ApplicationRound.objects.filter(L(status=status)).exists()

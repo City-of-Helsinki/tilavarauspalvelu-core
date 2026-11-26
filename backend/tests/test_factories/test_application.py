@@ -12,7 +12,7 @@ pytestmark = [
 ]
 
 
-@pytest.mark.parametrize("status", ApplicationStatusChoice.values)
-def test_application_factory_create_in_status(status):
+@pytest.mark.parametrize("status", list(ApplicationStatusChoice))
+def test_application_factory_create_in_status(status: ApplicationStatusChoice) -> None:
     application = ApplicationBuilder().with_status(status=status).create()
     assert application.status == status
