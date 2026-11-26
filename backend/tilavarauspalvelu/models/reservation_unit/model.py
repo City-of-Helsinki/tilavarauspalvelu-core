@@ -343,6 +343,7 @@ class ReservationUnit(models.Model):
     reservable_time_spans_in_period: list[dict[str, str]]
     # Set only by 'ReservationUnitNode.optimize_price_summary'.
     price_summary_components: list[dict[str, Any]]
+    price_summary_date: datetime.date
     # Set only by 'ReservationUnitNode.optimize_next_price_change'.
     scheduled_pricing_groups: list[dict[str, Any]]
 
