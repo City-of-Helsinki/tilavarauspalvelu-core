@@ -342,6 +342,7 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     if (round.reservationPeriodEndDate == null) {
       return acc;
     }
+    // The start of the last round day is enough here. isRangeReservable rejects the round days later.
     const end = parseApiDateAsHelsinkiStartOfDay(round.reservationPeriodEndDate);
     const begin = parseApiDateAsHelsinkiStartOfDay(round.reservationPeriodBeginDate);
     if (end == null || begin == null) {
