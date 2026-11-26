@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 import requests
@@ -26,11 +27,14 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservati
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationUnitFactory
-from tests.helpers import ResponseMock, exact, patch_method, use_retries
+from tests.helpers import ResponseMock, as_mock, exact, patch_method, use_retries
 from tests.test_integrations.test_keyless_entry.helpers import ErrorParams, default_reservation_unit_response
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
 
-def test_pindora_client__get_reservation_unit(settings):
+
+def test_pindora_client__get_reservation_unit(settings: Settings) -> None:
     reservation_unit = ReservationUnitFactory.build()
 
     data = default_reservation_unit_response()
@@ -48,7 +52,7 @@ def test_pindora_client__get_reservation_unit(settings):
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-unit/{reservation_unit.ext_uuid}"
 
 
-def test_pindora_client__get_reservation_unit__uses_cached_response():
+def test_pindora_client__get_reservation_unit__uses_cached_response() -> None:
     reservation_unit = ReservationUnitFactory.build()
 
     data = default_reservation_unit_response()
@@ -61,7 +65,7 @@ def test_pindora_client__get_reservation_unit__uses_cached_response():
     assert second_response == first_response
 
 
-def test_pindora_client__get_reservation_unit__missing_api_key(settings):
+def test_pindora_client__get_reservation_unit__missing_api_key(settings: Settings) -> None:
     settings.PINDORA_API_KEY = ""
 
     reservation_unit = ReservationUnitFactory.build()
@@ -71,7 +75,7 @@ def test_pindora_client__get_reservation_unit__missing_api_key(settings):
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
-def test_pindora_client__get_reservation_unit__missing_api_url(settings):
+def test_pindora_client__get_reservation_unit__missing_api_url(settings: Settings) -> None:
     settings.PINDORA_API_URL = ""
 
     reservation_unit = ReservationUnitFactory.build()
@@ -82,7 +86,7 @@ def test_pindora_client__get_reservation_unit__missing_api_url(settings):
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_reservation_unit__fails_all_retries():
+def test_pindora_client__get_reservation_unit__fails_all_retries() -> None:
     reservation_unit = ReservationUnitFactory.build()
 
     patch = patch_method(PindoraClient.request, side_effect=requests.ConnectionError("timeout"))
@@ -94,7 +98,7 @@ def test_pindora_client__get_reservation_unit__fails_all_retries():
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_reservation_unit__retry_on_500():
+def test_pindora_client__get_reservation_unit__retry_on_500() -> None:
     reservation_unit = ReservationUnitFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR))
@@ -106,7 +110,7 @@ def test_pindora_client__get_reservation_unit__retry_on_500():
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_reservation_unit__succeeds_after_retry():
+def test_pindora_client__get_reservation_unit__succeeds_after_retry() -> None:
     reservation_unit = ReservationUnitFactory.build()
 
     data = default_reservation_unit_response()
@@ -151,7 +155,9 @@ def test_pindora_client__get_reservation_unit__succeeds_after_retry():
         ),
     })
 )
-def test_pindora_client__get_reservation_unit__errors(status_code, exception, error_msg):
+def test_pindora_client__get_reservation_unit__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     reservation_unit = ReservationUnitFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -161,7 +167,7 @@ def test_pindora_client__get_reservation_unit__errors(status_code, exception, er
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
-def test_pindora_client__get_reservation_unit__missing_key():
+def test_pindora_client__get_reservation_unit__missing_key() -> None:
     reservation_unit = ReservationUnitFactory.build()
 
     data = default_reservation_unit_response()
@@ -174,7 +180,7 @@ def test_pindora_client__get_reservation_unit__missing_key():
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
-def test_pindora_client__get_reservation_unit__invalid_data():
+def test_pindora_client__get_reservation_unit__invalid_data() -> None:
     reservation_unit = ReservationUnitFactory.build()
 
     data = default_reservation_unit_response(reservation_unit_id="not-a-uuid")
@@ -188,7 +194,7 @@ def test_pindora_client__get_reservation_unit__invalid_data():
 
 @patch_method(PindoraClient.request)
 @pytest.mark.django_db
-def test_pindora_client__get_reservation_unit__pindora_mock(settings):
+def test_pindora_client__get_reservation_unit__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     reservation_unit = ReservationUnitFactory.create(name="Test Reservation Unit")
@@ -201,15 +207,15 @@ def test_pindora_client__get_reservation_unit__pindora_mock(settings):
         keypad_url="",
     )
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @pytest.mark.django_db
-def test_pindora_client__get_reservation_unit__pindora_mock__not_found(settings):
+def test_pindora_client__get_reservation_unit__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.get_reservation_unit(uuid.uuid4())
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0

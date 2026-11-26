@@ -14,21 +14,26 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
 from utils.date_utils import local_datetime
 
 
-def test_pindora_client__caching__reservation_unit_response():
+def test_pindora_client__caching__reservation_unit_response() -> None:
     reservation_unit_id = uuid.uuid4()
-    data = PindoraReservationUnitResponse(
+    # The client caches the reservation unit response as raw JSON.
+    data = {
+        "reservation_unit_id": str(reservation_unit_id),
+        "name": "foo",
+        "keypad_url": "https://example.com",
+    }
+
+    PindoraClient._cache_reservation_unit_response(data=data, ext_uuid=reservation_unit_id)
+
+    response = PindoraClient._get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
+    assert response == PindoraReservationUnitResponse(
         reservation_unit_id=reservation_unit_id,
         name="foo",
         keypad_url="https://example.com",
     )
 
-    PindoraClient._cache_reservation_unit_response(data=data, ext_uuid=reservation_unit_id)
 
-    response = PindoraClient._get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
-    assert response == data
-
-
-def test_pindora_client__caching__reservation_response():
+def test_pindora_client__caching__reservation_response() -> None:
     reservation_id = uuid.uuid4()
 
     data = PindoraReservationResponse(
@@ -58,7 +63,7 @@ def test_pindora_client__caching__reservation_response():
     assert response is None
 
 
-def test_pindora_client__caching__seasonal_booking_response():
+def test_pindora_client__caching__seasonal_booking_response() -> None:
     section_id = uuid.uuid4()
 
     data = PindoraSeasonalBookingResponse(
@@ -92,7 +97,7 @@ def test_pindora_client__caching__seasonal_booking_response():
     assert response is None
 
 
-def test_pindora_client__caching__reservation_series_response():
+def test_pindora_client__caching__reservation_series_response() -> None:
     series_id = uuid.uuid4()
 
     data = PindoraReservationSeriesResponse(

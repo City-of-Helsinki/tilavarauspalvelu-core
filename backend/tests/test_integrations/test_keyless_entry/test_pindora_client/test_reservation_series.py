@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 import requests
@@ -35,15 +36,18 @@ from utils.date_utils import local_datetime, local_iso_format
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory
-from tests.helpers import ResponseMock, exact, patch_method, use_retries
+from tests.helpers import ResponseMock, as_mock, exact, patch_method, use_retries
 from tests.test_integrations.test_keyless_entry.helpers import (
     ErrorParams,
     default_access_code_modify_response,
     default_reservation_series_response,
 )
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
 
-def test_pindora_client__get_reservation_series(settings):
+
+def test_pindora_client__get_reservation_series(settings: Settings) -> None:
     series = ReservationSeriesFactory.build()
 
     data = default_reservation_series_response()
@@ -98,7 +102,9 @@ def test_pindora_client__get_reservation_series(settings):
         ),
     })
 )
-def test_pindora_client__get_reservation_series__errors(status_code, exception, error_msg):
+def test_pindora_client__get_reservation_series__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     series = ReservationSeriesFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -108,7 +114,7 @@ def test_pindora_client__get_reservation_series__errors(status_code, exception, 
         PindoraClient.get_reservation_series(series)
 
 
-def test_pindora_client__get_reservation_series__missing_key():
+def test_pindora_client__get_reservation_series__missing_key() -> None:
     series = ReservationSeriesFactory.build()
 
     data = default_reservation_series_response()
@@ -121,7 +127,7 @@ def test_pindora_client__get_reservation_series__missing_key():
         PindoraClient.get_reservation_series(series)
 
 
-def test_pindora_client__get_reservation_series__invalid_data():
+def test_pindora_client__get_reservation_series__invalid_data() -> None:
     series = ReservationSeriesFactory.build()
 
     data = default_reservation_series_response(reservation_unit_id="not-a-uuid")
@@ -134,7 +140,7 @@ def test_pindora_client__get_reservation_series__invalid_data():
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_reservation_series__fails_all_retries():
+def test_pindora_client__get_reservation_series__fails_all_retries() -> None:
     series = ReservationSeriesFactory.build()
 
     patch = patch_method(PindoraClient.request, side_effect=requests.ConnectionError("timeout"))
@@ -146,7 +152,7 @@ def test_pindora_client__get_reservation_series__fails_all_retries():
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_reservation_series__retry_on_500():
+def test_pindora_client__get_reservation_series__retry_on_500() -> None:
     series = ReservationSeriesFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR))
@@ -158,7 +164,7 @@ def test_pindora_client__get_reservation_series__retry_on_500():
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_reservation_series__succeeds_after_retry():
+def test_pindora_client__get_reservation_series__succeeds_after_retry() -> None:
     series = ReservationSeriesFactory.build()
 
     data = default_reservation_series_response()
@@ -181,7 +187,7 @@ def test_pindora_client__get_reservation_series__succeeds_after_retry():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("is_active", [True, False])
-def test_pindora_client__create_reservation_series(settings, is_active: bool):
+def test_pindora_client__create_reservation_series(settings: Settings, is_active: bool) -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_series=series,
@@ -244,7 +250,9 @@ def test_pindora_client__create_reservation_series(settings, is_active: bool):
     })
 )
 @pytest.mark.django_db
-def test_pindora_client__create_reservation_series__errors(status_code, exception, error_msg):
+def test_pindora_client__create_reservation_series__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -261,7 +269,7 @@ def test_pindora_client__create_reservation_series__errors(status_code, exceptio
 
 
 @pytest.mark.django_db
-def test_pindora_client__create_reservation_series__no_reservations():
+def test_pindora_client__create_reservation_series__no_reservations() -> None:
     series = ReservationSeriesFactory.create()
 
     data = default_reservation_series_response(reservation_unit_code_validity=[])
@@ -275,7 +283,7 @@ def test_pindora_client__create_reservation_series__no_reservations():
 
 
 @pytest.mark.django_db
-def test_pindora_client__create_reservation_series__no_confirmed_reservations():
+def test_pindora_client__create_reservation_series__no_confirmed_reservations() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -295,7 +303,7 @@ def test_pindora_client__create_reservation_series__no_confirmed_reservations():
 
 
 @pytest.mark.django_db
-def test_pindora_client__reschedule_reservation_series(settings):
+def test_pindora_client__reschedule_reservation_series(settings: Settings) -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_series=series,
@@ -355,7 +363,9 @@ def test_pindora_client__reschedule_reservation_series(settings):
     })
 )
 @pytest.mark.django_db
-def test_pindora_client__reschedule_reservation_series__errors(status_code, exception, error_msg):
+def test_pindora_client__reschedule_reservation_series__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -372,7 +382,7 @@ def test_pindora_client__reschedule_reservation_series__errors(status_code, exce
 
 
 @pytest.mark.django_db
-def test_pindora_client__reschedule_reservation_series__no_reservations():
+def test_pindora_client__reschedule_reservation_series__no_reservations() -> None:
     series = ReservationSeriesFactory.create()
 
     data = default_access_code_modify_response()
@@ -386,7 +396,7 @@ def test_pindora_client__reschedule_reservation_series__no_reservations():
 
 
 @pytest.mark.django_db
-def test_pindora_client__reschedule_reservation_series__no_confirmed_reservations():
+def test_pindora_client__reschedule_reservation_series__no_confirmed_reservations() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -405,7 +415,7 @@ def test_pindora_client__reschedule_reservation_series__no_confirmed_reservation
     assert mock.call_args.kwargs["json"]["series"] == []
 
 
-def test_pindora_client__delete_reservation_series(settings):
+def test_pindora_client__delete_reservation_series(settings: Settings) -> None:
     series = ReservationSeriesFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
@@ -439,7 +449,9 @@ def test_pindora_client__delete_reservation_series(settings):
         ),
     })
 )
-def test_pindora_client__delete_reservation_series__errors(status_code, exception, error_msg):
+def test_pindora_client__delete_reservation_series__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     series = ReservationSeriesFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -449,7 +461,7 @@ def test_pindora_client__delete_reservation_series__errors(status_code, exceptio
         PindoraClient.delete_reservation_series(series)
 
 
-def test_pindora_client__change_reservation_series_access_code(settings):
+def test_pindora_client__change_reservation_series_access_code(settings: Settings) -> None:
     series = ReservationSeriesFactory.build()
 
     data = default_access_code_modify_response()
@@ -496,7 +508,9 @@ def test_pindora_client__change_reservation_series_access_code(settings):
         ),
     })
 )
-def test_pindora_client__change_reservation_series_access_code__errors(status_code, exception, error_msg):
+def test_pindora_client__change_reservation_series_access_code__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     series = ReservationSeriesFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -506,7 +520,7 @@ def test_pindora_client__change_reservation_series_access_code__errors(status_co
         PindoraClient.change_reservation_series_access_code(series)
 
 
-def test_pindora_client__activate_reservation_series_access_code(settings):
+def test_pindora_client__activate_reservation_series_access_code(settings: Settings) -> None:
     series = ReservationSeriesFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
@@ -543,7 +557,9 @@ def test_pindora_client__activate_reservation_series_access_code(settings):
         ),
     })
 )
-def test_pindora_client__activate_reservation_series_access_code__errors(status_code, exception, error_msg):
+def test_pindora_client__activate_reservation_series_access_code__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     series = ReservationSeriesFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -553,7 +569,7 @@ def test_pindora_client__activate_reservation_series_access_code__errors(status_
         PindoraClient.activate_reservation_series_access_code(series)
 
 
-def test_pindora_client__deactivate_reservation_series_access_code(settings):
+def test_pindora_client__deactivate_reservation_series_access_code(settings: Settings) -> None:
     series = ReservationSeriesFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
@@ -592,7 +608,9 @@ def test_pindora_client__deactivate_reservation_series_access_code(settings):
         ),
     })
 )
-def test_pindora_client__deactivate_reservation_series_access_code__errors(status_code, exception, error_msg):
+def test_pindora_client__deactivate_reservation_series_access_code__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     series = ReservationSeriesFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -605,7 +623,7 @@ def test_pindora_client__deactivate_reservation_series_access_code__errors(statu
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__get_reservation_series__pindora_mock(settings):
+def test_pindora_client__get_reservation_series__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -644,13 +662,13 @@ def test_pindora_client__get_reservation_series__pindora_mock(settings):
 
     assert response == series_data
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__get_reservation_series__pindora_mock__not_found(settings):
+def test_pindora_client__get_reservation_series__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -667,14 +685,14 @@ def test_pindora_client__get_reservation_series__pindora_mock__not_found(setting
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.get_reservation_series(series)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @patch_method(PindoraClient._mock_create_access_code, return_value="12345")
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__create_reservation_series__pindora_mock(settings):
+def test_pindora_client__create_reservation_series__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -709,13 +727,13 @@ def test_pindora_client__create_reservation_series__pindora_mock(settings):
         ],
     )
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__create_reservation_series__pindora_mock__already_exists(settings):
+def test_pindora_client__create_reservation_series__pindora_mock__already_exists(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -753,13 +771,13 @@ def test_pindora_client__create_reservation_series__pindora_mock__already_exists
     with pytest.raises(PindoraConflictError):
         PindoraClient.create_reservation_series(series)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__reschedule_reservation_series__pindora_mock(settings):
+def test_pindora_client__reschedule_reservation_series__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -797,13 +815,13 @@ def test_pindora_client__reschedule_reservation_series__pindora_mock(settings):
         )
     ]
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__reschedule_reservation_series__pindora_mock__not_found(settings):
+def test_pindora_client__reschedule_reservation_series__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -821,14 +839,14 @@ def test_pindora_client__reschedule_reservation_series__pindora_mock__not_found(
     with pytest.raises(PindoraNotFoundError, match=exact(msg)):
         PindoraClient.reschedule_reservation_series(series)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @patch_method(PindoraClient._mock_create_access_code, return_value="54321")
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__change_reservation_series_access_code__pindora_mock(settings):
+def test_pindora_client__change_reservation_series_access_code__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -872,16 +890,17 @@ def test_pindora_client__change_reservation_series_access_code__pindora_mock(set
 
     cached_response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series.ext_uuid)
 
+    assert cached_response is not None
     assert cached_response["access_code"] == "54321"
     assert cached_response["access_code_generated_at"] == local_datetime()
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__change_reservation_series_access_code__pindora_mock__not_found(settings):
+def test_pindora_client__change_reservation_series_access_code__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -898,13 +917,13 @@ def test_pindora_client__change_reservation_series_access_code__pindora_mock__no
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.change_reservation_series_access_code(series)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__activate_reservation_series_access_code__pindora_mock(settings):
+def test_pindora_client__activate_reservation_series_access_code__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -943,15 +962,16 @@ def test_pindora_client__activate_reservation_series_access_code__pindora_mock(s
 
     cached_response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series.ext_uuid)
 
+    assert cached_response is not None
     assert cached_response["access_code_is_active"] is True
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__activate_reservation_series_access_code__pindora_mock__not_found(settings):
+def test_pindora_client__activate_reservation_series_access_code__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -968,13 +988,13 @@ def test_pindora_client__activate_reservation_series_access_code__pindora_mock__
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.activate_reservation_series_access_code(series)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__deactivate_reservation_series_access_code__pindora_mock(settings):
+def test_pindora_client__deactivate_reservation_series_access_code__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -1013,15 +1033,16 @@ def test_pindora_client__deactivate_reservation_series_access_code__pindora_mock
 
     cached_response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series.ext_uuid)
 
+    assert cached_response is not None
     assert cached_response["access_code_is_active"] is False
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__deactivate_reservation_series_access_code__pindora_mock__not_found(settings):
+def test_pindora_client__deactivate_reservation_series_access_code__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -1038,13 +1059,13 @@ def test_pindora_client__deactivate_reservation_series_access_code__pindora_mock
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.deactivate_reservation_series_access_code(series)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__delete_reservation_series__pindora_mock(settings):
+def test_pindora_client__delete_reservation_series__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -1085,13 +1106,13 @@ def test_pindora_client__delete_reservation_series__pindora_mock(settings):
 
     assert cached_response is None
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__delete_reservation_series__pindora_mock__not_found(settings):
+def test_pindora_client__delete_reservation_series__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     series = ReservationSeriesFactory.create()
@@ -1108,4 +1129,4 @@ def test_pindora_client__delete_reservation_series__pindora_mock__not_found(sett
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.delete_reservation_series(series)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0

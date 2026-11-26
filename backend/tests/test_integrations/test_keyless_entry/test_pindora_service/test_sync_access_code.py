@@ -22,7 +22,7 @@ from tests.factories import (
     UnitFactory,
     UserFactory,
 )
-from tests.helpers import exact, patch_method
+from tests.helpers import as_mock, exact, patch_method
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries
@@ -56,7 +56,7 @@ def access_code_response(
 @patch_method(PindoraClient.create_reservation, side_effect=access_code_response)
 @patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__reservation__generated(is_active):
+def test_sync_access_code__reservation__generated(is_active: bool) -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -75,17 +75,20 @@ def test_sync_access_code__reservation__generated(is_active):
     assert reservation.access_code_generated_at == local_datetime(2023, 6, 1)
     assert reservation.access_code_is_active is is_active
 
-    assert PindoraClient.delete_reservation.call_count == 0
-    assert PindoraClient.create_reservation.call_count == 0
-    assert PindoraClient.reschedule_reservation.call_count == 1
-    assert PindoraClient.reschedule_reservation.call_args.kwargs == {"reservation": reservation, "is_active": is_active}
+    assert as_mock(PindoraClient.delete_reservation).call_count == 0
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
+    assert as_mock(PindoraClient.reschedule_reservation).call_count == 1
+    assert as_mock(PindoraClient.reschedule_reservation).call_args.kwargs == {
+        "reservation": reservation,
+        "is_active": is_active,
+    }
 
 
 @patch_method(PindoraClient.delete_reservation)
 @patch_method(PindoraClient.create_reservation, side_effect=access_code_response)
 @patch_method(PindoraClient.reschedule_reservation, side_effect=PindoraNotFoundError("Not found"))
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__reservation__generated__doesnt_exist(is_active):
+def test_sync_access_code__reservation__generated__doesnt_exist(is_active: bool) -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -104,17 +107,20 @@ def test_sync_access_code__reservation__generated__doesnt_exist(is_active):
     assert reservation.access_code_generated_at == local_datetime(2023, 6, 1)
     assert reservation.access_code_is_active is is_active
 
-    assert PindoraClient.delete_reservation.call_count == 0
-    assert PindoraClient.reschedule_reservation.call_count == 1
-    assert PindoraClient.create_reservation.call_count == 1
-    assert PindoraClient.create_reservation.call_args.kwargs == {"reservation": reservation, "is_active": is_active}
+    assert as_mock(PindoraClient.delete_reservation).call_count == 0
+    assert as_mock(PindoraClient.reschedule_reservation).call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_args.kwargs == {
+        "reservation": reservation,
+        "is_active": is_active,
+    }
 
 
 @patch_method(PindoraClient.delete_reservation)
 @patch_method(PindoraClient.create_reservation, side_effect=access_code_response)
 @patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__reservation__not_generated(is_active):
+def test_sync_access_code__reservation__not_generated(is_active: bool) -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -133,17 +139,20 @@ def test_sync_access_code__reservation__not_generated(is_active):
     assert reservation.access_code_generated_at == local_datetime(2023, 6, 1)
     assert reservation.access_code_is_active is is_active
 
-    assert PindoraClient.delete_reservation.call_count == 0
-    assert PindoraClient.create_reservation.call_count == 1
-    assert PindoraClient.create_reservation.call_args.kwargs == {"reservation": reservation, "is_active": is_active}
-    assert PindoraClient.reschedule_reservation.call_count == 0
+    assert as_mock(PindoraClient.delete_reservation).call_count == 0
+    assert as_mock(PindoraClient.create_reservation).call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_args.kwargs == {
+        "reservation": reservation,
+        "is_active": is_active,
+    }
+    assert as_mock(PindoraClient.reschedule_reservation).call_count == 0
 
 
 @patch_method(PindoraClient.delete_reservation)
 @patch_method(PindoraClient.create_reservation, side_effect=PindoraConflictError("Conflict"))
 @patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__reservation__not_generated__already_exists(is_active):
+def test_sync_access_code__reservation__not_generated__already_exists(is_active: bool) -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -162,16 +171,19 @@ def test_sync_access_code__reservation__not_generated__already_exists(is_active)
     assert reservation.access_code_generated_at == local_datetime(2023, 6, 1)
     assert reservation.access_code_is_active is is_active
 
-    assert PindoraClient.delete_reservation.call_count == 0
-    assert PindoraClient.create_reservation.call_count == 1
-    assert PindoraClient.reschedule_reservation.call_count == 1
-    assert PindoraClient.reschedule_reservation.call_args.kwargs == {"reservation": reservation, "is_active": is_active}
+    assert as_mock(PindoraClient.delete_reservation).call_count == 0
+    assert as_mock(PindoraClient.create_reservation).call_count == 1
+    assert as_mock(PindoraClient.reschedule_reservation).call_count == 1
+    assert as_mock(PindoraClient.reschedule_reservation).call_args.kwargs == {
+        "reservation": reservation,
+        "is_active": is_active,
+    }
 
 
 @patch_method(PindoraClient.delete_reservation)
 @patch_method(PindoraClient.create_reservation, side_effect=access_code_response)
 @patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
-def test_sync_access_code__reservation__not_access_code():
+def test_sync_access_code__reservation__not_access_code() -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -190,16 +202,16 @@ def test_sync_access_code__reservation__not_access_code():
     assert reservation.access_code_generated_at is None
     assert reservation.access_code_is_active is False
 
-    assert PindoraClient.delete_reservation.call_count == 1
-    assert PindoraClient.delete_reservation.call_args.args == (reservation,)
-    assert PindoraClient.create_reservation.call_count == 0
-    assert PindoraClient.reschedule_reservation.call_count == 0
+    assert as_mock(PindoraClient.delete_reservation).call_count == 1
+    assert as_mock(PindoraClient.delete_reservation).call_args.args == (reservation,)
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
+    assert as_mock(PindoraClient.reschedule_reservation).call_count == 0
 
 
 @patch_method(PindoraClient.delete_reservation, side_effect=PindoraNotFoundError("Not found"))
 @patch_method(PindoraClient.create_reservation, side_effect=access_code_response)
 @patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
-def test_sync_access_code__reservation__not_access_code__not_found():
+def test_sync_access_code__reservation__not_access_code__not_found() -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -218,17 +230,17 @@ def test_sync_access_code__reservation__not_access_code__not_found():
     assert reservation.access_code_generated_at == local_datetime(2022, 1, 1)
     assert reservation.access_code_is_active is True
 
-    assert PindoraClient.delete_reservation.call_count == 1
-    assert PindoraClient.delete_reservation.call_args.args == (reservation,)
-    assert PindoraClient.create_reservation.call_count == 0
-    assert PindoraClient.reschedule_reservation.call_count == 0
+    assert as_mock(PindoraClient.delete_reservation).call_count == 1
+    assert as_mock(PindoraClient.delete_reservation).call_args.args == (reservation,)
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
+    assert as_mock(PindoraClient.reschedule_reservation).call_count == 0
 
 
 @patch_method(PindoraClient.delete_reservation)
 @patch_method(PindoraClient.create_reservation, side_effect=access_code_response)
 @patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
 @pytest.mark.parametrize("state", [ReservationStateChoice.DENIED, ReservationStateChoice.CANCELLED])
-def test_sync_access_code__reservation__state_indicates_no_access_code(state):
+def test_sync_access_code__reservation__state_indicates_no_access_code(state: ReservationStateChoice) -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -247,10 +259,10 @@ def test_sync_access_code__reservation__state_indicates_no_access_code(state):
     assert reservation.access_code_generated_at is None
     assert reservation.access_code_is_active is False
 
-    assert PindoraClient.delete_reservation.call_count == 1
-    assert PindoraClient.delete_reservation.call_args.args == (reservation,)
-    assert PindoraClient.create_reservation.call_count == 0
-    assert PindoraClient.reschedule_reservation.call_count == 0
+    assert as_mock(PindoraClient.delete_reservation).call_count == 1
+    assert as_mock(PindoraClient.delete_reservation).call_args.args == (reservation,)
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
+    assert as_mock(PindoraClient.reschedule_reservation).call_count == 0
 
 
 # ── Reservation series and seasonal booking ──
@@ -261,7 +273,7 @@ def test_sync_access_code__reservation__state_indicates_no_access_code(state):
 @patch_method(PindoraClient.activate_reservation_series_access_code)
 @patch_method(PindoraClient.deactivate_reservation_series_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__reservation__in_series(is_active):
+def test_sync_access_code__reservation__in_series(is_active: bool) -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -277,11 +289,11 @@ def test_sync_access_code__reservation__in_series(is_active):
 
     PindoraService.sync_access_code(obj=reservation)
 
-    assert PindoraClient.reschedule_reservation_series.call_count == 1
-    assert PindoraClient.reschedule_reservation_series.call_args.args == (series,)
-    assert PindoraClient.create_reservation_series.call_count == 0
-    assert PindoraClient.activate_reservation_series_access_code.call_count == (1 if is_active else 0)
-    assert PindoraClient.deactivate_reservation_series_access_code.call_count == (0 if is_active else 1)
+    assert as_mock(PindoraClient.reschedule_reservation_series).call_count == 1
+    assert as_mock(PindoraClient.reschedule_reservation_series).call_args.args == (series,)
+    assert as_mock(PindoraClient.create_reservation_series).call_count == 0
+    assert as_mock(PindoraClient.activate_reservation_series_access_code).call_count == (1 if is_active else 0)
+    assert as_mock(PindoraClient.deactivate_reservation_series_access_code).call_count == (0 if is_active else 1)
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (local_datetime(2023, 6, 1) if is_active else None)
@@ -293,7 +305,7 @@ def test_sync_access_code__reservation__in_series(is_active):
 @patch_method(PindoraClient.activate_reservation_series_access_code)
 @patch_method(PindoraClient.deactivate_reservation_series_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__reservation__in_series__not_found(is_active):
+def test_sync_access_code__reservation__in_series__not_found(is_active: bool) -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -309,13 +321,13 @@ def test_sync_access_code__reservation__in_series__not_found(is_active):
 
     PindoraService.sync_access_code(obj=reservation)
 
-    assert PindoraClient.reschedule_reservation_series.call_count == 1
-    assert PindoraClient.reschedule_reservation_series.call_args.args == (series,)
-    assert PindoraClient.create_reservation_series.call_count == 1
-    assert PindoraClient.create_reservation_series.call_args.args == (series,)
-    assert PindoraClient.create_reservation_series.call_args.kwargs == {"is_active": is_active}
-    assert PindoraClient.activate_reservation_series_access_code.call_count == 0
-    assert PindoraClient.deactivate_reservation_series_access_code.call_count == 0
+    assert as_mock(PindoraClient.reschedule_reservation_series).call_count == 1
+    assert as_mock(PindoraClient.reschedule_reservation_series).call_args.args == (series,)
+    assert as_mock(PindoraClient.create_reservation_series).call_count == 1
+    assert as_mock(PindoraClient.create_reservation_series).call_args.args == (series,)
+    assert as_mock(PindoraClient.create_reservation_series).call_args.kwargs == {"is_active": is_active}
+    assert as_mock(PindoraClient.activate_reservation_series_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_reservation_series_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (
@@ -329,7 +341,7 @@ def test_sync_access_code__reservation__in_series__not_found(is_active):
 @patch_method(PindoraClient.activate_seasonal_booking_access_code)
 @patch_method(PindoraClient.deactivate_seasonal_booking_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__reservation__in_series__in_seasonal_booking(is_active):
+def test_sync_access_code__reservation__in_series__in_seasonal_booking(is_active: bool) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -352,11 +364,11 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking(is_active
 
     PindoraService.sync_access_code(obj=reservation)
 
-    assert PindoraClient.reschedule_seasonal_booking.call_count == 1
-    assert PindoraClient.reschedule_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_count == 0
-    assert PindoraClient.activate_seasonal_booking_access_code.call_count == (1 if is_active else 0)
-    assert PindoraClient.deactivate_seasonal_booking_access_code.call_count == (0 if is_active else 1)
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_count == 0
+    assert as_mock(PindoraClient.activate_seasonal_booking_access_code).call_count == (1 if is_active else 0)
+    assert as_mock(PindoraClient.deactivate_seasonal_booking_access_code).call_count == (0 if is_active else 1)
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (local_datetime(2023, 6, 1) if is_active else None)
@@ -368,7 +380,7 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking(is_active
 @patch_method(PindoraClient.activate_seasonal_booking_access_code)
 @patch_method(PindoraClient.deactivate_seasonal_booking_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_found(is_active):
+def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_found(is_active: bool) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -391,13 +403,13 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_foun
 
     PindoraService.sync_access_code(obj=reservation)
 
-    assert PindoraClient.reschedule_seasonal_booking.call_count == 1
-    assert PindoraClient.reschedule_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_count == 1
-    assert PindoraClient.create_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_args.kwargs == {"is_active": is_active}
-    assert PindoraClient.activate_seasonal_booking_access_code.call_count == 0
-    assert PindoraClient.deactivate_seasonal_booking_access_code.call_count == 0
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.create_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_args.kwargs == {"is_active": is_active}
+    assert as_mock(PindoraClient.activate_seasonal_booking_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_seasonal_booking_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (
@@ -411,7 +423,7 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_foun
 @patch_method(PindoraClient.activate_reservation_series_access_code)
 @patch_method(PindoraClient.deactivate_reservation_series_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__series(is_active):
+def test_sync_access_code__series(is_active: bool) -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -427,11 +439,11 @@ def test_sync_access_code__series(is_active):
 
     PindoraService.sync_access_code(obj=series)
 
-    assert PindoraClient.reschedule_reservation_series.call_count == 1
-    assert PindoraClient.reschedule_reservation_series.call_args.args == (series,)
-    assert PindoraClient.create_reservation_series.call_count == 0
-    assert PindoraClient.activate_reservation_series_access_code.call_count == (1 if is_active else 0)
-    assert PindoraClient.deactivate_reservation_series_access_code.call_count == (0 if is_active else 1)
+    assert as_mock(PindoraClient.reschedule_reservation_series).call_count == 1
+    assert as_mock(PindoraClient.reschedule_reservation_series).call_args.args == (series,)
+    assert as_mock(PindoraClient.create_reservation_series).call_count == 0
+    assert as_mock(PindoraClient.activate_reservation_series_access_code).call_count == (1 if is_active else 0)
+    assert as_mock(PindoraClient.deactivate_reservation_series_access_code).call_count == (0 if is_active else 1)
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (local_datetime(2023, 6, 1) if is_active else None)
@@ -443,7 +455,7 @@ def test_sync_access_code__series(is_active):
 @patch_method(PindoraClient.activate_reservation_series_access_code)
 @patch_method(PindoraClient.deactivate_reservation_series_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__series__not_found(is_active):
+def test_sync_access_code__series__not_found(is_active: bool) -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -459,13 +471,13 @@ def test_sync_access_code__series__not_found(is_active):
 
     PindoraService.sync_access_code(obj=series)
 
-    assert PindoraClient.reschedule_reservation_series.call_count == 1
-    assert PindoraClient.reschedule_reservation_series.call_args.args == (series,)
-    assert PindoraClient.create_reservation_series.call_count == 1
-    assert PindoraClient.create_reservation_series.call_args.args == (series,)
-    assert PindoraClient.create_reservation_series.call_args.kwargs == {"is_active": is_active}
-    assert PindoraClient.activate_reservation_series_access_code.call_count == 0
-    assert PindoraClient.deactivate_reservation_series_access_code.call_count == 0
+    assert as_mock(PindoraClient.reschedule_reservation_series).call_count == 1
+    assert as_mock(PindoraClient.reschedule_reservation_series).call_args.args == (series,)
+    assert as_mock(PindoraClient.create_reservation_series).call_count == 1
+    assert as_mock(PindoraClient.create_reservation_series).call_args.args == (series,)
+    assert as_mock(PindoraClient.create_reservation_series).call_args.kwargs == {"is_active": is_active}
+    assert as_mock(PindoraClient.activate_reservation_series_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_reservation_series_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (
@@ -479,7 +491,7 @@ def test_sync_access_code__series__not_found(is_active):
 @patch_method(PindoraClient.activate_seasonal_booking_access_code)
 @patch_method(PindoraClient.deactivate_seasonal_booking_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__series__in_seasonal_booking(is_active):
+def test_sync_access_code__series__in_seasonal_booking(is_active: bool) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -502,11 +514,11 @@ def test_sync_access_code__series__in_seasonal_booking(is_active):
 
     PindoraService.sync_access_code(obj=series)
 
-    assert PindoraClient.reschedule_seasonal_booking.call_count == 1
-    assert PindoraClient.reschedule_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_count == 0
-    assert PindoraClient.activate_seasonal_booking_access_code.call_count == (1 if is_active else 0)
-    assert PindoraClient.deactivate_seasonal_booking_access_code.call_count == (0 if is_active else 1)
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_count == 0
+    assert as_mock(PindoraClient.activate_seasonal_booking_access_code).call_count == (1 if is_active else 0)
+    assert as_mock(PindoraClient.deactivate_seasonal_booking_access_code).call_count == (0 if is_active else 1)
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (local_datetime(2023, 6, 1) if is_active else None)
@@ -518,7 +530,7 @@ def test_sync_access_code__series__in_seasonal_booking(is_active):
 @patch_method(PindoraClient.activate_seasonal_booking_access_code)
 @patch_method(PindoraClient.deactivate_seasonal_booking_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__series__in_seasonal_booking__not_found(is_active):
+def test_sync_access_code__series__in_seasonal_booking__not_found(is_active: bool) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -541,13 +553,13 @@ def test_sync_access_code__series__in_seasonal_booking__not_found(is_active):
 
     PindoraService.sync_access_code(obj=series)
 
-    assert PindoraClient.reschedule_seasonal_booking.call_count == 1
-    assert PindoraClient.reschedule_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_count == 1
-    assert PindoraClient.create_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_args.kwargs == {"is_active": is_active}
-    assert PindoraClient.activate_seasonal_booking_access_code.call_count == 0
-    assert PindoraClient.deactivate_seasonal_booking_access_code.call_count == 0
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.create_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_args.kwargs == {"is_active": is_active}
+    assert as_mock(PindoraClient.activate_seasonal_booking_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_seasonal_booking_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (
@@ -561,7 +573,7 @@ def test_sync_access_code__series__in_seasonal_booking__not_found(is_active):
 @patch_method(PindoraClient.activate_seasonal_booking_access_code)
 @patch_method(PindoraClient.deactivate_seasonal_booking_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__seasonal_booking(is_active):
+def test_sync_access_code__seasonal_booking(is_active: bool) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -584,11 +596,11 @@ def test_sync_access_code__seasonal_booking(is_active):
 
     PindoraService.sync_access_code(obj=section)
 
-    assert PindoraClient.reschedule_seasonal_booking.call_count == 1
-    assert PindoraClient.reschedule_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_count == 0
-    assert PindoraClient.activate_seasonal_booking_access_code.call_count == (1 if is_active else 0)
-    assert PindoraClient.deactivate_seasonal_booking_access_code.call_count == (0 if is_active else 1)
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_count == 0
+    assert as_mock(PindoraClient.activate_seasonal_booking_access_code).call_count == (1 if is_active else 0)
+    assert as_mock(PindoraClient.deactivate_seasonal_booking_access_code).call_count == (0 if is_active else 1)
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (local_datetime(2023, 6, 1) if is_active else None)
@@ -600,7 +612,7 @@ def test_sync_access_code__seasonal_booking(is_active):
 @patch_method(PindoraClient.activate_seasonal_booking_access_code)
 @patch_method(PindoraClient.deactivate_seasonal_booking_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
-def test_sync_access_code__seasonal_booking__not_found(is_active):
+def test_sync_access_code__seasonal_booking__not_found(is_active: bool) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -623,13 +635,13 @@ def test_sync_access_code__seasonal_booking__not_found(is_active):
 
     PindoraService.sync_access_code(obj=section)
 
-    assert PindoraClient.reschedule_seasonal_booking.call_count == 1
-    assert PindoraClient.reschedule_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_count == 1
-    assert PindoraClient.create_seasonal_booking.call_args.args == (section,)
-    assert PindoraClient.create_seasonal_booking.call_args.kwargs == {"is_active": is_active}
-    assert PindoraClient.activate_seasonal_booking_access_code.call_count == 0
-    assert PindoraClient.deactivate_seasonal_booking_access_code.call_count == 0
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.reschedule_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_count == 1
+    assert as_mock(PindoraClient.create_seasonal_booking).call_args.args == (section,)
+    assert as_mock(PindoraClient.create_seasonal_booking).call_args.kwargs == {"is_active": is_active}
+    assert as_mock(PindoraClient.activate_seasonal_booking_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_seasonal_booking_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == (
@@ -641,11 +653,12 @@ def test_sync_access_code__seasonal_booking__not_found(is_active):
 # ── Invalid target ──
 
 
-def test_sync_access_code__invalid_target():
+def test_sync_access_code__invalid_target() -> None:
     unit = UnitFactory.build(name="foo")
 
     msg = "Invalid sync target: foo"
     with patch_method(PindoraClient.request) as patch, pytest.raises(PindoraClientError, match=exact(msg)):
-        PindoraService.sync_access_code(obj=unit)
+        # The test passes an unsupported type on purpose.
+        PindoraService.sync_access_code(obj=unit)  # type: ignore[arg-type]
 
     assert patch.call_count == 0

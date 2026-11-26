@@ -28,7 +28,7 @@ pytestmark = [
 ]
 
 
-def test_get_access_code__reservation():
+def test_get_access_code__reservation() -> None:
     reservation = ReservationFactory.create(
         reservation_series=None,
         begins_at=local_datetime(2024, 1, 1, 12),
@@ -61,7 +61,7 @@ def test_get_access_code__reservation():
     )
 
 
-def test_get_access_code__reservation__in_series():
+def test_get_access_code__reservation__in_series() -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_series=series,
@@ -100,7 +100,7 @@ def test_get_access_code__reservation__in_series():
     )
 
 
-def test_get_access_code__reservation__in_series__pick_correct_reservation():
+def test_get_access_code__reservation__in_series__pick_correct_reservation() -> None:
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_series=series,
@@ -153,7 +153,7 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
     )
 
 
-def test_get_access_code__reservation__in_series__not_valid_for_reservation():
+def test_get_access_code__reservation__in_series__not_valid_for_reservation() -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_series=series,
@@ -184,7 +184,7 @@ def test_get_access_code__reservation__in_series__not_valid_for_reservation():
         PindoraService.get_access_code(obj=reservation)
 
 
-def test_get_access_code__reservation__in_series__in_seasonal_booking():
+def test_get_access_code__reservation__in_series__in_seasonal_booking() -> None:
     section = ApplicationSectionFactory.create()
     series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
@@ -226,7 +226,7 @@ def test_get_access_code__reservation__in_series__in_seasonal_booking():
     )
 
 
-def test_get_access_code__series():
+def test_get_access_code__series() -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         reservation_series=series,
@@ -271,7 +271,7 @@ def test_get_access_code__series():
     )
 
 
-def test_get_access_code__series__in_seasonal_booking():
+def test_get_access_code__series__in_seasonal_booking() -> None:
     section = ApplicationSectionFactory.create()
     series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
@@ -319,7 +319,7 @@ def test_get_access_code__series__in_seasonal_booking():
     )
 
 
-def test_get_access_code__series__in_seasonal_booking__remove_other_series_values():
+def test_get_access_code__series__in_seasonal_booking__remove_other_series_values() -> None:
     section = ApplicationSectionFactory.create()
 
     series_1 = ReservationSeriesFactory.create(
@@ -387,7 +387,7 @@ def test_get_access_code__series__in_seasonal_booking__remove_other_series_value
     )
 
 
-def test_get_access_code__seasonal_booking():
+def test_get_access_code__seasonal_booking() -> None:
     section = ApplicationSectionFactory.create()
     series = ReservationSeriesFactory.create(
         allocated_time_slot__reservation_unit_option__application_section=section,
@@ -435,11 +435,12 @@ def test_get_access_code__seasonal_booking():
     )
 
 
-def test_get_access_code__invalid_target():
+def test_get_access_code__invalid_target() -> None:
     unit = UnitFactory.build(name="foo")
 
     msg = "Invalid target: foo"
     with patch_method(PindoraClient.request) as patch, pytest.raises(PindoraClientError, match=exact(msg)):
-        PindoraService.get_access_code(obj=unit)
+        # The test passes an unsupported type on purpose.
+        PindoraService.get_access_code(obj=unit)  # type: ignore[call-overload]
 
     assert patch.call_count == 0

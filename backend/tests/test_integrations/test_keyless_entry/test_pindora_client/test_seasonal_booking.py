@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 import requests
@@ -41,15 +42,18 @@ from tests.factories import (
     ReservationSeriesFactory,
     ReservationUnitOptionFactory,
 )
-from tests.helpers import ResponseMock, exact, patch_method, use_retries
+from tests.helpers import ResponseMock, as_mock, exact, patch_method, use_retries
 from tests.test_integrations.test_keyless_entry.helpers import (
     ErrorParams,
     default_access_code_modify_response,
     default_seasonal_booking_response,
 )
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
 
-def test_pindora_client__get_seasonal_booking(settings):
+
+def test_pindora_client__get_seasonal_booking(settings: Settings) -> None:
     application_section = ApplicationSectionFactory.build()
 
     data = default_seasonal_booking_response()
@@ -82,7 +86,7 @@ def test_pindora_client__get_seasonal_booking(settings):
     )
 
 
-def test_pindora_client__get_seasonal_booking__missing_key():
+def test_pindora_client__get_seasonal_booking__missing_key() -> None:
     application_section = ApplicationSectionFactory.build()
 
     data = default_seasonal_booking_response()
@@ -95,7 +99,7 @@ def test_pindora_client__get_seasonal_booking__missing_key():
         PindoraClient.get_seasonal_booking(application_section)
 
 
-def test_pindora_client__get_seasonal_booking__invalid_data():
+def test_pindora_client__get_seasonal_booking__invalid_data() -> None:
     application_section = ApplicationSectionFactory.build()
 
     data = default_seasonal_booking_response()
@@ -132,7 +136,9 @@ def test_pindora_client__get_seasonal_booking__invalid_data():
         ),
     })
 )
-def test_pindora_client__get_seasonal_booking__errors(status_code, exception, error_msg):
+def test_pindora_client__get_seasonal_booking__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     application_section = ApplicationSectionFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -143,7 +149,7 @@ def test_pindora_client__get_seasonal_booking__errors(status_code, exception, er
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_seasonal_booking__fails_all_retries():
+def test_pindora_client__get_seasonal_booking__fails_all_retries() -> None:
     application_section = ApplicationSectionFactory.build()
 
     patch = patch_method(PindoraClient.request, side_effect=requests.ConnectionError("timeout"))
@@ -155,7 +161,7 @@ def test_pindora_client__get_seasonal_booking__fails_all_retries():
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_seasonal_booking__retry_on_500():
+def test_pindora_client__get_seasonal_booking__retry_on_500() -> None:
     application_section = ApplicationSectionFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR))
@@ -167,7 +173,7 @@ def test_pindora_client__get_seasonal_booking__retry_on_500():
 
 
 @use_retries(attempts=3)
-def test_pindora_client__get_seasonal_booking__succeeds_after_retry():
+def test_pindora_client__get_seasonal_booking__succeeds_after_retry() -> None:
     application_section = ApplicationSectionFactory.build()
 
     data = default_seasonal_booking_response()
@@ -190,7 +196,7 @@ def test_pindora_client__get_seasonal_booking__succeeds_after_retry():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("is_active", [True, False])
-def test_pindora_client__create_seasonal_booking(settings, is_active: bool):
+def test_pindora_client__create_seasonal_booking(settings: Settings, is_active: bool) -> None:
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
@@ -258,7 +264,9 @@ def test_pindora_client__create_seasonal_booking(settings, is_active: bool):
     })
 )
 @pytest.mark.django_db
-def test_pindora_client__create_seasonal_booking__errors(status_code, exception, error_msg):
+def test_pindora_client__create_seasonal_booking__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
@@ -281,7 +289,7 @@ def test_pindora_client__create_seasonal_booking__errors(status_code, exception,
 
 
 @pytest.mark.django_db
-def test_pindora_client__create_seasonal_booking__no_reservations():
+def test_pindora_client__create_seasonal_booking__no_reservations() -> None:
     application_section = ApplicationSectionFactory.create()
 
     data = default_seasonal_booking_response()
@@ -294,7 +302,7 @@ def test_pindora_client__create_seasonal_booking__no_reservations():
 
 
 @pytest.mark.django_db
-def test_pindora_client__create_seasonal_booking__no_confirmed_reservations():
+def test_pindora_client__create_seasonal_booking__no_confirmed_reservations() -> None:
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
@@ -319,7 +327,7 @@ def test_pindora_client__create_seasonal_booking__no_confirmed_reservations():
 
 
 @pytest.mark.django_db
-def test_pindora_client__reschedule_seasonal_booking(settings):
+def test_pindora_client__reschedule_seasonal_booking(settings: Settings) -> None:
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
@@ -385,7 +393,9 @@ def test_pindora_client__reschedule_seasonal_booking(settings):
     })
 )
 @pytest.mark.django_db
-def test_pindora_client__reschedule_seasonal_booking__errors(status_code, exception, error_msg):
+def test_pindora_client__reschedule_seasonal_booking__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
@@ -408,7 +418,7 @@ def test_pindora_client__reschedule_seasonal_booking__errors(status_code, except
 
 
 @pytest.mark.django_db
-def test_pindora_client__reschedule_seasonal_booking__no_reservations():
+def test_pindora_client__reschedule_seasonal_booking__no_reservations() -> None:
     application_section = ApplicationSectionFactory.create()
 
     data = default_access_code_modify_response()
@@ -421,7 +431,7 @@ def test_pindora_client__reschedule_seasonal_booking__no_reservations():
 
 
 @pytest.mark.django_db
-def test_pindora_client__reschedule_seasonal_booking__no_confirmed_reservations():
+def test_pindora_client__reschedule_seasonal_booking__no_confirmed_reservations() -> None:
     application_section = ApplicationSectionFactory.create()
     reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
@@ -445,7 +455,7 @@ def test_pindora_client__reschedule_seasonal_booking__no_confirmed_reservations(
     assert mock.call_args.kwargs["json"]["series"] == []
 
 
-def test_pindora_client__delete_seasonal_booking(settings):
+def test_pindora_client__delete_seasonal_booking(settings: Settings) -> None:
     application_section = ApplicationSectionFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
@@ -481,7 +491,9 @@ def test_pindora_client__delete_seasonal_booking(settings):
         ),
     })
 )
-def test_pindora_client__delete_seasonal_booking__errors(status_code, exception, error_msg):
+def test_pindora_client__delete_seasonal_booking__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     application_section = ApplicationSectionFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -491,7 +503,7 @@ def test_pindora_client__delete_seasonal_booking__errors(status_code, exception,
         PindoraClient.delete_seasonal_booking(application_section)
 
 
-def test_pindora_client__change_seasonal_booking_access_code(settings):
+def test_pindora_client__change_seasonal_booking_access_code(settings: Settings) -> None:
     application_section = ApplicationSectionFactory.build()
 
     data = default_access_code_modify_response()
@@ -538,7 +550,9 @@ def test_pindora_client__change_seasonal_booking_access_code(settings):
         ),
     })
 )
-def test_pindora_client__change_seasonal_booking_access_code__errors(status_code, exception, error_msg):
+def test_pindora_client__change_seasonal_booking_access_code__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     application_section = ApplicationSectionFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -548,7 +562,7 @@ def test_pindora_client__change_seasonal_booking_access_code__errors(status_code
         PindoraClient.change_seasonal_booking_access_code(application_section)
 
 
-def test_pindora_client__activate_seasonal_booking_access_code(settings):
+def test_pindora_client__activate_seasonal_booking_access_code(settings: Settings) -> None:
     application_section = ApplicationSectionFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
@@ -588,7 +602,9 @@ def test_pindora_client__activate_seasonal_booking_access_code(settings):
         ),
     })
 )
-def test_pindora_client__activate_seasonal_booking_access_code__errors(status_code, exception, error_msg):
+def test_pindora_client__activate_seasonal_booking_access_code__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     application_section = ApplicationSectionFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -598,7 +614,7 @@ def test_pindora_client__activate_seasonal_booking_access_code__errors(status_co
         PindoraClient.activate_seasonal_booking_access_code(application_section)
 
 
-def test_pindora_client__deactivate_seasonal_booking_access_code(settings):
+def test_pindora_client__deactivate_seasonal_booking_access_code(settings: Settings) -> None:
     application_section = ApplicationSectionFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
@@ -638,7 +654,9 @@ def test_pindora_client__deactivate_seasonal_booking_access_code(settings):
         ),
     })
 )
-def test_pindora_client__deactivate_seasonal_booking_access_code__errors(status_code, exception, error_msg):
+def test_pindora_client__deactivate_seasonal_booking_access_code__errors(
+    status_code: int, exception: type[Exception], error_msg: str
+) -> None:
     application_section = ApplicationSectionFactory.build()
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
@@ -651,7 +669,7 @@ def test_pindora_client__deactivate_seasonal_booking_access_code__errors(status_
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__get_seasonal_booking__pindora_mock(settings):
+def test_pindora_client__get_seasonal_booking__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -665,6 +683,7 @@ def test_pindora_client__get_seasonal_booking__pindora_mock(settings):
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
+    assert reservation.reservation_series is not None
     section_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="",
@@ -690,13 +709,13 @@ def test_pindora_client__get_seasonal_booking__pindora_mock(settings):
 
     assert response == section_data
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__get_seasonal_booking__pindora_mock__not_found(settings):
+def test_pindora_client__get_seasonal_booking__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -713,14 +732,14 @@ def test_pindora_client__get_seasonal_booking__pindora_mock__not_found(settings)
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.get_seasonal_booking(section)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @patch_method(PindoraClient._mock_create_access_code, return_value="12345")
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__create_seasonal_booking__pindora_mock(settings):
+def test_pindora_client__create_seasonal_booking__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -736,6 +755,7 @@ def test_pindora_client__create_seasonal_booking__pindora_mock(settings):
 
     response = PindoraClient.create_seasonal_booking(section)
 
+    assert reservation.reservation_series is not None
     assert response == PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="",
@@ -755,13 +775,13 @@ def test_pindora_client__create_seasonal_booking__pindora_mock(settings):
         ],
     )
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__create_seasonal_booking__pindora_mock__already_exists(settings):
+def test_pindora_client__create_seasonal_booking__pindora_mock__already_exists(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -775,6 +795,7 @@ def test_pindora_client__create_seasonal_booking__pindora_mock__already_exists(s
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
+    assert reservation.reservation_series is not None
     section_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="",
@@ -799,13 +820,13 @@ def test_pindora_client__create_seasonal_booking__pindora_mock__already_exists(s
     with pytest.raises(PindoraConflictError):
         PindoraClient.create_seasonal_booking(section)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__reschedule_seasonal_booking__pindora_mock(settings):
+def test_pindora_client__reschedule_seasonal_booking__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -819,6 +840,7 @@ def test_pindora_client__reschedule_seasonal_booking__pindora_mock(settings):
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
+    assert reservation.reservation_series is not None
     section_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="",
@@ -849,6 +871,7 @@ def test_pindora_client__reschedule_seasonal_booking__pindora_mock(settings):
 
     cached_response = PindoraClient._get_cached_seasonal_booking_response(ext_uuid=section.ext_uuid)
 
+    assert cached_response is not None
     assert cached_response["reservation_unit_code_validity"] == [
         PindoraSeasonalBookingAccessCodeValidity(
             reservation_unit_id=reservation.reservation_series.reservation_unit.ext_uuid,
@@ -859,13 +882,13 @@ def test_pindora_client__reschedule_seasonal_booking__pindora_mock(settings):
         )
     ]
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__reschedule_seasonal_booking__pindora_mock__not_found(settings):
+def test_pindora_client__reschedule_seasonal_booking__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -882,14 +905,14 @@ def test_pindora_client__reschedule_seasonal_booking__pindora_mock__not_found(se
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.reschedule_seasonal_booking(section)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @patch_method(PindoraClient._mock_create_access_code, return_value="54321")
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__change_seasonal_booking_access_code__pindora_mock(settings):
+def test_pindora_client__change_seasonal_booking_access_code__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -903,6 +926,7 @@ def test_pindora_client__change_seasonal_booking_access_code__pindora_mock(setti
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
+    assert reservation.reservation_series is not None
     section_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="",
@@ -933,16 +957,17 @@ def test_pindora_client__change_seasonal_booking_access_code__pindora_mock(setti
 
     cached_response = PindoraClient._get_cached_seasonal_booking_response(ext_uuid=section.ext_uuid)
 
+    assert cached_response is not None
     assert cached_response["access_code"] == "54321"
     assert cached_response["access_code_generated_at"] == local_datetime()
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__change_seasonal_booking_access_code__pindora_mock__not_found(settings):
+def test_pindora_client__change_seasonal_booking_access_code__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -959,13 +984,13 @@ def test_pindora_client__change_seasonal_booking_access_code__pindora_mock__not_
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.change_seasonal_booking_access_code(section)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__activate_seasonal_booking_access_code__pindora_mock(settings):
+def test_pindora_client__activate_seasonal_booking_access_code__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -979,6 +1004,7 @@ def test_pindora_client__activate_seasonal_booking_access_code__pindora_mock(set
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
+    assert reservation.reservation_series is not None
     section_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="",
@@ -1004,15 +1030,16 @@ def test_pindora_client__activate_seasonal_booking_access_code__pindora_mock(set
 
     cached_response = PindoraClient._get_cached_seasonal_booking_response(ext_uuid=section.ext_uuid)
 
+    assert cached_response is not None
     assert cached_response["access_code_is_active"] is True
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__activate_seasonal_booking_access_code__pindora_mock__not_found(settings):
+def test_pindora_client__activate_seasonal_booking_access_code__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -1029,13 +1056,13 @@ def test_pindora_client__activate_seasonal_booking_access_code__pindora_mock__no
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.activate_seasonal_booking_access_code(section)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__deactivate_seasonal_booking_access_code__pindora_mock(settings):
+def test_pindora_client__deactivate_seasonal_booking_access_code__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -1049,6 +1076,7 @@ def test_pindora_client__deactivate_seasonal_booking_access_code__pindora_mock(s
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
+    assert reservation.reservation_series is not None
     section_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="",
@@ -1074,15 +1102,16 @@ def test_pindora_client__deactivate_seasonal_booking_access_code__pindora_mock(s
 
     cached_response = PindoraClient._get_cached_seasonal_booking_response(ext_uuid=section.ext_uuid)
 
+    assert cached_response is not None
     assert cached_response["access_code_is_active"] is False
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__deactivate_seasonal_booking_access_code__pindora_mock__not_found(settings):
+def test_pindora_client__deactivate_seasonal_booking_access_code__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -1099,13 +1128,13 @@ def test_pindora_client__deactivate_seasonal_booking_access_code__pindora_mock__
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.deactivate_seasonal_booking_access_code(section)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__delete_seasonal_booking__pindora_mock(settings):
+def test_pindora_client__delete_seasonal_booking__pindora_mock(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -1119,6 +1148,7 @@ def test_pindora_client__delete_seasonal_booking__pindora_mock(settings):
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
+    assert reservation.reservation_series is not None
     section_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="",
@@ -1146,13 +1176,13 @@ def test_pindora_client__delete_seasonal_booking__pindora_mock(settings):
 
     assert cached_response is None
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
 
 
 @patch_method(PindoraClient.request)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.django_db
-def test_pindora_client__delete_seasonal_booking__pindora_mock__not_found(settings):
+def test_pindora_client__delete_seasonal_booking__pindora_mock__not_found(settings: Settings) -> None:
     settings.PINDORA_MOCK_ENABLED = True
 
     section = ApplicationSectionFactory.create()
@@ -1169,4 +1199,4 @@ def test_pindora_client__delete_seasonal_booking__pindora_mock__not_found(settin
     with pytest.raises(PindoraNotFoundError):
         PindoraClient.delete_seasonal_booking(section)
 
-    assert PindoraClient.request.call_count == 0
+    assert as_mock(PindoraClient.request).call_count == 0
