@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from graphql_relay import to_global_id
@@ -12,6 +13,9 @@ from tests.factories import PriceComponentFactory, PriceOptionFactory, PricingGr
 
 from .helpers import pricing_group_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -21,7 +25,7 @@ pytestmark = [
 # ── Pricing group ──
 
 
-def test_pricing_group__query__components_and_options(graphql):
+def test_pricing_group__query__components_and_options(graphql: GraphQLClient) -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group, name="Sports 1")
     option = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
