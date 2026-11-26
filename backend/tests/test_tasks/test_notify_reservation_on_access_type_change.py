@@ -9,14 +9,14 @@ from tilavarauspalvelu.tasks import notify_reservation_on_access_type_change_tas
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
-def test_notify_reservation_on_access_type_change_task():
+def test_notify_reservation_on_access_type_change_task() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     reservation_1 = ReservationFactory.create(
@@ -36,17 +36,17 @@ def test_notify_reservation_on_access_type_change_task():
 
     notify_reservation_on_access_type_change_task(reservation_pks=[reservation_1.pk, reservation_2.pk])
 
-    calls = EmailService.send_reservation_access_type_changed_email.call_args_list
+    calls = as_mock(EmailService.send_reservation_access_type_changed_email).call_args_list
     emailed_reservation_pks = [call.args[0].pk for call in calls]
     assert sorted(emailed_reservation_pks) == sorted([reservation_1.pk, reservation_2.pk])
-    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 0
+    assert as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_count == 0
 
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 13))  # Note time!
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
-def test_notify_reservation_on_access_type_change_task__dont_send_for_past_reservations():
+def test_notify_reservation_on_access_type_change_task__dont_send_for_past_reservations() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     reservation_1 = ReservationFactory.create(
@@ -66,10 +66,10 @@ def test_notify_reservation_on_access_type_change_task__dont_send_for_past_reser
 
     notify_reservation_on_access_type_change_task(reservation_pks=[reservation_1.pk, reservation_2.pk])
 
-    calls = EmailService.send_reservation_access_type_changed_email.call_args_list
+    calls = as_mock(EmailService.send_reservation_access_type_changed_email).call_args_list
     emailed_reservation_pks = [call.args[0].pk for call in calls]
     assert emailed_reservation_pks == [reservation_2.pk]
-    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 0
+    assert as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_count == 0
 
 
 @pytest.mark.django_db
@@ -86,7 +86,9 @@ def test_notify_reservation_on_access_type_change_task__dont_send_for_past_reser
 )
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
-def test_notify_reservation_on_access_type_change_task__dont_send_for_unconfirmed_reservations(state):
+def test_notify_reservation_on_access_type_change_task__dont_send_for_unconfirmed_reservations(
+    state: ReservationStateChoice,
+) -> None:
     reservation = ReservationFactory.create(
         state=state,
         begins_at=local_datetime(2024, 1, 1, 14),
@@ -96,15 +98,15 @@ def test_notify_reservation_on_access_type_change_task__dont_send_for_unconfirme
 
     notify_reservation_on_access_type_change_task(reservation_pks=[reservation.pk])
 
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 0
-    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 0
+    assert as_mock(EmailService.send_reservation_access_type_changed_email).call_count == 0
+    assert as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_count == 0
 
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
-def test_notify_reservation_on_access_type_change_task__seasonal_bookings():
+def test_notify_reservation_on_access_type_change_task__seasonal_bookings() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     section_1 = ApplicationSectionFactory.create()
@@ -131,8 +133,8 @@ def test_notify_reservation_on_access_type_change_task__seasonal_bookings():
 
     notify_reservation_on_access_type_change_task(reservation_pks=[reservation_1.pk, reservation_2.pk])
 
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 0
-    calls = EmailService.send_seasonal_booking_access_type_changed_email.call_args_list
+    assert as_mock(EmailService.send_reservation_access_type_changed_email).call_count == 0
+    calls = as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_args_list
     emailed_section_pks = [call.args[0].pk for call in calls]
     assert sorted(emailed_section_pks) == sorted([section_1.pk, section_2.pk])
 
@@ -141,7 +143,7 @@ def test_notify_reservation_on_access_type_change_task__seasonal_bookings():
 @freeze_time(local_datetime(2024, 1, 1, 13))  # Note time!
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
-def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_send_for_past_reservations():
+def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_send_for_past_reservations() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     section_1 = ApplicationSectionFactory.create()
@@ -168,8 +170,8 @@ def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_
 
     notify_reservation_on_access_type_change_task(reservation_pks=[reservation_1.pk, reservation_2.pk])
 
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 0
-    calls = EmailService.send_seasonal_booking_access_type_changed_email.call_args_list
+    assert as_mock(EmailService.send_reservation_access_type_changed_email).call_count == 0
+    calls = as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_args_list
     emailed_section_pks = [call.args[0].pk for call in calls]
     assert emailed_section_pks == [section_2.pk]
 
@@ -178,7 +180,9 @@ def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
-def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_send_for_cancelled_reservations():
+def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_send_for_cancelled_reservations() -> (
+    None
+):
     section = ApplicationSectionFactory.create()
 
     reservation = ReservationFactory.create(
@@ -192,15 +196,15 @@ def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_
 
     notify_reservation_on_access_type_change_task(reservation_pks=[reservation.pk])
 
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 0
-    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 0
+    assert as_mock(EmailService.send_reservation_access_type_changed_email).call_count == 0
+    assert as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_count == 0
 
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
-def test_notify_reservation_on_access_type_change_task__seasonal_bookings__same_section():
+def test_notify_reservation_on_access_type_change_task__seasonal_bookings__same_section() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     section = ApplicationSectionFactory.create()
@@ -227,8 +231,8 @@ def test_notify_reservation_on_access_type_change_task__seasonal_bookings__same_
     notify_reservation_on_access_type_change_task(reservation_pks=[reservation_1.pk, reservation_2.pk])
 
     # Only send once for the same section.
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 0
-    calls = EmailService.send_seasonal_booking_access_type_changed_email.call_args_list
+    assert as_mock(EmailService.send_reservation_access_type_changed_email).call_count == 0
+    calls = as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_args_list
     emailed_section_pks = [call.args[0].pk for call in calls]
     assert emailed_section_pks == [section.pk]
 
@@ -237,7 +241,7 @@ def test_notify_reservation_on_access_type_change_task__seasonal_bookings__same_
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
-def test_notify_reservation_on_access_type_change_task__normal_and_seasonal_bookings():
+def test_notify_reservation_on_access_type_change_task__normal_and_seasonal_bookings() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     reservation_1 = ReservationFactory.create(
@@ -261,10 +265,10 @@ def test_notify_reservation_on_access_type_change_task__normal_and_seasonal_book
 
     notify_reservation_on_access_type_change_task(reservation_pks=[reservation_1.pk, reservation_2.pk])
 
-    reservation_calls = EmailService.send_reservation_access_type_changed_email.call_args_list
+    reservation_calls = as_mock(EmailService.send_reservation_access_type_changed_email).call_args_list
     emailed_reservation_pks = [call.args[0].pk for call in reservation_calls]
     assert emailed_reservation_pks == [reservation_1.pk]
 
-    section_calls = EmailService.send_seasonal_booking_access_type_changed_email.call_args_list
+    section_calls = as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_args_list
     emailed_section_pks = [call.args[0].pk for call in section_calls]
     assert emailed_section_pks == [section.pk]

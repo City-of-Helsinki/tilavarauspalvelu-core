@@ -15,7 +15,7 @@ from tilavarauspalvelu.tasks import create_missing_pindora_reservations_task
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 # ── Helpers ──
 
@@ -44,7 +44,7 @@ def pindora_reservation_response(*, access_code_is_active: bool) -> PindoraReser
     return_value=pindora_reservation_response(access_code_is_active=True),
 )
 @patch_method(EmailService.send_reservation_access_type_changed_email)
-def test_create_missing_pindora_reservations__create_missing():
+def test_create_missing_pindora_reservations__create_missing() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -59,9 +59,9 @@ def test_create_missing_pindora_reservations__create_missing():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 1
-    assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_args.kwargs["is_active"] is True
+    assert as_mock(EmailService.send_reservation_access_type_changed_email).call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
@@ -74,7 +74,7 @@ def test_create_missing_pindora_reservations__create_missing():
     PindoraClient.create_reservation,
     return_value=pindora_reservation_response(access_code_is_active=False),
 )
-def test_create_missing_pindora_reservations__blocked():
+def test_create_missing_pindora_reservations__blocked() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -89,8 +89,8 @@ def test_create_missing_pindora_reservations__blocked():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 1
-    assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is False
+    assert as_mock(PindoraClient.create_reservation).call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_args.kwargs["is_active"] is False
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
@@ -100,7 +100,7 @@ def test_create_missing_pindora_reservations__blocked():
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.create_reservation)
-def test_create_missing_pindora_reservations__in_the_past():
+def test_create_missing_pindora_reservations__in_the_past() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -115,7 +115,7 @@ def test_create_missing_pindora_reservations__in_the_past():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 0
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at is None
@@ -129,7 +129,7 @@ def test_create_missing_pindora_reservations__in_the_past():
     return_value=pindora_reservation_response(access_code_is_active=True),
 )
 @patch_method(EmailService.send_reservation_access_type_changed_email)
-def test_create_missing_pindora_reservations__ongoing():
+def test_create_missing_pindora_reservations__ongoing() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -144,9 +144,9 @@ def test_create_missing_pindora_reservations__ongoing():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 1
-    assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_args.kwargs["is_active"] is True
+    assert as_mock(EmailService.send_reservation_access_type_changed_email).call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
@@ -156,7 +156,7 @@ def test_create_missing_pindora_reservations__ongoing():
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.create_reservation)
-def test_create_missing_pindora_reservations__not_confirmed():
+def test_create_missing_pindora_reservations__not_confirmed() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -171,7 +171,7 @@ def test_create_missing_pindora_reservations__not_confirmed():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 0
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at is None
@@ -181,7 +181,7 @@ def test_create_missing_pindora_reservations__not_confirmed():
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.create_reservation)
-def test_create_missing_pindora_reservations__not_access_code():
+def test_create_missing_pindora_reservations__not_access_code() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -196,7 +196,7 @@ def test_create_missing_pindora_reservations__not_access_code():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 0
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at is None
@@ -206,7 +206,7 @@ def test_create_missing_pindora_reservations__not_access_code():
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.create_reservation)
-def test_create_missing_pindora_reservations__already_generated():
+def test_create_missing_pindora_reservations__already_generated() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -221,7 +221,7 @@ def test_create_missing_pindora_reservations__already_generated():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 0
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == now
@@ -234,7 +234,7 @@ def test_create_missing_pindora_reservations__already_generated():
     PindoraClient.create_reservation,
     return_value=pindora_reservation_response(access_code_is_active=False),
 )
-def test_create_missing_pindora_reservations__multiple():
+def test_create_missing_pindora_reservations__multiple() -> None:
     now = local_datetime()
 
     reservation_unit = ReservationUnitFactory.create(name="foo")
@@ -263,7 +263,7 @@ def test_create_missing_pindora_reservations__multiple():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 2
+    assert as_mock(PindoraClient.create_reservation).call_count == 2
 
     reservation_1.refresh_from_db()
     reservation_2.refresh_from_db()
@@ -274,7 +274,7 @@ def test_create_missing_pindora_reservations__multiple():
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.create_reservation, side_effect=PindoraAPIError())
-def test_create_missing_pindora_reservations__pindora_error():
+def test_create_missing_pindora_reservations__pindora_error() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -289,7 +289,7 @@ def test_create_missing_pindora_reservations__pindora_error():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 1
+    assert as_mock(PindoraClient.create_reservation).call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at is None
@@ -299,7 +299,7 @@ def test_create_missing_pindora_reservations__pindora_error():
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.create_reservation)
-def test_create_missing_pindora_reservations__reservation_series_is_ignored():
+def test_create_missing_pindora_reservations__reservation_series_is_ignored() -> None:
     now = local_datetime()
 
     ReservationFactory.create(
@@ -315,4 +315,4 @@ def test_create_missing_pindora_reservations__reservation_series_is_ignored():
 
     create_missing_pindora_reservations_task()
 
-    assert PindoraClient.create_reservation.call_count == 0
+    assert as_mock(PindoraClient.create_reservation).call_count == 0
