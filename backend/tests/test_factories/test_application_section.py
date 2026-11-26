@@ -23,7 +23,10 @@ pytestmark = [
         (ApplicationSectionStatusChoice.REJECTED, ApplicationStatusChoice.HANDLED),
     ],
 )
-def test_application_section_factory_create_in_status(status, application_status):
+def test_application_section_factory_create_in_status(
+    status: ApplicationSectionStatusChoice,
+    application_status: ApplicationStatusChoice,
+) -> None:
     section = ApplicationSectionBuilder().with_status(status).create()
     assert section.status == status
     assert ApplicationSection.objects.filter(L(status=status.value)).exists()
