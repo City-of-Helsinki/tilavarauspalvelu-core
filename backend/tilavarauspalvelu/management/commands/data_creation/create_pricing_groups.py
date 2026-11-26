@@ -4,7 +4,7 @@ import dataclasses
 import datetime
 from collections import defaultdict
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 
 from tilavarauspalvelu.enums import (
     ApplicationFormType,
@@ -213,6 +213,8 @@ def _move_to_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem)
             unit__unit_groups=unit_group,
             reservation_unit_pricing_groups__pricing_group__components__amount__gt=0,
         )
+        # The sports round reservation units get a shared pricing group of their own.
+        .exclude(application_rounds__application_form=ApplicationFormType.SPORTS_FORM)
         .distinct()
         .order_by("pk")[:2]
     )
@@ -233,28 +235,7 @@ def _move_to_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem)
     own_rows.delete()
     PricingGroup.objects.filter(pk__in=own_pricing_group_pks).delete()
 
-    adults = PriceOption.objects.create(
-        name="Aikuiset",
-        name_fi="Aikuiset",
-        name_en="Adults",
-        name_sv="Vuxna",
-        description="Yli 20-vuotiaat",
-        description_fi="Yli 20-vuotiaat",
-        description_en="Over 20 years old",
-        description_sv="Över 20 år",
-        unit_group=unit_group,
-    )
-    juniors = PriceOption.objects.create(
-        name="Juniorit",
-        name_fi="Juniorit",
-        name_en="Juniors",
-        name_sv="Juniorer",
-        description="Alle 20-vuotiaat",
-        description_fi="Alle 20-vuotiaat",
-        description_en="Under 20 years old",
-        description_sv="Under 20 år",
-        unit_group=unit_group,
-    )
+    price_options = _get_or_create_age_price_options(unit_group=unit_group)
 
     pricing_group = PricingGroup.objects.create(
         name="Liikunta, hintaryhmä 1",
@@ -270,7 +251,7 @@ def _move_to_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem)
             kind=PriceComponentKind.BASE,
             valid_from=begins,
             valid_until=price_change,
-            price_option=adults,
+            price_option=price_options.adults,
             amount=Decimal(20),
             price_unit=PriceUnit.PER_HOUR,
             tax_level=tax_level,
@@ -281,7 +262,7 @@ def _move_to_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem)
             kind=PriceComponentKind.BASE,
             valid_from=price_change,
             valid_until=None,
-            price_option=adults,
+            price_option=price_options.adults,
             amount=Decimal(25),
             price_unit=PriceUnit.PER_HOUR,
             tax_level=tax_level,
@@ -292,7 +273,7 @@ def _move_to_shared_pricing_group(*, tax_level: TaxLevel, sales_item: SalesItem)
             kind=PriceComponentKind.BASE,
             valid_from=begins,
             valid_until=None,
-            price_option=juniors,
+            price_option=price_options.juniors,
             amount=Decimal(10),
             price_unit=PriceUnit.PER_HOUR,
             tax_level=tax_level,
@@ -338,28 +319,7 @@ def _move_sports_round_to_shared_pricing_group(*, tax_level: TaxLevel, sales_ite
     own_rows.delete()
     PricingGroup.objects.filter(pk__in=own_pricing_group_pks).delete()
 
-    adults = PriceOption.objects.create(
-        name="Aikuiset",
-        name_fi="Aikuiset",
-        name_en="Adults",
-        name_sv="Vuxna",
-        description="Yli 20-vuotiaat",
-        description_fi="Yli 20-vuotiaat",
-        description_en="Over 20 years old",
-        description_sv="Över 20 år",
-        unit_group=unit_group,
-    )
-    juniors = PriceOption.objects.create(
-        name="Juniorit",
-        name_fi="Juniorit",
-        name_en="Juniors",
-        name_sv="Juniorer",
-        description="Alle 20-vuotiaat",
-        description_fi="Alle 20-vuotiaat",
-        description_en="Under 20 years old",
-        description_sv="Under 20 år",
-        unit_group=unit_group,
-    )
+    price_options = _get_or_create_age_price_options(unit_group=unit_group)
 
     pricing_group = PricingGroup.objects.create(
         name="Liikunta, kausivaraukset",
@@ -375,7 +335,7 @@ def _move_sports_round_to_shared_pricing_group(*, tax_level: TaxLevel, sales_ite
             kind=PriceComponentKind.BASE,
             valid_from=begins,
             valid_until=None,
-            price_option=adults,
+            price_option=price_options.adults,
             amount=Decimal(15),
             price_unit=PriceUnit.PER_HOUR,
             tax_level=tax_level,
@@ -386,7 +346,7 @@ def _move_sports_round_to_shared_pricing_group(*, tax_level: TaxLevel, sales_ite
             kind=PriceComponentKind.BASE,
             valid_from=begins,
             valid_until=None,
-            price_option=juniors,
+            price_option=price_options.juniors,
             amount=Decimal(8),
             price_unit=PriceUnit.PER_HOUR,
             tax_level=tax_level,
@@ -403,3 +363,40 @@ def _move_sports_round_to_shared_pricing_group(*, tax_level: TaxLevel, sales_ite
         )
         for reservation_unit in reservation_units
     ])
+
+
+class AgePriceOptions(NamedTuple):
+    adults: PriceOption
+    juniors: PriceOption
+
+
+def _get_or_create_age_price_options(*, unit_group: UnitGroup) -> AgePriceOptions:
+    adults, _ = PriceOption.objects.get_or_create(
+        unit_group=unit_group,
+        name="Aikuiset",
+        defaults={
+            "name_fi": "Aikuiset",
+            "name_en": "Adults",
+            "name_sv": "Vuxna",
+            "description": "Yli 20-vuotiaat",
+            "description_fi": "Yli 20-vuotiaat",
+            "description_en": "Over 20 years old",
+            "description_sv": "Över 20 år",
+        },
+    )
+
+    juniors, _ = PriceOption.objects.get_or_create(
+        unit_group=unit_group,
+        name="Juniorit",
+        defaults={
+            "name_fi": "Juniorit",
+            "name_en": "Juniors",
+            "name_sv": "Juniorer",
+            "description": "Alle 20-vuotiaat",
+            "description_fi": "Alle 20-vuotiaat",
+            "description_en": "Under 20 years old",
+            "description_sv": "Under 20 år",
+        },
+    )
+
+    return AgePriceOptions(adults=adults, juniors=juniors)

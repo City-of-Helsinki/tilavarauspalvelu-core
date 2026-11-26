@@ -10,7 +10,9 @@ import { ContactPersonSection } from "./CompanyForm";
 import type { ApplicationPage3FormValues } from "./form";
 import { OrganisationActiveMembersInput } from "./OrganisationActiveMembersInput";
 
-export function OrganisationForm({ isSportsForm }: Readonly<{ isSportsForm: boolean }>): React.ReactElement {
+type OrganisationFormProps = Readonly<{ isSportsForm: boolean }>;
+
+export function OrganisationForm({ isSportsForm }: OrganisationFormProps): React.ReactElement {
   const { t } = useTranslation();
   const {
     control,
