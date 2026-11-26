@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationUnitCancellationRuleFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_cancellation_rules__query(graphql):
+def test_reservation_unit_cancellation_rules__query(graphql: GraphQLClient) -> None:
     rules = ReservationUnitCancellationRuleFactory.create()
 
     graphql.login_with_superuser()
@@ -36,7 +41,7 @@ def test_reservation_unit_cancellation_rules__query(graphql):
     }
 
 
-def test_reservation_unit_cancellation_rules__query__anonymous_user(graphql):
+def test_reservation_unit_cancellation_rules__query__anonymous_user(graphql: GraphQLClient) -> None:
     ReservationUnitCancellationRuleFactory.create()
 
     fields = """
