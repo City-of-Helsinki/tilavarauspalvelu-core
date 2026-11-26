@@ -47,7 +47,7 @@ class Params(NamedTuple):
         },
     )
 )
-def test_constraint_non_draft_notifications_must_have_active_period_and_message(params):
+def test_constraint_non_draft_notifications_must_have_active_period_and_message(params: dict[str, Any]) -> None:
     with pytest.raises(IntegrityError) as error:
         BannerNotificationFactory.create(draft=False, **params)
 
@@ -76,7 +76,7 @@ def test_constraint_non_draft_notifications_must_have_active_period_and_message(
         },
     )
 )
-def test_constraint_active_period_not_set_or_active_until_after_active_from(params):
+def test_constraint_active_period_not_set_or_active_until_after_active_from(params: dict[str, Any]) -> None:
     with pytest.raises(IntegrityError) as error:
         BannerNotificationFactory.create(**params)
 

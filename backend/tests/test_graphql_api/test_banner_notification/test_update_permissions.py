@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
@@ -8,13 +10,16 @@ from tests.factories import BannerNotificationFactory
 
 from .helpers import UPDATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_banner_notification__update__anonymous_user(graphql):
+def test_banner_notification__update__anonymous_user(graphql: GraphQLClient) -> None:
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
 
     response = graphql(
@@ -29,7 +34,7 @@ def test_banner_notification__update__anonymous_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_banner_notification__update__regular_user(graphql):
+def test_banner_notification__update__regular_user(graphql: GraphQLClient) -> None:
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
     graphql.login_with_regular_user()
 
@@ -45,7 +50,7 @@ def test_banner_notification__update__regular_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_banner_notification__update__no_perms(graphql):
+def test_banner_notification__update__no_perms(graphql: GraphQLClient) -> None:
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
     graphql.login_user_with_role(role=UserRoleChoice.VIEWER)
 
@@ -61,7 +66,7 @@ def test_banner_notification__update__no_perms(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_banner_notification__update__notification_manager(graphql):
+def test_banner_notification__update__notification_manager(graphql: GraphQLClient) -> None:
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
     graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
 

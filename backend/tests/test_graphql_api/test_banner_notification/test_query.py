@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
@@ -11,6 +11,9 @@ from tilavarauspalvelu.enums import BannerNotificationTarget
 
 from tests.factories import BannerNotificationFactory, UserFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -23,7 +26,7 @@ class FilteringParams(NamedTuple):
     expected: Any
 
 
-def test_filter_banner_notifications_by_name(graphql):
+def test_filter_banner_notifications_by_name(graphql: GraphQLClient) -> None:
     # given:
     # - There are two banner notifications in the system
     # - Notification manager user is using the system
@@ -72,7 +75,7 @@ def test_filter_banner_notifications_by_name(graphql):
         },
     )
 )
-def test_filter_banner_notifications_by_target(graphql, value, expected):
+def test_filter_banner_notifications_by_target(graphql: GraphQLClient, value: Any, expected: Any) -> None:
     # given:
     # - There are three banner notifications in the system, one each target
     # - Notification manager user is using the system
@@ -118,7 +121,7 @@ def test_filter_banner_notifications_by_target(graphql, value, expected):
         },
     )
 )
-def test_filter_banner_notifications_by_is_active(graphql, value, expected):
+def test_filter_banner_notifications_by_is_active(graphql: GraphQLClient, value: Any, expected: Any) -> None:
     # given:
     # - There are two banner notifications in the system, one active and one inactive
     # - Notification manager user is using the system
@@ -172,7 +175,7 @@ def test_filter_banner_notifications_by_is_active(graphql, value, expected):
         },
     )
 )
-def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
+def test_filter_banner_notifications_by_is_visible(graphql: GraphQLClient, value: Any, expected: Any) -> None:
     # given:
     # - There are six banner notifications in the system, one for each target in active and inactive state
     # - Notification manager user is using the system
@@ -207,7 +210,7 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
     assert response.edges == expected, response
 
 
-def test_fetch_single_banner_notification_by_id(graphql):
+def test_fetch_single_banner_notification_by_id(graphql: GraphQLClient) -> None:
     # given:
     # - There are two banner notifications in the system
     # - Notification manager user is using the system
