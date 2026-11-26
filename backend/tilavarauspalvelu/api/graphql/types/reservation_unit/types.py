@@ -42,7 +42,7 @@ from tilavarauspalvelu.services.pricing.next_price_change import (
     ScheduledSurcharge,
     find_next_price_change,
 )
-from tilavarauspalvelu.services.pricing.price_summary import BasePrice, summarize_prices
+from tilavarauspalvelu.services.pricing.price_summary import BasePrice, Surcharge, summarize_prices
 from tilavarauspalvelu.typing import AnyUser, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 from utils.db import SubqueryCount
@@ -467,12 +467,15 @@ class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
             )
             for component in base_components
         ]
-        surcharge_amounts = [
-            Decimal(component["amount"])
+        surcharges = [
+            Surcharge(
+                amount=Decimal(component["amount"]),
+                can_apply_for_discount=component["can_apply_for_discount"],
+            )
             for component in components
             if component["kind"] == PriceComponentKind.SURCHARGE
         ]
-        return summarize_prices(base_prices=base_prices, surcharge_amounts=surcharge_amounts)
+        return summarize_prices(base_prices=base_prices, surcharges=surcharges)
 
     @staticmethod
     def optimize_next_price_change(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
@@ -509,7 +512,10 @@ class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
             ]
             scheduled_surcharges = [
                 ScheduledSurcharge(
-                    amount=Decimal(component["amount"]),
+                    surcharge=Surcharge(
+                        amount=Decimal(component["amount"]),
+                        can_apply_for_discount=component["can_apply_for_discount"],
+                    ),
                     valid_from=datetime.date.fromisoformat(component["valid_from"]),
                     valid_until=(
                         datetime.date.fromisoformat(component["valid_until"])

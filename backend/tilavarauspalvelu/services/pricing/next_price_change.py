@@ -9,9 +9,8 @@ from .price_summary import summarize_prices
 
 if TYPE_CHECKING:
     import datetime
-    from decimal import Decimal
 
-    from .price_summary import BasePrice, PriceSummary
+    from .price_summary import BasePrice, PriceSummary, Surcharge
 
 __all__ = [
     "PriceChange",
@@ -31,7 +30,7 @@ class ScheduledBasePrice:
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class ScheduledSurcharge:
-    amount: Decimal
+    surcharge: Surcharge
     valid_from: datetime.date
     valid_until: datetime.date | None  # Exclusive
 
@@ -118,12 +117,13 @@ def _summarize_on_date(*, pricing_groups: list[ScheduledPricingGroup], on_date: 
         if scheduled_price.valid_from <= on_date
         and (scheduled_price.valid_until is None or scheduled_price.valid_until > on_date)
     ]
-    surcharge_amounts = [
-        surcharge.amount
-        for surcharge in pricing_group.surcharges
-        if surcharge.valid_from <= on_date and (surcharge.valid_until is None or surcharge.valid_until > on_date)
+    surcharges = [
+        scheduled_surcharge.surcharge
+        for scheduled_surcharge in pricing_group.surcharges
+        if scheduled_surcharge.valid_from <= on_date
+        and (scheduled_surcharge.valid_until is None or scheduled_surcharge.valid_until > on_date)
     ]
-    return summarize_prices(base_prices=base_prices, surcharge_amounts=surcharge_amounts)
+    return summarize_prices(base_prices=base_prices, surcharges=surcharges)
 
 
 def _pricing_group_on_date(

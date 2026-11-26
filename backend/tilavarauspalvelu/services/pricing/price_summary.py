@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 __all__ = [
     "BasePrice",
     "PriceSummary",
+    "Surcharge",
     "summarize_prices",
 ]
 
@@ -27,6 +28,12 @@ class BasePrice:
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class Surcharge:
+    amount: Decimal
+    can_apply_for_discount: bool
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class PriceSummary:
     is_free: bool
     lowest_amount: Decimal
@@ -39,7 +46,7 @@ class PriceSummary:
     tax_percentage: Decimal | None
 
 
-def summarize_prices(*, base_prices: list[BasePrice], surcharge_amounts: list[Decimal]) -> PriceSummary | None:
+def summarize_prices(*, base_prices: list[BasePrice], surcharges: list[Surcharge]) -> PriceSummary | None:
     """
     Summarize the prices that a reservation unit has on one date, for search cards and lists.
 
@@ -51,7 +58,7 @@ def summarize_prices(*, base_prices: list[BasePrice], surcharge_amounts: list[De
     if not base_prices:
         return None
 
-    has_paid_surcharge = any(amount > 0 for amount in surcharge_amounts)
+    has_paid_surcharge = any(surcharge.amount > 0 for surcharge in surcharges)
 
     cheapest = min(base_prices, key=lambda base_price: base_price.amount)
     distinct_prices = {(base_price.amount, base_price.price_unit) for base_price in base_prices}
@@ -71,7 +78,10 @@ def summarize_prices(*, base_prices: list[BasePrice], surcharge_amounts: list[De
         lowest_amount=cheapest.amount,
         price_unit=cheapest.price_unit,
         varies=len(distinct_prices) > 1 or has_paid_surcharge,
-        can_apply_for_discount=any(base_price.can_apply_for_discount for base_price in base_prices),
+        can_apply_for_discount=(
+            any(base_price.can_apply_for_discount for base_price in base_prices)
+            or any(surcharge.can_apply_for_discount for surcharge in surcharges)
+        ),
         material_price_description_fi=material_price.material_price_description_fi if material_price else "",
         material_price_description_en=material_price.material_price_description_en if material_price else "",
         material_price_description_sv=material_price.material_price_description_sv if material_price else "",
