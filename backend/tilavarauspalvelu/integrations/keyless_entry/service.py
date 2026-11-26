@@ -23,7 +23,7 @@ from .typing import PindoraAccessCodeModifyResponse, PindoraAccessCodePeriod
 
 if TYPE_CHECKING:
     import uuid
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Sequence
 
     from .typing import (
         PindoraAccessCodeValidity,
@@ -53,51 +53,62 @@ class PindoraService:
     def get_access_code(cls, obj: ApplicationSection) -> PindoraSectionInfoData: ...
 
     @classmethod
-    def get_access_code(cls, obj):
+    def get_access_code(
+        cls,
+        obj: Reservation | ReservationSeries | ApplicationSection,
+    ) -> PindoraReservationInfoData | PindoraSeriesInfoData | PindoraSectionInfoData:
         """Get access code from Pindora through the correct Pindora API endpoint according to the object's type."""
         match obj:
             case ApplicationSection():
-                response = PindoraClient.get_seasonal_booking(obj)
+                section_response = PindoraClient.get_seasonal_booking(obj)
 
                 series_for_section = ReservationSeries.objects.filter(
                     allocated_time_slot__reservation_unit_option__application_section=obj
                 )
 
                 access_code_validity: list[PindoraValidityInfoData] = []
-                for series in series_for_section:
-                    validity = cls._parse_series_validity_info(series, response["reservation_unit_code_validity"])
-                    access_code_validity.extend(validity)
+                for series_in_section in series_for_section:
+                    series_validity = cls._parse_series_validity_info(
+                        series_in_section,
+                        section_response["reservation_unit_code_validity"],
+                    )
+                    access_code_validity.extend(series_validity)
 
                 return PindoraSectionInfoData(
-                    access_code=response["access_code"],
-                    access_code_generated_at=response["access_code_generated_at"],
-                    access_code_is_active=response["access_code_is_active"],
-                    access_code_keypad_url=response["access_code_keypad_url"],
-                    access_code_phone_number=response["access_code_phone_number"],
-                    access_code_sms_number=response["access_code_sms_number"],
-                    access_code_sms_message=response["access_code_sms_message"],
+                    access_code=section_response["access_code"],
+                    access_code_generated_at=section_response["access_code_generated_at"],
+                    access_code_is_active=section_response["access_code_is_active"],
+                    access_code_keypad_url=section_response["access_code_keypad_url"],
+                    access_code_phone_number=section_response["access_code_phone_number"],
+                    access_code_sms_number=section_response["access_code_sms_number"],
+                    access_code_sms_message=section_response["access_code_sms_message"],
                     access_code_validity=access_code_validity,
                 )
 
             case ReservationSeries():
                 if obj.allocated_time_slot is None:
-                    response = PindoraClient.get_reservation_series(obj)
-                    validity = cls._parse_series_validity_info(obj, response["reservation_unit_code_validity"])
+                    series_response = PindoraClient.get_reservation_series(obj)
+                    series_validity = cls._parse_series_validity_info(
+                        obj,
+                        series_response["reservation_unit_code_validity"],
+                    )
                     return PindoraSeriesInfoData(
-                        access_code=response["access_code"],
-                        access_code_generated_at=response["access_code_generated_at"],
-                        access_code_is_active=response["access_code_is_active"],
-                        access_code_keypad_url=response["access_code_keypad_url"],
-                        access_code_phone_number=response["access_code_phone_number"],
-                        access_code_sms_number=response["access_code_sms_number"],
-                        access_code_sms_message=response["access_code_sms_message"],
-                        access_code_validity=validity,
+                        access_code=series_response["access_code"],
+                        access_code_generated_at=series_response["access_code_generated_at"],
+                        access_code_is_active=series_response["access_code_is_active"],
+                        access_code_keypad_url=series_response["access_code_keypad_url"],
+                        access_code_phone_number=series_response["access_code_phone_number"],
+                        access_code_sms_number=series_response["access_code_sms_number"],
+                        access_code_sms_message=series_response["access_code_sms_message"],
+                        access_code_validity=series_validity,
                     )
 
                 section = obj.allocated_time_slot.reservation_unit_option.application_section
-                section_data: PindoraSectionInfoData = cls.get_access_code(section)
+                section_data = cls.get_access_code(section)
 
-                validity = [acv for acv in section_data.access_code_validity if acv.reservation_series_id == obj.id]
+                series_validity = [
+                    acv for acv in section_data.access_code_validity if acv.reservation_series_id == obj.id
+                ]
 
                 return PindoraSeriesInfoData(
                     access_code=section_data.access_code,
@@ -107,32 +118,32 @@ class PindoraService:
                     access_code_phone_number=section_data.access_code_phone_number,
                     access_code_sms_number=section_data.access_code_sms_number,
                     access_code_sms_message=section_data.access_code_sms_message,
-                    access_code_validity=validity,
+                    access_code_validity=series_validity,
                 )
 
             case Reservation():
                 if obj.reservation_series is None:
-                    response = PindoraClient.get_reservation(obj)
-                    period = cls._parse_code_valid_period(response)
+                    reservation_response = PindoraClient.get_reservation(obj)
+                    period = cls._parse_code_valid_period(reservation_response)
                     return PindoraReservationInfoData(
-                        access_code=response["access_code"],
-                        access_code_generated_at=response["access_code_generated_at"],
-                        access_code_is_active=response["access_code_is_active"],
-                        access_code_keypad_url=response["access_code_keypad_url"],
-                        access_code_phone_number=response["access_code_phone_number"],
-                        access_code_sms_number=response["access_code_sms_number"],
-                        access_code_sms_message=response["access_code_sms_message"],
+                        access_code=reservation_response["access_code"],
+                        access_code_generated_at=reservation_response["access_code_generated_at"],
+                        access_code_is_active=reservation_response["access_code_is_active"],
+                        access_code_keypad_url=reservation_response["access_code_keypad_url"],
+                        access_code_phone_number=reservation_response["access_code_phone_number"],
+                        access_code_sms_number=reservation_response["access_code_sms_number"],
+                        access_code_sms_message=reservation_response["access_code_sms_message"],
                         access_code_begins_at=period["access_code_begins_at"],
                         access_code_ends_at=period["access_code_ends_at"],
                     )
 
                 series = obj.reservation_series
-                series_data: PindoraSeriesInfoData = cls.get_access_code(series)
+                series_data = cls.get_access_code(series)
 
                 next_valid = (acv for acv in series_data.access_code_validity if acv.reservation_id == obj.id)
-                validity = next(next_valid, None)
+                reservation_validity = next(next_valid, None)
 
-                if validity is None:
+                if reservation_validity is None:
                     msg = "Access code is not valid for this reservation"
                     raise PindoraAPIError(msg)
 
@@ -144,8 +155,8 @@ class PindoraService:
                     access_code_phone_number=series_data.access_code_phone_number,
                     access_code_sms_number=series_data.access_code_sms_number,
                     access_code_sms_message=series_data.access_code_sms_message,
-                    access_code_begins_at=validity.access_code_begins_at,
-                    access_code_ends_at=validity.access_code_ends_at,
+                    access_code_begins_at=reservation_validity.access_code_begins_at,
+                    access_code_ends_at=reservation_validity.access_code_ends_at,
                 )
 
             case _:
@@ -685,7 +696,7 @@ class PindoraService:
     def _parse_series_validity_info(
         cls,
         series: ReservationSeries,
-        validities: list[PindoraReservationSeriesAccessCodeValidity | PindoraSeasonalBookingAccessCodeValidity],
+        validities: Sequence[PindoraReservationSeriesAccessCodeValidity | PindoraSeasonalBookingAccessCodeValidity],
     ) -> list[PindoraValidityInfoData]:
         """
         Given the list of access code validity info from Pindora (either for a reservation series
