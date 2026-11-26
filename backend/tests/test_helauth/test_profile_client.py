@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import datetime
 import re
-from typing import NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 from unittest.mock import MagicMock
 
 import pytest
-from django.contrib.auth.models import AnonymousUser
 from freezegun import freeze_time
 from graphene_django_extensions.testing import parametrize_helper
 
@@ -27,9 +26,12 @@ from tests.factories.helsinki_profile import (
     ProfileEmailFactory,
     ProfilePhoneFactory,
 )
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, anonymous_user, as_mock, exact, patch_method
 
 from .helpers import UMA_TICKET_GRANT, TokenRequest
+
+if TYPE_CHECKING:
+    from tests.test_helauth.helpers import FakeKeycloak
 
 pytestmark = [
     pytest.mark.django_db,
@@ -49,9 +51,9 @@ class Params(NamedTuple):
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__all_primary():
+def test_helsinki_profile_client__prefill_info__all_primary() -> None:
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
@@ -92,21 +94,22 @@ def test_helsinki_profile_client__prefill_info__all_primary():
         ),
     })
 )
-def test_helsinki_profile_client__prefill_info__highest_priority_address(types, select):
+def test_helsinki_profile_client__prefill_info__highest_priority_address(types: list[str], select: int) -> None:
     addresses = [ProfileAddressFactory.create(addressType=type_) for type_ in types]
 
     profile_data = MyProfileDataFactory.create_basic(primaryAddress=None, addresses=addresses)
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["reservee_address_zip"] == addresses[select]["postalCode"]
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__permanent_address():
+def test_helsinki_profile_client__prefill_info__permanent_address() -> None:
     profile_data = MyProfileDataFactory.create_basic(
         primaryAddress=None,
         addresses=[],
@@ -114,45 +117,48 @@ def test_helsinki_profile_client__prefill_info__permanent_address():
         verifiedPersonalInformation__permanentAddress__postalCode="00100",
         verifiedPersonalInformation__permanentAddress__postOffice="Helsinki",
     )
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["reservee_address_zip"] == "00100"
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__permanent_foreign_address():
+def test_helsinki_profile_client__prefill_info__permanent_foreign_address() -> None:
     profile_data = MyProfileDataFactory.create_basic(
         primaryAddress=None,
         addresses=[],
         verifiedPersonalInformation__permanentAddress=None,
         verifiedPersonalInformation__permanentForeignAddress__streetAddress="Foreign street 1",
     )
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["reservee_address_zip"] is None
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__no_address():
+def test_helsinki_profile_client__prefill_info__no_address() -> None:
     profile_data = MyProfileDataFactory.create_basic(
         primaryAddress=None,
         addresses=[],
         verifiedPersonalInformation__permanentAddress=None,
         verifiedPersonalInformation__permanentForeignAddress=None,
     )
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["reservee_address_zip"] is None
 
 
@@ -186,27 +192,29 @@ def test_helsinki_profile_client__prefill_info__no_address():
         ),
     })
 )
-def test_helsinki_profile_client__prefill_info__highest_priority_phone(types, select):
+def test_helsinki_profile_client__prefill_info__highest_priority_phone(types: list[str], select: int) -> None:
     phones = [ProfilePhoneFactory.create(phoneType=type_) for type_ in types]
 
     profile_data = MyProfileDataFactory.create_basic(primaryPhone=None, phones=phones)
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["reservee_phone"] == phones[select]["phone"]
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__no_phone():
+def test_helsinki_profile_client__prefill_info__no_phone() -> None:
     profile_data = MyProfileDataFactory.create_basic(primaryPhone=None, phones=[])
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["reservee_phone"] is None
 
 
@@ -236,70 +244,75 @@ def test_helsinki_profile_client__prefill_info__no_phone():
         ),
     })
 )
-def test_helsinki_profile_client__prefill_info__highest_priority_email(types, select):
+def test_helsinki_profile_client__prefill_info__highest_priority_email(types: list[str], select: int) -> None:
     emails = [ProfileEmailFactory.create(emailType=type_) for type_ in types]
 
     profile_data = MyProfileDataFactory.create_basic(primaryEmail=None, emails=emails)
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["reservee_email"] == emails[select]["email"]
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__no_email():
+def test_helsinki_profile_client__prefill_info__no_email() -> None:
     profile_data = MyProfileDataFactory.create_basic(primaryEmail=None, emails=[])
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["reservee_email"] is None
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__municipality_matching_municipality_number():
+def test_helsinki_profile_client__prefill_info__municipality_matching_municipality_number() -> None:
     profile_data = MyProfileDataFactory.create_basic(
         verifiedPersonalInformation__municipalityOfResidenceNumber=MunicipalityChoice.HELSINKI.code,
     )
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["municipality"] == MunicipalityChoice.HELSINKI.value
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__municipality_matching_municipality_name():
+def test_helsinki_profile_client__prefill_info__municipality_matching_municipality_name() -> None:
     profile_data = MyProfileDataFactory.create_basic(
         verifiedPersonalInformation__municipalityOfResidence=MunicipalityChoice.HELSINKI.value,
     )
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["municipality"] == MunicipalityChoice.HELSINKI.value
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__unknown_municipality_is_other():
+def test_helsinki_profile_client__prefill_info__unknown_municipality_is_other() -> None:
     profile_data = MyProfileDataFactory.create_basic(
         verifiedPersonalInformation__municipalityOfResidence="foo",
         verifiedPersonalInformation__municipalityOfResidenceNumber="bar",
     )
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
+    assert prefill_info is not None
     assert prefill_info["municipality"] == MunicipalityChoice.OTHER.value
 
 
@@ -307,14 +320,14 @@ def test_helsinki_profile_client__prefill_info__unknown_municipality_is_other():
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @patch_method(SentryLogger.log_message)
 @pytest.mark.parametrize("status_code", [400, 500])
-def test_helsinki_profile_client__prefill_info__non_200_response(status_code):
+def test_helsinki_profile_client__prefill_info__non_200_response(status_code: int) -> None:
     response = MagicMock()
     response.status_code = status_code
     response.request = MagicMock()
     response.request.method = "get"
     response.url = "example.com"
 
-    HelsinkiProfileClient.request.return_value = response
+    as_mock(HelsinkiProfileClient.request).return_value = response
 
     user = UserFactory.create()
 
@@ -322,16 +335,16 @@ def test_helsinki_profile_client__prefill_info__non_200_response(status_code):
     with pytest.raises(ExternalServiceRequestError, match=exact(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @patch_method(SentryLogger.log_message)
-def test_helsinki_profile_client__prefill_info__contains_errors():
+def test_helsinki_profile_client__prefill_info__contains_errors() -> None:
     profile_data = MyProfileDataFactory.create_basic()
 
-    HelsinkiProfileClient.request.return_value = ResponseMock(
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(
         json_data={
             "data": {"myProfile": profile_data},
             "errors": [{"message": "foo"}],
@@ -344,17 +357,17 @@ def test_helsinki_profile_client__prefill_info__contains_errors():
     with pytest.raises(ExternalServiceError, match=exact(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__json_decode_error():
+def test_helsinki_profile_client__prefill_info__json_decode_error() -> None:
     response = MagicMock()
     response.status_code = 200
     response.json.side_effect = ValueError("foo")
 
-    HelsinkiProfileClient.request.return_value = response
+    as_mock(HelsinkiProfileClient.request).return_value = response
 
     user = UserFactory.create()
 
@@ -364,7 +377,7 @@ def test_helsinki_profile_client__prefill_info__json_decode_error():
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
-def test_helsinki_profile_client__prefill_info__no_token():
+def test_helsinki_profile_client__prefill_info__no_token() -> None:
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
     assert prefill_info is None
@@ -375,9 +388,9 @@ def test_helsinki_profile_client__prefill_info__no_token():
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__user_profile_info__queries_only_requested_fields():
+def test_helsinki_profile_client__user_profile_info__queries_only_requested_fields() -> None:
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     user = UserFactory.create_profile_user(profile_id="profile-id")
     profile_info = HelsinkiProfileClient.get_user_profile_info(
@@ -387,9 +400,10 @@ def test_helsinki_profile_client__user_profile_info__queries_only_requested_fiel
         fields=["email"],
     )
 
+    assert profile_info is not None
     assert profile_info["email"] == "user@example.com"
 
-    query = HelsinkiProfileClient.request.call_args.kwargs["json"]["query"]
+    query = as_mock(HelsinkiProfileClient.request).call_args.kwargs["json"]["query"]
     match = re.fullmatch(
         r'query \{ profile\(id:"profile-id"\) \{ (?P<selections>[^{}]*) \} \}(?P<fragments>.*)',
         query,
@@ -407,17 +421,17 @@ def test_helsinki_profile_client__user_profile_info__queries_only_requested_fiel
 # ── Token ──
 
 
-def test_helsinki_profile_client__ensure_token_valid__anonymous_user(keycloak):
-    session = {}
+def test_helsinki_profile_client__ensure_token_valid__anonymous_user(keycloak: FakeKeycloak) -> None:
+    session: dict[str, Any] = {}
 
-    is_valid = HelsinkiProfileClient.ensure_token_valid(user=AnonymousUser(), session=session)
+    is_valid = HelsinkiProfileClient.ensure_token_valid(user=anonymous_user(), session=session)
 
     assert is_valid is False
     assert session == {}
     assert keycloak.token_requests == []
 
 
-def test_helsinki_profile_client__ensure_token_valid__valid_token_in_session(keycloak):
+def test_helsinki_profile_client__ensure_token_valid__valid_token_in_session(keycloak: FakeKeycloak) -> None:
     user = UserFactory.create_profile_user()
     session = {
         "profile_access_token": "session-profile-access-token",
@@ -431,7 +445,7 @@ def test_helsinki_profile_client__ensure_token_valid__valid_token_in_session(key
 
 
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_helsinki_profile_client__get_token__refresh_with_profile_refresh_token(keycloak):
+def test_helsinki_profile_client__get_token__refresh_with_profile_refresh_token(keycloak: FakeKeycloak) -> None:
     user = UserFactory.create_profile_user()
     session = {
         "profile_access_token": "session-profile-access-token",
@@ -455,8 +469,11 @@ def test_helsinki_profile_client__get_token__refresh_with_profile_refresh_token(
     }
 
 
-def test_helsinki_profile_client__get_token__profile_refresh_token_rejected__use_keycloak_refresh_token(keycloak):
+def test_helsinki_profile_client__get_token__profile_refresh_token_rejected__use_keycloak_refresh_token(
+    keycloak: FakeKeycloak,
+) -> None:
     user = UserFactory.create_profile_user()
+    assert user.current_social_auth is not None
     keycloak_refresh_token = user.current_social_auth.extra_data["refresh_token"]
     keycloak.refresh_error_responses["session-profile-refresh-token"] = ResponseMock(
         json_data={"error": "invalid_grant"},
@@ -480,8 +497,11 @@ def test_helsinki_profile_client__get_token__profile_refresh_token_rejected__use
 
 
 @patch_method(SentryLogger.log_message)
-def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens_rejected(keycloak):
+def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens_rejected(
+    keycloak: FakeKeycloak,
+) -> None:
     user = UserFactory.create_profile_user()
+    assert user.current_social_auth is not None
     keycloak_refresh_token = user.current_social_auth.extra_data["refresh_token"]
     keycloak.refresh_error_responses["session-profile-refresh-token"] = ResponseMock(
         json_data={"error": "invalid_grant"},
@@ -507,14 +527,16 @@ def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens
     assert session["keycloak_refresh_token_expired"] is True
     assert "profile_access_token" not in session
 
-    SentryLogger.log_message.assert_called_once_with(
+    as_mock(SentryLogger.log_message).assert_called_once_with(
         "Unable to refresh Helsinki profile token",
         details={"user": user.pk, "error": "Profile refresh token expired"},
         level="warning",
     )
 
 
-def test_helsinki_profile_client__get_token__expired_profile_refresh_token__use_keycloak_token(keycloak):
+def test_helsinki_profile_client__get_token__expired_profile_refresh_token__use_keycloak_token(
+    keycloak: FakeKeycloak,
+) -> None:
     user = UserFactory.create_profile_user()
     session = {
         "profile_refresh_token": "session-profile-refresh-token",
@@ -533,9 +555,11 @@ def test_helsinki_profile_client__get_token__expired_profile_refresh_token__use_
 
 
 @patch_method(SentryLogger.log_message)
-def test_helsinki_profile_client__get_token__no_profile_refresh_token__no_keycloak_token(keycloak):
+def test_helsinki_profile_client__get_token__no_profile_refresh_token__no_keycloak_token(
+    keycloak: FakeKeycloak,
+) -> None:
     user = UserFactory.create()
-    session = {}
+    session: dict[str, Any] = {}
 
     token = HelsinkiProfileClient.get_token(user=user, session=session)
 
@@ -545,7 +569,7 @@ def test_helsinki_profile_client__get_token__no_profile_refresh_token__no_keyclo
 
 
 @patch_method(SentryLogger.log_message)
-def test_helsinki_profile_client__get_token__profile_token_request_rejected(keycloak):
+def test_helsinki_profile_client__get_token__profile_token_request_rejected(keycloak: FakeKeycloak) -> None:
     user = UserFactory.create_profile_user()
     keycloak.profile_token_error_response = ResponseMock(text="Access denied", status_code=403)
     session = {
@@ -561,17 +585,17 @@ def test_helsinki_profile_client__get_token__profile_token_request_rejected(keyc
     ]
     assert "profile_access_token" not in session
 
-    SentryLogger.log_message.assert_called_once_with(
+    as_mock(SentryLogger.log_message).assert_called_once_with(
         "Unable to get Helsinki profile token",
         details={"user": user.pk, "error": "Access denied"},
         level="warning",
     )
 
 
-def test_helsinki_profile_client__refresh_token__anonymous_user(keycloak):
-    session = {}
+def test_helsinki_profile_client__refresh_token__anonymous_user(keycloak: FakeKeycloak) -> None:
+    session: dict[str, Any] = {}
 
-    token = HelsinkiProfileClient.refresh_token(user=AnonymousUser(), session=session)
+    token = HelsinkiProfileClient.refresh_token(user=anonymous_user(), session=session)
 
     assert token is None
     assert session == {}

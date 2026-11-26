@@ -12,8 +12,7 @@ from tests.helpers import ResponseMock
 from tests.test_gdpr_api.helpers import RSA
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import User
-    from tilavarauspalvelu.typing import WSGIRequest
+    from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 
 
 OIDC_ENDPOINT = "https://tunnistus.example.com/auth/realms/helsinki-tunnistus"
@@ -30,7 +29,7 @@ OIDC_CONFIG = {
 UMA_TICKET_GRANT = "urn:ietf:params:oauth:grant-type:uma-ticket"
 
 
-def mock_request(user: User) -> WSGIRequest:
+def mock_request(user: AnyUser) -> WSGIRequest:
     request = MagicMock()
     request.user = user
     return request
