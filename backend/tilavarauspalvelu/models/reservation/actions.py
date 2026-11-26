@@ -21,7 +21,7 @@ from tilavarauspalvelu.enums import (
     TimezoneProperty,
     TimezoneRuleProperty,
 )
-from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
+from tilavarauspalvelu.exceptions import MissingValueError, ReservationPriceCalculationError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
     create_mock_verkkokauppa_order,
@@ -302,6 +302,11 @@ class ReservationActions:
             raise ValidationError(msg)
 
         verkkokauppa_order = self.create_order_in_verkkokauppa()
+
+        # The order creation fails if Verkkokauppa returns no checkout URL.
+        if verkkokauppa_order.checkout_url is None:
+            msg = "A created order has a checkout URL."
+            raise MissingValueError(msg)
 
         return PaymentOrder.objects.create(
             payment_type=payment_type,
