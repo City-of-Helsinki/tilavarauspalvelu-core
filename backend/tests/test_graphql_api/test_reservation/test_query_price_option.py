@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphql_relay import to_global_id
 
 from tests.factories import PriceOptionFactory, ReservationFactory, UserFactory
 
 from .helpers import reservation_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -16,7 +21,7 @@ pytestmark = [
 # ── Price option ──
 
 
-def test_reservation__query__price_option_for_own_reservation(graphql):
+def test_reservation__query__price_option_for_own_reservation(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     price_option = PriceOptionFactory.create(name="Aikuiset")
     reservation = ReservationFactory.create(user=user, price_option=price_option)
@@ -29,7 +34,7 @@ def test_reservation__query__price_option_for_own_reservation(graphql):
     assert response.first_query_object == {"priceOption": {"pk": price_option.pk, "nameFi": "Aikuiset"}}
 
 
-def test_reservation__query__price_option_for_other_users_reservation(graphql):
+def test_reservation__query__price_option_for_other_users_reservation(graphql: GraphQLClient) -> None:
     price_option = PriceOptionFactory.create()
     reservation = ReservationFactory.create(price_option=price_option)
 
@@ -41,7 +46,7 @@ def test_reservation__query__price_option_for_other_users_reservation(graphql):
     assert response.first_query_object == {"priceOption": None}
 
 
-def test_reservation__query__no_price_option(graphql):
+def test_reservation__query__no_price_option(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create()
 
     graphql.login_with_superuser()

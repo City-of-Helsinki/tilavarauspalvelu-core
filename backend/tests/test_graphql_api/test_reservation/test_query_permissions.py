@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -19,13 +20,18 @@ from tests.factories import (
 
 from .helpers import reservations_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation__query__regular_user_cannot_see_working_memo_for_other_users_reservation(graphql):
+def test_reservation__query__regular_user_cannot_see_working_memo_for_other_users_reservation(
+    graphql: GraphQLClient,
+) -> None:
     user = UserFactory.create()
     reservation = ReservationFactory.create(working_memo="foo")
 
@@ -38,7 +44,7 @@ def test_reservation__query__regular_user_cannot_see_working_memo_for_other_user
     assert response.node(0) == {"pk": reservation.pk, "workingMemo": None}
 
 
-def test_reservation__query__staff_user_can_see_working_memo_for_own_reservation(graphql):
+def test_reservation__query__staff_user_can_see_working_memo_for_own_reservation(graphql: GraphQLClient) -> None:
     user = UserFactory.create_with_general_role()
     reservation = ReservationFactory.create(working_memo="foo", user=user)
 
@@ -51,7 +57,7 @@ def test_reservation__query__staff_user_can_see_working_memo_for_own_reservation
     assert response.node(0) == {"pk": reservation.pk, "workingMemo": "foo"}
 
 
-def test_reservation__query__general_admin_can_see_working_memo_for_any_reservation(graphql):
+def test_reservation__query__general_admin_can_see_working_memo_for_any_reservation(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(working_memo="foo")
     admin = UserFactory.create_with_general_role()
 
@@ -64,7 +70,9 @@ def test_reservation__query__general_admin_can_see_working_memo_for_any_reservat
     assert response.node(0) == {"pk": reservation.pk, "workingMemo": "foo"}
 
 
-def test_reservation__query__unit_admin_can_see_working_memo_for_reservations_in_their_units(graphql):
+def test_reservation__query__unit_admin_can_see_working_memo_for_reservations_in_their_units(
+    graphql: GraphQLClient,
+) -> None:
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     admin = UserFactory.create_with_unit_role(units=[unit])
@@ -79,7 +87,9 @@ def test_reservation__query__unit_admin_can_see_working_memo_for_reservations_in
     assert response.node(0) == {"pk": reservation.pk, "workingMemo": "foo"}
 
 
-def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations_other_units(graphql):
+def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations_other_units(
+    graphql: GraphQLClient,
+) -> None:
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create()
     admin = UserFactory.create_with_unit_role(units=[unit])
@@ -94,7 +104,9 @@ def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations
     assert response.node(0) == {"pk": reservation.pk, "workingMemo": None}
 
 
-def test_reservation__query__regular_user_cannot_see_personal_information_from_other_reservations(graphql):
+def test_reservation__query__regular_user_cannot_see_personal_information_from_other_reservations(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create()
     graphql.login_with_regular_user()
 
@@ -168,7 +180,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
     }
 
 
-def test_reservation__query__fields_requiring_staff_permissions__superuser(graphql):
+def test_reservation__query__fields_requiring_staff_permissions__superuser(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         type=ReservationTypeChoice.STAFF,
         working_memo="foo",
@@ -189,6 +201,7 @@ def test_reservation__query__fields_requiring_staff_permissions__superuser(graph
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1
+    assert reservation.handled_at is not None
     assert response.node(0) == {
         "pk": reservation.pk,
         "type": ReservationTypeChoice.STAFF.value,
@@ -198,7 +211,7 @@ def test_reservation__query__fields_requiring_staff_permissions__superuser(graph
     }
 
 
-def test_reservation__query__fields_requiring_staff_permissions__regular_user(graphql):
+def test_reservation__query__fields_requiring_staff_permissions__regular_user(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         type=ReservationTypeChoice.STAFF,
         working_memo="foo",
@@ -228,7 +241,9 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
     }
 
 
-def test_reservation__query__reservation_owner_can_see_personal_information_from_own_reservation(graphql):
+def test_reservation__query__reservation_owner_can_see_personal_information_from_own_reservation(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create(
         age_group=AgeGroupFactory.create(),
         applying_for_free_of_charge=True,

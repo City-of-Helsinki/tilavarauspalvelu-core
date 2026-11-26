@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import Reservation
@@ -8,13 +10,16 @@ from tests.factories import ReservationFactory, UserFactory
 
 from .helpers import DELETE_MUTATION, get_delete_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation__delete__general_admin(graphql):
+def test_reservation__delete__general_admin(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_delete()
 
     user = UserFactory.create_with_general_role()
@@ -27,7 +32,7 @@ def test_reservation__delete__general_admin(graphql):
     assert Reservation.objects.filter(pk=reservation.pk).exists() is False
 
 
-def test_reservation__delete__reservation_owner(graphql):
+def test_reservation__delete__reservation_owner(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     reservation = ReservationFactory.create_for_delete(user=user)
 
@@ -39,7 +44,7 @@ def test_reservation__delete__reservation_owner(graphql):
     assert Reservation.objects.filter(pk=reservation.pk).exists() is False
 
 
-def test_reservation__delete__regular_user(graphql):
+def test_reservation__delete__regular_user(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_delete()
 
     graphql.login_with_regular_user()

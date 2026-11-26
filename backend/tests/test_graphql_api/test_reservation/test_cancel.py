@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
@@ -24,9 +25,14 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 from utils.date_utils import local_datetime
 
 from tests.factories import OrderFactory, PaymentOrderFactory, RefundFactory, ReservationFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import CANCEL_MUTATION, get_cancel_data
+
+if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -35,7 +41,7 @@ pytestmark = [
 
 @patch_method(EmailService.send_reservation_cancelled_email)
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
-def test_reservation__cancel__success(graphql, reservation_type):
+def test_reservation__cancel__success(graphql: GraphQLClient, reservation_type: ReservationTypeChoice) -> None:
     reservation = ReservationFactory.create_for_cancellation(type=reservation_type)
 
     graphql.login_with_superuser()
@@ -48,10 +54,10 @@ def test_reservation__cancel__success(graphql, reservation_type):
     assert reservation.state == ReservationStateChoice.CANCELLED
     assert reservation.cancel_reason == ReservationCancelReasonChoice.CHANGE_OF_PLANS
 
-    assert EmailService.send_reservation_cancelled_email.called is True
+    assert as_mock(EmailService.send_reservation_cancelled_email).called is True
 
 
-def test_reservation__cancel__adds_cancel_details(graphql):
+def test_reservation__cancel__adds_cancel_details(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation()
 
     graphql.login_with_superuser()
@@ -72,7 +78,7 @@ def test_reservation__cancel__adds_cancel_details(graphql):
         ReservationTypeChoice.BEHALF,
     ],
 )
-def test_reservation__cancel__fails_type_wrong(graphql, reservation_type):
+def test_reservation__cancel__fails_type_wrong(graphql: GraphQLClient, reservation_type: ReservationTypeChoice) -> None:
     reservation = ReservationFactory.create_for_cancellation(type=reservation_type)
 
     graphql.login_with_superuser()
@@ -83,7 +89,7 @@ def test_reservation__cancel__fails_type_wrong(graphql, reservation_type):
     assert response.field_error_messages() == ["Reservation cannot be cancelled based on its type"]
 
 
-def test_reservation__cancel__fails_when_type_is_seasonal_and_reservation_is_paid(graphql):
+def test_reservation__cancel__fails_when_type_is_seasonal_and_reservation_is_paid(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(
         type=ReservationTypeChoice.SEASONAL, price_lines__amount=10
     )
@@ -96,7 +102,7 @@ def test_reservation__cancel__fails_when_type_is_seasonal_and_reservation_is_pai
     assert response.field_error_messages() == ["Paid seasonal reservations cannot be cancelled."]
 
 
-def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql):
+def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(state=ReservationStateChoice.CREATED)
 
     graphql.login_with_superuser()
@@ -110,7 +116,7 @@ def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql):
     assert reservation.state == ReservationStateChoice.CREATED
 
 
-def test_reservation__cancel__fails_if_cancel_reason_not_given(graphql):
+def test_reservation__cancel__fails_if_cancel_reason_not_given(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation()
 
     graphql.login_with_superuser()
@@ -124,7 +130,7 @@ def test_reservation__cancel__fails_if_cancel_reason_not_given(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
-def test_reservation__cancel__regular_user_can_cancel_own_reservation(graphql):
+def test_reservation__cancel__regular_user_can_cancel_own_reservation(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation()
 
     graphql.force_login(reservation.user)
@@ -137,7 +143,7 @@ def test_reservation__cancel__regular_user_can_cancel_own_reservation(graphql):
     assert reservation.state == ReservationStateChoice.CANCELLED
 
 
-def test_reservation__cancel__regular_user_cannot_cancel_other_users_reservation(graphql):
+def test_reservation__cancel__regular_user_cannot_cancel_other_users_reservation(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation()
 
     graphql.login_with_regular_user()
@@ -150,7 +156,7 @@ def test_reservation__cancel__regular_user_cannot_cancel_other_users_reservation
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
-def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
+def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(
         reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=12),
     )
@@ -170,7 +176,9 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
 
 # 23.5 real hours before the reservation, but 24.5 hours on the wall clock.
 @freeze_time("2026-03-28 11:30:00+02:00")
-def test_reservation__cancel__fails_when_cancellation_time_is_over__over_daylight_saving_time_change(graphql):
+def test_reservation__cancel__fails_when_cancellation_time_is_over__over_daylight_saving_time_change(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_cancellation(
         begins_at=local_datetime(2026, 3, 29, 12),
         ends_at=local_datetime(2026, 3, 29, 13),
@@ -191,7 +199,7 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over__over_dayligh
 
 # The clocks move from 04:00 back to 03:00 at 01:00 UTC on 2026-10-25, so the hour from 03:00 to 04:00 occurs twice.
 @freeze_time("2026-10-25 01:10:00+00:00")
-def test_reservation__cancel__fails_when_reservation_is_ongoing__in_the_repeated_hour(graphql):
+def test_reservation__cancel__fails_when_reservation_is_ongoing__in_the_repeated_hour(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(
         begins_at=datetime.datetime.fromisoformat("2026-10-25T03:30:00+03:00"),
         ends_at=datetime.datetime.fromisoformat("2026-10-25T04:30:00+02:00"),
@@ -207,7 +215,7 @@ def test_reservation__cancel__fails_when_reservation_is_ongoing__in_the_repeated
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
-def test_reservation__cancel__fails_when_reservation_in_the_past(graphql):
+def test_reservation__cancel__fails_when_reservation_in_the_past(graphql: GraphQLClient) -> None:
     now = local_datetime()
     reservation = ReservationFactory.create_for_cancellation(
         begins_at=now - datetime.timedelta(hours=2),
@@ -225,7 +233,7 @@ def test_reservation__cancel__fails_when_reservation_in_the_past(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
-def test_reservation__cancel__fails_if_no_cancellation_rule(graphql):
+def test_reservation__cancel__fails_if_no_cancellation_rule(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(reservation_unit__cancellation_rule=None)
 
     graphql.login_with_superuser()
@@ -242,7 +250,9 @@ def test_reservation__cancel__fails_if_no_cancellation_rule(graphql):
 
 
 @override_settings(SEND_EMAILS=True)
-def test_reservation__cancel__sends_email_notification(graphql, outbox):
+def test_reservation__cancel__sends_email_notification(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives]
+) -> None:
     reservation = ReservationFactory.create_for_cancellation()
 
     graphql.login_with_superuser()
@@ -259,7 +269,7 @@ def test_reservation__cancel__sends_email_notification(graphql, outbox):
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
-def test_reservation__cancel__refund_for_paid_reservation(graphql):
+def test_reservation__cancel__refund_for_paid_reservation(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(price_lines__amount=1)
 
     payment_order = PaymentOrderFactory.create(
@@ -272,7 +282,7 @@ def test_reservation__cancel__refund_for_paid_reservation(graphql):
     )
 
     refund = RefundFactory.create()
-    VerkkokauppaAPIClient.refund_order.return_value = refund
+    as_mock(VerkkokauppaAPIClient.refund_order).return_value = refund
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
@@ -280,7 +290,7 @@ def test_reservation__cancel__refund_for_paid_reservation(graphql):
 
     assert response.has_errors is False, response.errors
 
-    VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=payment_order.remote_id)
+    as_mock(VerkkokauppaAPIClient.refund_order).assert_called_with(order_uuid=payment_order.remote_id)
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id == refund.refund_id
@@ -290,7 +300,7 @@ def test_reservation__cancel__refund_for_paid_reservation(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-def test_reservation__cancel__cancel_invoiced_reservation(graphql):
+def test_reservation__cancel__cancel_invoiced_reservation(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(price_lines__amount=1)
 
     payment_order = PaymentOrderFactory.create(
@@ -306,7 +316,7 @@ def test_reservation__cancel__cancel_invoiced_reservation(graphql):
     )
 
     order = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
-    VerkkokauppaAPIClient.cancel_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.cancel_order).return_value = order
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
@@ -314,7 +324,7 @@ def test_reservation__cancel__cancel_invoiced_reservation(graphql):
 
     assert response.has_errors is False, response.errors
 
-    VerkkokauppaAPIClient.cancel_order.assert_called_with(
+    as_mock(VerkkokauppaAPIClient.cancel_order).assert_called_with(
         order_uuid=payment_order.remote_id,
         user_uuid=payment_order.reservation_user_uuid,
     )
@@ -323,7 +333,7 @@ def test_reservation__cancel__cancel_invoiced_reservation(graphql):
     assert payment_order.status == OrderStatus.CANCELLED
 
 
-def test_reservation__cancel__cancel_unpaid_reservation(graphql):
+def test_reservation__cancel__cancel_unpaid_reservation(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(price_lines__amount=1)
 
     payment_order = PaymentOrderFactory.create(
@@ -349,7 +359,7 @@ def test_reservation__cancel__cancel_unpaid_reservation(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-def test_reservation__cancel__cancel_unpaid_reservation__also_cancel_verkkokauppa_order(graphql):
+def test_reservation__cancel__cancel_unpaid_reservation__also_cancel_verkkokauppa_order(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(price_lines__amount=1)
 
     payment_order = PaymentOrderFactory.create(
@@ -365,7 +375,7 @@ def test_reservation__cancel__cancel_unpaid_reservation__also_cancel_verkkokaupp
     )
 
     order = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
-    VerkkokauppaAPIClient.cancel_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.cancel_order).return_value = order
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
@@ -373,7 +383,7 @@ def test_reservation__cancel__cancel_unpaid_reservation__also_cancel_verkkokaupp
 
     assert response.has_errors is False, response.errors
 
-    VerkkokauppaAPIClient.cancel_order.assert_called_with(
+    as_mock(VerkkokauppaAPIClient.cancel_order).assert_called_with(
         order_uuid=payment_order.remote_id,
         user_uuid=payment_order.reservation_user_uuid,
     )
@@ -383,7 +393,7 @@ def test_reservation__cancel__cancel_unpaid_reservation__also_cancel_verkkokaupp
 
 
 @patch_method(PindoraService.delete_access_code)
-def test_reservation__cancel__delete_from_pindora__call_success(graphql):
+def test_reservation__cancel__delete_from_pindora__call_success(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
@@ -396,14 +406,14 @@ def test_reservation__cancel__delete_from_pindora__call_success(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.delete_access_code.called is True
+    assert as_mock(PindoraService.delete_access_code).called is True
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CANCELLED
 
 
 @patch_method(PindoraService.delete_access_code, side_effect=PindoraAPIError("Pindora API error"))
-def test_reservation__cancel__delete_from_pindora__call_fails(graphql):
+def test_reservation__cancel__delete_from_pindora__call_fails(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
@@ -417,14 +427,14 @@ def test_reservation__cancel__delete_from_pindora__call_fails(graphql):
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Pindora API error"]
 
-    assert PindoraService.delete_access_code.called is True
+    assert as_mock(PindoraService.delete_access_code).called is True
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
 @patch_method(PindoraService.delete_access_code, side_effect=PindoraNotFoundError("Error"))
-def test_reservation__cancel__delete_from_pindora__call_fails__404(graphql):
+def test_reservation__cancel__delete_from_pindora__call_fails__404(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_cancellation(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
@@ -438,7 +448,7 @@ def test_reservation__cancel__delete_from_pindora__call_fails__404(graphql):
     # Request is still successful if Pindora fails with 404
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.delete_access_code.called is True
+    assert as_mock(PindoraService.delete_access_code).called is True
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CANCELLED

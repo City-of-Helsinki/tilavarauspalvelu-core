@@ -16,6 +16,8 @@ from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 reservation_query = partial(build_query, "reservation")
@@ -49,7 +51,7 @@ REPAIR_ACCESS_CODE_STAFF_MUTATION = build_mutation(
 
 
 @contextmanager
-def mock_profile_reader(**kwargs: Any):
+def mock_profile_reader(**kwargs: Any) -> Generator[None]:
     profile_data = MyProfileDataFactory.create_basic(**kwargs)
     response = ResponseMock(json_data={"data": {"myProfile": profile_data}})
     patch_http = patch_method(HelsinkiProfileClient.request, return_value=response)
