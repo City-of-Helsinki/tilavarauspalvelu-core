@@ -50,7 +50,7 @@ class PriceComponent(models.Model):
     price_unit = TextChoicesField(enum=PriceUnit)
 
     can_apply_for_discount = models.BooleanField(default=False)
-    # Adjustment components change the amount of an adjustable component.
+    # Whether adjustment components can change the amount of this component. The adjustment kind is not built yet.
     is_adjustable = models.BooleanField(default=True)
 
     material_price_description = Nh3CharField(
