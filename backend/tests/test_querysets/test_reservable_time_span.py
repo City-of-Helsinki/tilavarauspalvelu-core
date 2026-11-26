@@ -81,7 +81,9 @@ class OverlapParams(NamedTuple):
         ),
     }),
 )
-def test_reservable_time_span__overlapping_with_period(start, end, overlaps):
+def test_reservable_time_span__overlapping_with_period(
+    start: datetime.datetime, end: datetime.datetime, overlaps: bool
+) -> None:
     origin_hauki_resource = OriginHaukiResourceFactory.create(id=205872)
     ReservableTimeSpanFactory.create(resource=origin_hauki_resource, start_datetime=start, end_datetime=end)
 
@@ -158,7 +160,7 @@ class FillParams(NamedTuple):
         ),
     }),
 )
-def test_reservable_time_span__fully_fill_period(start, end, fills):
+def test_reservable_time_span__fully_fill_period(start: datetime.datetime, end: datetime.datetime, fills: bool) -> None:
     origin_hauki_resource = OriginHaukiResourceFactory.create(id=205872)
     ReservableTimeSpanFactory.create(resource=origin_hauki_resource, start_datetime=start, end_datetime=end)
 

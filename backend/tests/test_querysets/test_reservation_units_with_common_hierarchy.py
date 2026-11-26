@@ -1,10 +1,18 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitHierarchy
 
 from tests.factories import ReservationUnitFactory, SpaceFactory
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from contextlib import AbstractContextManager
+
+    from graphene_django_extensions.testing.utils import QueryData
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +20,9 @@ pytestmark = [
 ]
 
 
-def test_reservation_units_with_common_hierarchy__queryset(query_counter):
+def test_reservation_units_with_common_hierarchy__queryset(
+    query_counter: Callable[[], AbstractContextManager[QueryData]],
+) -> None:
     # Space 1
     # └── Space 2
     # Space 3
@@ -63,7 +73,9 @@ def test_reservation_units_with_common_hierarchy__queryset(query_counter):
     assert get_affecting([res_1.pk, res_6.pk]) == [res_1.pk, res_2.pk, res_3.pk, res_5.pk, res_6.pk]
 
 
-def test_reservation_units_with_common_hierarchy__action_returns_units_sharing_spaces_in_one_query(query_counter):
+def test_reservation_units_with_common_hierarchy__action_returns_units_sharing_spaces_in_one_query(
+    query_counter: Callable[[], AbstractContextManager[QueryData]],
+) -> None:
     # Space 1
     # ├── Space 2
     # └── Space 3
