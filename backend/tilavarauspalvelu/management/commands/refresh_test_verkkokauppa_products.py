@@ -57,7 +57,8 @@ class Command(BaseCommand):
             # A price line protects its product, so keep the products that price lines use.
             reservation_unit.payment_products.filter(merchant=merchant, reservation_price_lines__isnull=True).delete()
             try:
-                reservation_unit.actions.refresh_payment_products()
+                reservation_unit.actions.create_missing_payment_products()
+                reservation_unit.actions.send_payment_product_accounting()
             except CreateProductError as error:
                 failed_pks.append(reservation_unit.pk)
                 self.stderr.write(f"Reservation unit {reservation_unit.pk}: {error}")

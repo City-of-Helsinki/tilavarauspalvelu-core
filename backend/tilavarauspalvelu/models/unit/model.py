@@ -122,7 +122,7 @@ class Unit(models.Model):
         return self.name
 
     def save(self, *args: Any, **kwargs: Any) -> None:
-        if not settings.UPDATE_PRODUCT_MAPPING:
+        if not settings.UPDATE_PRODUCT_MAPPING and not settings.UPDATE_ACCOUNTING:
             return super().save(*args, **kwargs)
 
         old_values = Unit.objects.filter(pk=self.pk).first()

@@ -9,7 +9,6 @@ from unittest.mock import patch
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
@@ -58,6 +57,12 @@ def create_sales_item(*, vat_code: str = "48") -> SalesItem:
     return SalesItemFactory.create(tax_level=tax_level)
 
 
+@pytest.fixture(autouse=True)
+def enable_payment_product_refresh(settings):
+    settings.UPDATE_PRODUCT_MAPPING = True
+    settings.UPDATE_ACCOUNTING = True
+
+
 def mock_create_product(*, params: CreateProductParams) -> Product:
     return Product(
         product_id=uuid.uuid4(),
@@ -70,7 +75,6 @@ def mock_create_product(*, params: CreateProductParams) -> Product:
 # ── Creating products ────────────────────────────────────────────────────────────────────────────────────────────────
 
 
-@override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=mock_create_product)
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
 def test_refresh_payment_products__reservation_unit_save__creates_product_after_commit(
@@ -500,6 +504,50 @@ def test_refresh_payment_products__accounting_api_error__logs_error_for_each_pro
 
     assert VerkkokauppaAPIClient.create_or_update_accounting.call_count == 2
     assert SentryLogger.log_exception.call_count == 2
+
+
+# ── Settings ─────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+@patch_method(VerkkokauppaAPIClient.create_product, side_effect=mock_create_product)
+@patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+def test_refresh_payment_products__product_mapping_off__creates_no_product_and_sends_accounting(settings):
+    settings.UPDATE_PRODUCT_MAPPING = False
+    sales_item = create_sales_item()
+    merchant = PaymentMerchantFactory.create()
+    reservation_unit = ReservationUnitFactory.create(
+        payment_merchant=merchant,
+        payment_accounting=PaymentAccountingFactory.create(),
+        own_price__amount=Decimal(10),
+        own_price__tax_level=sales_item.tax_level,
+        own_price__sales_item=sales_item,
+    )
+    product = PaymentProductFactory.create(reservation_unit=reservation_unit, sales_item=sales_item, merchant=merchant)
+
+    refresh_reservation_unit_payment_products_task(reservation_unit.pk)
+
+    assert VerkkokauppaAPIClient.create_product.call_count == 0
+    assert VerkkokauppaAPIClient.create_or_update_accounting.call_count == 1
+    assert VerkkokauppaAPIClient.create_or_update_accounting.call_args.kwargs["product_uuid"] == product.pk
+
+
+@patch_method(VerkkokauppaAPIClient.create_product, side_effect=mock_create_product)
+@patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+def test_refresh_payment_products__accounting_off__creates_product_and_sends_no_accounting(settings):
+    settings.UPDATE_ACCOUNTING = False
+    sales_item = create_sales_item()
+    reservation_unit = ReservationUnitFactory.create(
+        payment_merchant=PaymentMerchantFactory.create(),
+        payment_accounting=PaymentAccountingFactory.create(),
+        own_price__amount=Decimal(10),
+        own_price__tax_level=sales_item.tax_level,
+        own_price__sales_item=sales_item,
+    )
+
+    refresh_reservation_unit_payment_products_task(reservation_unit.pk)
+
+    assert PaymentProduct.objects.filter(reservation_unit=reservation_unit, sales_item=sales_item).exists() is True
+    assert VerkkokauppaAPIClient.create_or_update_accounting.call_count == 0
 
 
 # ── Task ─────────────────────────────────────────────────────────────────────────────────────────────────────────────

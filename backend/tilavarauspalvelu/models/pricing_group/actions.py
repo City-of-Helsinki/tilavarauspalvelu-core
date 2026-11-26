@@ -22,7 +22,7 @@ class PricingGroupActions:
 
     def refresh_reservation_unit_payment_products(self) -> None:
         """Refresh the verkkokauppa products of every reservation unit of the group, after the commit."""
-        if not settings.UPDATE_ACCOUNTING:
+        if not settings.UPDATE_PRODUCT_MAPPING and not settings.UPDATE_ACCOUNTING:
             return
 
         reservation_unit_pks = (

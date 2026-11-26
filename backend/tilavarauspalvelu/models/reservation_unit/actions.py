@@ -487,17 +487,22 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # Send emails to reservations that have changed their access type
         notify_reservation_on_access_type_change_task.delay_on_commit(reservation_pks=updated_reservations)
 
-    def refresh_payment_products(self) -> None:
-        """
-        Make a verkkokauppa product for each sales item that the reservation unit sells now or later,
-        then send the accounting of each product of the current merchant to verkkokauppa.
-        """
+    def create_missing_payment_products(self) -> None:
+        """Make a verkkokauppa product for each sales item that the reservation unit sells now or later."""
+        if self.reservation_unit.is_draft or self.reservation_unit.is_archived:
+            return
+
         merchant = self.get_merchant()
         if merchant is None:
             return
 
-        if not self.reservation_unit.is_draft and not self.reservation_unit.is_archived:
-            self._create_missing_payment_products(merchant=merchant)
+        self._create_payment_products_for_missing_sales_items(merchant=merchant)
+
+    def send_payment_product_accounting(self) -> None:
+        """Send the accounting of each product of the current merchant to verkkokauppa."""
+        merchant = self.get_merchant()
+        if merchant is None:
+            return
 
         accounting = self.get_accounting()
         if accounting is None:
@@ -557,7 +562,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
                     payment_product_id=str(product.pk),
                 )
 
-    def _create_missing_payment_products(self, *, merchant: PaymentMerchant) -> None:
+    def _create_payment_products_for_missing_sales_items(self, *, merchant: PaymentMerchant) -> None:
         today = local_date()
         rows = list(self.reservation_unit.reservation_unit_pricing_groups.order_by("begins"))
         past_or_active_rows = [row for row in rows if row.begins <= today]

@@ -354,7 +354,11 @@ def refresh_reservation_unit_payment_products_task(reservation_unit_pk: int) -> 
         )
         return
 
-    reservation_unit.actions.refresh_payment_products()
+    if settings.UPDATE_PRODUCT_MAPPING:
+        reservation_unit.actions.create_missing_payment_products()
+
+    if settings.UPDATE_ACCOUNTING:
+        reservation_unit.actions.send_payment_product_accounting()
 
 
 # TODO: Remove in the release after the one that adds 'refresh_reservation_unit_payment_products'.

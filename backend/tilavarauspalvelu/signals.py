@@ -127,7 +127,7 @@ def _reservation_unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Res
     created: bool = kwargs["created"]
     using = kwargs["using"]
 
-    if settings.UPDATE_PRODUCT_MAPPING:
+    if settings.UPDATE_PRODUCT_MAPPING or settings.UPDATE_ACCOUNTING:
         refresh_reservation_unit_payment_products_task.delay_on_commit(instance.pk)
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
@@ -158,7 +158,7 @@ def _unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Unit]]) -> None
 def _payment_accounting_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[PaymentAccounting]]) -> None:
     instance = kwargs["instance"]
 
-    if settings.UPDATE_ACCOUNTING:
+    if settings.UPDATE_PRODUCT_MAPPING or settings.UPDATE_ACCOUNTING:
         reservation_units_from_units = ReservationUnit.objects.filter(unit__in=instance.units.all())
         reservation_units = reservation_units_from_units.union(instance.reservation_units.all())
         for reservation_unit in reservation_units:
@@ -169,7 +169,7 @@ def _payment_accounting_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[P
 def _sales_item_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[SalesItem]]) -> None:
     instance = kwargs["instance"]
 
-    if settings.UPDATE_ACCOUNTING:
+    if settings.UPDATE_PRODUCT_MAPPING or settings.UPDATE_ACCOUNTING:
         reservation_unit_pks = (
             PaymentProduct.objects
             .filter(sales_item=instance)
@@ -188,7 +188,7 @@ def _reservation_unit_pricing_group_post_save(
 ) -> None:
     instance = kwargs["instance"]
 
-    if settings.UPDATE_ACCOUNTING:
+    if settings.UPDATE_PRODUCT_MAPPING or settings.UPDATE_ACCOUNTING:
         refresh_reservation_unit_payment_products_task.delay_on_commit(instance.reservation_unit_id)
 
 
@@ -202,7 +202,7 @@ def _reservation_unit_pricing_group_post_delete(
 ) -> None:
     instance = kwargs["instance"]
 
-    if settings.UPDATE_ACCOUNTING:
+    if settings.UPDATE_PRODUCT_MAPPING or settings.UPDATE_ACCOUNTING:
         refresh_reservation_unit_payment_products_task.delay_on_commit(instance.reservation_unit_id)
 
 
