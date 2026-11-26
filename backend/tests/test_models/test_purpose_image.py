@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from io import BytesIO
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
@@ -10,6 +11,9 @@ from PIL import Image
 
 from tilavarauspalvelu.models import IntendedUse
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -18,7 +22,7 @@ pytestmark = [
 
 @mock.patch("tilavarauspalvelu.signals.purge_image_cache_task.delay")
 @override_settings()
-def test_purpose__image_purge_on_save(mock_purge_image_cache, settings):
+def test_purpose__image_purge_on_save(mock_purge_image_cache: mock.MagicMock, settings: Settings) -> None:
     mock_image_data = BytesIO()
     mock_image = Image.new("RGB", (100, 100))
     mock_image.save(fp=mock_image_data, format="PNG")

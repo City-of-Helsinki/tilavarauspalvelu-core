@@ -14,27 +14,27 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_state_helper__get_state_with_published():
+def test_reservation_unit_state_helper__get_state_with_published() -> None:
     reservation_unit = ReservationUnitFactory.create(is_archived=False, is_draft=False)
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.PUBLISHED
 
 
-def test_reservation_unit_state_helper__get_state_with_archived():
+def test_reservation_unit_state_helper__get_state_with_archived() -> None:
     reservation_unit = ReservationUnitFactory.create(is_archived=True, is_draft=False)
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.ARCHIVED
 
 
-def test_reservation_unit_state_helper__get_state_with_archived_and_draft():
+def test_reservation_unit_state_helper__get_state_with_archived_and_draft() -> None:
     reservation_unit = ReservationUnitFactory.create(is_archived=True, is_draft=True)
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.ARCHIVED
 
 
-def test_reservation_unit_state_helper__get_state_with_draft():
+def test_reservation_unit_state_helper__get_state_with_draft() -> None:
     reservation_unit = ReservationUnitFactory.create(is_archived=False, is_draft=True)
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.DRAFT
 
 
-def test_reservation_unit_state_helper__get_state_with_scheduled_publishing_and_publish_begins():
+def test_reservation_unit_state_helper__get_state_with_scheduled_publishing_and_publish_begins() -> None:
     now = datetime.datetime.now(tz=datetime.UTC)
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
@@ -44,7 +44,7 @@ def test_reservation_unit_state_helper__get_state_with_scheduled_publishing_and_
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.SCHEDULED_PUBLISHING
 
 
-def test_reservation_unit_state_helper__get_state_with_scheduled_publishing_when_ends_in_past_begins_future():
+def test_reservation_unit_state_helper__get_state_with_scheduled_publishing_when_ends_in_past_begins_future() -> None:
     now = datetime.datetime.now(tz=datetime.UTC)
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
@@ -55,7 +55,7 @@ def test_reservation_unit_state_helper__get_state_with_scheduled_publishing_when
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.SCHEDULED_PUBLISHING
 
 
-def test_reservation_unit_state_helper__get_state_with_hidden():
+def test_reservation_unit_state_helper__get_state_with_hidden() -> None:
     now = datetime.datetime.now(tz=datetime.UTC)
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
@@ -66,7 +66,7 @@ def test_reservation_unit_state_helper__get_state_with_hidden():
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.HIDDEN
 
 
-def test_reservation_unit_state_helper__get_state_with_scheduled_hiding():
+def test_reservation_unit_state_helper__get_state_with_scheduled_hiding() -> None:
     now = datetime.datetime.now(tz=datetime.UTC)
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
@@ -77,7 +77,7 @@ def test_reservation_unit_state_helper__get_state_with_scheduled_hiding():
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.SCHEDULED_HIDING
 
 
-def test_reservation_unit_state_helper__get_state_with_scheduled_period():
+def test_reservation_unit_state_helper__get_state_with_scheduled_period() -> None:
     now = datetime.datetime.now(tz=datetime.UTC)
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,
@@ -88,7 +88,7 @@ def test_reservation_unit_state_helper__get_state_with_scheduled_period():
     assert reservation_unit.publishing_state == ReservationUnitPublishingState.SCHEDULED_PERIOD
 
 
-def test_reservation_unit_state_helper__state_is_hidden_when_publish_end_and_begins_in_the_past_and_the_same():
+def test_reservation_unit_state_helper__state_is_hidden_when_publish_end_and_begins_in_the_past_and_the_same() -> None:
     now = datetime.datetime.now(tz=datetime.UTC)
     reservation_unit = ReservationUnitFactory.create(
         is_archived=False,

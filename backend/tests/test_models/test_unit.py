@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from unittest.mock import NonCallableMock
 
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
+
 pytestmark = [
     pytest.mark.django_db,
 ]
@@ -36,8 +38,8 @@ def mock_refresh_reservation_unit_product_mapping_task() -> Generator[NonCallabl
 
 
 def test_unit__save__payment_merchant_changed__refreshes_reservation_units_without_own_merchant(
-    settings, django_capture_on_commit_callbacks
-):
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit, payment_merchant=None)
     ReservationUnitFactory.create(unit=unit, payment_merchant=PaymentMerchantFactory.create())
@@ -56,8 +58,8 @@ def test_unit__save__payment_merchant_changed__refreshes_reservation_units_witho
 
 
 def test_unit__save__payment_merchant_not_changed__does_not_refresh_reservation_units(
-    settings, django_capture_on_commit_callbacks
-):
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     unit = UnitFactory.create(payment_merchant=PaymentMerchantFactory.create())
     ReservationUnitFactory.create(unit=unit, payment_merchant=None)
 
@@ -74,8 +76,8 @@ def test_unit__save__payment_merchant_not_changed__does_not_refresh_reservation_
 
 
 def test_unit__save__product_mapping_updates_turned_off__does_not_refresh_reservation_units(
-    settings, django_capture_on_commit_callbacks
-):
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     unit = UnitFactory.create()
     ReservationUnitFactory.create(unit=unit, payment_merchant=None)
 

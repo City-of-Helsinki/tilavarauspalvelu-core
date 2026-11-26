@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -16,7 +17,10 @@ from tilavarauspalvelu.models import PaymentOrder, Reservation
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentOrderFactory, ReservationFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
 
 # Applied to all tests
 pytestmark = [
@@ -27,7 +31,7 @@ pytestmark = [
 # ── Price validation ──
 
 
-def test_order_price_net_fails_when_less_than_0_01():
+def test_order_price_net_fails_when_less_than_0_01() -> None:
     with pytest.raises(ValidationError) as error:
         PaymentOrderFactory.create(
             price_net=Decimal("0.0"),
@@ -38,7 +42,7 @@ def test_order_price_net_fails_when_less_than_0_01():
     assert error.value.message_dict == {"price_net": ["Must be greater than 0.01"]}
 
 
-def test_order_price_vat_fails_when_less_than_0():
+def test_order_price_vat_fails_when_less_than_0() -> None:
     with pytest.raises(ValidationError) as error:
         PaymentOrderFactory.create(
             price_net=Decimal("0.1"),
@@ -49,7 +53,7 @@ def test_order_price_vat_fails_when_less_than_0():
     assert error.value.message_dict == {"price_vat": ["Must be greater than 0"]}
 
 
-def test_order_price_total_fails_when_sum_is_not_correct():
+def test_order_price_total_fails_when_sum_is_not_correct() -> None:
     with pytest.raises(ValidationError) as error:
         PaymentOrderFactory.create(
             price_net=Decimal("0.1"),
@@ -64,12 +68,12 @@ def test_order_price_total_fails_when_sum_is_not_correct():
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
-def test_refresh_order_status_from_webshop__keeps_draft_if_no_payment_and_order_has_not_expired():
+def test_refresh_order_status_from_webshop__keeps_draft_if_no_payment_and_order_has_not_expired() -> None:
     payment_order = PaymentOrderFactory.create(status=OrderStatus.DRAFT, remote_id=uuid.uuid4())
 
     payment_order.actions.refresh_order_status_from_webshop()
 
-    assert VerkkokauppaAPIClient.get_payment.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.get_payment).call_count == 1
 
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.DRAFT
@@ -81,7 +85,7 @@ def test_refresh_order_status_from_webshop__keeps_draft_if_no_payment_and_order_
 
 @patch_method(EmailService.send_reservation_created_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_complete_payment__does_nothing_if_reservation_is_already_confirmed():
+def test_complete_payment__does_nothing_if_reservation_is_already_confirmed() -> None:
     reservation = ReservationFactory.create(state=ReservationStateChoice.CONFIRMED)
     payment_order = PaymentOrderFactory.create(reservation=reservation, status=OrderStatus.PAID)
 
@@ -90,20 +94,20 @@ def test_complete_payment__does_nothing_if_reservation_is_already_confirmed():
     reservation = Reservation.objects.get(pk=reservation.pk)
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    assert EmailService.send_reservation_created_email.call_count == 0
-    assert EmailService.send_reservation_created_staff_notification_email.call_count == 0
+    assert as_mock(EmailService.send_reservation_created_email).call_count == 0
+    assert as_mock(EmailService.send_reservation_created_staff_notification_email).call_count == 0
 
 
 # ── Cancel together with verkkokauppa ──
 
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-def test_cancel_together_with_verkkokauppa__does_nothing_if_status_cannot_be_cancelled():
+def test_cancel_together_with_verkkokauppa__does_nothing_if_status_cannot_be_cancelled() -> None:
     payment_order = PaymentOrderFactory.create(status=OrderStatus.PAID, remote_id=uuid.uuid4())
 
     payment_order.actions.cancel_together_with_verkkokauppa()
 
-    assert VerkkokauppaAPIClient.cancel_order.call_count == 0
+    assert as_mock(VerkkokauppaAPIClient.cancel_order).call_count == 0
 
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.PAID
@@ -112,7 +116,7 @@ def test_cancel_together_with_verkkokauppa__does_nothing_if_status_cannot_be_can
 
 @patch_method(VerkkokauppaAPIClient.cancel_order, return_value=None)
 @patch_method(SentryLogger.log_message)
-def test_cancel_together_with_verkkokauppa__does_not_cancel_if_order_is_not_found_from_verkkokauppa():
+def test_cancel_together_with_verkkokauppa__does_not_cancel_if_order_is_not_found_from_verkkokauppa() -> None:
     payment_order = PaymentOrderFactory.create(
         status=OrderStatus.DRAFT,
         remote_id=uuid.uuid4(),
@@ -121,8 +125,8 @@ def test_cancel_together_with_verkkokauppa__does_not_cancel_if_order_is_not_foun
 
     payment_order.actions.cancel_together_with_verkkokauppa()
 
-    assert VerkkokauppaAPIClient.cancel_order.call_count == 1
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.cancel_order).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.DRAFT
@@ -131,7 +135,7 @@ def test_cancel_together_with_verkkokauppa__does_not_cancel_if_order_is_not_foun
 
 @patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_message)
-def test_cancel_together_with_verkkokauppa__no_user_uuid__raises_error():
+def test_cancel_together_with_verkkokauppa__no_user_uuid__raises_error() -> None:
     payment_order = PaymentOrderFactory.create(
         status=OrderStatus.DRAFT,
         remote_id=uuid.uuid4(),
@@ -141,8 +145,8 @@ def test_cancel_together_with_verkkokauppa__no_user_uuid__raises_error():
     with pytest.raises(CancelOrderError):
         payment_order.actions.cancel_together_with_verkkokauppa()
 
-    assert VerkkokauppaAPIClient.request.call_count == 0
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.request).call_count == 0
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.DRAFT
@@ -151,7 +155,7 @@ def test_cancel_together_with_verkkokauppa__no_user_uuid__raises_error():
 
 @patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_message)
-def test_cancel_together_with_verkkokauppa__no_user_uuid__cancel_on_error():
+def test_cancel_together_with_verkkokauppa__no_user_uuid__cancel_on_error() -> None:
     payment_order = PaymentOrderFactory.create(
         status=OrderStatus.DRAFT,
         remote_id=uuid.uuid4(),
@@ -160,8 +164,8 @@ def test_cancel_together_with_verkkokauppa__no_user_uuid__cancel_on_error():
 
     payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
 
-    assert VerkkokauppaAPIClient.request.call_count == 0
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.request).call_count == 0
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.CANCELLED
@@ -172,12 +176,12 @@ def test_cancel_together_with_verkkokauppa__no_user_uuid__cancel_on_error():
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
-def test_issue_refund_in_verkkokauppa__does_nothing_if_status_cannot_be_refunded():
+def test_issue_refund_in_verkkokauppa__does_nothing_if_status_cannot_be_refunded() -> None:
     payment_order = PaymentOrderFactory.create(status=OrderStatus.DRAFT, remote_id=uuid.uuid4())
 
     payment_order.actions.issue_refund_in_verkkokauppa()
 
-    assert VerkkokauppaAPIClient.refund_order.call_count == 0
+    assert as_mock(VerkkokauppaAPIClient.refund_order).call_count == 0
 
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.DRAFT
@@ -185,12 +189,12 @@ def test_issue_refund_in_verkkokauppa__does_nothing_if_status_cannot_be_refunded
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
-def test_issue_refund_in_verkkokauppa__does_nothing_if_order_is_not_in_verkkokauppa():
+def test_issue_refund_in_verkkokauppa__does_nothing_if_order_is_not_in_verkkokauppa() -> None:
     payment_order = PaymentOrderFactory.create(status=OrderStatus.PAID, remote_id=None)
 
     payment_order.actions.issue_refund_in_verkkokauppa()
 
-    assert VerkkokauppaAPIClient.refund_order.call_count == 0
+    assert as_mock(VerkkokauppaAPIClient.refund_order).call_count == 0
 
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.PAID
@@ -199,13 +203,13 @@ def test_issue_refund_in_verkkokauppa__does_nothing_if_order_is_not_in_verkkokau
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_issue_refund_in_verkkokauppa__marks_refunded_when_verkkokauppa_is_mocked(settings):
+def test_issue_refund_in_verkkokauppa__marks_refunded_when_verkkokauppa_is_mocked(settings: Settings) -> None:
     settings.MOCK_VERKKOKAUPPA_API_ENABLED = True
     payment_order = PaymentOrderFactory.create(status=OrderStatus.PAID, remote_id=uuid.uuid4())
 
     payment_order.actions.issue_refund_in_verkkokauppa()
 
-    assert VerkkokauppaAPIClient.refund_order.call_count == 0
+    assert as_mock(VerkkokauppaAPIClient.refund_order).call_count == 0
 
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.REFUNDED

@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 from tests.factories import ReservationUnitFactory, ResourceFactory, SpaceFactory
+
+if TYPE_CHECKING:
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,9 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_hierarchy__refreshed_after_commit(settings, django_capture_on_commit_callbacks):
+def test_reservation_unit_hierarchy__refreshed_after_commit(
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_RESERVATION_UNIT_HIERARCHY = True
 
     with django_capture_on_commit_callbacks(execute=True):
@@ -23,7 +30,9 @@ def test_reservation_unit_hierarchy__refreshed_after_commit(settings, django_cap
     assert ReservationUnitHierarchy.objects.filter(reservation_unit=reservation_unit).exists() is True
 
 
-def test_reservation_unit_hierarchy__shared_resource_added(settings, django_capture_on_commit_callbacks):
+def test_reservation_unit_hierarchy__shared_resource_added(
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_RESERVATION_UNIT_HIERARCHY = True
 
     resource = ResourceFactory.create()
@@ -37,7 +46,9 @@ def test_reservation_unit_hierarchy__shared_resource_added(settings, django_capt
     assert sorted(hierarchy.related_reservation_unit_ids) == sorted([reservation_unit_1.pk, reservation_unit_2.pk])
 
 
-def test_reservation_unit_hierarchy__shared_space_deleted(settings, django_capture_on_commit_callbacks):
+def test_reservation_unit_hierarchy__shared_space_deleted(
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_RESERVATION_UNIT_HIERARCHY = True
 
     space = SpaceFactory.create()
@@ -55,7 +66,9 @@ def test_reservation_unit_hierarchy__shared_space_deleted(settings, django_captu
     assert hierarchy.related_reservation_unit_ids == [reservation_unit_1.pk]
 
 
-def test_reservation_unit_hierarchy__reservation_unit_deleted(settings, django_capture_on_commit_callbacks):
+def test_reservation_unit_hierarchy__reservation_unit_deleted(
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_RESERVATION_UNIT_HIERARCHY = True
 
     space = SpaceFactory.create()

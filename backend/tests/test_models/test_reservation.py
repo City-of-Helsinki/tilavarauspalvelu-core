@@ -148,7 +148,7 @@ class Params(NamedTuple):
         ),
     })
 )
-def test_reservation__reservee_name(fields: dict[str, Any], result: str):
+def test_reservation__reservee_name(fields: dict[str, Any], result: str) -> None:
     fields.setdefault("type", None)
     fields.setdefault("reservee_type", None)
     fields.setdefault("reservee_organisation_name", "")
@@ -162,7 +162,7 @@ def test_reservation__reservee_name(fields: dict[str, Any], result: str):
     assert reservation.reservee_name == result
 
 
-def test_reservation__access_code_should_be_active():
+def test_reservation__access_code_should_be_active() -> None:
     reservation = ReservationFactory.build(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -171,7 +171,7 @@ def test_reservation__access_code_should_be_active():
     assert reservation.access_code_should_be_active is True
 
 
-def test_reservation__access_code_should_be_active__not_access_code():
+def test_reservation__access_code_should_be_active__not_access_code() -> None:
     reservation = ReservationFactory.build(
         access_type=AccessType.UNRESTRICTED,
         state=ReservationStateChoice.CONFIRMED,
@@ -180,7 +180,7 @@ def test_reservation__access_code_should_be_active__not_access_code():
     assert reservation.access_code_should_be_active is False
 
 
-def test_reservation__access_code_should_be_active__blocked():
+def test_reservation__access_code_should_be_active__blocked() -> None:
     reservation = ReservationFactory.build(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -189,7 +189,7 @@ def test_reservation__access_code_should_be_active__blocked():
     assert reservation.access_code_should_be_active is False
 
 
-def test_reservation__access_code_should_be_active__not_confirmed():
+def test_reservation__access_code_should_be_active__not_confirmed() -> None:
     reservation = ReservationFactory.build(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CREATED,
@@ -198,7 +198,7 @@ def test_reservation__access_code_should_be_active__not_confirmed():
     assert reservation.access_code_should_be_active is False
 
 
-def test_reservation__is_access_code_is_active_correct__active_when_should_be():
+def test_reservation__is_access_code_is_active_correct__active_when_should_be() -> None:
     reservation = ReservationFactory.build(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -208,7 +208,7 @@ def test_reservation__is_access_code_is_active_correct__active_when_should_be():
     assert reservation.is_access_code_is_active_correct is True
 
 
-def test_reservation__is_access_code_is_active_correct__active_when_should_not_be():
+def test_reservation__is_access_code_is_active_correct__active_when_should_not_be() -> None:
     reservation = ReservationFactory.build(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -218,7 +218,7 @@ def test_reservation__is_access_code_is_active_correct__active_when_should_not_b
     assert reservation.is_access_code_is_active_correct is False
 
 
-def test_reservation__is_access_code_is_active_correct__inactive_when_should_not_be():
+def test_reservation__is_access_code_is_active_correct__inactive_when_should_not_be() -> None:
     reservation = ReservationFactory.build(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -228,7 +228,7 @@ def test_reservation__is_access_code_is_active_correct__inactive_when_should_not
     assert reservation.is_access_code_is_active_correct is False
 
 
-def test_reservation__is_access_code_is_active_correct__inactive_when_should_be():
+def test_reservation__is_access_code_is_active_correct__inactive_when_should_be() -> None:
     reservation = ReservationFactory.build(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -238,7 +238,7 @@ def test_reservation__is_access_code_is_active_correct__inactive_when_should_be(
     assert reservation.is_access_code_is_active_correct is True
 
 
-def test_reservation__reservation_form__contact_info_form():
+def test_reservation__reservation_form__contact_info_form() -> None:
     reservation = ReservationFactory.build(
         reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value
     )
@@ -252,7 +252,7 @@ def test_reservation__reservation_form__contact_info_form():
 
 
 @pytest.mark.parametrize("reservee_type", [ReserveeType.INDIVIDUAL, ReserveeType.COMPANY, ReserveeType.NONPROFIT])
-def test_reservation__reservation_form__reservee_info_form(reservee_type):
+def test_reservation__reservation_form__reservee_info_form(reservee_type: ReserveeType) -> None:
     reservation = ReservationFactory.build(
         reservation_unit__reservation_form=ReservationFormType.RESERVEE_INFO_FORM.value
     )
@@ -273,7 +273,7 @@ def test_reservation__reservation_form__reservee_info_form(reservee_type):
 
 
 @pytest.mark.parametrize("reservee_type", [ReserveeType.INDIVIDUAL, ReserveeType.COMPANY, ReserveeType.NONPROFIT])
-def test_reservation__reservation_form__purpose_form(reservee_type):
+def test_reservation__reservation_form__purpose_form(reservee_type: ReserveeType) -> None:
     reservation = ReservationFactory.build(reservation_unit__reservation_form=ReservationFormType.PURPOSE_FORM.value)
     required_fields = {
         "reservee_first_name",
@@ -295,7 +295,7 @@ def test_reservation__reservation_form__purpose_form(reservee_type):
 
 
 @pytest.mark.parametrize("reservee_type", [ReserveeType.INDIVIDUAL, ReserveeType.COMPANY, ReserveeType.NONPROFIT])
-def test_reservation__reservation_form__age_group_form(reservee_type):
+def test_reservation__reservation_form__age_group_form(reservee_type: ReserveeType) -> None:
     reservation = ReservationFactory.build(reservation_unit__reservation_form=ReservationFormType.AGE_GROUP_FORM.value)
     required_fields = {
         "reservee_first_name",
@@ -317,7 +317,7 @@ def test_reservation__reservation_form__age_group_form(reservee_type):
     assert set(reservation.actions.get_required_fields(reservee_type=reservee_type)) == required_fields
 
 
-def test_reservation__reservation_form__reservee_type_from_reservation():
+def test_reservation__reservation_form__reservee_type_from_reservation() -> None:
     reservation = ReservationFactory.build(
         reservee_type=ReserveeType.COMPANY,
         reservation_unit__reservation_form=ReservationFormType.RESERVEE_INFO_FORM.value,
@@ -338,7 +338,7 @@ def test_reservation__reservation_form__reservee_type_from_reservation():
 # ── Email reservee name ──
 
 
-def test_reservation__email_reservee_name__individual():
+def test_reservation__email_reservee_name__individual() -> None:
     reservation = ReservationFactory.build(
         reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="John",
@@ -349,7 +349,7 @@ def test_reservation__email_reservee_name__individual():
 
 
 @pytest.mark.parametrize("reservee_type", [ReserveeType.COMPANY, ReserveeType.NONPROFIT])
-def test_reservation__email_reservee_name__organisation(reservee_type):
+def test_reservation__email_reservee_name__organisation(reservee_type: ReserveeType) -> None:
     reservation = ReservationFactory.build(
         reservee_type=reservee_type,
         reservee_first_name="John",
@@ -363,7 +363,7 @@ def test_reservation__email_reservee_name__organisation(reservee_type):
 
 
 @pytest.mark.django_db
-def test_reservation__totals__from_price_lines():
+def test_reservation__totals__from_price_lines() -> None:
     reservation = ReservationFactory.create()
     ReservationPriceLineFactory.create(
         reservation=reservation,
@@ -393,7 +393,7 @@ def test_reservation__totals__from_price_lines():
 
 
 @pytest.mark.django_db
-def test_reservation__totals__no_price_lines():
+def test_reservation__totals__no_price_lines() -> None:
     reservation = ReservationFactory.create()
 
     expected = (Decimal("0.00"), Decimal("0.00"), Decimal("0.00"))
@@ -409,7 +409,7 @@ def test_reservation__totals__no_price_lines():
 
 
 @pytest.mark.django_db
-def test_reservation__totals__filter():
+def test_reservation__totals__filter() -> None:
     reservation = ReservationFactory.create(price_lines__amount=Decimal(10), price_lines__override_amount=Decimal(0))
     ReservationFactory.create(price_lines__amount=Decimal(10))
 
@@ -420,7 +420,7 @@ def test_reservation__totals__filter():
 # ── Payment order creation ──
 
 
-def test_reservation__create_payment_order_paid_online__on_site_payment_type():
+def test_reservation__create_payment_order_paid_online__on_site_payment_type() -> None:
     reservation = ReservationFactory.build()
 
     with pytest.raises(ValidationError) as error:
@@ -429,7 +429,7 @@ def test_reservation__create_payment_order_paid_online__on_site_payment_type():
     assert error.value.detail == [f"Payment type {PaymentType.ON_SITE!r} cannot be paid online"]
 
 
-def test_reservation__create_payment_order_pending_after_handling__on_site_payment_type():
+def test_reservation__create_payment_order_pending_after_handling__on_site_payment_type() -> None:
     reservation = ReservationFactory.build()
 
     with pytest.raises(ValidationError) as error:

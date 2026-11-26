@@ -19,7 +19,7 @@ pytestmark = [
 # ── Amount ──
 
 
-def test_price_component__amount_cannot_be_negative():
+def test_price_component__amount_cannot_be_negative() -> None:
     with pytest.raises(IntegrityError) as error:
         PriceComponentFactory.create(amount=Decimal(-1))
 
@@ -29,14 +29,14 @@ def test_price_component__amount_cannot_be_negative():
 # ── Discount ──
 
 
-def test_price_component__free_component_cannot_allow_discount():
+def test_price_component__free_component_cannot_allow_discount() -> None:
     with pytest.raises(IntegrityError) as error:
         PriceComponentFactory.create_free(can_apply_for_discount=True)
 
     assert "price_component_base_discount_only_when_paid" in str(error.value)
 
 
-def test_price_component__paid_component_can_allow_discount():
+def test_price_component__paid_component_can_allow_discount() -> None:
     component = PriceComponentFactory.create(amount=Decimal(10), can_apply_for_discount=True)
 
     component = PriceComponent.objects.get(pk=component.pk)
@@ -53,14 +53,14 @@ def test_price_component__paid_component_can_allow_discount():
         datetime.date(2025, 12, 31),
     ],
 )
-def test_price_component__valid_until_must_be_after_valid_from(valid_until):
+def test_price_component__valid_until_must_be_after_valid_from(valid_until: datetime.date) -> None:
     with pytest.raises(IntegrityError) as error:
         PriceComponentFactory.create(valid_from=datetime.date(2026, 1, 1), valid_until=valid_until)
 
     assert "price_component_valid_from_before_valid_until" in str(error.value)
 
 
-def test_price_component__valid_until_can_be_empty():
+def test_price_component__valid_until_can_be_empty() -> None:
     component = PriceComponentFactory.create(valid_from=datetime.date(2026, 1, 1), valid_until=None)
 
     component = PriceComponent.objects.get(pk=component.pk)

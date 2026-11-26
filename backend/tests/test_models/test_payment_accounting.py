@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from unittest.mock import NonCallableMock
 
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -32,8 +34,8 @@ def mock_refresh_reservation_unit_accounting_task() -> Generator[NonCallableMock
 
 
 def test_payment_accounting__webshop_sync_is_not_triggered_when_accounting_is_not_used(
-    settings, django_capture_on_commit_callbacks
-):
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_ACCOUNTING = True
 
     with (
@@ -45,7 +47,9 @@ def test_payment_accounting__webshop_sync_is_not_triggered_when_accounting_is_no
     assert mock.call_count == 0
 
 
-def test_payment_accounting__webshop_sync_trigger_reservation_units(settings, django_capture_on_commit_callbacks):
+def test_payment_accounting__webshop_sync_trigger_reservation_units(
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_ACCOUNTING = True
 
     with (
@@ -70,8 +74,8 @@ def test_payment_accounting__webshop_sync_trigger_reservation_units(settings, dj
 
 
 def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
-    settings, django_capture_on_commit_callbacks
-):
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_ACCOUNTING = True
 
     with (
@@ -96,8 +100,8 @@ def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
 
 
 def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(
-    settings, django_capture_on_commit_callbacks
-):
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_ACCOUNTING = True
 
     with (
@@ -122,7 +126,9 @@ def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(
     assert sorted(call.args[0] for call in mock.call_args_list) == [reservation_unit_1.pk, reservation_unit_2.pk]
 
 
-def test_payment_accounting__webshop_sync_waits_for_commit(settings, django_capture_on_commit_callbacks):
+def test_payment_accounting__webshop_sync_waits_for_commit(
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.UPDATE_ACCOUNTING = True
 
     payment_accounting = PaymentAccountingFactory.create()
@@ -142,7 +148,7 @@ def test_payment_accounting__webshop_sync_waits_for_commit(settings, django_capt
     assert mock.call_args.args == (reservation_unit.pk,)
 
 
-def test_payment_accounting__one_of_the_fields_is_required(settings):
+def test_payment_accounting__one_of_the_fields_is_required(settings: Settings) -> None:
     settings.UPDATE_ACCOUNTING = True
 
     with pytest.raises(IntegrityError) as error:
@@ -164,7 +170,7 @@ def test_payment_accounting__one_of_the_fields_is_required(settings):
         "product_invoicing_order_type",
     ],
 )
-def test_payment_accounting__product_invoicing_fields_are_required_together(settings, field):
+def test_payment_accounting__product_invoicing_fields_are_required_together(settings: Settings, field: str) -> None:
     settings.UPDATE_ACCOUNTING = True
 
     kwargs: dict[str, Any] = {

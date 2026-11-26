@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import Space
 
 from tests.factories import SpaceFactory, UnitFactory
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
 
 pytestmark = [
     pytest.mark.django_db,
@@ -14,7 +19,7 @@ pytestmark = [
 # ── Space tree ──
 
 
-def test_space__save__rebuilds_space_tree(settings):
+def test_space__save__rebuilds_space_tree(settings: Settings) -> None:
     settings.REBUILD_SPACE_HIERARCHY = True
 
     unit = UnitFactory.create()
@@ -29,7 +34,7 @@ def test_space__save__rebuilds_space_tree(settings):
     assert list(parent.get_descendants()) == [child]
 
 
-def test_space__delete__children_of_deleted_space_leave_the_tree(settings):
+def test_space__delete__children_of_deleted_space_leave_the_tree(settings: Settings) -> None:
     settings.REBUILD_SPACE_HIERARCHY = True
 
     unit = UnitFactory.create()
