@@ -1,4 +1,5 @@
 import type { Response } from "@playwright/test";
+import { pricePattern } from "../../../lib/locators";
 import { graphqlErrorsIn } from "../../../lib/responses";
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
@@ -204,14 +205,14 @@ export class QuickReservation extends PageObject {
     await expect(reservationtime).toHaveText(time_of_quick_reservation_slot, { useInnerText: true });
   }
 
-  /** Checks the info card's price. It can render in steps ("0 - 40,00 €" before "40,00 €"), so the check retries. */
+  /** Checks the info card's price. It can render in steps ("0–40 €" before "40,00 €"), so the check retries. */
   @step("quick_reservation.Check The Price Of Quick Reservation")
   async checkThePriceOfQuickReservation(price_with_text: string) {
-    // expect retries until the price matches. It normalizes whitespace, non-breaking spaces included.
-    await expect(this.page.getByTestId("reservation__reservation-info-card__price")).toHaveText(price_with_text, {
-      useInnerText: true,
-      timeout: CONTENT_WAIT_TIMEOUT,
-    });
+    // expect retries until the price matches. pricePattern leaves out spaces, dash styles and ",00" decimals.
+    await expect(
+      this.page.getByTestId("reservation__reservation-info-card__price"),
+      `The price is ${price_with_text}`
+    ).toHaveText(pricePattern(price_with_text), { useInnerText: true, timeout: CONTENT_WAIT_TIMEOUT });
   }
 
   /** Reads the booking number from the info card and returns it, e.g. 59923. */

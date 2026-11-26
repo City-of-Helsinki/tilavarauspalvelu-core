@@ -13,7 +13,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { describeAppVersions, readAppVersions } from "../lib/app-versions-reporter";
 import { BackendErrors } from "../lib/backend-errors";
 import { readEnv } from "../lib/env";
-import { reachesState } from "../lib/locators";
+import { pricePattern, reachesState } from "../lib/locators";
 import { SHARED_BASE, acquireLock, releaseLock, resetSharedState, sharedDir } from "../lib/locks";
 import { graphqlErrorsIn } from "../lib/responses";
 import { retry } from "../lib/retry";
@@ -315,6 +315,44 @@ test.describe("Runtime", () => {
     expect(slotsToPickFrom(["23:15", "23:30", "23:45"], date, timeOn12Nov(23, 10), 60)).toEqual([]);
     // A 30 min booking can start later: 23:15 ends at 23:45
     expect(slotsToPickFrom(["23:15", "23:30", "23:45"], date, timeOn12Nov(23, 10), 30)).toEqual([0]);
+  });
+
+  test("A price is checked by its amounts, tax and words, not by its spaces, dashes or ,00 decimals", () => {
+    const nbsp = " ";
+    const range = "Hinta: 0–30 € (sis. alv 25,5 %)";
+    const paid = "Hinta: 40,00 € (sis. alv 25,5 %)";
+    // The price as the app shows it, as it showed it before, and with other spaces or decimals
+    const same: Array<[string, string]> = [
+      [range, `Hinta: 0–30${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [range, "Hinta: 0 - 30,00 € (sis. alv 25,5%)"],
+      [range, `Hinta: 0 – 30${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [range, `Hinta: 0,00–30,00${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      ["Hinta: 0 - 30,00 € (sis. alv 25,5%)", `Hinta: 0–30${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [paid, `Hinta: 40,00${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [paid, "Hinta: 40,00 € (sis. alv 25,5%)"],
+      ["Hinta: Maksuton", "Hinta: Maksuton"],
+      ["30,00 €, hakee subventiota", `30,00${nbsp}€, hakee subventiota`],
+    ];
+    for (const [price, shown] of same) {
+      expect(pricePattern(price).test(shown), `${price} matches ${shown}`).toBe(true);
+    }
+    // Another amount or tax, a lost discount range, a missing tax or an extra text is another price. The info card
+    // shows a range like "0–40 €" before the final "40,00 €", so the range must not pass as that price.
+    const other: Array<[string, string]> = [
+      [range, `Hinta: 30,00${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [range, `Hinta: 0–40${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [range, `Hinta: 0–30,50${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [range, `Hinta: 0–30${nbsp}€ (sis. alv 24${nbsp}%)`],
+      [range, `Hinta: 0–30${nbsp}€`],
+      [range, `Hinta: 0–30${nbsp}€ (sis. alv 25,5${nbsp}%) + materiaalimaksu`],
+      [paid, `Hinta: 0–40${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [paid, `Hinta: 140,00${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      [paid, `Hinta: 40,50${nbsp}€ (sis. alv 25,5${nbsp}%)`],
+      ["Hinta: Maksuton", "Hinta: 0–30 €"],
+    ];
+    for (const [price, shown] of other) {
+      expect(pricePattern(price).test(shown), `${price} doesn't match ${shown}`).toBe(false);
+    }
   });
 
   test("Python keywords give the same results as python_keywords.py", () => {
