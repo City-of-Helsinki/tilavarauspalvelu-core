@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
 from django.db import connection
 from django.db.utils import OperationalError
 from rest_framework.reverse import reverse
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -15,7 +20,7 @@ pytestmark = [
 # ── Liveness ──
 
 
-def test_liveness_check__returns_status_and_version(api_client, settings):
+def test_liveness_check__returns_status_and_version(api_client: APIClient, settings: Settings) -> None:
     settings.APP_VERSION = "v1.2.3"
 
     response = api_client.get(reverse("liveness_check"))
@@ -27,7 +32,7 @@ def test_liveness_check__returns_status_and_version(api_client, settings):
 # ── Readiness ──
 
 
-def test_readiness_check__returns_status_and_version(api_client, settings):
+def test_readiness_check__returns_status_and_version(api_client: APIClient, settings: Settings) -> None:
     settings.APP_VERSION = "v1.2.3"
 
     response = api_client.get(reverse("readiness_check"))
@@ -36,7 +41,7 @@ def test_readiness_check__returns_status_and_version(api_client, settings):
     assert response.json() == {"status": "READY", "version": "v1.2.3"}
 
 
-def test_readiness_check__returns_version_when_database_is_not_ready(api_client, settings):
+def test_readiness_check__returns_version_when_database_is_not_ready(api_client: APIClient, settings: Settings) -> None:
     settings.APP_VERSION = "v1.2.3"
 
     with patch.object(connection, "ensure_connection", side_effect=OperationalError("no database")):

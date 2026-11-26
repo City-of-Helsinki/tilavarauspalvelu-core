@@ -58,9 +58,12 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from unittest.mock import NonCallableMock
 
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
+
 
 @pytest.fixture
-def clear_robot_test_data_flags(settings) -> Generator[None]:
+def clear_robot_test_data_flags(settings: Settings) -> Generator[None]:
     cache.delete(key=settings.ROBOT_TEST_DATA_RATE_LIMIT_KEY)
     try:
         yield
@@ -73,7 +76,7 @@ def clear_robot_test_data_flags(settings) -> Generator[None]:
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("clear_robot_test_data_flags")
-def test_robot_test_data_create_view(api_client, settings):
+def test_robot_test_data_create_view(api_client: APIClient, settings: Settings) -> None:
     path = reverse("robot_test_data")
 
     headers = {
@@ -89,10 +92,10 @@ def test_robot_test_data_create_view(api_client, settings):
 
 
 @pytest.mark.usefixtures("clear_robot_test_data_flags")
-def test_robot_test_data_create_view__missing_token(api_client):
+def test_robot_test_data_create_view__missing_token(api_client: APIClient) -> None:
     path = reverse("robot_test_data")
 
-    headers = {}
+    headers: dict[str, str] = {}
 
     with mock_data_generation() as mock:
         response = api_client.post(path, headers=headers)
@@ -107,7 +110,7 @@ def test_robot_test_data_create_view__missing_token(api_client):
 
 
 @pytest.mark.usefixtures("clear_robot_test_data_flags")
-def test_robot_test_data_create_view__incorrect_token(api_client):
+def test_robot_test_data_create_view__incorrect_token(api_client: APIClient) -> None:
     path = reverse("robot_test_data")
 
     headers = {
@@ -128,7 +131,7 @@ def test_robot_test_data_create_view__incorrect_token(api_client):
 
 @pytest.mark.usefixtures("clear_robot_test_data_flags")
 @freeze_time(local_datetime(2025, 1, 1, 12))
-def test_robot_test_data_create_view__rate_limit(api_client, settings):
+def test_robot_test_data_create_view__rate_limit(api_client: APIClient, settings: Settings) -> None:
     path = reverse("robot_test_data")
 
     settings.ROBOT_TEST_DATA_CREATION_RATE_LIMIT_SECONDS = 60
@@ -155,7 +158,7 @@ def test_robot_test_data_create_view__rate_limit(api_client, settings):
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("clear_robot_test_data_flags")
-def test_robot_test_data_create_view__lock(api_client, settings):
+def test_robot_test_data_create_view__lock(api_client: APIClient, settings: Settings) -> None:
     path = reverse("robot_test_data")
 
     headers = {
@@ -180,7 +183,7 @@ def test_robot_test_data_create_view__lock(api_client, settings):
 
 @pytest.mark.slow
 @pytest.mark.django_db
-def test_create_robot_test_data():
+def test_create_robot_test_data() -> None:
     create_robot_test_data_task.delay()
 
     assert Unit.objects.count() == 1
@@ -199,7 +202,7 @@ def test_create_robot_test_data():
 
 
 @pytest.mark.django_db(transaction=True)
-def test_create_robot_test_data__lock_is_held_only_during_creation(settings):
+def test_create_robot_test_data__lock_is_held_only_during_creation(settings: Settings) -> None:
     lock_held_during_creation: list[bool] = []
 
     def create_data() -> None:
@@ -213,7 +216,7 @@ def test_create_robot_test_data__lock_is_held_only_during_creation(settings):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_create_robot_test_data__lock_is_released_when_creation_fails(settings):
+def test_create_robot_test_data__lock_is_released_when_creation_fails(settings: Settings) -> None:
     with (
         patch("tilavarauspalvelu.tasks.create_robot_test_data", side_effect=SoftTimeLimitExceeded()),
         pytest.raises(SoftTimeLimitExceeded),
@@ -224,7 +227,7 @@ def test_create_robot_test_data__lock_is_released_when_creation_fails(settings):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_create_robot_test_data__skipped_when_another_session_holds_the_lock(settings):
+def test_create_robot_test_data__skipped_when_another_session_holds_the_lock(settings: Settings) -> None:
     other_connection = connections.create_connection(DEFAULT_DB_ALIAS)
     try:
         with other_connection.cursor() as cursor:
@@ -245,7 +248,7 @@ def test_create_robot_test_data__skipped_when_another_session_holds_the_lock(set
 @pytest.mark.slow
 @pytest.mark.django_db
 @freeze_time(local_datetime(2030, 1, 1, 12))
-def test_create_robot_test_data__application_round_is_open():
+def test_create_robot_test_data__application_round_is_open() -> None:
     create_robot_test_data_task.delay()
 
     application_round = ApplicationRound.objects.get(name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)")
@@ -265,7 +268,7 @@ def test_create_robot_test_data__application_round_is_open():
 
 @pytest.mark.slow
 @pytest.mark.django_db
-def test_create_robot_test_data__remove_existing_data_between_runs():
+def test_create_robot_test_data__remove_existing_data_between_runs() -> None:
     # Unit is recreated
     harakka = UnitFactory.create(name="Harakka, piilokoju", tprek_id="71677")
 
@@ -308,7 +311,7 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
 
 @pytest.mark.slow
 @pytest.mark.django_db
-def test_create_robot_test_data__users_can_exist_before_run():
+def test_create_robot_test_data__users_can_exist_before_run() -> None:
     UserFactory.create(username="u-5ubvcxgrxzdf5nj7y4sbjnvyeq")
 
     create_robot_test_data_task.delay()
@@ -318,7 +321,7 @@ def test_create_robot_test_data__users_can_exist_before_run():
 
 @pytest.mark.slow
 @pytest.mark.django_db
-def test_create_robot_test_data__users_have_the_robot_password(settings):
+def test_create_robot_test_data__users_have_the_robot_password(settings: Settings) -> None:
     create_robot_test_data_task.delay()
 
     users = list(User.objects.all())
@@ -332,7 +335,7 @@ def test_create_robot_test_data__users_have_the_robot_password(settings):
 
 @pytest.mark.slow
 @pytest.mark.django_db
-def test_create_robot_test_data__each_space_is_its_own_tree():
+def test_create_robot_test_data__each_space_is_its_own_tree() -> None:
     create_robot_test_data_task.delay()
 
     tree_fields = list(Space.objects.values_list("parent", "lft", "rght", "level"))
@@ -344,7 +347,7 @@ def test_create_robot_test_data__each_space_is_its_own_tree():
 
 @pytest.mark.slow
 @pytest.mark.django_db
-def test_create_robot_test_data__reservation_units_have_search_vectors():
+def test_create_robot_test_data__reservation_units_have_search_vectors() -> None:
     create_robot_test_data_task.delay()
 
     reservation_units = list(ReservationUnit.objects.all())
@@ -364,7 +367,7 @@ def test_create_robot_test_data__reservation_units_have_search_vectors():
 
 @pytest.mark.slow
 @pytest.mark.django_db
-def test_remove_existing_data():
+def test_remove_existing_data() -> None:
     create_robot_test_data_task.delay()
     remove_existing_data()
 

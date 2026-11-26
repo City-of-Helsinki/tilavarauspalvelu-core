@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import io
+from typing import TYPE_CHECKING
 
 import pytest
 from django.contrib.gis.geos import Point
@@ -14,6 +14,10 @@ from utils.utils import ical_hmac_signature
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
@@ -21,7 +25,7 @@ pytestmark = [
 
 @override_settings(EMAIL_VARAAMO_EXT_LINK="https://fake.varaamo.hel.fi")
 @freeze_time(local_datetime(2023, 1, 1))
-def test_reservation_ical(api_client, settings):
+def test_reservation_ical(api_client: APIClient, settings: Settings) -> None:
     user = UserFactory.create()
 
     api_client.force_authenticate(user=user)
@@ -49,7 +53,7 @@ def test_reservation_ical(api_client, settings):
 
     assert response.status_code == 200, response.content
 
-    content = io.BytesIO(b"".join(response.streaming_content)).read()
+    content = response.getvalue()
     calendar = Calendar.from_ical(content)
 
     description = (
@@ -90,15 +94,15 @@ def test_reservation_ical(api_client, settings):
 
     standard = timezone.subcomponents[0]
     assert standard.name == "STANDARD"
-    assert str(standard["DTSTART"].to_ical().decode()) == "16011028T040000"
-    assert str(standard["RRULE"].to_ical().decode()) == "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"
+    assert standard["DTSTART"].to_ical() == b"16011028T040000"
+    assert standard["RRULE"].to_ical() == b"FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"
     assert str(standard["TZOFFSETFROM"].to_ical()) == "+0300"
     assert str(standard["TZOFFSETTO"].to_ical()) == "+0200"
 
     daylight = timezone.subcomponents[1]
     assert daylight.name == "DAYLIGHT"
-    assert str(daylight["DTSTART"].to_ical().decode()) == "16010325T030000"
-    assert str(daylight["RRULE"].to_ical().decode()) == "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3"
+    assert daylight["DTSTART"].to_ical() == b"16010325T030000"
+    assert daylight["RRULE"].to_ical() == b"FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3"
     assert str(daylight["TZOFFSETFROM"].to_ical()) == "+0200"
     assert str(daylight["TZOFFSETTO"].to_ical()) == "+0300"
 
@@ -106,9 +110,9 @@ def test_reservation_ical(api_client, settings):
     assert event.name == "VEVENT"
 
     assert str(event["UID"]) == f"varaamo.reservation.{reservation.pk}@https://fake.varaamo.hel.fi"
-    assert str(event["DTSTART"].to_ical().decode()) == "20240101T120000"
-    assert str(event["DTEND"].to_ical().decode()) == "20240101T140000"
-    assert str(event["DTSTAMP"].to_ical().decode()) == "20221231T220000Z"
+    assert event["DTSTART"].to_ical() == b"20240101T120000"
+    assert event["DTEND"].to_ical() == b"20240101T140000"
+    assert event["DTSTAMP"].to_ical() == b"20221231T220000Z"
     assert str(event["SUMMARY"]) == "Reservation for Caisa"
     assert str(event["DESCRIPTION"]) == description
     assert str(event["X-ALT-DESC"]) == description
@@ -118,7 +122,7 @@ def test_reservation_ical(api_client, settings):
 
 @override_settings(EMAIL_VARAAMO_EXT_LINK="https://fake.varaamo.hel.fi")
 @pytest.mark.parametrize("language", ["sv", "en"])
-def test_reservation_ical__description_links_to_user_language(api_client, language):
+def test_reservation_ical__description_links_to_user_language(api_client: APIClient, language: str) -> None:
     user = UserFactory.create(preferred_language=language)
 
     api_client.force_authenticate(user=user)
@@ -147,7 +151,7 @@ def test_reservation_ical__description_links_to_user_language(api_client, langua
 
     assert response.status_code == 200, response.content
 
-    content = io.BytesIO(b"".join(response.streaming_content)).read()
+    content = response.getvalue()
     calendar = Calendar.from_ical(content)
 
     description = (
@@ -179,7 +183,7 @@ def test_reservation_ical__description_links_to_user_language(api_client, langua
     assert str(event["DESCRIPTION"]) == description
 
 
-def test_reservation_ical__without_hash(api_client):
+def test_reservation_ical__without_hash(api_client: APIClient) -> None:
     user = UserFactory.create()
 
     api_client.force_authenticate(user=user)
@@ -192,7 +196,7 @@ def test_reservation_ical__without_hash(api_client):
     assert response.json() == {"detail": "hash is required"}
 
 
-def test_reservation_ical__with_invalid_hash(api_client):
+def test_reservation_ical__with_invalid_hash(api_client: APIClient) -> None:
     user = UserFactory.create()
 
     api_client.force_authenticate(user=user)

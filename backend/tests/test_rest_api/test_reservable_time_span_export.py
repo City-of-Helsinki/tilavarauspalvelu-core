@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.urls import reverse
 
@@ -7,12 +9,16 @@ from utils.date_utils import local_datetime
 
 from tests.factories import ReservableTimeSpanFactory, ReservationUnitFactory, UnitFactory
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservable_time_spans_export(api_client, settings):
+def test_reservable_time_spans_export(api_client: APIClient, settings: Settings) -> None:
     reservable_time_span_1 = ReservableTimeSpanFactory.create(
         resource__id=1,
         start_datetime=local_datetime(2024, 1, 1, 12),
@@ -43,7 +49,7 @@ def test_reservable_time_spans_export(api_client, settings):
     assert data[1]["resource"] == reservable_time_span_2.resource.id
 
 
-def test_reservable_time_spans_export__missing_auth(api_client):
+def test_reservable_time_spans_export__missing_auth(api_client: APIClient) -> None:
     ReservableTimeSpanFactory.create(
         resource__id=1,
         start_datetime=local_datetime(2024, 1, 1, 12),
@@ -61,7 +67,7 @@ def test_reservable_time_spans_export__missing_auth(api_client):
     assert response.content.decode() == "Not authorized to export reservable time spans."
 
 
-def test_reservable_time_spans_export__incorrect_auth(api_client, settings):
+def test_reservable_time_spans_export__incorrect_auth(api_client: APIClient, settings: Settings) -> None:
     settings.EXPORT_AUTHORIZATION_TOKEN = "CORRECT_TOKEN"
 
     ReservableTimeSpanFactory.create(
@@ -81,7 +87,7 @@ def test_reservable_time_spans_export__incorrect_auth(api_client, settings):
     assert response.content.decode() == "Not authorized to export reservable time spans."
 
 
-def test_reservable_time_spans_export__only_one(api_client, settings):
+def test_reservable_time_spans_export__only_one(api_client: APIClient, settings: Settings) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(origin_hauki_resource__id=1)
     reservation_unit_2 = ReservationUnitFactory.create(origin_hauki_resource__id=2)
 
@@ -106,10 +112,11 @@ def test_reservable_time_spans_export__only_one(api_client, settings):
 
     data = response.json()
     assert len(data) == 1
+    assert resource_1 is not None
     assert data[0]["resource"] == resource_1.id
 
 
-def test_reservable_time_spans_export__only_two(api_client, settings):
+def test_reservable_time_spans_export__only_two(api_client: APIClient, settings: Settings) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(origin_hauki_resource__id=1)
     reservation_unit_2 = ReservationUnitFactory.create(origin_hauki_resource__id=2)
 
@@ -134,11 +141,13 @@ def test_reservable_time_spans_export__only_two(api_client, settings):
 
     data = response.json()
     assert len(data) == 2
+    assert resource_1 is not None
     assert data[0]["resource"] == resource_1.id
+    assert resource_2 is not None
     assert data[1]["resource"] == resource_2.id
 
 
-def test_reservable_time_spans_export__tprek_id(api_client, settings):
+def test_reservable_time_spans_export__tprek_id(api_client: APIClient, settings: Settings) -> None:
     unit_1 = UnitFactory.create(tprek_id="1")
     unit_2 = UnitFactory.create(tprek_id="2")
 
@@ -166,10 +175,11 @@ def test_reservable_time_spans_export__tprek_id(api_client, settings):
 
     data = response.json()
     assert len(data) == 1
+    assert resource_1 is not None
     assert data[0]["resource"] == resource_1.id
 
 
-def test_reservable_time_spans_export__hauki_resource(api_client, settings):
+def test_reservable_time_spans_export__hauki_resource(api_client: APIClient, settings: Settings) -> None:
     reservable_time_span = ReservableTimeSpanFactory.create(
         resource__id=1,
         start_datetime=local_datetime(2024, 1, 1, 12),
@@ -191,7 +201,7 @@ def test_reservable_time_spans_export__hauki_resource(api_client, settings):
     assert data[0]["resource"] == reservable_time_span.resource.id
 
 
-def test_reservable_time_spans_export__after(api_client, settings):
+def test_reservable_time_spans_export__after(api_client: APIClient, settings: Settings) -> None:
     ReservableTimeSpanFactory.create(
         resource__id=1,
         start_datetime=local_datetime(2024, 1, 1, 12),
@@ -213,7 +223,7 @@ def test_reservable_time_spans_export__after(api_client, settings):
     assert data[0]["resource"] == reservable_time_span.resource.id
 
 
-def test_reservable_time_spans_export__before(api_client, settings):
+def test_reservable_time_spans_export__before(api_client: APIClient, settings: Settings) -> None:
     reservable_time_span = ReservableTimeSpanFactory.create(
         resource__id=1,
         start_datetime=local_datetime(2024, 1, 1, 12),

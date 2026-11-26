@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import freezegun
 import pytest
 from django.urls import reverse
@@ -8,12 +10,16 @@ from utils.date_utils import local_datetime
 
 from tests.factories import ReservationUnitFactory
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit_export(api_client, settings):
+def test_reservation_unit_export(api_client: APIClient, settings: Settings) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -101,7 +107,7 @@ def test_reservation_unit_export(api_client, settings):
     assert data[1]["reservation_unit_id"] == reservation_unit_2.pk
 
 
-def test_reservation_unit_export__missing_auth(api_client):
+def test_reservation_unit_export__missing_auth(api_client: APIClient) -> None:
     ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
@@ -112,7 +118,7 @@ def test_reservation_unit_export__missing_auth(api_client):
     assert response.content.decode() == "Not authorized to export reservation units."
 
 
-def test_reservation_unit_export__incorrect_auth(api_client, settings):
+def test_reservation_unit_export__incorrect_auth(api_client: APIClient, settings: Settings) -> None:
     ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
@@ -125,7 +131,7 @@ def test_reservation_unit_export__incorrect_auth(api_client, settings):
     assert response.content.decode() == "Not authorized to export reservation units."
 
 
-def test_reservation_unit_export__only_one(api_client, settings):
+def test_reservation_unit_export__only_one(api_client: APIClient, settings: Settings) -> None:
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
@@ -139,7 +145,7 @@ def test_reservation_unit_export__only_one(api_client, settings):
     assert data[0]["reservation_unit_id"] == reservation_unit.pk
 
 
-def test_reservation_unit_export__only_two(api_client, settings):
+def test_reservation_unit_export__only_two(api_client: APIClient, settings: Settings) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -154,7 +160,7 @@ def test_reservation_unit_export__only_two(api_client, settings):
     assert data[1]["reservation_unit_id"] == reservation_unit_2.pk
 
 
-def test_reservation_unit_export__only_incorrect(api_client, settings):
+def test_reservation_unit_export__only_incorrect(api_client: APIClient, settings: Settings) -> None:
     ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
@@ -168,7 +174,7 @@ def test_reservation_unit_export__only_incorrect(api_client, settings):
     }
 
 
-def test_reservation_unit_export__tprek_id(api_client, settings):
+def test_reservation_unit_export__tprek_id(api_client: APIClient, settings: Settings) -> None:
     reservation_unit = ReservationUnitFactory.create(unit__tprek_id="1")
     ReservationUnitFactory.create(unit__tprek_id="2")
 
@@ -182,7 +188,7 @@ def test_reservation_unit_export__tprek_id(api_client, settings):
     assert data[0]["reservation_unit_id"] == reservation_unit.pk
 
 
-def test_reservation_unit_export__start(api_client, settings):
+def test_reservation_unit_export__start(api_client: APIClient, settings: Settings) -> None:
     ReservationUnitFactory.create()
     reservation_unit = ReservationUnitFactory.create()
 
@@ -196,7 +202,7 @@ def test_reservation_unit_export__start(api_client, settings):
     assert data[0]["reservation_unit_id"] == reservation_unit.pk
 
 
-def test_reservation_unit_export__stop(api_client, settings):
+def test_reservation_unit_export__stop(api_client: APIClient, settings: Settings) -> None:
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
@@ -211,7 +217,7 @@ def test_reservation_unit_export__stop(api_client, settings):
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_unit_export__updated_after(api_client, settings):
+def test_reservation_unit_export__updated_after(api_client: APIClient, settings: Settings) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     url = reverse("reservation_unit_export") + "?updated_after=2024-01-01T00:00:00+02:00"
@@ -225,7 +231,7 @@ def test_reservation_unit_export__updated_after(api_client, settings):
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_unit_export__updated_after__not_in_range(api_client, settings):
+def test_reservation_unit_export__updated_after__not_in_range(api_client: APIClient, settings: Settings) -> None:
     ReservationUnitFactory.create()
 
     url = reverse("reservation_unit_export") + "?updated_after=2024-01-02T00:00:00+02:00"
@@ -238,7 +244,7 @@ def test_reservation_unit_export__updated_after__not_in_range(api_client, settin
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_unit_export__updated_before(api_client, settings):
+def test_reservation_unit_export__updated_before(api_client: APIClient, settings: Settings) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     url = reverse("reservation_unit_export") + "?updated_before=2024-01-02T00:00:00+02:00"
@@ -252,7 +258,7 @@ def test_reservation_unit_export__updated_before(api_client, settings):
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_unit_export__updated_before__not_in_range(api_client, settings):
+def test_reservation_unit_export__updated_before__not_in_range(api_client: APIClient, settings: Settings) -> None:
     ReservationUnitFactory.create()
 
     url = reverse("reservation_unit_export") + "?updated_before=2024-01-01T00:00:00+02:00"
