@@ -11,7 +11,7 @@ from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import
 from tests.test_integrations.test_hauki.test_reservable_time_spans_client import _get_date
 
 
-def test__find_time_spans_near_period__touching_time_spans_are_skipped():
+def test__find_time_spans_near_period__touching_time_spans_are_skipped() -> None:
     ends_at_period_start = TimeSpanElement(
         start_datetime=_get_date(day=1, hour=8),
         end_datetime=_get_date(day=1, hour=10),
@@ -41,7 +41,7 @@ def test__find_time_spans_near_period__touching_time_spans_are_skipped():
     assert nearby_time_spans == [inside_period]
 
 
-def test__find_time_spans_near_period__long_buffer_reaches_past_a_later_time_span():
+def test__find_time_spans_near_period__long_buffer_reaches_past_a_later_time_span() -> None:
     earlier_day = TimeSpanElement(
         start_datetime=_get_date(day=1, hour=8),
         end_datetime=_get_date(day=1, hour=9),

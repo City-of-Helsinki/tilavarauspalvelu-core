@@ -10,7 +10,7 @@ from tests.test_integrations.test_hauki.test_reservable_time_spans_client import
 # No buffers
 
 
-def test__merge_overlapping_time_span_elements__no_buffers__ends_and_starts_at_the_same_time():
+def test__merge_overlapping_time_span_elements__no_buffers__ends_and_starts_at_the_same_time() -> None:
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -33,7 +33,7 @@ def test__merge_overlapping_time_span_elements__no_buffers__ends_and_starts_at_t
     ]
 
 
-def test__merge_overlapping_time_span_elements__no_buffers__overlapping():
+def test__merge_overlapping_time_span_elements__no_buffers__overlapping() -> None:
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -56,7 +56,7 @@ def test__merge_overlapping_time_span_elements__no_buffers__overlapping():
     ]
 
 
-def test__merge_overlapping_time_span_elements__no_buffers__fully_inside():
+def test__merge_overlapping_time_span_elements__no_buffers__fully_inside() -> None:
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=10),
@@ -79,7 +79,7 @@ def test__merge_overlapping_time_span_elements__no_buffers__fully_inside():
     ]
 
 
-def test__merge_overlapping_time_span_elements__no_buffers__not_combined():
+def test__merge_overlapping_time_span_elements__no_buffers__not_combined() -> None:
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -99,7 +99,7 @@ def test__merge_overlapping_time_span_elements__no_buffers__not_combined():
 # With buffers
 
 
-def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_same_time():
+def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_same_time() -> None:
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -128,7 +128,9 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
     ]
 
 
-def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_same_time__before_buffer_shortened():
+def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_same_time__before_buffer_shortened() -> (
+    None
+):
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -157,7 +159,9 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
     ]
 
 
-def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_same_time__after_buffer_shortened():
+def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_same_time__after_buffer_shortened() -> (
+    None
+):
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -186,7 +190,7 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
     ]
 
 
-def test__merge_overlapping_time_span_elements__buffers__overlapping():
+def test__merge_overlapping_time_span_elements__buffers__overlapping() -> None:
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -215,7 +219,9 @@ def test__merge_overlapping_time_span_elements__buffers__overlapping():
     ]
 
 
-def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reservation_in_before_buffer__no_changes():
+def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reservation_in_before_buffer__unchanged() -> (
+    None
+):
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -236,7 +242,9 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
     assert merge_overlapping_time_span_elements(time_span_elements) == time_span_elements
 
 
-def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reservation_in_after_buffer__no_changes():
+def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reservation_in_after_buffer__no_changes() -> (
+    None
+):
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -257,7 +265,9 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
     assert merge_overlapping_time_span_elements(time_span_elements) == time_span_elements
 
 
-def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reservation_in_before_buffer__shortened():
+def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reservation_in_before_buffer__shortened() -> (
+    None
+):
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -293,7 +303,9 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
     ]
 
 
-def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reservation_in_after_buffer__shortened():
+def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reservation_in_after_buffer__shortened() -> (
+    None
+):
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
@@ -329,7 +341,7 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
     ]
 
 
-def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffers_are_preserved():
+def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffers_are_preserved() -> None:
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=10),
@@ -358,7 +370,7 @@ def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffers_a
     ]
 
 
-def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffer_are_adjusted():
+def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffer_are_adjusted() -> None:
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=10),

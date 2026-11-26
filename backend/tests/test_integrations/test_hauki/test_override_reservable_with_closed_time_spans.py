@@ -12,7 +12,7 @@ from tests.test_integrations.test_hauki.test_reservable_time_spans_client import
 )
 
 
-def test__override_reservable_with_closed_time_spans__mixed_overlaps():
+def test__override_reservable_with_closed_time_spans__mixed_overlaps() -> None:
     reservable_time_spans, closed_time_spans = _get_reservable_and_closed_time_spans()
 
     normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
@@ -20,7 +20,7 @@ def test__override_reservable_with_closed_time_spans__mixed_overlaps():
     assert normalised_time_spans == _get_normalised_time_spans()
 
 
-def test__override_reservable_with_closed_time_spans__not_overlapping():
+def test__override_reservable_with_closed_time_spans__not_overlapping() -> None:
     reservable_time_spans = [
         TimeSpanElement(
             start_datetime=_get_date(day=1, hour=10),
@@ -48,7 +48,7 @@ def test__override_reservable_with_closed_time_spans__not_overlapping():
     ]
 
 
-def test__override_reservable_with_closed_time_spans__partial_overlap_same_start_or_end():
+def test__override_reservable_with_closed_time_spans__partial_overlap_same_start_or_end() -> None:
     reservable_time_spans = [
         TimeSpanElement(
             start_datetime=_get_date(day=1, hour=10),
@@ -104,7 +104,7 @@ def test__override_reservable_with_closed_time_spans__partial_overlap_same_start
     ]
 
 
-def test__override_reservable_with_closed_time_spans__full_overlap_same_start_or_end():
+def test__override_reservable_with_closed_time_spans__full_overlap_same_start_or_end() -> None:
     reservable_time_spans = [
         TimeSpanElement(
             start_datetime=_get_date(day=1, hour=10),
@@ -159,7 +159,7 @@ def test__override_reservable_with_closed_time_spans__full_overlap_same_start_or
     assert normalised_time_spans == []
 
 
-def test__override_reservable_with_closed_time_spans__reservable_split_into_many_parts():
+def test__override_reservable_with_closed_time_spans__reservable_split_into_many_parts() -> None:
     reservable_time_spans = [
         TimeSpanElement(
             start_datetime=_get_date(day=1, hour=10),
