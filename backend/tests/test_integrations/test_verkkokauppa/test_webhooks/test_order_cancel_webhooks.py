@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.urls import reverse
@@ -15,7 +16,11 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import PaymentOrderFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -52,9 +57,9 @@ def _create_mock_order(order_id: uuid.UUID, status: str = "") -> Order:
         OrderStatus.PAID_MANUALLY,
     ],
 )
-def test_order_cancel_webhook__success(api_client, settings, status):
+def test_order_cancel_webhook__success(api_client: APIClient, settings: Settings, status: OrderStatus) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id)
+    as_mock(VerkkokauppaAPIClient.get_order).return_value = _create_mock_order(order_id)
     payment_order = PaymentOrderFactory.create(
         remote_id=order_id,
         status=status,
@@ -85,9 +90,9 @@ def test_order_cancel_webhook__success(api_client, settings, status):
         OrderStatus.REFUNDED,
     ],
 )
-def test_order_cancel_webhook__no_action_needed(api_client, settings, status):
+def test_order_cancel_webhook__no_action_needed(api_client: APIClient, settings: Settings, status: OrderStatus) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id)
+    as_mock(VerkkokauppaAPIClient.get_order).return_value = _create_mock_order(order_id)
     PaymentOrderFactory.create(remote_id=order_id, status=status)
 
     data = {
@@ -101,7 +106,7 @@ def test_order_cancel_webhook__no_action_needed(api_client, settings, status):
     assert response.data == {"message": "Order is already in a state where no updates are needed"}
 
 
-def test_order_cancel_webhook__pending_order(api_client, settings):
+def test_order_cancel_webhook__pending_order(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     payment_order = PaymentOrderFactory.create(
         remote_id=order_id,
@@ -127,9 +132,9 @@ def test_order_cancel_webhook__pending_order(api_client, settings):
 @patch_method(VerkkokauppaAPIClient.get_order)
 @patch_method(SentryLogger.log_message)
 @pytest.mark.parametrize("missing_field", ["orderId", "namespace", "eventType"])
-def test_order_cancel_webhook__missing_fields(api_client, settings, missing_field):
+def test_order_cancel_webhook__missing_fields(api_client: APIClient, settings: Settings, missing_field: str) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id)
+    as_mock(VerkkokauppaAPIClient.get_order).return_value = _create_mock_order(order_id)
     PaymentOrderFactory.create(remote_id=order_id, status=OrderStatus.DRAFT)
 
     data = {
@@ -143,14 +148,14 @@ def test_order_cancel_webhook__missing_fields(api_client, settings, missing_fiel
     assert response.status_code == 400, response.data
     assert response.data == {missing_field: ["This field is required."]}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)
 @patch_method(SentryLogger.log_message)
-def test_order_cancel_webhook__bad_namespace(api_client, settings):
+def test_order_cancel_webhook__bad_namespace(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id)
+    as_mock(VerkkokauppaAPIClient.get_order).return_value = _create_mock_order(order_id)
     PaymentOrderFactory.create(remote_id=order_id, status=OrderStatus.DRAFT, processed_at=None)
 
     data = {
@@ -163,14 +168,14 @@ def test_order_cancel_webhook__bad_namespace(api_client, settings):
     assert response.status_code == 400, response.data
     assert response.data == {"namespace": ["Invalid namespace: 'foo'"]}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)
 @patch_method(SentryLogger.log_message)
-def test_order_cancel_webhook__bad_event_type(api_client, settings):
+def test_order_cancel_webhook__bad_event_type(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id)
+    as_mock(VerkkokauppaAPIClient.get_order).return_value = _create_mock_order(order_id)
     PaymentOrderFactory.create(remote_id=order_id, status=OrderStatus.DRAFT, processed_at=None)
 
     data = {
@@ -183,14 +188,14 @@ def test_order_cancel_webhook__bad_event_type(api_client, settings):
     assert response.status_code == 400, response.data
     assert response.data == {"eventType": ["Unsupported event type: 'foo'"]}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)
 @patch_method(SentryLogger.log_message)
-def test_order_cancel_webhook__payment_order_not_found(api_client, settings):
+def test_order_cancel_webhook__payment_order_not_found(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id)
+    as_mock(VerkkokauppaAPIClient.get_order).return_value = _create_mock_order(order_id)
 
     data = {
         "orderId": str(order_id),
@@ -202,14 +207,14 @@ def test_order_cancel_webhook__payment_order_not_found(api_client, settings):
     assert response.status_code == 404, response.data
     assert response.data == {"message": "Payment order not found"}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)
 @patch_method(SentryLogger.log_message)
-def test_order_cancel_webhook__order_fetch_failed(api_client, settings):
+def test_order_cancel_webhook__order_fetch_failed(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.side_effect = GetOrderError("Mock error")
+    as_mock(VerkkokauppaAPIClient.get_order).side_effect = GetOrderError("Mock error")
     PaymentOrderFactory.create(remote_id=order_id, status=OrderStatus.DRAFT, processed_at=None)
 
     data = {
@@ -222,14 +227,14 @@ def test_order_cancel_webhook__order_fetch_failed(api_client, settings):
     assert response.status_code == 500, response.data
     assert response.data == {"message": "Could not get order from verkkokauppa"}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)
 @patch_method(SentryLogger.log_message)
-def test_order_cancel_webhook__no_order_from_verkkokauppa(api_client, settings):
+def test_order_cancel_webhook__no_order_from_verkkokauppa(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.return_value = None
+    as_mock(VerkkokauppaAPIClient.get_order).return_value = None
     PaymentOrderFactory.create(remote_id=order_id, status=OrderStatus.DRAFT, processed_at=None)
 
     data = {
@@ -242,14 +247,14 @@ def test_order_cancel_webhook__no_order_from_verkkokauppa(api_client, settings):
     assert response.status_code == 404, response.data
     assert response.data == {"message": "Order not found from verkkokauppa"}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)
 @patch_method(SentryLogger.log_message)
-def test_order_cancel_webhook__invalid_order_status(api_client, settings):
+def test_order_cancel_webhook__invalid_order_status(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
-    VerkkokauppaAPIClient.get_order.return_value = _create_mock_order(order_id, status="foo")
+    as_mock(VerkkokauppaAPIClient.get_order).return_value = _create_mock_order(order_id, status="foo")
     PaymentOrderFactory.create(remote_id=order_id, status=OrderStatus.DRAFT, processed_at=None)
 
     data = {
@@ -262,4 +267,4 @@ def test_order_cancel_webhook__invalid_order_status(api_client, settings):
     assert response.status_code == 400, response.data
     assert response.data == {"message": "Payment order cannot be cancelled based webshop order status"}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1

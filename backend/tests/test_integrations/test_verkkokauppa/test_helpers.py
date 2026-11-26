@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.urls import include, path
@@ -21,6 +22,9 @@ from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import PaymentMerchantFactory, PaymentProductFactory, ReservationFactory, ReservationUnitFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
 
 # Applied to all tests
 pytestmark = [
@@ -54,7 +58,7 @@ urlpatterns = [
     ],
 )
 @freeze_time("2022-11-05T10:00:00")
-def test_get_formatted_reservation_time(language, result):
+def test_get_formatted_reservation_time(language: Lang, result: str) -> None:
     begin = datetime.datetime.now().astimezone(tz=DEFAULT_TIMEZONE)
     end = begin + datetime.timedelta(hours=2)
     reservation = ReservationFactory.create(begins_at=begin, ends_at=end, user__preferred_language=language)
@@ -62,7 +66,7 @@ def test_get_formatted_reservation_time(language, result):
     assert date == result
 
 
-def test_get_verkkokauppa_order_params__respect_reservee_language():
+def test_get_verkkokauppa_order_params__respect_reservee_language() -> None:
     payment_product = PaymentProductFactory.create()
     reservation_unit = ReservationUnitFactory.create(
         payment_product=payment_product,
@@ -91,7 +95,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
     assert order_params.items[0].product_name == "Namn, NAMN"
 
 
-def test_get_meta_label():
+def test_get_meta_label() -> None:
     reservation = ReservationFactory.create(user__preferred_language="fi")
 
     period_label = get_meta_label("reservationPeriod", reservation)
@@ -101,7 +105,7 @@ def test_get_meta_label():
     assert number_label == "Varausnumero"
 
 
-def test_get_meta_label__raises_exception_with_unsupported_key():
+def test_get_meta_label__raises_exception_with_unsupported_key() -> None:
     reservation = ReservationFactory.create(user__preferred_language="fi")
 
     with pytest.raises(UnsupportedMetaKeyError) as err:
@@ -114,7 +118,7 @@ def test_get_meta_label__raises_exception_with_unsupported_key():
 
 @pytest.mark.urls(__name__)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_create_mock_verkkokauppa_order__returns_draft_order_with_mock_urls():
+def test_create_mock_verkkokauppa_order__returns_draft_order_with_mock_urls() -> None:
     payment_product = PaymentProductFactory.create()
     reservation = ReservationFactory.create(
         reservation_unit__payment_product=payment_product,
@@ -154,7 +158,7 @@ def test_create_mock_verkkokauppa_order__returns_draft_order_with_mock_urls():
 
 
 @pytest.mark.urls(__name__)
-def test_create_mock_verkkokauppa_order__creates_product_for_existing_merchant():
+def test_create_mock_verkkokauppa_order__creates_product_for_existing_merchant() -> None:
     payment_merchant = PaymentMerchantFactory.create()
     reservation = ReservationFactory.create(
         reservation_unit__payment_product=None,
@@ -170,7 +174,7 @@ def test_create_mock_verkkokauppa_order__creates_product_for_existing_merchant()
 
 
 @pytest.mark.urls(__name__)
-def test_create_mock_verkkokauppa_order__creates_product_and_merchant_when_missing():
+def test_create_mock_verkkokauppa_order__creates_product_and_merchant_when_missing() -> None:
     reservation = ReservationFactory.create(
         reservation_unit__payment_product=None,
         reservation_unit__payment_merchant=None,

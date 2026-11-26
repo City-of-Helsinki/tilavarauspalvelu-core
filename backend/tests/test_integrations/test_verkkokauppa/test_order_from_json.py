@@ -4,12 +4,13 @@ import copy
 import datetime
 import uuid
 from decimal import Decimal
+from typing import Any
 
 from django.conf import settings
 
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
 
-order_json = {
+order_json: dict[str, Any] = {
     "orderId": "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6",
     "namespace": "tilavaraus",
     "user": "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6",
@@ -61,7 +62,7 @@ order_json = {
 }
 
 
-def test_order_from_json():
+def test_order_from_json() -> None:
     order = Order.from_json(order_json)
     assert order.order_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
     assert order.namespace == "tilavaraus"
@@ -84,15 +85,16 @@ def test_order_from_json():
     assert order.subscription_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
 
 
-def test_order_from_json__missing_fields__phone():
+def test_order_from_json__missing_fields__phone() -> None:
     data = copy.deepcopy(order_json)
     data["customer"].pop("phone")
     order = Order.from_json(data)
 
+    assert order.customer is not None
     assert order.customer.phone == ""
 
 
-def test_order_from_json__missing_fields__subscription_id():
+def test_order_from_json__missing_fields__subscription_id() -> None:
     data = copy.deepcopy(order_json)
     data.pop("subscriptionId")
     order = Order.from_json(data)
@@ -100,7 +102,7 @@ def test_order_from_json__missing_fields__subscription_id():
     assert order.subscription_id is None
 
 
-def test_order_from_json__created_at_no_milliseconds():
+def test_order_from_json__created_at_no_milliseconds() -> None:
     """Verkkokauppa API does not return milliseconds in the createdAt field, if the seconds is zero."""
     data = copy.deepcopy(order_json)
     data["createdAt"] = "2021-02-25T10:23:00"

@@ -10,7 +10,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import ParseRefundStatusError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import RefundStatusResult
 
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 refund_status_json = {
     "refundPaymentId": "ea0f16e8-14d7-4510-b83f-1a29494756f0_at_20230329-073612",
@@ -31,7 +31,7 @@ refund_status_json = {
 }
 
 
-def test__refund_status__from_json():
+def test__refund_status__from_json() -> None:
     refund_status = RefundStatusResult.from_json(refund_status_json)
 
     assert refund_status.order_id == uuid.UUID("63c0e5b7-a460-38f1-97d8-2ffce25cce31")
@@ -45,7 +45,7 @@ def test__refund_status__from_json():
 
 
 @patch_method(SentryLogger.log_exception)
-def test__refund_status__parsing_fails():
+def test__refund_status__parsing_fails() -> None:
     data = refund_status_json.copy()
     data["orderId"] = "not-a-uuid"
 
@@ -53,4 +53,4 @@ def test__refund_status__parsing_fails():
         RefundStatusResult.from_json(data)
 
     assert str(ex.value) == "Could not parse refund status: badly formed hexadecimal UUID string"
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1

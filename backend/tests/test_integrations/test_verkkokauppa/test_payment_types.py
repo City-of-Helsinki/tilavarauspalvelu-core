@@ -16,7 +16,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.payment.types import (
     WebShopPaymentStatus,
 )
 
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 get_payment_response: dict[str, Any] = {
     "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
@@ -38,7 +38,7 @@ get_payment_response: dict[str, Any] = {
 }
 
 
-def test_verkkokauppa__payment_types__payment__from_json():
+def test_verkkokauppa__payment_types__payment__from_json() -> None:
     payment = Payment.from_json(get_payment_response)
     assert payment == Payment(
         payment_id="08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
@@ -61,20 +61,20 @@ def test_verkkokauppa__payment_types__payment__from_json():
 
 
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__payment_types__payment__from_json__raises_exception_if_key_is_missing():
+def test_verkkokauppa__payment_types__payment__from_json__raises_exception_if_key_is_missing() -> None:
     response = get_payment_response.copy()
     response.pop("paymentId")
     with pytest.raises(ParsePaymentError):
         Payment.from_json(response)
 
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1
 
 
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__payment_types__payment__from_json__raises_exception_if_value_is_invalid():
+def test_verkkokauppa__payment_types__payment__from_json__raises_exception_if_value_is_invalid() -> None:
     response = get_payment_response.copy()
     response["orderId"] = "invalid-id"
     with pytest.raises(ParsePaymentError):
         Payment.from_json(response)
 
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1

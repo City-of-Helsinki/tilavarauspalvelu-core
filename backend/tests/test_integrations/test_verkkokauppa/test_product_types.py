@@ -14,7 +14,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
 )
 
 
-def test_verkkokauppa__product_types__create_product_params__to_json():
+def test_verkkokauppa__product_types__create_product_params__to_json() -> None:
     params = CreateProductParams(
         namespace="some-namespace",
         namespace_entity_id="some-entity-id",
@@ -29,7 +29,7 @@ def test_verkkokauppa__product_types__create_product_params__to_json():
     assert json == expected
 
 
-def test_verkkokauppa__product_types__product__from_json():
+def test_verkkokauppa__product_types__product__from_json() -> None:
     json = {
         "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
         "namespace": "some-namespace",
@@ -46,7 +46,7 @@ def test_verkkokauppa__product_types__product__from_json():
     assert product == expected
 
 
-def test_verkkokauppa__product_types__product__from_json__raises_exception_if_key_is_missing():
+def test_verkkokauppa__product_types__product__from_json__raises_exception_if_key_is_missing() -> None:
     with pytest.raises(ParseProductError):
         Product.from_json({
             "namespace": "some-namespace",
@@ -54,7 +54,7 @@ def test_verkkokauppa__product_types__product__from_json__raises_exception_if_ke
         })
 
 
-def test_verkkokauppa__product_types__product__from_json__raises_exception_if_value_is_invalid():
+def test_verkkokauppa__product_types__product__from_json__raises_exception_if_value_is_invalid() -> None:
     with pytest.raises(ParseProductError):
         Product.from_json({
             "productId": "invalid-product-id",
@@ -63,7 +63,7 @@ def test_verkkokauppa__product_types__product__from_json__raises_exception_if_va
         })
 
 
-def test_verkkokauppa__product_types__create_or_update_accounting_params__to_json():
+def test_verkkokauppa__product_types__create_or_update_accounting_params__to_json() -> None:
     params = CreateOrUpdateAccountingParams(
         vat_code="vat-code",
         internal_order="internal-order",
@@ -98,7 +98,7 @@ def test_verkkokauppa__product_types__create_or_update_accounting_params__to_jso
     assert json == expected
 
 
-def test_verkkokauppa__product_types__create_or_update_accounting_params__to_json__drops_empty_fields():
+def test_verkkokauppa__product_types__create_or_update_accounting_params__to_json__drops_empty_fields() -> None:
     params = CreateOrUpdateAccountingParams(
         vat_code="vat-code",
         internal_order="",
@@ -124,7 +124,7 @@ def test_verkkokauppa__product_types__create_or_update_accounting_params__to_jso
     assert json == expected
 
 
-def test_verkkokauppa__product_types__accounting_params__from_json():
+def test_verkkokauppa__product_types__accounting_params__from_json() -> None:
     json = {
         "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
         "vatCode": "vat-code",
@@ -149,7 +149,7 @@ def test_verkkokauppa__product_types__accounting_params__from_json():
     assert accounting == expected
 
 
-def test_verkkokauppa__product_types__accounting_params__from_json__raises_exception_if_key_is_missing():
+def test_verkkokauppa__product_types__accounting_params__from_json__raises_exception_if_key_is_missing() -> None:
     with pytest.raises(ParseAccountingError):
         Accounting.from_json({
             "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",

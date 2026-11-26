@@ -20,7 +20,7 @@ pytestmark = [
 
 
 @freezegun.freeze_time("2023-01-01 00:00:00")
-def test_get_verkkokauppa_order_params__to_json():
+def test_get_verkkokauppa_order_params__to_json() -> None:
     payment_product = PaymentProductFactory.create()
     reservation_unit = ReservationUnitFactory.create(payment_product=payment_product)
     user = UserFactory.create(
@@ -60,6 +60,7 @@ def test_get_verkkokauppa_order_params__to_json():
     ).strftime("%Y-%m-%dT%H:%M:%S")
 
     assert len(json["items"]) == 1
+    assert reservation.reservation_unit.payment_product is not None
     assert json["items"][0]["productId"] == str(reservation.reservation_unit.payment_product.id)
     assert (
         json["items"][0]["productName"]
@@ -88,7 +89,7 @@ def test_get_verkkokauppa_order_params__to_json():
 
 
 @freezegun.freeze_time("2023-01-01 00:00:00")
-def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
+def test_get_verkkokauppa_order_params__to_json__meta_label_language_support() -> None:
     payment_product = PaymentProductFactory.create()
     reservation_unit = ReservationUnitFactory.create(payment_product=payment_product)
     user = UserFactory.create(

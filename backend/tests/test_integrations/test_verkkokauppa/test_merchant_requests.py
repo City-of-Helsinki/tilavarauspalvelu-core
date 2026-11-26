@@ -21,7 +21,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, as_mock, exact, patch_method
 
 create_merchant_params: CreateMerchantParams = CreateMerchantParams(
     name="Test Merchant",
@@ -102,11 +102,13 @@ bad_request_response: dict[str, Any] = {"errors": [{"code": "bad-request", "mess
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__create_merchant__makes_valid_request_returns_merchant():
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=mutation_merchant_response)
+def test__create_merchant__makes_valid_request_returns_merchant() -> None:
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(
+        status_code=201, json_data=mutation_merchant_response
+    )
     response = VerkkokauppaAPIClient.create_merchant(params=create_merchant_params)
 
-    VerkkokauppaAPIClient.request.assert_called_with(
+    as_mock(VerkkokauppaAPIClient.request).assert_called_with(
         method="post",
         url=(settings.VERKKOKAUPPA_MERCHANT_API_URL + "/create/merchant/" + settings.VERKKOKAUPPA_NAMESPACE),
         json=create_merchant_params.to_json(),
@@ -117,20 +119,20 @@ def test__create_merchant__makes_valid_request_returns_merchant():
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__create_merchant__raises_exception_if_merchant_id_is_missing():
+def test__create_merchant__raises_exception_if_merchant_id_is_missing() -> None:
     response = mutation_merchant_response.copy()
     response.pop("merchantId")
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=201, json_data=response)
 
     with pytest.raises(CreateMerchantError):
         VerkkokauppaAPIClient.create_merchant(params=create_merchant_params)
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__create_merchant__raises_exception_if_merchant_id_is_invalid():
+def test__create_merchant__raises_exception_if_merchant_id_is_invalid() -> None:
     response = mutation_merchant_response.copy()
     response["merchantId"] = "invalid-id"
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=201, json_data=response)
 
     with pytest.raises(CreateMerchantError):
         VerkkokauppaAPIClient.create_merchant(params=create_merchant_params)
@@ -138,35 +140,39 @@ def test__create_merchant__raises_exception_if_merchant_id_is_invalid():
 
 @patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_message)
-def test__create_merchant__raises_exception_if_status_code_is_not_201():
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=500, json_data=mutation_merchant_response)
+def test__create_merchant__raises_exception_if_status_code_is_not_201() -> None:
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(
+        status_code=500, json_data=mutation_merchant_response
+    )
 
     with pytest.raises(CreateMerchantError):
         VerkkokauppaAPIClient.create_merchant(params=create_merchant_params)
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=400, json_data=bad_request_response),
 )
-def test__create_merchant__raises_exception_on_client_error_status_code():
+def test__create_merchant__raises_exception_on_client_error_status_code() -> None:
     msg = "Merchant creation failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
     with pytest.raises(CreateMerchantError, match=exact(msg)):
         VerkkokauppaAPIClient.create_merchant(params=create_merchant_params)
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__update_merchant__makes_valid_request_returns_merchant():
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=mutation_merchant_response)
+def test__update_merchant__makes_valid_request_returns_merchant() -> None:
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(
+        status_code=200, json_data=mutation_merchant_response
+    )
 
     response = VerkkokauppaAPIClient.update_merchant(
         merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
         params=update_merchant_params,
     )
 
-    VerkkokauppaAPIClient.request.assert_called_with(
+    as_mock(VerkkokauppaAPIClient.request).assert_called_with(
         method="post",
         url=(
             settings.VERKKOKAUPPA_MERCHANT_API_URL
@@ -182,10 +188,10 @@ def test__update_merchant__makes_valid_request_returns_merchant():
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__update_merchant__raises_exception_if_merchant_id_is_missing():
+def test__update_merchant__raises_exception_if_merchant_id_is_missing() -> None:
     response = mutation_merchant_response.copy()
     response.pop("merchantId")
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=200, json_data=response)
 
     with pytest.raises(UpdateMerchantError):
         VerkkokauppaAPIClient.update_merchant(
@@ -194,10 +200,10 @@ def test__update_merchant__raises_exception_if_merchant_id_is_missing():
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__update_merchant__raises_exception_if_merchant_id_is_invalid():
+def test__update_merchant__raises_exception_if_merchant_id_is_invalid() -> None:
     response = mutation_merchant_response.copy()
     response["merchantId"] = "invalid-id"
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=200, json_data=response)
 
     with pytest.raises(UpdateMerchantError):
         VerkkokauppaAPIClient.update_merchant(
@@ -207,22 +213,24 @@ def test__update_merchant__raises_exception_if_merchant_id_is_invalid():
 
 @patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_message)
-def test__update_merchant__raises_exception_if_status_code_is_not_200():
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=500, json_data=mutation_merchant_response)
+def test__update_merchant__raises_exception_if_status_code_is_not_200() -> None:
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(
+        status_code=500, json_data=mutation_merchant_response
+    )
 
     with pytest.raises(UpdateMerchantError):
         VerkkokauppaAPIClient.update_merchant(
             merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
         )
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=400, json_data=bad_request_response),
 )
-def test__update_merchant__raises_exception_on_client_error_status_code():
+def test__update_merchant__raises_exception_on_client_error_status_code() -> None:
     msg = "Merchant update failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
     with pytest.raises(UpdateMerchantError, match=exact(msg)):
         VerkkokauppaAPIClient.update_merchant(
@@ -232,8 +240,8 @@ def test__update_merchant__raises_exception_on_client_error_status_code():
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__update_merchant__raises_exception_if_status_code_is_404():
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=404, json_data={})
+def test__update_merchant__raises_exception_if_status_code_is_404() -> None:
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=404, json_data={})
 
     with pytest.raises(UpdateMerchantError):
         VerkkokauppaAPIClient.update_merchant(
@@ -242,15 +250,15 @@ def test__update_merchant__raises_exception_if_status_code_is_404():
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__get_merchant__returns_merchant():
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=get_merchant_response)
+def test__get_merchant__returns_merchant() -> None:
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=200, json_data=get_merchant_response)
 
     response = VerkkokauppaAPIClient.get_merchant(merchant_uuid=uuid.UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
     assert response == MerchantInfo.from_json(get_merchant_response)
 
 
 @patch_method(VerkkokauppaAPIClient.request)
-def test__get_merchant__returns_none():
+def test__get_merchant__returns_none() -> None:
     error_response = {
         "errors": [
             {
@@ -259,7 +267,7 @@ def test__get_merchant__returns_none():
             }
         ]
     }
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=404, json_data=error_response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=404, json_data=error_response)
 
     merchant = VerkkokauppaAPIClient.get_merchant(merchant_uuid=uuid.UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
     assert merchant is None
@@ -269,7 +277,7 @@ def test__get_merchant__returns_none():
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=400, json_data=bad_request_response),
 )
-def test__get_merchant__raises_exception_if_status_code_is_not_200():
+def test__get_merchant__raises_exception_if_status_code_is_not_200() -> None:
     msg = (
         "Fetching merchant 0312c2f7-3ed6-409e-84e3-ae21196e685d failed: "
         "[{'code': 'bad-request', 'message': 'Bad request'}]"
@@ -279,7 +287,7 @@ def test__get_merchant__raises_exception_if_status_code_is_not_200():
 
 
 @patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout("Read timed out"))
-def test__get_merchant__raises_exception_on_timeout():
+def test__get_merchant__raises_exception_on_timeout() -> None:
     msg = "Fetching merchant 0312c2f7-3ed6-409e-84e3-ae21196e685d failed: Read timed out"
     with pytest.raises(GetMerchantError, match=exact(msg)):
         VerkkokauppaAPIClient.get_merchant(merchant_uuid=uuid.UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
