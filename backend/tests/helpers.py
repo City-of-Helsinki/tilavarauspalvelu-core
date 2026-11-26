@@ -92,7 +92,7 @@ class ResponseMock:
     def __init__(
         self,
         *,
-        json_data: dict[str, Any] | None = None,
+        json_data: Any = None,
         text: str = "",
         status_code: int = 200,
         method: HTTPMethod = "GET",
@@ -104,7 +104,7 @@ class ResponseMock:
         self.request = SimpleNamespace(method=method)
         self.url = url
 
-    def json(self) -> dict[str, Any]:
+    def json(self) -> Any:
         return self.json_data
 
 
