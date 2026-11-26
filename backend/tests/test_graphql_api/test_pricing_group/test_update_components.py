@@ -220,6 +220,28 @@ def test_pricing_group__update_components__active_component_amount_cannot_change
     assert PriceComponent.objects.get(pk=active.pk).amount == Decimal(10)
 
 
+def test_pricing_group__update_components__component_of_another_group(graphql):
+    today = local_date()
+
+    pricing_group = PricingGroupFactory.create()
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=today - datetime.timedelta(days=10))
+    other = PriceComponentFactory.create(valid_from=today - datetime.timedelta(days=10))
+
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": pricing_group.pk,
+        "components": [{"pk": other.pk, "validUntil": None}],
+    }
+    response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_messages() == [f"Price component {other.pk} does not belong to this pricing group."]
+    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_NOT_IN_PRICING_GROUP]
+
+    assert PriceComponent.objects.get(pk=other.pk).pricing_group != pricing_group
+
+
 def test_pricing_group__update_components__coverage_errors_are_returned(graphql):
     today = local_date()
     change_date = today + datetime.timedelta(days=10)
