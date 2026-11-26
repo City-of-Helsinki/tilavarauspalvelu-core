@@ -9,7 +9,7 @@ from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiA
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, as_mock, exact, patch_method
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -56,31 +56,37 @@ _mocked_send_return_value = {
 
 @patch_method(HaukiAPIClient.get_resource, return_value={"id": 1})
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__parent_is_fetched_from_hauki_api(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__parent_is_fetched_from_hauki_api(
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.unit.origin_hauki_resource = None
 
     reservation_unit.actions.send_reservation_unit_to_hauki()
 
-    assert HaukiAPIClient.get_resource.call_args.kwargs == {"hauki_resource_id": "tprek:1234"}
-    data = HaukiAPIClient.update_resource.call_args.kwargs["data"]
+    assert as_mock(HaukiAPIClient.get_resource).call_args.kwargs == {"hauki_resource_id": "tprek:1234"}
+    data = as_mock(HaukiAPIClient.update_resource).call_args.kwargs["data"]
     assert data["parents"] == [1]
 
 
 @patch_method(HaukiAPIClient.get_resource, return_value=None)
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__parent_does_not_exist_in_hauki_api(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__parent_does_not_exist_in_hauki_api(
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.unit.origin_hauki_resource = None
 
     msg = "Parent Unit does not have 'Hauki Resource' set and could not get it from Hauki API."
     with pytest.raises(HaukiAPIError, match=exact(msg)):
         reservation_unit.actions.send_reservation_unit_to_hauki()
 
-    assert HaukiAPIClient.update_resource.call_count == 0
+    assert as_mock(HaukiAPIClient.update_resource).call_count == 0
 
 
 @patch_method(HaukiAPIClient.get_resource, return_value={"id": 1})
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__parent_without_tprek_id(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__parent_without_tprek_id(
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.unit.origin_hauki_resource = None
     reservation_unit.unit.tprek_id = None
 
@@ -88,30 +94,34 @@ def test__hauki_exporter__send_reservation_unit_to_hauki__parent_without_tprek_i
     with pytest.raises(HaukiAPIError, match=exact(msg)):
         reservation_unit.actions.send_reservation_unit_to_hauki()
 
-    assert HaukiAPIClient.get_resource.call_count == 0
-    assert HaukiAPIClient.update_resource.call_count == 0
+    assert as_mock(HaukiAPIClient.get_resource).call_count == 0
+    assert as_mock(HaukiAPIClient.update_resource).call_count == 0
 
 
 @patch_method(HaukiAPIClient.request, return_value=ResponseMock(status_code=503, url="https://hauki.test/resource/"))
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__request_error_when_fetching_parent(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__request_error_when_fetching_parent(
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.unit.origin_hauki_resource = None
 
     msg = "GET request to HAUKI (https://hauki.test/resource/) failed with status 503."
     with pytest.raises(ExternalServiceRequestError, match=exact(msg)):
         reservation_unit.actions.send_reservation_unit_to_hauki()
 
-    assert HaukiAPIClient.update_resource.call_count == 0
+    assert as_mock(HaukiAPIClient.update_resource).call_count == 0
 
 
 # ── send_reservation_unit_to_hauki: resource data ──
 
 
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__sends_reservation_unit_data(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__sends_reservation_unit_data(
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.actions.send_reservation_unit_to_hauki()
 
-    data = HaukiAPIClient.update_resource.call_args.kwargs["data"]
+    data = as_mock(HaukiAPIClient.update_resource).call_args.kwargs["data"]
     assert data == {
         "id": 999,
         "name": {
@@ -142,34 +152,40 @@ def test__hauki_exporter__send_reservation_unit_to_hauki__sends_reservation_unit
 
 
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__unit_without_department_id(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__unit_without_department_id(
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.unit.tprek_department_id = None
 
     msg = "Parent Unit does not have a department id."
     with pytest.raises(HaukiAPIError, match=exact(msg)):
         reservation_unit.actions.send_reservation_unit_to_hauki()
 
-    assert HaukiAPIClient.update_resource.call_count == 0
+    assert as_mock(HaukiAPIClient.update_resource).call_count == 0
 
 
 # ── send_reservation_unit_to_hauki: create or update ──
 
 
 @patch_method(HaukiAPIClient.create_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__create_new_resource(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__create_new_resource(
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.origin_hauki_resource = None
 
     reservation_unit.actions.send_reservation_unit_to_hauki()
 
-    assert HaukiAPIClient.create_resource.call_count == 1
+    assert as_mock(HaukiAPIClient.create_resource).call_count == 1
     reservation_unit.refresh_from_db()
-    assert reservation_unit.origin_hauki_resource.id == 222
+    assert reservation_unit.origin_hauki_resource_id == 222
 
 
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
-def test__hauki_exporter__send_reservation_unit_to_hauki__update_existing_resource(reservation_unit):
+def test__hauki_exporter__send_reservation_unit_to_hauki__update_existing_resource(
+    reservation_unit: ReservationUnit,
+) -> None:
     reservation_unit.actions.send_reservation_unit_to_hauki()
 
-    assert HaukiAPIClient.update_resource.call_count == 1
+    assert as_mock(HaukiAPIClient.update_resource).call_count == 1
     reservation_unit.refresh_from_db()
-    assert reservation_unit.origin_hauki_resource.id == 999
+    assert reservation_unit.origin_hauki_resource_id == 999

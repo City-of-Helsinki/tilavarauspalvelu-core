@@ -18,7 +18,7 @@ from tilavarauspalvelu.models import (
 )
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -26,7 +26,7 @@ pytestmark = [
 ]
 
 
-def test_reset_application_round_allocation__in_allocation():
+def test_reset_application_round_allocation__in_allocation() -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
 
     AllocatedTimeSlotFactory.create(
@@ -52,7 +52,7 @@ def test_reset_application_round_allocation__in_allocation():
     assert ReservationUnitOption.objects.filter(is_locked=True).count() == 0
 
 
-def test_reset_application_round_allocation__handled():
+def test_reset_application_round_allocation__handled() -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
 
     allocation_1 = AllocatedTimeSlotFactory.create(
@@ -92,7 +92,7 @@ def test_reset_application_round_allocation__handled():
     assert application_round.handled_at is None
 
 
-def test_reset_application_round_allocation__handled__delete_statistics():
+def test_reset_application_round_allocation__handled__delete_statistics() -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
 
     allocation = AllocatedTimeSlotFactory.create(
@@ -117,7 +117,7 @@ def test_reset_application_round_allocation__handled__delete_statistics():
 
 
 @patch_method(PindoraService.delete_access_code)
-def test_reset_application_round_allocation__handled__call_pindora_if_has_access_codes():
+def test_reset_application_round_allocation__handled__call_pindora_if_has_access_codes() -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
 
     allocation_1 = AllocatedTimeSlotFactory.create(
@@ -142,10 +142,10 @@ def test_reset_application_round_allocation__handled__call_pindora_if_has_access
 
     application_round.actions.reset_application_round_allocation()
 
-    assert PindoraService.delete_access_code.call_count == 1
+    assert as_mock(PindoraService.delete_access_code).call_count == 1
 
 
-def test_reset_application_round_allocation__results_sent():
+def test_reset_application_round_allocation__results_sent() -> None:
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create_in_status_results_sent(application_round=application_round)
 
