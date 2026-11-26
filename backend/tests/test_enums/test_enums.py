@@ -3,25 +3,25 @@ from __future__ import annotations
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, OrderStatus, OrderStatusWithFree
 
 
-def test_order_status_and_order_status_with_free_match():
+def test_order_status_and_order_status_with_free_match() -> None:
     order_statuses = sorted(OrderStatus)
     order_free_statuses = sorted(OrderStatusWithFree)
 
     assert "FREE" in order_free_statuses
     assert "FREE" not in order_statuses
 
-    order_free_statuses.remove("FREE")
+    order_free_statuses.remove(OrderStatusWithFree.FREE)
 
     assert order_statuses == order_free_statuses
 
 
-def test_access_type_and_access_type_with_multivalued_match():
+def test_access_type_and_access_type_with_multivalued_match() -> None:
     access_types = sorted(AccessType)
     access_types_with_multivalued = sorted(AccessTypeWithMultivalued)
 
     assert "MULTIVALUED" in access_types_with_multivalued
     assert "MULTIVALUED" not in access_types
 
-    access_types_with_multivalued.remove("MULTIVALUED")
+    access_types_with_multivalued.remove(AccessTypeWithMultivalued.MULTIVALUED)
 
     assert access_types == access_types_with_multivalued
