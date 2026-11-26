@@ -35,12 +35,16 @@ from tests.factories import (
     TaxLevelRateFactory,
     UserFactory,
 )
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import CONFIRM_MUTATION, get_confirm_data
 
 if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
     from tilavarauspalvelu.integrations.verkkokauppa.order.types import CreateOrderParams
+
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -49,7 +53,9 @@ pytestmark = [
 
 @override_settings(SEND_EMAILS=True)
 @patch_method(PindoraService.activate_access_code)
-def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
+def test_reservation__confirm__changes_state__confirmed(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives]
+) -> None:
     reservation = ReservationFactory.create_for_confirmation()
 
     # Unit admin will get an email
@@ -73,11 +79,13 @@ def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
     unit_name = reservation.reservation_unit.unit.name
     assert outbox[1].subject == f"New booking {reservation.id} has been made for {unit_name}"
 
-    assert PindoraService.activate_access_code.call_count == 0
+    assert as_mock(PindoraService.activate_access_code).call_count == 0
 
 
 @override_settings(SEND_EMAILS=True)
-def test_reservation__confirm__changes_state__requires_handling(graphql, outbox):
+def test_reservation__confirm__changes_state__requires_handling(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives]
+) -> None:
     reservation = ReservationFactory.create_for_confirmation(reservation_unit__require_reservation_handling=True)
 
     # Unit admin will get an email
@@ -103,7 +111,9 @@ def test_reservation__confirm__changes_state__requires_handling(graphql, outbox)
 
 
 @override_settings(SEND_EMAILS=True)
-def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_request(graphql, outbox):
+def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_request(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives]
+) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         price_lines__price_component__can_apply_for_discount=True,
         applying_for_free_of_charge=True,
@@ -133,7 +143,7 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
     assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit {unit_name}"
 
 
-def test_reservation__confirm__applying_for_free_of_charge_not_allowed_by_price(graphql):
+def test_reservation__confirm__applying_for_free_of_charge_not_allowed_by_price(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         price_lines__price_component__can_apply_for_discount=False,
         applying_for_free_of_charge=True,
@@ -153,7 +163,7 @@ def test_reservation__confirm__applying_for_free_of_charge_not_allowed_by_price(
     assert reservation.state == ReservationStateChoice.CREATED
 
 
-def test_reservation__confirm__fails_if_state_is_not_created(graphql):
+def test_reservation__confirm__fails_if_state_is_not_created(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(state=ReservationStateChoice.DENIED)
 
     graphql.login_with_superuser()
@@ -167,7 +177,7 @@ def test_reservation__confirm__fails_if_state_is_not_created(graphql):
     assert reservation.state == ReservationStateChoice.DENIED
 
 
-def test_reservation__confirm__reservation_owner_can_confirm(graphql):
+def test_reservation__confirm__reservation_owner_can_confirm(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation()
 
     graphql.force_login(reservation.user)
@@ -180,7 +190,7 @@ def test_reservation__confirm__reservation_owner_can_confirm(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
-def test_reservation__confirm__regular_user_cannot_confirm(graphql):
+def test_reservation__confirm__regular_user_cannot_confirm(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation()
 
     graphql.login_with_regular_user()
@@ -193,7 +203,7 @@ def test_reservation__confirm__regular_user_cannot_confirm(graphql):
     assert reservation.state == ReservationStateChoice.CREATED
 
 
-def test_reservation__confirm__updates_confirmed_at(graphql):
+def test_reservation__confirm__updates_confirmed_at(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(confirmed_at=None)
 
     graphql.login_with_superuser()
@@ -206,7 +216,7 @@ def test_reservation__confirm__updates_confirmed_at(graphql):
     assert reservation.confirmed_at is not None
 
 
-def test_reservation__confirm__succeeds_if_reservation_has_all_required_fields(graphql):
+def test_reservation__confirm__succeeds_if_reservation_has_all_required_fields(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_first_name="John",
@@ -225,7 +235,7 @@ def test_reservation__confirm__succeeds_if_reservation_has_all_required_fields(g
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
-def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql):
+def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_first_name="John",
@@ -245,7 +255,7 @@ def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql):
     assert reservation.state == ReservationStateChoice.CREATED
 
 
-def test_reservation__confirm__fails_if_reservee_type_is_missing(graphql):
+def test_reservation__confirm__fails_if_reservee_type_is_missing(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__reservation_form=ReservationFormType.RESERVEE_INFO_FORM.value,
         reservee_first_name="John",
@@ -268,7 +278,7 @@ def test_reservation__confirm__fails_if_reservee_type_is_missing(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__does_not_create_order_when_handling_is_required(graphql):
+def test_reservation__confirm__does_not_create_order_when_handling_is_required(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ONLINE,
         reservation_unit__require_reservation_handling=True,
@@ -284,11 +294,11 @@ def test_reservation__confirm__does_not_create_order_when_handling_is_required(g
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
     assert PaymentOrder.objects.count() == 0
-    assert VerkkokauppaAPIClient.create_order.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_order).called is False
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(graphql):
+def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ON_SITE,
         user__preferred_language="fi",
@@ -310,18 +320,18 @@ def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(
     assert orders[0].language == reservation.user.preferred_language
     assert orders[0].reservation == reservation
 
-    assert VerkkokauppaAPIClient.create_order.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_order).called is False
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_on_site(graphql):
+def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_on_site(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ONLINE,
         user__preferred_language="fi",
     )
 
     order = OrderFactory.create()
-    VerkkokauppaAPIClient.create_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = order
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -342,12 +352,12 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
     assert orders[0].checkout_url == order.checkout_url
     assert orders[0].receipt_url == order.receipt_url
 
-    assert VerkkokauppaAPIClient.create_order.called is True
+    assert as_mock(VerkkokauppaAPIClient.create_order).called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1, 0, 5))
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_date(graphql):
+def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_date(graphql: GraphQLClient) -> None:
     tax_level = TaxLevelFactory.create(rates__begins=local_date(2024, 1, 1), rates__percentage=Decimal("25.5"))
     TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2000, 1, 1), percentage=Decimal(24))
 
@@ -358,7 +368,7 @@ def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_da
         price_lines__tax_percentage=Decimal(24),
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -374,7 +384,7 @@ def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_da
     assert payment_order.price_vat == Decimal("2.52")
     assert payment_order.price_total == Decimal("12.4")
 
-    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    order_params: CreateOrderParams = as_mock(VerkkokauppaAPIClient.create_order).call_args.kwargs["order_params"]
     assert order_params.items[0].vat_percentage == Decimal("25.5")
     assert order_params.items[0].price_net == Decimal("9.88")
     assert order_params.items[0].price_vat == Decimal("2.52")
@@ -382,7 +392,7 @@ def test_reservation__confirm__paid_in_webshop__uses_tax_rate_of_confirmation_da
 
 @patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Test exception"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
+def test_reservation__confirm__does_not_save_when_api_call_fails(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ONLINE,
         user__preferred_language="fi",
@@ -401,14 +411,14 @@ def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__saves_empty_receipt_url_when_order_has_none(graphql):
+def test_reservation__confirm__saves_empty_receipt_url_when_order_has_none(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ONLINE,
         user__preferred_language="fi",
     )
 
     order = OrderFactory.create(receipt_url=None)
-    VerkkokauppaAPIClient.create_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = order
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -421,7 +431,7 @@ def test_reservation__confirm__saves_empty_receipt_url_when_order_has_none(graph
     assert payment_order.receipt_url == ""
 
 
-def test_reservation__confirm__default_payment_type__on_site(graphql):
+def test_reservation__confirm__default_payment_type__on_site(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ON_SITE,
     )
@@ -438,12 +448,12 @@ def test_reservation__confirm__default_payment_type__on_site(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__default_payment_type__online(graphql):
+def test_reservation__confirm__default_payment_type__online(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ONLINE,
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -455,11 +465,11 @@ def test_reservation__confirm__default_payment_type__online(graphql):
     assert len(orders) == 1
     assert orders[0].payment_type == PaymentType.ONLINE
 
-    assert VerkkokauppaAPIClient.create_order.called is True
+    assert as_mock(VerkkokauppaAPIClient.create_order).called is True
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
+def test_reservation__confirm__default_payment_type__online_or_invoice(graphql: GraphQLClient) -> None:
     sales_item = SalesItemFactory.create(material="12345678")
     reservation = ReservationFactory.create_for_confirmation(
         # Required params for invoicing to work
@@ -473,7 +483,7 @@ def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
         reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -485,16 +495,16 @@ def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
     assert len(orders) == 1
     assert orders[0].payment_type == PaymentType.ONLINE_OR_INVOICE
 
-    assert VerkkokauppaAPIClient.create_order.called is True
+    assert as_mock(VerkkokauppaAPIClient.create_order).called is True
 
     # 'invoicing_date' parameter is given so that invoicing is show in Verkkokauppa UI
-    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    order_params: CreateOrderParams = as_mock(VerkkokauppaAPIClient.create_order).call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date is not None
 
 
 @freeze_time(local_datetime(2030, 1, 1, 12))
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__invoicing_date_is_local_begin_date(graphql):
+def test_reservation__confirm__invoicing_date_is_local_begin_date(graphql: GraphQLClient) -> None:
     sales_item = SalesItemFactory.create(material="12345678")
     reservation = ReservationFactory.create_for_confirmation(
         begins_at=local_datetime(2030, 1, 10, 1),
@@ -509,7 +519,7 @@ def test_reservation__confirm__invoicing_date_is_local_begin_date(graphql):
         reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -517,12 +527,12 @@ def test_reservation__confirm__invoicing_date_is_local_begin_date(graphql):
 
     assert response.has_errors is False, response.errors
 
-    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    order_params: CreateOrderParams = as_mock(VerkkokauppaAPIClient.create_order).call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date == datetime.date(2030, 1, 10)
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__no_invoicing__reservee_type_missing(graphql):
+def test_reservation__confirm__no_invoicing__reservee_type_missing(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservee_type=None,
         reservation_unit__payment_type=PaymentType.ONLINE_OR_INVOICE,
@@ -532,7 +542,7 @@ def test_reservation__confirm__no_invoicing__reservee_type_missing(graphql):
         reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -540,12 +550,12 @@ def test_reservation__confirm__no_invoicing__reservee_type_missing(graphql):
 
     assert response.has_errors is False, response.errors
 
-    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    order_params: CreateOrderParams = as_mock(VerkkokauppaAPIClient.create_order).call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date is None
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__no_invoicing__nonprofit_without_identifier(graphql):
+def test_reservation__confirm__no_invoicing__nonprofit_without_identifier(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservee_type=ReserveeType.NONPROFIT,
         reservee_identifier="",
@@ -556,7 +566,7 @@ def test_reservation__confirm__no_invoicing__nonprofit_without_identifier(graphq
         reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -564,12 +574,12 @@ def test_reservation__confirm__no_invoicing__nonprofit_without_identifier(graphq
 
     assert response.has_errors is False, response.errors
 
-    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    order_params: CreateOrderParams = as_mock(VerkkokauppaAPIClient.create_order).call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date is None
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__no_invoicing__payment_type_online(graphql):
+def test_reservation__confirm__no_invoicing__payment_type_online(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservee_type=ReserveeType.COMPANY,
         reservation_unit__payment_type=PaymentType.ONLINE,
@@ -579,7 +589,7 @@ def test_reservation__confirm__no_invoicing__payment_type_online(graphql):
         reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -587,12 +597,12 @@ def test_reservation__confirm__no_invoicing__payment_type_online(graphql):
 
     assert response.has_errors is False, response.errors
 
-    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    order_params: CreateOrderParams = as_mock(VerkkokauppaAPIClient.create_order).call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date is None
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__no_invoicing__sales_item_without_material(graphql):
+def test_reservation__confirm__no_invoicing__sales_item_without_material(graphql: GraphQLClient) -> None:
     sales_item = SalesItemFactory.create(material="")
     reservation = ReservationFactory.create_for_confirmation(
         reservee_type=ReserveeType.COMPANY,
@@ -605,7 +615,7 @@ def test_reservation__confirm__no_invoicing__sales_item_without_material(graphql
         reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -613,19 +623,19 @@ def test_reservation__confirm__no_invoicing__sales_item_without_material(graphql
 
     assert response.has_errors is False, response.errors
 
-    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    order_params: CreateOrderParams = as_mock(VerkkokauppaAPIClient.create_order).call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date is None
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__no_invoicing__no_payment_accounting(graphql):
+def test_reservation__confirm__no_invoicing__no_payment_accounting(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservee_type=ReserveeType.COMPANY,
         reservation_unit__payment_type=PaymentType.ONLINE_OR_INVOICE,
         reservation_unit__payment_accounting=None,
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -633,11 +643,11 @@ def test_reservation__confirm__no_invoicing__no_payment_accounting(graphql):
 
     assert response.has_errors is False, response.errors
 
-    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    order_params: CreateOrderParams = as_mock(VerkkokauppaAPIClient.create_order).call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date is None
 
 
-def test_reservation__confirm__cannot_confirm_if_order_exists(graphql):
+def test_reservation__confirm__cannot_confirm_if_order_exists(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation()
     PaymentOrderFactory.create(reservation=reservation)
 
@@ -651,7 +661,7 @@ def test_reservation__confirm__cannot_confirm_if_order_exists(graphql):
     ]
 
 
-def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
+def test_reservation__confirm__order_not_created_when_price_is_zero(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(price_lines__amount=Decimal(0))
 
     graphql.login_with_superuser()
@@ -663,12 +673,12 @@ def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__return_order_data(graphql):
+def test_reservation__confirm__return_order_data(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ONLINE,
     )
 
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+    as_mock(VerkkokauppaAPIClient.create_order).return_value = OrderFactory.create()
 
     fields = "state order { paymentType checkoutUrl }"
     query = build_mutation("confirmReservation", "ReservationConfirmMutation", fields=fields)
@@ -679,7 +689,7 @@ def test_reservation__confirm__return_order_data(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert VerkkokauppaAPIClient.create_order.called is True
+    assert as_mock(VerkkokauppaAPIClient.create_order).called is True
 
     reservation.refresh_from_db()
 
@@ -692,7 +702,7 @@ def test_reservation__confirm__return_order_data(graphql):
     }
 
 
-def test_reservation__confirm__payment_type_online_requires_payment_product(graphql):
+def test_reservation__confirm__payment_type_online_requires_payment_product(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_product=None,
         reservation_unit__payment_type=PaymentType.ONLINE,
@@ -706,7 +716,7 @@ def test_reservation__confirm__payment_type_online_requires_payment_product(grap
     assert response.field_error_messages() == ["Reservation unit is missing payment product"]
 
 
-def test_reservation__confirm__payment_type_onsite_doesnt_require_payment_product(graphql):
+def test_reservation__confirm__payment_type_onsite_doesnt_require_payment_product(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_product=None,
         reservation_unit__payment_type=PaymentType.ON_SITE,
@@ -719,7 +729,9 @@ def test_reservation__confirm__payment_type_onsite_doesnt_require_payment_produc
     assert response.has_errors is False, response
 
 
-def test_reservation__confirm__without_price_and_with_free_pricing_does_not_require_payment_product(graphql):
+def test_reservation__confirm__without_price_and_with_free_pricing_does_not_require_payment_product(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_product=None,
         reservation_unit__own_price__amount=0,
@@ -740,7 +752,7 @@ def test_reservation__confirm__without_price_and_with_free_pricing_does_not_requ
 
 @patch_method(PindoraClient.get_reservation, side_effect=PindoraNotFoundError("Not found"))  # Called by email sending
 @patch_method(PindoraService.activate_access_code)
-def test_reservation__confirm__pindora_api__call_succeeds(graphql):
+def test_reservation__confirm__pindora_api__call_succeeds(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
@@ -755,13 +767,13 @@ def test_reservation__confirm__pindora_api__call_succeeds(graphql):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    assert PindoraService.activate_access_code.call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 1
 
 
 @patch_method(PindoraClient.get_reservation, side_effect=PindoraNotFoundError("Not found"))  # Called by email sending
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Error"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation__confirm__pindora_api__call_fails(graphql):
+def test_reservation__confirm__pindora_api__call_fails(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_confirmation(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
@@ -778,6 +790,6 @@ def test_reservation__confirm__pindora_api__call_fails(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
     assert reservation.access_code_is_active is False
 
-    assert PindoraService.activate_access_code.call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 1
 
-    assert SentryLogger.log_exception.called is True
+    assert as_mock(SentryLogger.log_exception).called is True

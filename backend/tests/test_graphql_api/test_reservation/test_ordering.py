@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from django.utils import timezone
@@ -10,6 +11,9 @@ from tilavarauspalvelu.enums import OrderStatus, ReserveeType
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 from tests.test_graphql_api.test_reservation.helpers import reservations_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -17,7 +21,7 @@ pytestmark = [
 
 
 @pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_reservation__order__by_reservation_unit_name__asc(graphql, lang):
+def test_reservation__order__by_reservation_unit_name__asc(graphql: GraphQLClient, lang: str) -> None:
     res_unit_a = ReservationUnitFactory.create(**{f"name_{lang}": "A Unit"})
     res_unit_b = ReservationUnitFactory.create(**{f"name_{lang}": "B Unit"})
     res_unit_c = ReservationUnitFactory.create(**{f"name_{lang}": "C Unit"})
@@ -38,7 +42,7 @@ def test_reservation__order__by_reservation_unit_name__asc(graphql, lang):
 
 
 @pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_reservation__order__by_reservation_unit_name__desc(graphql, lang):
+def test_reservation__order__by_reservation_unit_name__desc(graphql: GraphQLClient, lang: str) -> None:
     res_unit_a = ReservationUnitFactory.create(**{f"name_{lang}": "A Unit"})
     res_unit_b = ReservationUnitFactory.create(**{f"name_{lang}": "B Unit"})
     res_unit_c = ReservationUnitFactory.create(**{f"name_{lang}": "C Unit"})
@@ -58,7 +62,7 @@ def test_reservation__order__by_reservation_unit_name__desc(graphql, lang):
     assert response.node(2) == {"pk": reservation_1.pk}
 
 
-def test_reservation__order__by_reservee_name__asc(graphql):
+def test_reservation__order__by_reservee_name__asc(graphql: GraphQLClient) -> None:
     reservation_1 = ReservationFactory.create(
         reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="A",
@@ -83,7 +87,7 @@ def test_reservation__order__by_reservee_name__asc(graphql):
     assert response.node(2) == {"pk": reservation_3.pk}
 
 
-def test_reservation__order__by_reservee_name__desc(graphql):
+def test_reservation__order__by_reservee_name__desc(graphql: GraphQLClient) -> None:
     reservation_1 = ReservationFactory.create(
         reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="A",
@@ -109,7 +113,7 @@ def test_reservation__order__by_reservee_name__desc(graphql):
 
 
 @pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_reservation__order__by_unit_name__asc(graphql, lang):
+def test_reservation__order__by_unit_name__asc(graphql: GraphQLClient, lang: str) -> None:
     res_unit_a = ReservationUnitFactory.create(**{f"unit__name_{lang}": "A Unit"})
     res_unit_b = ReservationUnitFactory.create(**{f"unit__name_{lang}": "B Unit"})
     res_unit_c = ReservationUnitFactory.create(**{f"unit__name_{lang}": "C Unit"})
@@ -130,7 +134,7 @@ def test_reservation__order__by_unit_name__asc(graphql, lang):
 
 
 @pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_reservation__order__by_unit_name__desc(graphql, lang):
+def test_reservation__order__by_unit_name__desc(graphql: GraphQLClient, lang: str) -> None:
     res_unit_a = ReservationUnitFactory.create(**{f"unit__name_{lang}": "A Unit"})
     res_unit_b = ReservationUnitFactory.create(**{f"unit__name_{lang}": "B Unit"})
     res_unit_c = ReservationUnitFactory.create(**{f"unit__name_{lang}": "C Unit"})
@@ -150,7 +154,7 @@ def test_reservation__order__by_unit_name__desc(graphql, lang):
     assert response.node(2) == {"pk": reservation_1.pk}
 
 
-def test_reservation__order__by_created_at(graphql):
+def test_reservation__order__by_created_at(graphql: GraphQLClient) -> None:
     now = timezone.localtime()
     reservation_1 = ReservationFactory.create(created_at=now + datetime.timedelta(hours=-3))
     reservation_2 = ReservationFactory.create(created_at=now + datetime.timedelta(hours=-2))
@@ -167,7 +171,7 @@ def test_reservation__order__by_created_at(graphql):
     assert response.node(2) == {"pk": reservation_3.pk}
 
 
-def test_reservation__order__by_order_status(graphql):
+def test_reservation__order__by_order_status(graphql: GraphQLClient) -> None:
     reservation_1 = ReservationFactory.create()
     PaymentOrderFactory.create(status=OrderStatus.CANCELLED, reservation=reservation_1)
 

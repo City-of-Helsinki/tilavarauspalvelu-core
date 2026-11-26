@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -14,9 +15,12 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import CHANGE_ACCESS_CODE_STAFF_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -33,7 +37,7 @@ pytestmark = [
 @patch_method(PindoraService.activate_access_code)
 @patch_method(EmailService.send_reservation_access_code_changed_email)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_staff_change_access_code(graphql):
+def test_staff_change_access_code(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -53,9 +57,9 @@ def test_staff_change_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.change_access_code.call_count == 1
-    assert PindoraService.activate_access_code.call_count == 0
-    assert EmailService.send_reservation_access_code_changed_email.call_count == 1
+    assert as_mock(PindoraService.change_access_code).call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 0
+    assert as_mock(EmailService.send_reservation_access_code_changed_email).call_count == 1
 
 
 @patch_method(
@@ -68,7 +72,7 @@ def test_staff_change_access_code(graphql):
 @patch_method(PindoraService.activate_access_code)
 @patch_method(EmailService.send_reservation_access_code_changed_email)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_staff_change_access_code__not_active(graphql):
+def test_staff_change_access_code__not_active(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -88,9 +92,9 @@ def test_staff_change_access_code__not_active(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.change_access_code.call_count == 1
-    assert PindoraService.activate_access_code.call_count == 1
-    assert EmailService.send_reservation_access_code_changed_email.call_count == 1
+    assert as_mock(PindoraService.change_access_code).call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 1
+    assert as_mock(EmailService.send_reservation_access_code_changed_email).call_count == 1
 
 
 @patch_method(
@@ -103,7 +107,7 @@ def test_staff_change_access_code__not_active(graphql):
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Pindora Error"))
 @patch_method(EmailService.send_reservation_access_code_changed_email)
 @patch_method(SentryLogger.log_exception)
-def test_staff_change_access_code__not_active__pindora_call_fails(graphql):
+def test_staff_change_access_code__not_active__pindora_call_fails(graphql: GraphQLClient) -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -125,19 +129,19 @@ def test_staff_change_access_code__not_active__pindora_call_fails(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.change_access_code.call_count == 1
-    assert PindoraService.activate_access_code.call_count == 1
+    assert as_mock(PindoraService.change_access_code).call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 1
 
     # Email not sent since access code is not active due to activation failing
     # This will be corrected by a background task, and an email will be sent then.
-    assert EmailService.send_reservation_access_code_changed_email.call_count == 0
+    assert as_mock(EmailService.send_reservation_access_code_changed_email).call_count == 0
 
-    assert SentryLogger.log_exception.called is True
+    assert as_mock(SentryLogger.log_exception).called is True
 
 
 @patch_method(PindoraService.change_access_code)
 @patch_method(PindoraService.activate_access_code)
-def test_staff_change_access_code__not_generated(graphql):
+def test_staff_change_access_code__not_generated(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -161,7 +165,7 @@ def test_staff_change_access_code__not_generated(graphql):
 
 @patch_method(PindoraService.change_access_code)
 @patch_method(PindoraService.activate_access_code)
-def test_staff_change_access_code__not_access_type_access_code(graphql):
+def test_staff_change_access_code__not_access_type_access_code(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -185,7 +189,7 @@ def test_staff_change_access_code__not_access_type_access_code(graphql):
 
 @patch_method(PindoraService.change_access_code)
 @patch_method(PindoraService.activate_access_code)
-def test_staff_change_access_code__in_series(graphql):
+def test_staff_change_access_code__in_series(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -210,7 +214,7 @@ def test_staff_change_access_code__in_series(graphql):
 
 @patch_method(PindoraService.change_access_code)
 @patch_method(PindoraService.activate_access_code)
-def test_staff_change_access_code__state_not_confirmed(graphql):
+def test_staff_change_access_code__state_not_confirmed(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.WAITING_FOR_PAYMENT,
         type=ReservationTypeChoice.NORMAL,
@@ -234,7 +238,7 @@ def test_staff_change_access_code__state_not_confirmed(graphql):
 
 @patch_method(PindoraService.change_access_code)
 @patch_method(PindoraService.activate_access_code)
-def test_staff_change_access_code__type_is_blocked(graphql):
+def test_staff_change_access_code__type_is_blocked(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.BLOCKED,
@@ -265,7 +269,7 @@ def test_staff_change_access_code__type_is_blocked(graphql):
 )
 @patch_method(PindoraService.activate_access_code)
 @patch_method(EmailService.send_reservation_access_code_changed_email)
-def test_staff_change_access_code__ongoing(graphql):
+def test_staff_change_access_code__ongoing(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -285,14 +289,14 @@ def test_staff_change_access_code__ongoing(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.change_access_code.call_count == 1
-    assert PindoraService.activate_access_code.call_count == 0
-    assert EmailService.send_reservation_access_code_changed_email.call_count == 1
+    assert as_mock(PindoraService.change_access_code).call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 0
+    assert as_mock(EmailService.send_reservation_access_code_changed_email).call_count == 1
 
 
 @patch_method(PindoraService.change_access_code)
 @patch_method(PindoraService.activate_access_code)
-def test_staff_change_access_code__already_ended(graphql):
+def test_staff_change_access_code__already_ended(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -316,7 +320,7 @@ def test_staff_change_access_code__already_ended(graphql):
 
 @patch_method(PindoraService.change_access_code, side_effect=PindoraAPIError("Pindora Error"))
 @patch_method(PindoraService.activate_access_code)
-def test_staff_change_access_code__pindora_error(graphql):
+def test_staff_change_access_code__pindora_error(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -340,7 +344,7 @@ def test_staff_change_access_code__pindora_error(graphql):
 
 @patch_method(PindoraService.change_access_code, side_effect=PindoraNotFoundError("Not found"))
 @patch_method(PindoraService.activate_access_code)
-def test_staff_change_access_code__pindora_error__404(graphql):
+def test_staff_change_access_code__pindora_error__404(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,

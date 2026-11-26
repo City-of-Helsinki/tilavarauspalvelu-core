@@ -28,12 +28,16 @@ from tests.factories import (
     TaxLevelFactory,
     TaxLevelRateFactory,
 )
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, as_mock, patch_method
 
 from .helpers import APPROVE_MUTATION, get_approve_data
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -41,7 +45,7 @@ pytestmark = [
 
 
 @pytest.fixture
-def price_line_audit_logging(settings) -> Generator[None]:
+def price_line_audit_logging(settings: Settings) -> Generator[None]:
     """Register price lines for audit logging, and unregister them after the test."""
     settings.AUDIT_LOGGING_ENABLED = True
     auditlog.register(ReservationPriceLine)
@@ -53,7 +57,7 @@ def price_line_audit_logging(settings) -> Generator[None]:
 
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_reservation__approve__free(graphql):
+def test_reservation__approve__free(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_free()
 
     reservation = ReservationFactory.create(
@@ -71,13 +75,13 @@ def test_reservation__approve__free(graphql):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_created_staff_notification_email.called is True
+    assert as_mock(EmailService.send_reservation_confirmed_email).called is True
+    assert as_mock(EmailService.send_reservation_created_staff_notification_email).called is True
 
 
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_reservation__approve__paid__on_site(graphql):
+def test_reservation__approve__paid__on_site(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
     reservation = ReservationFactory.create(
@@ -96,14 +100,14 @@ def test_reservation__approve__paid__on_site(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
     assert reservation.price_lines.get().tax_percentage == Decimal("24.0")
 
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_created_staff_notification_email.called is True
+    assert as_mock(EmailService.send_reservation_confirmed_email).called is True
+    assert as_mock(EmailService.send_reservation_created_staff_notification_email).called is True
 
 
 @patch_method(EmailService.send_reservation_requires_payment_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__paid__in_webshop(graphql):
+def test_reservation__approve__paid__in_webshop(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -120,8 +124,8 @@ def test_reservation__approve__paid__in_webshop(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert EmailService.send_reservation_requires_payment_email.called is True
-    assert EmailService.send_reservation_created_staff_notification_email.called is True
+    assert as_mock(EmailService.send_reservation_requires_payment_email).called is True
+    assert as_mock(EmailService.send_reservation_created_staff_notification_email).called is True
 
     reservation.refresh_from_db()
 
@@ -147,6 +151,7 @@ def test_reservation__approve__paid__in_webshop(graphql):
     assert payment_order.price_total == Decimal("10.59")
 
     # Handled payment due by is set 3 days from now
+    assert payment_order.handled_payment_due_by is not None
     handled_payment_due_by = payment_order.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE)
     assert handled_payment_due_by == local_datetime(2024, 1, 4, 12)
 
@@ -154,7 +159,7 @@ def test_reservation__approve__paid__in_webshop(graphql):
 @patch_method(EmailService.send_reservation_requires_payment_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__paid__in_webshop__uses_tax_rate_of_approval_date(graphql):
+def test_reservation__approve__paid__in_webshop__uses_tax_rate_of_approval_date(graphql: GraphQLClient) -> None:
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
     TaxLevelRateFactory.create(tax_level=tax_level, begins=local_date(2024, 1, 10), percentage=Decimal(27))
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop(own_price__tax_level=tax_level)
@@ -182,7 +187,7 @@ def test_reservation__approve__paid__in_webshop__uses_tax_rate_of_approval_date(
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
+def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -207,12 +212,15 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
     payment_order = reservation.payment_order
 
     # Handled payment due by is set 1 hour before reservation begins
+    assert payment_order.handled_payment_due_by is not None
     handled_payment_due_by = payment_order.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE)
     assert handled_payment_due_by == local_datetime(2024, 1, 2, 11)
 
 
 @freeze_time(local_datetime(2026, 3, 28, 12))
-def test_reservation__approve__paid__in_webshop__close_to_begin_date__over_daylight_saving_time_change(graphql):
+def test_reservation__approve__paid__in_webshop__close_to_begin_date__over_daylight_saving_time_change(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     # The clocks move from 03:00 to 04:00 on this night.
@@ -232,6 +240,7 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date__over_dayli
 
     reservation.refresh_from_db()
     payment_order = reservation.payment_order
+    assert payment_order.handled_payment_due_by is not None
     handled_payment_due_by = payment_order.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE)
     assert handled_payment_due_by == local_datetime(2026, 3, 29, 2)
 
@@ -239,7 +248,7 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date__over_dayli
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_close(graphql):
+def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_close(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -255,8 +264,8 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
     data = get_approve_data(reservation, price="10.59")
     response = graphql(APPROVE_MUTATION, input_data=data)
 
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_created_staff_notification_email.called is True
+    assert as_mock(EmailService.send_reservation_confirmed_email).called is True
+    assert as_mock(EmailService.send_reservation_created_staff_notification_email).called is True
 
     assert response.has_errors is False, response.errors
 
@@ -278,7 +287,9 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_requires_payment_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_same_price(graphql):
+def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_same_price(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -315,12 +326,14 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
     assert hasattr(reservation, "payment_order")
     assert reservation.payment_order == payment_order
 
-    assert EmailService.send_reservation_confirmed_email.call_count == 1
-    assert EmailService.send_reservation_requires_payment_email.call_count == 0
+    assert as_mock(EmailService.send_reservation_confirmed_email).call_count == 1
+    assert as_mock(EmailService.send_reservation_requires_payment_email).call_count == 0
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__paid__in_webshop__has_payment__paid_online__refund_in_progress(graphql):
+def test_reservation__approve__paid__in_webshop__has_payment__paid_online__refund_in_progress(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -354,7 +367,9 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__refun
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.parametrize("price", ["10.59", "0"])
-def test_reservation__approve__paid__in_webshop__has_payment__paid_online__different_price(graphql, price):
+def test_reservation__approve__paid__in_webshop__has_payment__paid_online__different_price(
+    graphql: GraphQLClient, price: str
+) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -384,7 +399,9 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__diffe
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.parametrize("status", [OrderStatus.PAID_MANUALLY, OrderStatus.REFUNDED, OrderStatus.CANCELLED])
-def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(graphql, status):
+def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(
+    graphql: GraphQLClient, status: OrderStatus
+) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -431,9 +448,9 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.parametrize("status", [OrderStatus.CANCELLED, OrderStatus.EXPIRED])
 def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__price_zero__order_removed__not_cancelled(
-    graphql,
-    status,
-):
+    graphql: GraphQLClient,
+    status: OrderStatus,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -472,7 +489,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__p
 
 @patch_method(PindoraService.activate_access_code)
 @patch_method(PindoraService.create_access_code)
-def test_reservation__approve__pindora_api__call_succeeds(graphql):
+def test_reservation__approve__pindora_api__call_succeeds(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_free(
         access_types__access_type=AccessType.ACCESS_CODE,
     )
@@ -497,14 +514,14 @@ def test_reservation__approve__pindora_api__call_succeeds(graphql):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    assert PindoraService.activate_access_code.called is True
-    assert PindoraService.create_access_code.called is False
+    assert as_mock(PindoraService.activate_access_code).called is True
+    assert as_mock(PindoraService.create_access_code).called is False
 
 
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Error"))
 @patch_method(PindoraService.create_access_code)
 @patch_method(SentryLogger.log_exception)
-def test_reservation__approve__pindora_api__call_fails(graphql):
+def test_reservation__approve__pindora_api__call_fails(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_free(
         access_types__access_type=AccessType.ACCESS_CODE,
     )
@@ -531,15 +548,15 @@ def test_reservation__approve__pindora_api__call_fails(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
     assert reservation.access_code_is_active is False
 
-    assert PindoraService.activate_access_code.called is True
-    assert PindoraService.create_access_code.called is False
+    assert as_mock(PindoraService.activate_access_code).called is True
+    assert as_mock(PindoraService.create_access_code).called is False
 
-    assert SentryLogger.log_exception.called is True
+    assert as_mock(SentryLogger.log_exception).called is True
 
 
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_reservation__approve__pindora_api__series__access_code_not_generated(graphql):
+def test_reservation__approve__pindora_api__series__access_code_not_generated(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_free(
         access_types__access_type=AccessType.ACCESS_CODE,
     )
@@ -567,12 +584,12 @@ def test_reservation__approve__pindora_api__series__access_code_not_generated(gr
     assert reservation.state == ReservationStateChoice.CONFIRMED
     assert reservation.access_code_is_active is False
 
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_created_staff_notification_email.called is True
+    assert as_mock(EmailService.send_reservation_confirmed_email).called is True
+    assert as_mock(EmailService.send_reservation_created_staff_notification_email).called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__no_payment_type(graphql):
+def test_reservation__approve__no_payment_type(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(payment_type=None)
 
     reservation = ReservationFactory.create(
@@ -592,7 +609,7 @@ def test_reservation__approve__no_payment_type(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__no_payment_product_if_paid_online(graphql):
+def test_reservation__approve__no_payment_product_if_paid_online(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(
         own_price__amount=Decimal("20.00"),
         own_price__tax_level__rates__percentage=Decimal("25.50"),
@@ -615,7 +632,7 @@ def test_reservation__approve__no_payment_product_if_paid_online(graphql):
     assert response.field_error_messages() == ["Reservation unit is missing payment product"]
 
 
-def test_reservation__approve__status_not_requires_handling(graphql):
+def test_reservation__approve__status_not_requires_handling(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_free()
 
     reservation = ReservationFactory.create(
@@ -634,7 +651,7 @@ def test_reservation__approve__status_not_requires_handling(graphql):
     assert reservation.state == ReservationStateChoice.CREATED
 
 
-def test_reservation__approve__price_lines_missing(graphql):
+def test_reservation__approve__price_lines_missing(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_free()
 
     reservation = ReservationFactory.create(
@@ -654,7 +671,7 @@ def test_reservation__approve__price_lines_missing(graphql):
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
-def test_reservation__approve__handling_details_missing(graphql):
+def test_reservation__approve__handling_details_missing(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_free()
 
     reservation = ReservationFactory.create(
@@ -674,7 +691,7 @@ def test_reservation__approve__handling_details_missing(graphql):
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
-def test_reservation__approve__empty_handling_details(graphql):
+def test_reservation__approve__empty_handling_details(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_free()
 
     reservation = ReservationFactory.create(
@@ -699,7 +716,7 @@ def test_reservation__approve__empty_handling_details(graphql):
 
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_reservation__approve__price_lines__one_line_free_and_one_paid(graphql):
+def test_reservation__approve__price_lines__one_line_free_and_one_paid(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
     reservation = ReservationFactory.create(
@@ -733,7 +750,7 @@ def test_reservation__approve__price_lines__one_line_free_and_one_paid(graphql):
 
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_reservation__approve__price_lines__amounts_corrected_up_and_down(graphql):
+def test_reservation__approve__price_lines__amounts_corrected_up_and_down(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
     reservation = ReservationFactory.create(
@@ -767,7 +784,7 @@ def test_reservation__approve__price_lines__amounts_corrected_up_and_down(graphq
 @pytest.mark.usefixtures("price_line_audit_logging")
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_reservation__approve__price_lines__writes_audit_log(graphql):
+def test_reservation__approve__price_lines__writes_audit_log(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
     reservation = ReservationFactory.create(
@@ -789,7 +806,7 @@ def test_reservation__approve__price_lines__writes_audit_log(graphql):
 
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_reservation__approve__price_lines__null_override_clears_existing_override(graphql):
+def test_reservation__approve__price_lines__null_override_clears_existing_override(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
     reservation = ReservationFactory.create(
@@ -819,7 +836,7 @@ def test_reservation__approve__price_lines__null_override_clears_existing_overri
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__price_lines__all_lines_free(graphql):
+def test_reservation__approve__price_lines__all_lines_free(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -841,7 +858,7 @@ def test_reservation__approve__price_lines__all_lines_free(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert EmailService.send_reservation_confirmed_email.called is True
+    assert as_mock(EmailService.send_reservation_confirmed_email).called is True
 
     reservation = Reservation.objects.get(pk=reservation.pk)
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -853,7 +870,7 @@ def test_reservation__approve__price_lines__all_lines_free(graphql):
 @patch_method(EmailService.send_reservation_requires_payment_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__price_lines__paid__in_webshop(graphql):
+def test_reservation__approve__price_lines__paid__in_webshop(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -875,7 +892,7 @@ def test_reservation__approve__price_lines__paid__in_webshop(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert EmailService.send_reservation_requires_payment_email.called is True
+    assert as_mock(EmailService.send_reservation_requires_payment_email).called is True
 
     reservation = Reservation.objects.get(pk=reservation.pk)
     assert reservation.total_price == Decimal(20)
@@ -889,7 +906,7 @@ def test_reservation__approve__price_lines__paid__in_webshop(graphql):
 
 
 @pytest.mark.parametrize("case", ["other_reservation", "missing_line", "duplicate_line"])
-def test_reservation__approve__price_lines__lines_do_not_match(graphql, case):
+def test_reservation__approve__price_lines__lines_do_not_match(graphql: GraphQLClient, case: str) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
     reservation = ReservationFactory.create(
@@ -924,7 +941,7 @@ def test_reservation__approve__price_lines__lines_do_not_match(graphql, case):
     assert overrides == [None, None, None]
 
 
-def test_reservation__approve__price_lines__reservation_has_no_lines(graphql):
+def test_reservation__approve__price_lines__reservation_has_no_lines(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
     reservation = ReservationFactory.create(
@@ -944,7 +961,7 @@ def test_reservation__approve__price_lines__reservation_has_no_lines(graphql):
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
-def test_reservation__approve__price_lines__negative_override_amount(graphql):
+def test_reservation__approve__price_lines__negative_override_amount(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
     reservation = ReservationFactory.create(

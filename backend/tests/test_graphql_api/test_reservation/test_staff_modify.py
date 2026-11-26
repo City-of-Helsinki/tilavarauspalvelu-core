@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -11,16 +12,19 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime, next_hour
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import UPDATE_STAFF_MUTATION, get_staff_modify_data
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation__staff_modify(graphql):
+def test_reservation__staff_modify(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update()
 
     graphql.login_with_superuser()
@@ -33,7 +37,7 @@ def test_reservation__staff_modify(graphql):
     assert reservation.name == "foo"
 
 
-def test_reservation__staff_modify__wrong_state(graphql):
+def test_reservation__staff_modify__wrong_state(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(state=ReservationStateChoice.CANCELLED)
 
     graphql.login_with_superuser()
@@ -44,7 +48,7 @@ def test_reservation__staff_modify__wrong_state(graphql):
     assert response.field_error_messages() == ["Reservation cannot be edited by staff members based on its state"]
 
 
-def test_reservation__staff_modify__end_date_passed(graphql):
+def test_reservation__staff_modify__end_date_passed(graphql: GraphQLClient) -> None:
     end = next_hour(plus_hours=-1, plus_days=-2)
     begin = end - datetime.timedelta(hours=1)
 
@@ -58,7 +62,7 @@ def test_reservation__staff_modify__end_date_passed(graphql):
     assert response.field_error_messages() == ["Reservation cannot be changed anymore."]
 
 
-def test_reservation__staff_modify__normal_reservation_to_staff(graphql):
+def test_reservation__staff_modify__normal_reservation_to_staff(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.NORMAL)
 
     graphql.login_with_superuser()
@@ -69,7 +73,7 @@ def test_reservation__staff_modify__normal_reservation_to_staff(graphql):
     assert response.field_error_messages() == ["A normal type reservation cannot be changed to any other type."]
 
 
-def test_reservation__staff_modify__normal_reservation_to_behalf(graphql):
+def test_reservation__staff_modify__normal_reservation_to_behalf(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.NORMAL)
 
     graphql.login_with_superuser()
@@ -80,7 +84,7 @@ def test_reservation__staff_modify__normal_reservation_to_behalf(graphql):
     assert response.field_error_messages() == ["A normal type reservation cannot be changed to any other type."]
 
 
-def test_reservation__staff_modify__normal_reservation_to_blocked(graphql):
+def test_reservation__staff_modify__normal_reservation_to_blocked(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.NORMAL)
 
     graphql.login_with_superuser()
@@ -91,7 +95,7 @@ def test_reservation__staff_modify__normal_reservation_to_blocked(graphql):
     assert response.field_error_messages() == ["A normal type reservation cannot be changed to any other type."]
 
 
-def test_reservation__staff_modify__staff_reservation_to_normal(graphql):
+def test_reservation__staff_modify__staff_reservation_to_normal(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.STAFF)
 
     graphql.login_with_superuser()
@@ -104,7 +108,7 @@ def test_reservation__staff_modify__staff_reservation_to_normal(graphql):
     ]
 
 
-def test_reservation__staff_modify__behalf_reservation_to_normal(graphql):
+def test_reservation__staff_modify__behalf_reservation_to_normal(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.BEHALF)
 
     graphql.login_with_superuser()
@@ -117,7 +121,7 @@ def test_reservation__staff_modify__behalf_reservation_to_normal(graphql):
     ]
 
 
-def test_reservation__staff_modify__blocked_reservation_to_normal(graphql):
+def test_reservation__staff_modify__blocked_reservation_to_normal(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.BLOCKED)
 
     graphql.login_with_superuser()
@@ -131,7 +135,7 @@ def test_reservation__staff_modify__blocked_reservation_to_normal(graphql):
 
 
 @patch_method(PindoraService.activate_access_code)
-def test_reservation__staff_modify__blocked_reservation_to_staff(graphql):
+def test_reservation__staff_modify__blocked_reservation_to_staff(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.BLOCKED)
 
     graphql.login_with_superuser()
@@ -143,11 +147,13 @@ def test_reservation__staff_modify__blocked_reservation_to_staff(graphql):
     reservation.refresh_from_db()
     assert reservation.type == ReservationTypeChoice.STAFF
 
-    assert PindoraService.activate_access_code.call_count == 0
+    assert as_mock(PindoraService.activate_access_code).call_count == 0
 
 
 @patch_method(PindoraService.activate_access_code)
-def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_succeeds(graphql):
+def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_succeeds(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.BLOCKED,
         access_type=AccessType.ACCESS_CODE,
@@ -163,12 +169,14 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
     reservation.refresh_from_db()
     assert reservation.type == ReservationTypeChoice.STAFF
 
-    assert PindoraService.activate_access_code.call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 1
 
 
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Pindora API error"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_fails(graphql):
+def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_fails(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.BLOCKED,
         access_type=AccessType.ACCESS_CODE,
@@ -183,13 +191,15 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
     # Access code will be activated later in a background task.
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.activate_access_code.call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 1
 
-    assert SentryLogger.log_exception.called is True
+    assert as_mock(SentryLogger.log_exception).called is True
 
 
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraNotFoundError("Error"))
-def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_fails__404(graphql):
+def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_fails__404(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.BLOCKED,
         access_type=AccessType.ACCESS_CODE,
@@ -207,11 +217,11 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
     assert reservation.type == ReservationTypeChoice.STAFF
     assert reservation.access_code_is_active is False
 
-    assert PindoraService.activate_access_code.call_count == 1
+    assert as_mock(PindoraService.activate_access_code).call_count == 1
 
 
 @patch_method(PindoraService.deactivate_access_code)
-def test_reservation__staff_modify__staff_reservation_to_blocked(graphql):
+def test_reservation__staff_modify__staff_reservation_to_blocked(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.STAFF)
 
     graphql.login_with_superuser()
@@ -224,11 +234,11 @@ def test_reservation__staff_modify__staff_reservation_to_blocked(graphql):
     assert reservation.type == ReservationTypeChoice.BLOCKED
     assert reservation.access_code_is_active is False
 
-    assert PindoraService.deactivate_access_code.call_count == 0
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 0
 
 
 @patch_method(PindoraService.deactivate_access_code)
-def test_reservation__staff_modify__staff_reservation_to_blocked__in_reservation_series(graphql):
+def test_reservation__staff_modify__staff_reservation_to_blocked__in_reservation_series(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
@@ -247,10 +257,10 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__in_reservation
     reservation.refresh_from_db()
     assert reservation.type == ReservationTypeChoice.STAFF
 
-    assert PindoraService.deactivate_access_code.call_count == 0
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 0
 
 
-def test_reservation__staff_modify__in_reservation_series__same_type(graphql):
+def test_reservation__staff_modify__in_reservation_series__same_type(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
         reservation_series=ReservationSeriesFactory.create(),
@@ -267,7 +277,9 @@ def test_reservation__staff_modify__in_reservation_series__same_type(graphql):
 
 
 @patch_method(PindoraService.deactivate_access_code)
-def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_succeeds(graphql):
+def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_succeeds(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
@@ -284,12 +296,14 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
     reservation.refresh_from_db()
     assert reservation.type == ReservationTypeChoice.BLOCKED
 
-    assert PindoraService.deactivate_access_code.call_count == 1
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 1
 
 
 @patch_method(PindoraService.deactivate_access_code, side_effect=PindoraAPIError("Pindora API error"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_fails(graphql):
+def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_fails(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
@@ -305,13 +319,15 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
     # Access code will be deactivated later in a background task.
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.deactivate_access_code.call_count == 1
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 1
 
-    assert SentryLogger.log_exception.called is True
+    assert as_mock(SentryLogger.log_exception).called is True
 
 
 @patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Error"))
-def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_succeeds__404(graphql):
+def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_succeeds__404(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
@@ -330,4 +346,4 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
     assert reservation.type == ReservationTypeChoice.BLOCKED
     assert reservation.access_code_is_active is True
 
-    assert PindoraService.deactivate_access_code.call_count == 1
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 1

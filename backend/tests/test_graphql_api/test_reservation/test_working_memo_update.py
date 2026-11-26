@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
@@ -8,12 +10,15 @@ from tests.factories import ReservationFactory, ReservationUnitFactory, UserFact
 
 from .helpers import UPDATE_WORKING_MEMO_MUTATION, get_working_memo_update_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation__update__working_memo__general_admin(graphql):
+def test_reservation__update__working_memo__general_admin(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
@@ -29,7 +34,7 @@ def test_reservation__update__working_memo__general_admin(graphql):
     assert reservation.working_memo == data["workingMemo"]
 
 
-def test_reservation__update__working_memo__general_commenter(graphql):
+def test_reservation__update__working_memo__general_commenter(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
@@ -45,7 +50,7 @@ def test_reservation__update__working_memo__general_commenter(graphql):
     assert reservation.working_memo == data["workingMemo"]
 
 
-def test_reservation__update__working_memo__unit_commenter(graphql):
+def test_reservation__update__working_memo__unit_commenter(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
@@ -61,7 +66,7 @@ def test_reservation__update__working_memo__unit_commenter(graphql):
     assert reservation.working_memo == data["workingMemo"]
 
 
-def test_reservation__update__working_memo__regular_user(graphql):
+def test_reservation__update__working_memo__regular_user(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
@@ -75,7 +80,7 @@ def test_reservation__update__working_memo__regular_user(graphql):
     assert reservation.working_memo == ""
 
 
-def test_reservation__update__working_memo__staff_and_own_reservation(graphql):
+def test_reservation__update__working_memo__staff_and_own_reservation(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     admin = UserFactory.create_with_general_role()
@@ -92,7 +97,7 @@ def test_reservation__update__working_memo__staff_and_own_reservation(graphql):
     assert reservation.working_memo == data["workingMemo"]
 
 
-def test_reservation__update__working_memo__reserver_staff_user_and_not_own_reservation(graphql):
+def test_reservation__update__working_memo__reserver_staff_user_and_not_own_reservation(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     admin = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
@@ -109,7 +114,7 @@ def test_reservation__update__working_memo__reserver_staff_user_and_not_own_rese
     assert reservation.working_memo == ""
 
 
-def test_reservation__update__empty(graphql):
+def test_reservation__update__empty(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(working_memo="foo")
     graphql.login_with_superuser()
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING, Any
 
 import freezegun
 import pytest
@@ -21,9 +22,15 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
+
+if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+    from django.db.models import QuerySet
+
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -32,7 +39,9 @@ pytestmark = [
 
 @override_settings(SEND_EMAILS=True)
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
-def test_reservation__staff_adjust_time__send_email_if_type_normal_or_seasonal(graphql, reservation_type, outbox):
+def test_reservation__staff_adjust_time__send_email_if_type_normal_or_seasonal(
+    graphql: GraphQLClient, reservation_type: ReservationTypeChoice, outbox: list[EmailMultiAlternatives]
+) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(type=reservation_type)
 
     graphql.login_with_superuser()
@@ -49,7 +58,9 @@ def test_reservation__staff_adjust_time__send_email_if_type_normal_or_seasonal(g
 
 
 @override_settings(SEND_EMAILS=True)
-def test_reservation__staff_adjust_time__dont_send_email_to_staff_type_reservations(graphql, outbox):
+def test_reservation__staff_adjust_time__dont_send_email_to_staff_type_reservations(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives]
+) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(type=ReservationTypeChoice.STAFF)
 
     graphql.login_with_superuser()
@@ -61,7 +72,7 @@ def test_reservation__staff_adjust_time__dont_send_email_to_staff_type_reservati
     assert len(outbox) == 0
 
 
-def test_reservation__staff_adjust_time__buffer_change_success(graphql):
+def test_reservation__staff_adjust_time__buffer_change_success(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment()
 
     buffer_time_before = datetime.timedelta(minutes=15)
@@ -83,7 +94,7 @@ def test_reservation__staff_adjust_time__buffer_change_success(graphql):
     assert reservation.buffer_time_after == datetime.timedelta(minutes=30)
 
 
-def test_reservation__staff_adjust_time__wrong_state(graphql):
+def test_reservation__staff_adjust_time__wrong_state(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(state=ReservationStateChoice.CANCELLED)
 
     graphql.login_with_superuser()
@@ -94,7 +105,7 @@ def test_reservation__staff_adjust_time__wrong_state(graphql):
     assert response.field_error_messages() == ["Reservation cannot be rescheduled based on its state"]
 
 
-def test_reservation__staff_adjust_time__end_before_begin(graphql):
+def test_reservation__staff_adjust_time__end_before_begin(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment()
 
     end = next_hour(plus_hours=1)
@@ -108,7 +119,7 @@ def test_reservation__staff_adjust_time__end_before_begin(graphql):
     assert response.field_error_messages() == ["Reservation must end after it begins"]
 
 
-def test_reservation__staff_adjust_time__end_same_as_begin(graphql):
+def test_reservation__staff_adjust_time__end_same_as_begin(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment()
     original_ends_at = reservation.ends_at
 
@@ -125,7 +136,7 @@ def test_reservation__staff_adjust_time__end_same_as_begin(graphql):
     assert reservation.ends_at == original_ends_at.astimezone(datetime.UTC)
 
 
-def test_reservation__staff_adjust_time__begin_date_in_the_past(graphql):
+def test_reservation__staff_adjust_time__begin_date_in_the_past(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment()
 
     now = local_datetime()
@@ -143,7 +154,7 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past(graphql):
 
 
 @freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=12, minute=15, tzinfo=DEFAULT_TIMEZONE))
-def test_reservation__staff_adjust_time__begin_date_in_the_past__today(graphql):
+def test_reservation__staff_adjust_time__begin_date_in_the_past__today(graphql: GraphQLClient) -> None:
     #
     # Allow staff members to move the reservation to earlier time today.
     #
@@ -166,7 +177,7 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past__today(graphql):
     assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
-def test_reservation__staff_adjust_time__reservation_in_the_past(graphql):
+def test_reservation__staff_adjust_time__reservation_in_the_past(graphql: GraphQLClient) -> None:
     with freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=12, minute=15, tzinfo=DEFAULT_TIMEZONE)):
         reservation = ReservationFactory.create_for_time_adjustment()
 
@@ -181,7 +192,7 @@ def test_reservation__staff_adjust_time__reservation_in_the_past(graphql):
     assert response.field_error_messages() == ["Reservation cannot be changed anymore."]
 
 
-def test_reservation__staff_adjust_time__reservation_in_the_past__timezone_check(graphql):
+def test_reservation__staff_adjust_time__reservation_in_the_past__timezone_check(graphql: GraphQLClient) -> None:
     #
     # Regression test to check that the timezone is taken into account when checking reservation's date.
     # against the minimum allowed date.
@@ -213,7 +224,9 @@ def test_reservation__staff_adjust_time__reservation_in_the_past__timezone_check
 
 
 @freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=0, minute=15, tzinfo=DEFAULT_TIMEZONE))
-def test_reservation__staff_adjust_time__begin_date_in_the_past__move_to_yesterday_on_first_hour_of_day(graphql):
+def test_reservation__staff_adjust_time__begin_date_in_the_past__move_to_yesterday_on_first_hour_of_day(
+    graphql: GraphQLClient,
+) -> None:
     #
     # We allow changing the reservation time to the previous day if it's the first hour of the day.
     #
@@ -236,7 +249,7 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past__move_to_yesterd
     assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
-def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graphql):
+def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graphql: GraphQLClient) -> None:
     begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
@@ -270,7 +283,9 @@ def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graph
     assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
-def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to_its_buffer(graphql):
+def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to_its_buffer(
+    graphql: GraphQLClient,
+) -> None:
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
 
@@ -308,7 +323,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
     assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
-def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_its_buffer(graphql):
+def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_its_buffer(
+    graphql: GraphQLClient,
+) -> None:
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
 
@@ -346,7 +363,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
     assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
-def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to_own_buffer(graphql):
+def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to_own_buffer(
+    graphql: GraphQLClient,
+) -> None:
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
 
@@ -390,7 +409,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
     assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
-def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_own_buffer(graphql):
+def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_own_buffer(
+    graphql: GraphQLClient,
+) -> None:
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
 
@@ -434,7 +455,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
     assert reservation.ends_at == end.astimezone(datetime.UTC)
 
 
-def test_reservation__staff_adjust_time__reservation_start_time_not_in_interval(graphql):
+def test_reservation__staff_adjust_time__reservation_start_time_not_in_interval(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment()
 
     now = local_datetime()
@@ -453,7 +474,9 @@ def test_reservation__staff_adjust_time__reservation_start_time_not_in_interval(
 
 
 @pytest.mark.parametrize("interval", ReservationStartInterval.values)
-def test_reservation__staff_adjust_time__reservation_start_interval_over_30_treated_as_30(graphql, interval):
+def test_reservation__staff_adjust_time__reservation_start_interval_over_30_treated_as_30(
+    graphql: GraphQLClient, interval: str
+) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(reservation_unit__reservation_start_interval=interval)
 
     now = local_datetime()
@@ -473,7 +496,7 @@ def test_reservation__staff_adjust_time__reservation_start_interval_over_30_trea
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__staff_adjust_time__reservation_block_whole_day(graphql):
+def test_reservation__staff_adjust_time__reservation_block_whole_day(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
@@ -504,8 +527,7 @@ def test_reservation__staff_adjust_time__reservation_block_whole_day(graphql):
     response = graphql(ADJUST_STAFF_MUTATION, input_data=input_data)
     assert response.has_errors is False, response.errors
 
-    reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
-    assert reservation is not None
+    reservation = Reservation.objects.get(name="foo")
     assert reservation.begins_at == datetime.datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.ends_at == datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.buffer_time_before == datetime.timedelta(hours=12)
@@ -513,7 +535,9 @@ def test_reservation__staff_adjust_time__reservation_block_whole_day(graphql):
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__staff_adjust_time__reservation_block_whole_day__ignore_given_buffers(graphql):
+def test_reservation__staff_adjust_time__reservation_block_whole_day__ignore_given_buffers(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
@@ -546,8 +570,7 @@ def test_reservation__staff_adjust_time__reservation_block_whole_day__ignore_giv
     response = graphql(ADJUST_STAFF_MUTATION, input_data=input_data)
     assert response.has_errors is False, response.errors
 
-    reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
-    assert reservation is not None
+    reservation = Reservation.objects.get(name="foo")
     assert reservation.begins_at == datetime.datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.ends_at == datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.buffer_time_before == datetime.timedelta(hours=12)
@@ -555,7 +578,7 @@ def test_reservation__staff_adjust_time__reservation_block_whole_day__ignore_giv
 
 
 @patch_method(PindoraService.sync_access_code)
-def test_reservation__staff_adjust_time__same_access_type(graphql):
+def test_reservation__staff_adjust_time__same_access_type(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
@@ -570,11 +593,11 @@ def test_reservation__staff_adjust_time__same_access_type(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
 
 @patch_method(PindoraService.sync_access_code)
-def test_reservation__staff_adjust_time__same_access_type__requires_handling(graphql):
+def test_reservation__staff_adjust_time__same_access_type__requires_handling(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
@@ -590,14 +613,14 @@ def test_reservation__staff_adjust_time__same_access_type__requires_handling(gra
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True
 
 
 @patch_method(PindoraService.sync_access_code)
-def test_reservation__staff_adjust_time__change_to_access_code(graphql):
+def test_reservation__staff_adjust_time__change_to_access_code(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.UNRESTRICTED,
@@ -611,11 +634,11 @@ def test_reservation__staff_adjust_time__change_to_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
 
 @patch_method(PindoraService.sync_access_code)
-def test_reservation__staff_adjust_time__change_to_access_code__requires_handling(graphql):
+def test_reservation__staff_adjust_time__change_to_access_code__requires_handling(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.UNRESTRICTED,
@@ -630,11 +653,11 @@ def test_reservation__staff_adjust_time__change_to_access_code__requires_handlin
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
 
 @patch_method(PindoraService.sync_access_code)
-def test_reservation__staff_adjust_time__change_from_access_code(graphql):
+def test_reservation__staff_adjust_time__change_from_access_code(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
@@ -649,11 +672,11 @@ def test_reservation__staff_adjust_time__change_from_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
 
 @patch_method(PindoraService.sync_access_code, side_effect=PindoraAPIError("Pindora Error"))
-def test_reservation__staff_adjust_time__pindora_call_failed(graphql):
+def test_reservation__staff_adjust_time__pindora_call_failed(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
@@ -669,10 +692,12 @@ def test_reservation__staff_adjust_time__pindora_call_failed(graphql):
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Pindora Error"]
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
 
-def test_reservation__staff_adjust_time__overlapping_reservation_created_at_the_same_time(graphql):
+def test_reservation__staff_adjust_time__overlapping_reservation_created_at_the_same_time(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_time_adjustment()
     reservation_begin = reservation.begins_at
     reservation_end = reservation.ends_at
@@ -681,7 +706,7 @@ def test_reservation__staff_adjust_time__overlapping_reservation_created_at_the_
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
 
-    def callback(*args, **kwargs):
+    def callback(*args: Any, **kwargs: Any) -> QuerySet[Reservation]:
         res = ReservationFactory.create_for_reservation_unit(
             reservation_unit=reservation_unit,
             begins_at=reservation_begin,

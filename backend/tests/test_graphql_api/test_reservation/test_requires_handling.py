@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.test import override_settings
@@ -16,9 +17,15 @@ from tilavarauspalvelu.models.reservation.actions import ReservationActions
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory, UserFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
+
+if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+    from django.db.models import QuerySet
+
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -34,7 +41,9 @@ pytestmark = [
     ],
 )
 @patch_method(PindoraService.deactivate_access_code)
-def test_reservation__requires_handling__allowed_states(graphql, outbox, state):
+def test_reservation__requires_handling__allowed_states(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives], state: ReservationStateChoice
+) -> None:
     reservation = ReservationFactory.create_for_requires_handling(state=state)
 
     # Admin will get notification
@@ -55,7 +64,7 @@ def test_reservation__requires_handling__allowed_states(graphql, outbox, state):
     assert len(outbox) == 1
     assert outbox[0].subject == "Your booking is waiting for processing"
 
-    assert PindoraService.deactivate_access_code.call_count == 0
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 0
 
 
 @pytest.mark.parametrize(
@@ -67,7 +76,9 @@ def test_reservation__requires_handling__allowed_states(graphql, outbox, state):
         ReservationStateChoice.WAITING_FOR_PAYMENT,
     ],
 )
-def test_reservation__requires_handling__disallowed_states(graphql, state):
+def test_reservation__requires_handling__disallowed_states(
+    graphql: GraphQLClient, state: ReservationStateChoice
+) -> None:
     reservation = ReservationFactory.create_for_requires_handling(state=state)
 
     # Admin will get notification
@@ -88,7 +99,7 @@ def test_reservation__requires_handling__disallowed_states(graphql, state):
 
 
 @patch_method(PindoraService.deactivate_access_code)
-def test_reservation__requires_handling__in_reservation_series(graphql):
+def test_reservation__requires_handling__in_reservation_series(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_requires_handling(
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
@@ -107,11 +118,11 @@ def test_reservation__requires_handling__in_reservation_series(graphql):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    assert PindoraService.deactivate_access_code.call_count == 0
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 0
 
 
 @patch_method(PindoraService.deactivate_access_code)
-def test_reservation__requires_handling__pindora_api__call_succeeds(graphql):
+def test_reservation__requires_handling__pindora_api__call_succeeds(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_requires_handling(
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
@@ -128,11 +139,11 @@ def test_reservation__requires_handling__pindora_api__call_succeeds(graphql):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
-    assert PindoraService.deactivate_access_code.call_count == 1
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 1
 
 
 @patch_method(PindoraService.deactivate_access_code, side_effect=PindoraAPIError("Pindora API error"))
-def test_reservation__requires_handling__pindora_api__call_fails(graphql):
+def test_reservation__requires_handling__pindora_api__call_fails(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_requires_handling(
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
@@ -148,12 +159,12 @@ def test_reservation__requires_handling__pindora_api__call_fails(graphql):
     # Access code will be deactivated later in a background task.
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.deactivate_access_code.call_count == 1
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 1
 
 
 @patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Error"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation__requires_handling__pindora_api__call_fails__404(graphql):
+def test_reservation__requires_handling__pindora_api__call_fails__404(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_requires_handling(
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
@@ -172,12 +183,12 @@ def test_reservation__requires_handling__pindora_api__call_fails__404(graphql):
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
     assert reservation.access_code_is_active is True
 
-    assert PindoraService.deactivate_access_code.call_count == 1
+    assert as_mock(PindoraService.deactivate_access_code).call_count == 1
 
-    assert SentryLogger.log_exception.called is True
+    assert as_mock(SentryLogger.log_exception).called is True
 
 
-def test_reservation__requires_handling__denied_overlaps_with_existing_reservation(graphql):
+def test_reservation__requires_handling__denied_overlaps_with_existing_reservation(graphql: GraphQLClient) -> None:
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
@@ -208,7 +219,9 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
     assert reservation.state == ReservationStateChoice.DENIED
 
 
-def test_reservation__requires_handling__denied_overlaps_with_existing_reservation__after_mutation(graphql):
+def test_reservation__requires_handling__denied_overlaps_with_existing_reservation__after_mutation(
+    graphql: GraphQLClient,
+) -> None:
     now = local_datetime()
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
@@ -224,7 +237,7 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
 
-    def callback(*args, **kwargs):
+    def callback(*args: Any, **kwargs: Any) -> QuerySet[Reservation]:
         ReservationFactory.create_for_reservation_unit(
             begins_at=now + datetime.timedelta(hours=1),
             ends_at=now + datetime.timedelta(hours=2),
@@ -243,7 +256,7 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
     assert reservation.state == ReservationStateChoice.DENIED
 
 
-def test_reservation__requires_handling__cancel_order_if_not_paid_yet(graphql):
+def test_reservation__requires_handling__cancel_order_if_not_paid_yet(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_requires_handling(
         price_lines__amount=Decimal("12.4"),
         price_lines__tax_percentage=Decimal("25.5"),
@@ -268,7 +281,7 @@ def test_reservation__requires_handling__cancel_order_if_not_paid_yet(graphql):
     assert payment_order.status == OrderStatus.CANCELLED
 
 
-def test_reservation__requires_handling__leave_order_paid(graphql):
+def test_reservation__requires_handling__leave_order_paid(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_requires_handling(
         price_lines__amount=Decimal("12.4"),
         price_lines__tax_percentage=Decimal("25.5"),

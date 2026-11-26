@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -10,13 +11,16 @@ from tests.factories import ReservationFactory, ReservationUnitFactory
 
 from .helpers import APPROVE_MUTATION, get_approve_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
 @pytest.mark.parametrize("role", [UserRoleChoice.HANDLER, UserRoleChoice.ADMIN])
-def test_reservation__approve__allowed(graphql, role):
+def test_reservation__approve__allowed(graphql: GraphQLClient, role: UserRoleChoice) -> None:
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
     reservation = ReservationFactory.create(
         price_lines__amount=Decimal(0),
@@ -31,7 +35,7 @@ def test_reservation__approve__allowed(graphql, role):
     assert response.has_errors is False, response.errors
 
 
-def test_reservation__approve__allowed__own(graphql):
+def test_reservation__approve__allowed__own(graphql: GraphQLClient) -> None:
     # Reservers are allowed to approve their own reservations.
     user = graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
 
@@ -49,7 +53,7 @@ def test_reservation__approve__allowed__own(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_reservation__approve__not_allowed(graphql):
+def test_reservation__approve__not_allowed(graphql: GraphQLClient) -> None:
     graphql.login_with_regular_user()
 
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
@@ -66,7 +70,7 @@ def test_reservation__approve__not_allowed(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_reservation__approve__not_allowed__own(graphql):
+def test_reservation__approve__not_allowed__own(graphql: GraphQLClient) -> None:
     # Regular users are not approve to approve their own reservations without required role.
     user = graphql.login_with_regular_user()
 

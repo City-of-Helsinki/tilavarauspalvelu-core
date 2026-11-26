@@ -45,13 +45,15 @@ from .helpers import reservation_query, reservations_query
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
 
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation__query__all_fields(graphql):
+def test_reservation__query__all_fields(graphql: GraphQLClient) -> None:
     # given:
     # - There is a reservation in the system
     # - A superuser is using the system
@@ -160,7 +162,7 @@ def test_reservation__query__all_fields(graphql):
     }
 
 
-def test_reservation__query__single(graphql):
+def test_reservation__query__single(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create()
 
     graphql.login_with_superuser()
@@ -173,7 +175,7 @@ def test_reservation__query__single(graphql):
     assert response.first_query_object["pk"] == reservation.pk
 
 
-def test_reservation__query__reservee_name_for_individual_reservee(graphql):
+def test_reservation__query__reservee_name_for_individual_reservee(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="First",
@@ -191,7 +193,7 @@ def test_reservation__query__reservee_name_for_individual_reservee(graphql):
     assert response.first_query_object["reserveeName"] == "First Last"
 
 
-def test_reservation__query__reservee_name_for_business_reservee(graphql):
+def test_reservation__query__reservee_name_for_business_reservee(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         reservee_type=ReserveeType.COMPANY,
         reservee_organisation_name="Business Oy",
@@ -208,8 +210,8 @@ def test_reservation__query__reservee_name_for_business_reservee(graphql):
     assert response.first_query_object["reserveeName"] == "Business Oy"
 
 
-def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql):
-    reservation = ReservationFactory(
+def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql: GraphQLClient) -> None:
+    reservation = ReservationFactory.create(
         reservee_type=ReserveeType.NONPROFIT,
         reservee_organisation_name="Nonprofit Ry",
     )
@@ -225,7 +227,7 @@ def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql):
     assert response.first_query_object["reserveeName"] == "Nonprofit Ry"
 
 
-def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user(graphql):
+def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create()
 
     graphql.login_with_regular_user()
@@ -239,7 +241,7 @@ def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user
     assert PersonalInfoViewLog.objects.first() is None
 
 
-def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_admin(graphql):
+def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_admin(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create()
     admin = UserFactory.create_with_general_role()
 
@@ -249,6 +251,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1
+    assert reservation.user.date_of_birth is not None
     assert response.node(0) == {
         "pk": reservation.pk,
         "user": {
@@ -264,7 +267,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_
     assert view_log.field == "User.date_of_birth"
 
 
-def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_admin(graphql):
+def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_admin(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
@@ -276,6 +279,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_adm
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1
+    assert reservation.user.date_of_birth is not None
     assert response.node(0) == {
         "pk": reservation.pk,
         "user": {
@@ -291,7 +295,9 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_adm
     assert view_log.field == "User.date_of_birth"
 
 
-def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_group_admin(graphql):
+def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_group_admin(
+    graphql: GraphQLClient,
+) -> None:
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
     reservation_unit = ReservationUnitFactory.create(unit=unit)
@@ -304,6 +310,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1
+    assert reservation.user.date_of_birth is not None
     assert response.node(0) == {
         "pk": reservation.pk,
         "user": {
@@ -319,7 +326,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
     assert view_log.field == "User.date_of_birth"
 
 
-def test_reservation__query__is_handled(graphql):
+def test_reservation__query__is_handled(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(handled_at=None)
 
     graphql.login_with_superuser()
@@ -340,7 +347,7 @@ def test_reservation__query__is_handled(graphql):
     assert response.node(0) == {"pk": reservation.pk, "isHandled": True}
 
 
-def test_reservation__query__is_blocked(graphql):
+def test_reservation__query__is_blocked(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(type=ReservationTypeChoice.STAFF)
 
     graphql.login_with_superuser()
@@ -362,7 +369,7 @@ def test_reservation__query__is_blocked(graphql):
 
 
 @freezegun.freeze_time()  # Freeze time for consistent 'expiresInMinutes' result
-def test_reservation__query__order__all_fields(graphql):
+def test_reservation__query__order__all_fields(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create()
     PaymentOrderFactory.create(
         reservation=reservation,
@@ -395,7 +402,9 @@ def test_reservation__query__order__all_fields(graphql):
     }
 
 
-def test_reservation__query__reservation_unit_is_archived_but_data_is_still_returned_through_relation(graphql):
+def test_reservation__query__reservation_unit_is_archived_but_data_is_still_returned_through_relation(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create(reservation_unit__is_archived=True)
     reservation_unit = reservation.reservation_unit
 
@@ -460,7 +469,7 @@ def pindora_query(reservation: Reservation) -> str:
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation__query__pindora_info(graphql):
+def test_reservation__query__pindora_info(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -492,7 +501,7 @@ def test_reservation__query__pindora_info(graphql):
 
 @freeze_time(local_datetime(2022, 1, 1))
 @pytest.mark.parametrize("as_reservee", [True, False])
-def test_reservation__query__pindora_info__access_code_not_active(graphql, as_reservee):
+def test_reservation__query__pindora_info__access_code_not_active(graphql: GraphQLClient, as_reservee: bool) -> None:
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -507,10 +516,10 @@ def test_reservation__query__pindora_info__access_code_not_active(graphql, as_re
     else:
         graphql.login_with_superuser()
 
-    response = pindora_response()
-    response["access_code_is_active"] = False
+    pindora_data = pindora_response()
+    pindora_data["access_code_is_active"] = False
 
-    with patch_method(PindoraClient.get_reservation, return_value=response):
+    with patch_method(PindoraClient.get_reservation, return_value=pindora_data):
         response = graphql(query)
 
     assert response.has_errors is False, response
@@ -523,7 +532,7 @@ def test_reservation__query__pindora_info__access_code_not_active(graphql, as_re
 
 @freeze_time(local_datetime(2022, 1, 1))
 @pytest.mark.parametrize("as_reservee", [True, False])
-def test_reservation__query__pindora_info__not_confirmed(graphql, as_reservee):
+def test_reservation__query__pindora_info__not_confirmed(graphql: GraphQLClient, as_reservee: bool) -> None:
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.WAITING_FOR_PAYMENT,
@@ -550,7 +559,7 @@ def test_reservation__query__pindora_info__not_confirmed(graphql, as_reservee):
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation__query__pindora_info__access_type_not_access_code(graphql):
+def test_reservation__query__pindora_info__access_type_not_access_code(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         access_type=AccessType.UNRESTRICTED,
         state=ReservationStateChoice.CONFIRMED,
@@ -571,7 +580,7 @@ def test_reservation__query__pindora_info__access_type_not_access_code(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation__query__pindora_info__pindora_call_fails(graphql):
+def test_reservation__query__pindora_info__pindora_call_fails(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -592,7 +601,7 @@ def test_reservation__query__pindora_info__pindora_call_fails(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation__query__pindora_info__pindora_data_cached(graphql):
+def test_reservation__query__pindora_info__pindora_data_cached(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -629,7 +638,7 @@ def test_reservation__query__pindora_info__pindora_data_cached(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 3))
-def test_reservation__query__pindora_info__reservation_past(graphql):
+def test_reservation__query__pindora_info__reservation_past(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -650,7 +659,7 @@ def test_reservation__query__pindora_info__reservation_past(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation__query__pindora_info__in_reservation_series(graphql):
+def test_reservation__query__pindora_info__in_reservation_series(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
@@ -664,7 +673,7 @@ def test_reservation__query__pindora_info__in_reservation_series(graphql):
 
     graphql.force_login(reservation.user)
 
-    response = PindoraReservationSeriesResponse(
+    pindora_data = PindoraReservationSeriesResponse(
         reservation_unit_id=uuid.uuid4(),
         access_code="12345",
         access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
@@ -683,7 +692,7 @@ def test_reservation__query__pindora_info__in_reservation_series(graphql):
         ],
     )
 
-    with patch_method(PindoraClient.get_reservation_series, return_value=response):
+    with patch_method(PindoraClient.get_reservation_series, return_value=pindora_data):
         response = graphql(query)
 
     assert response.has_errors is False, response
@@ -702,7 +711,7 @@ def test_reservation__query__pindora_info__in_reservation_series(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation__query__pindora_info__in_application_section(graphql):
+def test_reservation__query__pindora_info__in_application_section(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     section = ApplicationSectionFactory.create(
@@ -726,7 +735,7 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
 
     graphql.force_login(reservation.user)
 
-    response = PindoraSeasonalBookingResponse(
+    pindora_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
         access_code_phone_number="+358407089833",
@@ -745,7 +754,7 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
         ],
     )
 
-    with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=pindora_data):
         response = graphql(query)
 
     assert response.has_errors is False, response
@@ -764,7 +773,7 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation__query__pindora_info__in_application_section__not_sent(graphql):
+def test_reservation__query__pindora_info__in_application_section__not_sent(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -787,7 +796,7 @@ def test_reservation__query__pindora_info__in_application_section__not_sent(grap
 
     graphql.force_login(reservation.user)
 
-    response = PindoraSeasonalBookingResponse(
+    pindora_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
         access_code_phone_number="+358407089833",
@@ -806,7 +815,7 @@ def test_reservation__query__pindora_info__in_application_section__not_sent(grap
         ],
     )
 
-    with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=pindora_data):
         response = graphql(query)
 
     assert response.has_errors is False, response

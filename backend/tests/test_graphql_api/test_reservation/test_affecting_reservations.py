@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from functools import partial
+from typing import TYPE_CHECKING
 
 import pytest
 from graphene_django_extensions.testing import build_query
@@ -12,6 +13,9 @@ from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory, UserFactory
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -20,7 +24,7 @@ pytestmark = [
 affecting_reservations_query = partial(build_query, "affectingReservations", order_by="pkAsc")
 
 
-def test_reservation__affecting__time_and_state(graphql):
+def test_reservation__affecting__time_and_state(graphql: GraphQLClient) -> None:
     start_date = datetime.date(2023, 1, 2)
     end_date = datetime.date(2023, 1, 3)
 
@@ -94,7 +98,7 @@ def test_reservation__affecting__time_and_state(graphql):
     ]
 
 
-def test_reservation__affecting__for_unit(graphql):
+def test_reservation__affecting__for_unit(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     other_unit = UnitFactory.create()
 
@@ -164,7 +168,7 @@ def test_reservation__affecting__for_unit(graphql):
     ]
 
 
-def test_reservation__affecting__for_reservation_unit(graphql):
+def test_reservation__affecting__for_reservation_unit(graphql: GraphQLClient) -> None:
     parent_space = SpaceFactory.create()
     child_space = SpaceFactory.create(parent=parent_space)
     other_space = SpaceFactory.create()
@@ -213,7 +217,7 @@ def test_reservation__affecting__for_reservation_unit(graphql):
     ]
 
 
-def test_reservation__affecting__affected_reservation_units(graphql):
+def test_reservation__affecting__affected_reservation_units(graphql: GraphQLClient) -> None:
     parent_space = SpaceFactory.create()
     other_space = SpaceFactory.create()
 
@@ -262,7 +266,7 @@ def test_reservation__affecting__affected_reservation_units(graphql):
     ]
 
 
-def test_reservation__affecting__user_authentication_flags(graphql):
+def test_reservation__affecting__user_authentication_flags(graphql: GraphQLClient) -> None:
     parent_space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[parent_space])
 

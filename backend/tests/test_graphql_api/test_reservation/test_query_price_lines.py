@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from graphql_relay import to_global_id
@@ -10,6 +11,9 @@ from tilavarauspalvelu.enums import PriceUnit
 from tests.factories import ReservationFactory, ReservationPriceLineFactory, UserFactory
 
 from .helpers import reservation_query, reservations_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -26,7 +30,7 @@ FIELDS = "priceLines { descriptionFi quantity priceUnit unitAmount amount overri
 # ── Price lines ──
 
 
-def test_reservation__query__price_lines_for_own_reservation(graphql):
+def test_reservation__query__price_lines_for_own_reservation(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     reservation = ReservationFactory.create(user=user)
     ReservationPriceLineFactory.create(
@@ -60,7 +64,7 @@ def test_reservation__query__price_lines_for_own_reservation(graphql):
     }
 
 
-def test_reservation__query__price_lines_material_price_description(graphql):
+def test_reservation__query__price_lines_material_price_description(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     reservation = ReservationFactory.create(user=user)
     ReservationPriceLineFactory.create(
@@ -87,7 +91,7 @@ def test_reservation__query__price_lines_material_price_description(graphql):
     }
 
 
-def test_reservation__query__price_lines_for_other_users_reservation(graphql):
+def test_reservation__query__price_lines_for_other_users_reservation(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create()
     ReservationPriceLineFactory.create(reservation=reservation)
 
@@ -99,7 +103,7 @@ def test_reservation__query__price_lines_for_other_users_reservation(graphql):
     assert response.first_query_object == {"priceLines": None}
 
 
-def test_reservation__query__price_lines_for_staff(graphql):
+def test_reservation__query__price_lines_for_staff(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create()
     ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(15))
 
@@ -111,7 +115,7 @@ def test_reservation__query__price_lines_for_staff(graphql):
     assert response.first_query_object == {"priceLines": [{"amount": "15.00"}]}
 
 
-def test_reservation__query__price_lines_are_prefetched(graphql):
+def test_reservation__query__price_lines_are_prefetched(graphql: GraphQLClient) -> None:
     for _ in range(3):
         reservation = ReservationFactory.create()
         ReservationPriceLineFactory.create(reservation=reservation)

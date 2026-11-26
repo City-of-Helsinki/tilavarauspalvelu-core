@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -11,13 +12,18 @@ from tests.factories import AgeGroupFactory, ReservationFactory, ReservationPurp
 
 from .helpers import UPDATE_MUTATION, get_update_data, mock_profile_reader
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation__update(graphql):
+def test_reservation__update(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update()
 
     graphql.login_with_superuser()
@@ -30,7 +36,7 @@ def test_reservation__update(graphql):
     assert reservation.name == "foo"
 
 
-def test_reservation__update__with_additional_data(graphql):
+def test_reservation__update__with_additional_data(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update(price_lines__price_component__can_apply_for_discount=True)
 
     age_group = AgeGroupFactory.create(minimum=18, maximum=30)
@@ -63,6 +69,7 @@ def test_reservation__update__with_additional_data(graphql):
 
     reservation.refresh_from_db()
 
+    assert reservation.age_group is not None
     assert reservation.age_group.maximum == 30
     assert reservation.age_group.minimum == 18
     assert reservation.applying_for_free_of_charge is True
@@ -73,6 +80,7 @@ def test_reservation__update__with_additional_data(graphql):
     assert reservation.municipality == MunicipalityChoice.HELSINKI
     assert reservation.name == "Test reservation"
     assert reservation.num_persons == 1
+    assert reservation.purpose is not None
     assert reservation.purpose.name == "Test purpose"
     assert reservation.reservee_address_zip == "00100"
     assert reservation.reservee_email == "john.doe@example.com"
@@ -85,7 +93,7 @@ def test_reservation__update__with_additional_data(graphql):
     assert reservation.type == ReservationTypeChoice.NORMAL
 
 
-def test_reservation__update__cannot_update_price(graphql):
+def test_reservation__update__cannot_update_price(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update()
 
     graphql.login_with_superuser()
@@ -95,7 +103,7 @@ def test_reservation__update__cannot_update_price(graphql):
     assert response.has_schema_errors
 
 
-def test_reservation__update__cannot_update_time(graphql):
+def test_reservation__update__cannot_update_time(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update()
 
     graphql.login_with_superuser()
@@ -105,7 +113,7 @@ def test_reservation__update__cannot_update_time(graphql):
     assert response.has_schema_errors
 
 
-def test_reservation__update__regular_user(graphql):
+def test_reservation__update__regular_user(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update()
 
     graphql.login_with_regular_user()
@@ -115,7 +123,7 @@ def test_reservation__update__regular_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_reservation__update__all_required_fields_are_filled(graphql):
+def test_reservation__update__all_required_fields_are_filled(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update(
         reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
     )
@@ -138,7 +146,7 @@ def test_reservation__update__all_required_fields_are_filled(graphql):
     assert reservation.reservee_phone == data["reserveePhone"]
 
 
-def test_reservation__update__missing_reservee_id(graphql):
+def test_reservation__update__missing_reservee_id(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update(
         reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_identifier="",
@@ -159,7 +167,7 @@ def test_reservation__update__missing_reservee_id(graphql):
     assert reservation.reservee_identifier == ""
 
 
-def test_reservation__update__missing_reservee_id_for_individual(graphql):
+def test_reservation__update__missing_reservee_id_for_individual(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update(
         reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_identifier="",
@@ -182,7 +190,7 @@ def test_reservation__update__missing_reservee_id_for_individual(graphql):
     assert reservation.reservee_identifier == ""
 
 
-def test_reservation__update__missing_reservee_organisation_name_for_individual(graphql):
+def test_reservation__update__missing_reservee_organisation_name_for_individual(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update(
         reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_organisation_name="",
@@ -205,7 +213,7 @@ def test_reservation__update__missing_reservee_organisation_name_for_individual(
     assert reservation.reservee_organisation_name == ""
 
 
-def test_reservation__update__some_required_fields_are_missing(graphql):
+def test_reservation__update__some_required_fields_are_missing(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update(
         reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_phone="",
@@ -223,7 +231,7 @@ def test_reservation__update__some_required_fields_are_missing(graphql):
     assert response.field_error_messages() == ["Value for required field 'reservee_phone' is missing."]
 
 
-def test_reservation__update__already_has_max_reservations_per_user(graphql):
+def test_reservation__update__already_has_max_reservations_per_user(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update(reservation_unit__max_reservations_per_user=1)
 
     graphql.login_with_superuser()
@@ -236,7 +244,9 @@ def test_reservation__update__already_has_max_reservations_per_user(graphql):
     assert reservation.name == "foo"
 
 
-def test_reservation__update__require_free_of_charge_reason_if_applying_for_free_of_charge(graphql):
+def test_reservation__update__require_free_of_charge_reason_if_applying_for_free_of_charge(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_update(price_lines__price_component__can_apply_for_discount=True)
 
     graphql.login_with_superuser()
@@ -247,7 +257,7 @@ def test_reservation__update__require_free_of_charge_reason_if_applying_for_free
     assert response.field_error_messages() == ["Free of charge reason is mandatory when applying for free of charge."]
 
 
-def test_reservation__update__applying_for_free_of_charge_not_allowed_by_price(graphql):
+def test_reservation__update__applying_for_free_of_charge_not_allowed_by_price(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_update(price_lines__price_component__can_apply_for_discount=False)
 
     graphql.login_with_superuser()
@@ -263,7 +273,9 @@ def test_reservation__update__applying_for_free_of_charge_not_allowed_by_price(g
     assert reservation.applying_for_free_of_charge is False
 
 
-def test_reservation__update__reservation_details_does_not_get_overridden_with_profile_data(graphql, settings):
+def test_reservation__update__reservation_details_does_not_get_overridden_with_profile_data(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
 
     reservation = ReservationFactory.create_for_update(

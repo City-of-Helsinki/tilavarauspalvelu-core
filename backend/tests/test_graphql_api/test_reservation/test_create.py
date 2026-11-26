@@ -42,13 +42,18 @@ from tests.factories import (
     TaxLevelRateFactory,
     UserFactory,
 )
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, as_mock, patch_method
 
 from .helpers import CREATE_MUTATION, get_create_data, mock_profile_reader
 
 if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from pytest_django import Settings
+
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.typing import SessionMapping
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -56,7 +61,7 @@ pytestmark = [
 ]
 
 
-def test_reservation__create__success(graphql):
+def test_reservation__create__success(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     graphql.login_with_superuser()
@@ -68,7 +73,7 @@ def test_reservation__create__success(graphql):
     assert Reservation.objects.count() == 1
 
 
-def test_reservation__create__cannot_set_reservation_price(graphql):
+def test_reservation__create__cannot_set_reservation_price(graphql: GraphQLClient) -> None:
     #
     # Reservation price is always calculated, so check that it cannot be set in the request.
     #
@@ -85,7 +90,7 @@ def test_reservation__create__cannot_set_reservation_price(graphql):
     assert Reservation.objects.exists() is False
 
 
-def test_reservation__create__overlapping_reservation(graphql):
+def test_reservation__create__overlapping_reservation(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     begin = next_hour(plus_hours=1)
@@ -137,12 +142,12 @@ class BufferParams(NamedTuple):
     })
 )
 def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
-    graphql,
-    reservation_type,
-    reservation_delta_time,
-    buffer_before,
-    buffer_after,
-):
+    graphql: GraphQLClient,
+    reservation_type: ReservationTypeChoice,
+    reservation_delta_time: datetime.timedelta,
+    buffer_before: datetime.timedelta,
+    buffer_after: datetime.timedelta,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         buffer_time_before=buffer_before,
         buffer_time_after=buffer_after,
@@ -174,7 +179,7 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
         assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
-def test_reservation__create__reservation_unit_closed(graphql):
+def test_reservation__create__reservation_unit_closed(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
@@ -184,7 +189,7 @@ def test_reservation__create__reservation_unit_closed(graphql):
     assert response.field_error_messages() == ["Reservation unit is not open within desired reservation time."]
 
 
-def test_reservation__create__reservation_unit_in_open_application_round(graphql):
+def test_reservation__create__reservation_unit_in_open_application_round(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     start_of_today = local_start_of_day()
@@ -209,7 +214,7 @@ def test_reservation__create__reservation_unit_in_open_application_round(graphql
     assert response.field_error_messages() == ["Reservation unit is in an open application round."]
 
 
-def test_reservation__create__reservation_unit_max_reservation_duration_exceeded(graphql):
+def test_reservation__create__reservation_unit_max_reservation_duration_exceeded(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         max_reservation_duration=datetime.timedelta(minutes=30),
     )
@@ -223,7 +228,7 @@ def test_reservation__create__reservation_unit_max_reservation_duration_exceeded
     ]
 
 
-def test_reservation__create__reservation_unit_min_reservation_duration_subceeded(graphql):
+def test_reservation__create__reservation_unit_min_reservation_duration_subceeded(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         min_reservation_duration=datetime.timedelta(hours=3),
     )
@@ -237,7 +242,7 @@ def test_reservation__create__reservation_unit_min_reservation_duration_subceede
     ]
 
 
-def test_reservation__create__reservation_unit_is_archived(graphql):
+def test_reservation__create__reservation_unit_is_archived(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(is_archived=True)
 
     graphql.login_with_superuser()
@@ -247,7 +252,7 @@ def test_reservation__create__reservation_unit_is_archived(graphql):
     assert response.field_error_messages() == ["Reservation unit is not currently published."]
 
 
-def test_reservation__create__reservation_unit_is_draft(graphql):
+def test_reservation__create__reservation_unit_is_draft(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(is_draft=True)
 
     graphql.login_with_superuser()
@@ -290,11 +295,11 @@ class ReservationTimeParams(NamedTuple):
     })
 )
 def test_reservation__create__reservation_unit_reservation_in_the_past_or_future(
-    graphql,
-    reservation_begins_delta,
-    reservation_ends_delta,
-    is_error,
-):
+    graphql: GraphQLClient,
+    reservation_begins_delta: int,
+    reservation_ends_delta: int,
+    is_error: bool,
+) -> None:
     begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
@@ -319,7 +324,7 @@ def test_reservation__create__reservation_unit_reservation_in_the_past_or_future
 
 # The clocks move from 04:00 back to 03:00 at 01:00 UTC on 2026-10-25, so the hour from 03:00 to 04:00 occurs twice.
 @freezegun.freeze_time("2026-10-24 12:00:00+03:00")
-def test_reservation__create__reservation_unit_reservation_ends_in_the_repeated_hour(graphql):
+def test_reservation__create__reservation_unit_reservation_ends_in_the_repeated_hour(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_ends_at=datetime.datetime.fromisoformat("2026-10-25T03:20:00+02:00"),
     )
@@ -340,7 +345,7 @@ def test_reservation__create__reservation_unit_reservation_ends_in_the_repeated_
 
 
 @freezegun.freeze_time("2026-10-25 01:10:00+00:00")
-def test_reservation__create__begin_in_the_past_in_the_repeated_hour(graphql):
+def test_reservation__create__begin_in_the_past_in_the_repeated_hour(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     graphql.login_with_superuser()
@@ -370,11 +375,11 @@ class PublishTimeParams(NamedTuple):
     })
 )
 def test_reservation__create__reservation_unit_publish_in_the_past_or_future(
-    graphql,
-    publish_begins_delta,
-    publish_ends_delta,
-    is_error,
-):
+    graphql: GraphQLClient,
+    publish_begins_delta: int,
+    publish_ends_delta: int,
+    is_error: bool,
+) -> None:
     begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
@@ -397,7 +402,7 @@ def test_reservation__create__reservation_unit_publish_in_the_past_or_future(
         assert reservation.state == ReservationStateChoice.CREATED
 
 
-def test_reservation__create__not_logged_in(graphql):
+def test_reservation__create__not_logged_in(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     data = get_create_data(reservation_unit)
@@ -406,7 +411,7 @@ def test_reservation__create__not_logged_in(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_reservation__create__max_reservations_per_user__under(graphql):
+def test_reservation__create__max_reservations_per_user__under(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     graphql.login_with_superuser()
@@ -418,7 +423,7 @@ def test_reservation__create__max_reservations_per_user__under(graphql):
     assert Reservation.objects.count() == 1
 
 
-def test_reservation__create__max_reservations_per_user__over(graphql):
+def test_reservation__create__max_reservations_per_user__over(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     begin = next_hour(plus_hours=1)
@@ -445,7 +450,7 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
     ]
 
 
-def test_reservation__create__max_reservations_per_user__non_normal_reservation(graphql):
+def test_reservation__create__max_reservations_per_user__non_normal_reservation(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     begin = next_hour(plus_hours=3)
@@ -480,7 +485,7 @@ def test_reservation__create__max_reservations_per_user__non_normal_reservation(
     assert Reservation.objects.count() == 5
 
 
-def test_reservation__create__max_reservations_per_user__past_reservations(graphql):
+def test_reservation__create__max_reservations_per_user__past_reservations(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     begin = next_hour(plus_hours=1)
@@ -506,7 +511,9 @@ def test_reservation__create__max_reservations_per_user__past_reservations(graph
     assert Reservation.objects.count() == 2
 
 
-def test_reservation__create__max_reservations_per_user__reservations_for_other_unrelated_reservation_units(graphql):
+def test_reservation__create__max_reservations_per_user__reservations_for_other_unrelated_reservation_units(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit_1 = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -533,7 +540,9 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     assert Reservation.objects.count() == 2
 
 
-def test_reservation__create__max_reservations_per_user__reservations_for_other_related_reservation_units(graphql):
+def test_reservation__create__max_reservations_per_user__reservations_for_other_related_reservation_units(
+    graphql: GraphQLClient,
+) -> None:
     """Reservations in the same hierarchy should NOT be counted towards the max_reservations_per_user limit."""
     reservation_unit_1: ReservationUnit = ReservationUnitFactory.create_reservable_now(
         max_reservations_per_user=1,
@@ -568,7 +577,9 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     assert Reservation.objects.count() == 2
 
 
-def test_reservation__create__max_reservations_per_user__other_reservation_created_at_the_same_time(graphql):
+def test_reservation__create__max_reservations_per_user__other_reservation_created_at_the_same_time(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
     user = graphql.login_with_regular_user()
 
@@ -640,12 +651,12 @@ class ReservationsMinMaxDaysParams(NamedTuple):
     })
 )
 def test_reservation__create__reservation_unit_reservations_min_and_max_days_before_and_after(
-    graphql,
-    reservation_days_delta,
-    reservations_max_days_before,
-    reservations_min_days_before,
-    error_message,
-):
+    graphql: GraphQLClient,
+    reservation_days_delta: int,
+    reservations_max_days_before: int | None,
+    reservations_min_days_before: int | None,
+    error_message: str | None,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservations_max_days_before=reservations_max_days_before,
         reservations_min_days_before=reservations_min_days_before,
@@ -667,7 +678,7 @@ def test_reservation__create__reservation_unit_reservations_min_and_max_days_bef
         assert reservation.state == ReservationStateChoice.CREATED
 
 
-def test_reservation__create__reservation_unit_reservation_kind_is_season(graphql):
+def test_reservation__create__reservation_unit_reservation_kind_is_season(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(reservation_kind=ReservationKind.SEASON)
 
     graphql.login_with_superuser()
@@ -677,7 +688,7 @@ def test_reservation__create__reservation_unit_reservation_kind_is_season(graphq
     assert response.field_error_messages() == ["Reservation unit is not direct bookable."]
 
 
-def test_reservation__create__price_calculation__free_reservation_unit(graphql):
+def test_reservation__create__price_calculation__free_reservation_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     graphql.login_with_superuser()
@@ -694,7 +705,7 @@ def test_reservation__create__price_calculation__free_reservation_unit(graphql):
     assert reservation.price_lines.get().tax_percentage == 0
 
 
-def test_reservation__create__pricing_requires_payment_type(graphql):
+def test_reservation__create__pricing_requires_payment_type(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         own_price__amount=Decimal(20),
         own_price__price_unit=PriceUnit.FIXED,
@@ -712,7 +723,7 @@ def test_reservation__create__pricing_requires_payment_type(graphql):
     assert response.field_error_messages() == ["Reservation unit has no payment type."]
 
 
-def test_reservation__create__price_calculation__fixed_price_reservation_unit(graphql):
+def test_reservation__create__price_calculation__fixed_price_reservation_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         own_price__amount=Decimal(20),
         own_price__price_unit=PriceUnit.FIXED,
@@ -736,7 +747,7 @@ def test_reservation__create__price_calculation__fixed_price_reservation_unit(gr
     assert reservation.price_lines.get().tax_percentage == Decimal(10)
 
 
-def test_reservation__create__saves_price_lines(graphql):
+def test_reservation__create__saves_price_lines(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         own_price__amount=Decimal(20),
         own_price__price_unit=PriceUnit.FIXED,
@@ -759,7 +770,7 @@ def test_reservation__create__saves_price_lines(graphql):
     ]
 
 
-def test_reservation__create__price_calculation__time_based_price(graphql):
+def test_reservation__create__price_calculation__time_based_price(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         own_price__amount=Decimal(20),
         own_price__price_unit=PriceUnit.PER_15_MINS,
@@ -781,7 +792,9 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
 
 
 @freeze_time(local_datetime(2026, 10, 24, 12))
-def test_reservation__create__price_calculation__time_based_price__daylight_saving_time_ends(graphql):
+def test_reservation__create__price_calculation__time_based_price__daylight_saving_time_ends(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         own_price__amount=Decimal(10),
         own_price__price_unit=PriceUnit.PER_HOUR,
@@ -804,7 +817,7 @@ def test_reservation__create__price_calculation__time_based_price__daylight_savi
     assert reservation.total_price == Decimal(70)
 
 
-def test_reservation__create__price_calculation__future_pricing(graphql):
+def test_reservation__create__price_calculation__future_pricing(graphql: GraphQLClient) -> None:
     now = local_start_of_day()
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
@@ -839,7 +852,7 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     assert reservation.price_lines.get().tax_percentage == Decimal(24)
 
 
-def test_reservation__create__price_calculation__tax_rate_on_creation_date(graphql):
+def test_reservation__create__price_calculation__tax_rate_on_creation_date(graphql: GraphQLClient) -> None:
     now = local_start_of_day()
 
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal(24))
@@ -869,7 +882,7 @@ def test_reservation__create__price_calculation__tax_rate_on_creation_date(graph
     assert reservation.price_lines.get().tax_percentage == Decimal(24)
 
 
-def test_reservation__create__price_calculation__tax_level_has_no_rate_today(graphql):
+def test_reservation__create__price_calculation__tax_level_has_no_rate_today(graphql: GraphQLClient) -> None:
     now = local_start_of_day()
     tomorrow = now.date() + datetime.timedelta(days=1)
 
@@ -894,7 +907,7 @@ def test_reservation__create__price_calculation__tax_level_has_no_rate_today(gra
     assert Reservation.objects.count() == 0
 
 
-def test_reservation__create__price_calculation__on_site_doesnt_require_payment_product(graphql):
+def test_reservation__create__price_calculation__on_site_doesnt_require_payment_product(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         own_price__amount=Decimal(20),
         own_price__price_unit=PriceUnit.FIXED,
@@ -918,7 +931,7 @@ def test_reservation__create__price_calculation__on_site_doesnt_require_payment_
     assert reservation.price_lines.get().tax_percentage == Decimal(10)
 
 
-def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
+def test_reservation__create__duration_is_not_multiple_of_interval(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     begin = next_hour(plus_hours=1)
@@ -934,7 +947,7 @@ def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
     ]
 
 
-def test_reservation__create__duration_is_zero(graphql):
+def test_reservation__create__duration_is_zero(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     begin = next_hour(plus_hours=1)
@@ -948,7 +961,7 @@ def test_reservation__create__duration_is_zero(graphql):
     assert Reservation.objects.exists() is False
 
 
-def test_reservation__create__begin_time_is_not_on_start_interval(graphql):
+def test_reservation__create__begin_time_is_not_on_start_interval(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     begin = next_hour(plus_hours=1, plus_minutes=5)
@@ -966,7 +979,9 @@ def test_reservation__create__begin_time_is_not_on_start_interval(graphql):
 
 
 @pytest.mark.parametrize("arm", [ProfileLoginAMR.SUOMI_FI, ProfileLoginAMR.HELTUNNISTUSSUOMIFI])
-def test_reservation__create__prefill_profile_data(graphql, settings, arm):
+def test_reservation__create__prefill_profile_data(
+    graphql: GraphQLClient, settings: Settings, arm: ProfileLoginAMR
+) -> None:
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
@@ -1000,7 +1015,7 @@ def test_reservation__create__prefill_profile_data(graphql, settings, arm):
     assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
-def test_reservation__create__prefill_profile_data__null_values(graphql, settings):
+def test_reservation__create__prefill_profile_data__null_values(graphql: GraphQLClient, settings: Settings) -> None:
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
@@ -1046,7 +1061,9 @@ def test_reservation__create__prefill_profile_data__null_values(graphql, setting
 @patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(status_code=500, json_data={}))
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @patch_method(SentryLogger.log_exception)
-def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphql, settings):
+def test_reservation__create__prefilled_with_profile_data__api_call_fails(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
@@ -1075,12 +1092,14 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphq
     assert reservation.municipality is None
 
     # External service call raises known exception, so no Sentry logging is done.
-    assert SentryLogger.log_exception.call_count == 0
+    assert as_mock(SentryLogger.log_exception).call_count == 0
 
 
 @patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(status_code=500, json_data={}))
 @patch_method(SentryLogger.log_exception)
-def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_data_in_session(graphql, settings):
+def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_data_in_session(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
@@ -1125,7 +1144,9 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_d
     assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
-def test_reservation__create__prefilled_with_profile_data__use_data_in_session__old_version(graphql, settings):
+def test_reservation__create__prefilled_with_profile_data__use_data_in_session__old_version(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
@@ -1170,7 +1191,9 @@ def test_reservation__create__prefilled_with_profile_data__use_data_in_session__
 
 
 @pytest.mark.parametrize("arm", ADLoginAMR)
-def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, settings, arm: ADLoginAMR):
+def test_reservation__create__prefilled_with_profile_data__ad_login(
+    graphql: GraphQLClient, settings: Settings, arm: ADLoginAMR
+) -> None:
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
@@ -1201,7 +1224,9 @@ def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, set
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_filled_by_buffers(graphql):
+def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_filled_by_buffers(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
     )
@@ -1226,7 +1251,9 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__create__reservation_block_whole_day__start_and_end_at_midnight_has_no_buffers(graphql):
+def test_reservation__create__reservation_block_whole_day__start_and_end_at_midnight_has_no_buffers(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
     )
@@ -1251,7 +1278,7 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__create__reservation_block_whole_day__back_to_back_whole_days(graphql):
+def test_reservation__create__reservation_block_whole_day__back_to_back_whole_days(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
     )
@@ -1283,7 +1310,9 @@ def test_reservation__create__reservation_block_whole_day__back_to_back_whole_da
 
 # The clocks move from 03:00 to 04:00 on the night of 2026-03-29, so that day has 23 hours.
 @freezegun.freeze_time(local_datetime(2026, 3, 27, 12))
-def test_reservation__create__reservation_block_whole_day__buffers_on_daylight_saving_time_change_day(graphql):
+def test_reservation__create__reservation_block_whole_day__buffers_on_daylight_saving_time_change_day(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
     )
@@ -1307,8 +1336,8 @@ def test_reservation__create__reservation_block_whole_day__buffers_on_daylight_s
 
 @freezegun.freeze_time(local_datetime(2026, 3, 27, 12))
 def test_reservation__create__reservation_block_whole_day__back_to_back__before_daylight_saving_time_change_day(
-    graphql,
-):
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
     )
@@ -1340,7 +1369,9 @@ def test_reservation__create__reservation_block_whole_day__back_to_back__before_
 
 
 @freezegun.freeze_time(local_datetime(2026, 3, 27, 12))
-def test_reservation__create__reservation_block_whole_day__back_to_back__on_daylight_saving_time_change_day(graphql):
+def test_reservation__create__reservation_block_whole_day__back_to_back__on_daylight_saving_time_change_day(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
     )
@@ -1380,10 +1411,10 @@ def test_reservation__create__reservation_block_whole_day__back_to_back__on_dayl
     ],
 )
 def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_new_reservation(
-    graphql,
-    new_reservation_begin_delta,
-    error_message,
-):
+    graphql: GraphQLClient,
+    new_reservation_begin_delta: datetime.timedelta,
+    error_message: str,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
     )
@@ -1414,7 +1445,7 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
         (ProfileLoginAMR.SUOMI_FI, False),
     ],
 )
-def test_reservation__create__reservee_used_ad_login(graphql, amr, expected):
+def test_reservation__create__reservee_used_ad_login(graphql: GraphQLClient, amr: str, expected: bool) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     user = UserFactory.create(social_auth__extra_data__amr=amr, email="test@hel.fi")
     graphql.force_login(user)
@@ -1429,7 +1460,7 @@ def test_reservation__create__reservee_used_ad_login(graphql, amr, expected):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation__create__require_adult_reservee__is_adult(graphql):
+def test_reservation__create__require_adult_reservee__is_adult(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
 
     user = UserFactory.create_profile_user(date_of_birth=local_date(2006, 1, 1))
@@ -1446,7 +1477,7 @@ def test_reservation__create__require_adult_reservee__is_adult(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation__create__require_adult_reservee__is_under_age(graphql):
+def test_reservation__create__require_adult_reservee__is_under_age(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
 
     user = UserFactory.create_profile_user(date_of_birth=local_date(2006, 1, 2))
@@ -1460,7 +1491,9 @@ def test_reservation__create__require_adult_reservee__is_under_age(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation__create__require_adult_reservee__is_under_age__reservation_unit_allows(graphql):
+def test_reservation__create__require_adult_reservee__is_under_age__reservation_unit_allows(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
 
     user = UserFactory.create_profile_user(date_of_birth=local_date(2006, 1, 2))
@@ -1477,7 +1510,7 @@ def test_reservation__create__require_adult_reservee__is_under_age__reservation_
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation__create__require_adult_reservee__no_id_token(graphql):
+def test_reservation__create__require_adult_reservee__no_id_token(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
 
     # We don't have an ID token, so we don't know if this is an AD user.
@@ -1495,7 +1528,7 @@ def test_reservation__create__require_adult_reservee__no_id_token(graphql):
     assert reservation is not None
 
 
-def test_reservation__create__require_adult_reservee__is_ad_user__internal(graphql):
+def test_reservation__create__require_adult_reservee__is_ad_user__internal(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
 
     user = UserFactory.create_ad_user(email="test@hel.fi")
@@ -1511,7 +1544,7 @@ def test_reservation__create__require_adult_reservee__is_ad_user__internal(graph
     assert reservation is not None
 
 
-def test_reservation__create__require_adult_reservee__is_ad_user__not_internal(graphql):
+def test_reservation__create__require_adult_reservee__is_ad_user__not_internal(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
 
     user = UserFactory.create_ad_user(email="test@example.com")
@@ -1525,7 +1558,9 @@ def test_reservation__create__require_adult_reservee__is_ad_user__not_internal(g
     assert response.field_error_messages() == ["AD user is not an internal user."]
 
 
-def test_reservation__create__require_adult_reservee__is_ad_user__not_internal__is_superuser(graphql):
+def test_reservation__create__require_adult_reservee__is_ad_user__not_internal__is_superuser(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
 
     user = UserFactory.create_ad_user(is_superuser=True, email="test@example.com")
@@ -1538,7 +1573,7 @@ def test_reservation__create__require_adult_reservee__is_ad_user__not_internal__
     assert response.has_errors is False, response.errors
 
 
-def test_reservation__create__dont_require_adult_reservee__is_ad_user__internal(graphql):
+def test_reservation__create__dont_require_adult_reservee__is_ad_user__internal(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
 
     user = UserFactory.create_ad_user(email="test@hel.fi")
@@ -1551,7 +1586,7 @@ def test_reservation__create__dont_require_adult_reservee__is_ad_user__internal(
     assert response.has_errors is False, response
 
 
-def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_internal(graphql):
+def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_internal(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
 
     user = UserFactory.create_ad_user(email="test@example.com")
@@ -1565,7 +1600,9 @@ def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_inter
     assert response.field_error_messages() == ["AD user is not an internal user."]
 
 
-def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_internal__is_superuser(graphql):
+def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_internal__is_superuser(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
 
     user = UserFactory.create_ad_user(is_superuser=True, email="test@example.com")
@@ -1579,7 +1616,7 @@ def test_reservation__create__dont_require_adult_reservee__is_ad_user__not_inter
 
 
 @patch_method(PindoraService.create_access_code)
-def test_reservation__create__access_type__access_code(graphql):
+def test_reservation__create__access_type__access_code(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         access_types__access_type=AccessType.ACCESS_CODE,
     )
@@ -1595,11 +1632,11 @@ def test_reservation__create__access_type__access_code(graphql):
 
     assert reservation.access_type == AccessType.ACCESS_CODE
 
-    assert PindoraService.create_access_code.called is True
+    assert as_mock(PindoraService.create_access_code).called is True
 
 
 @patch_method(PindoraService.create_access_code)
-def test_reservation__create__access_type__changes_to_access_code_in_the_future(graphql):
+def test_reservation__create__access_type__changes_to_access_code_in_the_future(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         access_types__access_type=AccessType.ACCESS_CODE,
         access_types__begin_date=next_hour(plus_days=2),
@@ -1616,11 +1653,13 @@ def test_reservation__create__access_type__changes_to_access_code_in_the_future(
 
     assert reservation.access_type == AccessType.UNRESTRICTED
 
-    assert PindoraService.create_access_code.call_count == 0
+    assert as_mock(PindoraService.create_access_code).call_count == 0
 
 
 @patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError("Pindora Error"))
-def test_reservation__create__access_type__access_code__no_reservation_on_pindora_failure(graphql):
+def test_reservation__create__access_type__access_code__no_reservation_on_pindora_failure(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         access_types__access_type=AccessType.ACCESS_CODE,
     )
@@ -1637,7 +1676,7 @@ def test_reservation__create__access_type__access_code__no_reservation_on_pindor
     assert Reservation.objects.exists() is False
 
 
-def test_reservation__create__two_overlapping_reservation_created_at_the_same_time(graphql):
+def test_reservation__create__two_overlapping_reservation_created_at_the_same_time(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create_reservable_now()
     graphql.login_with_regular_user()
     data = get_create_data(reservation_unit)
@@ -1645,7 +1684,7 @@ def test_reservation__create__two_overlapping_reservation_created_at_the_same_ti
     ReservationUnitHierarchy.refresh()
     reservation: Reservation | None = None
 
-    def callback(*args, **kwargs):
+    def callback(*args: Any, **kwargs: Any) -> QuerySet[Reservation]:
         nonlocal reservation
         reservation = ReservationFactory.create_for_reservation_unit(
             reservation_unit=reservation_unit,

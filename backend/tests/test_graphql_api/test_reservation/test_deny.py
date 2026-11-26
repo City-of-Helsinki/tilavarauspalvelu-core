@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
@@ -18,9 +19,14 @@ from tilavarauspalvelu.models import PaymentOrder
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentFactory, ReservationFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import DENY_MUTATION, get_deny_data
+
+if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -29,7 +35,7 @@ pytestmark = [
 
 @patch_method(EmailService.send_reservation_denied_email)
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
-def test_reservation__deny__state_is_confirmed(graphql, reservation_type):
+def test_reservation__deny__state_is_confirmed(graphql: GraphQLClient, reservation_type: ReservationTypeChoice) -> None:
     reservation = ReservationFactory.create_for_deny(state=ReservationStateChoice.CONFIRMED, type=reservation_type)
 
     graphql.login_with_superuser()
@@ -41,10 +47,10 @@ def test_reservation__deny__state_is_confirmed(graphql, reservation_type):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
 
-    assert EmailService.send_reservation_denied_email.called is True
+    assert as_mock(EmailService.send_reservation_denied_email).called is True
 
 
-def test_reservation__deny__status_not_allowed_states(graphql):
+def test_reservation__deny__status_not_allowed_states(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny(state=ReservationStateChoice.CREATED)
 
     graphql.login_with_superuser()
@@ -60,7 +66,7 @@ def test_reservation__deny__status_not_allowed_states(graphql):
     assert reservation.state == ReservationStateChoice.CREATED
 
 
-def test_reservation__deny__reason_missing(graphql):
+def test_reservation__deny__reason_missing(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny()
 
     graphql.login_with_superuser()
@@ -74,7 +80,7 @@ def test_reservation__deny__reason_missing(graphql):
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
-def test_reservation__deny__handling_details_missing(graphql):
+def test_reservation__deny__handling_details_missing(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny()
 
     graphql.login_with_superuser()
@@ -88,7 +94,7 @@ def test_reservation__deny__handling_details_missing(graphql):
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
-def test_reservation__deny__state_confirmed_and_reservation_ended(graphql):
+def test_reservation__deny__state_confirmed_and_reservation_ended(graphql: GraphQLClient) -> None:
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
     end = last_hour - datetime.timedelta(hours=1)
@@ -111,7 +117,7 @@ def test_reservation__deny__state_confirmed_and_reservation_ended(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
-def test_reservation__deny__state_requires_handling_and_reservation_ended(graphql):
+def test_reservation__deny__state_requires_handling_and_reservation_ended(graphql: GraphQLClient) -> None:
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
     end = last_hour - datetime.timedelta(hours=1)
@@ -130,7 +136,7 @@ def test_reservation__deny__state_requires_handling_and_reservation_ended(graphq
 
 
 @override_settings(SEND_EMAILS=True)
-def test_reservation__deny__send_email(graphql, outbox):
+def test_reservation__deny__send_email(graphql: GraphQLClient, outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create_for_deny()
 
     graphql.login_with_superuser()
@@ -157,7 +163,9 @@ def test_reservation__deny__send_email(graphql, outbox):
         ReservationTypeChoice.BEHALF,
     ],
 )
-def test_reservation__deny__dont_send_email_for_reservation_type_x(graphql, outbox, reservation_type):
+def test_reservation__deny__dont_send_email_for_reservation_type_x(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives], reservation_type: ReservationTypeChoice
+) -> None:
     reservation = ReservationFactory.create_for_deny(type=reservation_type)
 
     graphql.login_with_superuser()
@@ -173,7 +181,9 @@ def test_reservation__deny__dont_send_email_for_reservation_type_x(graphql, outb
 
 
 @override_settings(SEND_EMAILS=True)
-def test_reservation__deny__send_email_if_reservation_started_but_not_ended(graphql, outbox):
+def test_reservation__deny__send_email_if_reservation_started_but_not_ended(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives]
+) -> None:
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
     begin = last_hour - datetime.timedelta(hours=1)
@@ -195,7 +205,9 @@ def test_reservation__deny__send_email_if_reservation_started_but_not_ended(grap
 
 
 @override_settings(SEND_EMAILS=True)
-def test_reservation__deny__dont_send_notification_if_reservation_already_ended(graphql, outbox):
+def test_reservation__deny__dont_send_notification_if_reservation_already_ended(
+    graphql: GraphQLClient, outbox: list[EmailMultiAlternatives]
+) -> None:
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
     end = last_hour - datetime.timedelta(hours=1)
@@ -216,7 +228,7 @@ def test_reservation__deny__dont_send_notification_if_reservation_already_ended(
 
 
 @patch_method(PindoraService.delete_access_code)
-def test_reservation__deny__delete_from_pindora__call_success(graphql):
+def test_reservation__deny__delete_from_pindora__call_success(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
@@ -229,14 +241,14 @@ def test_reservation__deny__delete_from_pindora__call_success(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.delete_access_code.called is True
+    assert as_mock(PindoraService.delete_access_code).called is True
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
 
 
 @patch_method(PindoraService.delete_access_code, side_effect=PindoraAPIError("Pindora Error"))
-def test_reservation__deny__delete_from_pindora__call_fails(graphql):
+def test_reservation__deny__delete_from_pindora__call_fails(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
@@ -250,7 +262,7 @@ def test_reservation__deny__delete_from_pindora__call_fails(graphql):
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Pindora Error"]
 
-    assert PindoraService.delete_access_code.called is True
+    assert as_mock(PindoraService.delete_access_code).called is True
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
@@ -259,7 +271,9 @@ def test_reservation__deny__delete_from_pindora__call_fails(graphql):
 @patch_method(PindoraService.delete_access_code, side_effect=PindoraAPIError("Pindora Error"))
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-def test_reservation__deny__delete_from_pindora__call_fails__webshop_order_not_cancelled(graphql):
+def test_reservation__deny__delete_from_pindora__call_fails__webshop_order_not_cancelled(
+    graphql: GraphQLClient,
+) -> None:
     reservation = ReservationFactory.create_for_deny(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
@@ -277,7 +291,7 @@ def test_reservation__deny__delete_from_pindora__call_fails__webshop_order_not_c
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Pindora Error"]
 
-    assert VerkkokauppaAPIClient.cancel_order.called is False
+    assert as_mock(VerkkokauppaAPIClient.cancel_order).called is False
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
@@ -287,7 +301,7 @@ def test_reservation__deny__delete_from_pindora__call_fails__webshop_order_not_c
 
 
 @patch_method(PindoraService.delete_access_code, side_effect=PindoraNotFoundError("Error"))
-def test_reservation__deny__delete_from_pindora__call_fails__404(graphql):
+def test_reservation__deny__delete_from_pindora__call_fails__404(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny(
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
@@ -301,14 +315,14 @@ def test_reservation__deny__delete_from_pindora__call_fails__404(graphql):
     # Request is still successful if Pindora fails with 404
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.delete_access_code.called is True
+    assert as_mock(PindoraService.delete_access_code).called is True
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-def test_reservation__deny__has_order__status_unchanged_after_webshop_refresh(graphql):
+def test_reservation__deny__has_order__status_unchanged_after_webshop_refresh(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny(
         payment_order__remote_id=uuid.uuid4(),
         payment_order__status=OrderStatus.PAID,
@@ -319,7 +333,7 @@ def test_reservation__deny__has_order__status_unchanged_after_webshop_refresh(gr
     )
 
     payment = PaymentFactory.create(status=WebShopPaymentStatus.PAID_ONLINE)
-    VerkkokauppaAPIClient.get_payment.return_value = payment
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = payment
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
@@ -332,7 +346,7 @@ def test_reservation__deny__has_order__status_unchanged_after_webshop_refresh(gr
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-def test_reservation__deny__has_order__status_changed_after_webshop_refresh(graphql):
+def test_reservation__deny__has_order__status_changed_after_webshop_refresh(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny(
         payment_order__remote_id=uuid.uuid4(),
         payment_order__status=OrderStatus.PENDING,
@@ -345,7 +359,7 @@ def test_reservation__deny__has_order__status_changed_after_webshop_refresh(grap
     payment_order = reservation.payment_order
 
     payment = PaymentFactory.create(status=WebShopPaymentStatus.PAID_ONLINE)
-    VerkkokauppaAPIClient.get_payment.return_value = payment
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = payment
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
@@ -361,7 +375,7 @@ def test_reservation__deny__has_order__status_changed_after_webshop_refresh(grap
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-def test_reservation__deny__has_order__deny_successful_if_webshop_unresponsive(graphql):
+def test_reservation__deny__has_order__deny_successful_if_webshop_unresponsive(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny(
         payment_order__remote_id=uuid.uuid4(),
         payment_order__status=OrderStatus.PENDING,
@@ -372,7 +386,7 @@ def test_reservation__deny__has_order__deny_successful_if_webshop_unresponsive(g
         payment_order__price_total=Decimal("12.4"),
     )
 
-    VerkkokauppaAPIClient.get_payment.side_effect = GetPaymentError("Mock error")
+    as_mock(VerkkokauppaAPIClient.get_payment).side_effect = GetPaymentError("Mock error")
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
@@ -384,7 +398,7 @@ def test_reservation__deny__has_order__deny_successful_if_webshop_unresponsive(g
     assert reservation.state == ReservationStateChoice.DENIED
 
 
-def test_reservation__deny__has_order__unpaid_payment_cancelled(graphql):
+def test_reservation__deny__has_order__unpaid_payment_cancelled(graphql: GraphQLClient) -> None:
     reservation = ReservationFactory.create_for_deny(
         payment_order__remote_id=None,
         payment_order__status=OrderStatus.PENDING,
