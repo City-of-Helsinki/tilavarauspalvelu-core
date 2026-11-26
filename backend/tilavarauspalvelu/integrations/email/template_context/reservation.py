@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Annotated, Unpack
 from django.utils.translation import pgettext
 
 from tilavarauspalvelu.enums import AccessType, ReservationCancelReasonChoice
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import local_date_string, local_datetime_string
 from utils.utils import convert_html_to_text
@@ -216,6 +217,11 @@ def get_context_for_reservation_cancelled(
     **data: Unpack[ReservationCancelledContext],
 ) -> Annotated[EmailContext, EmailType.RESERVATION_CANCELLED]:
     if reservation is not None:
+        # The email is sent only for a reservation with a cancel reason.
+        if reservation.cancel_reason is None:
+            msg = "A cancelled reservation has a cancel reason."
+            raise MissingValueError(msg)
+
         cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
 
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
@@ -476,9 +482,15 @@ def get_context_for_reservation_requires_payment(
     **data: Unpack[ReservationRequiresPaymentContext],
 ) -> Annotated[EmailContext, EmailType.RESERVATION_REQUIRES_PAYMENT]:
     if reservation is not None:
+        # The email is sent only for a reservation that is paid after handling.
+        handled_payment_due_by = reservation.payment_order.handled_payment_due_by
+        if handled_payment_due_by is None:
+            msg = "A reservation that is paid after handling has a payment due date."
+            raise MissingValueError(msg)
+
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
         data["instructions_confirmed"] = reservation.actions.get_instructions(kind="confirmed", language=language)
-        data["handled_payment_due_by"] = reservation.payment_order.handled_payment_due_by
+        data["handled_payment_due_by"] = handled_payment_due_by
 
         data |= params_for_base_info(reservation=reservation, language=language)
         data |= params_for_price_info(reservation=reservation)

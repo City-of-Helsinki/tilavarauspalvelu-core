@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Annotated, Unpack
 from django.utils.translation import pgettext
 
 from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationStateChoice, Weekday
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import local_time_string
 
@@ -231,7 +232,12 @@ def get_context_for_seasonal_booking_cancelled_all(
     **data: Unpack[SeasonalBookingCancelledAllContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_ALL]:
     if section is not None:
-        reservation: Reservation = section.actions.get_last_cancelled_reservation()
+        # The email is sent only for a section with a cancelled reservation.
+        reservation = section.actions.get_last_cancelled_reservation()
+        if reservation is None or reservation.cancel_reason is None:
+            msg = "A cancelled seasonal booking has a cancelled reservation with a cancel reason."
+            raise MissingValueError(msg)
+
         application_round = section.application.application_round
 
         cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
@@ -265,7 +271,12 @@ def get_context_for_seasonal_booking_cancelled_all_staff_notification(
     **data: Unpack[SeasonalBookingCancelledAllStaffNotificationContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION]:
     if section is not None:
-        reservation: Reservation = section.actions.get_last_cancelled_reservation()
+        # The email is sent only for a section with a cancelled reservation.
+        reservation = section.actions.get_last_cancelled_reservation()
+        if reservation is None or reservation.cancel_reason is None:
+            msg = "A cancelled seasonal booking has a cancelled reservation with a cancel reason."
+            raise MissingValueError(msg)
+
         application_round = section.application.application_round
 
         cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
@@ -293,6 +304,11 @@ def get_context_for_seasonal_booking_cancelled_single(
     **data: Unpack[SeasonalBookingCancelledSingleContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_SINGLE]:
     if reservation is not None:
+        # The email is sent only for a reservation with a cancel reason.
+        if reservation.cancel_reason is None:
+            msg = "A cancelled reservation has a cancel reason."
+            raise MissingValueError(msg)
+
         section = reservation.actions.get_application_section()
 
         cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
@@ -337,7 +353,11 @@ def get_context_for_seasonal_booking_denied_series(
         reservation_unit = series.reservation_unit
         unit = reservation_unit.unit
 
+        # The email is sent only for a series with a denied reservation.
         latest_denied_reservation = series.reservations.filter(state=ReservationStateChoice.DENIED).last()
+        if latest_denied_reservation is None:
+            msg = "A denied series has a denied reservation."
+            raise MissingValueError(msg)
 
         begin_time = local_time_string(series.begin_time)
         end_time = local_time_string(series.end_time)

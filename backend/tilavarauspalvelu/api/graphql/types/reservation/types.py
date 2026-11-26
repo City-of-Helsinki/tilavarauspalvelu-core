@@ -319,6 +319,6 @@ class ReservationNode(DjangoNode[Reservation, AnyUser]):
         return response
 
     def resolve_draft_expires_at(root: Reservation, info: GQLInfo) -> datetime.datetime | None:
-        if root.state != ReservationStateChoice.CREATED:
+        if root.state != ReservationStateChoice.CREATED or root.created_at is None:
             return None
         return root.created_at + datetime.timedelta(minutes=settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES)

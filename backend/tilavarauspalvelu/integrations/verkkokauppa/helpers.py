@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, overload
 from django.conf import settings
 from django.urls import reverse
 
+from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     CreateOrderParams,
@@ -84,6 +85,13 @@ def get_verkkokauppa_order_params(
     invoicing_date: datetime.date | None = None,
 ) -> CreateOrderParams:
     reservation_unit: ReservationUnit = reservation.reservation_unit
+
+    # Callers validate that the reservation unit has a payment product.
+    payment_product = reservation_unit.payment_product
+    if payment_product is None:
+        msg = "A reservation unit that is paid online has a payment product."
+        raise MissingValueError(msg)
+
     preferred_language = reservation.user.get_preferred_language()
     reservation_unit_name = getattr(reservation_unit, f"name_{preferred_language}", reservation_unit.name)
     unit_name = getattr(reservation_unit.unit, f"name_{preferred_language}", reservation_unit.unit.name)
@@ -94,7 +102,7 @@ def get_verkkokauppa_order_params(
     # One row with the tax percentage of the price lines. TILA-4594 makes one row for each price line.
     items = [
         OrderItemParams(
-            product_id=reservation_unit.payment_product.id,
+            product_id=payment_product.id,
             product_name=f"{reservation_unit_name}, {unit_name}",
             quantity=1,  # Currently, we don't support quantities larger than 1
             unit="pcs",

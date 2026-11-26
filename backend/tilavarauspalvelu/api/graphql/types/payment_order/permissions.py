@@ -25,6 +25,8 @@ class PaymentOrderPermission(BasePermission[PaymentOrder, AnyUser]):
     def has_node_permission(cls, instance: PaymentOrder, user: AnyUser, filters: GraphQLFilterInfo) -> bool:
         if not user.is_authenticated:
             return False
+        if instance.reservation is None:
+            return False
         if instance.reservation.user == user:
             return True
         return user.permissions.can_view_reservation(instance.reservation)
