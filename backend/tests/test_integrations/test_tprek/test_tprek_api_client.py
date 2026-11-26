@@ -14,9 +14,10 @@ from tests.test_integrations.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
         json_data=SINGLE_TPREK_UNIT_JSON,
     ),
 )
-def test_TprekAPIClient__get_unit():
+def test_TprekAPIClient__get_unit() -> None:
     unit_data, location_data = TprekAPIClient.get_unit(unit_tprek_id="999")
 
+    assert unit_data is not None
     assert unit_data.tprek_id == "999"
     assert unit_data.name == "Test Unit"
     assert unit_data.name_fi == "Test Unit"
@@ -30,6 +31,7 @@ def test_TprekAPIClient__get_unit():
     assert unit_data.tprek_department_id == "test-department-id"
     assert unit_data.tprek_last_modified == local_datetime(2023, 5, 10, 8, 9, 0)
 
+    assert location_data is not None
     assert location_data.address_street == "Teststreet 1"
     assert location_data.address_street_fi == "Teststreet 1"
     assert location_data.address_street_en == "Teststreet 1"
@@ -52,15 +54,16 @@ def test_TprekAPIClient__get_unit():
         json_data={**SINGLE_TPREK_UNIT_JSON, "modified_time": "2023-05-10T05:09:00+00:00"},
     ),
 )
-def test_TprekAPIClient__get_unit__modified_time_with_offset():
+def test_TprekAPIClient__get_unit__modified_time_with_offset() -> None:
     unit_data, _ = TprekAPIClient.get_unit(unit_tprek_id="999")
 
+    assert unit_data is not None
     assert unit_data.tprek_last_modified == local_datetime(2023, 5, 10, 8, 9, 0)
 
 
 @patch_method(TprekAPIClient.get)
 @patch_method(TprekAPIClient.response_json, return_value=None)
-def test_TprekAPIClient__nonexistent_unit():
+def test_TprekAPIClient__nonexistent_unit() -> None:
     unit_data, location_data = TprekAPIClient.get_unit(unit_tprek_id="999")
     assert unit_data is None
     assert location_data is None
