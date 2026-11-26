@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ReserveeType
@@ -8,13 +10,16 @@ from tests.factories import ApplicationFactory, ApplicationSectionFactory, Reser
 
 from .helpers import applications_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application__order__by_pk(graphql):
+def test_application__order__by_pk(graphql: GraphQLClient) -> None:
     # given:
     # - There are two applications in the system
     # - A superuser is using the system
@@ -43,7 +48,7 @@ def test_application__order__by_pk(graphql):
     assert response.node(1) == {"pk": application_1.pk}
 
 
-def test_application__order__by_applicant(graphql):
+def test_application__order__by_applicant(graphql: GraphQLClient) -> None:
     # given:
     # - There are two applications in the system with different applicants
     # - A superuser is using the system
@@ -72,7 +77,7 @@ def test_application__order__by_applicant(graphql):
     assert response.node(1) == {"pk": application_1.pk}
 
 
-def test_application__order__by_applicant_type(graphql):
+def test_application__order__by_applicant_type(graphql: GraphQLClient) -> None:
     # given:
     # - There are three applications in the system with different applicant types
     # - A superuser is using the system
@@ -104,7 +109,7 @@ def test_application__order__by_applicant_type(graphql):
     assert response.node(2) == {"pk": application_1.pk}
 
 
-def test_application__order__by_status(graphql):
+def test_application__order__by_status(graphql: GraphQLClient) -> None:
     # given:
     # - There are applications in the system with different statuses
     # - A superuser is using the system
@@ -158,7 +163,9 @@ def test_application__order__by_status(graphql):
     ],
 )
 @pytest.mark.parametrize("direction", ["asc", "desc"])
-def test_application__order__by_preferred_unit_name(graphql, lang, order, direction):
+def test_application__order__by_preferred_unit_name(
+    graphql: GraphQLClient, lang: str, order: list[int], direction: str
+) -> None:
     order = list(reversed(order)) if direction == "desc" else order
 
     applications = {

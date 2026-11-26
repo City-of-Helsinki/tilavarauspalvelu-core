@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import freezegun
 import pytest
 
@@ -11,13 +13,18 @@ from tests.test_graphql_api.test_application.helpers import get_application_crea
 
 from .helpers import CREATE_MUTATION
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application__create(graphql):
+def test_application__create(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
     user = graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -36,7 +43,7 @@ def test_application__create(graphql):
     assert application.municipality == input_data["municipality"]
 
 
-def test_application__create__with_application_sections(graphql):
+def test_application__create__with_application_sections(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -53,7 +60,9 @@ def test_application__create__with_application_sections(graphql):
     assert ReservationUnitOption.objects.count() == 1
 
 
-def test_application__create__with_application_sections__application_round_does_not_exist(graphql):
+def test_application__create__with_application_sections__application_round_does_not_exist(
+    graphql: GraphQLClient,
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -70,7 +79,7 @@ def test_application__create__with_application_sections__application_round_does_
     assert Application.objects.count() == 0
 
 
-def test_application__create__with_application_sections__too_many(graphql, settings):
+def test_application__create__with_application_sections__too_many(graphql: GraphQLClient, settings: Settings) -> None:
     settings.MAXIMUM_SECTIONS_PER_APPLICATION = 0
 
     application_round = ApplicationRoundFactory.create_in_status_open()
@@ -90,7 +99,7 @@ def test_application__create__with_application_sections__too_many(graphql, setti
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_application__create__is_under_age(graphql):
+def test_application__create__is_under_age(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 2))
 
@@ -102,7 +111,7 @@ def test_application__create__is_under_age(graphql):
 
 
 @pytest.mark.parametrize("email", ["test@hel.fi", "test@edu.hel.fi"])
-def test_application__create__is_ad_user(graphql, email):
+def test_application__create__is_ad_user(graphql: GraphQLClient, email: str) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
 
     user = UserFactory.create_ad_user(
@@ -120,7 +129,7 @@ def test_application__create__is_ad_user(graphql, email):
     assert Application.objects.count() == 1
 
 
-def test_application__create__is_ad_user__not_internal_user(graphql):
+def test_application__create__is_ad_user__not_internal_user(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
 
     user = UserFactory.create_ad_user(
@@ -137,7 +146,7 @@ def test_application__create__is_ad_user__not_internal_user(graphql):
     assert response.field_error_messages() == ["AD user is not an internal user."]
 
 
-def test_application__create__is_ad_user__not_internal_user__is_superuser(graphql):
+def test_application__create__is_ad_user__not_internal_user__is_superuser(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
 
     user = UserFactory.create_ad_user(
@@ -155,7 +164,7 @@ def test_application__create__is_ad_user__not_internal_user__is_superuser(graphq
     assert Application.objects.count() == 1
 
 
-def test_application__create__sent_at(graphql):
+def test_application__create__sent_at(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -168,7 +177,7 @@ def test_application__create__sent_at(graphql):
     assert response.has_schema_errors is True, response
 
 
-def test_application__create__before_application_period(graphql):
+def test_application__create__before_application_period(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_upcoming()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -179,7 +188,7 @@ def test_application__create__before_application_period(graphql):
     assert response.field_error_messages() == ["Application round is not open for applications"]
 
 
-def test_application__create__after_application_period(graphql):
+def test_application__create__after_application_period(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 

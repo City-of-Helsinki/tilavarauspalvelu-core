@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -10,13 +11,16 @@ from tests.factories import ApplicationFactory, UnitFactory, UserFactory
 
 from .helpers import SEND_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application__send__regular_user(graphql):
+def test_application__send__regular_user(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_application_ready_for_sending()
 
     graphql.login_with_regular_user()
@@ -25,7 +29,7 @@ def test_application__send__regular_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_application__send__regular_user__own_application(graphql):
+def test_application__send__regular_user__own_application(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_application_ready_for_sending()
 
     graphql.force_login(application.user)
@@ -37,7 +41,7 @@ def test_application__send__regular_user__own_application(graphql):
     assert application.sent_at is not None
 
 
-def test_application__send__regular_user__own_application__application_period_over(graphql):
+def test_application__send__regular_user__own_application__application_period_over(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_application_ready_for_sending(
         application_round__application_period_begins_at=local_start_of_day() - datetime.timedelta(days=4),
         application_round__application_period_ends_at=local_start_of_day() - datetime.timedelta(days=2),
@@ -49,7 +53,7 @@ def test_application__send__regular_user__own_application__application_period_ov
     assert response.error_message() == "No permission to update."
 
 
-def test_application__send__general_admin(graphql):
+def test_application__send__general_admin(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_application_ready_for_sending()
     admin = UserFactory.create_with_general_role()
 
@@ -62,7 +66,7 @@ def test_application__send__general_admin(graphql):
     assert application.sent_at is not None
 
 
-def test_application__send__unit_admin(graphql):
+def test_application__send__unit_admin(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_unit_options__reservation_unit__unit=unit,
