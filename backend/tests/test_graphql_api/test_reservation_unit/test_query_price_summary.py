@@ -225,6 +225,47 @@ def test_reservation_unit__query__price_summary__inactive_option_not_included(gr
     }
 
 
+def test_reservation_unit__query__price_summary__surcharge_of_inactive_option_not_included(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create()
+    unit_group = UnitGroupFactory.create()
+    pricing_group = PricingGroupFactory.create(unit_group=unit_group)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        price_option=PriceOptionFactory.create(unit_group=unit_group),
+        amount=Decimal(30),
+        price_unit=PriceUnit.PER_HOUR,
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=today - datetime.timedelta(days=10),
+        price_option=PriceOptionFactory.create(unit_group=unit_group, is_active=False),
+        amount=Decimal(5),
+        can_apply_for_discount=True,
+    )
+
+    query = reservation_unit_query(fields=FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "priceSummary": {
+            "isFree": False,
+            "lowestAmount": "30.00",
+            "priceUnit": PriceUnit.PER_HOUR.value,
+            "varies": False,
+            "canApplyForDiscount": False,
+        },
+    }
+
+
 def test_reservation_unit__query__price_summary__free(graphql):
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
