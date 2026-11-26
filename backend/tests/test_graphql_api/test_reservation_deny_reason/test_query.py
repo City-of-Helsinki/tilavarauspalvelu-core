@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationDenyReasonFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -16,7 +20,7 @@ pytestmark = [
 deny_query = partial(build_query, "reservationDenyReasons", connection=True)
 
 
-def test_reservation_deny_reasons__query(graphql):
+def test_reservation_deny_reasons__query(graphql: GraphQLClient) -> None:
     deny_reason = ReservationDenyReasonFactory.create()
 
     graphql.login_with_superuser()
@@ -35,7 +39,7 @@ def test_reservation_deny_reasons__query(graphql):
     }
 
 
-def test_reservation_deny_reasons__query__anonymous_user(graphql):
+def test_reservation_deny_reasons__query__anonymous_user(graphql: GraphQLClient) -> None:
     ReservationDenyReasonFactory.create()
 
     query = deny_query()
@@ -44,7 +48,7 @@ def test_reservation_deny_reasons__query__anonymous_user(graphql):
     assert response.error_message() == "No permission to access node."
 
 
-def test_reservation_deny_reasons__order__by_rank(graphql):
+def test_reservation_deny_reasons__order__by_rank(graphql: GraphQLClient) -> None:
     deny_reason_1 = ReservationDenyReasonFactory.create(rank=1)
     deny_reason_2 = ReservationDenyReasonFactory.create(rank=3)
     deny_reason_3 = ReservationDenyReasonFactory.create(rank=2)
