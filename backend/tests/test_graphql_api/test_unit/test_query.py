@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -8,13 +9,16 @@ from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFact
 
 from .helpers import units_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_units__query(graphql):
+def test_units__query(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 
@@ -77,7 +81,7 @@ def test_units__query(graphql):
     }
 
 
-def test_units__query__unit_groups_alphabetical_order(graphql):
+def test_units__query__unit_groups_alphabetical_order(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     unit_group_1 = UnitGroupFactory.create(units=[unit], name="AAA")
     unit_group_2 = UnitGroupFactory.create(units=[unit], name="XXX")
@@ -105,7 +109,7 @@ def test_units__query__unit_groups_alphabetical_order(graphql):
     }
 
 
-def test_units__query__unit_groups__no_permissions(graphql):
+def test_units__query__unit_groups__no_permissions(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     UnitGroupFactory.create(units=[unit], name="AAA")
 
@@ -122,7 +126,7 @@ def test_units__query__unit_groups__no_permissions(graphql):
     assert response.error_message() == "No permission to access node."
 
 
-def test_units__query__check_duplication_is_prevented(graphql):
+def test_units__query__check_duplication_is_prevented(graphql: GraphQLClient) -> None:
     user = graphql.login_with_superuser()
 
     unit_1 = UnitFactory.create(name="A1")
