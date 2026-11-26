@@ -354,7 +354,11 @@ class ReservationUnit(models.Model):
 
     @lookup_property
     def highest_price_today() -> Decimal | None:
-        """The highest base price that is in effect today, or None if the reservation unit has no price today."""
+        """
+        The highest base or surcharge amount that is in effect today.
+        None if the reservation unit has no price today.
+        A value above zero means that the reservation unit has a paid price today.
+        """
         from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup
 
         # Lookup properties build this expression once per process, so the date must come from the database.
@@ -374,7 +378,7 @@ class ReservationUnit(models.Model):
                 .filter(
                     models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
                     pricing_group=active_pricing_group,
-                    kind=PriceComponentKind.BASE,
+                    kind__in=[PriceComponentKind.BASE, PriceComponentKind.SURCHARGE],
                     valid_from__lte=today,
                 )
                 .order_by("-amount")
@@ -395,7 +399,7 @@ class ReservationUnit(models.Model):
         components = PriceComponent.objects.filter(
             models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
             pricing_group=pricing_group_row.pricing_group_id,
-            kind=PriceComponentKind.BASE,
+            kind__in=[PriceComponentKind.BASE, PriceComponentKind.SURCHARGE],
             valid_from__lte=today,
         )
         return components.order_by("-amount").values_list("amount", flat=True).first()
