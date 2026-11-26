@@ -474,6 +474,11 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
         msg = "Payment for reservation could not be created in verkkokauppa"
         raise ValidationError(msg, code="RESERVATION_PAYMENT_CREATION_FAILED") from error
 
+    # The order creation fails if Verkkokauppa returns no checkout URL.
+    if verkkokauppa_order.checkout_url is None:
+        msg = "A created order has a checkout URL."
+        raise MissingValueError(msg)
+
     payment_order.remote_id = verkkokauppa_order.order_id
     payment_order.checkout_url = verkkokauppa_order.checkout_url
     payment_order.receipt_url = verkkokauppa_order.receipt_url or ""
