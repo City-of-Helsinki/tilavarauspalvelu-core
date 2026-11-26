@@ -17,12 +17,15 @@ from utils.date_utils import local_datetime
 
 from tests.factories import UnitFactory, UserFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, as_mock, patch_method
 
 from .helpers import OIDC_CONFIG, OIDC_ENDPOINT, UMA_TICKET_GRANT, TokenRequest
 
 if TYPE_CHECKING:
     from django.test import Client
+    from pytest_django import Settings
+
+    from tests.test_helauth.helpers import FakeKeycloak
 
 pytestmark = [
     pytest.mark.django_db,
@@ -93,13 +96,13 @@ def message_texts(response: Any) -> list[str]:
 # ── Login view ──
 
 
-def test_login_view__redirect_to_social_login(client):
+def test_login_view__redirect_to_social_login(client: Client) -> None:
     url = reverse("helusers:auth_login")
     response = client.get(url, data={"next": "http://localhost:3000/reservations", "lang": "sv", "ui": "customer"})
 
     assert response.status_code == 302
 
-    redirect_url = urllib.parse.urlparse(response.url)
+    redirect_url = urllib.parse.urlparse(response["Location"])
     assert redirect_url.path == "/pysocial/login/tunnistamo/"
     assert dict(urllib.parse.parse_qsl(redirect_url.query)) == {
         "next": "http://localhost:3000/reservations",
@@ -108,15 +111,15 @@ def test_login_view__redirect_to_social_login(client):
     }
 
 
-def test_login_view__redirect_to_social_login__no_customer_login(client):
+def test_login_view__redirect_to_social_login__no_customer_login(client: Client) -> None:
     url = reverse("helusers:auth_login")
     response = client.get(url, data={"ui": "admin"})
 
     assert response.status_code == 302
-    assert response.url == "/pysocial/login/tunnistamo/"
+    assert response["Location"] == "/pysocial/login/tunnistamo/"
 
 
-def test_login_view__logs_out_current_user(client):
+def test_login_view__logs_out_current_user(client: Client) -> None:
     user = UserFactory.create()
     client.force_login(user)
 
@@ -130,13 +133,13 @@ def test_login_view__logs_out_current_user(client):
 # ── Social login ──
 
 
-def test_social_login__redirect_to_keycloak(client, keycloak):
+def test_social_login__redirect_to_keycloak(client: Client, keycloak: FakeKeycloak) -> None:
     url = reverse("social:begin", kwargs={"backend": "tunnistamo"})
     response = client.get(url, data={"ui_locales": "sv", "kc_idp_hint": "suomi_fi"})
 
     assert response.status_code == 302
 
-    redirect_url = urllib.parse.urlparse(response.url)
+    redirect_url = urllib.parse.urlparse(response["Location"])
     assert redirect_url._replace(query="").geturl() == OIDC_CONFIG["authorization_endpoint"]
 
     params = dict(urllib.parse.parse_qsl(redirect_url.query))
@@ -153,7 +156,9 @@ def test_social_login__redirect_to_keycloak(client, keycloak):
     }
 
 
-def test_social_login__redirect_to_keycloak__no_language_or_identity_provider(client, keycloak):
+def test_social_login__redirect_to_keycloak__no_language_or_identity_provider(
+    client: Client, keycloak: FakeKeycloak
+) -> None:
     params = start_social_login(client)
 
     assert "ui_locales" not in params
@@ -161,12 +166,12 @@ def test_social_login__redirect_to_keycloak__no_language_or_identity_provider(cl
 
 
 @patch_method(HelsinkiProfileClient.request)
-def test_social_login__profile_login(client, keycloak):
+def test_social_login__profile_login(client: Client, keycloak: FakeKeycloak) -> None:
     profile_data = MyProfileDataFactory.create_basic(
         id="profile-id",
         verifiedPersonalInformation__nationalIdentificationNumber="010101A1234",
     )
-    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    as_mock(HelsinkiProfileClient.request).return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
     params = start_social_login(client)
     keycloak.id_token_claims = id_token_claims(nonce=params["nonce"], amr=ProfileLoginAMR.SUOMI_FI)
@@ -174,7 +179,7 @@ def test_social_login__profile_login(client, keycloak):
     response = complete_social_login(client, state=params["state"])
 
     assert response.status_code == 302
-    assert response.url == "/reservations"
+    assert response["Location"] == "/reservations"
 
     user = User.objects.get(uuid=keycloak.id_token_claims["sub"])
     assert user.email == "user@example.com"
@@ -208,7 +213,7 @@ def test_social_login__profile_login(client, keycloak):
 
 
 @patch_method(HelsinkiProfileClient.request)
-def test_social_login__ad_login(client, keycloak):
+def test_social_login__ad_login(client: Client, keycloak: FakeKeycloak) -> None:
     old_user = UserFactory.create(
         email="user@hel.fi",
         profile_id="",
@@ -228,7 +233,7 @@ def test_social_login__ad_login(client, keycloak):
     response = complete_social_login(client, state=params["state"])
 
     assert response.status_code == 302
-    assert response.url == "/reservations"
+    assert response["Location"] == "/reservations"
 
     user = User.objects.get(uuid=keycloak.id_token_claims["sub"])
     assert user.is_staff is True
@@ -241,13 +246,13 @@ def test_social_login__ad_login(client, keycloak):
     assert unit_role.is_from_ad_group is True
     assert list(unit_role.units.all()) == [unit]
 
-    assert HelsinkiProfileClient.request.call_count == 0
+    assert as_mock(HelsinkiProfileClient.request).call_count == 0
     assert keycloak.token_requests == [
         TokenRequest(grant_type="authorization_code", token="login-code"),
     ]
 
 
-def test_social_login__id_token_issued_in_the_future(client, keycloak):
+def test_social_login__id_token_issued_in_the_future(client: Client, keycloak: FakeKeycloak) -> None:
     params = start_social_login(client)
     keycloak.id_token_claims = id_token_claims(
         nonce=params["nonce"],
@@ -258,12 +263,14 @@ def test_social_login__id_token_issued_in_the_future(client, keycloak):
     response = complete_social_login(client, state=params["state"])
 
     assert response.status_code == 302
-    assert response.url == "/admin/"
+    assert response["Location"] == "/admin/"
     assert "_auth_user_id" not in client.session
     assert User.objects.filter(uuid=keycloak.id_token_claims["sub"]).exists() is False
 
 
-def test_social_login__id_token_issued_in_the_future__skip_iat_claim_validation(client, keycloak, settings):
+def test_social_login__id_token_issued_in_the_future__skip_iat_claim_validation(
+    client: Client, keycloak: FakeKeycloak, settings: Settings
+) -> None:
     settings.UNSAFE_SKIP_IAT_CLAIM_VALIDATION = True
 
     params = start_social_login(client)
@@ -276,7 +283,7 @@ def test_social_login__id_token_issued_in_the_future__skip_iat_claim_validation(
     response = complete_social_login(client, state=params["state"])
 
     assert response.status_code == 302
-    assert response.url == "/reservations"
+    assert response["Location"] == "/reservations"
 
     user = User.objects.get(uuid=keycloak.id_token_claims["sub"])
     assert client.session["_auth_user_id"] == str(user.pk)
@@ -285,7 +292,7 @@ def test_social_login__id_token_issued_in_the_future__skip_iat_claim_validation(
 # ── Logout view ──
 
 
-def test_logout_view__redirect_to_end_session_url(client):
+def test_logout_view__redirect_to_end_session_url(client: Client) -> None:
     user = UserFactory.create()
     client.force_login(user)
 
@@ -297,14 +304,14 @@ def test_logout_view__redirect_to_end_session_url(client):
     response = client.post(url)
 
     assert response.status_code == 302
-    assert response.url == build_end_session_url(
+    assert response["Location"] == build_end_session_url(
         id_token="foo", post_logout_redirect_uri="http://testserver/admin/login/"
     )
     assert "_auth_user_id" not in client.session
     assert message_texts(response) == ["You have been successfully logged out."]
 
 
-def test_logout_view__redirect_to_end_session_url__given_redirect_url(client):
+def test_logout_view__redirect_to_end_session_url__given_redirect_url(client: Client) -> None:
     user = UserFactory.create()
     client.force_login(user)
 
@@ -316,19 +323,21 @@ def test_logout_view__redirect_to_end_session_url__given_redirect_url(client):
     response = client.post(url, data={"redirect_to": "http://localhost:3000/"})
 
     assert response.status_code == 302
-    assert response.url == build_end_session_url(id_token="foo", post_logout_redirect_uri="http://localhost:3000/")
+    assert response["Location"] == build_end_session_url(
+        id_token="foo", post_logout_redirect_uri="http://localhost:3000/"
+    )
 
 
-def test_logout_view__no_end_session_url__anonymous_user(client):
+def test_logout_view__no_end_session_url__anonymous_user(client: Client) -> None:
     url = reverse("helusers:auth_logout")
     response = client.post(url, data={"redirect_to": "http://localhost:3000/"})
 
     assert response.status_code == 302
-    assert response.url == "http://localhost:3000/"
+    assert response["Location"] == "http://localhost:3000/"
     assert message_texts(response) == []
 
 
-def test_logout_view__django_admin_login(client):
+def test_logout_view__django_admin_login(client: Client) -> None:
     user = UserFactory.create()
     client.force_login(user, backend="config.auth.ProxyModelBackend")
 
@@ -336,12 +345,12 @@ def test_logout_view__django_admin_login(client):
     response = client.post(url)
 
     assert response.status_code == 302
-    assert response.url == "http://testserver/admin/login/"
+    assert response["Location"] == "http://testserver/admin/login/"
     assert "_auth_user_id" not in client.session
     assert message_texts(response) == ["You have been successfully logged out."]
 
 
-def test_logout_view__session_user_deleted(client):
+def test_logout_view__session_user_deleted(client: Client) -> None:
     user = UserFactory.create()
     client.force_login(user)
     user.delete()

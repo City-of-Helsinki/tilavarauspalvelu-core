@@ -13,9 +13,11 @@ from .helpers import OIDC_ENDPOINT, FakeKeycloak
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+    from pytest_django import Settings
+
 
 @pytest.fixture
-def keycloak(settings) -> Iterator[FakeKeycloak]:
+def keycloak(settings: Settings) -> Iterator[FakeKeycloak]:
     settings.SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = OIDC_ENDPOINT
     settings.SOCIAL_AUTH_TUNNISTAMO_SCOPE = []
 
