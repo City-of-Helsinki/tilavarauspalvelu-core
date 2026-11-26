@@ -71,8 +71,8 @@ Store tests run against a real Postgres. Assume the database is running first,
 and only start it with `just services` if you get database connection related
 errors during testing.
 
-Run `pytest` with `--reuse-db`. `tests/plugins.py` creates the database again when model or migration files change.
-Use `--create-db` to create it again by hand.
+The `just be test*` recipes reuse the test database. `tests/plugins.py` creates it again when model or migration files change.
+Use `just be test-fresh` to create it again by hand.
 
 Read a row back before asserting on it. A factory keeps the values it was seeded with,
 so it cannot show what the code under test changed.
@@ -81,12 +81,12 @@ Permission tests must read the row back too. Check that an allowed call changed 
 and that a denied call left it as it was. A check on `has_errors` alone is not enough.
 
 To run tests in parallel on one machine, give each run its own database.
-Set `TOX_PARALLEL_ENV=<name>` before `pytest`. The test database is then named `test_tvp_<name>`.
+Set `TOX_PARALLEL_ENV=<name>` before `just be test`. The test database is then named `test_tvp_<name>`.
 Without it, two runs share `test_tvp` and one can drop the database under the other.
 
 Frontend query tests are skipped in a normal run. Run them as the CI does:
-run `just gql-pluck` in `frontend/`, then `poetry run python manage.py defragment_frontend_queries`
-in `backend/`, then `poetry run pytest --only-frontend-query-tests`.
+run `just fe gql-pluck`, then `poetry run python manage.py defragment_frontend_queries`
+in `backend/`, then `just be test-frontend-query`.
 Old output from `gql-pluck` makes all of them fail. Run it again after you change a query.
 
 ## Mocking
