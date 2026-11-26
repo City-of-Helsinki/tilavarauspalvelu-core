@@ -12,7 +12,12 @@ from tests.factories import ReservationUnitFactory
 from .helpers import CREATE_MUTATION
 
 if TYPE_CHECKING:
+    from django.core.files import File
+    from pytest_django import Settings
+
     from tilavarauspalvelu.models import ReservationUnitImage
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -20,7 +25,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_image__create(graphql, mock_png):
+def test_reservation_unit_image__create(graphql: GraphQLClient, mock_png: File) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
@@ -40,7 +45,7 @@ def test_reservation_unit_image__create(graphql, mock_png):
     assert reservation_unit_image.image_type == ReservationUnitImageType.MAIN
 
 
-def test_reservation_unit_image__create__invalid_image_type(graphql, mock_png):
+def test_reservation_unit_image__create__invalid_image_type(graphql: GraphQLClient, mock_png: File) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
@@ -61,7 +66,7 @@ def test_reservation_unit_image__create__invalid_image_type(graphql, mock_png):
     assert reservation_unit_image is None
 
 
-def test_reservation_unit_image__create__not_a_valid_image(graphql, settings):
+def test_reservation_unit_image__create__not_a_valid_image(graphql: GraphQLClient, settings: Settings) -> None:
     settings.LANGUAGE_CODE = "en"
 
     reservation_unit = ReservationUnitFactory.create()
@@ -86,7 +91,9 @@ def test_reservation_unit_image__create__not_a_valid_image(graphql, settings):
     assert reservation_unit_image is None
 
 
-def test_reservation_unit_image__create__extension_not_allowed(graphql, settings, mock_png):
+def test_reservation_unit_image__create__extension_not_allowed(
+    graphql: GraphQLClient, settings: Settings, mock_png: File
+) -> None:
     settings.LANGUAGE_CODE = "en"
 
     reservation_unit = ReservationUnitFactory.create()
