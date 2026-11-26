@@ -1,4 +1,5 @@
 import type { Locator } from "@playwright/test";
+import { pricePattern } from "../../../lib/locators";
 import { expect, step, log } from "../../../lib/runtime";
 import { PageObject } from "../../page-object";
 import { BASIC_ADMIN_MALE } from "../../Resources/serial_users";
@@ -144,11 +145,11 @@ export class AdminReservations extends PageObject {
   ) {
     // Check price if provided
     if (singlebooking_price !== "None") {
-      // toHaveText reads the price's non-breaking spaces as spaces
+      // pricePattern leaves out spaces, dash styles and ",00" decimals
       await expect(
         this.page.getByTestId("reservation__summary--Hinta"),
         `The price is ${singlebooking_price}`
-      ).toHaveText(singlebooking_price, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
+      ).toHaveText(pricePattern(singlebooking_price), { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check status if provided
@@ -211,11 +212,11 @@ export class AdminReservations extends PageObject {
   ) {
     // Check price if provided
     if (singlebooking_price !== "None") {
-      // toHaveText reads the price's non-breaking spaces as spaces
+      // pricePattern leaves out spaces, dash styles and ",00" decimals
       await expect(
         this.page.getByTestId("reservation__summary--Hinta"),
         `The price is ${singlebooking_price}`
-      ).toHaveText(singlebooking_price, { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
+      ).toHaveText(pricePattern(singlebooking_price), { useInnerText: true, timeout: TEXT_CHECK_TIMEOUT });
     }
 
     // Check status if provided
