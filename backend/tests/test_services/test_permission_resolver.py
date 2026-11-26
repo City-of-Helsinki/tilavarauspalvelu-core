@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from django.contrib.auth.models import AnonymousUser
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
@@ -16,6 +15,7 @@ from tests.factories import (
     UnitGroupFactory,
     UserFactory,
 )
+from tests.helpers import anonymous_user
 
 pytestmark = [
     pytest.mark.django_db,
@@ -25,7 +25,7 @@ pytestmark = [
 # ── Resolver per user ──
 
 
-def test_permission_resolver__resolver_stays_bound_to_its_user():
+def test_permission_resolver__resolver_stays_bound_to_its_user() -> None:
     superuser = UserFactory.create_superuser()
     regular_user = UserFactory.create()
 
@@ -40,7 +40,7 @@ def test_permission_resolver__resolver_stays_bound_to_its_user():
 
 
 @pytest.mark.parametrize("kind", ["anonymous", "inactive"])
-def test_permission_resolver__anonymous_or_inactive_user__has_no_permissions(kind):
+def test_permission_resolver__anonymous_or_inactive_user__has_no_permissions(kind: str) -> None:
     unit = UnitFactory.create()
     space = SpaceFactory.create(unit=unit)
     reservation_unit = ReservationUnitFactory.create(unit=unit)
@@ -49,7 +49,7 @@ def test_permission_resolver__anonymous_or_inactive_user__has_no_permissions(kin
     application = ApplicationFactory.create()
     application_round = ApplicationRoundFactory.create()
 
-    user = AnonymousUser() if kind == "anonymous" else UserFactory.create_superuser(is_active=False)
+    user = anonymous_user() if kind == "anonymous" else UserFactory.create_superuser(is_active=False)
 
     assert user.permissions.has_any_role() is False
     assert user.permissions.has_general_role() is False
@@ -77,7 +77,7 @@ def test_permission_resolver__anonymous_or_inactive_user__has_no_permissions(kin
 # ── Superuser ──
 
 
-def test_permission_resolver__superuser__can_manage_notifications_and_reservations():
+def test_permission_resolver__superuser__can_manage_notifications_and_reservations() -> None:
     unit = UnitFactory.create()
     user = UserFactory.create_superuser()
 
@@ -88,7 +88,7 @@ def test_permission_resolver__superuser__can_manage_notifications_and_reservatio
 # ── Roles for units ──
 
 
-def test_permission_resolver__has_role_for_units__any_role_by_default():
+def test_permission_resolver__has_role_for_units__any_role_by_default() -> None:
     unit = UnitFactory.create()
     other_unit = UnitFactory.create()
     user = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.VIEWER)
@@ -97,7 +97,7 @@ def test_permission_resolver__has_role_for_units__any_role_by_default():
     assert user.permissions.has_role_for_units_or_their_unit_groups(units=[other_unit]) is False
 
 
-def test_permission_resolver__has_role_for_units__no_units_given__uses_units_from_roles():
+def test_permission_resolver__has_role_for_units__no_units_given__uses_units_from_roles() -> None:
     unit = UnitFactory.create()
     unit_group = UnitGroupFactory.create(units=[UnitFactory.create()])
     unit_user = UserFactory.create_with_unit_role(units=[unit])
@@ -112,7 +112,7 @@ def test_permission_resolver__has_role_for_units__no_units_given__uses_units_fro
 # ── Reservations ──
 
 
-def test_permission_resolver__can_manage_reservations_for_units__general_role():
+def test_permission_resolver__can_manage_reservations_for_units__general_role() -> None:
     unit = UnitFactory.create()
     admin = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
     viewer = UserFactory.create_with_general_role(role=UserRoleChoice.VIEWER)
@@ -121,7 +121,7 @@ def test_permission_resolver__can_manage_reservations_for_units__general_role():
     assert viewer.permissions.can_manage_reservations_for_units([unit]) is False
 
 
-def test_permission_resolver__can_view_reservation_series__general_role():
+def test_permission_resolver__can_view_reservation_series__general_role() -> None:
     reservation_series = ReservationSeriesFactory.create()
     viewer = UserFactory.create_with_general_role(role=UserRoleChoice.VIEWER)
     reserver = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
@@ -133,13 +133,13 @@ def test_permission_resolver__can_view_reservation_series__general_role():
 # ── Resources and spaces ──
 
 
-def test_permission_resolver__can_manage_resources__general_role():
+def test_permission_resolver__can_manage_resources__general_role() -> None:
     user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
 
     assert user.permissions.can_manage_resources(None) is True
 
 
-def test_permission_resolver__can_manage_resources__unit_role__no_space():
+def test_permission_resolver__can_manage_resources__unit_role__no_space() -> None:
     unit = UnitFactory.create()
     user = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.ADMIN)
 
@@ -147,7 +147,7 @@ def test_permission_resolver__can_manage_resources__unit_role__no_space():
     assert user.permissions.can_manage_resources(None) is False
 
 
-def test_permission_resolver__can_manage_spaces__unit_role__no_unit():
+def test_permission_resolver__can_manage_spaces__unit_role__no_unit() -> None:
     unit = UnitFactory.create()
     user = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.ADMIN)
 
@@ -158,7 +158,7 @@ def test_permission_resolver__can_manage_spaces__unit_role__no_unit():
 # ── Applications ──
 
 
-def test_permission_resolver__can_view_application__owner():
+def test_permission_resolver__can_view_application__owner() -> None:
     user = UserFactory.create()
     application = ApplicationFactory.create(user=user)
 
@@ -170,19 +170,19 @@ def test_permission_resolver__can_view_application__owner():
 # ── Users ──
 
 
-def test_permission_resolver__can_view_user__self():
+def test_permission_resolver__can_view_user__self() -> None:
     user = UserFactory.create()
 
     assert user.permissions.can_view_user(user) is True
 
 
-def test_permission_resolver__can_view_user__other_user_without_roles():
+def test_permission_resolver__can_view_user__other_user_without_roles() -> None:
     user = UserFactory.create()
 
     assert user.permissions.can_view_user(UserFactory.create()) is False
 
 
-def test_permission_resolver__can_view_user__superuser():
+def test_permission_resolver__can_view_user__superuser() -> None:
     user = UserFactory.create_superuser()
 
     assert user.permissions.can_view_user(UserFactory.create()) is True
@@ -197,7 +197,7 @@ def test_permission_resolver__can_view_user__superuser():
         (UserRoleChoice.RESERVER, False),
     ],
 )
-def test_permission_resolver__can_view_user__general_role(role, expected):
+def test_permission_resolver__can_view_user__general_role(role: UserRoleChoice, expected: bool) -> None:
     user = UserFactory.create_with_general_role(role=role)
 
     assert user.permissions.can_view_user(UserFactory.create()) is expected
@@ -210,13 +210,13 @@ def test_permission_resolver__can_view_user__general_role(role, expected):
         (UserRoleChoice.HANDLER, False),
     ],
 )
-def test_permission_resolver__can_view_user__unit_role(role, expected):
+def test_permission_resolver__can_view_user__unit_role(role: UserRoleChoice, expected: bool) -> None:
     user = UserFactory.create_with_unit_role(units=[UnitFactory.create()], role=role)
 
     assert user.permissions.can_view_user(UserFactory.create()) is expected
 
 
-def test_permission_resolver__can_view_user__unit_group_role():
+def test_permission_resolver__can_view_user__unit_group_role() -> None:
     unit_group = UnitGroupFactory.create(units=[UnitFactory.create()])
     user = UserFactory.create_with_unit_role(unit_groups=[unit_group], role=UserRoleChoice.ADMIN)
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from freezegun import freeze_time
@@ -14,6 +15,9 @@ from tilavarauspalvelu.services.pricing.application_round_options import (
     check_pricing_change_keeps_round_options,
 )
 from tilavarauspalvelu.typing import error_codes
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationRound, PricingGroup, ReservationUnit
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -43,7 +47,7 @@ JUN_1 = datetime.date(2027, 6, 1)
 # ── Helpers ──
 
 
-def create_round(reservation_units, **kwargs):
+def create_round(reservation_units: list[ReservationUnit], **kwargs: Any) -> ApplicationRound:
     return ApplicationRoundFactory.create(
         reservation_units=reservation_units,
         application_period_begins_at=local_datetime() - datetime.timedelta(weeks=8),
@@ -54,7 +58,7 @@ def create_round(reservation_units, **kwargs):
     )
 
 
-def create_unit_using(pricing_group, begins=JAN_1):
+def create_unit_using(pricing_group: PricingGroup, begins: datetime.date = JAN_1) -> ReservationUnit:
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitPricingGroupFactory.create(
         reservation_unit=reservation_unit,
@@ -64,7 +68,7 @@ def create_unit_using(pricing_group, begins=JAN_1):
     return reservation_unit
 
 
-def complete_reservation_creation(application_round):
+def complete_reservation_creation(application_round: ApplicationRound) -> None:
     application_round.handled_at = local_datetime()
     application_round.save()
     application = ApplicationFactory.create_in_status_handled(application_round=application_round)
@@ -76,19 +80,19 @@ def complete_reservation_creation(application_round):
 # ── Offered options ──
 
 
-def test_round_price_options__no_reservation_units():
+def test_round_price_options__no_reservation_units() -> None:
     application_round = create_round([])
 
     assert application_round_price_options(application_round) == []
 
 
-def test_round_price_options__reservation_units_without_pricing_group():
+def test_round_price_options__reservation_units_without_pricing_group() -> None:
     application_round = create_round([ReservationUnitFactory.create()])
 
     assert application_round_price_options(application_round) == []
 
 
-def test_round_price_options__shared_group__ordered_by_name():
+def test_round_price_options__shared_group__ordered_by_name() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -101,7 +105,7 @@ def test_round_price_options__shared_group__ordered_by_name():
     assert application_round_price_options(application_round) == [adults, juniors]
 
 
-def test_round_price_options__inactive_option_is_not_offered():
+def test_round_price_options__inactive_option_is_not_offered() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group, is_active=False)
@@ -112,7 +116,7 @@ def test_round_price_options__inactive_option_is_not_offered():
     assert application_round_price_options(application_round) == []
 
 
-def test_round_price_options__component_without_option_offers_active_unit_group_options():
+def test_round_price_options__component_without_option_offers_active_unit_group_options() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -126,7 +130,7 @@ def test_round_price_options__component_without_option_offers_active_unit_group_
     assert application_round_price_options(application_round) == [adults, juniors]
 
 
-def test_round_price_options__own_group_component_without_option_offers_no_option():
+def test_round_price_options__own_group_component_without_option_offers_no_option() -> None:
     pricing_group = PricingGroupFactory.create(unit_group=None)
     PriceComponentFactory.create(pricing_group=pricing_group, price_option=None, valid_from=JAN_1)
 
@@ -135,7 +139,7 @@ def test_round_price_options__own_group_component_without_option_offers_no_optio
     assert application_round_price_options(application_round) == []
 
 
-def test_round_price_options__explicit_and_implicit_options_match():
+def test_round_price_options__explicit_and_implicit_options_match() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -151,7 +155,7 @@ def test_round_price_options__explicit_and_implicit_options_match():
     assert application_round_price_options(application_round) == [adults, juniors]
 
 
-def test_round_price_options__groups_with_different_options():
+def test_round_price_options__groups_with_different_options() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     juniors = PriceOptionFactory.create(unit_group=unit_group)
@@ -168,7 +172,7 @@ def test_round_price_options__groups_with_different_options():
     assert application_round_price_options(application_round) == [adults]
 
 
-def test_round_price_options__option_ends_during_period():
+def test_round_price_options__option_ends_during_period() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group)
@@ -181,7 +185,7 @@ def test_round_price_options__option_ends_during_period():
     assert application_round_price_options(application_round) == [adults]
 
 
-def test_round_price_options__option_ends_on_last_day_of_period():
+def test_round_price_options__option_ends_on_last_day_of_period() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     adults = PriceOptionFactory.create(unit_group=unit_group)
@@ -197,7 +201,7 @@ def test_round_price_options__option_ends_on_last_day_of_period():
     assert application_round_price_options(application_round) == []
 
 
-def test_round_price_options__pricing_group_changes_during_period():
+def test_round_price_options__pricing_group_changes_during_period() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
 
@@ -221,7 +225,7 @@ def test_round_price_options__pricing_group_changes_during_period():
 # ── Round change ──
 
 
-def test_round_change__new_round_with_same_options():
+def test_round_change__new_round_with_same_options() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     first_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -242,7 +246,7 @@ def test_round_change__new_round_with_same_options():
     assert errors == []
 
 
-def test_round_change__new_round_with_different_options():
+def test_round_change__new_round_with_different_options() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -270,7 +274,7 @@ def test_round_change__new_round_with_different_options():
     assert errors == [RoundOptionError(code=error_codes.APPLICATION_ROUND_PRICE_OPTIONS_INCONSISTENT, message=message)]
 
 
-def test_round_change__new_round_with_option_for_part_of_period():
+def test_round_change__new_round_with_option_for_part_of_period() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -295,7 +299,7 @@ def test_round_change__new_round_with_option_for_part_of_period():
     assert errors == [RoundOptionError(code=error_codes.APPLICATION_ROUND_PRICE_OPTIONS_INCONSISTENT, message=message)]
 
 
-def test_round_change__saved_round_loses_option():
+def test_round_change__saved_round_loses_option() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -323,7 +327,7 @@ def test_round_change__saved_round_loses_option():
     assert errors == [RoundOptionError(code=error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED, message=message)]
 
 
-def test_round_change__saved_round_with_reservations_can_lose_option():
+def test_round_change__saved_round_with_reservations_can_lose_option() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -347,7 +351,7 @@ def test_round_change__saved_round_with_reservations_can_lose_option():
 # ── Pricing change ──
 
 
-def test_pricing_change__option_removed_from_shared_group():
+def test_pricing_change__option_removed_from_shared_group() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -371,7 +375,7 @@ def test_pricing_change__option_removed_from_shared_group():
     assert errors == [RoundOptionError(code=error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED, message=message)]
 
 
-def test_pricing_change__option_added_to_only_group():
+def test_pricing_change__option_added_to_only_group() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     juniors = PriceOptionFactory.create(unit_group=unit_group)
@@ -390,7 +394,7 @@ def test_pricing_change__option_added_to_only_group():
     assert errors == []
 
 
-def test_pricing_change__explicit_options_replaced_by_component_without_option():
+def test_pricing_change__explicit_options_replaced_by_component_without_option() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     juniors = PriceOptionFactory.create(unit_group=unit_group)
@@ -410,7 +414,7 @@ def test_pricing_change__explicit_options_replaced_by_component_without_option()
     assert errors == []
 
 
-def test_pricing_change__option_added_to_one_of_two_groups():
+def test_pricing_change__option_added_to_one_of_two_groups() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -439,7 +443,7 @@ def test_pricing_change__option_added_to_one_of_two_groups():
     assert errors == [RoundOptionError(code=error_codes.APPLICATION_ROUND_PRICE_OPTIONS_INCONSISTENT, message=message)]
 
 
-def test_pricing_change__reservation_unit_moves_to_group_without_option():
+def test_pricing_change__reservation_unit_moves_to_group_without_option() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     shared_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -468,7 +472,7 @@ def test_pricing_change__reservation_unit_moves_to_group_without_option():
     assert all(error.message.startswith(f"Application round '{application_round.name}': ") for error in errors)
 
 
-def test_pricing_change__new_group_without_pk():
+def test_pricing_change__new_group_without_pk() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     shared_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -490,7 +494,7 @@ def test_pricing_change__new_group_without_pk():
     assert errors == []
 
 
-def test_pricing_change__round_with_reservations_is_not_checked():
+def test_pricing_change__round_with_reservations_is_not_checked() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -508,7 +512,7 @@ def test_pricing_change__round_with_reservations_is_not_checked():
     assert errors == []
 
 
-def test_pricing_change__handled_round_without_reservations_is_checked():
+def test_pricing_change__handled_round_without_reservations_is_checked() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -527,7 +531,7 @@ def test_pricing_change__handled_round_without_reservations_is_checked():
     assert [error.code for error in errors] == [error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED]
 
 
-def test_pricing_change__round_with_ended_reservation_period_is_not_checked():
+def test_pricing_change__round_with_ended_reservation_period_is_not_checked() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -550,7 +554,7 @@ def test_pricing_change__round_with_ended_reservation_period_is_not_checked():
 # ── Price option change ──
 
 
-def test_price_option_change__deactivated_implicit_option_is_checked():
+def test_price_option_change__deactivated_implicit_option_is_checked() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -564,7 +568,7 @@ def test_price_option_change__deactivated_implicit_option_is_checked():
     assert [error.code for error in errors] == [error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED]
 
 
-def test_price_option_change__deactivated_explicit_option_is_checked():
+def test_price_option_change__deactivated_explicit_option_is_checked() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -578,7 +582,7 @@ def test_price_option_change__deactivated_explicit_option_is_checked():
     assert [error.code for error in errors] == [error_codes.APPLICATION_ROUND_PRICE_OPTIONS_REMOVED]
 
 
-def test_price_option_change__round_with_ended_reservation_period_is_not_checked():
+def test_price_option_change__round_with_ended_reservation_period_is_not_checked() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)

@@ -41,6 +41,10 @@ from tests.helpers import exact
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+    from pytest_django import DjangoAssertNumQueries, Settings
+
+    from tilavarauspalvelu.models import TaxLevel
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -54,7 +58,7 @@ JAN_1 = datetime.date(2026, 1, 1)
 MAR_1 = datetime.date(2026, 3, 1)
 
 
-def create_tax_level_with_rate_change():
+def create_tax_level_with_rate_change() -> TaxLevel:
     """A tax level with the rate 24 % until March 1st 2026 and 25.5 % after it."""
     tax_level = TaxLevelFactory.create(rates=[])
     TaxLevelRateFactory.create(tax_level=tax_level, begins=datetime.date(2000, 1, 1), percentage=Decimal(24))
@@ -63,7 +67,7 @@ def create_tax_level_with_rate_change():
 
 
 @pytest.fixture
-def price_line_audit_logging(settings) -> Generator[None]:
+def price_line_audit_logging(settings: Settings) -> Generator[None]:
     """Register price lines for audit logging, and unregister them after the test."""
     settings.AUDIT_LOGGING_ENABLED = True
     auditlog.register(ReservationPriceLine)
@@ -77,7 +81,7 @@ def price_line_audit_logging(settings) -> Generator[None]:
 
 
 @freeze_time("2026-02-15T12:00:00+02:00")
-def test_build_price_lines__hourly_price():
+def test_build_price_lines__hourly_price() -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -129,7 +133,7 @@ def test_build_price_lines__hourly_price():
     assert result.calculation.total == Decimal("15.00")
 
 
-def test_build_price_lines__price_change_during_reservation_gives_two_lines():
+def test_build_price_lines__price_change_during_reservation_gives_two_lines() -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -167,7 +171,7 @@ def test_build_price_lines__price_change_during_reservation_gives_two_lines():
     assert result.lines[1].amount == Decimal("20.00")
 
 
-def test_build_price_lines__description_from_price_option():
+def test_build_price_lines__description_from_price_option() -> None:
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -199,7 +203,7 @@ def test_build_price_lines__description_from_price_option():
     assert result.lines[0].description_sv == "Vuxna"
 
 
-def test_build_price_lines__material_price_description_from_price_component():
+def test_build_price_lines__material_price_description_from_price_component() -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -228,7 +232,7 @@ def test_build_price_lines__material_price_description_from_price_component():
     assert result.lines[0].material_price_description_sv == "Material"
 
 
-def test_build_price_lines__no_pricing_group():
+def test_build_price_lines__no_pricing_group() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     msg = "Reservation unit has no pricing group on 2026-02-01."
@@ -242,7 +246,7 @@ def test_build_price_lines__no_pricing_group():
 
 
 @freeze_time("2026-02-15T12:00:00+02:00")
-def test_build_price_lines__tax_level_without_rate_today():
+def test_build_price_lines__tax_level_without_rate_today() -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -265,7 +269,7 @@ def test_build_price_lines__tax_level_without_rate_today():
 
 
 @freeze_time("2026-02-15T12:00:00+02:00")
-def test_build_price_lines_with_data__makes_no_queries(django_assert_num_queries):
+def test_build_price_lines_with_data__makes_no_queries(django_assert_num_queries: DjangoAssertNumQueries) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -303,7 +307,7 @@ def test_build_price_lines_with_data__makes_no_queries(django_assert_num_queries
 # ── Set reservation price lines ──
 
 
-def test_set_reservation_price_lines__saves_lines_and_price():
+def test_set_reservation_price_lines__saves_lines_and_price() -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -336,7 +340,7 @@ def test_set_reservation_price_lines__saves_lines_and_price():
     assert lines[0].amount == Decimal("20.00")
 
 
-def test_set_reservation_price_lines__replaces_old_lines():
+def test_set_reservation_price_lines__replaces_old_lines() -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -374,7 +378,7 @@ def test_set_reservation_price_lines__replaces_old_lines():
     assert lines[0].override_amount is None
 
 
-def test_set_reservation_price_lines__nothing_changes_on_calculation_error():
+def test_set_reservation_price_lines__nothing_changes_on_calculation_error() -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
         reservation_unit=reservation_unit,
@@ -394,7 +398,7 @@ def test_set_reservation_price_lines__nothing_changes_on_calculation_error():
 
 
 @pytest.mark.usefixtures("price_line_audit_logging")
-def test_set_reservation_price_lines__writes_audit_log():
+def test_set_reservation_price_lines__writes_audit_log() -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -433,7 +437,7 @@ def test_set_reservation_price_lines__writes_audit_log():
 # ── Set price line taxes ──
 
 
-def test_set_price_line_taxes__rate_on_the_given_date():
+def test_set_price_line_taxes__rate_on_the_given_date() -> None:
     tax_level = create_tax_level_with_rate_change()
     reservation = ReservationFactory.create()
     line = ReservationPriceLineFactory.create(
@@ -451,7 +455,7 @@ def test_set_price_line_taxes__rate_on_the_given_date():
 
 
 @pytest.mark.usefixtures("price_line_audit_logging")
-def test_set_price_line_taxes__writes_audit_log():
+def test_set_price_line_taxes__writes_audit_log() -> None:
     tax_level = create_tax_level_with_rate_change()
     reservation = ReservationFactory.create()
     line = ReservationPriceLineFactory.create(
@@ -467,7 +471,7 @@ def test_set_price_line_taxes__writes_audit_log():
     assert list(entries.values_list("changes", flat=True)) == [{"tax_percentage": ["24.00", "25.50"]}]
 
 
-def test_set_price_line_taxes__reservation_without_lines():
+def test_set_price_line_taxes__reservation_without_lines() -> None:
     reservation = ReservationFactory.create()
 
     set_price_line_taxes(reservation=reservation, on_date=MAR_1)
@@ -478,7 +482,9 @@ def test_set_price_line_taxes__reservation_without_lines():
 @freeze_time("2026-03-01T12:00:00+02:00")
 @override_settings(MOCK_VERKKOKAUPPA_API_ENABLED=True)
 @mock.patch("tilavarauspalvelu.models.reservation.actions.create_mock_verkkokauppa_order")
-def test_create_order_in_verkkokauppa__sets_price_line_taxes_on_the_order_date(create_mock_order):
+def test_create_order_in_verkkokauppa__sets_price_line_taxes_on_the_order_date(
+    create_mock_order: mock.MagicMock,
+) -> None:
     tax_level = create_tax_level_with_rate_change()
     reservation = ReservationFactory.create()
     line = ReservationPriceLineFactory.create(reservation=reservation, tax_level=tax_level, tax_percentage=Decimal(24))

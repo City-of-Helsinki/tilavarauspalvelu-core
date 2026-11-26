@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
@@ -11,13 +12,18 @@ from utils.date_utils import local_start_of_day
 
 from tests.factories import GeneralRoleFactory, UnitRoleFactory, UserFactory
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
 @freeze_time("2024-01-01 00:00:00")
-def test_deactivate_old_permissions__last_login_older_than_limit__deactivates_roles_and_staff_flags(settings):
+def test_deactivate_old_permissions__last_login_older_than_limit__deactivates_roles_and_staff_flags(
+    settings: Settings,
+) -> None:
     delta = 1
     settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = delta
     last_login = local_start_of_day() - datetime.timedelta(days=delta, seconds=1)
@@ -54,7 +60,7 @@ def test_deactivate_old_permissions__last_login_older_than_limit__deactivates_ro
 
 
 @freeze_time("2024-01-01 00:00:00")
-def test_deactivate_old_permissions__last_login_at_limit__keeps_roles_and_staff_flags(settings):
+def test_deactivate_old_permissions__last_login_at_limit__keeps_roles_and_staff_flags(settings: Settings) -> None:
     delta = 1
     settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = delta
     last_login = local_start_of_day() - datetime.timedelta(days=delta)

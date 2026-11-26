@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import pytest
@@ -26,6 +27,11 @@ from tests.factories import (
     UnitGroupFactory,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from pytest_django import Settings
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -44,7 +50,7 @@ APR_1 = datetime.date(2026, 4, 1)
 
 
 @pytest.fixture
-def freeze_today():
+def freeze_today() -> Generator[None]:
     with freeze_time("2026-02-15T12:00:00+02:00"):
         yield
 
@@ -63,7 +69,7 @@ def error_details(error: ValidationError) -> list[ErrorDetail]:
 # ── Price change ──
 
 
-def test_save_price_component_changes__price_change_from_a_future_date():
+def test_save_price_component_changes__price_change_from_a_future_date() -> None:
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, amount=Decimal(10))
 
@@ -85,7 +91,7 @@ def test_save_price_component_changes__price_change_from_a_future_date():
     assert components[1].amount == Decimal(20)
 
 
-def test_save_price_component_changes__first_components_can_begin_in_the_past():
+def test_save_price_component_changes__first_components_can_begin_in_the_past() -> None:
     pricing_group = PricingGroupFactory.create()
     new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=JAN_1)
 
@@ -96,7 +102,7 @@ def test_save_price_component_changes__first_components_can_begin_in_the_past():
     assert components[0].valid_from == JAN_1
 
 
-def test_save_price_component_changes__future_component_can_be_changed():
+def test_save_price_component_changes__future_component_can_be_changed() -> None:
     pricing_group = PricingGroupFactory.create()
     PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, valid_until=MAR_1)
     future = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=MAR_1, amount=Decimal(20))
@@ -109,7 +115,7 @@ def test_save_price_component_changes__future_component_can_be_changed():
     assert future.amount == Decimal(30)
 
 
-def test_save_price_component_changes__future_component_can_be_deleted():
+def test_save_price_component_changes__future_component_can_be_deleted() -> None:
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, valid_until=MAR_1)
     future = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=MAR_1)
@@ -123,7 +129,7 @@ def test_save_price_component_changes__future_component_can_be_deleted():
     assert components[0].valid_until is None
 
 
-def test_save_price_component_changes__sends_accounting_of_reservation_units_once(settings):
+def test_save_price_component_changes__sends_accounting_of_reservation_units_once(settings: Settings) -> None:
     settings.UPDATE_ACCOUNTING = True
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
@@ -148,7 +154,7 @@ def test_save_price_component_changes__sends_accounting_of_reservation_units_onc
 # ── Past components ──
 
 
-def test_save_price_component_changes__past_component_cannot_be_changed():
+def test_save_price_component_changes__past_component_cannot_be_changed() -> None:
     pricing_group = PricingGroupFactory.create()
     past = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, valid_until=FEB_1)
     PriceComponentFactory.create(pricing_group=pricing_group, valid_from=FEB_1)
@@ -167,7 +173,7 @@ def test_save_price_component_changes__past_component_cannot_be_changed():
     assert PriceComponent.objects.get(pk=past.pk).amount == Decimal(10)
 
 
-def test_save_price_component_changes__past_component_cannot_be_deleted():
+def test_save_price_component_changes__past_component_cannot_be_deleted() -> None:
     pricing_group = PricingGroupFactory.create()
     past = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1, valid_until=FEB_1)
     PriceComponentFactory.create(pricing_group=pricing_group, valid_from=FEB_1)
@@ -187,7 +193,7 @@ def test_save_price_component_changes__past_component_cannot_be_deleted():
 # ── Active components ──
 
 
-def test_save_price_component_changes__active_component_amount_cannot_be_changed():
+def test_save_price_component_changes__active_component_amount_cannot_be_changed() -> None:
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
 
@@ -205,7 +211,7 @@ def test_save_price_component_changes__active_component_amount_cannot_be_changed
     assert PriceComponent.objects.get(pk=active.pk).amount == Decimal(10)
 
 
-def test_save_price_component_changes__active_component_tax_level_cannot_be_changed():
+def test_save_price_component_changes__active_component_tax_level_cannot_be_changed() -> None:
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
     tax_level = active.tax_level
@@ -225,7 +231,7 @@ def test_save_price_component_changes__active_component_tax_level_cannot_be_chan
 
 
 @pytest.mark.parametrize("valid_until", [FEB_1, FEB_15])
-def test_save_price_component_changes__active_component_end_must_be_in_the_future(valid_until):
+def test_save_price_component_changes__active_component_end_must_be_in_the_future(valid_until: datetime.date) -> None:
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
     new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=APR_1)
@@ -244,7 +250,7 @@ def test_save_price_component_changes__active_component_end_must_be_in_the_futur
     assert PriceComponent.objects.get(pk=active.pk).valid_until is None
 
 
-def test_save_price_component_changes__active_component_cannot_be_deleted():
+def test_save_price_component_changes__active_component_cannot_be_deleted() -> None:
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
 
@@ -264,7 +270,7 @@ def test_save_price_component_changes__active_component_cannot_be_deleted():
 
 
 @pytest.mark.parametrize("valid_from", [FEB_1, FEB_15])
-def test_save_price_component_changes__new_component_must_begin_after_today(valid_from):
+def test_save_price_component_changes__new_component_must_begin_after_today(valid_from: datetime.date) -> None:
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
     new = PriceComponentFactory.build(
@@ -285,7 +291,7 @@ def test_save_price_component_changes__new_component_must_begin_after_today(vali
     assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
 
 
-def test_save_price_component_changes__component_of_another_group():
+def test_save_price_component_changes__component_of_another_group() -> None:
     pricing_group = PricingGroupFactory.create()
     PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
     other = PriceComponentFactory.create(valid_from=MAR_1)
@@ -316,7 +322,9 @@ def test_save_price_component_changes__component_of_another_group():
         ),
     ],
 )
-def test_save_price_component_changes__model_constraints_are_checked(component_fields, message, code):
+def test_save_price_component_changes__model_constraints_are_checked(
+    component_fields: dict[str, Any], message: str, code: str
+) -> None:
     pricing_group = PricingGroupFactory.create()
     new = PriceComponentFactory.build(
         pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=JAN_1, **component_fields
@@ -329,7 +337,7 @@ def test_save_price_component_changes__model_constraints_are_checked(component_f
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_save_price_component_changes__free_component_cannot_allow_discount():
+def test_save_price_component_changes__free_component_cannot_allow_discount() -> None:
     pricing_group = PricingGroupFactory.create()
     new = PriceComponentFactory.build(
         pricing_group=pricing_group,
@@ -351,7 +359,7 @@ def test_save_price_component_changes__free_component_cannot_allow_discount():
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_save_price_component_changes__model_constraints_are_checked_for_changed_components():
+def test_save_price_component_changes__model_constraints_are_checked_for_changed_components() -> None:
     pricing_group = PricingGroupFactory.create()
     future = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=MAR_1)
 
@@ -369,7 +377,7 @@ def test_save_price_component_changes__model_constraints_are_checked_for_changed
 # ── Price options ──
 
 
-def test_save_price_component_changes__option_of_another_unit_group():
+def test_save_price_component_changes__option_of_another_unit_group() -> None:
     pricing_group = PricingGroupFactory.create(unit_group=UnitGroupFactory.create())
     option = PriceOptionFactory.create(unit_group=UnitGroupFactory.create())
     new = PriceComponentFactory.build(
@@ -388,7 +396,7 @@ def test_save_price_component_changes__option_of_another_unit_group():
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_save_price_component_changes__own_group_cannot_use_options():
+def test_save_price_component_changes__own_group_cannot_use_options() -> None:
     pricing_group = PricingGroupFactory.create(unit_group=None)
     option = PriceOptionFactory.create()
     new = PriceComponentFactory.build(
@@ -406,7 +414,7 @@ def test_save_price_component_changes__own_group_cannot_use_options():
     ]
 
 
-def test_save_price_component_changes__inactive_option():
+def test_save_price_component_changes__inactive_option() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     option = PriceOptionFactory.create(unit_group=unit_group, is_active=False)
@@ -422,7 +430,7 @@ def test_save_price_component_changes__inactive_option():
     ]
 
 
-def test_save_price_component_changes__existing_component_can_keep_an_inactive_option():
+def test_save_price_component_changes__existing_component_can_keep_an_inactive_option() -> None:
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     option = PriceOptionFactory.create(unit_group=unit_group)
@@ -443,7 +451,7 @@ def test_save_price_component_changes__existing_component_can_keep_an_inactive_o
 # ── Coverage ──
 
 
-def test_save_price_component_changes__coverage_errors_save_nothing():
+def test_save_price_component_changes__coverage_errors_save_nothing() -> None:
     pricing_group = PricingGroupFactory.create()
     active = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
     new = PriceComponentFactory.build(
@@ -465,7 +473,7 @@ def test_save_price_component_changes__coverage_errors_save_nothing():
     assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
 
 
-def test_save_price_component_changes__coverage_includes_reservation_units():
+def test_save_price_component_changes__coverage_includes_reservation_units() -> None:
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(pricing_group=pricing_group, begins=JAN_1)
     new = PriceComponentFactory.build(pricing_group=pricing_group, tax_level=TaxLevelFactory.create(), valid_from=MAR_1)
@@ -484,7 +492,7 @@ def test_save_price_component_changes__coverage_includes_reservation_units():
 # ── Sales items ──
 
 
-def test_save_price_component_changes__sales_item_must_have_the_tax_level_of_the_component():
+def test_save_price_component_changes__sales_item_must_have_the_tax_level_of_the_component() -> None:
     pricing_group = PricingGroupFactory.create()
     new = PriceComponentFactory.build(
         pricing_group=pricing_group,
@@ -505,7 +513,7 @@ def test_save_price_component_changes__sales_item_must_have_the_tax_level_of_the
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_save_price_component_changes__paid_online_needs_sales_item():
+def test_save_price_component_changes__paid_online_needs_sales_item() -> None:
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
         pricing_group=pricing_group,
@@ -528,7 +536,7 @@ def test_save_price_component_changes__paid_online_needs_sales_item():
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 
 
-def test_save_price_component_changes__paid_on_site_needs_no_sales_item():
+def test_save_price_component_changes__paid_on_site_needs_no_sales_item() -> None:
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
         pricing_group=pricing_group,
@@ -546,7 +554,7 @@ def test_save_price_component_changes__paid_on_site_needs_no_sales_item():
 # ── Application rounds ──
 
 
-def test_save_price_component_changes__option_removed_from_open_application_round():
+def test_save_price_component_changes__option_removed_from_open_application_round() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
     juniors = PriceOptionFactory.create(unit_group=unit_group, name="Juniors")
@@ -598,7 +606,7 @@ def test_save_price_component_changes__option_removed_from_open_application_roun
     assert PriceComponent.objects.get(pk=juniors_component.pk).valid_until is None
 
 
-def test_save_price_component_changes__own_group_in_inconsistent_application_round():
+def test_save_price_component_changes__own_group_in_inconsistent_application_round() -> None:
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
     shared_group = PricingGroupFactory.create(unit_group=unit_group)
