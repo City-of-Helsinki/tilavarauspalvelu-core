@@ -177,12 +177,12 @@ def calculate_price_with_data(
         msg = f"Reservation unit has no price on {base_quantities.first_date_without_component.isoformat()}."
         raise PriceCalculationError(msg)
 
-    lines = _calculation_lines(base_quantities)
+    lines = _build_calculation_lines(base_quantities)
 
     surcharge_components = [component for component in components if component.kind == PriceComponentKind.SURCHARGE]
     for surcharge_component in surcharge_components:
         surcharge_quantities = _count_quantities(components=[surcharge_component], begin=begin, end=end)
-        lines += _calculation_lines(surcharge_quantities)
+        lines += _build_calculation_lines(surcharge_quantities)
 
     total = sum((line.amount for line in lines), start=Decimal(0))
     can_apply_for_discount = any(line.component.can_apply_for_discount for line in lines)
@@ -259,7 +259,7 @@ def _count_quantities(
     )
 
 
-def _calculation_lines(quantities: _Quantities) -> list[PriceCalculationLine]:
+def _build_calculation_lines(quantities: _Quantities) -> list[PriceCalculationLine]:
     lines: list[PriceCalculationLine] = []
     for pk, quantity in quantities.quantities.items():
         component = quantities.components_by_pk[pk]
