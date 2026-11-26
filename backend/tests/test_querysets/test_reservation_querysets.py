@@ -65,11 +65,11 @@ def _validate_time_spans(
     """
     closed_time_spans: set[TimeSpanElement] = {
         TimeSpanElement(
-            start_datetime=reservation.buffered_begins_at,
-            end_datetime=reservation.buffered_ends_at,
+            start_datetime=reservation.begins_at - reservation.buffer_time_before,
+            end_datetime=reservation.ends_at + reservation.buffer_time_after,
             is_reservable=False,
         )
-        for reservation in Reservation.objects.with_buffered_begin_and_end().filter(
+        for reservation in Reservation.objects.filter(
             reservation_unit__pk__in=[*related_reservation_unit_ids, reservation_unit_id]
         )
     }
