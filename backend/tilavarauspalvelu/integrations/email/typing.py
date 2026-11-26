@@ -295,7 +295,7 @@ class SeasonalBookingAccessCodeChangedContext(TypedDict, total=False):
     allocations: list[dict[str, Any]]
 
 
-class SeasonalBookingCancelledAllContext(TypedDict):
+class SeasonalBookingCancelledAllContext(TypedDict, total=False):
     cancel_reason: str
     email_recipient_name: str
     application_section_name: str
