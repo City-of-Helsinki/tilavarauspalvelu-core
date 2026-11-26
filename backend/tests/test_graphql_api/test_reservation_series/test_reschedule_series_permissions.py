@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from freezegun import freeze_time
 
@@ -9,6 +11,9 @@ from utils.date_utils import local_datetime, local_time
 from tests.factories import GeneralRoleFactory, UnitRoleFactory, UserFactory
 
 from .helpers import RESCHEDULE_SERIES_MUTATION, create_reservation_series, get_minimal_reschedule_data
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -27,7 +32,9 @@ pytestmark = [
     ],
 )
 @freeze_time(local_datetime(year=2023, month=12, day=1))
-def test_reservation_series__reschedule_series__general_role(graphql, role, has_permission):
+def test_reservation_series__reschedule_series__general_role(
+    graphql: GraphQLClient, role: UserRoleChoice, has_permission: bool
+) -> None:
     series = create_reservation_series()
     graphql.login_user_with_role(role=role)
 
@@ -41,7 +48,7 @@ def test_reservation_series__reschedule_series__general_role(graphql, role, has_
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
-def test_reservation_series__reschedule_series__general_reserver__own_reservation(graphql):
+def test_reservation_series__reschedule_series__general_reserver__own_reservation(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     series = create_reservation_series(user=user)
     GeneralRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
@@ -67,7 +74,9 @@ def test_reservation_series__reschedule_series__general_reserver__own_reservatio
     ],
 )
 @freeze_time(local_datetime(year=2023, month=12, day=1))
-def test_reservation_series__reschedule_series__unit_role(graphql, role, has_permission):
+def test_reservation_series__reschedule_series__unit_role(
+    graphql: GraphQLClient, role: UserRoleChoice, has_permission: bool
+) -> None:
     series = create_reservation_series()
     user = UserFactory.create_with_unit_role(role=role, units=[series.reservation_unit.unit])
 
@@ -82,7 +91,7 @@ def test_reservation_series__reschedule_series__unit_role(graphql, role, has_per
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
-def test_reservation_series__reschedule_series__unit_reserver__own_reservation(graphql):
+def test_reservation_series__reschedule_series__unit_reserver__own_reservation(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     series = create_reservation_series(user=user)
     UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[series.reservation_unit.unit])

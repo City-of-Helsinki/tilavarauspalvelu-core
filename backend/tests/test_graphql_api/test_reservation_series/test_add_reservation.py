@@ -13,12 +13,14 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationDenyReasonFactory, ReservationUnitAccessTypeFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import ADD_RESERVATION_TO_SERIES_MUTATION, create_reservation_series, get_minimal_add_data
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
+
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -26,7 +28,7 @@ pytestmark = [
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__add_reservation(graphql):
+def test_reservation_series__add_reservation(graphql: GraphQLClient) -> None:
     series = create_reservation_series()
 
     assert series.reservations.count() == 9
@@ -40,17 +42,20 @@ def test_reservation_series__add_reservation(graphql):
 
     assert series.reservations.count() == 10
 
-    reservation: Reservation = series.reservations.order_by("pk").last()
+    reservation = series.reservations.order_by("pk").last()
+
+    assert reservation is not None
     assert reservation.begins_at == datetime.datetime(2024, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.ends_at == datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE)
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__add_reservation__last_reservation_denied(graphql):
+def test_reservation_series__add_reservation__last_reservation_denied(graphql: GraphQLClient) -> None:
     series = create_reservation_series()
 
     deny_reason = ReservationDenyReasonFactory.create()
-    last_reservation: Reservation = series.reservations.last()
+    last_reservation = series.reservations.last()
+    assert last_reservation is not None
     last_reservation.state = ReservationStateChoice.DENIED
     last_reservation.deny_reason = deny_reason
     last_reservation.cancel_reason = ReservationCancelReasonChoice.CHANGE_OF_PLANS
@@ -63,14 +68,16 @@ def test_reservation_series__add_reservation__last_reservation_denied(graphql):
 
     assert response.has_errors is False, response
 
-    reservation: Reservation = series.reservations.order_by("pk").last()
+    reservation = series.reservations.order_by("pk").last()
+
+    assert reservation is not None
     assert reservation.state == ReservationStateChoice.CONFIRMED
     assert reservation.deny_reason is None
     assert reservation.cancel_reason is None
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__add_reservation__overlapping(graphql):
+def test_reservation_series__add_reservation__overlapping(graphql: GraphQLClient) -> None:
     series = create_reservation_series()
 
     assert series.reservations.count() == 9
@@ -91,7 +98,7 @@ def test_reservation_series__add_reservation__overlapping(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__add_reservation__begin_after_end(graphql):
+def test_reservation_series__add_reservation__begin_after_end(graphql: GraphQLClient) -> None:
     series = create_reservation_series()
 
     assert series.reservations.count() == 9
@@ -113,7 +120,7 @@ def test_reservation_series__add_reservation__begin_after_end(graphql):
 
 @freeze_time(local_datetime(2024, 1, 1))
 @patch_method(PindoraService.reschedule_access_code)
-def test_reservation_series__add_reservation__access_code(graphql):
+def test_reservation_series__add_reservation__access_code(graphql: GraphQLClient) -> None:
     series = create_reservation_series(
         reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
         reservations__access_type=AccessType.ACCESS_CODE,
@@ -142,13 +149,13 @@ def test_reservation_series__add_reservation__access_code(graphql):
     assert new_reservation.access_code_is_active is False
     assert new_reservation.access_code_generated_at is None
 
-    assert PindoraService.reschedule_access_code.called is True
+    assert as_mock(PindoraService.reschedule_access_code).called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1))
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not Found"))
 @patch_method(PindoraService.create_access_code)
-def test_reservation_series__add_reservation__access_code__create_if_not_found(graphql):
+def test_reservation_series__add_reservation__access_code__create_if_not_found(graphql: GraphQLClient) -> None:
     series = create_reservation_series(
         reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
         reservations__access_type=AccessType.ACCESS_CODE,
@@ -178,15 +185,15 @@ def test_reservation_series__add_reservation__access_code__create_if_not_found(g
     assert new_reservation.access_code_generated_at is None
 
     # Since rescheduling found no access code, we create new one.
-    assert PindoraService.reschedule_access_code.called is True
-    assert PindoraService.create_access_code.called is True
+    assert as_mock(PindoraService.reschedule_access_code).called is True
+    assert as_mock(PindoraService.create_access_code).called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1))
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraAPIError("Failed"))
 @patch_method(PindoraService.create_access_code)
 @patch_method(SentryLogger.log_exception)
-def test_reservation_series__add_reservation__access_code__failed_pindora_call(graphql):
+def test_reservation_series__add_reservation__access_code__failed_pindora_call(graphql: GraphQLClient) -> None:
     series = create_reservation_series(
         reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
         reservations__access_type=AccessType.ACCESS_CODE,
@@ -216,16 +223,16 @@ def test_reservation_series__add_reservation__access_code__failed_pindora_call(g
     assert new_reservation.access_code_generated_at is None
 
     # Since rescheduling failed unexpectedly, we don't call create_access_code, but don't fail either.
-    assert PindoraService.reschedule_access_code.called is True
-    assert PindoraService.create_access_code.called is False
+    assert as_mock(PindoraService.reschedule_access_code).called is True
+    assert as_mock(PindoraService.create_access_code).called is False
 
     # We log the error to Sentry.
-    assert SentryLogger.log_exception.called is True
+    assert as_mock(SentryLogger.log_exception).called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1))
 @patch_method(PindoraService.reschedule_access_code)
-def test_reservation_series__add_reservation__new_one_is_not_access_code(graphql):
+def test_reservation_series__add_reservation__new_one_is_not_access_code(graphql: GraphQLClient) -> None:
     series = create_reservation_series(
         reservations__access_type=AccessType.ACCESS_CODE,
         reservations__access_code_is_active=True,
@@ -264,4 +271,4 @@ def test_reservation_series__add_reservation__new_one_is_not_access_code(graphql
     assert new_reservation.access_code_generated_at is None
 
     # No need to call Pindora if this reservation doesn't add an access code.
-    assert PindoraService.reschedule_access_code.called is False
+    assert as_mock(PindoraService.reschedule_access_code).called is False

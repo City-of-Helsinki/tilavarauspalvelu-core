@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
@@ -8,6 +10,9 @@ from tilavarauspalvelu.models import ReservationSeries
 from tests.factories import ReservationUnitFactory, UserFactory
 
 from .helpers import CREATE_SERIES_MUTATION, get_minimal_series_data
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -25,7 +30,9 @@ pytestmark = [
         (UserRoleChoice.NOTIFICATION_MANAGER, False),
     ],
 )
-def test_reservation_series__create_series__general_role(graphql, role, has_permission):
+def test_reservation_series__create_series__general_role(
+    graphql: GraphQLClient, role: UserRoleChoice, has_permission: bool
+) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_user_with_role(role=role)
 
@@ -46,7 +53,9 @@ def test_reservation_series__create_series__general_role(graphql, role, has_perm
         (UserRoleChoice.NOTIFICATION_MANAGER, False),
     ],
 )
-def test_reservation_series__create_series__unit_role(graphql, role, has_permission):
+def test_reservation_series__create_series__unit_role(
+    graphql: GraphQLClient, role: UserRoleChoice, has_permission: bool
+) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = UserFactory.create_with_unit_role(role=role, units=[reservation_unit.unit])
 

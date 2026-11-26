@@ -13,14 +13,19 @@ from tilavarauspalvelu.models import ReservationStatistic
 from utils.date_utils import local_datetime
 
 from tests.factories import AllocatedTimeSlotFactory, ReservationDenyReasonFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import DENY_SERIES_MUTATION, create_reservation_series
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from django.core.mail import EmailMultiAlternatives
+    from pytest_django import Settings
+
     from tilavarauspalvelu.models import Reservation
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -30,7 +35,7 @@ pytestmark = [
 
 @patch_method(EmailService.send_seasonal_booking_denied_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series(graphql):
+def test_reservation_series__deny_series(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()
@@ -62,11 +67,11 @@ def test_reservation_series__deny_series(graphql):
     assert all(reservation.handling_details != "Handling details" for reservation in past_reservations)
     assert all(reservation.handled_at is None for reservation in past_reservations)
 
-    assert EmailService.send_seasonal_booking_denied_series_email.called is False
+    assert as_mock(EmailService.send_seasonal_booking_denied_series_email).called is False
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__update_statistics(graphql, settings):
+def test_reservation_series__deny_series__update_statistics(graphql: GraphQLClient, settings: Settings) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reason = ReservationDenyReasonFactory.create()
@@ -94,7 +99,7 @@ def test_reservation_series__deny_series__update_statistics(graphql, settings):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__dont_need_handling_details(graphql):
+def test_reservation_series__deny_series__dont_need_handling_details(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()
@@ -113,7 +118,7 @@ def test_reservation_series__deny_series__dont_need_handling_details(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__reason_missing(graphql):
+def test_reservation_series__deny_series__reason_missing(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = {
@@ -130,12 +135,13 @@ def test_reservation_series__deny_series__reason_missing(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__only_deny_certain_states(graphql):
+def test_reservation_series__deny_series__only_deny_certain_states(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()
 
     last_reservation = reservation_series.reservations.order_by("begins_at").last()
+    assert last_reservation is not None
     last_reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
     last_reservation.save()
 
@@ -156,7 +162,7 @@ def test_reservation_series__deny_series__only_deny_certain_states(graphql):
 
 @patch_method(PindoraService.reschedule_access_code)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__has_access_codes(graphql):
+def test_reservation_series__deny_series__has_access_codes(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series(
@@ -174,12 +180,12 @@ def test_reservation_series__deny_series__has_access_codes(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.reschedule_access_code.called is True
+    assert as_mock(PindoraService.reschedule_access_code).called is True
 
 
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not Found"))
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__has_access_codes__pindora_not_found(graphql):
+def test_reservation_series__deny_series__has_access_codes__pindora_not_found(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series(
@@ -198,7 +204,7 @@ def test_reservation_series__deny_series__has_access_codes__pindora_not_found(gr
     # Mutation didn't fail on missing access code.
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.reschedule_access_code.called is True
+    assert as_mock(PindoraService.reschedule_access_code).called is True
 
     # Future reservations were still denied.
     future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begins_at__gt=local_datetime())
@@ -207,7 +213,7 @@ def test_reservation_series__deny_series__has_access_codes__pindora_not_found(gr
 
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraAPIError("Failed"))
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__has_access_codes__pindora_call_fails(graphql):
+def test_reservation_series__deny_series__has_access_codes__pindora_call_fails(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series(
@@ -228,7 +234,7 @@ def test_reservation_series__deny_series__has_access_codes__pindora_call_fails(g
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Failed"]
 
-    assert PindoraService.reschedule_access_code.called is True
+    assert as_mock(PindoraService.reschedule_access_code).called is True
 
     # Future reservation were not denied.
     future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begins_at__gt=local_datetime())
@@ -237,7 +243,7 @@ def test_reservation_series__deny_series__has_access_codes__pindora_call_fails(g
 
 @patch_method(EmailService.send_seasonal_booking_denied_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__in_seasonal_booking(graphql):
+def test_reservation_series__deny_series__in_seasonal_booking(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     allocation = AllocatedTimeSlotFactory.create()
@@ -254,11 +260,13 @@ def test_reservation_series__deny_series__in_seasonal_booking(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert EmailService.send_seasonal_booking_denied_series_email.called is True
+    assert as_mock(EmailService.send_seasonal_booking_denied_series_email).called is True
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__in_seasonal_booking__no_reservations_to_deny(graphql, settings, outbox):
+def test_reservation_series__deny_series__in_seasonal_booking__no_reservations_to_deny(
+    graphql: GraphQLClient, settings: Settings, outbox: list[EmailMultiAlternatives]
+) -> None:
     settings.SEND_EMAILS = True
 
     reason = ReservationDenyReasonFactory.create()
@@ -285,7 +293,9 @@ def test_reservation_series__deny_series__in_seasonal_booking__no_reservations_t
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__in_seasonal_booking__already_denied(graphql, settings, outbox):
+def test_reservation_series__deny_series__in_seasonal_booking__already_denied(
+    graphql: GraphQLClient, settings: Settings, outbox: list[EmailMultiAlternatives]
+) -> None:
     settings.SEND_EMAILS = True
 
     reason = ReservationDenyReasonFactory.create()

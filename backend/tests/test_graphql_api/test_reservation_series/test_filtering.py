@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 import pytest
 
 from tests.factories import ReservationSeriesFactory
 
 from .helpers import reservation_series_many_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_series__filter__by_user(graphql):
+def test_reservation_series__filter__by_user(graphql: GraphQLClient) -> None:
     reservation_series = ReservationSeriesFactory.create()
     ReservationSeriesFactory.create()
     graphql.login_with_superuser()
@@ -34,7 +39,7 @@ def test_reservation_series__filter__by_user(graphql):
         ("reservationUnitNameSv", "SV"),
     ],
 )
-def test_reservation_series__filter__by_reservation_unit_name(graphql, field, value):
+def test_reservation_series__filter__by_reservation_unit_name(graphql: GraphQLClient, field: str, value: str) -> None:
     reservation_series = ReservationSeriesFactory.create(
         name="1",
         reservation_unit__name_fi="FI",
@@ -49,7 +54,8 @@ def test_reservation_series__filter__by_reservation_unit_name(graphql, field, va
     )
     graphql.login_with_superuser()
 
-    query = reservation_series_many_query(**{field: value})
+    filters: dict[str, Any] = {field: value}
+    query = reservation_series_many_query(**filters)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -66,7 +72,9 @@ def test_reservation_series__filter__by_reservation_unit_name(graphql, field, va
         ("reservationUnitNameSv", "SV, baz"),
     ],
 )
-def test_reservation_series__filter__by_reservation_unit_name__multiple(graphql, field, value):
+def test_reservation_series__filter__by_reservation_unit_name__multiple(
+    graphql: GraphQLClient, field: str, value: str
+) -> None:
     reservation_series_1 = ReservationSeriesFactory.create(
         name="1",
         reservation_unit__name_fi="FI",
@@ -81,7 +89,8 @@ def test_reservation_series__filter__by_reservation_unit_name__multiple(graphql,
     )
     graphql.login_with_superuser()
 
-    query = reservation_series_many_query(**{field: value})
+    filters: dict[str, Any] = {field: value}
+    query = reservation_series_many_query(**filters)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -91,7 +100,7 @@ def test_reservation_series__filter__by_reservation_unit_name__multiple(graphql,
     assert response.node(1) == {"pk": reservation_series_2.pk}
 
 
-def test_reservation_series__filter__by_reservation_unit(graphql):
+def test_reservation_series__filter__by_reservation_unit(graphql: GraphQLClient) -> None:
     reservation_series = ReservationSeriesFactory.create()
     ReservationSeriesFactory.create()
     graphql.login_with_superuser()
@@ -105,7 +114,7 @@ def test_reservation_series__filter__by_reservation_unit(graphql):
     assert response.node(0) == {"pk": reservation_series.pk}
 
 
-def test_reservation_series__filter__by_reservation_unit__multiple(graphql):
+def test_reservation_series__filter__by_reservation_unit__multiple(graphql: GraphQLClient) -> None:
     reservation_series_1 = ReservationSeriesFactory.create(name="1")
     reservation_series_2 = ReservationSeriesFactory.create(name="2")
     graphql.login_with_superuser()
@@ -122,7 +131,7 @@ def test_reservation_series__filter__by_reservation_unit__multiple(graphql):
     assert response.node(1) == {"pk": reservation_series_2.pk}
 
 
-def test_reservation_series__filter__by_unit(graphql):
+def test_reservation_series__filter__by_unit(graphql: GraphQLClient) -> None:
     reservation_series = ReservationSeriesFactory.create()
     ReservationSeriesFactory.create()
     graphql.login_with_superuser()
@@ -136,7 +145,7 @@ def test_reservation_series__filter__by_unit(graphql):
     assert response.node(0) == {"pk": reservation_series.pk}
 
 
-def test_reservation_series__filter__by_unit__multiple(graphql):
+def test_reservation_series__filter__by_unit__multiple(graphql: GraphQLClient) -> None:
     reservation_series_1 = ReservationSeriesFactory.create(name="1")
     reservation_series_2 = ReservationSeriesFactory.create(name="2")
     graphql.login_with_superuser()
@@ -153,11 +162,12 @@ def test_reservation_series__filter__by_unit__multiple(graphql):
     assert response.node(1) == {"pk": reservation_series_2.pk}
 
 
-def test_reservation_series__filter__by_reservation_unit_type(graphql):
+def test_reservation_series__filter__by_reservation_unit_type(graphql: GraphQLClient) -> None:
     reservation_series = ReservationSeriesFactory.create(reservation_unit__reservation_unit_type__name="foo")
     ReservationSeriesFactory.create(reservation_unit__reservation_unit_type__name="bar")
     graphql.login_with_superuser()
 
+    assert reservation_series.reservation_unit.reservation_unit_type is not None
     query = reservation_series_many_query(
         reservation_unit_type=reservation_series.reservation_unit.reservation_unit_type.pk,
     )
@@ -169,7 +179,7 @@ def test_reservation_series__filter__by_reservation_unit_type(graphql):
     assert response.node(0) == {"pk": reservation_series.pk}
 
 
-def test_reservation_series__filter__by_reservation_unit_type__multiple(graphql):
+def test_reservation_series__filter__by_reservation_unit_type__multiple(graphql: GraphQLClient) -> None:
     reservation_series_1 = ReservationSeriesFactory.create(
         name="1",
         reservation_unit__reservation_unit_type__name="foo",
@@ -180,6 +190,8 @@ def test_reservation_series__filter__by_reservation_unit_type__multiple(graphql)
     )
     graphql.login_with_superuser()
 
+    assert reservation_series_1.reservation_unit.reservation_unit_type is not None
+    assert reservation_series_2.reservation_unit.reservation_unit_type is not None
     query = reservation_series_many_query(
         reservation_unit_type=[
             reservation_series_1.reservation_unit.reservation_unit_type.pk,

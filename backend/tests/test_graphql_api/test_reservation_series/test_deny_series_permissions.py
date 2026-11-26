@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from freezegun import freeze_time
 
@@ -10,13 +12,16 @@ from tests.factories import ReservationDenyReasonFactory, UnitRoleFactory, UserF
 
 from .helpers import DENY_SERIES_MUTATION, create_reservation_series
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__regular_user(graphql):
+def test_reservation_series__deny_series__regular_user(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()
@@ -34,7 +39,7 @@ def test_reservation_series__deny_series__regular_user(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__general_admin(graphql):
+def test_reservation_series__deny_series__general_admin(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()
@@ -52,7 +57,7 @@ def test_reservation_series__deny_series__general_admin(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__unit_admin(graphql):
+def test_reservation_series__deny_series__unit_admin(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()
@@ -72,7 +77,7 @@ def test_reservation_series__deny_series__unit_admin(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__unit_handler(graphql):
+def test_reservation_series__deny_series__unit_handler(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()
@@ -92,7 +97,7 @@ def test_reservation_series__deny_series__unit_handler(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__unit_reserver__own_reservation(graphql):
+def test_reservation_series__deny_series__unit_reserver__own_reservation(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     user = UserFactory.create()
@@ -115,7 +120,7 @@ def test_reservation_series__deny_series__unit_reserver__own_reservation(graphql
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__deny_series__unit_reserver__other_user_reservation(graphql):
+def test_reservation_series__deny_series__unit_reserver__other_user_reservation(graphql: GraphQLClient) -> None:
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()

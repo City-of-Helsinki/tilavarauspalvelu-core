@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import freezegun
 import pytest
 
@@ -12,6 +14,9 @@ from tests.helpers import patch_method
 
 from .helpers import REPAIR_ACCESS_CODE_SERIES_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
@@ -19,7 +24,7 @@ pytestmark = [
 
 @patch_method(PindoraService.sync_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code__regular_user(graphql):
+def test_repair_reservation_series_access_code__regular_user(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -42,7 +47,7 @@ def test_repair_reservation_series_access_code__regular_user(graphql):
 
 @patch_method(PindoraService.sync_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code__general_admin(graphql):
+def test_repair_reservation_series_access_code__general_admin(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_unit=series.reservation_unit,

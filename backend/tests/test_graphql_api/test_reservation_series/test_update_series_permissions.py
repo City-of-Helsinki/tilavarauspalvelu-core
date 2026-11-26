@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
@@ -7,6 +9,9 @@ from tilavarauspalvelu.enums import UserRoleChoice
 from tests.factories import GeneralRoleFactory, ReservationSeriesFactory, UnitRoleFactory, UserFactory
 
 from .helpers import UPDATE_SERIES_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -24,7 +29,9 @@ pytestmark = [
         (UserRoleChoice.NOTIFICATION_MANAGER, False),
     ],
 )
-def test_reservation_series__update_series__general_admin(graphql, role, has_permission):
+def test_reservation_series__update_series__general_admin(
+    graphql: GraphQLClient, role: UserRoleChoice, has_permission: bool
+) -> None:
     series = ReservationSeriesFactory.create(name="Old name")
 
     data = {"pk": series.id, "name": "New name"}
@@ -37,7 +44,7 @@ def test_reservation_series__update_series__general_admin(graphql, role, has_per
     assert series.name == ("New name" if has_permission else "Old name")
 
 
-def test_reservation_series__update_series__general_reserver__own_reservation(graphql):
+def test_reservation_series__update_series__general_reserver__own_reservation(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     series = ReservationSeriesFactory.create(user=user, name="Old name")
     GeneralRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
@@ -62,7 +69,9 @@ def test_reservation_series__update_series__general_reserver__own_reservation(gr
         (UserRoleChoice.NOTIFICATION_MANAGER, False),
     ],
 )
-def test_reservation_series__update_series__unit_admin(graphql, role, has_permission):
+def test_reservation_series__update_series__unit_admin(
+    graphql: GraphQLClient, role: UserRoleChoice, has_permission: bool
+) -> None:
     series = ReservationSeriesFactory.create(name="Old name")
     user = UserFactory.create_with_unit_role(role=role, units=[series.reservation_unit.unit])
 
@@ -76,7 +85,7 @@ def test_reservation_series__update_series__unit_admin(graphql, role, has_permis
     assert series.name == ("New name" if has_permission else "Old name")
 
 
-def test_reservation_series__update_series__unit_reserver__own_reservation(graphql):
+def test_reservation_series__update_series__unit_reserver__own_reservation(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     series = ReservationSeriesFactory.create(user=user, name="Old name")
     UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[series.reservation_unit.unit])

@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ReservationSeriesFactory, ReservationUnitFactory, UserFactory
 
 from .helpers import reservation_series_many_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_series__query__regular_user__can_only_see_own(graphql):
+def test_reservation_series__query__regular_user__can_only_see_own(graphql: GraphQLClient) -> None:
     user = graphql.login_with_regular_user()
 
     reservation_series = ReservationSeriesFactory.create(user=user)
@@ -27,7 +32,7 @@ def test_reservation_series__query__regular_user__can_only_see_own(graphql):
     assert response.node(0) == {"pk": reservation_series.pk}
 
 
-def test_reservation_series__query__general_admin(graphql):
+def test_reservation_series__query__general_admin(graphql: GraphQLClient) -> None:
     user = UserFactory.create_with_general_role()
     reservation_series_1 = ReservationSeriesFactory.create(name="1", user=user)
     reservation_series_2 = ReservationSeriesFactory.create(name="2")
@@ -44,7 +49,7 @@ def test_reservation_series__query__general_admin(graphql):
     assert response.node(1) == {"pk": reservation_series_2.pk}
 
 
-def test_reservation_series__query__unit_admin(graphql):
+def test_reservation_series__query__unit_admin(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
