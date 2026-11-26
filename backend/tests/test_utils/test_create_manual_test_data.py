@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import datetime
+import io
 from decimal import Decimal
 
 import pytest
+from django.core.management import CommandError, call_command
 from django.db.models import Sum
 from freezegun import freeze_time
 
@@ -67,7 +69,9 @@ from tests.factories import (
     ApplicationRoundFactory,
     ReservationFactory,
     ReservationSeriesFactory,
+    UnitFactory,
 )
+from tests.helpers import exact
 from tests.test_graphql_api.test_allocated_time_slot.helpers import CREATE_ALLOCATION, allocation_create_data
 from tests.test_graphql_api.test_application_round.helpers import SET_HANDLED_MUTATION, SET_RESULTS_SENT_MUTATION
 
@@ -111,6 +115,30 @@ FULL_PAID_ALLOCATION: list[tuple[str, str, Weekday, datetime.time, datetime.time
     ("Tiimipalaverit", "Ryhmätila", Weekday.TUESDAY, datetime.time(18), datetime.time(19, 30)),
     ("Henkilöstön virkistysilta", "Tapahtumapaketti", Weekday.TUESDAY, datetime.time(18), datetime.time(20)),
 ]
+
+MANUAL_TEST_ROUND_NAMES = [
+    "Kausivaraus manuaalitestaukseen (AVOINNA)",
+    "Kausivaraus manuaalitestaukseen (KÄSITTELYSSÄ)",
+    "Kausivaraus manuaalitestaukseen (MAKSULLINEN, AVOINNA)",
+    "Kausivaraus manuaalitestaukseen (MAKSULLINEN, KÄSITTELYSSÄ)",
+]
+
+COMMAND_ROUNDS = [
+    pytest.param("open", "Kausivaraus manuaalitestaukseen (AVOINNA)", id="open round"),
+    pytest.param("in-allocation", "Kausivaraus manuaalitestaukseen (KÄSITTELYSSÄ)", id="round in allocation"),
+    pytest.param("open-paid", "Kausivaraus manuaalitestaukseen (MAKSULLINEN, AVOINNA)", id="open paid round"),
+    pytest.param(
+        "paid-in-allocation",
+        "Kausivaraus manuaalitestaukseen (MAKSULLINEN, KÄSITTELYSSÄ)",
+        id="paid round in allocation",
+    ),
+]
+
+
+def run_command(*arguments: str) -> str:
+    output = io.StringIO()
+    call_command("create_manual_test_data", *arguments, stdout=output)
+    return output.getvalue()
 
 
 # ── Open manual test round ──
@@ -978,3 +1006,50 @@ def test_create_manual_test_rounds__reservation_units_have_search_vectors():
 
     assert len(reservation_units) == 20
     assert reservation_units_without_search_vectors == []
+
+
+# ── Command ──
+
+
+def test_create_manual_test_data__makes_the_named_rounds_in_order():
+    output = run_command("paid-in-allocation", "open", "open-paid", "in-allocation")
+
+    rounds = ApplicationRound.objects.order_by("pk").values_list("name_fi", flat=True)
+    round_names = list(rounds)
+    assert round_names == [
+        "Kausivaraus manuaalitestaukseen (MAKSULLINEN, KÄSITTELYSSÄ)",
+        "Kausivaraus manuaalitestaukseen (AVOINNA)",
+        "Kausivaraus manuaalitestaukseen (MAKSULLINEN, AVOINNA)",
+        "Kausivaraus manuaalitestaukseen (KÄSITTELYSSÄ)",
+    ]
+    assert output == (
+        "Made the round 'paid-in-allocation'.\n"
+        "Made the round 'open'.\n"
+        "Made the round 'open-paid'.\n"
+        "Made the round 'in-allocation'.\n"
+    )
+
+
+@pytest.mark.parametrize(("round_argument", "round_name"), COMMAND_ROUNDS)
+def test_create_manual_test_data__removes_the_named_round(round_argument, round_name):
+    for unit_name in MANUAL_TEST_ROUND_NAMES:
+        UnitFactory.create(name=unit_name)
+
+    output = run_command("--remove", round_argument)
+
+    unit_names = Unit.objects.values_list("name_fi", flat=True)
+    remaining_unit_names = sorted(unit_names)
+    kept_unit_names = sorted(unit_name for unit_name in MANUAL_TEST_ROUND_NAMES if unit_name != round_name)
+    assert remaining_unit_names == kept_unit_names
+    assert output == f"Removed the round '{round_argument}'.\n"
+
+
+def test_create_manual_test_data__refuses_to_run_in_production(monkeypatch):
+    monkeypatch.setenv("DJANGO_SETTINGS_ENVIRONMENT", "Production")
+
+    msg = "This command makes test data, so it cannot run in production."
+    with pytest.raises(CommandError, match=exact(msg)):
+        run_command("open")
+
+    round_exists = ApplicationRound.objects.exists()
+    assert round_exists is False
