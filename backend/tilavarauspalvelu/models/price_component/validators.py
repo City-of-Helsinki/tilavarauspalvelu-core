@@ -93,6 +93,10 @@ class PriceComponentValidator:
             changed_component=changed_component,
         )
 
+        if changed_component.kind != saved_component.kind:
+            msg = f"The kind of price component {saved_component.pk} cannot be changed."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_KIND_CHANGED)
+
         if is_past:
             if changed_field_names:
                 msg = f"Price component {saved_component.pk} is in the past and cannot be changed."

@@ -288,6 +288,49 @@ def test_reservation_unit__own_pricings__future_surcharge_is_kept(graphql):
     assert components == [active, surcharge]
 
 
+def test_reservation_unit__own_pricings__future_surcharge_cannot_become_a_base_price(graphql):
+    today = local_date()
+    future_date = today + datetime.timedelta(days=10)
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=today - datetime.timedelta(days=10),
+    )
+    active = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        amount=Decimal(10),
+        price_unit=PriceUnit.PER_HOUR,
+        can_apply_for_discount=True,
+    )
+    surcharge = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=future_date,
+        amount=Decimal(5),
+    )
+
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": reservation_unit.pk,
+        "ownPricings": [
+            own_pricing_input(begins=active.valid_from, amount="10.00", tax_level=active.tax_level, pk=active.pk),
+            own_pricing_input(begins=future_date, amount="20.00", tax_level=surcharge.tax_level, pk=surcharge.pk),
+        ],
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_KIND_CHANGED]
+
+    surcharge = PriceComponent.objects.get(pk=surcharge.pk)
+    assert surcharge.kind == PriceComponentKind.SURCHARGE
+    assert surcharge.amount == Decimal(5)
+
+
 # ── Pricing group rules ──
 
 

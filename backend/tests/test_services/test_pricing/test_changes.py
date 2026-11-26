@@ -8,7 +8,7 @@ import pytest
 from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
-from tilavarauspalvelu.enums import PaymentType
+from tilavarauspalvelu.enums import PaymentType, PriceComponentKind
 from tilavarauspalvelu.models import PriceComponent
 from tilavarauspalvelu.services.pricing.changes import save_price_component_changes
 from tilavarauspalvelu.tasks import refresh_reservation_unit_payment_products_task
@@ -107,6 +107,29 @@ def test_save_price_component_changes__future_component_can_be_changed():
 
     future = PriceComponent.objects.get(pk=future.pk)
     assert future.amount == Decimal(30)
+
+
+def test_save_price_component_changes__future_component_kind_cannot_be_changed():
+    pricing_group = PricingGroupFactory.create()
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=JAN_1)
+    future = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=MAR_1,
+    )
+
+    future.kind = PriceComponentKind.BASE
+
+    with pytest.raises(ValidationError) as error:
+        save_price_component_changes(pricing_group=pricing_group, components=[future], deleted_component_pks=[])
+
+    assert error_details(error.value) == [
+        ErrorDetail(
+            f"The kind of price component {future.pk} cannot be changed.",
+            code=error_codes.PRICE_COMPONENT_KIND_CHANGED,
+        ),
+    ]
+    assert PriceComponent.objects.get(pk=future.pk).kind == PriceComponentKind.SURCHARGE
 
 
 def test_save_price_component_changes__future_component_can_be_deleted():
