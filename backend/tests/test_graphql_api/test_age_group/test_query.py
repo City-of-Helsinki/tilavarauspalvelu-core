@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import AgeGroupFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -15,12 +19,12 @@ pytestmark = [
 age_groups_query = partial(build_query, "ageGroups", connection=True)
 
 
-def test_age_group__query__all_fields(graphql):
+def test_age_group__query__all_fields(graphql: GraphQLClient) -> None:
     # given:
     # - There are two age groups in the database
     # - A superuser is using the system
-    group_1 = AgeGroupFactory(minimum=18, maximum=30)
-    group_2 = AgeGroupFactory(minimum=31, maximum=60)
+    group_1 = AgeGroupFactory.create(minimum=18, maximum=30)
+    group_2 = AgeGroupFactory.create(minimum=31, maximum=60)
     graphql.login_with_superuser()
 
     # when:
@@ -49,12 +53,12 @@ def test_age_group__query__all_fields(graphql):
     }
 
 
-def test_age_group__query__regular_user(graphql):
+def test_age_group__query__regular_user(graphql: GraphQLClient) -> None:
     # given:
     # - There are two age groups in the database
     # - Regular user is using the system
-    group_1 = AgeGroupFactory(minimum=18, maximum=30)
-    group_2 = AgeGroupFactory(minimum=31, maximum=60)
+    group_1 = AgeGroupFactory.create(minimum=18, maximum=30)
+    group_2 = AgeGroupFactory.create(minimum=31, maximum=60)
     graphql.login_with_regular_user()
 
     # when:
@@ -70,12 +74,12 @@ def test_age_group__query__regular_user(graphql):
     assert response.node(1) == {"pk": group_2.pk}
 
 
-def test_age_group__query__anonymous_user(graphql):
+def test_age_group__query__anonymous_user(graphql: GraphQLClient) -> None:
     # given:
     # - There are two age groups in the database
     # - An anonymous user is using the system
-    group_1 = AgeGroupFactory(minimum=18, maximum=30)
-    group_2 = AgeGroupFactory(minimum=31, maximum=60)
+    group_1 = AgeGroupFactory.create(minimum=18, maximum=30)
+    group_2 = AgeGroupFactory.create(minimum=31, maximum=60)
 
     # when:
     # - The user queries for age groups
