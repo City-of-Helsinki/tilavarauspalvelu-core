@@ -110,6 +110,12 @@ exclude = [
     "/migrations/",
 ]
 warn_unused_ignores = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+# Most test functions have no annotations.
+module = ["tests.*"]
+disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]
 # These packages have no type hints or stubs.
