@@ -10,7 +10,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import ParseRefundError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import Refund
 
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 refund_json = {
     "refundId": "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6",
@@ -29,7 +29,7 @@ refund_json = {
 }
 
 
-def test_verkkokauppa__refund__from_json():
+def test_verkkokauppa__refund__from_json() -> None:
     refund = Refund.from_json(refund_json)
     assert refund.refund_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
     assert refund.order_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
@@ -44,7 +44,7 @@ def test_verkkokauppa__refund__from_json():
     assert refund.refund_reason == "Test reason"
 
 
-def test_verkkokauppa__refund__from_json__optional_fields_not_included():
+def test_verkkokauppa__refund__from_json__optional_fields_not_included() -> None:
     data = refund_json.copy()
     data.pop("customerFirstName")
     data.pop("customerLastName")
@@ -66,11 +66,11 @@ def test_verkkokauppa__refund__from_json__optional_fields_not_included():
 
 
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__refund__from_json__parsing_fails():
+def test_verkkokauppa__refund__from_json__parsing_fails() -> None:
     data = refund_json.copy()
     data["refundId"] = "not-a-uuid"
     with pytest.raises(ParseRefundError) as ex:
         Refund.from_json(data)
 
     assert str(ex.value) == "Could not parse refund: badly formed hexadecimal UUID string"
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1

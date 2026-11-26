@@ -71,7 +71,7 @@ get_merchant_response: dict[str, Any] = {
 }
 
 
-def test_verkkokauppa__merchant_types__merchant_info__from_json():
+def test_verkkokauppa__merchant_types__merchant_info__from_json() -> None:
     expected = MerchantInfo(
         name="Test Merchant",
         street="Test Street 1",
@@ -88,7 +88,7 @@ def test_verkkokauppa__merchant_types__merchant_info__from_json():
     assert actual == expected
 
 
-def test_verkkokauppa__merchant_types__merchant__from_json():
+def test_verkkokauppa__merchant_types__merchant__from_json() -> None:
     expected = Merchant(
         id=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
         namespace="tilanvaraus",
@@ -109,7 +109,7 @@ def test_verkkokauppa__merchant_types__merchant__from_json():
     assert expected == actual
 
 
-def test_verkkokauppa__merchant_types__merchant__from_json__empty_configurations():
+def test_verkkokauppa__merchant_types__merchant__from_json__empty_configurations() -> None:
     expected = Merchant(
         id=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
         namespace="tilanvaraus",
@@ -133,14 +133,14 @@ def test_verkkokauppa__merchant_types__merchant__from_json__empty_configurations
     assert expected == actual
 
 
-def test_verkkokauppa__merchant_types__merchant__from_json__missing_field():
+def test_verkkokauppa__merchant_types__merchant__from_json__missing_field() -> None:
     response = mutation_merchant_response.copy()
     response.pop("merchantId")
     with pytest.raises(ParseMerchantError, match=exact("Could not parse merchant: 'merchantId'")):
         Merchant.from_json(response)
 
 
-def test_verkkokauppa__merchant_types__create_merchant_params__to_json():
+def test_verkkokauppa__merchant_types__create_merchant_params__to_json() -> None:
     params = CreateMerchantParams(
         name="Test Merchant",
         paytrail_merchant_id="123456",
@@ -172,7 +172,7 @@ def test_verkkokauppa__merchant_types__create_merchant_params__to_json():
     assert params.to_json() == expected
 
 
-def test_verkkokauppa__merchant_types__update_merchant_params__to_json():
+def test_verkkokauppa__merchant_types__update_merchant_params__to_json() -> None:
     params = UpdateMerchantParams(
         name="Test Merchant",
         street="Test street 1",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 from django.urls import reverse
@@ -12,8 +13,12 @@ from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPa
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 from tests.factories import PaymentOrderFactory, ReservationFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 from tests.test_integrations.test_verkkokauppa.test_webhooks.helpers import get_mock_order_payment_api
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -24,7 +29,7 @@ pytestmark = [
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(EmailService.send_reservation_created_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
-def test_order_payment_webhook__success(api_client, settings):
+def test_order_payment_webhook__success(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -45,7 +50,7 @@ def test_order_payment_webhook__success(api_client, settings):
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(order_id, payment_id)
 
     response = api_client.post(url, data=data, format="json")
 
@@ -60,13 +65,13 @@ def test_order_payment_webhook__success(api_client, settings):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    assert EmailService.send_reservation_created_email.called is True
-    assert EmailService.send_reservation_created_staff_notification_email.called is True
+    assert as_mock(EmailService.send_reservation_created_email).called is True
+    assert as_mock(EmailService.send_reservation_created_staff_notification_email).called is True
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
-def test_order_payment_webhook__success__no_reservation(api_client, settings):
+def test_order_payment_webhook__success__no_reservation(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -85,7 +90,7 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(order_id, payment_id)
 
     response = api_client.post(url, data=data, format="json")
 
@@ -97,8 +102,8 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
     assert payment_order.payment_id
     assert payment_order.processed_at is not None
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == (
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args[0] == (
         "Verkkokauppa: Order was paid, but its reservation does not exist or will not happen. Refund it manually."
     )
 
@@ -106,7 +111,9 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
 @pytest.mark.parametrize("state", [ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
-def test_order_payment_webhook__success__reservation_will_not_happen(api_client, settings, state):
+def test_order_payment_webhook__success__reservation_will_not_happen(
+    api_client: APIClient, settings: Settings, state: ReservationStateChoice
+) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -127,7 +134,7 @@ def test_order_payment_webhook__success__reservation_will_not_happen(api_client,
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(order_id, payment_id)
 
     response = api_client.post(url, data=data, format="json")
 
@@ -136,15 +143,17 @@ def test_order_payment_webhook__success__reservation_will_not_happen(api_client,
     reservation.refresh_from_db()
     assert reservation.state == state
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == (
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args[0] == (
         "Verkkokauppa: Order was paid, but its reservation does not exist or will not happen. Refund it manually."
     )
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @pytest.mark.parametrize("status", [OrderStatus.PAID, OrderStatus.PAID_MANUALLY, OrderStatus.REFUNDED])
-def test_order_payment_webhook__no_action_needed(api_client, settings, status):
+def test_order_payment_webhook__no_action_needed(
+    api_client: APIClient, settings: Settings, status: OrderStatus
+) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id, status=status)
@@ -157,7 +166,7 @@ def test_order_payment_webhook__no_action_needed(api_client, settings, status):
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(order_id, payment_id)
 
     response = api_client.post(url, data=data, format="json")
 
@@ -168,7 +177,7 @@ def test_order_payment_webhook__no_action_needed(api_client, settings, status):
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
 @pytest.mark.parametrize("missing_field", ["orderId", "paymentId", "namespace", "eventType"])
-def test_order_payment_webhook__missing_field(api_client, settings, missing_field):
+def test_order_payment_webhook__missing_field(api_client: APIClient, settings: Settings, missing_field: str) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id)
@@ -182,19 +191,19 @@ def test_order_payment_webhook__missing_field(api_client, settings, missing_fiel
     data.pop(missing_field)
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(order_id, payment_id)
 
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
     assert response.data == {missing_field: ["This field is required."]}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
-def test_order_payment_webhook__bad_namespace(api_client):
+def test_order_payment_webhook__bad_namespace(api_client: APIClient) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id)
@@ -207,19 +216,19 @@ def test_order_payment_webhook__bad_namespace(api_client):
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(order_id, payment_id)
 
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
     assert response.data == {"namespace": ["Invalid namespace: 'foo'"]}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
-def test_order_payment_webhook__bad_event_type(api_client, settings):
+def test_order_payment_webhook__bad_event_type(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id)
@@ -232,19 +241,19 @@ def test_order_payment_webhook__bad_event_type(api_client, settings):
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(order_id, payment_id)
 
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
     assert response.data == {"eventType": ["Unsupported event type: 'foo'"]}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
-def test_order_payment_webhook__payment_order_not_found(api_client, settings):
+def test_order_payment_webhook__payment_order_not_found(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -256,19 +265,19 @@ def test_order_payment_webhook__payment_order_not_found(api_client, settings):
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(order_id, payment_id)
 
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
     assert response.data == {"message": "Payment order not found"}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
-def test_order_payment_webhook__payment_fetch_failed(api_client, settings):
+def test_order_payment_webhook__payment_fetch_failed(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -282,18 +291,18 @@ def test_order_payment_webhook__payment_fetch_failed(api_client, settings):
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.side_effect = GetPaymentError("Mock error")
+    as_mock(VerkkokauppaAPIClient.get_payment).side_effect = GetPaymentError("Mock error")
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 500, response.data
     assert response.data == {"message": "Could not get payment from verkkokauppa"}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
-def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, settings):
+def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -307,18 +316,18 @@ def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, setting
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = None
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = None
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
     assert response.data == {"message": "Payment not found from verkkokauppa"}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(SentryLogger.log_message)
-def test_order_payment_webhook__invalid_payment_status(api_client, settings):
+def test_order_payment_webhook__invalid_payment_status(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -332,11 +341,13 @@ def test_order_payment_webhook__invalid_payment_status(api_client, settings):
     }
     url = reverse("payment-list")
 
-    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id, status="foo")
+    as_mock(VerkkokauppaAPIClient.get_payment).return_value = get_mock_order_payment_api(
+        order_id, payment_id, status="foo"
+    )
 
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
     assert response.data == {"message": "Payment order doesn't require update based webshop payment status"}
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1

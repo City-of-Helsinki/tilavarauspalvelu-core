@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
 
 
-def test_is_numeric():
+def test_is_numeric() -> None:
     is_numeric("")
     is_numeric("12356")
     is_numeric("00000")
@@ -21,7 +21,7 @@ def test_is_numeric():
         is_numeric("12356⁰")
 
 
-def test_validate_accounting_project():
+def test_validate_accounting_project() -> None:
     validate_accounting_project("1234567")
     validate_accounting_project("1234567890")
     validate_accounting_project("123456789012")

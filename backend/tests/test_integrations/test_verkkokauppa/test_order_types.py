@@ -21,7 +21,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     WebShopOrderStatus,
 )
 
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -133,7 +133,7 @@ create_order_response: dict[str, Any] = {
 }
 
 
-def test_verkkokauppa__order_types__create_order_params__to_json():
+def test_verkkokauppa__order_types__create_order_params__to_json() -> None:
     json = create_order_params.to_json()
     assert json == {
         "namespace": "test-namespace",
@@ -183,7 +183,7 @@ def test_verkkokauppa__order_types__create_order_params__to_json():
     }
 
 
-def test_verkkokauppa__order_types__order__from_json():
+def test_verkkokauppa__order_types__order__from_json() -> None:
     order = Order.from_json(create_order_response)
     assert order == Order(
         order_id=uuid.UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
@@ -242,20 +242,20 @@ def test_verkkokauppa__order_types__order__from_json():
 
 
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__order_types__order__from_json__raises_exception_if_key_is_missing():
+def test_verkkokauppa__order_types__order__from_json__raises_exception_if_key_is_missing() -> None:
     response = create_order_response.copy()
     response.pop("orderId")
     with pytest.raises(ParseOrderError):
         Order.from_json(response)
 
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1
 
 
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__order_types__order__from_json__raises_exception_if_value_is_invalid():
+def test_verkkokauppa__order_types__order__from_json__raises_exception_if_value_is_invalid() -> None:
     response = create_order_response.copy()
     response["orderId"] = "invalid-order-id"
     with pytest.raises(ParseOrderError):
         Order.from_json(response)
 
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1

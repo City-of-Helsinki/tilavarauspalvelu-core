@@ -24,7 +24,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.payment.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, as_mock, exact, patch_method
 
 get_payment_response: dict[str, Any] = {
     "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
@@ -62,12 +62,12 @@ bad_request_response: dict[str, Any] = {"errors": [{"code": "bad-request", "mess
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=200, json_data=get_payment_response),
 )
-def test_verkkokauppa__get_payment__makes_valid_request():
+def test_verkkokauppa__get_payment__makes_valid_request() -> None:
     order_uuid = uuid.UUID(get_payment_response["orderId"])
 
     payment = VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
-    VerkkokauppaAPIClient.request.assert_called_with(
+    as_mock(VerkkokauppaAPIClient.request).assert_called_with(
         method="get",
         url=urljoin(settings.VERKKOKAUPPA_PAYMENT_API_URL, f"admin/{order_uuid}"),
         params=None,
@@ -88,7 +88,7 @@ def test_verkkokauppa__get_payment__makes_valid_request():
         json_data=get_payment_404_response,
     ),
 )
-def test_verkkokauppa__get_payment__returns_none_when_payment_is_missing():
+def test_verkkokauppa__get_payment__returns_none_when_payment_is_missing() -> None:
     order_uuid = uuid.UUID(get_payment_response["orderId"])
 
     payment = VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
@@ -97,35 +97,35 @@ def test_verkkokauppa__get_payment__returns_none_when_payment_is_missing():
 
 @patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__get_payment__raises_exception_if_key_is_missing():
+def test_verkkokauppa__get_payment__raises_exception_if_key_is_missing() -> None:
     response = get_payment_response.copy()
     order_uuid = uuid.UUID(response.pop("orderId"))
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=200, json_data=response)
 
     with pytest.raises(GetPaymentError, match=exact("Payment retrieval failed")):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__get_payment__raises_exception_if_value_is_invalid():
+def test_verkkokauppa__get_payment__raises_exception_if_value_is_invalid() -> None:
     order_uuid = uuid.UUID(get_payment_response["orderId"])
 
     response = get_payment_response.copy()
     response["orderId"] = "invalid-id"
 
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=200, json_data=response)
 
     with pytest.raises(GetPaymentError, match=exact("Payment retrieval failed")):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())
-def test_verkkokauppa__get_payment__raises_exception_on_timeout():
+def test_verkkokauppa__get_payment__raises_exception_on_timeout() -> None:
     order_uuid = uuid.UUID(get_payment_response["orderId"])
     with pytest.raises(GetPaymentError, match=exact("Payment retrieval failed")):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
@@ -135,7 +135,7 @@ def test_verkkokauppa__get_payment__raises_exception_on_timeout():
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=400, json_data=bad_request_response),
 )
-def test_verkkokauppa__get_payment__raises_exception_if_status_code_is_not_200():
+def test_verkkokauppa__get_payment__raises_exception_if_status_code_is_not_200() -> None:
     order_uuid = uuid.UUID(get_payment_response["orderId"])
 
     msg = "Payment retrieval failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
@@ -148,13 +148,13 @@ def test_verkkokauppa__get_payment__raises_exception_if_status_code_is_not_200()
     return_value=ResponseMock(status_code=503, json_data=get_payment_404_response),
 )
 @patch_method(SentryLogger.log_message)
-def test_verkkokauppa__get_payment__raises_exception_if_status_is_503_with_missing_payment_error_code():
+def test_verkkokauppa__get_payment__raises_exception_if_status_is_503_with_missing_payment_error_code() -> None:
     order_uuid = uuid.UUID(get_payment_response["orderId"])
 
     with pytest.raises(GetPaymentError, match=exact("Payment retrieval failed")):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 refund_status_response: dict[str, Any] = {
@@ -180,7 +180,7 @@ refund_status_response: dict[str, Any] = {
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=200, json_data=refund_status_response),
 )
-def test_verkkokauppa__get_refund_status__returns_status():
+def test_verkkokauppa__get_refund_status__returns_status() -> None:
     order_uuid = uuid.UUID(refund_status_response["orderId"])
     refund_status = VerkkokauppaAPIClient.get_refund_status(order_uuid=order_uuid)
     expected = RefundStatusResult.from_json(refund_status_response)
@@ -201,7 +201,7 @@ def test_verkkokauppa__get_refund_status__returns_status():
         },
     ),
 )
-def test_verkkokauppa__get_refund_status__returns_none_when_refund_payment_is_missing():
+def test_verkkokauppa__get_refund_status__returns_none_when_refund_payment_is_missing() -> None:
     order_uuid = uuid.UUID(refund_status_response["orderId"])
 
     refund_status = VerkkokauppaAPIClient.get_refund_status(order_uuid=order_uuid)
@@ -212,7 +212,7 @@ def test_verkkokauppa__get_refund_status__returns_none_when_refund_payment_is_mi
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=400, json_data=bad_request_response),
 )
-def test_verkkokauppa__get_refund_status__raises_exception_if_status_code_is_not_200():
+def test_verkkokauppa__get_refund_status__raises_exception_if_status_code_is_not_200() -> None:
     order_uuid = uuid.UUID(refund_status_response["orderId"])
 
     msg = "Payment refund status retrieval failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
@@ -222,16 +222,16 @@ def test_verkkokauppa__get_refund_status__raises_exception_if_status_code_is_not
 
 @patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__get_refund_status__raises_exception_if_key_is_missing():
+def test_verkkokauppa__get_refund_status__raises_exception_if_key_is_missing() -> None:
     response = refund_status_response.copy()
     order_uuid = uuid.UUID(response.pop("orderId"))
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=200, json_data=response)
 
     msg = "Payment refund status retrieval failed: Could not parse refund status: 'orderId'"
     with pytest.raises(GetRefundStatusError, match=exact(msg)):
         VerkkokauppaAPIClient.get_refund_status(order_uuid=order_uuid)
 
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1
 
 
 refund_response: dict[str, Any] = {
@@ -260,7 +260,7 @@ refund_response: dict[str, Any] = {
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=200, json_data=refund_response),
 )
-def test_verkkokauppa__refund_order__returns_refund():
+def test_verkkokauppa__refund_order__returns_refund() -> None:
     order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
     refund = VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
     expected = Refund.from_json(refund_response["refunds"][0])
@@ -270,7 +270,7 @@ def test_verkkokauppa__refund_order__returns_refund():
 @patch_method(VerkkokauppaAPIClient.request, return_value=ResponseMock(status_code=500, json_data={}))
 @patch_method(SentryLogger.log_message)
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__refund_order__raises_exception_on_non_200_status_code():
+def test_verkkokauppa__refund_order__raises_exception_on_non_200_status_code() -> None:
     order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
 
     with pytest.raises(RefundPaymentError) as err:
@@ -278,8 +278,8 @@ def test_verkkokauppa__refund_order__raises_exception_on_non_200_status_code():
 
     msg = "Payment refund failed: GET request to VERKKOKAUPPA (http://example.com) failed with status 500."
     assert str(err.value) == msg
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_exception).call_count == 1
 
 
 @patch_method(
@@ -287,45 +287,45 @@ def test_verkkokauppa__refund_order__raises_exception_on_non_200_status_code():
     return_value=ResponseMock(status_code=400, json_data=bad_request_response),
 )
 @patch_method(SentryLogger.log_message)
-def test_verkkokauppa__refund_order__raises_exception_on_client_error_status_code():
+def test_verkkokauppa__refund_order__raises_exception_on_client_error_status_code() -> None:
     order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
 
     msg = "Payment refund failed: problem with upstream service"
     with pytest.raises(RefundPaymentError, match=exact(msg)):
         VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.request)
-def test_verkkokauppa__refund_order__raises_exception_on_multi_refund_response():
+def test_verkkokauppa__refund_order__raises_exception_on_multi_refund_response() -> None:
     order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
 
     response = deepcopy(refund_response)
     response["refunds"].append({})
 
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=200, json_data=response)
 
     with pytest.raises(RefundPaymentError) as err:
         VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
 
     assert str(err.value) == "Refund response refund count expected to be 1 but was 2"
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
-def test_verkkokauppa__refund_order__raises_exception_on_invalid_response():
+def test_verkkokauppa__refund_order__raises_exception_on_invalid_response() -> None:
     order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
 
     response = deepcopy(refund_response)
     response["refunds"][0]["refundId"] = "not-a-uuid"
-    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
+    as_mock(VerkkokauppaAPIClient.request).return_value = ResponseMock(status_code=200, json_data=response)
 
     with pytest.raises(RefundPaymentError) as err:
         VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
 
     assert str(err.value) == "Payment refund failed: Could not parse refund: badly formed hexadecimal UUID string"
 
-    assert SentryLogger.log_exception.call_count == 2
+    assert as_mock(SentryLogger.log_exception).call_count == 2

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 from django.urls import reverse
@@ -11,8 +12,12 @@ from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetRe
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 from tests.factories import PaymentOrderFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 from tests.test_integrations.test_verkkokauppa.test_webhooks.helpers import get_mock_order_refund_api
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -21,7 +26,7 @@ pytestmark = [
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
-def test_order_refund_webhook__success(api_client, settings):
+def test_order_refund_webhook__success(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     payment_order = PaymentOrderFactory.create(
@@ -40,7 +45,7 @@ def test_order_refund_webhook__success(api_client, settings):
     }
     url = reverse("refund-list")
 
-    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id)
+    as_mock(VerkkokauppaAPIClient.get_refund_status).return_value = get_mock_order_refund_api(order_id, refund_id)
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
@@ -53,7 +58,9 @@ def test_order_refund_webhook__success(api_client, settings):
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
 @patch_method(SentryLogger.log_message)
-def test_order_refund_webhook__order_already_refunded_with_different_refund_id(api_client, settings):
+def test_order_refund_webhook__order_already_refunded_with_different_refund_id(
+    api_client: APIClient, settings: Settings
+) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -72,7 +79,7 @@ def test_order_refund_webhook__order_already_refunded_with_different_refund_id(a
     }
     url = reverse("refund-list")
 
-    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id)
+    as_mock(VerkkokauppaAPIClient.get_refund_status).return_value = get_mock_order_refund_api(order_id, refund_id)
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
@@ -90,7 +97,7 @@ def test_order_refund_webhook__order_already_refunded_with_different_refund_id(a
     ],
 )
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
-def test_order_refund_webhook__no_action_needed(api_client, settings, status):
+def test_order_refund_webhook__no_action_needed(api_client: APIClient, settings: Settings, status: OrderStatus) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -109,7 +116,7 @@ def test_order_refund_webhook__no_action_needed(api_client, settings, status):
     }
     url = reverse("refund-list")
 
-    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id)
+    as_mock(VerkkokauppaAPIClient.get_refund_status).return_value = get_mock_order_refund_api(order_id, refund_id)
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
@@ -119,7 +126,7 @@ def test_order_refund_webhook__no_action_needed(api_client, settings, status):
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
 @patch_method(SentryLogger.log_message)
 @pytest.mark.parametrize("missing_field", ["orderId", "refundId", "refundPaymentId", "namespace", "eventType"])
-def test_order_refund_webhook__missing_fields(api_client, settings, missing_field):
+def test_order_refund_webhook__missing_fields(api_client: APIClient, settings: Settings, missing_field: str) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -139,7 +146,7 @@ def test_order_refund_webhook__missing_fields(api_client, settings, missing_fiel
     data.pop(missing_field)
     url = reverse("refund-list")
 
-    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id)
+    as_mock(VerkkokauppaAPIClient.get_refund_status).return_value = get_mock_order_refund_api(order_id, refund_id)
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
@@ -148,7 +155,7 @@ def test_order_refund_webhook__missing_fields(api_client, settings, missing_fiel
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
 @patch_method(SentryLogger.log_message)
-def test_order_refund_webhook__bad_namespace(api_client):
+def test_order_refund_webhook__bad_namespace(api_client: APIClient) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -167,7 +174,7 @@ def test_order_refund_webhook__bad_namespace(api_client):
     }
     url = reverse("refund-list")
 
-    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id)
+    as_mock(VerkkokauppaAPIClient.get_refund_status).return_value = get_mock_order_refund_api(order_id, refund_id)
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
@@ -176,7 +183,7 @@ def test_order_refund_webhook__bad_namespace(api_client):
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
 @patch_method(SentryLogger.log_message)
-def test_order_refund_webhook__bad_event_type(api_client, settings):
+def test_order_refund_webhook__bad_event_type(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -195,7 +202,7 @@ def test_order_refund_webhook__bad_event_type(api_client, settings):
     }
     url = reverse("refund-list")
 
-    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id)
+    as_mock(VerkkokauppaAPIClient.get_refund_status).return_value = get_mock_order_refund_api(order_id, refund_id)
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
@@ -204,7 +211,7 @@ def test_order_refund_webhook__bad_event_type(api_client, settings):
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
 @patch_method(SentryLogger.log_message)
-def test_order_refund_webhook__payment_order_not_found(api_client, settings):
+def test_order_refund_webhook__payment_order_not_found(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
 
@@ -217,7 +224,7 @@ def test_order_refund_webhook__payment_order_not_found(api_client, settings):
     }
     url = reverse("refund-list")
 
-    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id)
+    as_mock(VerkkokauppaAPIClient.get_refund_status).return_value = get_mock_order_refund_api(order_id, refund_id)
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
@@ -226,7 +233,7 @@ def test_order_refund_webhook__payment_order_not_found(api_client, settings):
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status, side_effect=GetRefundStatusError("Mock error"))
 @patch_method(SentryLogger.log_message)
-def test_order_refund_webhook__refund_fetch_failed(api_client, settings):
+def test_order_refund_webhook__refund_fetch_failed(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -253,7 +260,7 @@ def test_order_refund_webhook__refund_fetch_failed(api_client, settings):
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status, return_value=None)
 @patch_method(SentryLogger.log_message)
-def test_order_refund_webhook__no_refund_from_verkkokauppa(api_client, settings):
+def test_order_refund_webhook__no_refund_from_verkkokauppa(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -280,7 +287,7 @@ def test_order_refund_webhook__no_refund_from_verkkokauppa(api_client, settings)
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
 @patch_method(SentryLogger.log_message)
-def test_order_refund_webhook__invalid_refund_status(api_client, settings):
+def test_order_refund_webhook__invalid_refund_status(api_client: APIClient, settings: Settings) -> None:
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -299,7 +306,9 @@ def test_order_refund_webhook__invalid_refund_status(api_client, settings):
     }
     url = reverse("refund-list")
 
-    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id, status="foo")
+    as_mock(VerkkokauppaAPIClient.get_refund_status).return_value = get_mock_order_refund_api(
+        order_id, refund_id, status="foo"
+    )
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
