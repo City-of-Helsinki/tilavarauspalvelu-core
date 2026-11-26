@@ -95,7 +95,7 @@ def create_pricing(
 # ── Pricing groups ──
 
 
-def test_migrate_pricings_to_pricing_groups__own_pricing_group_from_pricings():
+def test_migrate_pricings_to_pricing_groups__own_pricing_group_from_pricings() -> None:
     reservation_unit = ReservationUnitFactory.create(name="Sali", name_fi="Sali", name_en="Hall", name_sv="Sal")
     today = local_date()
     past = today - datetime.timedelta(days=100)
@@ -187,7 +187,7 @@ def test_migrate_pricings_to_pricing_groups__own_pricing_group_from_pricings():
     ]
 
 
-def test_migrate_pricings_to_pricing_groups__skips_reservation_unit_with_pricing_group():
+def test_migrate_pricings_to_pricing_groups__skips_reservation_unit_with_pricing_group() -> None:
     reservation_unit = ReservationUnitFactory.create()
     today = local_date()
 
@@ -212,7 +212,7 @@ def test_migrate_pricings_to_pricing_groups__skips_reservation_unit_with_pricing
     assert PriceComponent.objects.exists() is False
 
 
-def test_migrate_pricings_to_pricing_groups__free_pricing_group_for_reservation_unit_without_pricings():
+def test_migrate_pricings_to_pricing_groups__free_pricing_group_for_reservation_unit_without_pricings() -> None:
     reservation_unit = ReservationUnitFactory.create(name="Sali", name_fi="Sali", name_en="Hall", name_sv="Sal")
 
     apps = migrate_to(BEFORE_MIGRATION)
@@ -246,7 +246,7 @@ def test_migrate_pricings_to_pricing_groups__free_pricing_group_for_reservation_
     ]
 
 
-def test_migrate_pricings_to_pricing_groups__error_when_no_tax_free_tax_level():
+def test_migrate_pricings_to_pricing_groups__error_when_no_tax_free_tax_level() -> None:
     ReservationUnitFactory.create()
 
     migrate_to(BEFORE_MIGRATION)
@@ -265,8 +265,8 @@ def test_migrate_pricings_to_pricing_groups__error_when_no_tax_free_tax_level():
     ],
 )
 def test_migrate_pricings_to_pricing_groups__can_apply_for_discount(
-    can_apply_free_of_charge, highest_price, can_apply_for_discount
-):
+    can_apply_free_of_charge: bool, highest_price: Decimal, can_apply_for_discount: bool
+) -> None:
     reservation_unit = ReservationUnitFactory.create(can_apply_free_of_charge=can_apply_free_of_charge)
 
     apps = migrate_to(BEFORE_MIGRATION)
@@ -288,7 +288,7 @@ def test_migrate_pricings_to_pricing_groups__can_apply_for_discount(
 # ── Payment type ──
 
 
-def test_migrate_pricings_to_pricing_groups__payment_type_from_active_paid_pricing():
+def test_migrate_pricings_to_pricing_groups__payment_type_from_active_paid_pricing() -> None:
     reservation_unit = ReservationUnitFactory.create(payment_type=None)
     today = local_date()
 
@@ -309,7 +309,7 @@ def test_migrate_pricings_to_pricing_groups__payment_type_from_active_paid_prici
     assert ReservationUnit.objects.get(pk=reservation_unit.pk).payment_type == "ON_SITE"
 
 
-def test_migrate_pricings_to_pricing_groups__payment_type_from_future_paid_pricing_when_active_is_free():
+def test_migrate_pricings_to_pricing_groups__payment_type_from_future_paid_pricing_when_active_is_free() -> None:
     reservation_unit = ReservationUnitFactory.create(payment_type=None)
     today = local_date()
 
@@ -337,7 +337,7 @@ def test_migrate_pricings_to_pricing_groups__payment_type_from_future_paid_prici
     assert ReservationUnit.objects.get(pk=reservation_unit.pk).payment_type == "ON_SITE"
 
 
-def test_migrate_pricings_to_pricing_groups__no_payment_type_when_free():
+def test_migrate_pricings_to_pricing_groups__no_payment_type_when_free() -> None:
     reservation_unit = ReservationUnitFactory.create(payment_type=None)
 
     apps = migrate_to(BEFORE_MIGRATION)
@@ -360,7 +360,7 @@ def test_migrate_pricings_to_pricing_groups__no_payment_type_when_free():
 # ── Sales items ──
 
 
-def test_migrate_pricings_to_pricing_groups__sales_item_from_accounting_material():
+def test_migrate_pricings_to_pricing_groups__sales_item_from_accounting_material() -> None:
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
     today = local_date()
@@ -384,7 +384,7 @@ def test_migrate_pricings_to_pricing_groups__sales_item_from_accounting_material
     assert list(components) == [(past, None), (today, "10000116")]
 
 
-def test_migrate_pricings_to_pricing_groups__sales_item_from_unit_accounting():
+def test_migrate_pricings_to_pricing_groups__sales_item_from_unit_accounting() -> None:
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=None, unit__payment_accounting=accounting)
 
@@ -412,7 +412,9 @@ def test_migrate_pricings_to_pricing_groups__sales_item_from_unit_accounting():
         ("ONLINE_OR_INVOICE", Decimal(0)),
     ],
 )
-def test_migrate_pricings_to_pricing_groups__no_sales_item_when_not_paid_online(payment_type, highest_price):
+def test_migrate_pricings_to_pricing_groups__no_sales_item_when_not_paid_online(
+    payment_type: str, highest_price: Decimal
+) -> None:
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
 
@@ -435,7 +437,7 @@ def test_migrate_pricings_to_pricing_groups__no_sales_item_when_not_paid_online(
     assert list(PriceComponent.objects.values_list("sales_item", flat=True)) == [None]
 
 
-def test_migrate_pricings_to_pricing_groups__sales_item_for_each_main_ledger_account_of_material():
+def test_migrate_pricings_to_pricing_groups__sales_item_for_each_main_ledger_account_of_material() -> None:
     accounting_1 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340025")
     accounting_2 = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="340100")
     reservation_unit_1 = ReservationUnitFactory.create(payment_accounting=accounting_1)
@@ -464,7 +466,7 @@ def test_migrate_pricings_to_pricing_groups__sales_item_for_each_main_ledger_acc
     assert list(components.values_list("sales_item__main_ledger_account", flat=True)) == ["340025", "340100"]
 
 
-def test_migrate_pricings_to_pricing_groups__uses_existing_sales_item():
+def test_migrate_pricings_to_pricing_groups__uses_existing_sales_item() -> None:
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
 
@@ -490,7 +492,9 @@ def test_migrate_pricings_to_pricing_groups__uses_existing_sales_item():
     assert list(PriceComponent.objects.values_list("sales_item", flat=True)) == [sales_item.pk]
 
 
-def test_migrate_pricings_to_pricing_groups__sales_item_without_material_from_tax_level_and_main_ledger_account():
+def test_migrate_pricings_to_pricing_groups__sales_item_without_material_from_tax_level_and_main_ledger_account() -> (
+    None
+):
     accounting_1 = create_accounting_without_invoicing(name="Tili 1", main_ledger_account="350080")
     accounting_2 = create_accounting_without_invoicing(name="Tili 2", main_ledger_account="350080")
     accounting_3 = create_accounting_without_invoicing(name="Tili 3", main_ledger_account="350090")
@@ -529,7 +533,7 @@ def test_migrate_pricings_to_pricing_groups__sales_item_without_material_from_ta
     ]
 
 
-def test_migrate_pricings_to_pricing_groups__uses_existing_sales_item_without_material():
+def test_migrate_pricings_to_pricing_groups__uses_existing_sales_item_without_material() -> None:
     accounting = create_accounting_without_invoicing(main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
 
@@ -555,7 +559,7 @@ def test_migrate_pricings_to_pricing_groups__uses_existing_sales_item_without_ma
     assert list(PriceComponent.objects.values_list("sales_item", flat=True)) == [sales_item.pk]
 
 
-def test_migrate_pricings_to_pricing_groups__past_online_pricing_needs_no_accounting():
+def test_migrate_pricings_to_pricing_groups__past_online_pricing_needs_no_accounting() -> None:
     reservation_unit = ReservationUnitFactory.create(payment_accounting=None, unit__payment_accounting=None)
     today = local_date()
 
@@ -576,7 +580,7 @@ def test_migrate_pricings_to_pricing_groups__past_online_pricing_needs_no_accoun
     assert list(PriceComponent.objects.values_list("sales_item", flat=True)) == [None, None]
 
 
-def test_migrate_pricings_to_pricing_groups__archived_reservation_unit_needs_no_sales_item():
+def test_migrate_pricings_to_pricing_groups__archived_reservation_unit_needs_no_sales_item() -> None:
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
     archived_with_other_tax_level = ReservationUnitFactory.create(payment_accounting=accounting, is_archived=True)
@@ -621,7 +625,7 @@ def test_migrate_pricings_to_pricing_groups__archived_reservation_unit_needs_no_
 # ── Conflicts ──
 
 
-def test_migrate_pricings_to_pricing_groups__error_when_first_pricing_is_in_the_future():
+def test_migrate_pricings_to_pricing_groups__error_when_first_pricing_is_in_the_future() -> None:
     reservation_unit = ReservationUnitFactory.create(name="Sali")
     future = local_date() + datetime.timedelta(days=10)
 
@@ -638,7 +642,7 @@ def test_migrate_pricings_to_pricing_groups__error_when_first_pricing_is_in_the_
         migrate_to(AFTER_MIGRATION)
 
 
-def test_migrate_pricings_to_pricing_groups__error_when_no_accounting():
+def test_migrate_pricings_to_pricing_groups__error_when_no_accounting() -> None:
     reservation_unit = ReservationUnitFactory.create(
         name="Sali",
         payment_accounting=None,
@@ -663,7 +667,7 @@ def test_migrate_pricings_to_pricing_groups__error_when_no_accounting():
         migrate_to(AFTER_MIGRATION)
 
 
-def test_migrate_pricings_to_pricing_groups__error_when_material_has_two_tax_levels():
+def test_migrate_pricings_to_pricing_groups__error_when_material_has_two_tax_levels() -> None:
     accounting = PaymentAccountingFactory.create(
         name="Tili",
         product_invoicing_material="10000116",
@@ -704,7 +708,7 @@ def test_migrate_pricings_to_pricing_groups__error_when_material_has_two_tax_lev
         migrate_to(AFTER_MIGRATION)
 
 
-def test_migrate_pricings_to_pricing_groups__error_when_existing_sales_item_has_other_tax_level():
+def test_migrate_pricings_to_pricing_groups__error_when_existing_sales_item_has_other_tax_level() -> None:
     accounting = PaymentAccountingFactory.create(product_invoicing_material="10000116", main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(payment_accounting=accounting)
 
@@ -725,7 +729,7 @@ def test_migrate_pricings_to_pricing_groups__error_when_existing_sales_item_has_
         migrate_to(AFTER_MIGRATION)
 
 
-def test_migrate_pricings_to_pricing_groups__error_when_name_of_sales_item_without_material_is_taken():
+def test_migrate_pricings_to_pricing_groups__error_when_name_of_sales_item_without_material_is_taken() -> None:
     accounting = create_accounting_without_invoicing(name="Tili", main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(name="Sali", payment_accounting=accounting)
 

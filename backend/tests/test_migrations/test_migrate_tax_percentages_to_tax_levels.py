@@ -69,7 +69,7 @@ def create_pricing(
 # ── Forward ──
 
 
-def test_migrate_tax_percentages_to_tax_levels__creates_tax_levels_with_rate_history():
+def test_migrate_tax_percentages_to_tax_levels__creates_tax_levels_with_rate_history() -> None:
     reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(apps, reservation_unit=reservation_unit, percentage=Decimal("25.50"))
@@ -97,7 +97,7 @@ def test_migrate_tax_percentages_to_tax_levels__creates_tax_levels_with_rate_his
     ]
 
 
-def test_migrate_tax_percentages_to_tax_levels__no_pricings():
+def test_migrate_tax_percentages_to_tax_levels__no_pricings() -> None:
     migrate_to(BEFORE_MIGRATION)
 
     apps = migrate_to(AFTER_MIGRATION)
@@ -117,7 +117,9 @@ def test_migrate_tax_percentages_to_tax_levels__no_pricings():
         (Decimal("25.50"), "Yleinen"),
     ],
 )
-def test_migrate_tax_percentages_to_tax_levels__sets_tax_level_by_percentage(percentage, tax_level_name):
+def test_migrate_tax_percentages_to_tax_levels__sets_tax_level_by_percentage(
+    percentage: Decimal, tax_level_name: str
+) -> None:
     reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
     pricing = create_pricing(apps, reservation_unit=reservation_unit, percentage=percentage)
@@ -129,7 +131,7 @@ def test_migrate_tax_percentages_to_tax_levels__sets_tax_level_by_percentage(per
     assert list(pricings.values_list("tax_level__name", "tax_percentage__value")) == [(tax_level_name, percentage)]
 
 
-def test_migrate_tax_percentages_to_tax_levels__unknown_percentage():
+def test_migrate_tax_percentages_to_tax_levels__unknown_percentage() -> None:
     reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(apps, reservation_unit=reservation_unit, percentage=Decimal("23.00"))
@@ -142,7 +144,7 @@ def test_migrate_tax_percentages_to_tax_levels__unknown_percentage():
 # ── Forward: VAT only changes ──
 
 
-def test_migrate_tax_percentages_to_tax_levels__deletes_vat_only_change():
+def test_migrate_tax_percentages_to_tax_levels__deletes_vat_only_change() -> None:
     reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
@@ -177,7 +179,7 @@ def test_migrate_tax_percentages_to_tax_levels__deletes_vat_only_change():
     ]
 
 
-def test_migrate_tax_percentages_to_tax_levels__keeps_vat_change_with_new_price():
+def test_migrate_tax_percentages_to_tax_levels__keeps_vat_change_with_new_price() -> None:
     reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
@@ -205,7 +207,7 @@ def test_migrate_tax_percentages_to_tax_levels__keeps_vat_change_with_new_price(
     ]
 
 
-def test_migrate_tax_percentages_to_tax_levels__keeps_change_to_another_tax_level():
+def test_migrate_tax_percentages_to_tax_levels__keeps_change_to_another_tax_level() -> None:
     reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
@@ -232,7 +234,7 @@ def test_migrate_tax_percentages_to_tax_levels__keeps_change_to_another_tax_leve
     ]
 
 
-def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_without_activation_flag():
+def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_without_activation_flag() -> None:
     reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
     create_pricing(
@@ -258,7 +260,7 @@ def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_without_activat
     ]
 
 
-def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_in_another_reservation_unit():
+def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_in_another_reservation_unit() -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
     apps = migrate_to(BEFORE_MIGRATION)
@@ -285,7 +287,7 @@ def test_migrate_tax_percentages_to_tax_levels__keeps_same_price_in_another_rese
 # ── Reverse ──
 
 
-def test_fill_missing_tax_percentages():
+def test_fill_missing_tax_percentages() -> None:
     reservation_unit = ReservationUnitFactory.create()
     apps = migrate_to(AFTER_MIGRATION)
 

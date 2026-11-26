@@ -38,7 +38,7 @@ def migrate_to(target: tuple[str, str]) -> StateApps:
 # ── Forward ──
 
 
-def test_add_vat_code_to_tax_level_rate__fills_vat_code_by_percentage():
+def test_add_vat_code_to_tax_level_rate__fills_vat_code_by_percentage() -> None:
     apps = migrate_to(BEFORE_MIGRATION)
 
     TaxLevel = apps.get_model("tilavarauspalvelu", "TaxLevel")
