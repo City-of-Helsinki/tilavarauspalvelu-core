@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import SpaceFactory, UnitFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_regular_user_cannot_update_space(graphql):
+def test_regular_user_cannot_update_space(graphql: GraphQLClient) -> None:
     # given:
     # - There is a space
     # - A regular user is using the system
@@ -28,7 +33,7 @@ def test_regular_user_cannot_update_space(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_unit_admin_can_update_space(graphql):
+def test_unit_admin_can_update_space(graphql: GraphQLClient) -> None:
     # given:
     # - There is a space
     # - A unit admin for the space's unit is using the system
@@ -45,7 +50,7 @@ def test_unit_admin_can_update_space(graphql):
     assert response.has_errors is False, response
 
 
-def test_unit_admin_cannot_update_space_for_other_unit(graphql):
+def test_unit_admin_cannot_update_space_for_other_unit(graphql: GraphQLClient) -> None:
     # given:
     # - There is a space
     # - A unit admin for some other unit is using the system
@@ -63,7 +68,7 @@ def test_unit_admin_cannot_update_space_for_other_unit(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_general_admin_can_update_space(graphql):
+def test_general_admin_can_update_space(graphql: GraphQLClient) -> None:
     # given:
     # - There is a space
     # - A general admin is using the system

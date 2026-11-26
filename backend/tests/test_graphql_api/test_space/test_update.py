@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import Space
@@ -7,6 +9,9 @@ from tilavarauspalvelu.models import Space
 from tests.factories import SpaceFactory, UnitFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -17,7 +22,7 @@ pytestmark = [
 # ── Update ──
 
 
-def test_update_space(graphql):
+def test_update_space(graphql: GraphQLClient) -> None:
     # given:
     # - There is a space
     # - A superuser is using the system
@@ -39,7 +44,7 @@ def test_update_space(graphql):
 # ── Moving to another unit or parent ──
 
 
-def test_update_space__unit_admin_cannot_move_space_to_other_unit(graphql):
+def test_update_space__unit_admin_cannot_move_space_to_other_unit(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create(name="foo")
     original_unit = space.unit
     other_unit = UnitFactory.create()
@@ -55,7 +60,7 @@ def test_update_space__unit_admin_cannot_move_space_to_other_unit(graphql):
     assert space.unit == original_unit
 
 
-def test_update_space__superuser_cannot_move_space_to_other_unit(graphql):
+def test_update_space__superuser_cannot_move_space_to_other_unit(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create(name="foo")
     original_unit = space.unit
     other_unit = UnitFactory.create()
@@ -70,7 +75,7 @@ def test_update_space__superuser_cannot_move_space_to_other_unit(graphql):
     assert space.unit == original_unit
 
 
-def test_update_space__unit_admin_can_move_space_under_space_of_same_unit(graphql):
+def test_update_space__unit_admin_can_move_space_under_space_of_same_unit(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create(name="foo")
     new_parent = SpaceFactory.create(name="bar", unit=space.unit)
     admin = UserFactory.create_with_unit_role(units=[space.unit])
@@ -84,7 +89,7 @@ def test_update_space__unit_admin_can_move_space_under_space_of_same_unit(graphq
     assert space.parent == new_parent
 
 
-def test_update_space__unit_admin_cannot_move_space_under_space_of_other_unit(graphql):
+def test_update_space__unit_admin_cannot_move_space_under_space_of_other_unit(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create(name="foo")
     other_space = SpaceFactory.create(name="bar")
     admin = UserFactory.create_with_unit_role(units=[space.unit])
@@ -103,7 +108,7 @@ def test_update_space__unit_admin_cannot_move_space_under_space_of_other_unit(gr
 
 
 @pytest.mark.parametrize("name", ["", " "])
-def test_update_space__name_fi_cannot_be_empty(graphql, name):
+def test_update_space__name_fi_cannot_be_empty(graphql: GraphQLClient, name: str) -> None:
     # given:
     # - There is a space
     # - A superuser is using the system

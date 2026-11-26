@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
@@ -9,13 +11,16 @@ from tests.factories import ApplicationRoundFactory, ReservationUnitFactory, Spa
 
 from .helpers import DELETE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_delete_space(graphql):
+def test_delete_space(graphql: GraphQLClient) -> None:
     # given:
     # - There is a space
     # - A superuser is using the system
@@ -45,7 +50,9 @@ def test_delete_space(graphql):
         ApplicationRoundStatusChoice.HANDLED,
     ],
 )
-def test_space_not_deleted_because_in_active_application_round(graphql, status):
+def test_space_not_deleted_because_in_active_application_round(
+    graphql: GraphQLClient, status: ApplicationRoundStatusChoice
+) -> None:
     # given:
     # - There is a space
     # - The space is in an active (not sent) application round
@@ -67,7 +74,7 @@ def test_space_not_deleted_because_in_active_application_round(graphql, status):
     assert Space.objects.filter(pk=pk).exists() is True
 
 
-def test_delete_space__in_use(graphql):
+def test_delete_space__in_use(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     ReservationUnitFactory.create(spaces=[space])
     graphql.login_with_superuser()
