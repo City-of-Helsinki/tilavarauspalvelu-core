@@ -37,8 +37,8 @@ class PriceComponentValidator:
 
     def validate_discount_only_when_paid(self) -> None:
         component = self.price_component
-        if component.kind == PriceComponentKind.BASE and component.can_apply_for_discount and component.amount <= 0:
-            msg = "A free base component cannot allow applying for a discount."
+        if component.can_apply_for_discount and component.amount <= 0:
+            msg = "A free price component cannot allow applying for a discount."
             raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_DISCOUNT_WHEN_FREE)
 
     def validate_base_is_adjustable(self) -> None:

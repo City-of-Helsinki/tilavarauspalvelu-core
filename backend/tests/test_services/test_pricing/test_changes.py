@@ -344,7 +344,7 @@ def test_save_price_component_changes__free_component_cannot_allow_discount():
 
     assert error_details(error.value) == [
         ErrorDetail(
-            "A free base component cannot allow applying for a discount.",
+            "A free price component cannot allow applying for a discount.",
             code=error_codes.PRICE_COMPONENT_DISCOUNT_WHEN_FREE,
         ),
     ]

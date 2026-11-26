@@ -41,7 +41,14 @@ def test_price_component__free_component_cannot_allow_discount():
     with pytest.raises(IntegrityError) as error:
         PriceComponentFactory.create_free(can_apply_for_discount=True)
 
-    assert "price_component_base_discount_only_when_paid" in str(error.value)
+    assert "price_component_discount_only_when_paid" in str(error.value)
+
+
+def test_price_component__free_surcharge_cannot_allow_discount():
+    with pytest.raises(IntegrityError) as error:
+        PriceComponentFactory.create_free(kind=PriceComponentKind.SURCHARGE, can_apply_for_discount=True)
+
+    assert "price_component_discount_only_when_paid" in str(error.value)
 
 
 def test_price_component__paid_component_can_allow_discount():

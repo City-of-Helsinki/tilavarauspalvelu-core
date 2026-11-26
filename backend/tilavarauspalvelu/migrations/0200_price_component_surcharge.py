@@ -26,4 +26,12 @@ class Migration(migrations.Migration):
             model_name='pricecomponent',
             constraint=models.CheckConstraint(condition=models.Q(models.Q(('kind', 'BASE'), _negated=True), ('is_adjustable', True), _connector='OR'), name='price_component_base_is_adjustable', violation_error_code=tilavarauspalvelu.typing.error_codes['PRICE_COMPONENT_BASE_NOT_ADJUSTABLE'], violation_error_message='A base component must be adjustable.'),
         ),
+        migrations.RemoveConstraint(
+            model_name='pricecomponent',
+            name='price_component_base_discount_only_when_paid',
+        ),
+        migrations.AddConstraint(
+            model_name='pricecomponent',
+            constraint=models.CheckConstraint(condition=models.Q(('can_apply_for_discount', False), ('amount__gt', 0), _connector='OR'), name='price_component_discount_only_when_paid', violation_error_code=tilavarauspalvelu.typing.error_codes['PRICE_COMPONENT_DISCOUNT_WHEN_FREE'], violation_error_message='A free price component cannot allow applying for a discount.'),
+        ),
     ]
