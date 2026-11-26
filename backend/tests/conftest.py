@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import ExitStack, nullcontext
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import pytest
 import stamina
@@ -37,7 +37,8 @@ def _deactivate_retries() -> None:
 def outbox() -> list[EmailMultiAlternatives]:
     from django.core import mail
 
-    return mail.outbox
+    # The project sends only 'EmailMultiAlternatives'. Return the same list, so that tests see new emails.
+    return cast("list[EmailMultiAlternatives]", mail.outbox)
 
 
 @pytest.fixture(autouse=True)
