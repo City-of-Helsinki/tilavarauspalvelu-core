@@ -110,11 +110,11 @@ def _pricing_group_errors() -> list[str]:
                 description=f"{description}, payment accounting {accounting.pk} '{accounting.name}'",
             )
             if source.material:
-                key = (source.material, source.main_ledger_account)
-                sources_by_material.setdefault(key, []).append(source)
+                material_key = (source.material, source.main_ledger_account)
+                sources_by_material.setdefault(material_key, []).append(source)
             else:
-                key = (source.tax_level_id, source.main_ledger_account)
-                sources_without_material.setdefault(key, []).append(source)
+                tax_level_key = (source.tax_level_id, source.main_ledger_account)
+                sources_without_material.setdefault(tax_level_key, []).append(source)
 
     existing_sales_items = list(SalesItem.objects.order_by("pk"))
 
