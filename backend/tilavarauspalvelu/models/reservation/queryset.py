@@ -97,19 +97,6 @@ class ReservationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
             buffered_ends_at=models.F("ends_at") + models.F("buffer_time_after"),
         )
 
-    def filter_buffered_reservations_period(self, start_date: datetime.date, end_date: datetime.date) -> Self:
-        """Filter reservations that are on the given period."""
-        return (
-            self
-            .with_buffered_begin_and_end()
-            .filter(
-                buffered_begins_at__date__lte=end_date,
-                buffered_ends_at__date__gte=start_date,
-            )
-            .distinct()
-            .order_by("buffered_begin")
-        )
-
     def total_duration(self) -> datetime.timedelta:
         return (
             self
