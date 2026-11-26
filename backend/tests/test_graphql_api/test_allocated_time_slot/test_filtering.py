@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import (
@@ -24,13 +26,16 @@ from tests.factories import (
 
 from .helpers import allocations_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_allocated_time_slot__filter__by_pk(graphql):
+def test_allocated_time_slot__filter__by_pk(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -49,7 +54,7 @@ def test_allocated_time_slot__filter__by_pk(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_pk__multiple(graphql):
+def test_allocated_time_slot__filter__by_pk__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -69,7 +74,7 @@ def test_allocated_time_slot__filter__by_pk__multiple(graphql):
     assert response.node(1) == {"pk": allocation_2.pk}
 
 
-def test_allocated_time_slot__filter__by_application_round(graphql):
+def test_allocated_time_slot__filter__by_application_round(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -89,7 +94,7 @@ def test_allocated_time_slot__filter__by_application_round(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_application_section_status(graphql):
+def test_allocated_time_slot__filter__by_application_section_status(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots in two application sections with different states
     # - A superuser is using the system
@@ -114,16 +119,16 @@ def test_allocated_time_slot__filter__by_application_section_status(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_application_section_status__multiple(graphql):
+def test_allocated_time_slot__filter__by_application_section_status__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots in two application sections with different states
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_in_allocation(applied_reservations_per_week=2)
     section_2 = ApplicationSectionFactory.create_in_status_handled()
     option_1 = section_1.reservation_unit_options.first()
-    option_2 = section_2.reservation_unit_options.first()
+    option_2 = section_2.reservation_unit_options.get()
     allocation_1 = AllocatedTimeSlotFactory.create(reservation_unit_option=option_1)
-    allocation_2 = option_2.allocated_time_slots.first()
+    allocation_2 = option_2.allocated_time_slots.get()
     graphql.login_with_superuser()
 
     # Sanity check
@@ -142,7 +147,7 @@ def test_allocated_time_slot__filter__by_application_section_status__multiple(gr
     assert response.node(1) == {"pk": allocation_1.pk}
 
 
-def test_allocated_time_slot__filter__by_applicant_type(graphql):
+def test_allocated_time_slot__filter__by_applicant_type(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different applicant types
     # - A superuser is using the system
@@ -166,7 +171,7 @@ def test_allocated_time_slot__filter__by_applicant_type(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_applicant_type__multiple(graphql):
+def test_allocated_time_slot__filter__by_applicant_type__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different applicant types
     # - A superuser is using the system
@@ -195,7 +200,7 @@ def test_allocated_time_slot__filter__by_applicant_type__multiple(graphql):
     assert response.node(1) == {"pk": allocation_2.pk}
 
 
-def test_allocated_time_slot__filter__by_allocated_unit(graphql):
+def test_allocated_time_slot__filter__by_allocated_unit(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different allocated units
     # - A superuser is using the system
@@ -216,7 +221,7 @@ def test_allocated_time_slot__filter__by_allocated_unit(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_allocated_unit__multiple(graphql):
+def test_allocated_time_slot__filter__by_allocated_unit__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different allocated units
     # - A superuser is using the system
@@ -238,7 +243,7 @@ def test_allocated_time_slot__filter__by_allocated_unit__multiple(graphql):
     assert response.node(1) == {"pk": allocation_2.pk}
 
 
-def test_allocated_time_slot__filter__by_unit_group(graphql):
+def test_allocated_time_slot__filter__by_unit_group(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different allocated unit groups
     # - A superuser is using the system
@@ -259,7 +264,7 @@ def test_allocated_time_slot__filter__by_unit_group(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_allocated_reservation_unit(graphql):
+def test_allocated_time_slot__filter__by_allocated_reservation_unit(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different allocated reservation units
     # - A superuser is using the system
@@ -280,7 +285,7 @@ def test_allocated_time_slot__filter__by_allocated_reservation_unit(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_allocated_reservation_unit__multiple(graphql):
+def test_allocated_time_slot__filter__by_allocated_reservation_unit__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different allocated reservation units
     # - A superuser is using the system
@@ -302,7 +307,7 @@ def test_allocated_time_slot__filter__by_allocated_reservation_unit__multiple(gr
     assert response.node(1) == {"pk": allocation_2.pk}
 
 
-def test_allocated_time_slot__filter__by_allocated_day(graphql):
+def test_allocated_time_slot__filter__by_allocated_day(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different allocated day of the week
     # - A superuser is using the system
@@ -321,7 +326,7 @@ def test_allocated_time_slot__filter__by_allocated_day(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_allocated_day__multiple(graphql):
+def test_allocated_time_slot__filter__by_allocated_day__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots with different allocated day of the week
     # - A superuser is using the system
@@ -341,7 +346,7 @@ def test_allocated_time_slot__filter__by_allocated_day__multiple(graphql):
     assert response.node(1) == {"pk": allocation_2.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__section_id(graphql):
+def test_allocated_time_slot__filter__by_text_search__section_id(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -380,7 +385,7 @@ def test_allocated_time_slot__filter__by_text_search__section_id(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__section_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__section_name(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -415,7 +420,7 @@ def test_allocated_time_slot__filter__by_text_search__section_name(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__application_id(graphql):
+def test_allocated_time_slot__filter__by_text_search__application_id(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -455,7 +460,7 @@ def test_allocated_time_slot__filter__by_text_search__application_id(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__applicant__organisation_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__organisation_name(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -490,7 +495,9 @@ def test_allocated_time_slot__filter__by_text_search__applicant__organisation_na
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__applicant__contact_person_first_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__contact_person_first_name(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -525,7 +532,9 @@ def test_allocated_time_slot__filter__by_text_search__applicant__contact_person_
     assert response.node(0) == {"pk": schedule.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__applicant__contact_person_last_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__contact_person_last_name(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -560,7 +569,7 @@ def test_allocated_time_slot__filter__by_text_search__applicant__contact_person_
     assert response.node(0) == {"pk": schedule.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__applicant__user_first_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__user_first_name(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -595,7 +604,7 @@ def test_allocated_time_slot__filter__by_text_search__applicant__user_first_name
     assert response.node(0) == {"pk": schedule.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__applicant__user_last_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__user_last_name(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -630,7 +639,7 @@ def test_allocated_time_slot__filter__by_text_search__applicant__user_last_name(
     assert response.node(0) == {"pk": schedule.pk}
 
 
-def test_allocated_time_slot__filter__by_text_search__not_found(graphql):
+def test_allocated_time_slot__filter__by_text_search__not_found(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -672,7 +681,9 @@ def test_allocated_time_slot__filter__by_text_search__not_found(graphql):
         AccessCodeState.ACCESS_CODE_PENDING,
     ],
 )
-def test_allocated_time_slot__filter__by_access_code_state(graphql, access_code_state):
+def test_allocated_time_slot__filter__by_access_code_state(
+    graphql: GraphQLClient, access_code_state: AccessCodeState
+) -> None:
     allocation_1 = AllocatedTimeSlotFactory.create()
     series_1 = ReservationSeriesFactory.create(allocated_time_slot=allocation_1)
     ReservationFactory.create(

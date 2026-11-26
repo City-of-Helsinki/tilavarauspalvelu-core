@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -10,6 +11,9 @@ from utils.date_utils import DEFAULT_TIMEZONE
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationSectionFactory
 
 from .helpers import allocations_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -28,7 +32,7 @@ pytestmark = [
         ("applicationPkDesc", [3, 2, 1]),
     ],
 )
-def test_allocated_time_slot__order__by_ids(graphql, field, order):
+def test_allocated_time_slot__order__by_ids(graphql: GraphQLClient, field: str, order: list[int]) -> None:
     # given:
     # - There are three allocated time slots
     schedules = {
@@ -53,7 +57,7 @@ def test_allocated_time_slot__order__by_ids(graphql, field, order):
     assert response.node(2) == {"pk": schedules[next(ordering)].pk}
 
 
-def test_allocated_time_slot__order__by_applicant(graphql):
+def test_allocated_time_slot__order__by_applicant(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     allocation_1 = AllocatedTimeSlotFactory.create(
@@ -89,7 +93,7 @@ def test_allocated_time_slot__order__by_applicant(graphql):
     assert response.node(1) == {"pk": allocation_1.pk}
 
 
-def test_allocated_time_slot__order__by_application_section_name(graphql):
+def test_allocated_time_slot__order__by_application_section_name(graphql: GraphQLClient) -> None:
     # given:
     # - There are two allocated time slots
     allocation_1 = AllocatedTimeSlotFactory.create(reservation_unit_option__application_section__name="A")
@@ -122,7 +126,7 @@ def test_allocated_time_slot__order__by_application_section_name(graphql):
 
 
 @pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_allocated_time_slot__order__by_allocated_unit_name(graphql, lang):
+def test_allocated_time_slot__order__by_allocated_unit_name(graphql: GraphQLClient, lang: str) -> None:
     # given:
     # - There are two allocated time slots
     allocation_1 = AllocatedTimeSlotFactory.create(
@@ -159,7 +163,7 @@ def test_allocated_time_slot__order__by_allocated_unit_name(graphql, lang):
 
 
 @pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_allocated_time_slot__order__by_allocated_reservation_unit_name(graphql, lang):
+def test_allocated_time_slot__order__by_allocated_reservation_unit_name(graphql: GraphQLClient, lang: str) -> None:
     # given:
     # - There are two allocated time slots
     allocation_1 = AllocatedTimeSlotFactory.create(
@@ -195,7 +199,7 @@ def test_allocated_time_slot__order__by_allocated_reservation_unit_name(graphql,
     assert response.node(1) == {"pk": allocation_1.pk}
 
 
-def test_allocated_time_slot__order__by_allocated_time_of_week(graphql):
+def test_allocated_time_slot__order__by_allocated_time_of_week(graphql: GraphQLClient) -> None:
     # given:
     # - There are four allocated time slots
     allocation_1 = AllocatedTimeSlotFactory.create(
@@ -249,7 +253,7 @@ def test_allocated_time_slot__order__by_allocated_time_of_week(graphql):
     assert response.node(3) == {"pk": allocation_1.pk}
 
 
-def test_allocated_time_slot__order__by_application_status(graphql):
+def test_allocated_time_slot__order__by_application_status(graphql: GraphQLClient) -> None:
     # given:
     # - There are allocated time slots with different application statuses
     application_1 = ApplicationFactory.create_in_status_cancelled(
@@ -275,29 +279,29 @@ def test_allocated_time_slot__order__by_application_status(graphql):
         application_sections__reservation_unit_options__allocated_time_slots__day_of_the_week=Weekday.MONDAY,
     )
 
-    section_1 = application_1.application_sections.first()
-    section_2 = application_2.application_sections.first()
-    section_3 = application_3.application_sections.first()
-    section_4 = application_4.application_sections.first()
-    section_5 = application_5.application_sections.first()
-    section_6 = application_6.application_sections.first()
-    section_7 = application_7.application_sections.first()
+    section_1 = application_1.application_sections.get()
+    section_2 = application_2.application_sections.get()
+    section_3 = application_3.application_sections.get()
+    section_4 = application_4.application_sections.get()
+    section_5 = application_5.application_sections.get()
+    section_6 = application_6.application_sections.get()
+    section_7 = application_7.application_sections.get()
 
-    option_1 = section_1.reservation_unit_options.first()
-    option_2 = section_2.reservation_unit_options.first()
-    option_3 = section_3.reservation_unit_options.first()
-    option_4 = section_4.reservation_unit_options.first()
-    option_5 = section_5.reservation_unit_options.first()
-    option_6 = section_6.reservation_unit_options.first()
-    option_7 = section_7.reservation_unit_options.first()
+    option_1 = section_1.reservation_unit_options.get()
+    option_2 = section_2.reservation_unit_options.get()
+    option_3 = section_3.reservation_unit_options.get()
+    option_4 = section_4.reservation_unit_options.get()
+    option_5 = section_5.reservation_unit_options.get()
+    option_6 = section_6.reservation_unit_options.get()
+    option_7 = section_7.reservation_unit_options.get()
 
-    allocation_cancelled = option_1.allocated_time_slots.first()
-    allocation_draft = option_2.allocated_time_slots.first()
-    allocation_received = option_3.allocated_time_slots.first()
-    allocation_results_sent = option_4.allocated_time_slots.first()
-    allocation_expired = option_5.allocated_time_slots.first()
-    allocation_handled = option_6.allocated_time_slots.first()
-    allocation_in_allocation = option_7.allocated_time_slots.first()
+    allocation_cancelled = option_1.allocated_time_slots.get()
+    allocation_draft = option_2.allocated_time_slots.get()
+    allocation_received = option_3.allocated_time_slots.get()
+    allocation_results_sent = option_4.allocated_time_slots.get()
+    allocation_expired = option_5.allocated_time_slots.get()
+    allocation_handled = option_6.allocated_time_slots.get()
+    allocation_in_allocation = option_7.allocated_time_slots.get()
 
     # Double check that values are correct
     assert application_1.status == ApplicationStatusChoice.CANCELLED
@@ -345,7 +349,7 @@ def test_allocated_time_slot__order__by_application_status(graphql):
     assert response.node(6) == {"pk": allocation_draft.pk}
 
 
-def test_allocated_time_slot__order__by_application_section_status(graphql):
+def test_allocated_time_slot__order__by_application_section_status(graphql: GraphQLClient) -> None:
     # given:
     # - There are allocated time slots with different application section statuses
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(
@@ -358,13 +362,13 @@ def test_allocated_time_slot__order__by_application_section_status(graphql):
     )
     section_3 = ApplicationSectionFactory.create_in_status_handled()
 
-    option_1 = section_1.reservation_unit_options.first()
-    option_2 = section_2.reservation_unit_options.first()
-    option_3 = section_3.reservation_unit_options.first()
+    option_1 = section_1.reservation_unit_options.get()
+    option_2 = section_2.reservation_unit_options.get()
+    option_3 = section_3.reservation_unit_options.get()
 
-    allocation_1 = option_1.allocated_time_slots.first()
-    allocation_2 = option_2.allocated_time_slots.first()
-    allocation_3 = option_3.allocated_time_slots.first()
+    allocation_1 = option_1.allocated_time_slots.get()
+    allocation_2 = option_2.allocated_time_slots.get()
+    allocation_3 = option_3.allocated_time_slots.get()
 
     # Double check that values are correct
     assert section_1.status == ApplicationSectionStatusChoice.UNALLOCATED

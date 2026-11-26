@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ApplicationFactory
 
 from .helpers import CREATE_ALLOCATION, allocation_create_data
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,13 +17,13 @@ pytestmark = [
 ]
 
 
-def test_allocated_time_slot__create__applicant(graphql):
+def test_allocated_time_slot__create__applicant(graphql: GraphQLClient) -> None:
     # given:
     # - There is an allocatable reservation unit option
     # - The application owner is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
 
     graphql.force_login(application.user)
 

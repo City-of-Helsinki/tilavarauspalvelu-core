@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
@@ -8,13 +10,16 @@ from tests.factories import ApplicationFactory, ApplicationRoundFactory
 
 from .helpers import DELETE_ALLOCATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_allocated_time_slot__delete(graphql):
+def test_allocated_time_slot__delete(graphql: GraphQLClient) -> None:
     # given:
     # - There is an allocated application
     # - A superuser is using the system
@@ -22,9 +27,9 @@ def test_allocated_time_slot__delete(graphql):
         times_slots_to_create=1,
         pre_allocated=True,
     )
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
-    slot = option.allocated_time_slots.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
+    slot = option.allocated_time_slots.get()
     graphql.login_with_superuser()
 
     assert section.status == ApplicationSectionStatusChoice.HANDLED
@@ -54,7 +59,9 @@ def test_allocated_time_slot__delete(graphql):
         ApplicationRoundStatusChoice.RESULTS_SENT,
     ],
 )
-def test_allocated_time_slot__delete__blocked_due_to_round_status(graphql, round_status):
+def test_allocated_time_slot__delete__blocked_due_to_round_status(
+    graphql: GraphQLClient, round_status: ApplicationRoundStatusChoice
+) -> None:
     # given:
     # - There is an allocated application, in an application round with different statuses
     # - A superuser is using the system
@@ -64,9 +71,9 @@ def test_allocated_time_slot__delete__blocked_due_to_round_status(graphql, round
         times_slots_to_create=1,
         pre_allocated=True,
     )
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
-    slot = option.allocated_time_slots.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
+    slot = option.allocated_time_slots.get()
 
     graphql.login_with_superuser()
 
