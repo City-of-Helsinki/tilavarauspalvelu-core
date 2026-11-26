@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from collections import defaultdict
+from typing import TYPE_CHECKING
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -19,6 +20,9 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -27,7 +31,7 @@ pytestmark = [
 NEXT_YEAR = local_date().year + 1
 
 
-def _datetime(year=NEXT_YEAR, month=5, day=1, hour=0, minute=0) -> datetime.datetime:
+def _datetime(year: int = NEXT_YEAR, month: int = 5, day: int = 1, hour: int = 0, minute: int = 0) -> datetime.datetime:
     # Convert to UTC to match timezone returned by GQL endpoint
     return datetime.datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).astimezone(datetime.UTC)
 
@@ -77,7 +81,7 @@ def _validate_time_spans(
     assert all_closed_time_spans.get(reservation_unit_id) == closed_time_spans
 
 
-def test_affecting_time_span__closed_time_spans__only_resources():
+def test_affecting_time_span__closed_time_spans__only_resources() -> None:
     # Resource 1 <- ReservationUnit 1, 2
     # Resource 2 <- ReservationUnit 3, 4
     # Resource 3 <- ReservationUnit 5
@@ -112,7 +116,7 @@ def test_affecting_time_span__closed_time_spans__only_resources():
     _validate_time_spans(all_closed_time_spans, reservation_unit_5.pk, [])
 
 
-def test_affecting_time_span__closed_time_spans__only_spaces():
+def test_affecting_time_span__closed_time_spans__only_spaces() -> None:
     # Space 1                    <- ReservationUnit 1, 8
     # ├── Space 1.1              <- ReservationUnit 2
     # │   ├── Space 1.1.1        <- ReservationUnit 4
@@ -230,7 +234,7 @@ def test_affecting_time_span__closed_time_spans__only_spaces():
     )
 
 
-def test_affecting_time_span__closed_time_spans__resources_and_spaces():
+def test_affecting_time_span__closed_time_spans__resources_and_spaces() -> None:
     # Space 1             <- ReservationUnit 5
     # ├── Space 1.1       <- ReservationUnit 1, 3
     # │   └── Space 1.1.1 <- ReservationUnit 4
@@ -333,7 +337,7 @@ def test_affecting_time_span__closed_time_spans__resources_and_spaces():
 # ── create_missing_statistics ──
 
 
-def test_reservation__create_missing_statistics__limit_and_batches():
+def test_reservation__create_missing_statistics__limit_and_batches() -> None:
     reservation_1 = ReservationFactory.create()
     reservation_2 = ReservationFactory.create()
     reservation_3 = ReservationFactory.create()
@@ -354,7 +358,7 @@ def test_reservation__create_missing_statistics__limit_and_batches():
     assert reservation_pks == [reservation_1.pk, reservation_2.pk, reservation_3.pk, reservation_4.pk]
 
 
-def test_reservation__create_missing_statistics__skip_reservations_past_retention(settings):
+def test_reservation__create_missing_statistics__skip_reservations_past_retention(settings: Settings) -> None:
     settings.REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
 
     created_at = local_datetime() - relativedelta(years=5, days=1)
