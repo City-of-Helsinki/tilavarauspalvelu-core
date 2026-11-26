@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.contrib.admin import AdminSite
@@ -31,6 +31,9 @@ from tests.factories import (
 )
 
 if TYPE_CHECKING:
+    from django.forms import ModelForm
+    from rest_framework.test import APIClient
+
     from tilavarauspalvelu.models import TermsOfUse
 
 # Applied to all tests
@@ -39,7 +42,7 @@ pytestmark = [
 ]
 
 
-def get_valid_data(reservation_unit: ReservationUnit):
+def get_valid_data(reservation_unit: ReservationUnit) -> dict[str, Any]:
     return {
         "unit": reservation_unit.unit.pk,
         "name_fi": reservation_unit.name_fi,
@@ -52,7 +55,7 @@ def get_valid_data(reservation_unit: ReservationUnit):
     }
 
 
-def test_reservation_unit_admin__terms_validation__success():
+def test_reservation_unit_admin__terms_validation__success() -> None:
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -81,7 +84,7 @@ def test_reservation_unit_admin__terms_validation__success():
     assert form.is_valid(), form.errors
 
 
-def test_reservation_unit_admin__terms_validation__pricing_terms_incorrect_type():
+def test_reservation_unit_admin__terms_validation__pricing_terms_incorrect_type() -> None:
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -115,7 +118,7 @@ def test_reservation_unit_admin__terms_validation__pricing_terms_incorrect_type(
     ]
 
 
-def test_reservation_unit_admin__terms_validation__payment_terms_incorrect_type():
+def test_reservation_unit_admin__terms_validation__payment_terms_incorrect_type() -> None:
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -149,7 +152,7 @@ def test_reservation_unit_admin__terms_validation__payment_terms_incorrect_type(
     ]
 
 
-def test_reservation_unit_admin__terms_validation__cancellation_terms_incorrect_type():
+def test_reservation_unit_admin__terms_validation__cancellation_terms_incorrect_type() -> None:
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -184,7 +187,7 @@ def test_reservation_unit_admin__terms_validation__cancellation_terms_incorrect_
     ]
 
 
-def test_reservation_unit_admin__terms_validation__service_specific_terms_incorrect_type():
+def test_reservation_unit_admin__terms_validation__service_specific_terms_incorrect_type() -> None:
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -219,7 +222,7 @@ def test_reservation_unit_admin__terms_validation__service_specific_terms_incorr
     ]
 
 
-def test_reservation_unit_admin__terms_validation__no_cancellation_terms_for_direct_booking():
+def test_reservation_unit_admin__terms_validation__no_cancellation_terms_for_direct_booking() -> None:
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -250,7 +253,7 @@ def test_reservation_unit_admin__terms_validation__no_cancellation_terms_for_dir
     ]
 
 
-def test_reservation_unit_admin__terms_validation__no_service_specific_terms_for_direct_booking():
+def test_reservation_unit_admin__terms_validation__no_service_specific_terms_for_direct_booking() -> None:
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -281,7 +284,9 @@ def test_reservation_unit_admin__terms_validation__no_service_specific_terms_for
     ]
 
 
-def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_booking_when_price_allows_discount():
+def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_booking_when_price_allows_discount() -> (
+    None
+):
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
@@ -314,7 +319,7 @@ def test_reservation_unit_admin__terms_validation__no_pricing_terms_for_direct_b
     ]
 
 
-def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid():
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid() -> None:
     reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
 
     form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
@@ -325,7 +330,7 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     ]
 
 
-def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_free():
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_free() -> None:
     reservation_unit = create_reservation_unit_with_price(amount=Decimal(0))
 
     form = create_admin_form(reservation_unit=reservation_unit, payment_terms=None)
@@ -333,7 +338,9 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     assert form.is_valid(), form.errors
 
 
-def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid_price_has_ended():
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid_price_has_ended() -> (
+    None
+):
     reservation_unit = create_reservation_unit_with_price(
         amount=Decimal(10),
         valid_until=local_date() - datetime.timedelta(days=1),
@@ -344,7 +351,7 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     assert form.is_valid(), form.errors
 
 
-def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_after_change_to_free():
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_after_change_to_free() -> None:
     reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
     free_pricing_group = PricingGroupFactory.create(unit_group=None)
     ReservationUnitPricingGroupFactory.create(
@@ -363,7 +370,7 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     assert form.is_valid(), form.errors
 
 
-def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid_in_future():
+def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_booking_when_paid_in_future() -> None:
     reservation_unit = create_reservation_unit_with_price(amount=Decimal(0))
     paid_pricing_group = PricingGroupFactory.create(unit_group=None)
     ReservationUnitPricingGroupFactory.create(
@@ -385,7 +392,9 @@ def test_reservation_unit_admin__terms_validation__no_payment_terms_for_direct_b
     ]
 
 
-def test_reservation_unit_admin__terms_validation__no_terms_needed_for_paid_group_that_the_unit_no_longer_uses():
+def test_reservation_unit_admin__terms_validation__no_terms_needed_for_paid_group_that_the_unit_no_longer_uses() -> (
+    None
+):
     reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
     old_pricing_group = reservation_unit.reservation_unit_pricing_groups.get().pricing_group
     old_pricing_group.components.update(can_apply_for_discount=True)
@@ -411,7 +420,7 @@ def test_reservation_unit_admin__terms_validation__no_terms_needed_for_paid_grou
 # ── Pricing groups ──
 
 
-def test_reservation_unit_admin__pricing_groups__link_to_pricing_group(api_client):
+def test_reservation_unit_admin__pricing_groups__link_to_pricing_group(api_client: APIClient) -> None:
     reservation_unit = create_reservation_unit_with_price(amount=Decimal(10))
     pricing_group_row = reservation_unit.reservation_unit_pricing_groups.get()
     api_client.force_login(UserFactory.create_superuser())
@@ -456,7 +465,7 @@ def create_reservation_unit_with_price(
     return reservation_unit
 
 
-def create_admin_form(*, reservation_unit: ReservationUnit, payment_terms: TermsOfUse | None):
+def create_admin_form(*, reservation_unit: ReservationUnit, payment_terms: TermsOfUse | None) -> ModelForm:
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
     request.user = UserFactory.create_superuser()
 

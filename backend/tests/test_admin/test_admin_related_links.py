@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.urls import reverse
 
@@ -11,6 +13,10 @@ from tests.factories import (
     UserFactory,
 )
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -20,7 +26,7 @@ pytestmark = [
 # ── Related object lists ──
 
 
-def test_admin_related_links__user__shows_only_their_reservations(api_client):
+def test_admin_related_links__user__shows_only_their_reservations(api_client: APIClient) -> None:
     admin_user = UserFactory.create_superuser()
     api_client.force_login(admin_user)
 
@@ -35,7 +41,7 @@ def test_admin_related_links__user__shows_only_their_reservations(api_client):
     assert list(response.context["cl"].result_list) == [reservation]
 
 
-def test_admin_related_links__user__shows_only_their_reservation_series(api_client):
+def test_admin_related_links__user__shows_only_their_reservation_series(api_client: APIClient) -> None:
     admin_user = UserFactory.create_superuser()
     api_client.force_login(admin_user)
 
@@ -50,7 +56,7 @@ def test_admin_related_links__user__shows_only_their_reservation_series(api_clie
     assert list(response.context["cl"].result_list) == [reservation_series]
 
 
-def test_admin_related_links__user__shows_only_their_applications(api_client):
+def test_admin_related_links__user__shows_only_their_applications(api_client: APIClient) -> None:
     admin_user = UserFactory.create_superuser()
     api_client.force_login(admin_user)
 
@@ -65,7 +71,7 @@ def test_admin_related_links__user__shows_only_their_applications(api_client):
     assert list(response.context["cl"].result_list) == [application]
 
 
-def test_admin_related_links__reservation_unit__shows_only_its_reservations(api_client):
+def test_admin_related_links__reservation_unit__shows_only_its_reservations(api_client: APIClient) -> None:
     admin_user = UserFactory.create_superuser()
     api_client.force_login(admin_user)
 
@@ -83,7 +89,7 @@ def test_admin_related_links__reservation_unit__shows_only_its_reservations(api_
 # ── Staff UI ──
 
 
-def test_admin_related_links__reservation__opens_staff_ui(api_client, settings):
+def test_admin_related_links__reservation__opens_staff_ui(api_client: APIClient, settings: Settings) -> None:
     settings.EMAIL_VARAAMO_EXT_LINK = "https://varaamo.hel.fi/"
 
     admin_user = UserFactory.create_superuser()
@@ -98,7 +104,7 @@ def test_admin_related_links__reservation__opens_staff_ui(api_client, settings):
     assert response["Location"] == f"https://varaamo.hel.fi/kasittely/reservations/{reservation.pk}"
 
 
-def test_admin_related_links__application__opens_staff_ui(api_client, settings):
+def test_admin_related_links__application__opens_staff_ui(api_client: APIClient, settings: Settings) -> None:
     settings.EMAIL_VARAAMO_EXT_LINK = "https://varaamo.hel.fi/"
 
     admin_user = UserFactory.create_superuser()
@@ -113,7 +119,7 @@ def test_admin_related_links__application__opens_staff_ui(api_client, settings):
     assert response["Location"] == f"https://varaamo.hel.fi/kasittely/applications/{application.pk}"
 
 
-def test_admin_related_links__reservation_unit__opens_staff_ui(api_client, settings):
+def test_admin_related_links__reservation_unit__opens_staff_ui(api_client: APIClient, settings: Settings) -> None:
     settings.EMAIL_VARAAMO_EXT_LINK = "https://varaamo.hel.fi/"
 
     admin_user = UserFactory.create_superuser()

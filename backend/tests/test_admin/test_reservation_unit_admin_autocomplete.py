@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from django.contrib.admin import AdminSite
 from django.test import RequestFactory
 
 from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitAdmin
@@ -15,11 +16,11 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_admin__autocomplete__reservation_kind_is_direct_are_excluded_from_queryset():
+def test_reservation_unit_admin__autocomplete__reservation_kind_is_direct_are_excluded_from_queryset() -> None:
     include_these = ReservationUnitFactory.create_batch(5, reservation_kind=ReservationKind.DIRECT_AND_SEASON)
     exclude_these = ReservationUnitFactory.create_batch(4, reservation_kind=ReservationKind.DIRECT)
 
-    reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, None)
+    reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
     get_request = RequestFactory().get(
         "/admin/autocomplete/?app_label=application&model_name=applicationround&field_name=reservation_units",
         data={
@@ -40,11 +41,11 @@ def test_reservation_unit_admin__autocomplete__reservation_kind_is_direct_are_ex
         assert not queryset.filter(pk=r.pk).exists()
 
 
-def test_reservation_unit_admin__autocomplete__requests_from_not_application_round_results_all():
+def test_reservation_unit_admin__autocomplete__requests_from_not_application_round_results_all() -> None:
     include_these = ReservationUnitFactory.create_batch(5, reservation_kind=ReservationKind.DIRECT_AND_SEASON)
     exclude_these = ReservationUnitFactory.create_batch(4, reservation_kind=ReservationKind.DIRECT)
 
-    reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, None)
+    reservation_unit_admin = ReservationUnitAdmin(ReservationUnit, AdminSite())
     get_request = RequestFactory().get(
         "/admin/autocomplete/?app_label=reservations&model_name=reservation&field_name=reservation_unit",
         data={

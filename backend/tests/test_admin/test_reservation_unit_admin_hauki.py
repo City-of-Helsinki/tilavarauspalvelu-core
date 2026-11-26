@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
@@ -10,8 +12,11 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_date
 
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory, TermsOfUseFactory, UserFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, as_mock, patch_method
 from tests.test_admin.helpers import management_form_data, required_reservation_unit_form_data
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -21,7 +26,7 @@ pytestmark = [
 
 @patch_method(HaukiAPIClient.request, return_value=ResponseMock(status_code=503, url="https://hauki.test/resource/"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation_unit_admin__hauki_refetch_error_does_not_fail_save(api_client):
+def test_reservation_unit_admin__hauki_refetch_error_does_not_fail_save(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -36,6 +41,7 @@ def test_reservation_unit_admin__hauki_refetch_error_does_not_fail_save(api_clie
     )
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=[reservation_unit.pk])
+    assert reservation_unit.origin_hauki_resource is not None
     data = {
         **required_reservation_unit_form_data(reservation_unit),
         **management_form_data("access_types", total_forms=1),
@@ -49,15 +55,17 @@ def test_reservation_unit_admin__hauki_refetch_error_does_not_fail_save(api_clie
     response = api_client.post(path=url, data=data)
 
     assert response.status_code == 302, response.content
-    assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
+    assert response["Location"] == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.name == "new name"
 
-    assert SentryLogger.log_exception.call_count == 1
-    error = SentryLogger.log_exception.call_args.args[0]
+    assert as_mock(SentryLogger.log_exception).call_count == 1
+    error = as_mock(SentryLogger.log_exception).call_args.args[0]
     assert str(error) == "GET request to HAUKI (https://hauki.test/resource/) failed with status 503."
-    assert SentryLogger.log_exception.call_args.kwargs == {"details": f"Reservation unit: {reservation_unit.pk}"}
+    assert as_mock(SentryLogger.log_exception).call_args.kwargs == {
+        "details": f"Reservation unit: {reservation_unit.pk}"
+    }
 
     warnings = [str(message) for message in get_messages(response.wsgi_request) if message.level_tag == "warning"]
     assert warnings == [

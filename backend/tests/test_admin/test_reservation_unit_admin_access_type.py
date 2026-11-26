@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
@@ -20,12 +20,15 @@ from tests.factories import (
     UnitFactory,
     UserFactory,
 )
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 from tests.test_admin.helpers import (
     collect_admin_form_errors,
     management_form_data,
     required_reservation_unit_form_data,
 )
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -49,7 +52,7 @@ def get_form_reservation_unit(**kwargs: Any) -> ReservationUnit:
     })
 
 
-def test_reservation_unit_admin__access_types__add_first_access_type(api_client):
+def test_reservation_unit_admin__access_types__add_first_access_type(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -70,7 +73,7 @@ def test_reservation_unit_admin__access_types__add_first_access_type(api_client)
 
     # Response is a redirect to the list view
     assert response.status_code == 302, response.content
-    assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
+    assert response["Location"] == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     reservation_unit.refresh_from_db()
 
@@ -80,7 +83,7 @@ def test_reservation_unit_admin__access_types__add_first_access_type(api_client)
     assert access_types[0].begin_date == local_date()
 
 
-def test_reservation_unit_admin__access_types__set_to_past(api_client):
+def test_reservation_unit_admin__access_types__set_to_past(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -113,7 +116,7 @@ def test_reservation_unit_admin__access_types__set_to_past(api_client):
     ]
 
 
-def test_reservation_unit_admin__access_types__move_past_begin_date(api_client):
+def test_reservation_unit_admin__access_types__move_past_begin_date(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
     today = local_date()
@@ -162,7 +165,7 @@ def test_reservation_unit_admin__access_types__move_past_begin_date(api_client):
     ]
 
 
-def test_reservation_unit_admin__access_types__move_active_begin_date(api_client):
+def test_reservation_unit_admin__access_types__move_active_begin_date(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
     today = local_date()
@@ -203,7 +206,7 @@ def test_reservation_unit_admin__access_types__move_active_begin_date(api_client
     ]
 
 
-def test_reservation_unit_admin__access_types__move_begin_date_to_past(api_client):
+def test_reservation_unit_admin__access_types__move_begin_date_to_past(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -252,7 +255,7 @@ def test_reservation_unit_admin__access_types__move_begin_date_to_past(api_clien
     ]
 
 
-def test_reservation_unit_admin__access_types__no_active_access_type(api_client):
+def test_reservation_unit_admin__access_types__no_active_access_type(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
     today = local_date()
@@ -294,7 +297,7 @@ def test_reservation_unit_admin__access_types__no_active_access_type(api_client)
 
 
 @patch_method(PindoraClient.get_reservation_unit)
-def test_reservation_unit_admin__access_types__access_code_checks_pindora(api_client):
+def test_reservation_unit_admin__access_types__access_code_checks_pindora(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -322,7 +325,7 @@ def test_reservation_unit_admin__access_types__access_code_checks_pindora(api_cl
 
     # Response is a redirect to the list view
     assert response.status_code == 302, response.content
-    assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
+    assert response["Location"] == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     reservation_unit.refresh_from_db()
 
@@ -331,11 +334,11 @@ def test_reservation_unit_admin__access_types__access_code_checks_pindora(api_cl
     assert access_types[0].access_type == AccessType.ACCESS_CODE
     assert access_types[0].begin_date == local_date()
 
-    assert PindoraClient.get_reservation_unit.call_count == 1
+    assert as_mock(PindoraClient.get_reservation_unit).call_count == 1
 
 
 @patch_method(PindoraClient.get_reservation_unit)
-def test_reservation_unit_admin__access_types__already_access_code_skips_pindora_check(api_client):
+def test_reservation_unit_admin__access_types__already_access_code_skips_pindora_check(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -363,7 +366,7 @@ def test_reservation_unit_admin__access_types__already_access_code_skips_pindora
 
     # Response is a redirect to the list view
     assert response.status_code == 302, response.content
-    assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
+    assert response["Location"] == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     reservation_unit.refresh_from_db()
 
@@ -372,11 +375,11 @@ def test_reservation_unit_admin__access_types__already_access_code_skips_pindora
     assert access_types[0].access_type == AccessType.ACCESS_CODE
 
     # Pindora still called in form init...
-    assert PindoraClient.get_reservation_unit.call_count == 1
+    assert as_mock(PindoraClient.get_reservation_unit).call_count == 1
 
 
 @freeze_time(local_datetime(2023, 1, 1, hour=0))
-def test_reservation_unit_admin__access_types__set_new_access_type_to_reservations(api_client):
+def test_reservation_unit_admin__access_types__set_new_access_type_to_reservations(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -452,7 +455,7 @@ def test_reservation_unit_admin__access_types__set_new_access_type_to_reservatio
 
     # Response is a redirect to the list view
     assert response.status_code == 302, response.content
-    assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
+    assert response["Location"] == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     past_reservation.refresh_from_db()
     assert past_reservation.access_type == AccessType.PHYSICAL_KEY
@@ -464,7 +467,7 @@ def test_reservation_unit_admin__access_types__set_new_access_type_to_reservatio
     assert future_reservation.access_type == AccessType.OPENED_BY_STAFF
 
 
-def test_reservation_unit_admin__access_types__cannot_delete_active(api_client):
+def test_reservation_unit_admin__access_types__cannot_delete_active(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -507,7 +510,7 @@ def test_reservation_unit_admin__access_types__cannot_delete_active(api_client):
     ]
 
 
-def test_reservation_unit_admin__access_types__new(api_client):
+def test_reservation_unit_admin__access_types__new(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -541,9 +544,9 @@ def test_reservation_unit_admin__access_types__new(api_client):
 
     # Response is a redirect to the list view
     assert response.status_code == 302, response.content
-    assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
+    assert response["Location"] == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
-    reservation_unit = ReservationUnit.objects.first()
+    reservation_unit = ReservationUnit.objects.get()
 
     access_types = reservation_unit.access_types.all()
     assert len(access_types) == 1
@@ -551,7 +554,7 @@ def test_reservation_unit_admin__access_types__new(api_client):
     assert access_types[0].begin_date == local_date()
 
 
-def test_reservation_unit_admin__access_types__new__access_code(api_client):
+def test_reservation_unit_admin__access_types__new__access_code(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 

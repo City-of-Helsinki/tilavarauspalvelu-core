@@ -30,7 +30,7 @@ pytestmark = [
 
 
 @pytest.fixture
-def create_all_models():
+def create_all_models() -> None:
     create_one_of_each_model()
 
 
@@ -55,14 +55,15 @@ def create_one_of_each_model() -> None:
     return_value=ResponseMock(status_code=200, json_data=get_merchant_response),
 )
 @pytest.mark.slow
-def test_django_admin_site__pages_load__model_admins(create_all_models):
+@pytest.mark.usefixtures("create_all_models")
+def test_django_admin_site__pages_load__model_admins() -> None:
     """Test that all Django admin pages load without errors."""
     user = factories.UserFactory.create_superuser()
     client = Client()
     client.force_login(user)
 
-    email_message = EmailMessage.objects.first()
-    payment_order = PaymentOrder.objects.first()
+    email_message = EmailMessage.objects.get()
+    payment_order = PaymentOrder.objects.get()
     page_status = {
         "/admin/tilavarauspalvelu/emailmessage/add/": HTTPStatus.FORBIDDEN,
         f"/admin/tilavarauspalvelu/emailmessage/{email_message.pk}/delete/": HTTPStatus.FORBIDDEN,
@@ -86,7 +87,7 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
 
             # Edit & Delete views
             elif url_pattern.lookup_str.endswith((".change_view", ".delete_view")):
-                first_object = model.objects.first()
+                first_object = model._default_manager.first()
                 if first_object is None:
                     pytest.fail(f"Did not find any objects for model '{model}'")
 
@@ -111,14 +112,15 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
 
 
 @pytest.mark.slow
-def test_django_admin_site__pages_load__data_views():
+def test_django_admin_site__pages_load__data_views() -> None:
     """Test that all Django Admin data views load"""
     user = factories.UserFactory.create_superuser()
     client = Client()
     client.force_login(user)
 
     url_pattern: URLPattern
-    for url_pattern in admin.site.get_admin_data_urls():
+    # The 'admin_data_views' package adds this method to the admin site at runtime.
+    for url_pattern in admin.site.get_admin_data_urls():  # type: ignore[attr-defined]
         # Views that we don't really want to test
         if url_pattern.lookup_str.endswith((
             ".download_json",  # Doesn't accept GET requests
@@ -152,7 +154,8 @@ def test_django_admin_site__pages_load__data_views():
     return_value=ResponseMock(status_code=200, json_data=get_merchant_response),
 )
 @pytest.mark.slow
-def test_django_admin_site__query_counts__same_for_more_objects(create_all_models):
+@pytest.mark.usefixtures("create_all_models")
+def test_django_admin_site__query_counts__same_for_more_objects() -> None:
     user = factories.UserFactory.create_superuser()
     client = Client()
     client.force_login(user)
@@ -164,7 +167,8 @@ def test_django_admin_site__query_counts__same_for_more_objects(create_all_model
             continue
 
         url_prefix = f"admin:{model._meta.app_label}_{model._meta.model_name}"
-        first_object = model.objects.order_by("pk").first()
+        first_object = model._default_manager.order_by("pk").first()
+        assert first_object is not None
         changelist_url = reverse(f"{url_prefix}_changelist")
         change_url = reverse(f"{url_prefix}_change", args=[first_object.pk])
         admin_urls.extend([changelist_url, change_url])

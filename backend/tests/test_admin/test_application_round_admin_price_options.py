@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
@@ -20,6 +20,11 @@ from tests.factories import (
 )
 from tests.test_admin.helpers import collect_admin_form_errors, round_form_data
 
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
+    from tilavarauspalvelu.models import PriceOption, ReservationUnit
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -32,7 +37,7 @@ JAN_1 = datetime.date(2027, 1, 1)
 # ── Helpers ──
 
 
-def create_unit_with_options(*options):
+def create_unit_with_options(*options: PriceOption) -> ReservationUnit:
     pricing_group = PricingGroupFactory.create(unit_group=options[0].unit_group)
     for option in options:
         PriceComponentFactory.create(pricing_group=pricing_group, price_option=option, valid_from=JAN_1)
@@ -49,7 +54,7 @@ def create_unit_with_options(*options):
 # ── Price options ──
 
 
-def test_application_round_admin__create_with_same_price_options(api_client):
+def test_application_round_admin__create_with_same_price_options(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group)
@@ -68,7 +73,7 @@ def test_application_round_admin__create_with_same_price_options(api_client):
     assert set(application_round.reservation_units.all()) == {first_unit, second_unit}
 
 
-def test_application_round_admin__create_with_different_price_options_is_rejected(api_client):
+def test_application_round_admin__create_with_different_price_options_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
@@ -100,7 +105,7 @@ def test_application_round_admin__create_with_different_price_options_is_rejecte
     assert not ApplicationRound.objects.filter(name_fi="Kesä").exists()
 
 
-def test_application_round_admin__change_that_removes_price_option_is_rejected(api_client):
+def test_application_round_admin__change_that_removes_price_option_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")

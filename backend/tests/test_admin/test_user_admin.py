@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import datetime
 import json
+from typing import TYPE_CHECKING
 
 import pytest
 from django.urls import reverse
@@ -13,6 +14,9 @@ from utils.utils import get_jwt_payload
 
 from tests.factories import UserFactory
 
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -22,7 +26,7 @@ pytestmark = [
 # ── Change page ──
 
 
-def test_user_admin__change_page__does_not_show_tokens(api_client):
+def test_user_admin__change_page__does_not_show_tokens(api_client: APIClient) -> None:
     admin = UserFactory.create_superuser()
     api_client.force_login(admin)
 
@@ -39,7 +43,7 @@ def test_user_admin__change_page__does_not_show_tokens(api_client):
     assert refresh_token not in content
 
 
-def test_user_admin__change_page__id_token_without_time_claims(api_client):
+def test_user_admin__change_page__id_token_without_time_claims(api_client: APIClient) -> None:
     admin = UserFactory.create_superuser()
     api_client.force_login(admin)
 
@@ -64,7 +68,7 @@ def test_user_admin__change_page__id_token_without_time_claims(api_client):
     assert response.status_code == 200
 
 
-def test_user_admin__social_auth_change_page__not_available(api_client):
+def test_user_admin__social_auth_change_page__not_available(api_client: APIClient) -> None:
     admin = UserFactory.create_superuser()
     api_client.force_login(admin)
 
@@ -76,7 +80,7 @@ def test_user_admin__social_auth_change_page__not_available(api_client):
     assert response.status_code == 404
 
 
-def test_user_admin__change_page__logs_date_of_birth_view(api_client):
+def test_user_admin__change_page__logs_date_of_birth_view(api_client: APIClient) -> None:
     admin = UserFactory.create_superuser()
     api_client.force_login(admin)
 
@@ -94,7 +98,7 @@ def test_user_admin__change_page__logs_date_of_birth_view(api_client):
     assert view_logs[0].field == "User.date_of_birth"
 
 
-def test_user_admin__change_page__does_not_log_view_without_permission(api_client):
+def test_user_admin__change_page__does_not_log_view_without_permission(api_client: APIClient) -> None:
     staff_user = UserFactory.create(is_staff=True)
     api_client.force_login(staff_user)
 

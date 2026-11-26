@@ -16,7 +16,8 @@ from tests.factories import ReservationUnitFactory, UnitFactory, UserFactory
 
 if TYPE_CHECKING:
     from django.db import models
-    from django.test.client import _MonkeyPatchedWSGIResponse
+    from django.http import HttpResponse
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -38,7 +39,7 @@ def create_log_entry(instance: models.Model) -> LogEntry:
     )
 
 
-def get_result_count_text(response: _MonkeyPatchedWSGIResponse) -> str:
+def get_result_count_text(response: HttpResponse) -> str:
     content = response.content.decode()
     match = re.search(r'<span class="small quiet">(.*?)</span>', content, flags=re.DOTALL)
     assert match is not None
@@ -48,7 +49,7 @@ def get_result_count_text(response: _MonkeyPatchedWSGIResponse) -> str:
 # ── Resource type filter ──
 
 
-def test_log_entry_admin__resource_type_filter__lists_content_types_with_log_entries(api_client):
+def test_log_entry_admin__resource_type_filter__lists_content_types_with_log_entries(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -75,7 +76,7 @@ def test_log_entry_admin__resource_type_filter__lists_content_types_with_log_ent
     ]
 
 
-def test_log_entry_admin__resource_type_filter__shows_only_selected_content_type(api_client):
+def test_log_entry_admin__resource_type_filter__shows_only_selected_content_type(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -96,7 +97,7 @@ def test_log_entry_admin__resource_type_filter__shows_only_selected_content_type
 # ── Result count ──
 
 
-def test_log_entry_admin__result_count__exact_below_limit(api_client):
+def test_log_entry_admin__result_count__exact_below_limit(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -114,7 +115,7 @@ def test_log_entry_admin__result_count__exact_below_limit(api_client):
     assert get_result_count_text(response) == '2 results (<a href="?">Show all</a>)'
 
 
-def test_log_entry_admin__result_count__limited_above_limit(api_client):
+def test_log_entry_admin__result_count__limited_above_limit(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -145,7 +146,7 @@ def test_log_entry_admin__result_count__limited_above_limit(api_client):
 # ── Search ──
 
 
-def test_log_entry_admin__search__number_finds_exact_object_id(api_client):
+def test_log_entry_admin__search__number_finds_exact_object_id(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -163,7 +164,7 @@ def test_log_entry_admin__search__number_finds_exact_object_id(api_client):
     assert result_list == [unit_log_entry]
 
 
-def test_log_entry_admin__search__text_finds_object_name(api_client):
+def test_log_entry_admin__search__text_finds_object_name(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -184,7 +185,7 @@ def test_log_entry_admin__search__text_finds_object_name(api_client):
 # ── Change view ──
 
 
-def test_log_entry_admin__change_view__shows_additional_data(api_client):
+def test_log_entry_admin__change_view__shows_additional_data(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 

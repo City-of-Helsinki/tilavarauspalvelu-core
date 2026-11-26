@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.urls import reverse
 
@@ -7,6 +9,9 @@ from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.models import PaymentOrder
 
 from tests.factories import PaymentOrderFactory, ReservationFactory, UserFactory
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -17,7 +22,7 @@ pytestmark = [
 # ── Change page ──
 
 
-def test_payment_order_admin__change_page__shows_payment_order_without_save(api_client):
+def test_payment_order_admin__change_page__shows_payment_order_without_save(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -30,7 +35,7 @@ def test_payment_order_admin__change_page__shows_payment_order_without_save(api_
     assert response.context["has_change_permission"] is False
 
 
-def test_payment_order_admin__change_page__does_not_save_changes(api_client):
+def test_payment_order_admin__change_page__does_not_save_changes(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -48,7 +53,7 @@ def test_payment_order_admin__change_page__does_not_save_changes(api_client):
 # ── Add and delete ──
 
 
-def test_payment_order_admin__add_page__forbidden(api_client):
+def test_payment_order_admin__add_page__forbidden(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -57,7 +62,7 @@ def test_payment_order_admin__add_page__forbidden(api_client):
     assert response.status_code == 403
 
 
-def test_payment_order_admin__delete_page__forbidden(api_client):
+def test_payment_order_admin__delete_page__forbidden(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 

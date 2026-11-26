@@ -11,6 +11,8 @@ from tests.factories import SalesItemFactory, TaxLevelFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors
 
 if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
     from tilavarauspalvelu.models import TaxLevel
 
 # Applied to all tests
@@ -34,7 +36,7 @@ def sales_item_form_data(*, tax_level: TaxLevel, material: str) -> dict[str, Any
 # ── Material ──
 
 
-def test_sales_item_admin__add(api_client):
+def test_sales_item_admin__add(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tax_level = TaxLevelFactory.create()
 
@@ -51,7 +53,7 @@ def test_sales_item_admin__add(api_client):
     assert sales_item.material == "10000116"
 
 
-def test_sales_item_admin__material_is_optional(api_client):
+def test_sales_item_admin__material_is_optional(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tax_level = TaxLevelFactory.create()
     SalesItemFactory.create(material="")
@@ -64,7 +66,7 @@ def test_sales_item_admin__material_is_optional(api_client):
     assert list(SalesItem.objects.values_list("material", flat=True)) == ["", ""]
 
 
-def test_sales_item_admin__material_is_unique_for_main_ledger_account(api_client):
+def test_sales_item_admin__material_is_unique_for_main_ledger_account(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tax_level = TaxLevelFactory.create()
     SalesItemFactory.create(material="10000116", main_ledger_account="340025")
@@ -86,7 +88,7 @@ def test_sales_item_admin__material_is_unique_for_main_ledger_account(api_client
     assert SalesItem.objects.count() == 1
 
 
-def test_sales_item_admin__material_with_other_main_ledger_account(api_client):
+def test_sales_item_admin__material_with_other_main_ledger_account(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tax_level = TaxLevelFactory.create()
     SalesItemFactory.create(material="10000116", main_ledger_account="340100")

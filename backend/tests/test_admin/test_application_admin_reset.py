@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.contrib.admin import helpers
 from django.contrib.messages import get_messages
@@ -10,6 +12,9 @@ from tilavarauspalvelu.models import AllocatedTimeSlot, Application, Reservation
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ReservationSeriesFactory, UserFactory
 
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -19,7 +24,7 @@ pytestmark = [
 # ── Reset application allocations ──
 
 
-def test_application_admin__reset_applications__deletes_allocations(api_client):
+def test_application_admin__reset_applications__deletes_allocations(api_client: APIClient) -> None:
     admin = UserFactory.create_superuser()
     api_client.force_login(admin)
 
@@ -43,12 +48,12 @@ def test_application_admin__reset_applications__deletes_allocations(api_client):
     assert allocations.exists() is False
 
 
-def test_application_admin__reset_applications__application_round_handled(api_client):
+def test_application_admin__reset_applications__application_round_handled(api_client: APIClient) -> None:
     admin = UserFactory.create_superuser()
     api_client.force_login(admin)
 
     application = ApplicationFactory.create_in_status_handled()
-    option = application.application_sections.first().reservation_unit_options.first()
+    option = application.application_sections.get().reservation_unit_options.first()
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=option)
     series = ReservationSeriesFactory.create(allocated_time_slot=allocation)
 

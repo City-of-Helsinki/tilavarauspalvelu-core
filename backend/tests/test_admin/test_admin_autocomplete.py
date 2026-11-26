@@ -12,6 +12,7 @@ from tests.factories import ReservationUnitFactory, UserFactory
 
 if TYPE_CHECKING:
     from django.test import Client
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -44,7 +45,9 @@ def autocomplete(client: Client, *, model_name: str, field_name: str) -> Autocom
 # ── Search results ──
 
 
-def test_admin_autocomplete__reservation_units__labels_include_unit_without_extra_queries(api_client):
+def test_admin_autocomplete__reservation_units__labels_include_unit_without_extra_queries(
+    api_client: APIClient,
+) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
