@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import urllib.parse
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -13,7 +14,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models.reservation_unit.actions import ReservationUnitHaukiExporter
 
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, as_mock, patch_method
 
 from .helpers import (
     UPDATE_MUTATION,
@@ -21,6 +22,11 @@ from .helpers import (
     get_draft_update_input_data,
     reservation_unit_query,
 )
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -30,7 +36,9 @@ pytestmark = [
 
 @patch_method(HaukiResourceHashUpdater.run)
 @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
-def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_exists(graphql, settings):
+def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_exists(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.HAUKI_EXPORTS_ENABLED = True
     graphql.login_with_superuser()
 
@@ -43,13 +51,15 @@ def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_exist
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
-    assert HaukiResourceHashUpdater.run.call_count == 1
-    assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
+    assert as_mock(HaukiResourceHashUpdater.run).call_count == 1
+    assert as_mock(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki).call_count == 1
 
 
 @patch_method(HaukiAPIClient.request, return_value=ResponseMock(status_code=503, url="https://hauki.test/resource/"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation_unit__update__opening_hours_refetch_error_does_not_fail_mutation(graphql, settings):
+def test_reservation_unit__update__opening_hours_refetch_error_does_not_fail_mutation(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.HAUKI_EXPORTS_ENABLED = False
     graphql.login_with_superuser()
 
@@ -66,14 +76,18 @@ def test_reservation_unit__update__opening_hours_refetch_error_does_not_fail_mut
     reservation_unit.refresh_from_db()
     assert reservation_unit.name == "new name"
 
-    assert SentryLogger.log_exception.call_count == 1
-    error = SentryLogger.log_exception.call_args.args[0]
+    assert as_mock(SentryLogger.log_exception).call_count == 1
+    error = as_mock(SentryLogger.log_exception).call_args.args[0]
     assert str(error) == "GET request to HAUKI (https://hauki.test/resource/) failed with status 503."
-    assert SentryLogger.log_exception.call_args.kwargs == {"details": f"Reservation unit: {reservation_unit.pk}"}
+    assert as_mock(SentryLogger.log_exception).call_args.kwargs == {
+        "details": f"Reservation unit: {reservation_unit.pk}"
+    }
 
 
 @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
-def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_doesnt_exist(graphql, settings):
+def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_doesnt_exist(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.HAUKI_EXPORTS_ENABLED = True
     graphql.login_with_superuser()
 
@@ -83,11 +97,13 @@ def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_doesn
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
-    assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
+    assert as_mock(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki).call_count == 1
 
 
 @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
-def test_reservation_unit__update__send_resource_to_hauki_when_exports_disabled(graphql, settings):
+def test_reservation_unit__update__send_resource_to_hauki_when_exports_disabled(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.HAUKI_EXPORTS_ENABLED = False
     graphql.login_with_superuser()
 
@@ -98,11 +114,13 @@ def test_reservation_unit__update__send_resource_to_hauki_when_exports_disabled(
 
     assert response.has_errors is False, response
 
-    assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 0
+    assert as_mock(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki).call_count == 0
 
 
 @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
-def test_reservation_unit__update__send_resource_to_hauki__export_failed_is_false(graphql, settings):
+def test_reservation_unit__update__send_resource_to_hauki__export_failed_is_false(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.HAUKI_EXPORTS_ENABLED = True
     graphql.login_with_superuser()
 
@@ -116,7 +134,9 @@ def test_reservation_unit__update__send_resource_to_hauki__export_failed_is_fals
 
 @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki, side_effect=HaukiAPIError("foo"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation_unit__update__send_resource_to_hauki_error_does_not_fail_mutation(graphql, settings):
+def test_reservation_unit__update__send_resource_to_hauki_error_does_not_fail_mutation(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.HAUKI_EXPORTS_ENABLED = True
     graphql.login_with_superuser()
 
@@ -130,15 +150,17 @@ def test_reservation_unit__update__send_resource_to_hauki_error_does_not_fail_mu
     reservation_unit.refresh_from_db()
     assert reservation_unit.name == "new name"
 
-    assert SentryLogger.log_exception.call_count == 1
-    error = SentryLogger.log_exception.call_args.args[0]
+    assert as_mock(SentryLogger.log_exception).call_count == 1
+    error = as_mock(SentryLogger.log_exception).call_args.args[0]
     assert isinstance(error, HaukiAPIError)
     assert str(error) == "foo"
-    assert SentryLogger.log_exception.call_args.kwargs == {"details": f"Reservation unit: {reservation_unit.pk}"}
+    assert as_mock(SentryLogger.log_exception).call_args.kwargs == {
+        "details": f"Reservation unit: {reservation_unit.pk}"
+    }
 
 
 @freezegun.freeze_time("2023-01-01T12:00:00+02:00")
-def test_reservation_unit__query__hauki_url__regular_user(graphql):
+def test_reservation_unit__query__hauki_url__regular_user(graphql: GraphQLClient) -> None:
     graphql.login_with_regular_user()
 
     reservation_unit = ReservationUnitFactory.create(
@@ -154,7 +176,7 @@ def test_reservation_unit__query__hauki_url__regular_user(graphql):
 
 
 @freezegun.freeze_time("2023-01-01T12:00:00+02:00")
-def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
+def test_reservation_unit__query__hauki_url__superuser(graphql: GraphQLClient, settings: Settings) -> None:
     user = graphql.login_with_superuser()
 
     origin_hauki_resource = OriginHaukiResourceFactory.create()
@@ -189,7 +211,7 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
     assert response.first_query_object == {"haukiUrl": url}
 
 
-def test_reservation_unit__query__hauki_url__superuser__no_hauki_resource(graphql):
+def test_reservation_unit__query__hauki_url__superuser__no_hauki_resource(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(
         unit__tprek_department_id="ORGANISATION",
         ext_uuid="3774af34-9916-40f2-acc7-68db5a627710",

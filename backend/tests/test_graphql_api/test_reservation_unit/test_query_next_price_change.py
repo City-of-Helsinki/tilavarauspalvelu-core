@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from freezegun import freeze_time
@@ -24,6 +25,11 @@ from tests.test_graphql_api.test_reservation.helpers import reservations_query
 
 from .helpers import reservation_unit_query, reservation_units_query
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
+
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -45,7 +51,7 @@ FIELDS = """
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__pricing_group_changes(graphql):
+def test_reservation_unit__query__next_price_change__pricing_group_changes(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     active_group = PricingGroupFactory.create()
     future_group = PricingGroupFactory.create()
@@ -82,7 +88,7 @@ def test_reservation_unit__query__next_price_change__pricing_group_changes(graph
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__first_pricing_group_in_future(graphql):
+def test_reservation_unit__query__next_price_change__first_pricing_group_in_future(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     future_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -101,7 +107,7 @@ def test_reservation_unit__query__next_price_change__first_pricing_group_in_futu
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__past_pricing_group_not_included(graphql):
+def test_reservation_unit__query__next_price_change__past_pricing_group_not_included(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     past_group = PricingGroupFactory.create()
     active_group = PricingGroupFactory.create()
@@ -129,7 +135,7 @@ def test_reservation_unit__query__next_price_change__past_pricing_group_not_incl
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__component_changes(graphql):
+def test_reservation_unit__query__next_price_change__component_changes(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -172,7 +178,7 @@ def test_reservation_unit__query__next_price_change__component_changes(graphql):
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__only_tax_level_changes(graphql):
+def test_reservation_unit__query__next_price_change__only_tax_level_changes(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -203,7 +209,7 @@ def test_reservation_unit__query__next_price_change__only_tax_level_changes(grap
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__becomes_free(graphql):
+def test_reservation_unit__query__next_price_change__becomes_free(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -228,7 +234,7 @@ def test_reservation_unit__query__next_price_change__becomes_free(graphql):
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__first_of_many_changes(graphql):
+def test_reservation_unit__query__next_price_change__first_of_many_changes(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -259,7 +265,9 @@ def test_reservation_unit__query__next_price_change__first_of_many_changes(graph
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__change_without_summary_change_skipped(graphql):
+def test_reservation_unit__query__next_price_change__change_without_summary_change_skipped(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -306,7 +314,7 @@ def test_reservation_unit__query__next_price_change__change_without_summary_chan
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__inactive_option_not_included(graphql):
+def test_reservation_unit__query__next_price_change__inactive_option_not_included(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
@@ -331,7 +339,7 @@ def test_reservation_unit__query__next_price_change__inactive_option_not_include
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__no_change(graphql):
+def test_reservation_unit__query__next_price_change__no_change(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -349,7 +357,7 @@ def test_reservation_unit__query__next_price_change__no_change(graphql):
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__no_pricing_group(graphql):
+def test_reservation_unit__query__next_price_change__no_pricing_group(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     query = reservation_unit_query(fields=FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
@@ -362,7 +370,7 @@ def test_reservation_unit__query__next_price_change__no_pricing_group(graphql):
 # ── Reservation limit ──
 
 
-def _create_reservation_unit_with_price_change_on_march_1(**kwargs):
+def _create_reservation_unit_with_price_change_on_march_1(**kwargs: Any) -> ReservationUnit:
     reservation_unit = ReservationUnitFactory.create(**kwargs)
     pricing_group = PricingGroupFactory.create()
     ReservationUnitPricingGroupFactory.create(
@@ -388,7 +396,9 @@ def _create_reservation_unit_with_price_change_on_march_1(**kwargs):
     ],
 )
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__reservation_ends_at(graphql, reservation_ends_at, has_change):
+def test_reservation_unit__query__next_price_change__reservation_ends_at(
+    graphql: GraphQLClient, reservation_ends_at: datetime.datetime, has_change: bool
+) -> None:
     reservation_unit = _create_reservation_unit_with_price_change_on_march_1(reservation_ends_at=reservation_ends_at)
 
     query = reservation_unit_query(fields=FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
@@ -408,10 +418,10 @@ def test_reservation_unit__query__next_price_change__reservation_ends_at(graphql
 )
 @freeze_time(local_datetime(2026, 1, 15, 12))
 def test_reservation_unit__query__next_price_change__reservations_max_days_before(
-    graphql,
-    reservations_max_days_before,
-    has_change,
-):
+    graphql: GraphQLClient,
+    reservations_max_days_before: int,
+    has_change: bool,
+) -> None:
     reservation_unit = _create_reservation_unit_with_price_change_on_march_1(
         reservations_max_days_before=reservations_max_days_before,
     )
@@ -427,7 +437,9 @@ def test_reservation_unit__query__next_price_change__reservations_max_days_befor
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__query_count_does_not_grow_with_list(graphql):
+def test_reservation_unit__query__next_price_change__query_count_does_not_grow_with_list(
+    graphql: GraphQLClient,
+) -> None:
     for _ in range(3):
         _create_reservation_unit_with_price_change_on_march_1()
 
@@ -444,7 +456,7 @@ def test_reservation_unit__query__next_price_change__query_count_does_not_grow_w
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))
-def test_reservation_unit__query__next_price_change__through_foreign_key(graphql):
+def test_reservation_unit__query__next_price_change__through_foreign_key(graphql: GraphQLClient) -> None:
     for _ in range(3):
         reservation_unit = _create_reservation_unit_with_price_change_on_march_1()
         ReservationFactory.create(reservation_unit=reservation_unit)

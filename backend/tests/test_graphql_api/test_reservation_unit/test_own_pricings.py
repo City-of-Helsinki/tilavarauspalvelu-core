@@ -26,6 +26,8 @@ from .helpers import CREATE_MUTATION, UPDATE_MUTATION, get_create_draft_input_da
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import SalesItem, TaxLevel
 
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -59,7 +61,7 @@ def own_pricing_input(
 # ── Create ──
 
 
-def test_reservation_unit__own_pricings__create(graphql):
+def test_reservation_unit__own_pricings__create(graphql: GraphQLClient) -> None:
     today = local_date()
 
     tax_level = TaxLevelFactory.create()
@@ -94,7 +96,7 @@ def test_reservation_unit__own_pricings__create(graphql):
     assert components[0].sales_item == sales_item
 
 
-def test_reservation_unit__own_pricings__paid_online_needs_sales_item(graphql):
+def test_reservation_unit__own_pricings__paid_online_needs_sales_item(graphql: GraphQLClient) -> None:
     today = local_date()
 
     graphql.login_with_superuser()
@@ -110,7 +112,7 @@ def test_reservation_unit__own_pricings__paid_online_needs_sales_item(graphql):
     assert not ReservationUnit.objects.exists()
 
 
-def test_reservation_unit__own_pricings__paid_on_site_needs_no_sales_item(graphql):
+def test_reservation_unit__own_pricings__paid_on_site_needs_no_sales_item(graphql: GraphQLClient) -> None:
     today = local_date()
 
     graphql.login_with_superuser()
@@ -127,7 +129,9 @@ def test_reservation_unit__own_pricings__paid_on_site_needs_no_sales_item(graphq
     assert component.sales_item is None
 
 
-def test_reservation_unit__own_pricings__payment_type_cannot_change_to_online_without_sales_items(graphql):
+def test_reservation_unit__own_pricings__payment_type_cannot_change_to_online_without_sales_items(
+    graphql: GraphQLClient,
+) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create(is_draft=True, payment_type=PaymentType.ON_SITE)
     pricing_group = PricingGroupFactory.create(unit_group=None)
@@ -153,7 +157,7 @@ def test_reservation_unit__own_pricings__payment_type_cannot_change_to_online_wi
 # ── Update ──
 
 
-def test_reservation_unit__own_pricings__first_pricing_can_begin_in_the_past(graphql):
+def test_reservation_unit__own_pricings__first_pricing_can_begin_in_the_past(graphql: GraphQLClient) -> None:
     begins = local_date() - datetime.timedelta(days=10)
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
@@ -172,7 +176,7 @@ def test_reservation_unit__own_pricings__first_pricing_can_begin_in_the_past(gra
     assert list(row.pricing_group.components.values_list("valid_from", flat=True)) == [begins]
 
 
-def test_reservation_unit__own_pricings__add_future_pricing(graphql):
+def test_reservation_unit__own_pricings__add_future_pricing(graphql: GraphQLClient) -> None:
     today = local_date()
     future_date = today + datetime.timedelta(days=10)
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -212,7 +216,7 @@ def test_reservation_unit__own_pricings__add_future_pricing(graphql):
     assert components[1].amount == Decimal(20)
 
 
-def test_reservation_unit__own_pricings__remove_future_pricing(graphql):
+def test_reservation_unit__own_pricings__remove_future_pricing(graphql: GraphQLClient) -> None:
     today = local_date()
     future_date = today + datetime.timedelta(days=10)
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -252,7 +256,7 @@ def test_reservation_unit__own_pricings__remove_future_pricing(graphql):
 # ── Pricing group rules ──
 
 
-def test_reservation_unit__own_pricings__shared_group_is_rejected(graphql):
+def test_reservation_unit__own_pricings__shared_group_is_rejected(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     pricing_group = PricingGroupFactory.create(unit_group=UnitGroupFactory.create())
@@ -281,7 +285,7 @@ def test_reservation_unit__own_pricings__shared_group_is_rejected(graphql):
     assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
 
 
-def test_reservation_unit__own_pricings__own_group_used_by_another_reservation_unit(graphql):
+def test_reservation_unit__own_pricings__own_group_used_by_another_reservation_unit(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     pricing_group = PricingGroupFactory.create(unit_group=None)

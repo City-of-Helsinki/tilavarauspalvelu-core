@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -10,6 +11,11 @@ from utils.date_utils import local_date, local_datetime
 from tests.factories import ApplicationRoundFactory, ReservationUnitFactory, SpaceFactory
 
 from .helpers import ARCHIVE_MUTATION, UPDATE_MUTATION, get_draft_update_input_data, get_non_draft_update_input_data
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -26,7 +32,7 @@ PENDING_ROUND_MESSAGE = (
 # ── Helpers ──
 
 
-def create_pending_round(*reservation_units):
+def create_pending_round(*reservation_units: ReservationUnit) -> ApplicationRound:
     today = local_date()
     return ApplicationRoundFactory.create(
         name="Kesä",
@@ -36,7 +42,7 @@ def create_pending_round(*reservation_units):
     )
 
 
-def create_ended_round(*reservation_units):
+def create_ended_round(*reservation_units: ReservationUnit) -> ApplicationRound:
     today = local_date()
     return ApplicationRoundFactory.create(
         name="Kevät",
@@ -51,7 +57,7 @@ def create_ended_round(*reservation_units):
 # ── Update ──
 
 
-def test_reservation_unit__update__to_draft_in_pending_application_round_is_rejected(graphql):
+def test_reservation_unit__update__to_draft_in_pending_application_round_is_rejected(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -67,7 +73,9 @@ def test_reservation_unit__update__to_draft_in_pending_application_round_is_reje
     assert reservation_unit.is_draft is False
 
 
-def test_reservation_unit__update__to_direct_only_in_pending_application_round_is_rejected(graphql):
+def test_reservation_unit__update__to_direct_only_in_pending_application_round_is_rejected(
+    graphql: GraphQLClient,
+) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False, reservation_kind=ReservationKind.SEASON)
@@ -83,7 +91,7 @@ def test_reservation_unit__update__to_direct_only_in_pending_application_round_i
     assert reservation_unit.reservation_kind == ReservationKind.SEASON
 
 
-def test_reservation_unit__update__to_draft_in_ended_application_round(graphql):
+def test_reservation_unit__update__to_draft_in_ended_application_round(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
@@ -98,7 +106,7 @@ def test_reservation_unit__update__to_draft_in_ended_application_round(graphql):
     assert reservation_unit.is_draft is True
 
 
-def test_reservation_unit__update__draft_that_is_already_in_pending_application_round(graphql):
+def test_reservation_unit__update__draft_that_is_already_in_pending_application_round(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
@@ -116,7 +124,7 @@ def test_reservation_unit__update__draft_that_is_already_in_pending_application_
 # ── Archive ──
 
 
-def test_reservation_unit__archive__in_pending_application_round_is_rejected(graphql):
+def test_reservation_unit__archive__in_pending_application_round_is_rejected(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     space = SpaceFactory.create()
@@ -133,7 +141,7 @@ def test_reservation_unit__archive__in_pending_application_round_is_rejected(gra
     assert reservation_unit.is_draft is False
 
 
-def test_reservation_unit__archive__in_ended_application_round(graphql):
+def test_reservation_unit__archive__in_ended_application_round(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     space = SpaceFactory.create()

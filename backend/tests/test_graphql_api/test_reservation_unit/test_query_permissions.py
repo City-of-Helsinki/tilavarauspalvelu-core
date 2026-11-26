@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -19,13 +20,16 @@ from tests.factories import (
 
 from .helpers import reservation_units_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit__query__anonymous_user(graphql):
+def test_reservation_unit__query__anonymous_user(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
 
@@ -37,7 +41,7 @@ def test_reservation_unit__query__anonymous_user(graphql):
     assert len(response.edges) == 1
 
 
-def test_reservation_unit__query__regular_user(graphql):
+def test_reservation_unit__query__regular_user(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
     graphql.login_with_regular_user()
@@ -76,7 +80,7 @@ SENSITIVE_FIELDS = """
 """
 
 
-def test_reservation_unit__query__sensitive_information__regular_user(graphql):
+def test_reservation_unit__query__sensitive_information__regular_user(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = UserFactory.create(date_of_birth=datetime.date(2020, 1, 1))
 
@@ -128,7 +132,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
     }
 
 
-def test_reservation_unit__query__sensitive_information__general_admin(graphql):
+def test_reservation_unit__query__sensitive_information__general_admin(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = UserFactory.create(date_of_birth=datetime.date(2020, 1, 1))
 
@@ -159,6 +163,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
+    assert user.date_of_birth is not None
     assert response.node(0) == {
         "reservations": [
             {
@@ -187,7 +192,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
     assert PersonalInfoViewLog.objects.count() == 1
 
 
-def test_reservation_unit__query__payment_merchant__without_permissions(graphql):
+def test_reservation_unit__query__payment_merchant__without_permissions(graphql: GraphQLClient) -> None:
     merchant = PaymentMerchantFactory.create()
     ReservationUnitFactory.create(payment_merchant=merchant)
 
@@ -198,7 +203,7 @@ def test_reservation_unit__query__payment_merchant__without_permissions(graphql)
     assert response.error_message("paymentMerchant") == "No permission to access field."
 
 
-def test_reservation_unit__query__payment_product__without_permissions(graphql):
+def test_reservation_unit__query__payment_product__without_permissions(graphql: GraphQLClient) -> None:
     merchant = PaymentMerchantFactory.create()
     product = PaymentProductFactory.create(merchant=merchant)
     ReservationUnitFactory.create(payment_merchant=merchant, payment_product=product)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from graphql_relay import to_global_id
@@ -11,6 +12,9 @@ from tests.factories import ReservationUnitFactory, ReservationUnitPricingGroupF
 
 from .helpers import reservation_unit_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -20,7 +24,7 @@ pytestmark = [
 # ── Pricing groups ──
 
 
-def test_reservation_unit__query__pricing_groups_exclude_past_rows(graphql):
+def test_reservation_unit__query__pricing_groups_exclude_past_rows(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
 
@@ -50,7 +54,7 @@ def test_reservation_unit__query__pricing_groups_exclude_past_rows(graphql):
     }
 
 
-def test_reservation_unit__query__only_future_pricing_group(graphql):
+def test_reservation_unit__query__only_future_pricing_group(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     future = ReservationUnitPricingGroupFactory.create(

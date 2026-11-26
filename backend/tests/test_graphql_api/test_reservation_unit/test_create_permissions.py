@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import UnitFactory, UserFactory
 
 from .helpers import CREATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit__create__draft__anonymous_user(graphql):
+def test_reservation_unit__create__draft__anonymous_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - An anonymous user is using the system
@@ -29,7 +34,7 @@ def test_reservation_unit__create__draft__anonymous_user(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_reservation_unit__create__draft__regular_user(graphql):
+def test_reservation_unit__create__draft__regular_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A regular user is using the system
@@ -47,7 +52,7 @@ def test_reservation_unit__create__draft__regular_user(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_reservation_unit__create__draft__superuser(graphql):
+def test_reservation_unit__create__draft__superuser(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A superuser is using the system
@@ -65,7 +70,7 @@ def test_reservation_unit__create__draft__superuser(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_reservation_unit__create__draft__general_admin(graphql):
+def test_reservation_unit__create__draft__general_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A general admin is using the system
@@ -84,7 +89,7 @@ def test_reservation_unit__create__draft__general_admin(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_reservation_unit__create__draft__unit_admin(graphql):
+def test_reservation_unit__create__draft__unit_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A unit admin is using the system

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -14,7 +15,7 @@ from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 
 from tests.factories import ResourceFactory, SpaceFactory, UnitFactory, UserFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import (
     CREATE_MUTATION,
@@ -22,6 +23,11 @@ from .helpers import (
     get_create_non_draft_input_data,
     get_free_own_pricing_data,
 )
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -32,7 +38,7 @@ pytestmark = [
 # ── Create ──
 
 
-def test_reservation_unit__create(graphql):
+def test_reservation_unit__create(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 
@@ -54,7 +60,7 @@ def test_reservation_unit__create(graphql):
 # ── Spaces and resources of other units ──
 
 
-def test_reservation_unit__create__unit_admin__space_of_other_unit(graphql):
+def test_reservation_unit__create__unit_admin__space_of_other_unit(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     other_space = SpaceFactory.create()
     admin = UserFactory.create_with_unit_role(units=[unit])
@@ -69,7 +75,7 @@ def test_reservation_unit__create__unit_admin__space_of_other_unit(graphql):
     assert ReservationUnit.objects.exists() is False
 
 
-def test_reservation_unit__create__unit_admin__resource_of_other_unit(graphql):
+def test_reservation_unit__create__unit_admin__resource_of_other_unit(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     other_resource = ResourceFactory.create()
     admin = UserFactory.create_with_unit_role(units=[unit])
@@ -112,7 +118,7 @@ HAUKI_RESOURCE = HaukiAPIResource(
 
 @patch_method(HaukiAPIClient.get_resource, return_value=HAUKI_RESOURCE)
 @patch_method(HaukiAPIClient.create_resource, return_value=HAUKI_RESOURCE)
-def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
+def test_reservation_unit__create__send_to_hauki__succeeded(graphql: GraphQLClient, settings: Settings) -> None:
     settings.HAUKI_EXPORTS_ENABLED = True
 
     unit = UnitFactory.create(tprek_id="123", tprek_department_id="org")
@@ -126,21 +132,22 @@ def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
 
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert HaukiAPIClient.get_resource.call_count == 1
-    assert HaukiAPIClient.create_resource.call_count == 1
+    assert as_mock(HaukiAPIClient.get_resource).call_count == 1
+    assert as_mock(HaukiAPIClient.create_resource).call_count == 1
 
     assert response.has_errors is False
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
+    assert reservation_unit.origin_hauki_resource is not None
     assert reservation_unit.origin_hauki_resource.id == 123
 
 
 @patch_method(HaukiAPIClient.get_resource, return_value=HAUKI_RESOURCE)
 @patch_method(HaukiAPIClient.create_resource, side_effect=HaukiAPIError("foo"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
+def test_reservation_unit__create__send_to_hauki__failed(graphql: GraphQLClient, settings: Settings) -> None:
     settings.HAUKI_EXPORTS_ENABLED = True
 
     unit = UnitFactory.create(tprek_id="123", tprek_department_id="org")
@@ -154,14 +161,14 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
 
     response = graphql(CREATE_MUTATION_WITH_HAUKI_EXPORT_FAILED, input_data=data)
 
-    assert HaukiAPIClient.get_resource.call_count == 1
-    assert HaukiAPIClient.create_resource.call_count == 1
+    assert as_mock(HaukiAPIClient.get_resource).call_count == 1
+    assert as_mock(HaukiAPIClient.create_resource).call_count == 1
 
     assert response.has_errors is False, response
     assert response.first_query_object["haukiExportFailed"] is True
 
-    assert SentryLogger.log_exception.call_count == 1
-    error = SentryLogger.log_exception.call_args.args[0]
+    assert as_mock(SentryLogger.log_exception).call_count == 1
+    error = as_mock(SentryLogger.log_exception).call_args.args[0]
     assert isinstance(error, HaukiAPIError)
     assert str(error) == "foo"
 
@@ -174,7 +181,7 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
 # ── Fields ──
 
 
-def test_reservation_unit__create__empty_name(graphql):
+def test_reservation_unit__create__empty_name(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 
@@ -190,7 +197,7 @@ def test_reservation_unit__create__empty_name(graphql):
     assert response.field_error_messages("name") == ["This field may not be blank."]
 
 
-def test_reservation_unit__create__instructions(graphql):
+def test_reservation_unit__create__instructions(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 
@@ -228,7 +235,7 @@ def test_reservation_unit__create__instructions(graphql):
 # ── Non-draft ──
 
 
-def test_reservation_unit__create__non_draft(graphql):
+def test_reservation_unit__create__non_draft(graphql: GraphQLClient) -> None:
     data = get_create_non_draft_input_data()
 
     graphql.login_with_superuser()
@@ -240,7 +247,7 @@ def test_reservation_unit__create__non_draft(graphql):
 
 
 @pytest.mark.parametrize("value", [[], None], ids=["empty", "missing"])
-def test_reservation_unit__create__non_draft__no_price(graphql, value):
+def test_reservation_unit__create__non_draft__no_price(graphql: GraphQLClient, value: Any) -> None:
     data = get_create_non_draft_input_data()
     if value is None:
         del data["ownPricings"]
@@ -254,7 +261,7 @@ def test_reservation_unit__create__non_draft__no_price(graphql, value):
     assert ReservationUnit.objects.count() == 0
 
 
-def test_reservation_unit__create__non_draft__only_future_price(graphql):
+def test_reservation_unit__create__non_draft__only_future_price(graphql: GraphQLClient) -> None:
     tomorrow = local_date() + datetime.timedelta(days=1)
     data = get_create_non_draft_input_data(ownPricings=[get_free_own_pricing_data(begins=tomorrow)])
 
@@ -267,7 +274,9 @@ def test_reservation_unit__create__non_draft__only_future_price(graphql):
 
 @pytest.mark.parametrize("field", ["nameEn", "descriptionEn"])
 @pytest.mark.parametrize("value", ["", None], ids=["empty", "missing"])
-def test_reservation_unit__create__non_draft__translation_not_given(graphql, field, value):
+def test_reservation_unit__create__non_draft__translation_not_given(
+    graphql: GraphQLClient, field: str, value: Any
+) -> None:
     data = get_create_non_draft_input_data()
     if value is None:
         del data[field]
@@ -285,7 +294,7 @@ def test_reservation_unit__create__non_draft__translation_not_given(graphql, fie
 
 
 @pytest.mark.parametrize("value", [[], None], ids=["empty", "missing"])
-def test_reservation_unit__create__non_draft__no_spaces_and_no_resources(graphql, value):
+def test_reservation_unit__create__non_draft__no_spaces_and_no_resources(graphql: GraphQLClient, value: Any) -> None:
     data = get_create_non_draft_input_data()
     if value is None:
         del data["resources"]
@@ -304,7 +313,7 @@ def test_reservation_unit__create__non_draft__no_spaces_and_no_resources(graphql
     assert ReservationUnit.objects.count() == 0
 
 
-def test_reservation_unit__create__non_draft__missing_reservation_unit_type(graphql):
+def test_reservation_unit__create__non_draft__missing_reservation_unit_type(graphql: GraphQLClient) -> None:
     data = get_create_non_draft_input_data()
     del data["reservationUnitType"]
 
@@ -316,7 +325,7 @@ def test_reservation_unit__create__non_draft__missing_reservation_unit_type(grap
     assert ReservationUnit.objects.count() == 0
 
 
-def test_reservation_unit__create__non_draft__min_persons_over_max_persons(graphql):
+def test_reservation_unit__create__non_draft__min_persons_over_max_persons(graphql: GraphQLClient) -> None:
     data = get_create_non_draft_input_data()
     data["minPersons"] = 11
 
@@ -328,7 +337,9 @@ def test_reservation_unit__create__non_draft__min_persons_over_max_persons(graph
     assert ReservationUnit.objects.count() == 0
 
 
-def test_reservation_unit__create__non_draft__reservation_kind_defaults_to_direct_and_season(graphql):
+def test_reservation_unit__create__non_draft__reservation_kind_defaults_to_direct_and_season(
+    graphql: GraphQLClient,
+) -> None:
     data = get_create_non_draft_input_data()
     del data["reservationKind"]
 
@@ -344,7 +355,7 @@ def test_reservation_unit__create__non_draft__reservation_kind_defaults_to_direc
 # ── Min and max reservation duration ──
 
 
-def test_reservation_unit__create__min_max_reservation_duration__valid(graphql):
+def test_reservation_unit__create__min_max_reservation_duration__valid(graphql: GraphQLClient) -> None:
     data = get_create_non_draft_input_data()
     data["minReservationDuration"] = int(datetime.timedelta(hours=2).total_seconds())
     data["maxReservationDuration"] = int(datetime.timedelta(hours=3).total_seconds())
@@ -356,7 +367,9 @@ def test_reservation_unit__create__min_max_reservation_duration__valid(graphql):
     assert ReservationUnit.objects.filter(pk=response.first_query_object["pk"]).exists()
 
 
-def test_reservation_unit__create__min_reservation_duration_greater_than_max_reservation_duration(graphql):
+def test_reservation_unit__create__min_reservation_duration_greater_than_max_reservation_duration(
+    graphql: GraphQLClient,
+) -> None:
     data = get_create_non_draft_input_data()
     data["minReservationDuration"] = int(datetime.timedelta(hours=2).total_seconds())
     data["maxReservationDuration"] = int(datetime.timedelta(hours=1).total_seconds())
@@ -370,7 +383,9 @@ def test_reservation_unit__create__min_reservation_duration_greater_than_max_res
 
 
 @pytest.mark.parametrize("field_name", ["minReservationDuration", "maxReservationDuration"])
-def test_reservation_unit__create__min_max_reservation_duration__shorter_than_start_interval(graphql, field_name):
+def test_reservation_unit__create__min_max_reservation_duration__shorter_than_start_interval(
+    graphql: GraphQLClient, field_name: str
+) -> None:
     data = get_create_non_draft_input_data()
     assert "60" in data["reservationStartInterval"]
     data[field_name] = int(datetime.timedelta(minutes=30).total_seconds())
@@ -384,7 +399,9 @@ def test_reservation_unit__create__min_max_reservation_duration__shorter_than_st
 
 
 @pytest.mark.parametrize("field_name", ["minReservationDuration", "maxReservationDuration"])
-def test_reservation_unit__create__min_max_reservation_duration__not_multiple_of_start_interval(graphql, field_name):
+def test_reservation_unit__create__min_max_reservation_duration__not_multiple_of_start_interval(
+    graphql: GraphQLClient, field_name: str
+) -> None:
     data = get_create_non_draft_input_data()
     assert "60" in data["reservationStartInterval"]
     data[field_name] = int(datetime.timedelta(minutes=90).total_seconds())
@@ -400,7 +417,7 @@ def test_reservation_unit__create__min_max_reservation_duration__not_multiple_of
 # ── Timeslots ──
 
 
-def test_reservation_unit__create__with_timeslots(graphql):
+def test_reservation_unit__create__with_timeslots(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A superuser is using the system
@@ -439,7 +456,7 @@ def test_reservation_unit__create__with_timeslots(graphql):
     assert reservation_units[0].application_round_time_slots.count() == 2
 
 
-def test_reservation_unit__create__with_timeslots__weekday_required(graphql):
+def test_reservation_unit__create__with_timeslots__weekday_required(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A superuser is using the system
@@ -473,7 +490,7 @@ def test_reservation_unit__create__with_timeslots__weekday_required(graphql):
     )
 
 
-def test_reservation_unit__create__with_timeslots__begin_before_end(graphql):
+def test_reservation_unit__create__with_timeslots__begin_before_end(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A superuser is using the system
@@ -508,7 +525,7 @@ def test_reservation_unit__create__with_timeslots__begin_before_end(graphql):
     ]
 
 
-def test_reservation_unit__create__with_timeslots__overlapping_reservable_times(graphql):
+def test_reservation_unit__create__with_timeslots__overlapping_reservable_times(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A superuser is using the system
@@ -544,7 +561,7 @@ def test_reservation_unit__create__with_timeslots__overlapping_reservable_times(
     ]
 
 
-def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql):
+def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A superuser is using the system
@@ -583,7 +600,7 @@ def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql):
     ]
 
 
-def test_reservation_unit__create__with_timeslots__open_has_no_reservable_times(graphql):
+def test_reservation_unit__create__with_timeslots__open_has_no_reservable_times(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A superuser is using the system
@@ -616,7 +633,7 @@ def test_reservation_unit__create__with_timeslots__open_has_no_reservable_times(
     ]
 
 
-def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(graphql):
+def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - A superuser is using the system
@@ -655,7 +672,7 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
 # ── Reservation block whole day ──
 
 
-def test_reservation_unit__create__reservation_block_whole_day(graphql):
+def test_reservation_unit__create__reservation_block_whole_day(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 

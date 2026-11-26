@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from graphql_relay import to_global_id
@@ -24,6 +25,9 @@ from tests.test_graphql_api.test_reservation.helpers import reservations_query
 
 from .helpers import reservation_unit_query, reservation_units_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -43,7 +47,7 @@ MATERIAL_PRICE_FIELDS = (
 # ── Price summary ──
 
 
-def test_reservation_unit__query__price_summary__one_price(graphql):
+def test_reservation_unit__query__price_summary__one_price(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -74,7 +78,7 @@ def test_reservation_unit__query__price_summary__one_price(graphql):
     }
 
 
-def test_reservation_unit__query__price_summary__can_apply_for_discount(graphql):
+def test_reservation_unit__query__price_summary__can_apply_for_discount(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -106,7 +110,7 @@ def test_reservation_unit__query__price_summary__can_apply_for_discount(graphql)
     }
 
 
-def test_reservation_unit__query__price_summary__options_with_different_prices(graphql):
+def test_reservation_unit__query__price_summary__options_with_different_prices(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
@@ -146,7 +150,7 @@ def test_reservation_unit__query__price_summary__options_with_different_prices(g
     }
 
 
-def test_reservation_unit__query__price_summary__inactive_option_not_included(graphql):
+def test_reservation_unit__query__price_summary__inactive_option_not_included(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
@@ -186,7 +190,7 @@ def test_reservation_unit__query__price_summary__inactive_option_not_included(gr
     }
 
 
-def test_reservation_unit__query__price_summary__free(graphql):
+def test_reservation_unit__query__price_summary__free(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -216,7 +220,7 @@ def test_reservation_unit__query__price_summary__free(graphql):
     }
 
 
-def test_reservation_unit__query__price_summary__future_price_change_not_included(graphql):
+def test_reservation_unit__query__price_summary__future_price_change_not_included(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -258,7 +262,7 @@ def test_reservation_unit__query__price_summary__future_price_change_not_include
     }
 
 
-def test_reservation_unit__query__price_summary__future_pricing_group_not_included(graphql):
+def test_reservation_unit__query__price_summary__future_pricing_group_not_included(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     active_group = PricingGroupFactory.create()
@@ -291,7 +295,7 @@ def test_reservation_unit__query__price_summary__future_pricing_group_not_includ
     assert response.first_query_object["priceSummary"]["lowestAmount"] == "20.00"
 
 
-def test_reservation_unit__query__price_summary__on_date__future_price_change(graphql):
+def test_reservation_unit__query__price_summary__on_date__future_price_change(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -324,7 +328,7 @@ def test_reservation_unit__query__price_summary__on_date__future_price_change(gr
     }
 
 
-def test_reservation_unit__query__price_summary__on_date__day_before_price_change(graphql):
+def test_reservation_unit__query__price_summary__on_date__day_before_price_change(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -354,7 +358,7 @@ def test_reservation_unit__query__price_summary__on_date__day_before_price_chang
     assert response.first_query_object == {"priceSummary": {"lowestAmount": "20.00"}}
 
 
-def test_reservation_unit__query__price_summary__on_date__future_pricing_group(graphql):
+def test_reservation_unit__query__price_summary__on_date__future_pricing_group(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     active_group = PricingGroupFactory.create()
@@ -389,7 +393,7 @@ def test_reservation_unit__query__price_summary__on_date__future_pricing_group(g
     assert response.first_query_object == {"priceSummary": {"lowestAmount": "10.00"}}
 
 
-def test_reservation_unit__query__price_summary__on_date__aliases_with_different_dates(graphql):
+def test_reservation_unit__query__price_summary__on_date__aliases_with_different_dates(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -425,7 +429,9 @@ def test_reservation_unit__query__price_summary__on_date__aliases_with_different
     }
 
 
-def test_reservation_unit__query__price_summary__on_date__query_count_does_not_grow_with_list(graphql):
+def test_reservation_unit__query__price_summary__on_date__query_count_does_not_grow_with_list(
+    graphql: GraphQLClient,
+) -> None:
     today = local_date()
     for amount in (Decimal(10), Decimal(20), Decimal(30)):
         reservation_unit = ReservationUnitFactory.create()
@@ -450,7 +456,7 @@ def test_reservation_unit__query__price_summary__on_date__query_count_does_not_g
     assert len(response.queries) == 2, response.query_log
 
 
-def test_reservation_unit__query__price_summary__no_pricing_group(graphql):
+def test_reservation_unit__query__price_summary__no_pricing_group(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     query = reservation_unit_query(fields=FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
@@ -460,7 +466,7 @@ def test_reservation_unit__query__price_summary__no_pricing_group(graphql):
     assert response.first_query_object == {"priceSummary": None}
 
 
-def test_reservation_unit__query__price_summary__query_count_does_not_grow_with_list(graphql):
+def test_reservation_unit__query__price_summary__query_count_does_not_grow_with_list(graphql: GraphQLClient) -> None:
     today = local_date()
     for amount in (Decimal(10), Decimal(20), Decimal(30)):
         reservation_unit = ReservationUnitFactory.create()
@@ -484,7 +490,7 @@ def test_reservation_unit__query__price_summary__query_count_does_not_grow_with_
     assert len(response.queries) == 2, response.query_log
 
 
-def test_reservation_unit__query__price_summary__through_foreign_key(graphql):
+def test_reservation_unit__query__price_summary__through_foreign_key(graphql: GraphQLClient) -> None:
     today = local_date()
     for amount in (Decimal("12.50"), Decimal(20), Decimal(30)):
         reservation_unit = ReservationUnitFactory.create()
@@ -527,7 +533,7 @@ def test_reservation_unit__query__price_summary__through_foreign_key(graphql):
 # ── Tax percentage ──
 
 
-def test_reservation_unit__query__price_summary__tax_percentage_of_the_cheapest_price(graphql):
+def test_reservation_unit__query__price_summary__tax_percentage_of_the_cheapest_price(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
@@ -559,7 +565,7 @@ def test_reservation_unit__query__price_summary__tax_percentage_of_the_cheapest_
     assert response.first_query_object == {"priceSummary": {"lowestAmount": "15.00", "taxPercentage": "14.00"}}
 
 
-def test_reservation_unit__query__price_summary__tax_percentage_of_today(graphql):
+def test_reservation_unit__query__price_summary__tax_percentage_of_today(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -588,7 +594,7 @@ def test_reservation_unit__query__price_summary__tax_percentage_of_today(graphql
     assert response.first_query_object == {"priceSummary": {"lowestAmount": "20.00", "taxPercentage": "24.00"}}
 
 
-def test_reservation_unit__query__price_summary__tax_percentage_without_rate(graphql):
+def test_reservation_unit__query__price_summary__tax_percentage_without_rate(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -614,7 +620,7 @@ def test_reservation_unit__query__price_summary__tax_percentage_without_rate(gra
 # ── Material price ──
 
 
-def test_reservation_unit__query__price_summary__material_price(graphql):
+def test_reservation_unit__query__price_summary__material_price(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -649,7 +655,7 @@ def test_reservation_unit__query__price_summary__material_price(graphql):
     }
 
 
-def test_reservation_unit__query__price_summary__no_material_price(graphql):
+def test_reservation_unit__query__price_summary__no_material_price(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -670,7 +676,9 @@ def test_reservation_unit__query__price_summary__no_material_price(graphql):
     assert response.first_query_object["priceSummary"]["materialPriceDescriptionFi"] == ""
 
 
-def test_reservation_unit__query__price_summary__material_price_of_the_cheapest_option_that_has_one(graphql):
+def test_reservation_unit__query__price_summary__material_price_of_the_cheapest_option_that_has_one(
+    graphql: GraphQLClient,
+) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     unit_group = UnitGroupFactory.create()
@@ -699,7 +707,7 @@ def test_reservation_unit__query__price_summary__material_price_of_the_cheapest_
     assert response.first_query_object["priceSummary"]["materialPriceDescriptionFi"] == "B"
 
 
-def test_reservation_unit__query__price_summary__material_price_without_finnish(graphql):
+def test_reservation_unit__query__price_summary__material_price_without_finnish(graphql: GraphQLClient) -> None:
     today = local_date()
     reservation_unit = ReservationUnitFactory.create()
     pricing_group = PricingGroupFactory.create()

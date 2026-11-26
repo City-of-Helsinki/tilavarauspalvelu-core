@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django.settings import graphene_settings
 
 from tests.factories import ReservationUnitFactory, UserFactory
 from tests.test_graphql_api.test_reservation_unit.helpers import reservation_units_all_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_all__no_pagination_limit(graphql):
+def test_reservation_unit_all__no_pagination_limit(graphql: GraphQLClient) -> None:
     ReservationUnitFactory.create_batch(2)
     ReservationUnitFactory.create(is_archived=True)  # Should not be returned
 
@@ -30,7 +35,7 @@ def test_reservation_unit_all__no_pagination_limit(graphql):
     assert len(response.first_query_object) == 2
 
 
-def test_reservation_unit_all__filter__by_name_fi(graphql):
+def test_reservation_unit_all__filter__by_name_fi(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(name_fi="foo")
     ReservationUnitFactory.create(name_fi="bar")
 
@@ -42,7 +47,7 @@ def test_reservation_unit_all__filter__by_name_fi(graphql):
     assert response.first_query_object[0] == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit_all__filter__only_with_permission__general_admin(graphql):
+def test_reservation_unit_all__filter__only_with_permission__general_admin(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 

@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ReservationUnitFactory, SpaceFactory, UnitFactory, UserFactory
 
 from .helpers import ARCHIVE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit__archive__general_admin(graphql):
+def test_reservation_unit__archive__general_admin(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(is_draft=False, spaces=[space])
 
@@ -28,7 +33,7 @@ def test_reservation_unit__archive__general_admin(graphql):
     assert reservation_unit.is_archived is True
 
 
-def test_reservation_unit__archive__unit_admin(graphql):
+def test_reservation_unit__archive__unit_admin(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(is_draft=False, spaces=[space])
 
@@ -44,7 +49,7 @@ def test_reservation_unit__archive__unit_admin(graphql):
     assert reservation_unit.is_archived is True
 
 
-def test_reservation_unit__archive__unit_admin__different_unit(graphql):
+def test_reservation_unit__archive__unit_admin__different_unit(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(is_draft=False, spaces=[space])
 
@@ -62,7 +67,7 @@ def test_reservation_unit__archive__unit_admin__different_unit(graphql):
     assert reservation_unit.is_archived is False
 
 
-def test_reservation_unit__archive__regular_user(graphql):
+def test_reservation_unit__archive__regular_user(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(is_draft=False, spaces=[space])
 
@@ -77,7 +82,7 @@ def test_reservation_unit__archive__regular_user(graphql):
     assert reservation_unit.is_archived is False
 
 
-def test_reservation_unit__archive__anonymous_user(graphql):
+def test_reservation_unit__archive__anonymous_user(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(is_draft=False, spaces=[space])
 

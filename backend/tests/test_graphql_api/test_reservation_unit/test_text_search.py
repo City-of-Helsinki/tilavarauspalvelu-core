@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import Literal, NamedTuple
+from typing import TYPE_CHECKING, Literal, NamedTuple
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
@@ -11,6 +11,11 @@ from tilavarauspalvelu.models import ReservationUnit
 from tests.factories import EquipmentFactory, IntendedUseFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory
 
 from .helpers import reservation_units_query
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -295,7 +300,13 @@ class Params(NamedTuple):
         ),
     })
 )
-def test_reservation_unit__filter__by_text_search(graphql, text_search, reservation_unit_data, has_results, language):
+def test_reservation_unit__filter__by_text_search(
+    graphql: GraphQLClient,
+    text_search: str,
+    reservation_unit_data: SearchableData,
+    has_results: bool,
+    language: Literal["fi", "sv", "en"],
+) -> None:
     ReservationUnitFactory.create(**dataclasses.asdict(reservation_unit_data))
     ReservationUnit.objects.update_search_vectors()
 
@@ -309,7 +320,7 @@ def test_reservation_unit__filter__by_text_search(graphql, text_search, reservat
     assert len(response.edges) == (1 if has_results else 0)
 
 
-def test_reservation_unit__filter__by_text_search__and_other_filters(graphql):
+def test_reservation_unit__filter__by_text_search__and_other_filters(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(name="foo")
     ReservationUnitFactory.create(name="foo bar")
 
@@ -323,7 +334,7 @@ def test_reservation_unit__filter__by_text_search__and_other_filters(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_text_search__unauthenticated_user(graphql):
+def test_reservation_unit__filter__by_text_search__unauthenticated_user(graphql: GraphQLClient) -> None:
     # Django translations are inactive during testing, so `get_language_from_request`
     # always returns `settings.LANGUAGE_CODE`, see `django.utils.translation.trans_null.get_language_from_request`
 
@@ -342,7 +353,9 @@ def test_reservation_unit__filter__by_text_search__unauthenticated_user(graphql)
 # ── Search vector updates ──
 
 
-def test_reservation_unit__filter__by_text_search__unit_name_changed(graphql, settings):
+def test_reservation_unit__filter__by_text_search__unit_name_changed(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.UPDATE_SEARCH_VECTORS = True
 
     reservation_unit = ReservationUnitFactory.create()
@@ -360,7 +373,7 @@ def test_reservation_unit__filter__by_text_search__unit_name_changed(graphql, se
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_text_search__space_added(graphql, settings):
+def test_reservation_unit__filter__by_text_search__space_added(graphql: GraphQLClient, settings: Settings) -> None:
     settings.UPDATE_SEARCH_VECTORS = True
 
     reservation_unit = ReservationUnitFactory.create()
@@ -374,7 +387,7 @@ def test_reservation_unit__filter__by_text_search__space_added(graphql, settings
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_text_search__resource_added(graphql, settings):
+def test_reservation_unit__filter__by_text_search__resource_added(graphql: GraphQLClient, settings: Settings) -> None:
     settings.UPDATE_SEARCH_VECTORS = True
 
     reservation_unit = ReservationUnitFactory.create()
@@ -388,7 +401,9 @@ def test_reservation_unit__filter__by_text_search__resource_added(graphql, setti
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_text_search__intended_use_added(graphql, settings):
+def test_reservation_unit__filter__by_text_search__intended_use_added(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.UPDATE_SEARCH_VECTORS = True
 
     reservation_unit = ReservationUnitFactory.create()
@@ -402,7 +417,7 @@ def test_reservation_unit__filter__by_text_search__intended_use_added(graphql, s
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_text_search__equipment_added(graphql, settings):
+def test_reservation_unit__filter__by_text_search__equipment_added(graphql: GraphQLClient, settings: Settings) -> None:
     settings.UPDATE_SEARCH_VECTORS = True
 
     reservation_unit = ReservationUnitFactory.create()

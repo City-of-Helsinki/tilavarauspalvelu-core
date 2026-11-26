@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
 from graphene_django_extensions.testing import parametrize_helper
@@ -33,13 +33,16 @@ from .helpers import (
     reservation_units_query,
 )
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit__filter__by_pk(graphql):
+def test_reservation_unit__filter__by_pk(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
@@ -51,7 +54,7 @@ def test_reservation_unit__filter__by_pk(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_pk__multiple(graphql):
+def test_reservation_unit__filter__by_pk__multiple(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
@@ -65,7 +68,7 @@ def test_reservation_unit__filter__by_pk__multiple(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__by_tprek_id(graphql):
+def test_reservation_unit__filter__by_tprek_id(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(unit__tprek_id="foo")
     ReservationUnitFactory.create(unit__tprek_id="bar")
 
@@ -77,7 +80,7 @@ def test_reservation_unit__filter__by_tprek_id(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_tprek_department_id(graphql):
+def test_reservation_unit__filter__by_tprek_department_id(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(unit__tprek_department_id="foo")
     ReservationUnitFactory.create(unit__tprek_department_id="bar")
 
@@ -89,7 +92,7 @@ def test_reservation_unit__filter__by_tprek_department_id(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_equipment(graphql):
+def test_reservation_unit__filter__by_equipment(graphql: GraphQLClient) -> None:
     # given:
     # - There are two reservation units with different equipments
     equipment_1 = EquipmentFactory.create(name="foo")
@@ -109,7 +112,7 @@ def test_reservation_unit__filter__by_equipment(graphql):
     assert response.node(0) == {"nameFi": "fizz"}
 
 
-def test_reservation_unit__filter__by_equipment__multiple(graphql):
+def test_reservation_unit__filter__by_equipment__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two reservation units with different equipments, and one with both
     equipment_1 = EquipmentFactory.create(name="foo")
@@ -130,7 +133,7 @@ def test_reservation_unit__filter__by_equipment__multiple(graphql):
     assert response.node(0) == {"nameFi": "1"}
 
 
-def test_reservation_unit__filter__by_equipment__multiple__none_match(graphql):
+def test_reservation_unit__filter__by_equipment__multiple__none_match(graphql: GraphQLClient) -> None:
     # given:
     # - There are two reservation units with different equipments
     equipment_1 = EquipmentFactory.create(name="foo")
@@ -149,7 +152,7 @@ def test_reservation_unit__filter__by_equipment__multiple__none_match(graphql):
     assert len(response.edges) == 0, response
 
 
-def test_reservation_unit__filter__by_unit(graphql):
+def test_reservation_unit__filter__by_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(unit=UnitFactory.create())
     ReservationUnitFactory.create(unit=UnitFactory.create())
 
@@ -161,7 +164,7 @@ def test_reservation_unit__filter__by_unit(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_unit__multiple(graphql):
+def test_reservation_unit__filter__by_unit__multiple(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(unit=UnitFactory.create())
     reservation_unit_2 = ReservationUnitFactory.create(unit=UnitFactory.create())
     ReservationUnitFactory.create(unit=UnitFactory.create())
@@ -175,7 +178,7 @@ def test_reservation_unit__filter__by_unit__multiple(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__by_unit_group(graphql):
+def test_reservation_unit__filter__by_unit_group(graphql: GraphQLClient) -> None:
     unit_group = UnitGroupFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit__unit_groups=[unit_group])
     ReservationUnitFactory.create()
@@ -188,7 +191,7 @@ def test_reservation_unit__filter__by_unit_group(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_application_round__multiple(graphql):
+def test_reservation_unit__filter__by_application_round__multiple(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
     reservation_unit_3 = ReservationUnitFactory.create()
@@ -206,10 +209,11 @@ def test_reservation_unit__filter__by_application_round__multiple(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_type(graphql):
+def test_reservation_unit__filter__by_reservation_unit_type(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
+    assert reservation_unit.reservation_unit_type is not None
     query = reservation_units_query(reservationUnitType=reservation_unit.reservation_unit_type.pk)
     response = graphql(query)
 
@@ -218,11 +222,13 @@ def test_reservation_unit__filter__by_reservation_unit_type(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_type__multiple(graphql):
+def test_reservation_unit__filter__by_reservation_unit_type__multiple(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
+    assert reservation_unit_1.reservation_unit_type is not None
+    assert reservation_unit_2.reservation_unit_type is not None
     query = reservation_units_query(
         reservationUnitType=[
             reservation_unit_1.reservation_unit_type.pk,
@@ -237,11 +243,11 @@ def test_reservation_unit__filter__by_reservation_unit_type__multiple(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__by_intended_uses(graphql):
+def test_reservation_unit__filter__by_intended_uses(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(intended_uses__name="foo")
     ReservationUnitFactory.create(intended_uses__name="bar")
 
-    query = reservation_units_query(intended_uses=reservation_unit.intended_uses.first().pk)
+    query = reservation_units_query(intended_uses=reservation_unit.intended_uses.get().pk)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -249,15 +255,15 @@ def test_reservation_unit__filter__by_intended_uses(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_multiple_intended_uses(graphql):
+def test_reservation_unit__filter__by_multiple_intended_uses(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(intended_uses__name="foo")
     reservation_unit_2 = ReservationUnitFactory.create(intended_uses__name="bar")
     ReservationUnitFactory.create(intended_uses__name="baz")
 
     query = reservation_units_query(
         intended_uses=[
-            reservation_unit_1.intended_uses.first().pk,
-            reservation_unit_2.intended_uses.first().pk,
+            reservation_unit_1.intended_uses.get().pk,
+            reservation_unit_2.intended_uses.get().pk,
         ]
     )
     response = graphql(query)
@@ -268,7 +274,7 @@ def test_reservation_unit__filter__by_multiple_intended_uses(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__by_max_persons_gte(graphql):
+def test_reservation_unit__filter__by_max_persons_gte(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(max_persons=None)
     reservation_unit_2 = ReservationUnitFactory.create(max_persons=201)
     reservation_unit_3 = ReservationUnitFactory.create(max_persons=200)
@@ -284,7 +290,7 @@ def test_reservation_unit__filter__by_max_persons_gte(graphql):
     assert response.node(2) == {"pk": reservation_unit_3.pk}
 
 
-def test_reservation_unit__filter__by_max_persons_lte(graphql):
+def test_reservation_unit__filter__by_max_persons_lte(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(max_persons=None)
     ReservationUnitFactory.create(max_persons=201)
     reservation_unit_2 = ReservationUnitFactory.create(max_persons=200)
@@ -300,7 +306,7 @@ def test_reservation_unit__filter__by_max_persons_lte(graphql):
     assert response.node(2) == {"pk": reservation_unit_3.pk}
 
 
-def test_reservation_unit__filter__by_min_persons_gte(graphql):
+def test_reservation_unit__filter__by_min_persons_gte(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(min_persons=None)
     reservation_unit_2 = ReservationUnitFactory.create(min_persons=201)
     reservation_unit_3 = ReservationUnitFactory.create(min_persons=200)
@@ -316,7 +322,7 @@ def test_reservation_unit__filter__by_min_persons_gte(graphql):
     assert response.node(2) == {"pk": reservation_unit_3.pk}
 
 
-def test_reservation_unit__filter__by_min_persons_lte(graphql):
+def test_reservation_unit__filter__by_min_persons_lte(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(min_persons=None)
     ReservationUnitFactory.create(min_persons=201)
     reservation_unit_2 = ReservationUnitFactory.create(min_persons=200)
@@ -332,7 +338,7 @@ def test_reservation_unit__filter__by_min_persons_lte(graphql):
     assert response.node(2) == {"pk": reservation_unit_3.pk}
 
 
-def test_reservation_unit__filter__by_persons_allowed(graphql):
+def test_reservation_unit__filter__by_persons_allowed(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create(min_persons=None, max_persons=None)
     reservation_unit_2 = ReservationUnitFactory.create(min_persons=None, max_persons=201)
     reservation_unit_3 = ReservationUnitFactory.create(min_persons=200, max_persons=None)
@@ -351,7 +357,7 @@ def test_reservation_unit__filter__by_persons_allowed(graphql):
     assert response.node(3) == {"pk": reservation_unit_4.pk}
 
 
-def test_reservation_unit__filter__by_name_fi(graphql):
+def test_reservation_unit__filter__by_name_fi(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(name_fi="foo")
     ReservationUnitFactory.create(name_fi="bar")
 
@@ -363,7 +369,7 @@ def test_reservation_unit__filter__by_name_fi(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_surface_area(graphql):
+def test_reservation_unit__filter__by_surface_area(graphql: GraphQLClient) -> None:
     ReservationUnitFactory.create(surface_area=121)
     reservation_unit_1 = ReservationUnitFactory.create(surface_area=120)
     reservation_unit_2 = ReservationUnitFactory.create(surface_area=90)
@@ -380,7 +386,7 @@ def test_reservation_unit__filter__by_surface_area(graphql):
     assert response.node(2) == {"pk": reservation_unit_3.pk}
 
 
-def test_reservation_unit__filter__by_rank(graphql):
+def test_reservation_unit__filter__by_rank(graphql: GraphQLClient) -> None:
     ReservationUnitFactory.create(rank=1)
     reservation_unit_1 = ReservationUnitFactory.create(rank=2)
     reservation_unit_2 = ReservationUnitFactory.create(rank=3)
@@ -397,7 +403,7 @@ def test_reservation_unit__filter__by_rank(graphql):
     assert response.node(2) == {"pk": reservation_unit_3.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_type_rank(graphql):
+def test_reservation_unit__filter__by_reservation_unit_type_rank(graphql: GraphQLClient) -> None:
     type_1 = ReservationUnitTypeFactory(rank=1)
     type_2 = ReservationUnitTypeFactory(rank=2)
     type_3 = ReservationUnitTypeFactory(rank=3)
@@ -420,7 +426,7 @@ def test_reservation_unit__filter__by_reservation_unit_type_rank(graphql):
     assert response.node(2) == {"pk": reservation_unit_3.pk}
 
 
-def test_reservation_unit__filter__application_rounds__by_active(graphql):
+def test_reservation_unit__filter__application_rounds__by_active(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
@@ -441,7 +447,7 @@ def test_reservation_unit__filter__application_rounds__by_active(graphql):
     }
 
 
-def test_reservation_unit__filter__by_is_draft(graphql):
+def test_reservation_unit__filter__by_is_draft(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     ReservationUnitFactory.create(is_draft=False)
 
@@ -453,7 +459,7 @@ def test_reservation_unit__filter__by_is_draft(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_is_visible(graphql):
+def test_reservation_unit__filter__by_is_visible(graphql: GraphQLClient) -> None:
     now = local_datetime()
 
     # No publish times -> VISIBLE
@@ -537,7 +543,9 @@ class Params(NamedTuple):
         ),
     })
 )
-def test_reservation_unit__filter__by_reservation_kind(graphql, kind, units):
+def test_reservation_unit__filter__by_reservation_kind(
+    graphql: GraphQLClient, kind: ReservationKind, units: list[int]
+) -> None:
     reservation_units = {
         1: ReservationUnitFactory.create(reservation_kind=ReservationKind.DIRECT),
         2: ReservationUnitFactory.create(reservation_kind=ReservationKind.SEASON),
@@ -554,7 +562,7 @@ def test_reservation_unit__filter__by_reservation_kind(graphql, kind, units):
         assert response.node(i) == {"pk": reservation_units[unit].pk}
 
 
-def test_reservation_unit__filter__only_with_permission__general_admin(graphql):
+def test_reservation_unit__filter__only_with_permission__general_admin(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -570,7 +578,7 @@ def test_reservation_unit__filter__only_with_permission__general_admin(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__only_with_permission__unit_admin(graphql):
+def test_reservation_unit__filter__only_with_permission__unit_admin(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
@@ -591,7 +599,7 @@ def test_reservation_unit__filter__only_with_permission__unit_admin(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__only_with_manage_permission__general_admin(graphql):
+def test_reservation_unit__filter__only_with_manage_permission__general_admin(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -607,7 +615,7 @@ def test_reservation_unit__filter__only_with_manage_permission__general_admin(gr
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__only_with_manage_permission__unit_admin(graphql):
+def test_reservation_unit__filter__only_with_manage_permission__unit_admin(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
@@ -627,7 +635,7 @@ def test_reservation_unit__filter__only_with_manage_permission__unit_admin(graph
     assert response.node(0) == {"pk": reservation_unit_1.pk}
 
 
-def test_reservation_unit__filter__only_with_manage_permission__anonymous(graphql):
+def test_reservation_unit__filter__only_with_manage_permission__anonymous(graphql: GraphQLClient) -> None:
     ReservationUnitFactory.create()
 
     query = reservation_units_query(onlyWithManagePermission=True)
@@ -640,7 +648,7 @@ def test_reservation_unit__filter__only_with_manage_permission__anonymous(graphq
 # Reservation state
 
 
-def test_reservation_unit__filter__by_reservation_state__reservable(graphql):
+def test_reservation_unit__filter__by_reservation_state__reservable(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
@@ -654,7 +662,7 @@ def test_reservation_unit__filter__by_reservation_state__reservable(graphql):
     assert response.node(1) == {"pk": reservation_units.reservable_free.pk}
 
 
-def test_reservation_unit__filter__by_reservation_state__scheduled_reservation(graphql):
+def test_reservation_unit__filter__by_reservation_state__scheduled_reservation(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
@@ -667,7 +675,7 @@ def test_reservation_unit__filter__by_reservation_state__scheduled_reservation(g
     assert response.node(0) == {"pk": reservation_units.scheduled_reservation.pk}
 
 
-def test_reservation_unit__filter__by_reservation_state__scheduled_period(graphql):
+def test_reservation_unit__filter__by_reservation_state__scheduled_period(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
@@ -680,7 +688,7 @@ def test_reservation_unit__filter__by_reservation_state__scheduled_period(graphq
     assert response.node(0) == {"pk": reservation_units.scheduled_period.pk}
 
 
-def test_reservation_unit__filter__by_reservation_state__scheduled_closing(graphql):
+def test_reservation_unit__filter__by_reservation_state__scheduled_closing(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
@@ -693,7 +701,7 @@ def test_reservation_unit__filter__by_reservation_state__scheduled_closing(graph
     assert response.node(0) == {"pk": reservation_units.scheduled_closing.pk}
 
 
-def test_reservation_unit__filter__by_reservation_state__reservation_closed(graphql):
+def test_reservation_unit__filter__by_reservation_state__reservation_closed(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
@@ -708,7 +716,7 @@ def test_reservation_unit__filter__by_reservation_state__reservation_closed(grap
     assert response.node(2) == {"pk": reservation_units.missing_payment_product.pk}
 
 
-def test_reservation_unit__filter__by_reservation_state__multiple(graphql):
+def test_reservation_unit__filter__by_reservation_state__multiple(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
@@ -731,7 +739,7 @@ def test_reservation_unit__filter__by_reservation_state__multiple(graphql):
 # Reservation unit state
 
 
-def test_reservation_unit__filter__by_reservation_unit_state__archived(graphql):
+def test_reservation_unit__filter__by_reservation_unit_state__archived(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     create_reservation_units_for_reservation_unit_state_filtering()
@@ -744,7 +752,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__archived(graphql):
     assert len(response.edges) == 0
 
 
-def test_reservation_unit__filter__by_reservation_unit_state__draft(graphql):
+def test_reservation_unit__filter__by_reservation_unit_state__draft(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
@@ -757,7 +765,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__draft(graphql):
     assert response.node(0) == {"pk": reservation_units.draft.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_state__scheduled_publishing(graphql):
+def test_reservation_unit__filter__by_reservation_unit_state__scheduled_publishing(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
@@ -770,7 +778,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__scheduled_publishi
     assert response.node(0) == {"pk": reservation_units.scheduled_publishing.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_state__published(graphql):
+def test_reservation_unit__filter__by_reservation_unit_state__published(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
@@ -783,7 +791,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__published(graphql)
     assert response.node(0) == {"pk": reservation_units.published.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_state__scheduled_period(graphql):
+def test_reservation_unit__filter__by_reservation_unit_state__scheduled_period(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
@@ -796,7 +804,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__scheduled_period(g
     assert response.node(0) == {"pk": reservation_units.scheduled_period.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_state__scheduled_hiding(graphql):
+def test_reservation_unit__filter__by_reservation_unit_state__scheduled_hiding(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
@@ -809,7 +817,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__scheduled_hiding(g
     assert response.node(0) == {"pk": reservation_units.scheduled_hiding.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_state__hidden(graphql):
+def test_reservation_unit__filter__by_reservation_unit_state__hidden(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
@@ -822,7 +830,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__hidden(graphql):
     assert response.node(0) == {"pk": reservation_units.hidden.pk}
 
 
-def test_reservation_unit__filter__by_reservation_unit_state__multiple(graphql):
+def test_reservation_unit__filter__by_reservation_unit_state__multiple(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
@@ -844,7 +852,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__multiple(graphql):
 # Access type
 
 
-def test_reservation_unit__filter__by_access_type(graphql):
+def test_reservation_unit__filter__by_access_type(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     today = local_date()
@@ -888,7 +896,7 @@ def test_reservation_unit__filter__by_access_type(graphql):
     assert response.node(0) == {"nameFi": reservation_unit.name_fi}
 
 
-def test_reservation_unit__filter__by_access_type__no_period(graphql):
+def test_reservation_unit__filter__by_access_type__no_period(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(
         name="with key",
         access_types__access_type=AccessType.PHYSICAL_KEY,

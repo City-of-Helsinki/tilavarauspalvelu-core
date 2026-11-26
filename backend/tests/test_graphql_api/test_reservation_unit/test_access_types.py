@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
@@ -11,7 +12,7 @@ from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitAccessTypeFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import (
     CREATE_MUTATION,
@@ -21,13 +22,16 @@ from .helpers import (
     get_draft_update_input_data,
 )
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_unit__create__access_types(graphql):
+def test_reservation_unit__create__access_types(graphql: GraphQLClient) -> None:
     today = local_date()
 
     data = get_create_draft_input_data()
@@ -49,14 +53,14 @@ def test_reservation_unit__create__access_types(graphql):
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
 
-    access_type = list(reservation_unit.access_types.order_by("begin_date").all())
-    assert len(access_type) == 2
+    access_types = list(reservation_unit.access_types.order_by("begin_date").all())
+    assert len(access_types) == 2
 
-    assert access_type[0].access_type == AccessType.OPENED_BY_STAFF
-    assert access_type[1].access_type == AccessType.UNRESTRICTED
+    assert access_types[0].access_type == AccessType.OPENED_BY_STAFF
+    assert access_types[1].access_type == AccessType.UNRESTRICTED
 
 
-def test_reservation_unit__create__access_types__not_access_code(graphql):
+def test_reservation_unit__create__access_types__not_access_code(graphql: GraphQLClient) -> None:
     today = local_date()
 
     data = get_create_draft_input_data()
@@ -74,7 +78,7 @@ def test_reservation_unit__create__access_types__not_access_code(graphql):
     assert response.field_error_messages() == ["Cannot set access type to access code on reservation unit create."]
 
 
-def test_reservation_unit__create__access_types__not_in_the_past(graphql):
+def test_reservation_unit__create__access_types__not_in_the_past(graphql: GraphQLClient) -> None:
     today = local_date()
 
     data = get_create_draft_input_data()
@@ -92,7 +96,7 @@ def test_reservation_unit__create__access_types__not_in_the_past(graphql):
     assert response.field_error_messages() == ["Access type cannot be created in the past."]
 
 
-def test_reservation_unit__create__access_types__published(graphql):
+def test_reservation_unit__create__access_types__published(graphql: GraphQLClient) -> None:
     data = get_create_non_draft_input_data()
 
     graphql.login_with_superuser()
@@ -102,13 +106,13 @@ def test_reservation_unit__create__access_types__published(graphql):
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
 
-    access_type = list(reservation_unit.access_types.order_by("begin_date").all())
-    assert len(access_type) == 1
+    access_types = list(reservation_unit.access_types.order_by("begin_date").all())
+    assert len(access_types) == 1
 
-    assert access_type[0].access_type == AccessType.UNRESTRICTED
+    assert access_types[0].access_type == AccessType.UNRESTRICTED
 
 
-def test_reservation_unit__create__access_types__published__no_access_types(graphql):
+def test_reservation_unit__create__access_types__published__no_access_types(graphql: GraphQLClient) -> None:
     data = get_create_non_draft_input_data()
     data["accessTypes"] = []
 
@@ -120,7 +124,7 @@ def test_reservation_unit__create__access_types__published__no_access_types(grap
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_unit__create__access_types__published__no_active_access_type(graphql):
+def test_reservation_unit__create__access_types__published__no_active_access_type(graphql: GraphQLClient) -> None:
     data = get_create_non_draft_input_data()
     data["accessTypes"] = [
         {
@@ -136,7 +140,7 @@ def test_reservation_unit__create__access_types__published__no_active_access_typ
     assert response.field_error_messages() == ["At least one active access type is required."]
 
 
-def test_reservation_unit__update__access_types(graphql):
+def test_reservation_unit__update__access_types(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     access_type = ReservationUnitAccessTypeFactory.create(
@@ -171,16 +175,18 @@ def test_reservation_unit__update__access_types(graphql):
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
 
-    access_type = list(reservation_unit.access_types.order_by("begin_date").all())
-    assert len(access_type) == 3
+    access_types = list(reservation_unit.access_types.order_by("begin_date").all())
+    assert len(access_types) == 3
 
-    assert access_type[0].access_type == AccessType.PHYSICAL_KEY
-    assert access_type[1].access_type == AccessType.OPENED_BY_STAFF
-    assert access_type[2].access_type == AccessType.UNRESTRICTED
+    assert access_types[0].access_type == AccessType.PHYSICAL_KEY
+    assert access_types[1].access_type == AccessType.OPENED_BY_STAFF
+    assert access_types[2].access_type == AccessType.UNRESTRICTED
 
 
 @pytest.mark.parametrize("started_days_ago", [0, 1])
-def test_reservation_unit__update__access_types__cannot_change_access_type_begin_date(graphql, started_days_ago):
+def test_reservation_unit__update__access_types__cannot_change_access_type_begin_date(
+    graphql: GraphQLClient, started_days_ago: int
+) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     today = local_date() - datetime.timedelta(days=started_days_ago)
@@ -207,7 +213,7 @@ def test_reservation_unit__update__access_types__cannot_change_access_type_begin
     assert response.field_error_messages() == ["Past of active access type begin date cannot be changed."]
 
 
-def test_reservation_unit__update__access_types__cannot_move_to_the_past(graphql):
+def test_reservation_unit__update__access_types__cannot_move_to_the_past(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     today = local_date()
@@ -240,7 +246,9 @@ def test_reservation_unit__update__access_types__cannot_move_to_the_past(graphql
 
 
 @pytest.mark.parametrize("begins_in_days", [0, 1])
-def test_reservation_unit__update__access_types__without_pk_updates_access_type_on_same_date(graphql, begins_in_days):
+def test_reservation_unit__update__access_types__without_pk_updates_access_type_on_same_date(
+    graphql: GraphQLClient, begins_in_days: int
+) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     today = local_date()
@@ -283,7 +291,9 @@ def test_reservation_unit__update__access_types__without_pk_updates_access_type_
     assert access_types[1].access_type == AccessType.OPENED_BY_STAFF
 
 
-def test_reservation_unit__update__access_types__without_pk_on_date_of_moved_access_type(graphql):
+def test_reservation_unit__update__access_types__without_pk_on_date_of_moved_access_type(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     today = local_date()
@@ -329,7 +339,7 @@ def test_reservation_unit__update__access_types__without_pk_on_date_of_moved_acc
 
 
 @freeze_time(local_datetime(2023, 1, 1, hour=0))
-def test_reservation_unit__update__access_types__set_new_access_type_to_reservations(graphql):
+def test_reservation_unit__update__access_types__set_new_access_type_to_reservations(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     today = local_date(2023, 1, 1)
@@ -411,7 +421,9 @@ def test_reservation_unit__update__access_types__set_new_access_type_to_reservat
 
 
 @patch_method(PindoraClient.get_reservation_unit)
-def test_reservation_unit__update__access_types__check_from_pindora__switch_to_access_code(graphql):
+def test_reservation_unit__update__access_types__check_from_pindora__switch_to_access_code(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     access_type = ReservationUnitAccessTypeFactory.create(
@@ -434,11 +446,11 @@ def test_reservation_unit__update__access_types__check_from_pindora__switch_to_a
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.get_reservation_unit.call_count == 1
+    assert as_mock(PindoraClient.get_reservation_unit).call_count == 1
 
 
 @patch_method(PindoraClient.get_reservation_unit)
-def test_reservation_unit__update__access_types__check_from_pindora__new_access_type(graphql):
+def test_reservation_unit__update__access_types__check_from_pindora__new_access_type(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     today = local_date()
 
@@ -466,11 +478,13 @@ def test_reservation_unit__update__access_types__check_from_pindora__new_access_
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.get_reservation_unit.call_count == 1
+    assert as_mock(PindoraClient.get_reservation_unit).call_count == 1
 
 
 @patch_method(PindoraClient.get_reservation_unit)
-def test_reservation_unit__update__access_types__dont_check_from_pindora__still_access_code(graphql):
+def test_reservation_unit__update__access_types__dont_check_from_pindora__still_access_code(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     access_type = ReservationUnitAccessTypeFactory.create(
@@ -493,10 +507,10 @@ def test_reservation_unit__update__access_types__dont_check_from_pindora__still_
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.get_reservation_unit.call_count == 0
+    assert as_mock(PindoraClient.get_reservation_unit).call_count == 0
 
 
-def test_reservation_unit__update__access_types__future_one_is_deleted(graphql):
+def test_reservation_unit__update__access_types__future_one_is_deleted(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
     today = local_date()
@@ -523,6 +537,6 @@ def test_reservation_unit__update__access_types__future_one_is_deleted(graphql):
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
 
-    access_type = list(reservation_unit.access_types.order_by("begin_date").all())
-    assert len(access_type) == 1
-    assert access_type[0].pk == active_access_type.pk
+    access_types = list(reservation_unit.access_types.order_by("begin_date").all())
+    assert len(access_types) == 1
+    assert access_types[0].pk == active_access_type.pk
