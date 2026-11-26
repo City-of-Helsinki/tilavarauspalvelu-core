@@ -101,7 +101,22 @@ def get_context_for_reservation_access_type_changed(
         change_date = res_unit_access_type.begin_date
 
     else:
-        context = get_context_for_reservation_rescheduled(**data, language=language)
+        context = get_context_for_reservation_rescheduled(
+            language=language,
+            email_recipient_name=data["email_recipient_name"],
+            reservation_unit_name=data["reservation_unit_name"],
+            unit_name=data["unit_name"],
+            unit_location=data["unit_location"],
+            begin_datetime=data["begin_datetime"],
+            end_datetime=data["end_datetime"],
+            price=data["price"],
+            tax_percentage=data["tax_percentage"],
+            reservation_id=data["reservation_id"],
+            instructions_confirmed=data["instructions_confirmed"],
+            access_code_is_used=data["access_code_is_used"],
+            access_code=data["access_code"],
+            access_code_validity_period=data["access_code_validity_period"],
+        )
 
         access_type = AccessType(data["access_type"])
         change_date = data["change_date"]

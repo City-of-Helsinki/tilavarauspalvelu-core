@@ -11,7 +11,6 @@ from rest_framework.fields import DateTimeField, IntegerField
 from tilavarauspalvelu.enums import AccessType, PaymentType
 from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
-from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
@@ -21,6 +20,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
     from tilavarauspalvelu.models import User
     from tilavarauspalvelu.services.pricing.price_lines import PriceLines
     from tilavarauspalvelu.typing import AnyUser, WSGIRequest
@@ -122,15 +122,35 @@ class ReservationCreateSerializer(NestingModelSerializer[Reservation, Reservatio
 
         # Primarily use the prefill info directly from the profile, but if it is not available,
         # use the prefill info stored in the session.
+        reservation_prefill_info: ReservationPrefillInfo | None
         reservation_prefill_info = prefill_info or request.session.get("reservation_prefill_info")
-        if reservation_prefill_info is not None:
-            # Validate cached keys before updating the data, in case the data has keys from older incompatible version.
-            prefill_valid_keys = list(ReservationPrefillInfo.__annotations__)
-            data.update({
-                key: value
-                for key, value in reservation_prefill_info.items()
-                if value is not None and key in prefill_valid_keys
-            })
+        if reservation_prefill_info is None:
+            return
+
+        # The session can have data from an older version, so a key can be missing.
+        first_name = reservation_prefill_info.get("reservee_first_name")
+        if first_name is not None:
+            data["reservee_first_name"] = first_name
+
+        last_name = reservation_prefill_info.get("reservee_last_name")
+        if last_name is not None:
+            data["reservee_last_name"] = last_name
+
+        email = reservation_prefill_info.get("reservee_email")
+        if email is not None:
+            data["reservee_email"] = email
+
+        phone = reservation_prefill_info.get("reservee_phone")
+        if phone is not None:
+            data["reservee_phone"] = phone
+
+        address_zip = reservation_prefill_info.get("reservee_address_zip")
+        if address_zip is not None:
+            data["reservee_address_zip"] = address_zip
+
+        municipality = reservation_prefill_info.get("municipality")
+        if municipality is not None:
+            data["municipality"] = municipality
 
     def create(self, validated_data: ReservationCreateData) -> Reservation:
         reservation: Reservation = super().create(validated_data)
