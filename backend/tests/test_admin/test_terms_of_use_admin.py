@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import re
+from typing import TYPE_CHECKING
 
 import pytest
 from django.urls import reverse
 
 from tests.factories import TermsOfUseFactory, UserFactory
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -15,7 +19,7 @@ pytestmark = [
 # ── Change page ──
 
 
-def test_terms_of_use_admin__change_page__terms_without_name(api_client):
+def test_terms_of_use_admin__change_page__terms_without_name(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
@@ -12,6 +12,9 @@ from tilavarauspalvelu.models import ApplicationRound
 from tests.factories import ApplicationRoundFactory, ReservationUnitFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors, round_form_data
 
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -21,7 +24,7 @@ pytestmark = [
 # ── Added reservation units ──
 
 
-def test_application_round_admin__create_with_seasonal_reservation_units(api_client):
+def test_application_round_admin__create_with_seasonal_reservation_units(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     season_unit = ReservationUnitFactory.create(reservation_kind=ReservationKind.SEASON)
     direct_and_season_unit = ReservationUnitFactory.create(reservation_kind=ReservationKind.DIRECT_AND_SEASON)
@@ -38,7 +41,9 @@ def test_application_round_admin__create_with_seasonal_reservation_units(api_cli
     assert set(application_round.reservation_units.all()) == {season_unit, direct_and_season_unit}
 
 
-def test_application_round_admin__create_with_draft_and_archived_reservation_units_is_rejected(api_client):
+def test_application_round_admin__create_with_draft_and_archived_reservation_units_is_rejected(
+    api_client: APIClient,
+) -> None:
     api_client.force_login(UserFactory.create_superuser())
     draft_unit = ReservationUnitFactory.create(name="Draft hall", is_draft=True)
     archived_unit = ReservationUnitFactory.create(name="Archived hall", is_draft=True, is_archived=True)
@@ -67,7 +72,7 @@ def test_application_round_admin__create_with_draft_and_archived_reservation_uni
     assert not ApplicationRound.objects.filter(name_fi="Kesä").exists()
 
 
-def test_application_round_admin__create_with_direct_only_reservation_unit_is_rejected(api_client):
+def test_application_round_admin__create_with_direct_only_reservation_unit_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     direct_unit = ReservationUnitFactory.create(reservation_kind=ReservationKind.DIRECT)
 
@@ -91,7 +96,7 @@ def test_application_round_admin__create_with_direct_only_reservation_unit_is_re
     assert not ApplicationRound.objects.filter(name_fi="Kesä").exists()
 
 
-def test_application_round_admin__change_keeps_saved_archived_reservation_unit(api_client):
+def test_application_round_admin__change_keeps_saved_archived_reservation_unit(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     archived_unit = ReservationUnitFactory.create(is_draft=True, is_archived=True)
     new_unit = ReservationUnitFactory.create()
@@ -115,7 +120,7 @@ def test_application_round_admin__change_keeps_saved_archived_reservation_unit(a
     assert set(application_round.reservation_units.all()) == {archived_unit, new_unit}
 
 
-def test_application_round_admin__change_that_adds_draft_reservation_unit_is_rejected(api_client):
+def test_application_round_admin__change_that_adds_draft_reservation_unit_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     saved_unit = ReservationUnitFactory.create()
     draft_unit = ReservationUnitFactory.create(name="Draft hall", is_draft=True)

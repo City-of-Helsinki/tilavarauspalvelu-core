@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.urls import reverse
 
@@ -13,6 +15,9 @@ from tests.factories import (
 )
 from tests.test_admin.helpers import count_queries
 
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -22,7 +27,7 @@ pytestmark = [
 # ── List pages ──
 
 
-def test_admin_query_counts__payment_order_list__same_for_more_payment_orders(api_client):
+def test_admin_query_counts__payment_order_list__same_for_more_payment_orders(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -36,7 +41,7 @@ def test_admin_query_counts__payment_order_list__same_for_more_payment_orders(ap
     assert count_queries(api_client, url) == query_count
 
 
-def test_admin_query_counts__space_list__same_for_more_spaces(api_client):
+def test_admin_query_counts__space_list__same_for_more_spaces(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -50,7 +55,7 @@ def test_admin_query_counts__space_list__same_for_more_spaces(api_client):
     assert count_queries(api_client, url) == query_count
 
 
-def test_admin_query_counts__origin_hauki_resource_list__same_for_more_resources(api_client):
+def test_admin_query_counts__origin_hauki_resource_list__same_for_more_resources(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 

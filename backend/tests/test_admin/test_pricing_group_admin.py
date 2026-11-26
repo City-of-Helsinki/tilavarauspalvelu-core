@@ -28,6 +28,9 @@ from tests.factories import (
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
 
 if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
+
     from tilavarauspalvelu.models import TaxLevel
 
 # Applied to all tests
@@ -86,7 +89,7 @@ def group_form_data() -> dict[str, Any]:
 # ── Save ──
 
 
-def test_pricing_group_admin__create_with_component_and_reservation_unit(api_client):
+def test_pricing_group_admin__create_with_component_and_reservation_unit(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     reservation_unit = ReservationUnitFactory.create()
     tax_level = TaxLevelFactory.create()
@@ -114,7 +117,9 @@ def test_pricing_group_admin__create_with_component_and_reservation_unit(api_cli
     assert rows[0].reservation_unit == reservation_unit
 
 
-def test_pricing_group_admin__new_components_send_accounting_of_reservation_units(api_client, settings):
+def test_pricing_group_admin__new_components_send_accounting_of_reservation_units(
+    api_client: APIClient, settings: Settings
+) -> None:
     settings.UPDATE_ACCOUNTING = True
     api_client.force_login(UserFactory.create_superuser())
     pricing_group = PricingGroupFactory.create(name_fi="Hinnasto", name_en="Prices", name_sv="Priser")
@@ -148,7 +153,7 @@ def test_pricing_group_admin__new_components_send_accounting_of_reservation_unit
 # ── Validation ──
 
 
-def test_pricing_group_admin__overlapping_components_are_rejected(api_client):
+def test_pricing_group_admin__overlapping_components_are_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
 
     url = reverse("admin:tilavarauspalvelu_pricinggroup_add")
@@ -177,7 +182,7 @@ def test_pricing_group_admin__overlapping_components_are_rejected(api_client):
     assert not PricingGroup.objects.exists()
 
 
-def test_pricing_group_admin__reservation_unit_before_components_is_rejected(api_client):
+def test_pricing_group_admin__reservation_unit_before_components_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     reservation_unit = ReservationUnitFactory.create()
 
@@ -207,7 +212,7 @@ def test_pricing_group_admin__reservation_unit_before_components_is_rejected(api
     assert not PricingGroup.objects.exists()
 
 
-def test_pricing_group_admin__own_group_with_two_reservation_units_is_rejected(api_client):
+def test_pricing_group_admin__own_group_with_two_reservation_units_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     first = ReservationUnitFactory.create()
     second = ReservationUnitFactory.create()
@@ -238,7 +243,7 @@ def test_pricing_group_admin__own_group_with_two_reservation_units_is_rejected(a
     assert not PricingGroup.objects.exists()
 
 
-def test_pricing_group_admin__inactive_option_is_rejected(api_client):
+def test_pricing_group_admin__inactive_option_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     unit_group = UnitGroupFactory.create()
     option = PriceOptionFactory.create(unit_group=unit_group, is_active=False)
@@ -267,7 +272,7 @@ def test_pricing_group_admin__inactive_option_is_rejected(api_client):
     assert not PricingGroup.objects.exists()
 
 
-def test_pricing_group_admin__invalid_reservation_unit_row_on_add_shows_errors(api_client):
+def test_pricing_group_admin__invalid_reservation_unit_row_on_add_shows_errors(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
 
     url = reverse("admin:tilavarauspalvelu_pricinggroup_add")
@@ -285,7 +290,9 @@ def test_pricing_group_admin__invalid_reservation_unit_row_on_add_shows_errors(a
     assert not PricingGroup.objects.exists()
 
 
-def test_pricing_group_admin__reservation_unit_in_application_round_cannot_lose_price_option(api_client):
+def test_pricing_group_admin__reservation_unit_in_application_round_cannot_lose_price_option(
+    api_client: APIClient,
+) -> None:
     api_client.force_login(UserFactory.create_superuser())
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
@@ -342,7 +349,7 @@ def test_pricing_group_admin__reservation_unit_in_application_round_cannot_lose_
 
 
 @freeze_time("2026-02-15T12:00:00+02:00")
-def test_pricing_group_admin__active_component_amount_change_is_rejected(api_client):
+def test_pricing_group_admin__active_component_amount_change_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     pricing_group = PricingGroupFactory.create(name_fi="Hinnasto")
     component = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1))
@@ -371,7 +378,7 @@ def test_pricing_group_admin__active_component_amount_change_is_rejected(api_cli
 
 
 @freeze_time("2026-02-15T12:00:00+02:00")
-def test_pricing_group_admin__active_component_delete_is_rejected(api_client):
+def test_pricing_group_admin__active_component_delete_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     pricing_group = PricingGroupFactory.create(name_fi="Hinnasto")
     component = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1))
@@ -399,7 +406,7 @@ def test_pricing_group_admin__active_component_delete_is_rejected(api_client):
 
 
 @freeze_time("2026-02-15T12:00:00+02:00")
-def test_pricing_group_admin__new_component_from_today_is_rejected(api_client):
+def test_pricing_group_admin__new_component_from_today_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     pricing_group = PricingGroupFactory.create(name_fi="Hinnasto")
     component = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1))
@@ -428,7 +435,7 @@ def test_pricing_group_admin__new_component_from_today_is_rejected(api_client):
 
 
 @freeze_time("2026-02-15T12:00:00+02:00")
-def test_pricing_group_admin__price_change_from_future_date_is_saved(api_client):
+def test_pricing_group_admin__price_change_from_future_date_is_saved(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     pricing_group = PricingGroupFactory.create(name_fi="Hinnasto")
     component = PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1))

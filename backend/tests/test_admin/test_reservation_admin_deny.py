@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.contrib.admin import helpers
@@ -21,7 +22,11 @@ from tests.factories import (
     ReservationFactory,
     UserFactory,
 )
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
+
+if TYPE_CHECKING:
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -51,7 +56,9 @@ def create_invoiced_reservation(*, begins_at: datetime.datetime) -> Reservation:
 # ── Deny with refund ──
 
 
-def test_reservation_admin__deny_with_refund__confirmation_page__future_invoice_is_cancellable(api_client):
+def test_reservation_admin__deny_with_refund__confirmation_page__future_invoice_is_cancellable(
+    api_client: APIClient,
+) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -65,18 +72,19 @@ def test_reservation_admin__deny_with_refund__confirmation_page__future_invoice_
     response = api_client.post(path=url, data=data)
 
     assert response.status_code == 200
+    assert response.context_data is not None
     assert response.context_data["queryset_cancellable_reservation_count"] == 1
 
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-def test_reservation_admin__deny_with_refund__future_invoice_is_cancelled(api_client):
+def test_reservation_admin__deny_with_refund__future_invoice_is_cancelled(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
     reservation = create_invoiced_reservation(begins_at=local_datetime() + datetime.timedelta(days=7))
     deny_reason = ReservationDenyReasonFactory.create()
 
-    VerkkokauppaAPIClient.cancel_order.return_value = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
+    as_mock(VerkkokauppaAPIClient.cancel_order).return_value = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
 
     url = reverse("admin:tilavarauspalvelu_reservation_changelist")
     data = {
@@ -95,15 +103,15 @@ def test_reservation_admin__deny_with_refund__future_invoice_is_cancelled(api_cl
     payment_order = PaymentOrder.objects.get(reservation=reservation)
     assert payment_order.status == OrderStatus.CANCELLED
 
-    assert VerkkokauppaAPIClient.cancel_order.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.cancel_order).call_count == 1
 
 
 # ── Deny without refund ──
 
 
 def test_reservation_admin__deny_without_refund__updates_statistics(
-    api_client, settings, django_capture_on_commit_callbacks
-):
+    api_client: APIClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     user = UserFactory.create_superuser()

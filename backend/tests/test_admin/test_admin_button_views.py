@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import io
+from typing import TYPE_CHECKING
 
 import pytest
 from django.contrib.messages import get_messages
@@ -19,7 +20,10 @@ from tests.factories import (
     OriginHaukiResourceFactory,
     UserFactory,
 )
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, as_mock, patch_method
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -31,7 +35,9 @@ pytestmark = [
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_application_round_admin__export_applications_to_csv__exports_the_round_applications(api_client):
+def test_application_round_admin__export_applications_to_csv__exports_the_round_applications(
+    api_client: APIClient,
+) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -55,13 +61,13 @@ def test_application_round_admin__export_applications_to_csv__exports_the_round_
         f"attachment;filename=application_round_applications_{application_round.pk}_2024-01-01.csv"
     )
 
-    content = b"".join(response.streaming_content).decode()
+    content = response.getvalue().decode()
     application_ids = {row[0] for row in csv.reader(io.StringIO(content)) if row}
     assert str(application.pk) in application_ids
     assert str(other_application.pk) not in application_ids
 
 
-def test_application_round_admin__export_applications_to_csv__invalid_id_shows_an_error(api_client):
+def test_application_round_admin__export_applications_to_csv__invalid_id_shows_an_error(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -73,7 +79,7 @@ def test_application_round_admin__export_applications_to_csv__invalid_id_shows_a
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_application_round_admin__export_results_to_csv__exports_the_round_results(api_client):
+def test_application_round_admin__export_results_to_csv__exports_the_round_results(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -88,7 +94,7 @@ def test_application_round_admin__export_results_to_csv__exports_the_round_resul
     )
 
 
-def test_application_round_admin__export_results_to_csv__invalid_id_shows_an_error(api_client):
+def test_application_round_admin__export_results_to_csv__invalid_id_shows_an_error(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -103,13 +109,13 @@ def test_application_round_admin__export_results_to_csv__invalid_id_shows_an_err
 
 
 @patch_method(HaukiAPIClient.get)
-def test_origin_hauki_resource_admin__update_reservable_time_spans__fetches_the_resource(api_client):
+def test_origin_hauki_resource_admin__update_reservable_time_spans__fetches_the_resource(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
     resource = OriginHaukiResourceFactory.create()
     data = HaukiAPIResourceListResponseFactory.create(results=[])
-    HaukiAPIClient.get.return_value = ResponseMock(status_code=200, json_data=data)
+    as_mock(HaukiAPIClient.get).return_value = ResponseMock(status_code=200, json_data=data)
 
     url = reverse(
         "admin:tilavarauspalvelu_originhaukiresource_update_single_hauki_resource_reservable_times_pans",
@@ -117,8 +123,8 @@ def test_origin_hauki_resource_admin__update_reservable_time_spans__fetches_the_
     )
     response = api_client.get(url)
 
-    assert HaukiAPIClient.get.call_count == 1
-    assert HaukiAPIClient.get.call_args.kwargs["params"] == {"resource_ids": str(resource.pk)}
+    assert as_mock(HaukiAPIClient.get).call_count == 1
+    assert as_mock(HaukiAPIClient.get).call_args.kwargs["params"] == {"resource_ids": str(resource.pk)}
 
     messages = [message.message for message in get_messages(response.wsgi_request)]
     assert messages == ["Reservable Time Spans updated."]

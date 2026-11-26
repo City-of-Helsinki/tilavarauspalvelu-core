@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from admin_data_views.settings import admin_data_settings
 from django.urls import reverse
 
 from tests.factories import UserFactory
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -14,7 +19,7 @@ pytestmark = [
 # ── Email template view ──
 
 
-def test_email_template_admin__view__invalid_email_type(api_client):
+def test_email_template_admin__view__invalid_email_type(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -32,7 +37,7 @@ def test_email_template_admin__view__invalid_email_type(api_client):
 # ── Email tester ──
 
 
-def test_email_template_admin__tester__invalid_email_type(api_client):
+def test_email_template_admin__tester__invalid_email_type(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 

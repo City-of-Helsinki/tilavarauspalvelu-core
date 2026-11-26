@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import re
+from typing import TYPE_CHECKING
 
 import pytest
 from django.contrib import admin
 from django.urls import reverse
 
 from tests.factories import UserFactory
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -17,7 +22,7 @@ pytestmark = [
 # ── Header ──
 
 
-def test_admin_site__header__shows_environment_name(api_client, settings):
+def test_admin_site__header__shows_environment_name(api_client: APIClient, settings: Settings) -> None:
     settings.ENVIRONMENT_NAME = "production"
 
     user = UserFactory.create_superuser()
@@ -36,7 +41,7 @@ def test_admin_site__header__shows_environment_name(api_client, settings):
 # ── Model groups ──
 
 
-def test_admin_site__index__every_model_is_in_a_topic_group(api_client):
+def test_admin_site__index__every_model_is_in_a_topic_group(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -65,7 +70,7 @@ def test_admin_site__index__every_model_is_in_a_topic_group(api_client):
     assert set(registered_admin_urls) <= set(shown_admin_urls)
 
 
-def test_admin_site__sidebar__uses_topic_groups(api_client):
+def test_admin_site__sidebar__uses_topic_groups(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -77,7 +82,7 @@ def test_admin_site__sidebar__uses_topic_groups(api_client):
     assert group_labels[0] == "reservations"
 
 
-def test_admin_site__app_index__keeps_the_app_models(api_client):
+def test_admin_site__app_index__keeps_the_app_models(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 

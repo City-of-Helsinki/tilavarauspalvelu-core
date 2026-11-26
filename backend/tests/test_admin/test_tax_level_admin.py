@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
@@ -12,6 +12,9 @@ from utils.date_utils import local_date
 
 from tests.factories import TaxLevelFactory, TaxLevelRateFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -47,7 +50,7 @@ def existing_rate_form_data(index: int, rate: TaxLevelRate, *, delete: bool = Fa
 # ── Tax level rates ──
 
 
-def test_tax_level_admin__rates__add_future_rate(api_client):
+def test_tax_level_admin__rates__add_future_rate(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tomorrow = local_date() + datetime.timedelta(days=1)
 
@@ -74,7 +77,7 @@ def test_tax_level_admin__rates__add_future_rate(api_client):
     ]
 
 
-def test_tax_level_admin__rates__add_two_rates_with_same_date(api_client):
+def test_tax_level_admin__rates__add_two_rates_with_same_date(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tomorrow = local_date() + datetime.timedelta(days=1)
 
@@ -114,7 +117,7 @@ def test_tax_level_admin__rates__add_two_rates_with_same_date(api_client):
     assert rates == [(rate.begins, Decimal(24))]
 
 
-def test_tax_level_admin__rates__delete_only_rate_in_effect_today(api_client):
+def test_tax_level_admin__rates__delete_only_rate_in_effect_today(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tomorrow = local_date() + datetime.timedelta(days=1)
 
@@ -147,7 +150,7 @@ def test_tax_level_admin__rates__delete_only_rate_in_effect_today(api_client):
     assert rates == [(rate.begins, Decimal(24))]
 
 
-def test_tax_level_admin__rates__create_tax_level_with_future_rate_only(api_client):
+def test_tax_level_admin__rates__create_tax_level_with_future_rate_only(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tomorrow = local_date() + datetime.timedelta(days=1)
 
@@ -175,7 +178,7 @@ def test_tax_level_admin__rates__create_tax_level_with_future_rate_only(api_clie
     assert TaxLevel.objects.count() == 0
 
 
-def test_tax_level_admin__rates__add_view_shows_one_empty_rate(api_client):
+def test_tax_level_admin__rates__add_view_shows_one_empty_rate(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
 
     url = reverse("admin:tilavarauspalvelu_taxlevel_add")
@@ -187,7 +190,7 @@ def test_tax_level_admin__rates__add_view_shows_one_empty_rate(api_client):
     assert formset.total_form_count() == 1
 
 
-def test_tax_level_admin__rates__change_view_shows_no_empty_rates(api_client):
+def test_tax_level_admin__rates__change_view_shows_no_empty_rates(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
 
     tax_level = TaxLevelFactory.create()
@@ -205,7 +208,7 @@ def test_tax_level_admin__rates__change_view_shows_no_empty_rates(api_client):
 # ── Locked rates ──
 
 
-def test_tax_level_admin__locked_rates__show_rate_that_began_yesterday_as_text(api_client):
+def test_tax_level_admin__locked_rates__show_rate_that_began_yesterday_as_text(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     yesterday = local_date() - datetime.timedelta(days=1)
 
@@ -222,7 +225,7 @@ def test_tax_level_admin__locked_rates__show_rate_that_began_yesterday_as_text(a
     assert str(form["DELETE"]) == '<input type="hidden" name="rates-0-DELETE" disabled id="id_rates-0-DELETE">'
 
 
-def test_tax_level_admin__locked_rates__change_rate_that_began_yesterday(api_client):
+def test_tax_level_admin__locked_rates__change_rate_that_began_yesterday(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     yesterday = local_date() - datetime.timedelta(days=1)
     two_days_ago = local_date() - datetime.timedelta(days=2)
@@ -246,7 +249,7 @@ def test_tax_level_admin__locked_rates__change_rate_that_began_yesterday(api_cli
     assert rates == [(yesterday, Decimal(24))]
 
 
-def test_tax_level_admin__locked_rates__delete_rate_that_began_yesterday(api_client):
+def test_tax_level_admin__locked_rates__delete_rate_that_began_yesterday(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     yesterday = local_date() - datetime.timedelta(days=1)
 
@@ -273,7 +276,7 @@ def test_tax_level_admin__locked_rates__delete_rate_that_began_yesterday(api_cli
     ]
 
 
-def test_tax_level_admin__locked_rates__change_rate_that_begins_today(api_client):
+def test_tax_level_admin__locked_rates__change_rate_that_begins_today(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
 
     tax_level = TaxLevelFactory.create(rates__begins=local_date(), rates__percentage=Decimal(24))
@@ -294,7 +297,7 @@ def test_tax_level_admin__locked_rates__change_rate_that_begins_today(api_client
     assert rates == [(local_date(), Decimal("25.5"))]
 
 
-def test_tax_level_admin__locked_rates__change_vat_code_of_rate_that_began_yesterday(api_client):
+def test_tax_level_admin__locked_rates__change_vat_code_of_rate_that_began_yesterday(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     yesterday = local_date() - datetime.timedelta(days=1)
 
@@ -319,7 +322,7 @@ def test_tax_level_admin__locked_rates__change_vat_code_of_rate_that_began_yeste
 # ── VAT code ──
 
 
-def test_tax_level_admin__vat_code__too_short(api_client):
+def test_tax_level_admin__vat_code__too_short(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
 
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal("25.5"))
@@ -352,7 +355,7 @@ def test_tax_level_admin__vat_code__too_short(api_client):
 # ── List ──
 
 
-def test_tax_level_admin__list__current_and_next_percentage(api_client):
+def test_tax_level_admin__list__current_and_next_percentage(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     tomorrow = local_date() + datetime.timedelta(days=1)
     next_week = local_date() + datetime.timedelta(days=7)
@@ -378,7 +381,7 @@ def test_tax_level_admin__list__current_and_next_percentage(api_client):
     assert rows == [["24.00%", "25.50%", tomorrow]]
 
 
-def test_tax_level_admin__list__no_next_percentage(api_client):
+def test_tax_level_admin__list__no_next_percentage(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
 
     TaxLevelFactory.create(rates__percentage=Decimal(24))

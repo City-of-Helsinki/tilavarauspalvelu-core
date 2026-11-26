@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
@@ -16,6 +16,9 @@ from tests.test_admin.helpers import (
     required_reservation_unit_form_data,
 )
 
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -25,7 +28,7 @@ pytestmark = [
 # ── Pending application rounds ──
 
 
-def test_reservation_unit_admin__to_draft_in_pending_application_round_is_rejected(api_client):
+def test_reservation_unit_admin__to_draft_in_pending_application_round_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     today = local_date()
 
@@ -66,7 +69,7 @@ def test_reservation_unit_admin__to_draft_in_pending_application_round_is_reject
     assert reservation_unit.is_draft is False
 
 
-def test_reservation_unit_admin__to_draft_in_ended_application_round(api_client):
+def test_reservation_unit_admin__to_draft_in_ended_application_round(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     today = local_date()
 

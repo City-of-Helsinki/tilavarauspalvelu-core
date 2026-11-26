@@ -11,6 +11,8 @@ from tests.factories import ApplicationSectionFactory, SportFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
 
 if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
     from tilavarauspalvelu.models import ApplicationSection
 
 # Applied to all tests
@@ -48,7 +50,7 @@ def section_form_data(section: ApplicationSection, **overrides: Any) -> dict[str
 # ── Sports data ──
 
 
-def test_application_section_admin__sports_form__switch_from_sport_to_other_sport(api_client):
+def test_application_section_admin__sports_form__switch_from_sport_to_other_sport(api_client: APIClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__application_round__application_form=ApplicationFormType.SPORTS_FORM,
         sport=SportFactory.create(),
@@ -65,7 +67,7 @@ def test_application_section_admin__sports_form__switch_from_sport_to_other_spor
     assert section.sport_other == "Kabaddi"
 
 
-def test_application_section_admin__sports_form__sport_and_other_sport(api_client):
+def test_application_section_admin__sports_form__sport_and_other_sport(api_client: APIClient) -> None:
     sport = SportFactory.create()
     section = ApplicationSectionFactory.create_in_status_unallocated(
         application__application_round__application_form=ApplicationFormType.SPORTS_FORM,
@@ -92,7 +94,7 @@ def test_application_section_admin__sports_form__sport_and_other_sport(api_clien
     assert section.sport_other == ""
 
 
-def test_application_section_admin__default_form__sports_data_not_allowed(api_client):
+def test_application_section_admin__default_form__sports_data_not_allowed(api_client: APIClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated()
     api_client.force_login(UserFactory.create_superuser())
 
@@ -114,7 +116,7 @@ def test_application_section_admin__default_form__sports_data_not_allowed(api_cl
     assert section.league_level == ""
 
 
-def test_application_section_admin__default_form__empty_sports_data(api_client):
+def test_application_section_admin__default_form__empty_sports_data(api_client: APIClient) -> None:
     section = ApplicationSectionFactory.create_in_status_unallocated()
     api_client.force_login(UserFactory.create_superuser())
 

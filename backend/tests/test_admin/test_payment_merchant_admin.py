@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.contrib import messages
 from django.contrib.messages import get_messages
@@ -13,6 +15,9 @@ from tilavarauspalvelu.models import PaymentMerchant
 
 from tests.factories import PaymentMerchantFactory, UserFactory
 from tests.helpers import patch_method
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -38,7 +43,7 @@ pytestmark = [
         shop_id="shop",
     ),
 )
-def test_payment_merchant_admin__change_page__shows_merchant_info(api_client):
+def test_payment_merchant_admin__change_page__shows_merchant_info(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -56,7 +61,7 @@ def test_payment_merchant_admin__change_page__shows_merchant_info(api_client):
 
 
 @patch_method(VerkkokauppaAPIClient.get_merchant, return_value=None)
-def test_payment_merchant_admin__change_page__merchant_not_found(api_client):
+def test_payment_merchant_admin__change_page__merchant_not_found(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -75,7 +80,7 @@ def test_payment_merchant_admin__change_page__merchant_not_found(api_client):
 
 
 @patch_method(VerkkokauppaAPIClient.get_merchant, side_effect=GetMerchantError("Fetching merchant failed"))
-def test_payment_merchant_admin__change_page__merchant_api_fails(api_client):
+def test_payment_merchant_admin__change_page__merchant_api_fails(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -97,7 +102,7 @@ def test_payment_merchant_admin__change_page__merchant_api_fails(api_client):
 
 
 @patch_method(VerkkokauppaAPIClient.get_merchant, return_value=None)
-def test_payment_merchant_admin__save__blocked_when_merchant_not_found(api_client):
+def test_payment_merchant_admin__save__blocked_when_merchant_not_found(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 

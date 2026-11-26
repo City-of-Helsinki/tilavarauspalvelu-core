@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
@@ -18,6 +18,11 @@ from tests.factories import (
     UserFactory,
 )
 from tests.test_admin.helpers import collect_admin_form_errors
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
+    from tilavarauspalvelu.models import ApplicationRound, PricingGroup, ReservationUnit
 
 # Applied to all tests
 pytestmark = [
@@ -46,12 +51,12 @@ def option_form_data(*, name: str, unit_group_pk: int, is_active: bool) -> dict[
     return data
 
 
-def create_unit_using(pricing_group):
+def create_unit_using(pricing_group: PricingGroup) -> ReservationUnit:
     row = ReservationUnitPricingGroupFactory.create(pricing_group=pricing_group, begins=JAN_1)
     return row.reservation_unit
 
 
-def create_round(reservation_units):
+def create_round(reservation_units: list[ReservationUnit]) -> ApplicationRound:
     return ApplicationRoundFactory.create(
         name="Kesä",
         reservation_units=reservation_units,
@@ -65,7 +70,7 @@ def create_round(reservation_units):
 # ── Unit group ──
 
 
-def test_price_option_admin__unit_group_can_change_when_no_component_uses_option(api_client):
+def test_price_option_admin__unit_group_can_change_when_no_component_uses_option(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     option = PriceOptionFactory.create()
     new_unit_group = UnitGroupFactory.create()
@@ -79,7 +84,7 @@ def test_price_option_admin__unit_group_can_change_when_no_component_uses_option
     assert option.unit_group == new_unit_group
 
 
-def test_price_option_admin__unit_group_cannot_change_when_component_uses_option(api_client):
+def test_price_option_admin__unit_group_cannot_change_when_component_uses_option(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     option = PriceOptionFactory.create()
     old_unit_group = option.unit_group
@@ -98,7 +103,7 @@ def test_price_option_admin__unit_group_cannot_change_when_component_uses_option
 # ── Application rounds ──
 
 
-def test_price_option_admin__new_option_for_round_with_only_implicit_options(api_client):
+def test_price_option_admin__new_option_for_round_with_only_implicit_options(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     unit_group = UnitGroupFactory.create()
     PriceOptionFactory.create(unit_group=unit_group, name="Adults")
@@ -114,7 +119,7 @@ def test_price_option_admin__new_option_for_round_with_only_implicit_options(api
     assert PriceOption.objects.filter(name_fi="Juniors").exists()
 
 
-def test_price_option_admin__new_option_that_makes_round_inconsistent_is_rejected(api_client):
+def test_price_option_admin__new_option_that_makes_round_inconsistent_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")
@@ -150,7 +155,7 @@ def test_price_option_admin__new_option_that_makes_round_inconsistent_is_rejecte
     assert not PriceOption.objects.filter(name_fi="Juniors").exists()
 
 
-def test_price_option_admin__deactivating_implicit_option_of_round_is_rejected(api_client):
+def test_price_option_admin__deactivating_implicit_option_of_round_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     unit_group = UnitGroupFactory.create()
     adults = PriceOptionFactory.create(unit_group=unit_group, name="Adults")

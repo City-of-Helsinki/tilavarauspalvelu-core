@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.urls import reverse
@@ -13,6 +13,9 @@ from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationUnitFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors, round_form_data
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -38,7 +41,7 @@ def create_round(**kwargs: Any) -> ApplicationRound:
 
 
 @freeze_time(NOW)
-def test_application_round_admin__create_with_sports_form(api_client):
+def test_application_round_admin__create_with_sports_form(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     reservation_unit = ReservationUnitFactory.create()
 
@@ -56,7 +59,7 @@ def test_application_round_admin__create_with_sports_form(api_client):
 
 
 @freeze_time(NOW)
-def test_application_round_admin__change_application_form_before_application_period(api_client):
+def test_application_round_admin__change_application_form_before_application_period(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     application_round = create_round(
         application_period_begins_at=NOW + datetime.timedelta(days=1),
@@ -77,7 +80,9 @@ def test_application_round_admin__change_application_form_before_application_per
 
 
 @freeze_time(NOW)
-def test_application_round_admin__change_application_form_after_application_period_began_is_rejected(api_client):
+def test_application_round_admin__change_application_form_after_application_period_began_is_rejected(
+    api_client: APIClient,
+) -> None:
     api_client.force_login(UserFactory.create_superuser())
     application_round = create_round(
         application_period_begins_at=NOW - datetime.timedelta(days=1),
@@ -107,7 +112,7 @@ def test_application_round_admin__change_application_form_after_application_peri
 
 
 @freeze_time(NOW)
-def test_application_round_admin__change_application_form_with_applications_is_rejected(api_client):
+def test_application_round_admin__change_application_form_with_applications_is_rejected(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     application_round = create_round(
         application_period_begins_at=NOW + datetime.timedelta(days=1),
@@ -138,7 +143,7 @@ def test_application_round_admin__change_application_form_with_applications_is_r
 
 
 @freeze_time(NOW)
-def test_application_round_admin__other_changes_allowed_after_application_period_began(api_client):
+def test_application_round_admin__other_changes_allowed_after_application_period_began(api_client: APIClient) -> None:
     api_client.force_login(UserFactory.create_superuser())
     application_round = create_round(
         application_form=ApplicationFormType.SPORTS_FORM,

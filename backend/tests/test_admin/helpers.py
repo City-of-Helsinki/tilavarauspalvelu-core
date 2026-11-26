@@ -25,7 +25,9 @@ if TYPE_CHECKING:
 def collect_admin_form_errors(errors: list[dict[str, Any]]) -> Generator[None, Any]:
     """Collect errors from the admin form to the given list of errors."""
 
-    def hook(request: WSGIRequest, template: list[str], context: dict[str, Any], *args, **kwargs) -> TemplateResponse:
+    def hook(
+        request: WSGIRequest, template: list[str], context: dict[str, Any], *args: Any, **kwargs: Any
+    ) -> TemplateResponse:
         errors.extend(context["errors"].get_json_data())
         return TemplateResponse(request, template, context, *args, **kwargs)
 

@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.urls import reverse
 
 from tests.factories import UnitFactory, UserFactory
+
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
 
 # Applied to all tests
 pytestmark = [
@@ -14,7 +19,7 @@ pytestmark = [
 # ── TPREK fields ──
 
 
-def test_unit_admin__change_page__tprek_fields_read_only_for_tprek_unit(api_client):
+def test_unit_admin__change_page__tprek_fields_read_only_for_tprek_unit(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -35,7 +40,7 @@ def test_unit_admin__change_page__tprek_fields_read_only_for_tprek_unit(api_clie
     assert "payment_merchant" in form_fields
 
 
-def test_unit_admin__change_page__tprek_fields_editable_without_tprek_id(api_client):
+def test_unit_admin__change_page__tprek_fields_editable_without_tprek_id(api_client: APIClient) -> None:
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
