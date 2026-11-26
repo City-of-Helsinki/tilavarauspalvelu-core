@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ParticipantGenderFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_participant_gender__query(graphql):
+def test_participant_gender__query(graphql: GraphQLClient) -> None:
     participant_gender = ParticipantGenderFactory.create()
 
     fields = """
@@ -36,7 +41,7 @@ def test_participant_gender__query(graphql):
     ]
 
 
-def test_participant_gender__order__by_rank(graphql):
+def test_participant_gender__order__by_rank(graphql: GraphQLClient) -> None:
     participant_gender_1 = ParticipantGenderFactory.create(rank=2)
     participant_gender_2 = ParticipantGenderFactory.create(rank=0)
     participant_gender_3 = ParticipantGenderFactory.create(rank=1)
