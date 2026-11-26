@@ -1125,6 +1125,50 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_d
     assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
+def test_reservation__create__prefilled_with_profile_data__use_data_in_session__old_version(graphql, settings):
+    # given:
+    # - Prefill setting is on
+    # - There is a reservation unit in the system
+    # - The reservation unit has a reservable time span
+    # - A regular user who has logged in with Suomi.fi is using the system
+    settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+    user = UserFactory.create(social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI)
+    graphql.force_login(user)
+
+    # when:
+    # - The user tries to create a reservation, but the helsinki profile call fails.
+    # - The session has prefill data from an older version, with an unknown key and a missing key
+    def update_session_prefill_info(session: SessionMapping, **kwargs: Any) -> str:
+        session["reservation_prefill_info"] = {
+            "reservee_first_name": "Example",
+            "reservee_last_name": "User",
+            "reservee_email": "user@example.com",
+            "reservee_phone": "0123456789",
+            "reservee_address_zip": "00100",
+            "reservee_address_city": "Helsinki",
+        }
+        return "foo"
+
+    data = get_create_data(reservation_unit)
+    with patch_method(HelsinkiProfileClient.get_token, side_effect=update_session_prefill_info):
+        response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - There are no errors in the response
+    # - The reservation was prefilled with the known keys from the session
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.reservee_first_name == "Example"
+    assert reservation.reservee_last_name == "User"
+    assert reservation.reservee_email == "user@example.com"
+    assert reservation.reservee_phone == "0123456789"
+    assert reservation.reservee_address_zip == "00100"
+    assert reservation.municipality is None
+
+
 @pytest.mark.parametrize("arm", ADLoginAMR)
 def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, settings, arm: ADLoginAMR):
     # given:
