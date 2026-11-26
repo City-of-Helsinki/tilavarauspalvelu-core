@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 from copy import deepcopy
 from inspect import isfunction
+from typing import TYPE_CHECKING
 
 import pytest
 from graphql import OperationType
@@ -20,6 +21,9 @@ from tests.factories import (
 
 from .helpers import assert_no_undefined_variables, get_customer_query_info
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.frontend_query,
@@ -27,7 +31,7 @@ pytestmark = [
 
 
 # NOTE: Test names need to include the name of the operation for this to work.
-def test_frontend_queries__customer_ui__tests_exist_for_all_mutations():
+def test_frontend_queries__customer_ui__tests_exist_for_all_mutations() -> None:
     queries = get_customer_query_info()
     operations = {name for name, info in queries.items() if info[0].operation == OperationType.MUTATION}
 
@@ -47,7 +51,7 @@ def test_frontend_queries__customer_ui__tests_exist_for_all_mutations():
     assert not sorted_missing, "Some mutations not tested"
 
 
-def test_frontend_queries__customer_ui__AdjustReservationTime(graphql):
+def test_frontend_queries__customer_ui__AdjustReservationTime(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["AdjustReservationTime"]
 
@@ -79,7 +83,7 @@ def test_frontend_queries__customer_ui__AdjustReservationTime(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CancelApplication(graphql):
+def test_frontend_queries__customer_ui__CancelApplication(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["CancelApplication"]
 
@@ -103,7 +107,7 @@ def test_frontend_queries__customer_ui__CancelApplication(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CancelApplicationSection(graphql):
+def test_frontend_queries__customer_ui__CancelApplicationSection(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["CancelApplicationSection"]
 
@@ -134,7 +138,7 @@ def test_frontend_queries__customer_ui__CancelApplicationSection(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CancelReservation(graphql):
+def test_frontend_queries__customer_ui__CancelReservation(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["CancelReservation"]
 
@@ -160,7 +164,7 @@ def test_frontend_queries__customer_ui__CancelReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ConfirmReservation(graphql):
+def test_frontend_queries__customer_ui__ConfirmReservation(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ConfirmReservation"]
 
@@ -184,7 +188,7 @@ def test_frontend_queries__customer_ui__ConfirmReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateApplication(graphql):
+def test_frontend_queries__customer_ui__CreateApplication(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["CreateApplication"]
 
@@ -233,7 +237,7 @@ def test_frontend_queries__customer_ui__CreateApplication(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateReservation(graphql):
+def test_frontend_queries__customer_ui__CreateReservation(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["CreateReservation"]
 
@@ -261,7 +265,7 @@ def test_frontend_queries__customer_ui__CreateReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__DeleteReservation(graphql):
+def test_frontend_queries__customer_ui__DeleteReservation(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["DeleteReservation"]
 
@@ -284,7 +288,7 @@ def test_frontend_queries__customer_ui__DeleteReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__SendApplication(graphql):
+def test_frontend_queries__customer_ui__SendApplication(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["SendApplication"]
 
@@ -307,7 +311,7 @@ def test_frontend_queries__customer_ui__SendApplication(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateApplication(graphql):
+def test_frontend_queries__customer_ui__UpdateApplication(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["UpdateApplication"]
 
@@ -331,7 +335,7 @@ def test_frontend_queries__customer_ui__UpdateApplication(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateReservation(graphql):
+def test_frontend_queries__customer_ui__UpdateReservation(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["UpdateReservation"]
 

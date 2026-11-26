@@ -61,7 +61,7 @@ class QueryInfo:
     typename: str
     """Name of the GraphQL object type for the root operation. Can be used to generate Node IDs."""
 
-    variables: dict[str, str]
+    variables: dict[str, Any]
     """Variables used in the operation."""
 
     factory: type[GenericDjangoModelFactory] | None
