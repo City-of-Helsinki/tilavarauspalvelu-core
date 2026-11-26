@@ -48,12 +48,11 @@ export function ApplicantInfoPreview({ application, isSportsForm }: ApplicantInf
   const shouldShowActiveMembers = isOrganisation && isSportsForm && application.organisationActiveMembers != null;
 
   // The design puts the active members on the first row, next to the other organisation fields.
+  // Only that row has 4 columns, so the organisation fields and the contact fields are in separate containers.
   return (
-    <ApplicationInfoContainer $columns={shouldShowActiveMembers ? 4 : 3}>
-      {application.applicantType == null ? (
-        <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>
-      ) : application.applicantType !== ReserveeType.Individual ? (
-        <>
+    <>
+      {isOrganisation && (
+        <ApplicationInfoContainer $columnCount={shouldShowActiveMembers ? 4 : 3}>
           <LabelValue
             label={
               application.applicantType === ReserveeType.Company
@@ -80,25 +79,28 @@ export function ApplicantInfoPreview({ application, isSportsForm }: ApplicantInf
               value={application.organisationActiveMembers}
             />
           )}
-        </>
-      ) : null}
-      <LabelValue label={t("application:preview.contactPerson")} value={applicant.name} />
-      <LabelValue label={t("application:preview.contactInfo")} value={applicant.contact} />
-      {applicant.address && <LabelValue label={t("application:preview.address")} value={applicant.address} />}
-      {applicant.billingAddress && (
-        <LabelValue
-          label={t("application:preview.organisation.billingAddress")}
-          value={applicant.billingAddress}
-          fullWidth={!!application.organisationStreetAddress}
-        />
+        </ApplicationInfoContainer>
       )}
-      {application.applicantType === ReserveeType.Individual && application.additionalInformation && (
-        <LabelValue
-          label={t("application:preview.additionalInformation")}
-          value={application.additionalInformation}
-          fullWidth
-        />
-      )}
-    </ApplicationInfoContainer>
+      <ApplicationInfoContainer $hasDividerAbove={isOrganisation}>
+        {application.applicantType == null && <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>}
+        <LabelValue label={t("application:preview.contactPerson")} value={applicant.name} />
+        <LabelValue label={t("application:preview.contactInfo")} value={applicant.contact} />
+        {applicant.address && <LabelValue label={t("application:preview.address")} value={applicant.address} />}
+        {applicant.billingAddress && (
+          <LabelValue
+            label={t("application:preview.organisation.billingAddress")}
+            value={applicant.billingAddress}
+            fullWidth={!!application.organisationStreetAddress}
+          />
+        )}
+        {application.applicantType === ReserveeType.Individual && application.additionalInformation && (
+          <LabelValue
+            label={t("application:preview.additionalInformation")}
+            value={application.additionalInformation}
+            fullWidth
+          />
+        )}
+      </ApplicationInfoContainer>
+    </>
   );
 }

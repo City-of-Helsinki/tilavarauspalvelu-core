@@ -48,10 +48,12 @@ export const ApplicationSectionHeader = styled.h2`
 
 type ApplicationInfoContainerProps = {
   // The number of InfoItemContainers in one row on a wide screen. The default is 3.
-  $columns?: 3 | 4;
+  $columnCount?: 3 | 4;
+  // Keep the divider above the first row, when the container follows another ApplicationInfoContainer.
+  $hasDividerAbove?: boolean;
 };
 
-const getColumns = ({ $columns }: ApplicationInfoContainerProps) => $columns ?? 3;
+const getColumnCount = ({ $columnCount }: ApplicationInfoContainerProps) => $columnCount ?? 3;
 
 /** Puts the InfoItemContainers in rows on a wide screen, with dashed dividers between them. */
 export const ApplicationInfoContainer = styled.div<ApplicationInfoContainerProps>`
@@ -59,19 +61,19 @@ export const ApplicationInfoContainer = styled.div<ApplicationInfoContainerProps
   display: flex;
   flex-flow: column nowrap;
   @media (min-width: ${breakpoints.m}) {
-    --application-info-columns: ${getColumns};
+    --application-info-columns: ${getColumnCount};
     flex-flow: row wrap;
 
     /* The first row has no divider above it */
-    > :nth-child(-n + ${getColumns}) {
-      border-top: 0;
+    > :nth-child(-n + ${getColumnCount}) {
+      ${({ $hasDividerAbove }) => ($hasDividerAbove ? "" : "border-top: 0;")}
     }
     /* The first item in each row is aligned with the left side of the parent content */
-    > :nth-child(${getColumns}n + 1) > * {
+    > :nth-child(${getColumnCount}n + 1) > * {
       padding-left: 0;
     }
     /* Each item that is not the last one in its row has a divider on the right */
-    > :not(:nth-child(${getColumns}n)):not(:last-child) > * {
+    > :not(:nth-child(${getColumnCount}n)):not(:last-child) > * {
       border-right: var(--application-content-border);
     }
   }
