@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationUnitTypeFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_type__query(graphql):
+def test_reservation_unit_type__query(graphql: GraphQLClient) -> None:
     res_unit_type = ReservationUnitTypeFactory.create(name="foo")
 
     graphql.login_with_superuser()
@@ -38,7 +43,7 @@ def test_reservation_unit_type__query(graphql):
     }
 
 
-def test_reservation_unit_type__order__by_name(graphql):
+def test_reservation_unit_type__order__by_name(graphql: GraphQLClient) -> None:
     res_unit_type_1 = ReservationUnitTypeFactory.create(name="1")
     res_unit_type_2 = ReservationUnitTypeFactory.create(name="3")
     res_unit_type_3 = ReservationUnitTypeFactory.create(name="2")
