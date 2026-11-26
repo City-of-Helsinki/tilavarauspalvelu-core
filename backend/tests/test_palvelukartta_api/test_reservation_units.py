@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.urls import reverse
 
@@ -7,12 +9,15 @@ from utils.date_utils import local_datetime
 
 from tests.factories import ReservationUnitFactory, UnitFactory
 
+if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_palvelukartta_api__reservation_units(api_client):
+def test_palvelukartta_api__reservation_units(api_client: APIClient) -> None:
     unit_1 = UnitFactory.create(tprek_id="1234")
     reservation_unit_1 = ReservationUnitFactory.create(unit=unit_1)
     reservation_unit_2 = ReservationUnitFactory.create(unit=unit_1)
@@ -39,7 +44,7 @@ def test_palvelukartta_api__reservation_units(api_client):
     ]
 
 
-def test_palvelukartta_api__reservation_units__only_visible(api_client):
+def test_palvelukartta_api__reservation_units__only_visible(api_client: APIClient) -> None:
     unit = UnitFactory.create(tprek_id="1234")
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     ReservationUnitFactory.create(unit=unit, publish_ends_at=local_datetime(year=2022, month=1, day=1))
