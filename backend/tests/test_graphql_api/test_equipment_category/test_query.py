@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import EquipmentCategoryFactory
 
 from .helpers import equipment_categories_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_equipment_category__query(graphql):
+def test_equipment_category__query(graphql: GraphQLClient) -> None:
     category = EquipmentCategoryFactory.create(name="foo")
 
     graphql.login_with_superuser()
