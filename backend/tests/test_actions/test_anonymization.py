@@ -39,7 +39,7 @@ pytestmark = [
 ]
 
 
-def test_anonymization__user():
+def test_anonymization__user() -> None:
     mr_anonymous = UserFactory.create_superuser(
         username="anonym",
         first_name="anony",
@@ -79,7 +79,7 @@ def test_anonymization__user():
     assert UserSocialAuth.objects.filter(user=mr_anonymous).count() == 0
 
 
-def test_anonymization__application():
+def test_anonymization__application() -> None:
     mr_anonymous = UserFactory.create_superuser(
         username="anonym",
         first_name="anony",
@@ -135,7 +135,7 @@ def test_anonymization__application():
     assert LogEntry.objects.get_for_object(other_application).count() == 1
 
 
-def test_anonymization__reservation():
+def test_anonymization__reservation() -> None:
     mr_anonymous = UserFactory.create_superuser(
         username="anonym",
         first_name="anony",
@@ -176,6 +176,7 @@ def test_anonymization__reservation():
     assert reservation.cancel_details == SENSITIVE_RESERVATION
     assert reservation.handling_details == SENSITIVE_RESERVATION
 
+    assert reservation.reservation_series is not None
     assert reservation.reservation_series.name == ANONYMIZED
     assert reservation.reservation_series.description == ANONYMIZED
 
@@ -185,7 +186,7 @@ def test_anonymization__reservation():
 
 
 @freeze_time("2024-01-01")
-def test_anonymization__can_anonymize__open_reservations():
+def test_anonymization__can_anonymize__open_reservations() -> None:
     user = UserFactory.create(first_name="foo")
 
     now = local_datetime()
@@ -198,8 +199,11 @@ def test_anonymization__can_anonymize__open_reservations():
     assert can_anonymize.has_open_payments is False
 
 
-@pytest.mark.parametrize("status", ApplicationStatusChoice.blocks_anonymization)
-def test_anonymization__can_anonymize__open_applications(status):
+@pytest.mark.parametrize(
+    "status",
+    [ApplicationStatusChoice(status) for status in ApplicationStatusChoice.blocks_anonymization],
+)
+def test_anonymization__can_anonymize__open_applications(status: ApplicationStatusChoice) -> None:
     user = UserFactory.create(first_name="foo")
 
     ApplicationBuilder().with_status(status).create(user=user)
@@ -211,7 +215,7 @@ def test_anonymization__can_anonymize__open_applications(status):
     assert can_anonymize.has_open_payments is False
 
 
-def test_anonymization__can_anonymize__open_payments():
+def test_anonymization__can_anonymize__open_payments() -> None:
     user = UserFactory.create(first_name="foo")
 
     PaymentOrderFactory.create(
@@ -231,7 +235,7 @@ def test_anonymization__can_anonymize__open_payments():
 
 @freeze_time("2024-01-01")
 @override_settings(ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10)
-def test_anonymization__anonymize_inactive_users():
+def test_anonymization__anonymize_inactive_users() -> None:
     now = local_datetime()
 
     user_1 = UserFactory.create(first_name="foo", last_login=now - datetime.timedelta(days=11))

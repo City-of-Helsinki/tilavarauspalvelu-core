@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
 from tests.factories import ADGroupFactory, UnitFactory, UnitRoleFactory, UserFactory
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_user_actions__get_ad_group_roles__single():
+def test_user_actions__get_ad_group_roles__single() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
     roles = user.actions.get_ad_group_roles()
@@ -20,7 +25,7 @@ def test_user_actions__get_ad_group_roles__single():
     assert roles == {UserRoleChoice.HANDLER: {unit.id}}
 
 
-def test_user_actions__get_ad_group_roles__single__prefix_has_underscore():
+def test_user_actions__get_ad_group_roles__single__prefix_has_underscore() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi_new__varaamo__handler__123")
     roles = user.actions.get_ad_group_roles()
@@ -28,7 +33,7 @@ def test_user_actions__get_ad_group_roles__single__prefix_has_underscore():
     assert roles == {UserRoleChoice.HANDLER: {unit.id}}
 
 
-def test_user_actions__get_ad_group_roles__multiple():
+def test_user_actions__get_ad_group_roles__multiple() -> None:
     unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     ad_group_1 = ADGroupFactory.create(name="oodi__varaamo__handler__123")
@@ -39,7 +44,7 @@ def test_user_actions__get_ad_group_roles__multiple():
     assert roles == {UserRoleChoice.HANDLER: {unit_1.id}, UserRoleChoice.RESERVER: {unit_2.id}}
 
 
-def test_user_actions__get_ad_group_roles__multiple__same_unit():
+def test_user_actions__get_ad_group_roles__multiple__same_unit() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     ad_group_1 = ADGroupFactory.create(name="oodi__varaamo__handler__123")
     ad_group_2 = ADGroupFactory.create(name="oodi__varaamo__reserver__123")
@@ -49,7 +54,7 @@ def test_user_actions__get_ad_group_roles__multiple__same_unit():
     assert roles == {UserRoleChoice.HANDLER: {unit.id}, UserRoleChoice.RESERVER: {unit.id}}
 
 
-def test_user_actions__get_ad_group_roles__multiple__same_role():
+def test_user_actions__get_ad_group_roles__multiple__same_role() -> None:
     unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     ad_group_1 = ADGroupFactory.create(name="oodi__varaamo__handler__123")
@@ -60,7 +65,7 @@ def test_user_actions__get_ad_group_roles__multiple__same_role():
     assert roles == {UserRoleChoice.HANDLER: {unit_1.id, unit_2.id}}
 
 
-def test_user_actions__get_ad_group_roles__multiple_roles_in_same_ad_group():
+def test_user_actions__get_ad_group_roles__multiple_roles_in_same_ad_group() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__reserver__123")
     roles = user.actions.get_ad_group_roles()
@@ -68,21 +73,21 @@ def test_user_actions__get_ad_group_roles__multiple_roles_in_same_ad_group():
     assert roles == {UserRoleChoice.HANDLER: {unit.id}, UserRoleChoice.RESERVER: {unit.id}}
 
 
-def test_user_actions__get_ad_group_roles__no_ad_groups():
+def test_user_actions__get_ad_group_roles__no_ad_groups() -> None:
     user = UserFactory.create()
     roles = user.actions.get_ad_group_roles()
 
     assert roles == {}
 
 
-def test_user_actions__get_ad_group_roles__ad_group_doesnt_match():
+def test_user_actions__get_ad_group_roles__ad_group_doesnt_match() -> None:
     user = UserFactory.create(ad_groups__name="foo")
     roles = user.actions.get_ad_group_roles()
 
     assert roles == {}
 
 
-def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_prefix():
+def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_prefix() -> None:
     UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="varaamo__handler__123")
     roles = user.actions.get_ad_group_roles()
@@ -90,7 +95,7 @@ def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_prefix():
     assert roles == {}
 
 
-def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_tprek_id():
+def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_tprek_id() -> None:
     UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__admin")
     roles = user.actions.get_ad_group_roles()
@@ -98,7 +103,7 @@ def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_tprek_id():
     assert roles == {}
 
 
-def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_role():
+def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_role() -> None:
     UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__123")
     roles = user.actions.get_ad_group_roles()
@@ -106,7 +111,7 @@ def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__no_role():
     assert roles == {}
 
 
-def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__unknown_role():
+def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__unknown_role() -> None:
     UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__new__123")
     roles = user.actions.get_ad_group_roles()
@@ -114,7 +119,7 @@ def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__unknown_role()
     assert roles == {}
 
 
-def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__skip_unknown_role():
+def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__skip_unknown_role() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__new__123")
     roles = user.actions.get_ad_group_roles()
@@ -122,7 +127,7 @@ def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__skip_unknown_r
     assert roles == {UserRoleChoice.HANDLER: {unit.id}}
 
 
-def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__unknown_unit():
+def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__unknown_unit() -> None:
     UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__456")
     roles = user.actions.get_ad_group_roles()
@@ -130,7 +135,7 @@ def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__unknown_unit()
     assert roles == {}
 
 
-def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__dont_allow_permissions_from_ad_groups():
+def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__dont_allow_permissions_from_ad_groups() -> None:
     UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=False)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
     roles = user.actions.get_ad_group_roles()
@@ -138,7 +143,7 @@ def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__dont_allow_per
     assert roles == {}
 
 
-def test_user_actions__get_ad_group_roles__fake_superuser_ad_groups(settings):
+def test_user_actions__get_ad_group_roles__fake_superuser_ad_groups(settings: Settings) -> None:
     settings.FAKE_SUPERUSER_AD_GROUPS = ["oodi__varaamo__handler__123"]
 
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
@@ -148,7 +153,7 @@ def test_user_actions__get_ad_group_roles__fake_superuser_ad_groups(settings):
     assert roles == {UserRoleChoice.HANDLER: {unit.id}}
 
 
-def test_user_actions__get_ad_group_roles__fake_superuser_ad_groups__not_superuser(settings):
+def test_user_actions__get_ad_group_roles__fake_superuser_ad_groups__not_superuser(settings: Settings) -> None:
     settings.FAKE_SUPERUSER_AD_GROUPS = ["oodi__varaamo__handler__123"]
 
     UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
@@ -158,7 +163,7 @@ def test_user_actions__get_ad_group_roles__fake_superuser_ad_groups__not_superus
     assert roles == {}
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__add_new_role():
+def test_user_actions__update_unit_roles_from_ad_groups__add_new_role() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
 
@@ -171,7 +176,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_role():
     assert unit_roles[0].units.first() == unit
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__remove_old_role():
+def test_user_actions__update_unit_roles_from_ad_groups__remove_old_role() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create()
 
@@ -184,7 +189,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__remove_old_role():
     assert user.unit_roles.count() == 0
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__add_new_and_remove_old_role():
+def test_user_actions__update_unit_roles_from_ad_groups__add_new_and_remove_old_role() -> None:
     unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
@@ -199,7 +204,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_and_remove_old_
     assert unit_roles[0].units.first() == unit_1
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__add_new_unit():
+def test_user_actions__update_unit_roles_from_ad_groups__add_new_unit() -> None:
     unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     ad_group_1 = ADGroupFactory.create(name="oodi__varaamo__handler__123")
@@ -220,7 +225,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_unit():
     assert unit_roles_units[1] == unit_2
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__remove_existing_unit():
+def test_user_actions__update_unit_roles_from_ad_groups__remove_existing_unit() -> None:
     unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
@@ -238,7 +243,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__remove_existing_unit():
     assert unit_roles_units[0] == unit_1
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__dont_remove_role_if_not_added_via_ad_group():
+def test_user_actions__update_unit_roles_from_ad_groups__dont_remove_role_if_not_added_via_ad_group() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create()
 
@@ -251,7 +256,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__dont_remove_role_if_not
     assert user.unit_roles.first() == role
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__roles_remain_as_is():
+def test_user_actions__update_unit_roles_from_ad_groups__roles_remain_as_is() -> None:
     unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     ad_group_1 = ADGroupFactory.create(name="oodi__varaamo__handler__123")
@@ -272,7 +277,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__roles_remain_as_is():
     assert unit_roles_units[1] == unit_2
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__role_changed_units_remain():
+def test_user_actions__update_unit_roles_from_ad_groups__role_changed_units_remain() -> None:
     unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     ad_group_1 = ADGroupFactory.create(name="oodi__varaamo__handler__123")
@@ -293,7 +298,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__role_changed_units_rema
     assert unit_roles_units[1] == unit_2
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__ad_roles_no_longer_allowed():
+def test_user_actions__update_unit_roles_from_ad_groups__ad_roles_no_longer_allowed() -> None:
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=False)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
 

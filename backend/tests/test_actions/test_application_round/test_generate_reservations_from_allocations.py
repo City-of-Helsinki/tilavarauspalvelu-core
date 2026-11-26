@@ -46,6 +46,7 @@ from tests.factories import (
 from tests.factories.application_round import ApplicationRoundFactory
 from tests.factories.reservation_unit import ReservationUnitBuilder
 from tests.factories.unit import UnitBuilder
+from tests.helpers import as_mock
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application, ApplicationRound, PriceOption, ReservationUnit
@@ -54,6 +55,30 @@ pytestmark = [
     pytest.mark.django_db,
     pytest.mark.patch_method.with_args(HaukiAPIClient.get_date_periods, return_value=[]),
 ]
+
+
+def closed_date_period(
+    *,
+    start_date: str | None,
+    end_date: str | None,
+    resource_state: HaukiResourceState,
+    override: bool,
+) -> HaukiAPIDatePeriod:
+    """Return a Hauki date period. The reservation generation reads only the dates, the state and the override."""
+    return HaukiAPIDatePeriod(
+        id=1,
+        resource=1,
+        name={"fi": None, "sv": None, "en": None},
+        description={"fi": None, "sv": None, "en": None},
+        start_date=start_date,
+        end_date=end_date,
+        resource_state=resource_state,
+        override=override,
+        origins=[],
+        created="2023-09-06T09:14:12.671531+03:00",
+        modified="2023-09-06T09:14:12.671531+03:00",
+        time_span_groups=[],
+    )
 
 
 # ── Helpers ──
@@ -104,7 +129,7 @@ def create_priced_reservation_unit(*, price_option: PriceOption | None = None) -
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations():
+def test_generate_reservation_series_from_allocations() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -127,12 +152,13 @@ def test_generate_reservation_series_from_allocations():
 
     application_round.actions.generate_reservations_from_allocations()
 
-    assert HaukiAPIClient.get_date_periods.call_count == 1
+    assert as_mock(HaukiAPIClient.get_date_periods).call_count == 1
 
     all_series: list[ReservationSeries] = list(ReservationSeries.objects.all())
     assert len(all_series) == 1
 
     series = all_series[0]
+    assert series.allocated_time_slot is not None
     section = series.allocated_time_slot.reservation_unit_option.application_section
 
     assert series.name == section.name
@@ -177,7 +203,7 @@ def test_generate_reservation_series_from_allocations():
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__individual():
+def test_generate_reservation_series_from_allocations__individual() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -198,7 +224,7 @@ def test_generate_reservation_series_from_allocations__individual():
         user=user,
     )
 
-    application: Application = application_round.applications.first()
+    application: Application = application_round.applications.get()
     application.applicant_type = ReserveeType.INDIVIDUAL
     application.save()
 
@@ -214,7 +240,7 @@ def test_generate_reservation_series_from_allocations__individual():
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
 @pytest.mark.parametrize("reservee_type", [ReserveeType.COMPANY, ReserveeType.NONPROFIT])
-def test_generate_reservation_series_from_allocations__organisation_reservee(reservee_type):
+def test_generate_reservation_series_from_allocations__organisation_reservee(reservee_type: ReserveeType) -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -235,7 +261,7 @@ def test_generate_reservation_series_from_allocations__organisation_reservee(res
         user=user,
     )
 
-    application: Application = application_round.applications.first()
+    application: Application = application_round.applications.get()
     application.applicant_type = reservee_type
     application.save()
 
@@ -252,7 +278,7 @@ def test_generate_reservation_series_from_allocations__organisation_reservee(res
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__multiple_allocations():
+def test_generate_reservation_series_from_allocations__multiple_allocations() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -291,11 +317,11 @@ def test_generate_reservation_series_from_allocations__multiple_allocations():
     assert reservations[1].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 12)
     assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 2, 14)
 
-    assert HaukiAPIClient.get_date_periods.call_count == 1
+    assert as_mock(HaukiAPIClient.get_date_periods).call_count == 1
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__invalid_start_interval():
+def test_generate_reservation_series_from_allocations__invalid_start_interval() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -330,7 +356,7 @@ def test_generate_reservation_series_from_allocations__invalid_start_interval():
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__overlapping_reservation():
+def test_generate_reservation_series_from_allocations__overlapping_reservation() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -376,7 +402,7 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours():
+def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -397,11 +423,11 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
         user=user,
     )
 
-    HaukiAPIClient.get_date_periods.return_value = [
-        HaukiAPIDatePeriod(
+    as_mock(HaukiAPIClient.get_date_periods).return_value = [
+        closed_date_period(
             start_date="2024-01-01",
             end_date="2024-01-01",
-            resource_state=HaukiResourceState.CLOSED.value,
+            resource_state=HaukiResourceState.CLOSED,
             override=True,
         ),
     ]
@@ -418,11 +444,11 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
     assert rejected[0].begin_datetime.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
     assert rejected[0].end_datetime.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
 
-    assert HaukiAPIClient.get_date_periods.call_count == 1
+    assert as_mock(HaukiAPIClient.get_date_periods).call_count == 1
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__no_end_date():
+def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__no_end_date() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -443,11 +469,11 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
         user=user,
     )
 
-    HaukiAPIClient.get_date_periods.return_value = [
-        HaukiAPIDatePeriod(
+    as_mock(HaukiAPIClient.get_date_periods).return_value = [
+        closed_date_period(
             start_date="2024-01-08",
             end_date=None,
-            resource_state=HaukiResourceState.CLOSED.value,
+            resource_state=HaukiResourceState.CLOSED,
             override=True,
         ),
     ]
@@ -467,7 +493,7 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__no_start_date():
+def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__no_start_date() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -488,11 +514,11 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
         user=user,
     )
 
-    HaukiAPIClient.get_date_periods.return_value = [
-        HaukiAPIDatePeriod(
+    as_mock(HaukiAPIClient.get_date_periods).return_value = [
+        closed_date_period(
             start_date=None,
             end_date="2024-01-01",
-            resource_state=HaukiResourceState.CLOSED.value,
+            resource_state=HaukiResourceState.CLOSED,
             override=True,
         ),
     ]
@@ -512,7 +538,7 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__not_affecting():
+def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__not_affecting() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -533,26 +559,26 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
         user=user,
     )
 
-    HaukiAPIClient.get_date_periods.return_value = [
+    as_mock(HaukiAPIClient.get_date_periods).return_value = [
         # Wrong date
-        HaukiAPIDatePeriod(
+        closed_date_period(
             start_date="2024-01-02",
             end_date="2024-01-02",
-            resource_state=HaukiResourceState.CLOSED.value,
+            resource_state=HaukiResourceState.CLOSED,
             override=True,
         ),
         # Non-overriding date period
-        HaukiAPIDatePeriod(
+        closed_date_period(
             start_date="2024-01-01",
             end_date="2024-01-01",
-            resource_state=HaukiResourceState.CLOSED.value,
+            resource_state=HaukiResourceState.CLOSED,
             override=False,
         ),
         # Not closed
-        HaukiAPIDatePeriod(
+        closed_date_period(
             start_date="2024-01-01",
             end_date="2024-01-01",
-            resource_state=HaukiResourceState.WITH_RESERVATION.value,
+            resource_state=HaukiResourceState.WITH_RESERVATION,
             override=True,
         ),
     ]
@@ -565,11 +591,11 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
     assert reservations[0].begins_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 12)
     assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 1, 14)
 
-    assert HaukiAPIClient.get_date_periods.call_count == 1
+    assert as_mock(HaukiAPIClient.get_date_periods).call_count == 1
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__access_code():
+def test_generate_reservation_series_from_allocations__access_code() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_access_code().create()
@@ -599,7 +625,7 @@ def test_generate_reservation_series_from_allocations__access_code():
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__access_code__changes_during_reservation_period():
+def test_generate_reservation_series_from_allocations__access_code__changes_during_reservation_period() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().create()
@@ -642,7 +668,7 @@ def test_generate_reservation_series_from_allocations__access_code__changes_duri
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__two_reservation_units_with_different_access_type():
+def test_generate_reservation_series_from_allocations__two_reservation_units_with_different_access_type() -> None:
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit_1 = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -681,7 +707,7 @@ def test_generate_reservation_series_from_allocations__two_reservation_units_wit
     assert reservations[1].access_type == AccessType.UNRESTRICTED
     assert reservations[2].access_type == AccessType.UNRESTRICTED
 
-    reservations: list[Reservation] = list(qs.filter(reservation_unit=reservation_unit_2))
+    reservations = list(qs.filter(reservation_unit=reservation_unit_2))
     assert len(reservations) == 3
 
     assert reservations[0].access_type == AccessType.ACCESS_CODE
@@ -693,7 +719,7 @@ def test_generate_reservation_series_from_allocations__two_reservation_units_wit
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_generate_reservation_series_from_allocations__prices_from_price_option():
+def test_generate_reservation_series_from_allocations__prices_from_price_option() -> None:
     adults = PriceOptionFactory.create(unit_group=UnitGroupFactory.create(), name="Aikuiset")
     reservation_unit = create_priced_reservation_unit(price_option=adults)
     application_round = create_round_on_mondays(reservation_units=[reservation_unit])
@@ -716,7 +742,7 @@ def test_generate_reservation_series_from_allocations__prices_from_price_option(
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_generate_reservation_series_from_allocations__component_with_and_without_price_option():
+def test_generate_reservation_series_from_allocations__component_with_and_without_price_option() -> None:
     adults = PriceOptionFactory.create(unit_group=UnitGroupFactory.create(), name="Aikuiset")
     pricing_group = PricingGroupFactory.create(unit_group=adults.unit_group)
     PriceComponentFactory.create(
@@ -751,7 +777,7 @@ def test_generate_reservation_series_from_allocations__component_with_and_withou
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_generate_reservation_series_from_allocations__pricing_group_changes_during_reservation_period():
+def test_generate_reservation_series_from_allocations__pricing_group_changes_during_reservation_period() -> None:
     reservation_unit = create_priced_reservation_unit()
     second_group = PricingGroupFactory.create()
     PriceComponentFactory.create(
@@ -779,7 +805,7 @@ def test_generate_reservation_series_from_allocations__pricing_group_changes_dur
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_generate_reservation_series_from_allocations__no_pricing_groups():
+def test_generate_reservation_series_from_allocations__no_pricing_groups() -> None:
     adults = PriceOptionFactory.create(unit_group=UnitGroupFactory.create())
     reservation_unit = ReservationUnitBuilder().with_unrestricted_access().create()
     application_round = create_round_on_mondays(reservation_units=[reservation_unit])
@@ -796,7 +822,7 @@ def test_generate_reservation_series_from_allocations__no_pricing_groups():
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_generate_reservation_series_from_allocations__mixed_pricing_groups():
+def test_generate_reservation_series_from_allocations__mixed_pricing_groups() -> None:
     priced_unit = create_priced_reservation_unit()
     unpriced_unit = ReservationUnitBuilder().with_unrestricted_access().create()
     application_round = create_round_on_mondays(reservation_units=[priced_unit, unpriced_unit])
@@ -809,7 +835,7 @@ def test_generate_reservation_series_from_allocations__mixed_pricing_groups():
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_generate_reservation_series_from_allocations__price_query_count_does_not_grow_with_reservations():
+def test_generate_reservation_series_from_allocations__price_query_count_does_not_grow_with_reservations() -> None:
     def count_queries(weeks: int) -> int:
         reservation_unit = create_priced_reservation_unit()
         application_round = create_round_on_mondays(reservation_units=[reservation_unit], weeks=weeks)

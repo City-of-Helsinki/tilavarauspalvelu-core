@@ -17,7 +17,7 @@ pytestmark = [
 
 
 @freezegun.freeze_time("2025-01-01")
-def test_reservation_unit__access_types__end_date():
+def test_reservation_unit__access_types__end_date() -> None:
     now = local_datetime()
 
     reservation_unit = ReservationUnitFactory.create()
@@ -32,7 +32,7 @@ def test_reservation_unit__access_types__end_date():
         begin_date=now.date() + datetime.timedelta(days=7),
     )
 
-    qs = reservation_unit.access_types.annotate(end_date=L("end_date")).order_by("begin_date").values("end_date")
+    qs = reservation_unit.access_types.order_by("begin_date").values(end_date=L("end_date"))
     assert list(qs) == [
         {"end_date": datetime.date(2025, 1, 8)},
         {"end_date": datetime.date.max},
@@ -40,7 +40,7 @@ def test_reservation_unit__access_types__end_date():
 
 
 @freezegun.freeze_time("2025-01-01")
-def test_reservation_unit__access_types__end_date__not_annotated__other_reservation_units_ignored():
+def test_reservation_unit__access_types__end_date__not_annotated__other_reservation_units_ignored() -> None:
     now = local_datetime()
 
     reservation_unit = ReservationUnitFactory.create()
@@ -72,7 +72,7 @@ def test_reservation_unit__access_types__end_date__not_annotated__other_reservat
 
 
 @freezegun.freeze_time("2025-01-01")
-def test_reservation_unit__access_types__active():
+def test_reservation_unit__access_types__active() -> None:
     now = local_datetime()
 
     reservation_unit = ReservationUnitFactory.create()
@@ -90,9 +90,8 @@ def test_reservation_unit__access_types__active():
     qs = (
         reservation_unit.access_types
         .active()
-        .annotate(end_date=L("end_date"))
         .order_by("begin_date")
-        .values("access_type", "begin_date", "end_date")
+        .values("access_type", "begin_date", end_date=L("end_date"))
     )
     assert list(qs) == [
         {
@@ -112,7 +111,7 @@ def test_reservation_unit__access_types__active():
         AccessType.PHYSICAL_KEY,
     ],
 )
-def test_reservation_unit__access_type_at(access_type):
+def test_reservation_unit__access_type_at(access_type: AccessType) -> None:
     now = local_datetime()
     past = now - datetime.timedelta(days=1)
     future = now + datetime.timedelta(days=1)
@@ -138,7 +137,7 @@ def test_reservation_unit__access_type_at(access_type):
         AccessType.PHYSICAL_KEY,
     ],
 )
-def test_reservation_unit__access_type_at__null(access_type):
+def test_reservation_unit__access_type_at__null(access_type: AccessType) -> None:
     now = local_datetime()
     past = now - datetime.timedelta(days=1)
     future = now + datetime.timedelta(days=1)
@@ -155,7 +154,7 @@ def test_reservation_unit__access_type_at__null(access_type):
     assert reservation_unit.current_access_type is None
 
 
-def test_reservation_unit__get_access_types_on_period():
+def test_reservation_unit__get_access_types_on_period() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     ReservationUnitAccessTypeFactory.create(
@@ -190,7 +189,7 @@ def test_reservation_unit__get_access_types_on_period():
     }
 
 
-def test_reservation_unit__get_access_types_on_period__starts_before_period():
+def test_reservation_unit__get_access_types_on_period__starts_before_period() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     ReservationUnitAccessTypeFactory.create(
@@ -218,7 +217,7 @@ def test_reservation_unit__get_access_types_on_period__starts_before_period():
     }
 
 
-def test_reservation_unit__get_access_types_on_period__no_active_access_type_in_the_beginning():
+def test_reservation_unit__get_access_types_on_period__no_active_access_type_in_the_beginning() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     ReservationUnitAccessTypeFactory.create(
@@ -248,7 +247,7 @@ def test_reservation_unit__get_access_types_on_period__no_active_access_type_in_
     }
 
 
-def test_reservation_unit__get_access_types_on_period__single():
+def test_reservation_unit__get_access_types_on_period__single() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     ReservationUnitAccessTypeFactory.create(
@@ -273,7 +272,7 @@ def test_reservation_unit__get_access_types_on_period__single():
     }
 
 
-def test_reservation_unit__get_access_types_on_period__no_access_types():
+def test_reservation_unit__get_access_types_on_period__no_access_types() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     begin_date = datetime.date(2025, 1, 1)
