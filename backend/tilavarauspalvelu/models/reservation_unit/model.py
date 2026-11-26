@@ -496,9 +496,6 @@ class ReservationUnit(models.Model):
 
     @lookup_property
     def reservation_state() -> ReservationUnitReservationState:
-        # The generated Python code cannot use enum members as constants, so use their values.
-        webshop_payment_types = [payment_type.value for payment_type in PaymentType.requires_verkkokauppa]
-
         case = models.Case(
             # Reservation Unit is currently not reservable, but will be in the future.
             models.When(
@@ -540,7 +537,8 @@ class ReservationUnit(models.Model):
                     | (
                         # Paid price paid in verkkokauppa with no payment product.
                         L(highest_price_today__gt=0)
-                        & models.Q(payment_type__in=webshop_payment_types)
+                        # The create mutation needs a product also when the payment type is empty.
+                        & ~models.Q(payment_type=PaymentType.ON_SITE.value)
                         & L(has_payment_product=False)
                         # When using Mock Verkkokauppa API, pricing is valid even if there is no payment product.
                         if not settings.MOCK_VERKKOKAUPPA_API_ENABLED
