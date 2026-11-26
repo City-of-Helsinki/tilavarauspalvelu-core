@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.helpers import TranslationsFromPOFiles
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -53,7 +58,7 @@ DATA = [
 ]
 
 
-def test_reservation_cancel_reasons__query(graphql):
+def test_reservation_cancel_reasons__query(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     with TranslationsFromPOFiles():
@@ -64,7 +69,7 @@ def test_reservation_cancel_reasons__query(graphql):
     assert response.first_query_object == DATA
 
 
-def test_reservation_cancel_reasons__query__anonymous_user(graphql):
+def test_reservation_cancel_reasons__query__anonymous_user(graphql: GraphQLClient) -> None:
     with TranslationsFromPOFiles():
         response = graphql(QUERY)
 
