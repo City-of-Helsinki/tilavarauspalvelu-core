@@ -11,6 +11,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # TextChoicesField takes its max_length from the current enum, also in old migrations.
+        # So the migration state already has the new length, and makemigrations cannot see the change.
+        migrations.RunSQL(
+            sql='ALTER TABLE "price_component" ALTER COLUMN "kind" TYPE varchar(9);',
+            reverse_sql='ALTER TABLE "price_component" ALTER COLUMN "kind" TYPE varchar(4);',
+        ),
         migrations.AddField(
             model_name='pricecomponent',
             name='is_adjustable',
