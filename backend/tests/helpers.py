@@ -79,6 +79,20 @@ class GraphQLClient(BaseGraphQLClient):
         assert isinstance(response, GQLResponse)
         return response
 
+    def login_with_superuser(self, username: str = "admin", **kwargs: Any) -> User:
+        from tilavarauspalvelu.models import User
+
+        user = super().login_with_superuser(username, **kwargs)
+        assert isinstance(user, User)
+        return user
+
+    def login_with_regular_user(self, username: str = "user", **kwargs: Any) -> User:
+        from tilavarauspalvelu.models import User
+
+        user = super().login_with_regular_user(username, **kwargs)
+        assert isinstance(user, User)
+        return user
+
     def login_user_with_role(self, role: UserRoleChoice) -> User:
         """Login with a user with the given role."""
         from .factories import UserFactory
