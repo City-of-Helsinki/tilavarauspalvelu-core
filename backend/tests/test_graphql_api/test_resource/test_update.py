@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ResourceLocationType
@@ -8,6 +10,9 @@ from tilavarauspalvelu.models import Resource
 from tests.factories import ResourceFactory, SpaceFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -18,8 +23,9 @@ pytestmark = [
 # ── Update ──
 
 
-def test_resource__update(graphql):
+def test_resource__update(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
+    assert resource.space is not None
     space = SpaceFactory.create(unit=resource.space.unit)
     graphql.login_with_superuser()
 
@@ -46,8 +52,9 @@ def test_resource__update(graphql):
 # ── Moving to another space ──
 
 
-def test_resource__update__unit_admin__move_to_space_of_same_unit(graphql):
+def test_resource__update__unit_admin__move_to_space_of_same_unit(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
+    assert resource.space is not None
     new_space = SpaceFactory.create(unit=resource.space.unit)
     admin = UserFactory.create_with_unit_role(units=[resource.space.unit])
     graphql.force_login(admin)
@@ -64,10 +71,11 @@ def test_resource__update__unit_admin__move_to_space_of_same_unit(graphql):
     assert resource.space == new_space
 
 
-def test_resource__update__unit_admin__move_to_space_of_other_unit(graphql):
+def test_resource__update__unit_admin__move_to_space_of_other_unit(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
     original_space = resource.space
     other_space = SpaceFactory.create()
+    assert original_space is not None
     admin = UserFactory.create_with_unit_role(units=[original_space.unit])
     graphql.force_login(admin)
 
@@ -84,7 +92,7 @@ def test_resource__update__unit_admin__move_to_space_of_other_unit(graphql):
     assert resource.space == original_space
 
 
-def test_resource__update__superuser__move_to_space_of_other_unit(graphql):
+def test_resource__update__superuser__move_to_space_of_other_unit(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
     original_space = resource.space
     other_space = SpaceFactory.create()
@@ -106,7 +114,7 @@ def test_resource__update__superuser__move_to_space_of_other_unit(graphql):
 # ── Fields and location ──
 
 
-def test_resource__update__remove_translations(graphql):
+def test_resource__update__remove_translations(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
     graphql.login_with_superuser()
 
@@ -125,7 +133,7 @@ def test_resource__update__remove_translations(graphql):
     assert resource.name_sv is None
 
 
-def test_resource__update__empty_name_fi(graphql):
+def test_resource__update__empty_name_fi(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
     graphql.login_with_superuser()
 
@@ -139,7 +147,7 @@ def test_resource__update__empty_name_fi(graphql):
     assert response.field_error_messages("name") == ["This field may not be blank."]
 
 
-def test_resource__update__null_space_with_fixed_location(graphql):
+def test_resource__update__null_space_with_fixed_location(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
     graphql.login_with_superuser()
 
@@ -153,7 +161,7 @@ def test_resource__update__null_space_with_fixed_location(graphql):
     assert response.field_error_messages() == ["Location type 'fixed' needs a space to be defined."]
 
 
-def test_resource__update__null_space_with_movable_location(graphql):
+def test_resource__update__null_space_with_movable_location(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create(location_type=ResourceLocationType.MOVABLE)
     graphql.login_with_superuser()
 
@@ -170,7 +178,7 @@ def test_resource__update__null_space_with_movable_location(graphql):
     assert resource.location_type == ResourceLocationType.MOVABLE
 
 
-def test_resource__update__bad_location(graphql):
+def test_resource__update__bad_location(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
     graphql.login_with_superuser()
 

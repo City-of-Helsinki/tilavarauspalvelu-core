@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ResourceLocationType
@@ -9,13 +11,16 @@ from tests.factories import SpaceFactory, UnitGroupFactory, UserFactory
 
 from .helpers import CREATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_resource__create__regular_user(graphql):
+def test_resource__create__regular_user(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     graphql.login_with_regular_user()
 
@@ -32,7 +37,7 @@ def test_resource__create__regular_user(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_resource__create__unit_admin__can_manage_resources(graphql):
+def test_resource__create__unit_admin__can_manage_resources(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
 
     user = UserFactory.create_with_unit_role(units=[space.unit])
@@ -53,7 +58,7 @@ def test_resource__create__unit_admin__can_manage_resources(graphql):
     assert Resource.objects.filter(pk=response.first_query_object["pk"]).exists()
 
 
-def test_resource__create__unit_group_admin__can_manage_resources(graphql):
+def test_resource__create__unit_group_admin__can_manage_resources(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     unit_group = UnitGroupFactory.create(units=[space.unit])
 

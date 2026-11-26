@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ResourceFactory, UnitGroupFactory, UserFactory
 
 from .helpers import resources_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_resources__filter__only_with_permissions__regular_user(graphql):
+def test_resources__filter__only_with_permissions__regular_user(graphql: GraphQLClient) -> None:
     ResourceFactory.create()
 
     graphql.login_with_regular_user()
@@ -24,7 +29,7 @@ def test_resources__filter__only_with_permissions__regular_user(graphql):
     assert response.edges == []
 
 
-def test_resources__filter__only_with_permissions__general_admin__can_manage_resources(graphql):
+def test_resources__filter__only_with_permissions__general_admin__can_manage_resources(graphql: GraphQLClient) -> None:
     resource = ResourceFactory.create()
 
     user = UserFactory.create_with_general_role()
@@ -38,10 +43,11 @@ def test_resources__filter__only_with_permissions__general_admin__can_manage_res
     assert response.node() == {"pk": resource.pk}
 
 
-def test_resources__filter__only_with_permissions__unit_admin__can_manage_resources(graphql):
+def test_resources__filter__only_with_permissions__unit_admin__can_manage_resources(graphql: GraphQLClient) -> None:
     resource_1 = ResourceFactory.create()
     ResourceFactory.create()
 
+    assert resource_1.space is not None
     user = UserFactory.create_with_unit_role(units=[resource_1.space.unit])
     graphql.force_login(user)
 
@@ -53,10 +59,13 @@ def test_resources__filter__only_with_permissions__unit_admin__can_manage_resour
     assert response.node() == {"pk": resource_1.pk}
 
 
-def test_resources__filter__only_with_permissions__unit_group_admin__can_manage_resources(graphql):
+def test_resources__filter__only_with_permissions__unit_group_admin__can_manage_resources(
+    graphql: GraphQLClient,
+) -> None:
     resource_1 = ResourceFactory.create()
     ResourceFactory.create()
 
+    assert resource_1.space is not None
     unit_group = UnitGroupFactory.create(units=[resource_1.space.unit])
 
     user = UserFactory.create_with_unit_role(unit_groups=[unit_group])

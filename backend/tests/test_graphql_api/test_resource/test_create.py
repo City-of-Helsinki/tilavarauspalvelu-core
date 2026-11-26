@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ResourceLocationType
@@ -9,13 +11,16 @@ from tests.factories import SpaceFactory
 
 from .helpers import CREATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_resource__create(graphql):
+def test_resource__create(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     graphql.login_with_superuser()
 
@@ -35,12 +40,13 @@ def test_resource__create(graphql):
     assert resource.name_fi == "a"
     assert resource.name_en == "b"
     assert resource.name_sv == "c"
+    assert resource.space is not None
     assert resource.space.pk == space.pk
     assert resource.location_type == ResourceLocationType.FIXED.value
 
 
 @pytest.mark.parametrize("field", ["nameFi", "nameEn", "nameSv"])
-def test_resource__create__missing_name(graphql, field):
+def test_resource__create__missing_name(graphql: GraphQLClient, field: str) -> None:
     space = SpaceFactory.create()
     graphql.login_with_superuser()
 
@@ -60,7 +66,7 @@ def test_resource__create__missing_name(graphql, field):
     assert Resource.objects.filter(pk=response.first_query_object["pk"]).exists()
 
 
-def test_resource__create__no_space_fixed_location(graphql):
+def test_resource__create__no_space_fixed_location(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     data = {
@@ -76,7 +82,7 @@ def test_resource__create__no_space_fixed_location(graphql):
     assert response.field_error_messages() == ["Location type 'fixed' needs a space to be defined."]
 
 
-def test_resource__create__no_space_movable_location(graphql):
+def test_resource__create__no_space_movable_location(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     data = {
@@ -97,7 +103,7 @@ def test_resource__create__no_space_movable_location(graphql):
     assert resource.location_type == ResourceLocationType.MOVABLE.value
 
 
-def test_resource__create__wrong_location_type(graphql):
+def test_resource__create__wrong_location_type(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     graphql.login_with_superuser()
 
