@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import Space
@@ -8,13 +10,16 @@ from tests.factories import SpaceFactory, UnitFactory, UserFactory
 
 from .helpers import CREATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_create_space(graphql):
+def test_create_space(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     unit = UnitFactory.create()
@@ -30,7 +35,7 @@ def test_create_space(graphql):
     assert Space.objects.count() == 1
 
 
-def test_create_space__unit_admin_cannot_create_space_under_space_of_other_unit(graphql):
+def test_create_space__unit_admin_cannot_create_space_under_space_of_other_unit(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     other_space = SpaceFactory.create()
     admin = UserFactory.create_with_unit_role(units=[unit])
@@ -49,7 +54,7 @@ def test_create_space__unit_admin_cannot_create_space_under_space_of_other_unit(
     assert Space.objects.filter(parent=other_space).exists() is False
 
 
-def test_create_space__name_is_required(graphql):
+def test_create_space__name_is_required(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     unit = UnitFactory.create()
@@ -65,7 +70,7 @@ def test_create_space__name_is_required(graphql):
     assert Space.objects.count() == 0
 
 
-def test_create_space__unit_is_required(graphql):
+def test_create_space__unit_is_required(graphql: GraphQLClient) -> None:
     graphql.login_with_superuser()
 
     UnitFactory.create()
@@ -81,7 +86,7 @@ def test_create_space__unit_is_required(graphql):
 
 
 @pytest.mark.parametrize("value", ["", " "])
-def test_create_space__name_cannot_be_empty(graphql, value):
+def test_create_space__name_cannot_be_empty(graphql: GraphQLClient, value: str) -> None:
     graphql.login_with_superuser()
 
     unit = UnitFactory.create()

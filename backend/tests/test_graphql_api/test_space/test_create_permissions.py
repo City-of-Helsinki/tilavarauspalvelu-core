@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import UnitFactory, UserFactory
 
 from .helpers import CREATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_spaces__create__regular_user_cannot_create_space(graphql):
+def test_spaces__create__regular_user_cannot_create_space(graphql: GraphQLClient) -> None:
     # given:
     # - A superuser is using the system
     graphql.login_with_regular_user()
@@ -33,7 +38,7 @@ def test_spaces__create__regular_user_cannot_create_space(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_spaces__create__unit_admin_can_create_space(graphql):
+def test_spaces__create__unit_admin_can_create_space(graphql: GraphQLClient) -> None:
     # given:
     # - A unit admin is using the system
     unit = UnitFactory.create()
@@ -54,7 +59,7 @@ def test_spaces__create__unit_admin_can_create_space(graphql):
     assert response.has_errors is False, response
 
 
-def test_spaces__create__unit_admin_cannot_create_space_for_other_unit(graphql):
+def test_spaces__create__unit_admin_cannot_create_space_for_other_unit(graphql: GraphQLClient) -> None:
     # given:
     # - A superuser is using the system
     unit_1 = UnitFactory.create()
@@ -76,7 +81,7 @@ def test_spaces__create__unit_admin_cannot_create_space_for_other_unit(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_spaces__create__general_admin_can_create_space(graphql):
+def test_spaces__create__general_admin_can_create_space(graphql: GraphQLClient) -> None:
     # given:
     # - A general admin is using the system
     admin = UserFactory.create_with_general_role()

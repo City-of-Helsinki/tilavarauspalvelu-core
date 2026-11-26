@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import SpaceFactory, UserFactory
 
 from .helpers import spaces_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_space__filter__only_with_permissions__regular_user(graphql):
+def test_space__filter__only_with_permissions__regular_user(graphql: GraphQLClient) -> None:
     # given:
     # - There are two spaces in the database
     # - A regular user is using the system
@@ -29,7 +34,7 @@ def test_space__filter__only_with_permissions__regular_user(graphql):
     assert len(response.edges) == 0
 
 
-def test_space__filter__only_with_permissions__general_admin(graphql):
+def test_space__filter__only_with_permissions__general_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There are two spaces in the database
     # - A general admin is using the system
@@ -47,7 +52,7 @@ def test_space__filter__only_with_permissions__general_admin(graphql):
     assert len(response.edges) == 2
 
 
-def test_space__filter__only_with_permissions__unit_admin(graphql):
+def test_space__filter__only_with_permissions__unit_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There are two spaces in the database
     # - A unit admin for one of the space's unit's is using the system
@@ -66,13 +71,13 @@ def test_space__filter__only_with_permissions__unit_admin(graphql):
     assert response.node(0) == {"pk": space.pk}
 
 
-def test_space__filter__only_with_permissions__unit_group_admin(graphql):
+def test_space__filter__only_with_permissions__unit_group_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There are two spaces in the database
     # - A unit group admin for one of the space's unit's groups is using the system
     space = SpaceFactory.create(unit__unit_groups__name="foo")
     SpaceFactory.create(unit__unit_groups__name="bar")
-    unit_group = space.unit.unit_groups.first()
+    unit_group = space.unit.unit_groups.get()
     admin = UserFactory.create_with_unit_role(unit_groups=[unit_group])
     graphql.force_login(admin)
 

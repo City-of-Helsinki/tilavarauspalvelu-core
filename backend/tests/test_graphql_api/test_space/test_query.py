@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import SpaceFactory
 from tests.test_graphql_api.test_space.helpers import spaces_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_query_spaces__all_fields(graphql):
+def test_query_spaces__all_fields(graphql: GraphQLClient) -> None:
     # given:
     # - There are two spaces in the database
     # - A superuser is using the system
