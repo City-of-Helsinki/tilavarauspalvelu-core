@@ -1492,6 +1492,29 @@ files = [
 django = ">=5.2"
 
 [[package]]
+name = "djangorestframework-stubs"
+version = "3.18.2"
+description = "PEP-484 stubs for django-rest-framework"
+optional = false
+python-versions = ">=3.11"
+groups = ["lint"]
+files = [
+    {file = "djangorestframework_stubs-3.18.2-py3-none-any.whl", hash = "sha256:fb4bffc3037063535390fd2cfde11f81c182e05949220d4742ffc0485218972c"},
+    {file = "djangorestframework_stubs-3.18.2.tar.gz", hash = "sha256:a8e009eee5e7c78c0a0a28cc69875bd1a44bde5499de085e52461479dc9522b1"},
+]
+
+[package.dependencies]
+django-stubs = ">=6.1.2"
+types-pyyaml = "*"
+typing-extensions = ">=4.0"
+
+[package.extras]
+compatible-mypy = ["django-stubs[compatible-mypy]", "mypy (>=1.13,<2.5)"]
+coreapi = ["coreapi (>=2.0.0)"]
+markdown = ["types-markdown (>=0.1.5)"]
+requests = ["types-requests"]
+
+[[package]]
 name = "dnspython"
 version = "2.9.2"
 description = "DNS toolkit"
@@ -4083,4 +4106,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "de434f5dfc0a749c3cdc95af764210ad102524bb4b1ab386acb65dbd346cf190"
+content-hash = "c1c612dbc77dd7b33eca436987d1723da7c3a7d7ae79b7ededa441b160e82fd5"
