@@ -16,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_suitable_time_range__fulfilled():
+def test_suitable_time_range__fulfilled() -> None:
     application_section = ApplicationSectionFactory.create_in_status_unallocated(
         applied_reservations_per_week=2,
     )
@@ -73,12 +73,12 @@ def test_suitable_time_range__fulfilled():
     ],
 )
 def test_suitable_time_range__fulfilled__only_by_allocation_overlapping_the_range(
-    range_begin,
-    range_end,
-    allocation_begin,
-    allocation_end,
-    expected,
-):
+    range_begin: int,
+    range_end: int,
+    allocation_begin: int,
+    allocation_end: int,
+    expected: bool,
+) -> None:
     application_section = ApplicationSectionFactory.create_in_status_in_allocation(
         applied_reservations_per_week=2,
     )
@@ -100,7 +100,7 @@ def test_suitable_time_range__fulfilled__only_by_allocation_overlapping_the_rang
     assert SuitableTimeRange.objects.filter(L(fulfilled=expected), pk=time_range.pk).exists()
 
 
-def test_suitable_time_range__fulfilled__morning_allocation_does_not_fulfill_evening_range():
+def test_suitable_time_range__fulfilled__morning_allocation_does_not_fulfill_evening_range() -> None:
     application_section = ApplicationSectionFactory.create_in_status_in_allocation(
         applied_reservations_per_week=2,
     )

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from io import BytesIO
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
@@ -12,6 +13,9 @@ from tilavarauspalvelu.models import ReservationUnitImage
 
 from tests.factories import ReservationUnitFactory
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -19,7 +23,9 @@ pytestmark = [
 
 
 @mock.patch("tilavarauspalvelu.signals.update_reservation_unit_image_urls_task.delay")
-def test_reservation_unit_image__save__update_urls_called_on_save(mock_update_urls, settings):
+def test_reservation_unit_image__save__update_urls_called_on_save(
+    mock_update_urls: mock.MagicMock, settings: Settings
+) -> None:
     settings.UPDATE_RESERVATION_UNIT_THUMBNAILS = True
 
     reservation_unit = ReservationUnitFactory.create()
@@ -30,7 +36,9 @@ def test_reservation_unit_image__save__update_urls_called_on_save(mock_update_ur
 
 
 @mock.patch("tilavarauspalvelu.signals.purge_image_cache_task.delay")
-def test_reservation_unit_image__purge__image_cache_is_purged_on_save(mock_purge_image_cache, settings):
+def test_reservation_unit_image__purge__image_cache_is_purged_on_save(
+    mock_purge_image_cache: mock.MagicMock, settings: Settings
+) -> None:
     mock_image_data = BytesIO()
     mock_image = Image.new("RGB", (100, 100))
     mock_image.save(fp=mock_image_data, format="PNG")

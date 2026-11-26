@@ -29,7 +29,7 @@ pytestmark = [
 ]
 
 
-def test_application_section__status():
+def test_application_section__status() -> None:
     now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
     application_round = ApplicationRoundFactory.create(
         application_period_begins_at=now - datetime.timedelta(days=7),
@@ -88,7 +88,7 @@ def test_application_section__status():
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
 
 
-def test_application_section__status__partially_allocated__option_unusable():
+def test_application_section__status__partially_allocated__option_unusable() -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     section = ApplicationSectionFactory.create(
         application__application_round=application_round,
@@ -111,7 +111,7 @@ def test_application_section__status__partially_allocated__option_unusable():
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
 
 
-def test_application_section__allocations():
+def test_application_section__allocations() -> None:
     section_1 = ApplicationSectionFactory.create()
     option_1 = ReservationUnitOptionFactory.create(application_section=section_1, reservation_unit__name="foo 0")
 
@@ -138,16 +138,17 @@ def test_application_section__allocations():
 
     section = (
         ApplicationSection.objects
-        .annotate(allocations=L("allocations"))
+        .annotate(orm_allocations=L("allocations"))
         .filter(reservation_unit_options__reservation_unit__name__startswith="foo")
         .order_by("pk")
         .first()
     )
 
-    assert section.allocations == 6
+    assert section is not None
+    assert section.orm_allocations == 6
 
 
-def test_application_section__usable_reservation_unit_options():
+def test_application_section__usable_reservation_unit_options() -> None:
     section = ApplicationSectionFactory.create()
 
     # Sanity check
@@ -182,7 +183,7 @@ def test_application_section__usable_reservation_unit_options():
     assert ApplicationSection.objects.filter(L(usable_reservation_unit_options=1)).exists()
 
 
-def test_application_section__should_have_active_access_code__active():
+def test_application_section__should_have_active_access_code__active() -> None:
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
@@ -194,7 +195,7 @@ def test_application_section__should_have_active_access_code__active():
     assert section.should_have_active_access_code is True
 
 
-def test_application_section__should_have_active_access_code__blocked():
+def test_application_section__should_have_active_access_code__blocked() -> None:
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
@@ -206,7 +207,7 @@ def test_application_section__should_have_active_access_code__blocked():
     assert section.should_have_active_access_code is False
 
 
-def test_application_section__should_have_active_access_code__not_confirmed():
+def test_application_section__should_have_active_access_code__not_confirmed() -> None:
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
@@ -218,7 +219,7 @@ def test_application_section__should_have_active_access_code__not_confirmed():
     assert section.should_have_active_access_code is False
 
 
-def test_application_section__is_access_code_is_active_correct__active_when_should_be():
+def test_application_section__is_access_code_is_active_correct__active_when_should_be() -> None:
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
@@ -232,7 +233,7 @@ def test_application_section__is_access_code_is_active_correct__active_when_shou
     assert section.is_access_code_is_active_correct is True
 
 
-def test_application_section__is_access_code_is_active_correct__active_when_should_not_be():
+def test_application_section__is_access_code_is_active_correct__active_when_should_not_be() -> None:
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
@@ -246,7 +247,7 @@ def test_application_section__is_access_code_is_active_correct__active_when_shou
     assert section.is_access_code_is_active_correct is False
 
 
-def test_application_section__is_access_code_is_active_correct__inactive_when_should_not_be():
+def test_application_section__is_access_code_is_active_correct__inactive_when_should_not_be() -> None:
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
@@ -259,7 +260,7 @@ def test_application_section__is_access_code_is_active_correct__inactive_when_sh
     assert section.is_access_code_is_active_correct is False
 
 
-def test_application_section__is_access_code_is_active_correct__inactive_when_should_be():
+def test_application_section__is_access_code_is_active_correct__inactive_when_should_be() -> None:
     section = ApplicationSectionFactory.create()
     ReservationFactory.create(
         reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,

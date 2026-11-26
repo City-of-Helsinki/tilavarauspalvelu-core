@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
@@ -14,6 +15,9 @@ from tests.factories import (
     SalesItemFactory,
 )
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -23,7 +27,7 @@ pytestmark = [
 # ── Accounting ──
 
 
-def test_sales_item__save_sends_accounting_of_reservation_units_that_use_it(settings):
+def test_sales_item__save_sends_accounting_of_reservation_units_that_use_it(settings: Settings) -> None:
     settings.UPDATE_ACCOUNTING = True
     sales_item = SalesItemFactory.create()
     pricing_group = PricingGroupFactory.create()
@@ -38,7 +42,7 @@ def test_sales_item__save_sends_accounting_of_reservation_units_that_use_it(sett
     assert [call.args for call in mock.call_args_list] == [(reservation_unit.pk,)]
 
 
-def test_sales_item__save_does_not_send_accounting_when_turned_off(settings):
+def test_sales_item__save_does_not_send_accounting_when_turned_off(settings: Settings) -> None:
     settings.UPDATE_ACCOUNTING = False
     sales_item = SalesItemFactory.create()
     ReservationUnitFactory.create(own_price__tax_level=sales_item.tax_level, own_price__sales_item=sales_item)

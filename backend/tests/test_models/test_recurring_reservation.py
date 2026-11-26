@@ -16,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_series__access_type__single():
+def test_reservation_series__access_type__single() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(reservation_series=series, access_type=AccessType.ACCESS_CODE)
 
@@ -25,16 +25,16 @@ def test_reservation_series__access_type__single():
     assert series.used_access_types == [AccessType.ACCESS_CODE]
 
     series = ReservationSeries.objects.annotate(
-        used_access_types=L("used_access_types"),
-        access_type=L("access_type"),
-    ).first()
+        orm_used_access_types=L("used_access_types"),
+        orm_access_type=L("access_type"),
+    ).get()
 
     # Test ORM code
-    assert series.access_type == AccessType.ACCESS_CODE
-    assert series.used_access_types == [AccessType.ACCESS_CODE]
+    assert series.orm_access_type == AccessType.ACCESS_CODE
+    assert series.orm_used_access_types == [AccessType.ACCESS_CODE]
 
 
-def test_reservation_series__access_type__zero():
+def test_reservation_series__access_type__zero() -> None:
     series = ReservationSeriesFactory.create()
 
     # Test non-ORM code
@@ -42,16 +42,16 @@ def test_reservation_series__access_type__zero():
     assert series.used_access_types == []
 
     series = ReservationSeries.objects.annotate(
-        used_access_types=L("used_access_types"),
-        access_type=L("access_type"),
-    ).first()
+        orm_used_access_types=L("used_access_types"),
+        orm_access_type=L("access_type"),
+    ).get()
 
     # Test ORM code
-    assert series.access_type == AccessType.UNRESTRICTED
-    assert series.used_access_types == []
+    assert series.orm_access_type == AccessType.UNRESTRICTED
+    assert series.orm_used_access_types == []
 
 
-def test_reservation_series__access_type__multiple_same():
+def test_reservation_series__access_type__multiple_same() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(reservation_series=series, access_type=AccessType.PHYSICAL_KEY)
     ReservationFactory.create(reservation_series=series, access_type=AccessType.PHYSICAL_KEY)
@@ -61,16 +61,16 @@ def test_reservation_series__access_type__multiple_same():
     assert series.used_access_types == [AccessType.PHYSICAL_KEY]
 
     series = ReservationSeries.objects.annotate(
-        used_access_types=L("used_access_types"),
-        access_type=L("access_type"),
-    ).first()
+        orm_used_access_types=L("used_access_types"),
+        orm_access_type=L("access_type"),
+    ).get()
 
     # Test ORM code
-    assert series.access_type == AccessType.PHYSICAL_KEY
-    assert series.used_access_types == [AccessType.PHYSICAL_KEY]
+    assert series.orm_access_type == AccessType.PHYSICAL_KEY
+    assert series.orm_used_access_types == [AccessType.PHYSICAL_KEY]
 
 
-def test_reservation_series__access_type__multiple_different():
+def test_reservation_series__access_type__multiple_different() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(reservation_series=series, access_type=AccessType.PHYSICAL_KEY)
     ReservationFactory.create(reservation_series=series, access_type=AccessType.ACCESS_CODE)
@@ -80,16 +80,16 @@ def test_reservation_series__access_type__multiple_different():
     assert series.used_access_types == [AccessType.ACCESS_CODE, AccessType.PHYSICAL_KEY]
 
     series = ReservationSeries.objects.annotate(
-        used_access_types=L("used_access_types"),
-        access_type=L("access_type"),
-    ).first()
+        orm_used_access_types=L("used_access_types"),
+        orm_access_type=L("access_type"),
+    ).get()
 
     # Test ORM code
-    assert series.access_type == AccessTypeWithMultivalued.MULTIVALUED
-    assert series.used_access_types == [AccessType.ACCESS_CODE, AccessType.PHYSICAL_KEY]
+    assert series.orm_access_type == AccessTypeWithMultivalued.MULTIVALUED
+    assert series.orm_used_access_types == [AccessType.ACCESS_CODE, AccessType.PHYSICAL_KEY]
 
 
-def test_reservation_series__access_type__only_going_to_occur():
+def test_reservation_series__access_type__only_going_to_occur() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -106,16 +106,16 @@ def test_reservation_series__access_type__only_going_to_occur():
     assert series.used_access_types == [AccessType.ACCESS_CODE]
 
     series = ReservationSeries.objects.annotate(
-        used_access_types=L("used_access_types"),
-        access_type=L("access_type"),
-    ).first()
+        orm_used_access_types=L("used_access_types"),
+        orm_access_type=L("access_type"),
+    ).get()
 
     # Test ORM code
-    assert series.access_type == AccessTypeWithMultivalued.ACCESS_CODE
-    assert series.used_access_types == [AccessType.ACCESS_CODE]
+    assert series.orm_access_type == AccessTypeWithMultivalued.ACCESS_CODE
+    assert series.orm_used_access_types == [AccessType.ACCESS_CODE]
 
 
-def test_reservation_series__should_have_active_access_code__active():
+def test_reservation_series__should_have_active_access_code__active() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -127,7 +127,7 @@ def test_reservation_series__should_have_active_access_code__active():
     assert series.should_have_active_access_code is True
 
 
-def test_reservation_series__should_have_active_access_code__blocked():
+def test_reservation_series__should_have_active_access_code__blocked() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -139,7 +139,7 @@ def test_reservation_series__should_have_active_access_code__blocked():
     assert series.should_have_active_access_code is False
 
 
-def test_reservation_series__should_have_active_access_code__not_confirmed():
+def test_reservation_series__should_have_active_access_code__not_confirmed() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -151,7 +151,7 @@ def test_reservation_series__should_have_active_access_code__not_confirmed():
     assert series.should_have_active_access_code is False
 
 
-def test_reservation_series__should_have_active_access_code__not_access_code():
+def test_reservation_series__should_have_active_access_code__not_access_code() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -163,7 +163,7 @@ def test_reservation_series__should_have_active_access_code__not_access_code():
     assert series.should_have_active_access_code is False
 
 
-def test_reservation_series__access_code_is_active_correct__active_when_should_be():
+def test_reservation_series__access_code_is_active_correct__active_when_should_be() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -177,7 +177,7 @@ def test_reservation_series__access_code_is_active_correct__active_when_should_b
     assert series.is_access_code_is_active_correct is True
 
 
-def test_reservation_series__access_code_is_active_correct__active_when_should_not_be():
+def test_reservation_series__access_code_is_active_correct__active_when_should_not_be() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -191,7 +191,7 @@ def test_reservation_series__access_code_is_active_correct__active_when_should_n
     assert series.is_access_code_is_active_correct is False
 
 
-def test_reservation_series__access_code_is_active_correct__inactive_when_should_be():
+def test_reservation_series__access_code_is_active_correct__inactive_when_should_be() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -204,7 +204,7 @@ def test_reservation_series__access_code_is_active_correct__inactive_when_should
     assert series.is_access_code_is_active_correct is True
 
 
-def test_reservation_series__access_code_is_active_correct__inactive_when_should_not_be():
+def test_reservation_series__access_code_is_active_correct__inactive_when_should_not_be() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -217,7 +217,7 @@ def test_reservation_series__access_code_is_active_correct__inactive_when_should
     assert series.is_access_code_is_active_correct is False
 
 
-def test_reservation_series__total_price__reservations_going_to_occur():
+def test_reservation_series__total_price__reservations_going_to_occur() -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_series=series,
@@ -239,19 +239,19 @@ def test_reservation_series__total_price__reservations_going_to_occur():
     # Test non-ORM code
     assert series.total_price == Decimal("30.00")
 
-    series = ReservationSeries.objects.annotate(total_price=L("total_price")).first()
+    series = ReservationSeries.objects.annotate(orm_total_price=L("total_price")).get()
 
     # Test ORM code
-    assert series.total_price == Decimal("30.00")
+    assert series.orm_total_price == Decimal("30.00")
 
 
-def test_reservation_series__total_price__no_reservations():
+def test_reservation_series__total_price__no_reservations() -> None:
     series = ReservationSeriesFactory.create()
 
     # Test non-ORM code
     assert series.total_price == Decimal("0.00")
 
-    series = ReservationSeries.objects.annotate(total_price=L("total_price")).first()
+    series = ReservationSeries.objects.annotate(orm_total_price=L("total_price")).get()
 
     # Test ORM code
-    assert series.total_price == Decimal("0.00")
+    assert series.orm_total_price == Decimal("0.00")

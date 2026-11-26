@@ -14,7 +14,7 @@ pytestmark = [
 ]
 
 
-def test_user__str__last_login_displays_if_has_logged():
+def test_user__str__last_login_displays_if_has_logged() -> None:
     user = UserFactory.create(
         username="test",
         first_name="First",
@@ -26,7 +26,7 @@ def test_user__str__last_login_displays_if_has_logged():
     assert str(user) == "Last First (test@localhost) - 16.05.2023 15:00"
 
 
-def test_user__str__last_login_does_not_display_if_has_not_logged():
+def test_user__str__last_login_does_not_display_if_has_not_logged() -> None:
     user = UserFactory.create(
         username="test",
         first_name="First",
@@ -38,28 +38,28 @@ def test_user__str__last_login_does_not_display_if_has_not_logged():
     assert str(user) == "Last First (test@localhost)"
 
 
-def test_user__general_user__has_any_role():
+def test_user__general_user__has_any_role() -> None:
     user = UserFactory.create()
     assert user.permissions.has_any_role() is False
 
 
-def test_user__superuser__has_any_role():
+def test_user__superuser__has_any_role() -> None:
     user = UserFactory.create_superuser()
     assert user.permissions.has_any_role() is True
 
 
-def test_user__general_admin__has_any_role():
+def test_user__general_admin__has_any_role() -> None:
     user = UserFactory.create_with_general_role()
     assert user.permissions.has_any_role() is True
 
 
-def test_user__unit_admin__has_any_role():
+def test_user__unit_admin__has_any_role() -> None:
     unit = UnitFactory.create()
     user = UserFactory.create_with_unit_role(units=[unit])
     assert user.permissions.has_any_role() is True
 
 
-def test_user__unit_group_admin__has_any_role():
+def test_user__unit_group_admin__has_any_role() -> None:
     unit_group = UnitGroupFactory.create()
     user = UserFactory.create_with_unit_role(unit_groups=[unit_group])
     assert user.permissions.has_any_role() is True

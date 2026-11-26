@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -9,13 +10,19 @@ from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitHierarchy
 
 from tests.factories import AllocatedTimeSlotFactory, ReservationUnitFactory, ReservationUnitOptionFactory, SpaceFactory
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from contextlib import AbstractContextManager
+
+    from graphene_django_extensions.testing.utils import QueryData
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_allocated_time_slot__allocated_time_of_week__day_of_the_week_number():
+def test_allocated_time_slot__allocated_time_of_week__day_of_the_week_number() -> None:
     allocation = AllocatedTimeSlotFactory.create(
         day_of_the_week=Weekday.MONDAY,
         begin_time=datetime.time(12, 0),
@@ -55,7 +62,9 @@ def test_allocated_time_slot__allocated_time_of_week__day_of_the_week_number():
     assert allocation.day_of_the_week_number == 7
 
 
-def test_allocated_time_slot__affecting_allocations(query_counter):
+def test_allocated_time_slot__affecting_allocations(
+    query_counter: Callable[[], AbstractContextManager[QueryData]],
+) -> None:
     parent_space = SpaceFactory.create()
     common_space = SpaceFactory.create(parent=parent_space)
 
@@ -121,8 +130,7 @@ def test_allocated_time_slot__affecting_allocations(query_counter):
             begin_date=period_begin,
             end_date=period_end,
         )
-        allocations = allocations.order_by("pk").values_list("pk", flat=True)
-        allocations = list(allocations)
+        allocation_pks = list(allocations.order_by("pk").values_list("pk", flat=True))
 
     assert len(counter.queries) == 1, counter.log
-    assert list(allocations) == [slot_1.pk, slot_2.pk, slot_3.pk, slot_4.pk]
+    assert allocation_pks == [slot_1.pk, slot_2.pk, slot_3.pk, slot_4.pk]

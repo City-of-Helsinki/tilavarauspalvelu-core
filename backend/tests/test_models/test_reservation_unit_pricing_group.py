@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
@@ -9,6 +10,9 @@ from django.db import IntegrityError
 from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
 
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingGroupFactory
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
 
 # Applied to all tests
 pytestmark = [
@@ -19,7 +23,7 @@ pytestmark = [
 # ── Begin date ──
 
 
-def test_reservation_unit_pricing_group__one_group_per_reservation_unit_and_date():
+def test_reservation_unit_pricing_group__one_group_per_reservation_unit_and_date() -> None:
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitPricingGroupFactory.create(reservation_unit=reservation_unit, begins=datetime.date(2026, 1, 1))
 
@@ -32,7 +36,7 @@ def test_reservation_unit_pricing_group__one_group_per_reservation_unit_and_date
 # ── Accounting ──
 
 
-def test_reservation_unit_pricing_group__save_sends_accounting_of_the_reservation_unit(settings):
+def test_reservation_unit_pricing_group__save_sends_accounting_of_the_reservation_unit(settings: Settings) -> None:
     settings.UPDATE_ACCOUNTING = True
     reservation_unit = ReservationUnitFactory.create()
 
@@ -42,7 +46,7 @@ def test_reservation_unit_pricing_group__save_sends_accounting_of_the_reservatio
     assert [call.args for call in mock.call_args_list] == [(reservation_unit.pk,)]
 
 
-def test_reservation_unit_pricing_group__delete_sends_accounting_of_the_reservation_unit(settings):
+def test_reservation_unit_pricing_group__delete_sends_accounting_of_the_reservation_unit(settings: Settings) -> None:
     settings.UPDATE_ACCOUNTING = True
     reservation_unit = ReservationUnitFactory.create()
     row = ReservationUnitPricingGroupFactory.create(reservation_unit=reservation_unit)

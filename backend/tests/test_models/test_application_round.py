@@ -17,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_application_round__status():
+def test_application_round__status() -> None:
     now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
     application_round = ApplicationRoundFactory.create(
         application_period_begins_at=now + datetime.timedelta(days=1),

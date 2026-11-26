@@ -22,11 +22,11 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
 
 
-def _get_date(*, month=1, day=1) -> datetime.date:
+def _get_date(*, month: int = 1, day: int = 1) -> datetime.date:
     return datetime.date(2022, month, day)
 
 
-def _get_dt(*, month=1, day=1, hour=None, minute=0) -> datetime.datetime:
+def _get_dt(*, month: int = 1, day: int = 1, hour: int, minute: int = 0) -> datetime.datetime:
     return datetime.datetime(2022, month, day, hour, minute, 0, tzinfo=DEFAULT_TIMEZONE)
 
 
@@ -57,7 +57,9 @@ def reservation_unit() -> ReservationUnit:
 
 @pytest.mark.django_db
 @freeze_time("2022-01-01")
-def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times(reservation_unit):
+def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times(
+    reservation_unit: ReservationUnit,
+) -> None:
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_dt(month=1, day=1, hour=10),
@@ -94,7 +96,7 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
 
 
 @pytest.mark.django_db
-def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__span_ends_at_midnight():
+def test__reservation_unit_reservation_scheduler__possible_start_times__span_ends_at_midnight() -> None:
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory.create(),
         reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES,
@@ -117,7 +119,7 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
 
 
 @pytest.mark.django_db
-def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__whole_day():
+def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__whole_day() -> None:
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory.create(),
         reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES,
@@ -136,7 +138,7 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
 
 
 @pytest.mark.django_db
-def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__over_dst_change():
+def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__over_dst_change() -> None:
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory.create(),
         reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES,
@@ -155,7 +157,7 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
 
 
 @pytest.mark.django_db
-def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__skipped_hour():
+def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__skipped_hour() -> None:
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory.create(),
         reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES,

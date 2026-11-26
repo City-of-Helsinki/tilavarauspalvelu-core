@@ -8,7 +8,7 @@ from tests.helpers import exact
 
 
 @pytest.mark.django_db
-def test_email_message__validate_email_attachments__valid_attachments_are_saved():
+def test_email_message__validate_email_attachments__valid_attachments_are_saved() -> None:
     email_message = EmailMessageFactory.build(
         attachments=[
             {
@@ -37,7 +37,7 @@ def test_email_message__validate_email_attachments__valid_attachments_are_saved(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("missing", ["filename", "content", "mimetype"])
-def test_email_message__validate_email_attachments__missing_keys(missing):
+def test_email_message__validate_email_attachments__missing_keys(missing: str) -> None:
     attachment = {
         "filename": "file.txt",
         "content": "content",
@@ -54,7 +54,7 @@ def test_email_message__validate_email_attachments__missing_keys(missing):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("missing", ["filename", "content", "mimetype"])
-def test_email_message__validate_email_attachments__value_not_string(missing):
+def test_email_message__validate_email_attachments__value_not_string(missing: str) -> None:
     attachment = {
         "filename": "file.txt",
         "content": "content",

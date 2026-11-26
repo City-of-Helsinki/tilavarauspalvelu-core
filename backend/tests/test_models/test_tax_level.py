@@ -17,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_tax_level__get_percentage():
+def test_tax_level__get_percentage() -> None:
     tax_level = TaxLevelFactory.create(rates__percentage=Decimal(24), rates__begins=datetime.date(2024, 1, 1))
     TaxLevelRateFactory.create(tax_level=tax_level, begins=datetime.date(2024, 9, 1), percentage=Decimal("25.5"))
 
@@ -27,17 +27,17 @@ def test_tax_level__get_percentage():
     assert tax_level.actions.get_percentage(on_date=datetime.date(2030, 1, 1)) == Decimal("25.5")
 
 
-def test_tax_level__get_percentage__no_rate_in_effect():
+def test_tax_level__get_percentage__no_rate_in_effect() -> None:
     tax_level = TaxLevelFactory.create(name="Yleinen", rates__begins=datetime.date(2024, 1, 1))
 
     with pytest.raises(ValidationError) as error:
         tax_level.actions.get_percentage(on_date=datetime.date(2023, 12, 31))
 
     assert error.value.detail == ["Tax level 'Yleinen' has no rate on 2023-12-31"]
-    assert error.value.detail[0].code == error_codes.TAX_LEVEL_HAS_NO_RATE
+    assert error.value.get_codes() == [error_codes.TAX_LEVEL_HAS_NO_RATE]
 
 
-def test_tax_level__name_is_unique():
+def test_tax_level__name_is_unique() -> None:
     TaxLevelFactory.create(name="Yleinen")
 
     with pytest.raises(IntegrityError):

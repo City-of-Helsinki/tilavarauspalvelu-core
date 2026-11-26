@@ -23,7 +23,7 @@ pytestmark = [
 ]
 
 
-def test_application__status():
+def test_application__status() -> None:
     now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
     application_round = ApplicationRoundFactory.create(
         application_period_begins_at=now - datetime.timedelta(days=7),
@@ -97,7 +97,7 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.CANCELLED)).exists()
 
 
-def test_application__all_sections_allocated():
+def test_application__all_sections_allocated() -> None:
     now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
     application_round = ApplicationRoundFactory.create(
         application_period_begins_at=now - datetime.timedelta(days=7),
@@ -141,7 +141,7 @@ def test_application__all_sections_allocated():
     assert Application.objects.filter(L(all_sections_allocated=True)).exists()
 
 
-def test_application__applicant():
+def test_application__applicant() -> None:
     application = ApplicationFactory.create(
         organisation_name="",
         contact_person_first_name="",

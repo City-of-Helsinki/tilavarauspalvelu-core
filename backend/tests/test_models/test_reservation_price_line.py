@@ -19,7 +19,7 @@ pytestmark = [
 
 
 @pytest.mark.parametrize("quantity", [Decimal(0), Decimal(-1)])
-def test_reservation_price_line__quantity_must_be_positive(quantity):
+def test_reservation_price_line__quantity_must_be_positive(quantity: Decimal) -> None:
     with pytest.raises(IntegrityError) as error:
         ReservationPriceLineFactory.create(quantity=quantity)
 
@@ -37,7 +37,9 @@ def test_reservation_price_line__quantity_must_be_positive(quantity):
         (Decimal(10), Decimal(10), Decimal(-1)),
     ],
 )
-def test_reservation_price_line__amounts_cannot_be_negative(unit_amount, amount_before_adjustment, amount):
+def test_reservation_price_line__amounts_cannot_be_negative(
+    unit_amount: Decimal, amount_before_adjustment: Decimal, amount: Decimal
+) -> None:
     with pytest.raises(IntegrityError) as error:
         ReservationPriceLineFactory.create(
             unit_amount=unit_amount,
@@ -48,7 +50,7 @@ def test_reservation_price_line__amounts_cannot_be_negative(unit_amount, amount_
     assert "reservation_price_line_amounts_not_negative" in str(error.value)
 
 
-def test_reservation_price_line__override_amount_cannot_be_negative():
+def test_reservation_price_line__override_amount_cannot_be_negative() -> None:
     with pytest.raises(IntegrityError) as error:
         ReservationPriceLineFactory.create(override_amount=Decimal(-1))
 
@@ -56,7 +58,7 @@ def test_reservation_price_line__override_amount_cannot_be_negative():
 
 
 @pytest.mark.parametrize("override_amount", [None, Decimal(0)])
-def test_reservation_price_line__override_amount_can_be_empty_or_zero(override_amount):
+def test_reservation_price_line__override_amount_can_be_empty_or_zero(override_amount: Decimal | None) -> None:
     line = ReservationPriceLineFactory.create(override_amount=override_amount)
 
     line = ReservationPriceLine.objects.get(pk=line.pk)

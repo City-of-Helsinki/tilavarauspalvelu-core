@@ -18,6 +18,8 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from unittest.mock import NonCallableMock
 
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
+
 
 @contextmanager
 def mock_notify_reservation_on_access_type_change_task() -> Generator[NonCallableMock]:
@@ -31,7 +33,9 @@ def mock_notify_reservation_on_access_type_change_task() -> Generator[NonCallabl
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_unit_update_access_types_for_reservations(django_capture_on_commit_callbacks):
+def test_reservation_unit_update_access_types_for_reservations(
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     ReservationUnitAccessTypeFactory.create(
@@ -89,7 +93,9 @@ def test_reservation_unit_update_access_types_for_reservations(django_capture_on
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_unit_update_access_types_for_reservations__notify_after_commit(django_capture_on_commit_callbacks):
+def test_reservation_unit_update_access_types_for_reservations__notify_after_commit(
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitAccessTypeFactory.create(
         begin_date=local_date(2024, 1, 1),
@@ -116,9 +122,9 @@ def test_reservation_unit_update_access_types_for_reservations__notify_after_com
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation_unit_update_access_types_for_reservations__updates_statistics(
-    settings,
-    django_capture_on_commit_callbacks,
-):
+    settings: Settings,
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_unit = ReservationUnitFactory.create()
