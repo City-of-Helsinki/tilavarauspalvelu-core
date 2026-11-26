@@ -50,6 +50,21 @@ same behavior. Remove or merge true duplicates.
 
 Use the `settings` fixture to override settings for a test.
 
+## Running tests
+
+Run tests with the `just be test*` recipes from the repository root. Give the test paths and other pytest options as arguments.
+The recipes reuse the test database and run tests in parallel. Run `just help` to see the full list and what each recipe skips.
+
+- `just be test`: the default. Skips slow tests and migration tests, and runs without migrations.
+- `just be test-all`: also runs slow tests.
+- `just be test-migrate`: runs with migrations, so it also runs the migration tests.
+- `just be test-migrations`: runs only the migration tests.
+- `just be test-fresh`: creates the test database again with migrations first.
+- `just be test-frontend-query`: runs only the frontend query tests. Read the "Database" section first.
+
+A run without migrations skips the tests under `tests/test_migrations/`.
+Run `just be test-migrations` after you change a migration or a model.
+
 ## Database
 
 Store tests run against a real Postgres. Assume the database is running first,
