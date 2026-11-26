@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import itertools
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from django.db import connection
@@ -31,7 +32,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_export__multiple():
+def test_reservation_unit_export__multiple() -> None:
     # given:
     # - There are two "complete"/"full" reservation units in the system
     reservation_units = ReservationUnitFactory.create_batch(
@@ -84,36 +85,36 @@ def test_reservation_unit_export__multiple():
     assert row_2[next(index)] == reservation_unit_1.description_fi
     assert row_2[next(index)] == reservation_unit_1.description_en
     assert row_2[next(index)] == reservation_unit_1.description_sv
-    assert row_2[next(index)] == reservation_unit_1.reservation_unit_type.name
+    assert row_2[next(index)] == "Normal"
     assert row_2[next(index)] == reservation_unit_1.notes_when_applying
     assert row_2[next(index)] == reservation_unit_1.notes_when_applying_fi
     assert row_2[next(index)] == reservation_unit_1.notes_when_applying_en
     assert row_2[next(index)] == reservation_unit_1.notes_when_applying_sv
-    assert row_2[next(index)] == reservation_unit_1.service_specific_terms.name
+    assert row_2[next(index)] == "Service specific terms"
     assert row_2[next(index)] == (reservation_unit_1.unit.tprek_id or "")
     assert row_2[next(index)] == (reservation_unit_1.unit.name or "")
     assert row_2[next(index)] == reservation_unit_1.contact_information
     assert row_2[next(index)] == reservation_unit_1.is_draft
     assert row_2[next(index)] == reservation_unit_1.publish_begins_at
     assert row_2[next(index)] == reservation_unit_1.publish_ends_at
-    assert row_2[next(index)] == reservation_unit_1.spaces.first().name_fi
-    assert row_2[next(index)] == reservation_unit_1.resources.first().name_fi
-    assert row_2[next(index)] == reservation_unit_1.payment_terms.name
-    assert row_2[next(index)] == reservation_unit_1.cancellation_terms.name
-    assert row_2[next(index)] == reservation_unit_1.pricing_terms.name
-    assert row_2[next(index)] == reservation_unit_1.cancellation_rule.name
+    assert row_2[next(index)] == "Space"
+    assert row_2[next(index)] == "Resource"
+    assert row_2[next(index)] == "Payment terms"
+    assert row_2[next(index)] == "Cancellation terms"
+    assert row_2[next(index)] == "Pricing terms"
+    assert row_2[next(index)] == "Cancellation rule"
     assert row_2[next(index)] == PriceUnit.PER_HOUR
     assert row_2[next(index)] == Decimal(20)
     assert row_2[next(index)] == Decimal(20)
     assert row_2[next(index)] == "25.50%"
     assert row_2[next(index)] == "Material price description"
-    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
-    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)
+    assert row_2[next(index)] == local_datetime_string(datetime.datetime(2022, 1, 1, tzinfo=DEFAULT_TIMEZONE))
+    assert row_2[next(index)] == local_datetime_string(datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE))
     assert row_2[next(index)] == reservation_unit_1.reservation_form
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
     assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label
     assert row_2[next(index)] == ReservationKind(reservation_unit_1.reservation_kind).label
-    assert row_2[next(index)] == AccessType(reservation_unit_1.current_access_type).label
+    assert row_2[next(index)] == AccessType.UNRESTRICTED.label
     assert row_2[next(index)] == PaymentType.ONLINE.label
     assert row_2[next(index)] is False
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_fi
@@ -138,8 +139,8 @@ def test_reservation_unit_export__multiple():
     assert row_2[next(index)] == reservation_unit_1.reservations_min_days_before
     assert row_2[next(index)] == reservation_unit_1.max_reservations_per_user
     assert row_2[next(index)] == reservation_unit_1.is_archived
-    assert row_2[next(index)] == reservation_unit_1.intended_uses.first().name_fi
-    assert row_2[next(index)] == reservation_unit_1.equipments.first().name_fi
+    assert row_2[next(index)] == "Purpose"
+    assert row_2[next(index)] == "Equipment"
     assert row_2[next(index)] == reservation_unit_1.publishing_state
     assert row_2[next(index)] == reservation_unit_1.reservation_state
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.updated_at)
@@ -215,7 +216,7 @@ def test_reservation_unit_export__multiple():
         },
     ),
 )
-def test_reservation_unit_export__missing_relations(column_value_mapping, missing):
+def test_reservation_unit_export__missing_relations(column_value_mapping: dict[str, Any], missing: Missing) -> None:
     # given:
     # - There is one reservation unit with the given missing data in the system
     data = {
@@ -252,7 +253,7 @@ def test_reservation_unit_export__missing_relations(column_value_mapping, missin
         assert writes[1][index] == expected_value
 
 
-def test_reservation_unit_export__subset():
+def test_reservation_unit_export__subset() -> None:
     # given:
     # - There are 5 reservation units in the system
     ReservationUnitFactory.create_batch(5)
@@ -269,7 +270,7 @@ def test_reservation_unit_export__subset():
     assert len(writes) == 4, writes
 
 
-def test_reservation_unit_export__query_count_does_not_grow_with_reservation_units():
+def test_reservation_unit_export__query_count_does_not_grow_with_reservation_units() -> None:
     ReservationUnitFactory.create(
         own_price__amount=Decimal(20),
         access_types__access_type=AccessType.UNRESTRICTED,
@@ -290,7 +291,7 @@ def test_reservation_unit_export__query_count_does_not_grow_with_reservation_uni
     assert len(four_reservation_units.captured_queries) == len(one_reservation_unit.captured_queries)
 
 
-def test_reservation_unit_export__missing_description_translation_is_exported_as_empty_value():
+def test_reservation_unit_export__missing_description_translation_is_exported_as_empty_value() -> None:
     ReservationUnitFactory.create(description_sv=None)
 
     exporter = ReservationUnitExporter()
@@ -302,7 +303,7 @@ def test_reservation_unit_export__missing_description_translation_is_exported_as
     assert writes[1][writes[0].index("Description_sv")] == ""
 
 
-def test_reservation_unit_export__related_names_fall_back_to_other_languages():
+def test_reservation_unit_export__related_names_fall_back_to_other_languages() -> None:
     english_only_space = SpaceFactory.create()
     nameless_space = SpaceFactory.create()
     Space.objects.filter(pk=english_only_space.pk).update(name_fi=None, name_en="Hall", name_sv=None)

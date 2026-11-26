@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
@@ -17,7 +17,7 @@ from tests.factories.application import ApplicationBuilder
 from .helpers import Missing, MissingParams, mock_csv_writer
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -25,7 +25,7 @@ pytestmark = [
 ]
 
 
-def test_application_round_applications_export__multiple_applications(graphql):
+def test_application_round_applications_export__multiple_applications(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
@@ -53,8 +53,8 @@ def test_application_round_applications_export__multiple_applications(graphql):
         application_sections__reservation_unit_options__reservation_unit__name="bar",
         application_sections__reservation_unit_options__reservation_unit__unit__name="buzz",
     )
-    section_1: ApplicationSection = application_1.application_sections.first()
-    section_2: ApplicationSection = application_2.application_sections.first()
+    section_1 = application_1.application_sections.get()
+    section_2 = application_2.application_sections.get()
 
     exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
@@ -118,18 +118,18 @@ def test_application_round_applications_export__multiple_applications(graphql):
             organisation_id=application_1.organisation_identifier,
             contact_person_first_name=application_1.contact_person_first_name,
             contact_person_last_name=application_1.contact_person_last_name,
-            contact_person_email=application_1.contact_person_email,
+            contact_person_email=application_1.contact_person_email or "",
             contact_person_phone=application_1.contact_person_phone_number,
             section_id=str(section_1.id),
             section_status=section_1.status.value,
             section_name=section_1.name,
             reservations_begin_date=local_date_string(section_1.reservations_begin_date),
             reservations_end_date=local_date_string(section_1.reservations_end_date),
-            municipality=application_1.municipality,
-            purpose_name=section_1.purpose.name,
+            municipality=application_1.municipality or "",
+            purpose_name="purpose",
             age_group_str=str(section_1.age_group),
             num_persons=str(section_1.num_persons),
-            applicant_type=application_1.applicant_type,
+            applicant_type=application_1.applicant_type or "",
             applied_reservations_per_week=str(section_1.applied_reservations_per_week),
             reservation_min_duration=local_timedelta_string(section_1.reservation_min_duration),
             reservation_max_duration=local_timedelta_string(section_1.reservation_max_duration),
@@ -159,18 +159,18 @@ def test_application_round_applications_export__multiple_applications(graphql):
             organisation_id=application_2.organisation_identifier,
             contact_person_first_name=application_2.contact_person_first_name,
             contact_person_last_name=application_2.contact_person_last_name,
-            contact_person_email=application_2.contact_person_email,
+            contact_person_email=application_2.contact_person_email or "",
             contact_person_phone=application_2.contact_person_phone_number,
             section_id=str(section_2.id),
             section_status=section_2.status.value,
             section_name=section_2.name,
             reservations_begin_date=local_date_string(section_2.reservations_begin_date),
             reservations_end_date=local_date_string(section_2.reservations_end_date),
-            municipality=application_2.municipality,
-            purpose_name=section_2.purpose.name,
+            municipality=application_2.municipality or "",
+            purpose_name="free",
             age_group_str=str(section_2.age_group),
             num_persons=str(section_2.num_persons),
-            applicant_type=application_2.applicant_type,
+            applicant_type=application_2.applicant_type or "",
             applied_reservations_per_week=str(section_2.applied_reservations_per_week),
             reservation_min_duration=local_timedelta_string(section_2.reservation_min_duration),
             reservation_max_duration=local_timedelta_string(section_2.reservation_max_duration),
@@ -259,7 +259,9 @@ def test_application_round_applications_export__multiple_applications(graphql):
         ),
     })
 )
-def test_application_round_applications_export__missing_data(graphql, column_value_mapping, missing):
+def test_application_round_applications_export__missing_data(
+    graphql: GraphQLClient, column_value_mapping: dict[str, Any], missing: Missing
+) -> None:
     # given:
     # - There is one non-draft application with the given missing data in the system
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
@@ -311,7 +313,7 @@ def test_application_round_applications_export__missing_data(graphql, column_val
         assert data_row[index] == expected_value
 
 
-def test_application_round_applications_export__sports_form_data(graphql):
+def test_application_round_applications_export__sports_form_data(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
@@ -363,7 +365,7 @@ def test_application_round_applications_export__sports_form_data(graphql):
     ]
 
 
-def test_application_round_applications_export__no_reservation_unit_options(graphql):
+def test_application_round_applications_export__no_reservation_unit_options(graphql: GraphQLClient) -> None:
     # given:
     # - There is a single application with no reservation unit options
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
