@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import SportFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_sport__query(graphql):
+def test_sport__query(graphql: GraphQLClient) -> None:
     sport = SportFactory.create()
 
     fields = """
@@ -36,7 +41,7 @@ def test_sport__query(graphql):
     ]
 
 
-def test_sport__order__by_rank(graphql):
+def test_sport__order__by_rank(graphql: GraphQLClient) -> None:
     sport_1 = SportFactory.create(rank=2)
     sport_2 = SportFactory.create(rank=0)
     sport_3 = SportFactory.create(rank=1)
