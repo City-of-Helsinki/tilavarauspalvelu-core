@@ -6,7 +6,7 @@ from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiA
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitHaukiResourceIdImporter
 
 from tests.factories import OriginHaukiResourceFactory, UnitFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, as_mock, patch_method
 
 pytestmark = [
     pytest.mark.django_db,
@@ -43,7 +43,7 @@ SECOND_RET_VAL = {
         ResponseMock(status_code=200, json_data=SECOND_RET_VAL),
     ],
 )
-def test__tprek_unit_hauki_resource_importer__multiple_pages():
+def test__tprek_unit_hauki_resource_importer__multiple_pages() -> None:
     unit_1 = UnitFactory.create(tprek_id=1)
     unit_2 = UnitFactory.create(tprek_id=2)
 
@@ -52,13 +52,15 @@ def test__tprek_unit_hauki_resource_importer__multiple_pages():
     unit_1.refresh_from_db()
     unit_2.refresh_from_db()
 
+    assert unit_1.origin_hauki_resource is not None
     assert unit_1.origin_hauki_resource.id == 1
+    assert unit_2.origin_hauki_resource is not None
     assert unit_2.origin_hauki_resource.id == 2
-    assert HaukiAPIClient.get.call_count == 2
+    assert as_mock(HaukiAPIClient.get).call_count == 2
 
 
 @patch_method(HaukiAPIClient.get, side_effect=[ResponseMock(status_code=200, json_data=SECOND_RET_VAL)])
-def test__tprek_unit_hauki_resource_importer__some_resources_not_found():
+def test__tprek_unit_hauki_resource_importer__some_resources_not_found() -> None:
     unit_1 = UnitFactory.create(tprek_id=1)
     unit_2 = UnitFactory.create(tprek_id=2)
 
@@ -68,14 +70,15 @@ def test__tprek_unit_hauki_resource_importer__some_resources_not_found():
     unit_2.refresh_from_db()
 
     assert unit_1.origin_hauki_resource is None
+    assert unit_2.origin_hauki_resource is not None
     assert unit_2.origin_hauki_resource.id == 2
-    assert HaukiAPIClient.get.call_count == 1
+    assert as_mock(HaukiAPIClient.get).call_count == 1
 
 
 @patch_method(HaukiAPIClient.get)
-def test__tprek_unit_hauki_resource_importer__origin_hauki_resource__already_exists():
+def test__tprek_unit_hauki_resource_importer__origin_hauki_resource__already_exists() -> None:
     unit = UnitFactory.create(tprek_id=888, origin_hauki_resource=OriginHaukiResourceFactory.create())
 
     TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units(units=[unit])
 
-    assert HaukiAPIClient.get.call_count == 0
+    assert as_mock(HaukiAPIClient.get).call_count == 0

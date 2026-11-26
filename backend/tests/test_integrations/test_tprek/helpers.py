@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-SINGLE_TPREK_UNIT_JSON = {
+from typing import Any
+
+SINGLE_TPREK_UNIT_JSON: dict[str, Any] = {
     "id": 999,
     "dept_id": "test-department-id",
     "name_fi": "Test Unit",
