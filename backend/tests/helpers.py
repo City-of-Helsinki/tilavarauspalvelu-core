@@ -16,6 +16,7 @@ from django.utils import translation
 from django.utils.functional import lazy
 from django.utils.translation import trans_real
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
+from graphene_django_extensions.testing.client import GQLResponse as BaseGQLResponse
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -29,15 +30,55 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import HTTPMethod, Lang
 
 __all__ = [
+    "GQLResponse",
     "GraphQLClient",
     "ResponseMock",
     "TranslationsFromPOFiles",
+    "as_mock",
     "exact",
 ]
 
 
+class GQLResponse(BaseGQLResponse):
+    """
+    GraphQL response where the JSON data has the type 'Any'.
+    Tests know the shape of the data they ask for, so they can read it without type checks.
+    """
+
+    def __getitem__(self, item: str) -> Any:
+        return super().__getitem__(item)
+
+    @property
+    def data(self) -> Any:
+        return super().data
+
+    @property
+    def first_query_object(self) -> Any:
+        return super().first_query_object
+
+
 class GraphQLClient(BaseGraphQLClient):
-    def login_user_with_role(self, role: UserRoleChoice) -> User | None:
+    response_class = GQLResponse
+
+    def __call__(
+        self,
+        query: str,
+        input_data: dict[str, Any] | None = None,
+        variables: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        operation_name: str | None = None,
+    ) -> GQLResponse:
+        response = super().__call__(
+            query,
+            input_data=input_data,
+            variables=variables,
+            headers=headers,
+            operation_name=operation_name,
+        )
+        assert isinstance(response, GQLResponse)
+        return response
+
+    def login_user_with_role(self, role: UserRoleChoice) -> User:
         """Login with a user with the given role."""
         from .factories import UserFactory
 
@@ -239,6 +280,22 @@ class TranslationsFromPOFiles:
 
         msg = f"Language '{lang_code}' is not supported"
         raise LookupError(msg)
+
+
+def as_mock(method: Callable[..., Any]) -> mock.Mock:
+    """
+    Return the mock that a patch has put in place of the given method.
+    mypy sees the method with its original type, so use this to read the attributes of the mock.
+
+    >>> @patch_method(MyClass.my_method)
+    >>> def test_something() -> None:
+    >>>     ...
+    >>>     assert as_mock(MyClass.my_method).call_count == 1
+    """
+    if not isinstance(method, mock.Mock):
+        msg = f"'{method}' is not patched with a mock."
+        pytest.fail(msg)
+    return method
 
 
 def exact(msg: str) -> str:
