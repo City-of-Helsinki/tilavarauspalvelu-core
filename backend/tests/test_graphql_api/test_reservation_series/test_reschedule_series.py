@@ -14,12 +14,16 @@ from tilavarauspalvelu.models import ReservationStatistic
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_time
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import RESCHEDULE_SERIES_MUTATION, create_reservation_series, get_minimal_reschedule_data
 
 if TYPE_CHECKING:
+    from pytest_django import Settings
+
     from tilavarauspalvelu.models import Reservation
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -29,7 +33,7 @@ pytestmark = [
 
 @patch_method(EmailService.send_seasonal_booking_rescheduled_series_email)
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__change_begin_date(graphql):
+def test_reservation_series__reschedule_series__change_begin_date(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(allocated_time_slot__day_of_the_week=Weekday.MONDAY)
 
     # Change begin date to the next Tuesday.
@@ -56,11 +60,11 @@ def test_reservation_series__reschedule_series__change_begin_date(graphql):
     assert reservations[6].begins_at.date() == local_date(year=2024, month=1, day=22)
     assert reservations[7].begins_at.date() == local_date(year=2024, month=1, day=29)
 
-    assert EmailService.send_seasonal_booking_rescheduled_series_email.called is True
+    assert as_mock(EmailService.send_seasonal_booking_rescheduled_series_email).called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__change_begin_time(graphql):
+def test_reservation_series__reschedule_series__change_begin_time(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
@@ -88,7 +92,7 @@ def test_reservation_series__reschedule_series__change_begin_time(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__change_end_date(graphql):
+def test_reservation_series__reschedule_series__change_end_date(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(
@@ -120,7 +124,7 @@ def test_reservation_series__reschedule_series__change_end_date(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__change_end_time(graphql):
+def test_reservation_series__reschedule_series__change_end_time(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, endTime="14:00:00")
@@ -148,7 +152,9 @@ def test_reservation_series__reschedule_series__change_end_time(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Monday
-def test_reservation_series__reschedule_series__change_begin_date__reservations_in_the_past(graphql):
+def test_reservation_series__reschedule_series__change_begin_date__reservations_in_the_past(
+    graphql: GraphQLClient,
+) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, beginDate="2023-12-05")
@@ -163,7 +169,7 @@ def test_reservation_series__reschedule_series__change_begin_date__reservations_
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__change_weekdays(graphql):
+def test_reservation_series__reschedule_series__change_weekdays(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
@@ -189,7 +195,7 @@ def test_reservation_series__reschedule_series__change_weekdays(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__change_weekdays__invalid_weekday(graphql):
+def test_reservation_series__reschedule_series__change_weekdays__invalid_weekday(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, weekdays=[8])
@@ -201,7 +207,7 @@ def test_reservation_series__reschedule_series__change_weekdays__invalid_weekday
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__change_buffer_times(graphql):
+def test_reservation_series__reschedule_series__change_buffer_times(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, bufferTimeBefore="00:30:00", bufferTimeAfter="01:00:00")
@@ -220,7 +226,7 @@ def test_reservation_series__reschedule_series__change_buffer_times(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__empty_series(graphql):
+def test_reservation_series__reschedule_series__empty_series(graphql: GraphQLClient) -> None:
     reservation_series = ReservationSeriesFactory.create()
 
     data = get_minimal_reschedule_data(reservation_series)
@@ -235,7 +241,7 @@ def test_reservation_series__reschedule_series__empty_series(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=12, day=1))
-def test_reservation_series__reschedule_series__all_reservations_in_the_past(graphql):
+def test_reservation_series__reschedule_series__all_reservations_in_the_past(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series)
@@ -250,7 +256,7 @@ def test_reservation_series__reschedule_series__all_reservations_in_the_past(gra
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Monday
-def test_reservation_series__reschedule_series__change_part_of_the_series(graphql):
+def test_reservation_series__reschedule_series__change_part_of_the_series(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
@@ -282,7 +288,9 @@ def test_reservation_series__reschedule_series__change_part_of_the_series(graphq
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1, hour=11))  # Monday
-def test_reservation_series__reschedule_series__change_part_of_the_series__during_reservation(graphql):
+def test_reservation_series__reschedule_series__change_part_of_the_series__during_reservation(
+    graphql: GraphQLClient,
+) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
@@ -316,10 +324,13 @@ def test_reservation_series__reschedule_series__change_part_of_the_series__durin
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
 @pytest.mark.parametrize("state", [ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
-def test_reservation_series__reschedule_series__dont_remove_unconfirmed_reservations(graphql, state):
+def test_reservation_series__reschedule_series__dont_remove_unconfirmed_reservations(
+    graphql: GraphQLClient, state: ReservationStateChoice
+) -> None:
     reservation_series = create_reservation_series()
 
-    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    reservation = reservation_series.reservations.order_by("begins_at").first()
+    assert reservation is not None
     reservation.state = state
     reservation.save()
 
@@ -341,12 +352,12 @@ def test_reservation_series__reschedule_series__dont_remove_unconfirmed_reservat
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
-def test_reservation_series__reschedule_series__details_from_reservation__use_next(graphql):
+def test_reservation_series__reschedule_series__details_from_reservation__use_next(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(reservations__name="foo")
 
     # Change name for the next reservation.
     # This should be enough to determine that we used this reservation's details.
-    reservation: Reservation = reservation_series.reservations.filter(begins_at__date=local_date()).first()
+    reservation: Reservation = reservation_series.reservations.filter(begins_at__date=local_date()).get()
     reservation.name = "bar"
     reservation.save()
 
@@ -373,19 +384,21 @@ def test_reservation_series__reschedule_series__details_from_reservation__use_ne
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
-def test_reservation_series__reschedule_series__details_from_reservation__next_is_cancelled(graphql):
+def test_reservation_series__reschedule_series__details_from_reservation__next_is_cancelled(
+    graphql: GraphQLClient,
+) -> None:
     reservation_series = create_reservation_series(reservations__name="foo")
 
-    reservations = reservation_series.reservations.filter(begins_at__date__gte=local_date()).iterator()
+    future_reservations = reservation_series.reservations.filter(begins_at__date__gte=local_date()).iterator()
 
     # The next reservation is cancelled, so we shouldn't use its details.
-    reservation: Reservation = next(reservations)
+    reservation = next(future_reservations)
     reservation.name = "bar"
     reservation.state = ReservationStateChoice.CANCELLED
     reservation.save()
 
     # The one after that is still going to occur, so we should use its details.
-    reservation: Reservation = next(reservations)
+    reservation = next(future_reservations)
     reservation.name = "baz"
     reservation.save()
 
@@ -420,7 +433,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__next_i
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__end_date_before_begin_date(graphql):
+def test_reservation_series__reschedule_series__end_date_before_begin_date(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, endDate="2023-01-01")
@@ -433,7 +446,9 @@ def test_reservation_series__reschedule_series__end_date_before_begin_date(graph
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__end_date_more_than_two_years_into_future(graphql):
+def test_reservation_series__reschedule_series__end_date_more_than_two_years_into_future(
+    graphql: GraphQLClient,
+) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, endDate="2025-12-02")  # 2 years + 1 day
@@ -448,7 +463,7 @@ def test_reservation_series__reschedule_series__end_date_more_than_two_years_int
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__end_time_before_begin_time__same_day(graphql):
+def test_reservation_series__reschedule_series__end_time_before_begin_time__same_day(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(
@@ -469,7 +484,9 @@ def test_reservation_series__reschedule_series__end_time_before_begin_time__same
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__end_time_before_begin_time__different_days(graphql):
+def test_reservation_series__reschedule_series__end_time_before_begin_time__different_days(
+    graphql: GraphQLClient,
+) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(
@@ -490,7 +507,7 @@ def test_reservation_series__reschedule_series__end_time_before_begin_time__diff
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__invalid_start_interval(graphql):
+def test_reservation_series__reschedule_series__invalid_start_interval(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:01")
@@ -505,7 +522,7 @@ def test_reservation_series__reschedule_series__invalid_start_interval(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__no_recurrence_interval(graphql):
+def test_reservation_series__reschedule_series__no_recurrence_interval(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
     reservation_series.recurrence_in_days = None
     reservation_series.save(update_fields=["recurrence_in_days"])
@@ -524,10 +541,11 @@ def test_reservation_series__reschedule_series__no_recurrence_interval(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__overlapping_reservations(graphql):
+def test_reservation_series__reschedule_series__overlapping_reservations(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
-    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    reservation = reservation_series.reservations.order_by("begins_at").first()
+    assert reservation is not None
     begin_date = reservation.begins_at.date()
 
     # Add overlapping reservation
@@ -561,12 +579,13 @@ def test_reservation_series__reschedule_series__overlapping_reservations(graphql
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__overlapping_reservations__buffer_before(graphql):
+def test_reservation_series__reschedule_series__overlapping_reservations__buffer_before(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(
         reservation_unit__buffer_time_before=datetime.timedelta(minutes=30),
     )
 
-    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    reservation = reservation_series.reservations.order_by("begins_at").first()
+    assert reservation is not None
     begin_date = reservation.begins_at.date()
 
     # Add overlapping reservation, but only with the buffer time.
@@ -600,12 +619,13 @@ def test_reservation_series__reschedule_series__overlapping_reservations__buffer
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__overlapping_reservations__buffer_after(graphql):
+def test_reservation_series__reschedule_series__overlapping_reservations__buffer_after(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(
         reservation_unit__buffer_time_after=datetime.timedelta(minutes=30),
     )
 
-    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    reservation = reservation_series.reservations.order_by("begins_at").first()
+    assert reservation is not None
     begin_date = reservation.begins_at.date()
 
     # Add overlapping reservation, but only with the buffer time.
@@ -639,13 +659,14 @@ def test_reservation_series__reschedule_series__overlapping_reservations__buffer
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__overlapping_reservations__only_buffers(graphql):
+def test_reservation_series__reschedule_series__overlapping_reservations__only_buffers(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(
         reservation_unit__buffer_time_before=datetime.timedelta(minutes=60),
         reservation_unit__buffer_time_after=datetime.timedelta(minutes=60),
     )
 
-    reservation: Reservation = reservation_series.reservations.order_by("begins_at").first()
+    reservation = reservation_series.reservations.order_by("begins_at").first()
+    assert reservation is not None
     begin_date = reservation.begins_at.date()
 
     # Add overlapping reservation, but only with the buffer time.
@@ -673,7 +694,7 @@ def test_reservation_series__reschedule_series__overlapping_reservations__only_b
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__skip_dates(graphql):
+def test_reservation_series__reschedule_series__skip_dates(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     assert reservation_series.reservations.count() == 9
@@ -698,7 +719,7 @@ def test_reservation_series__reschedule_series__skip_dates(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__create_statistics(graphql, settings):
+def test_reservation_series__reschedule_series__create_statistics(graphql: GraphQLClient, settings: Settings) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_series = create_reservation_series()
@@ -726,7 +747,9 @@ def test_reservation_series__reschedule_series__create_statistics(graphql, setti
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
-def test_reservation_series__reschedule_series__create_statistics__partial(graphql, settings):
+def test_reservation_series__reschedule_series__create_statistics__partial(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_series = create_reservation_series()
@@ -754,7 +777,7 @@ def test_reservation_series__reschedule_series__create_statistics__partial(graph
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=4, hour=10, minute=30))  # Monday
-def test_reservation_series__reschedule_series__same_day_ongoing_reservation(graphql):
+def test_reservation_series__reschedule_series__same_day_ongoing_reservation(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, beginTime="11:00:00")
@@ -782,7 +805,7 @@ def test_reservation_series__reschedule_series__same_day_ongoing_reservation(gra
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=4, hour=8))  # Monday
-def test_reservation_series__reschedule_series__same_day_future_reservation(graphql):
+def test_reservation_series__reschedule_series__same_day_future_reservation(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     data = get_minimal_reschedule_data(reservation_series, beginTime="11:00:00")
@@ -811,7 +834,7 @@ def test_reservation_series__reschedule_series__same_day_future_reservation(grap
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
 @patch_method(PindoraService.sync_access_code)
-def test_reservation_series__reschedule_series__is_access_code(graphql):
+def test_reservation_series__reschedule_series__is_access_code(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(
         reservations__access_type=AccessType.ACCESS_CODE,
         reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
@@ -824,12 +847,12 @@ def test_reservation_series__reschedule_series__is_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
 @patch_method(PindoraService.sync_access_code)
-def test_reservation_series__reschedule_series__was_access_code(graphql):
+def test_reservation_series__reschedule_series__was_access_code(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(
         reservations__access_type=AccessType.ACCESS_CODE,
         reservation_unit__access_types__access_type=AccessType.UNRESTRICTED,
@@ -842,12 +865,12 @@ def test_reservation_series__reschedule_series__was_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
 @patch_method(PindoraService.sync_access_code)
-def test_reservation_series__reschedule_series__changed_to_access_code(graphql):
+def test_reservation_series__reschedule_series__changed_to_access_code(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(
         reservations__access_type=AccessType.UNRESTRICTED,
         reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
@@ -860,12 +883,12 @@ def test_reservation_series__reschedule_series__changed_to_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
 @patch_method(PindoraService.sync_access_code, side_effect=PindoraAPIError("Pindora Error"))
-def test_reservation_series__reschedule_series__pindora_call_fails(graphql):
+def test_reservation_series__reschedule_series__pindora_call_fails(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series(
         reservations__access_type=AccessType.ACCESS_CODE,
         reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
@@ -880,4 +903,4 @@ def test_reservation_series__reschedule_series__pindora_call_fails(graphql):
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Pindora Error"]
 
-    assert PindoraService.sync_access_code.called is True
+    assert as_mock(PindoraService.sync_access_code).called is True

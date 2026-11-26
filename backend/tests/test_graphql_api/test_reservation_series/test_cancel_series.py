@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
@@ -24,9 +25,14 @@ from tests.factories import (
     TaxLevelFactory,
     UserFactory,
 )
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import CANCEL_SECTION_SERIES_MUTATION, create_reservation_series
+
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -37,7 +43,7 @@ pytestmark = [
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__cancel_whole_remaining(graphql):
+def test_reservation_series__cancel_section_series__cancel_whole_remaining(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -70,14 +76,16 @@ def test_reservation_series__cancel_section_series__cancel_whole_remaining(graph
     assert response.first_query_object == {"cancelled": 5, "future": 5}
     assert reservation_series.reservations.count() == 9
 
-    assert EmailService.send_seasonal_booking_cancelled_all_email.called is True
-    assert EmailService.send_seasonal_booking_cancelled_all_staff_notification_email.called is True
+    assert as_mock(EmailService.send_seasonal_booking_cancelled_all_email).called is True
+    assert as_mock(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email).called is True
 
 
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__update_statistics(graphql, settings):
+def test_reservation_series__cancel_section_series__update_statistics(
+    graphql: GraphQLClient, settings: Settings
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     user = UserFactory.create()
@@ -117,7 +125,7 @@ def test_reservation_series__cancel_section_series__update_statistics(graphql, s
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__cancel_details_not_required(graphql):
+def test_reservation_series__cancel_section_series__cancel_details_not_required(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -151,7 +159,7 @@ def test_reservation_series__cancel_section_series__cancel_details_not_required(
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__not_seasonal_type(graphql):
+def test_reservation_series__cancel_section_series__not_seasonal_type(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -186,7 +194,7 @@ def test_reservation_series__cancel_section_series__not_seasonal_type(graphql):
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__paid(graphql):
+def test_reservation_series__cancel_section_series__paid(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -227,7 +235,7 @@ def test_reservation_series__cancel_section_series__paid(graphql):
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__only_free_reservations(graphql):
+def test_reservation_series__cancel_section_series__only_free_reservations(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -280,7 +288,7 @@ def test_reservation_series__cancel_section_series__only_free_reservations(graph
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__not_confirmed_state(graphql):
+def test_reservation_series__cancel_section_series__not_confirmed_state(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -316,7 +324,7 @@ def test_reservation_series__cancel_section_series__not_confirmed_state(graphql)
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__cancellation_rule(graphql):
+def test_reservation_series__cancel_section_series__cancellation_rule(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -365,7 +373,7 @@ def test_reservation_series__cancel_section_series__cancellation_rule(graphql):
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
 @patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_reservation_series__cancel_section_series__access_codes(graphql):
+def test_reservation_series__cancel_section_series__access_codes(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     reservation_series = create_reservation_series(
@@ -396,4 +404,4 @@ def test_reservation_series__cancel_section_series__access_codes(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.reschedule_access_code.called is True
+    assert as_mock(PindoraService.reschedule_access_code).called is True

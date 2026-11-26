@@ -13,12 +13,14 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIEr
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory, UserFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import REPAIR_ACCESS_CODE_SERIES_MUTATION
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationSeries
+
+    from tests.helpers import GraphQLClient
 
 pytestmark = [
     pytest.mark.django_db,
@@ -27,7 +29,7 @@ pytestmark = [
 
 @patch_method(PindoraService.sync_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code(graphql):
+def test_repair_reservation_series_access_code(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -51,13 +53,13 @@ def test_repair_reservation_series_access_code(graphql):
         "accessCodeIsActive": True,
     }
 
-    assert PindoraService.sync_access_code.call_count == 1
+    assert as_mock(PindoraService.sync_access_code).call_count == 1
 
 
 @patch_method(PindoraService.sync_access_code)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code__in_seasonal_booking(graphql):
+def test_repair_reservation_series_access_code__in_seasonal_booking(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -82,23 +84,23 @@ def test_repair_reservation_series_access_code__in_seasonal_booking(graphql):
     def hook(obj: ReservationSeries) -> None:
         obj.reservations.update(access_code_is_active=True)
 
-    PindoraService.sync_access_code.side_effect = hook
+    as_mock(PindoraService.sync_access_code).side_effect = hook
 
     graphql.login_with_superuser()
     response = graphql(REPAIR_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.call_count == 1
+    assert as_mock(PindoraService.sync_access_code).call_count == 1
 
     # Since connected to seasonal booking, email should be sent.
-    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 1
-    assert EmailService.send_seasonal_booking_access_type_changed_email.call_args.args[0] == section
+    assert as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_count == 1
+    assert as_mock(EmailService.send_seasonal_booking_access_type_changed_email).call_args.args[0] == section
 
 
 @patch_method(PindoraService.sync_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code__activate_if_inactive(graphql):
+def test_repair_reservation_series_access_code__activate_if_inactive(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -117,12 +119,12 @@ def test_repair_reservation_series_access_code__activate_if_inactive(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.sync_access_code.call_count == 1
+    assert as_mock(PindoraService.sync_access_code).call_count == 1
 
 
 @patch_method(PindoraService.sync_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 2))
-def test_repair_reservation_series_access_code__no_future_reservations(graphql):
+def test_repair_reservation_series_access_code__no_future_reservations(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -145,7 +147,7 @@ def test_repair_reservation_series_access_code__no_future_reservations(graphql):
 
 @patch_method(PindoraService.sync_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code__no_reservations(graphql):
+def test_repair_reservation_series_access_code__no_reservations(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
 
     graphql.login_with_superuser()
@@ -157,7 +159,7 @@ def test_repair_reservation_series_access_code__no_reservations(graphql):
 
 @patch_method(PindoraService.sync_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code__not_using_access_codes(graphql):
+def test_repair_reservation_series_access_code__not_using_access_codes(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -182,7 +184,7 @@ def test_repair_reservation_series_access_code__not_using_access_codes(graphql):
 
 @patch_method(PindoraService.sync_access_code)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code__not_requiring_active_access_codes(graphql):
+def test_repair_reservation_series_access_code__not_requiring_active_access_codes(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -205,7 +207,7 @@ def test_repair_reservation_series_access_code__not_requiring_active_access_code
 
 @patch_method(PindoraService.sync_access_code, side_effect=PindoraAPIError("Pindora Error"))
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
-def test_repair_reservation_series_access_code__pindora_call_fails(graphql):
+def test_repair_reservation_series_access_code__pindora_call_fails(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create()
     ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -225,4 +227,4 @@ def test_repair_reservation_series_access_code__pindora_call_fails(graphql):
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Pindora Error"]
 
-    assert PindoraService.sync_access_code.call_count == 1
+    assert as_mock(PindoraService.sync_access_code).call_count == 1

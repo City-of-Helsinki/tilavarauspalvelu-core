@@ -12,7 +12,11 @@ from tests.factories import AgeGroupFactory, ReservationFactory, ReservationPurp
 from .helpers import UPDATE_SERIES_MUTATION
 
 if TYPE_CHECKING:
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
+
     from tilavarauspalvelu.models import Reservation
+
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -20,7 +24,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_series__update_series(graphql):
+def test_reservation_series__update_series(graphql: GraphQLClient) -> None:
     age_group_1 = AgeGroupFactory.create(minimum=18, maximum=100)
     age_group_2 = AgeGroupFactory.create(minimum=0, maximum=17)
     purpose_1 = ReservationPurposeFactory.create()
@@ -72,7 +76,7 @@ def test_reservation_series__update_series(graphql):
     assert reservation_series.description == "New description"
     assert reservation_series.age_group == age_group_2
 
-    reservation: Reservation = reservation_series.reservations.first()
+    reservation: Reservation = reservation_series.reservations.get()
     assert reservation.name == "foo"
     assert reservation.description == "bar"
     assert reservation.num_persons == 12
@@ -92,7 +96,7 @@ def test_reservation_series__update_series(graphql):
     assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
-def test_reservation_series__update_series__skip_reservations(graphql):
+def test_reservation_series__update_series__skip_reservations(graphql: GraphQLClient) -> None:
     reservation_series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(name="foo", reservation_series=reservation_series)
     reservation_2 = ReservationFactory.create(name="foo", reservation_series=reservation_series)
@@ -116,7 +120,9 @@ def test_reservation_series__update_series__skip_reservations(graphql):
     assert reservation_2.name == "bar"
 
 
-def test_reservation_series__update_series__update_statistics(graphql, settings, django_capture_on_commit_callbacks):
+def test_reservation_series__update_series__update_statistics(
+    graphql: GraphQLClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_series = ReservationSeriesFactory.create()

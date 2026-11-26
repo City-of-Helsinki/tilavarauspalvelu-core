@@ -37,13 +37,15 @@ from .helpers import reservation_series_many_query, reservation_series_single_qu
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationSeries
 
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_reservation_series__query(graphql):
+def test_reservation_series__query(graphql: GraphQLClient) -> None:
     reservation_series = ReservationSeriesFactory.create()
     graphql.login_with_superuser()
 
@@ -85,7 +87,7 @@ def test_reservation_series__query(graphql):
     }
 
 
-def test_reservation_series__query__relations(graphql):
+def test_reservation_series__query__relations(graphql: GraphQLClient) -> None:
     reservation_series = ReservationSeriesFactory.create(
         reservations__name="foo",
         age_group__minimum=18,
@@ -129,10 +131,12 @@ def test_reservation_series__query__relations(graphql):
 
     assert response.has_errors is False
 
-    reservation = reservation_series.reservations.first()
-    occurrence = reservation_series.rejected_occurrences.first()
+    reservation = reservation_series.reservations.get()
+    occurrence = reservation_series.rejected_occurrences.get()
 
     assert len(response.edges) == 1
+    assert reservation_series.age_group is not None
+    assert reservation_series.allocated_time_slot is not None
     assert response.node(0) == {
         "pk": reservation_series.pk,
         "user": {
@@ -168,7 +172,7 @@ def test_reservation_series__query__relations(graphql):
     }
 
 
-def test_reservation_series__query__reservations__archived_reservation_unit(graphql):
+def test_reservation_series__query__reservations__archived_reservation_unit(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(is_archived=True)
     reservation_series = ReservationSeriesFactory.create(reservation_unit=reservation_unit)
     ReservationFactory.create(reservation_series=reservation_series, reservation_unit=reservation_unit)
@@ -229,7 +233,7 @@ def pindora_query(series: ReservationSeries) -> str:
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation_series__query__pindora_info(graphql):
+def test_reservation_series__query__pindora_info(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create(
         begin=local_datetime(2022, 1, 1, 10),
         end=local_datetime(2022, 1, 1, 12),
@@ -273,7 +277,9 @@ def test_reservation_series__query__pindora_info(graphql):
 
 @freeze_time(local_datetime(2022, 1, 1))
 @pytest.mark.parametrize("as_reservee", [True, False])
-def test_reservation_series__query__pindora_info__access_code_not_active(graphql, as_reservee):
+def test_reservation_series__query__pindora_info__access_code_not_active(
+    graphql: GraphQLClient, as_reservee: bool
+) -> None:
     series = ReservationSeriesFactory.create(
         begin=local_datetime(2022, 1, 1, 10),
         end=local_datetime(2022, 1, 1, 12),
@@ -292,10 +298,10 @@ def test_reservation_series__query__pindora_info__access_code_not_active(graphql
 
     query = pindora_query(series)
 
-    response = pindora_response(series)
-    response["access_code_is_active"] = False
+    pindora_data = pindora_response(series)
+    pindora_data["access_code_is_active"] = False
 
-    with patch_method(PindoraClient.get_reservation_series, return_value=response):
+    with patch_method(PindoraClient.get_reservation_series, return_value=pindora_data):
         response = graphql(query)
 
     assert response.has_errors is False, response
@@ -307,7 +313,7 @@ def test_reservation_series__query__pindora_info__access_code_not_active(graphql
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation_series__query__pindora_info__access_type_not_access_code(graphql):
+def test_reservation_series__query__pindora_info__access_type_not_access_code(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create(
         begin=local_datetime(2022, 1, 1, 10),
         end=local_datetime(2022, 1, 1, 12),
@@ -332,7 +338,7 @@ def test_reservation_series__query__pindora_info__access_type_not_access_code(gr
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation_series__query__pindora_info__pindora_call_fails(graphql):
+def test_reservation_series__query__pindora_info__pindora_call_fails(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create(
         begin=local_datetime(2022, 1, 1, 10),
         end=local_datetime(2022, 1, 1, 12),
@@ -357,7 +363,7 @@ def test_reservation_series__query__pindora_info__pindora_call_fails(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 3))
-def test_reservation_series__query__pindora_info__reservation_past(graphql):
+def test_reservation_series__query__pindora_info__reservation_past(graphql: GraphQLClient) -> None:
     series = ReservationSeriesFactory.create(
         begin=local_datetime(2022, 1, 1, 10),
         end=local_datetime(2022, 1, 1, 12),
@@ -382,7 +388,7 @@ def test_reservation_series__query__pindora_info__reservation_past(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation_series__query__pindora_info__in_application_section(graphql):
+def test_reservation_series__query__pindora_info__in_application_section(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     section = ApplicationSectionFactory.create(application__application_round=application_round)
     reservation_unit = ReservationUnitFactory.create()
@@ -405,7 +411,7 @@ def test_reservation_series__query__pindora_info__in_application_section(graphql
 
     query = pindora_query(series)
 
-    response = PindoraSeasonalBookingResponse(
+    pindora_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
         access_code_phone_number="+358407089833",
@@ -424,7 +430,7 @@ def test_reservation_series__query__pindora_info__in_application_section(graphql
         ],
     )
 
-    with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=pindora_data):
         response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -449,7 +455,7 @@ def test_reservation_series__query__pindora_info__in_application_section(graphql
 
 
 @freeze_time(local_datetime(2022, 1, 1))
-def test_reservation_series__query__pindora_info__in_application_section__not_sent(graphql):
+def test_reservation_series__query__pindora_info__in_application_section__not_sent(graphql: GraphQLClient) -> None:
     section = ApplicationSectionFactory.create(
         application__application_round__sent_at=None,
     )
@@ -473,7 +479,7 @@ def test_reservation_series__query__pindora_info__in_application_section__not_se
 
     query = pindora_query(series)
 
-    response = PindoraSeasonalBookingResponse(
+    pindora_data = PindoraSeasonalBookingResponse(
         access_code="12345",
         access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
         access_code_phone_number="+358407089833",
@@ -492,7 +498,7 @@ def test_reservation_series__query__pindora_info__in_application_section__not_se
         ],
     )
 
-    with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=pindora_data):
         response = graphql(query)
 
     assert response.has_errors is False, response.errors

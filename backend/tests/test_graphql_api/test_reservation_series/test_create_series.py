@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -28,9 +29,12 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import CREATE_SERIES_MUTATION, get_minimal_series_data
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -38,7 +42,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_series__create_series(graphql):
+def test_reservation_series__create_series(graphql: GraphQLClient) -> None:
     age_group = AgeGroupFactory.create()
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
@@ -80,7 +84,7 @@ def test_reservation_series__create_series(graphql):
     assert reservations[0].reservation_unit == reservation_unit
 
 
-def test_reservation_series__create_series__reservation_details(graphql):
+def test_reservation_series__create_series__reservation_details(graphql: GraphQLClient) -> None:
     age_group = AgeGroupFactory.create()
     purpose = ReservationPurposeFactory.create()
     reservation_unit = ReservationUnitFactory.create()
@@ -151,12 +155,12 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert reservations[0].reservation_unit == reservation_unit
 
 
-def test_reservation_series__create_series__multiple_recurrences(graphql):
+def test_reservation_series__create_series__multiple_recurrences(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
-    end = datetime.date(2024, 1, 15).isoformat()
-    data = get_minimal_series_data(reservation_unit, user, endDate=end)
+    end_date = datetime.date(2024, 1, 15).isoformat()
+    data = get_minimal_series_data(reservation_unit, user, endDate=end_date)
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
@@ -188,13 +192,13 @@ def test_reservation_series__create_series__multiple_recurrences(graphql):
     assert reservations[2].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
-def test_reservation_series__create_series__multiple_weekdays(graphql):
+def test_reservation_series__create_series__multiple_weekdays(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
-    end = datetime.date(2024, 1, 7).isoformat()
+    end_date = datetime.date(2024, 1, 7).isoformat()
     weekdays = [Weekday.MONDAY.value, Weekday.WEDNESDAY.value, Weekday.FRIDAY.value]
-    data = get_minimal_series_data(reservation_unit, user, endDate=end, weekdays=weekdays)
+    data = get_minimal_series_data(reservation_unit, user, endDate=end_date, weekdays=weekdays)
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
@@ -227,7 +231,7 @@ def test_reservation_series__create_series__multiple_weekdays(graphql):
 
 
 @pytest.mark.parametrize("reservation_type", ReservationTypeStaffChoice.values)
-def test_reservation_series__create_series__reservation_type(graphql, reservation_type):
+def test_reservation_series__create_series__reservation_type(graphql: GraphQLClient, reservation_type: str) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
@@ -244,7 +248,9 @@ def test_reservation_series__create_series__reservation_type(graphql, reservatio
     assert reservations[0].type == reservation_type
 
 
-def test_reservation_series__create_series__reservation_type__cant_create_normal_reservation(graphql):
+def test_reservation_series__create_series__reservation_type__cant_create_normal_reservation(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
@@ -255,7 +261,7 @@ def test_reservation_series__create_series__reservation_type__cant_create_normal
     assert response.has_schema_errors is True
 
 
-def test_reservation_series__create_series__different_reservation_user(graphql):
+def test_reservation_series__create_series__different_reservation_user(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     admin = graphql.login_with_superuser()
     user = UserFactory.create()
@@ -275,13 +281,13 @@ def test_reservation_series__create_series__different_reservation_user(graphql):
     assert reservations[0].user == user
 
 
-def test_reservation_series__create_series__skip_dates(graphql):
+def test_reservation_series__create_series__skip_dates(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
-    end = datetime.date(2024, 1, 15).isoformat()
+    end_date = datetime.date(2024, 1, 15).isoformat()
     skip = [datetime.date(2024, 1, 8).isoformat()]
-    data = get_minimal_series_data(reservation_unit, user, endDate=end, skipDates=skip)
+    data = get_minimal_series_data(reservation_unit, user, endDate=end_date, skipDates=skip)
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
@@ -307,7 +313,7 @@ def test_reservation_series__create_series__skip_dates(graphql):
     assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
-def test_reservation_series__create_series__daylight_savings(graphql):
+def test_reservation_series__create_series__daylight_savings(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
@@ -355,7 +361,7 @@ def test_reservation_series__create_series__daylight_savings(graphql):
         "reservationDetails",
     ],
 )
-def test_reservation_series__create_series__missing_arguments(graphql, missing):
+def test_reservation_series__create_series__missing_arguments(graphql: GraphQLClient, missing: str) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
@@ -366,7 +372,7 @@ def test_reservation_series__create_series__missing_arguments(graphql, missing):
     assert response.has_schema_errors is True
 
 
-def test_reservation_series__create_series__check_opening_hours__missing_hours(graphql):
+def test_reservation_series__create_series__check_opening_hours__missing_hours(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
@@ -387,7 +393,7 @@ def test_reservation_series__create_series__check_opening_hours__missing_hours(g
     assert Reservation.objects.count() == 0
 
 
-def test_reservation_series__create_series__check_opening_hours__no_missing_hours(graphql):
+def test_reservation_series__create_series__check_opening_hours__no_missing_hours(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(origin_hauki_resource__id="987")
 
     begin = datetime.date(2024, 1, 1)
@@ -432,7 +438,9 @@ def test_reservation_series__create_series__check_opening_hours__no_missing_hour
     assert reservations[1].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
-def test_reservation_series__create_series__check_opening_hours__partially_missing_hours(graphql):
+def test_reservation_series__create_series__check_opening_hours__partially_missing_hours(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(origin_hauki_resource__id="987")
 
     begin = datetime.date(2024, 1, 1)
@@ -469,7 +477,9 @@ def test_reservation_series__create_series__check_opening_hours__partially_missi
     assert Reservation.objects.count() == 0
 
 
-def test_reservation_series__create_series__check_opening_hours__skip_dates_where_missing_hours(graphql):
+def test_reservation_series__create_series__check_opening_hours__skip_dates_where_missing_hours(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(origin_hauki_resource__id="987")
 
     begin = datetime.date(2024, 1, 1)
@@ -509,7 +519,7 @@ def test_reservation_series__create_series__check_opening_hours__skip_dates_wher
     assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
-def test_reservation_series__create_series__end_time_before_begin_time__different_days(graphql):
+def test_reservation_series__create_series__end_time_before_begin_time__different_days(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 
@@ -529,7 +539,7 @@ def test_reservation_series__create_series__end_time_before_begin_time__differen
     assert ReservationSeries.objects.count() == 0
 
 
-def test_reservation_series__create_series__overlapping_reservations(graphql):
+def test_reservation_series__create_series__overlapping_reservations(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
@@ -573,7 +583,7 @@ def test_reservation_series__create_series__overlapping_reservations(graphql):
     assert Reservation.objects.count() == 1  # The overlapping reservation still exists
 
 
-def test_reservation_series__create_series__overlapping_reservations__ends_at_midnight(graphql):
+def test_reservation_series__create_series__overlapping_reservations__ends_at_midnight(graphql: GraphQLClient) -> None:
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
@@ -617,7 +627,7 @@ def test_reservation_series__create_series__overlapping_reservations__ends_at_mi
     assert ReservationSeries.objects.count() == 0
 
 
-def test_reservation_series__create_series__block_whole_day(graphql):
+def test_reservation_series__create_series__block_whole_day(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
     user = graphql.login_with_superuser()
 
@@ -637,7 +647,9 @@ def test_reservation_series__create_series__block_whole_day(graphql):
     assert reservations[0].buffer_time_after == datetime.timedelta(hours=12)
 
 
-def test_reservation_series__create_series__block_whole_day__over_daylight_saving_time_change(graphql):
+def test_reservation_series__create_series__block_whole_day__over_daylight_saving_time_change(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
     user = graphql.login_with_superuser()
 
@@ -665,7 +677,7 @@ def test_reservation_series__create_series__block_whole_day__over_daylight_savin
 
 
 @patch_method(PindoraService.create_access_code)
-def test_reservation_series__create_series__access_type_access_code(graphql):
+def test_reservation_series__create_series__access_type_access_code(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
     user = graphql.login_with_superuser()
 
@@ -676,7 +688,7 @@ def test_reservation_series__create_series__access_type_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.create_access_code.called is True
+    assert as_mock(PindoraService.create_access_code).called is True
 
     pk = response.first_query_object["pk"]
     reservations: list[Reservation] = list(Reservation.objects.filter(reservation_series=pk))
@@ -684,7 +696,9 @@ def test_reservation_series__create_series__access_type_access_code(graphql):
 
 
 @patch_method(PindoraService.create_access_code)
-def test_reservation_series__create_series__access_type_access_code__only_some_reservations(graphql):
+def test_reservation_series__create_series__access_type_access_code__only_some_reservations(
+    graphql: GraphQLClient,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(
         access_types__access_type=AccessType.ACCESS_CODE,
         access_types__begin_date=datetime.date(2024, 1, 5),
@@ -699,7 +713,7 @@ def test_reservation_series__create_series__access_type_access_code__only_some_r
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.create_access_code.called is True
+    assert as_mock(PindoraService.create_access_code).called is True
 
     pk = response.first_query_object["pk"]
     reservations: list[Reservation] = list(Reservation.objects.order_by("begins_at").filter(reservation_series=pk))
@@ -711,7 +725,7 @@ def test_reservation_series__create_series__access_type_access_code__only_some_r
 
 @patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError("Pindora Error"))
 @patch_method(SentryLogger.log_exception)
-def test_reservation_series__create_series__access_type_access_code__pindora_call_fails(graphql):
+def test_reservation_series__create_series__access_type_access_code__pindora_call_fails(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
     user = graphql.login_with_superuser()
 
@@ -724,9 +738,9 @@ def test_reservation_series__create_series__access_type_access_code__pindora_cal
     # Access codes will be created later in a background task.
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.create_access_code.called is True
+    assert as_mock(PindoraService.create_access_code).called is True
 
-    assert SentryLogger.log_exception.called is True
+    assert as_mock(SentryLogger.log_exception).called is True
 
     reservation_series: ReservationSeries | None = ReservationSeries.objects.first()
     assert reservation_series is not None
@@ -739,7 +753,7 @@ def test_reservation_series__create_series__access_type_access_code__pindora_cal
     assert reservations[0].access_code_is_active is False
 
 
-def test_reservation_series__create_series__weekdays_that_never_occur(graphql):
+def test_reservation_series__create_series__weekdays_that_never_occur(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
 

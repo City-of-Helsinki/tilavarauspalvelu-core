@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from freezegun import freeze_time
 
@@ -12,13 +14,16 @@ from tests.test_graphql_api.test_reservation_series.helpers import (
     get_minimal_add_data,
 )
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__add_reservation__regular_user(graphql):
+def test_reservation_series__add_reservation__regular_user(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     assert reservation_series.reservations.count() == 9
@@ -32,7 +37,7 @@ def test_reservation_series__add_reservation__regular_user(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__add_reservation__unit_admin(graphql):
+def test_reservation_series__add_reservation__unit_admin(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     assert reservation_series.reservations.count() == 9
@@ -50,7 +55,7 @@ def test_reservation_series__add_reservation__unit_admin(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__add_reservation__general_admin(graphql):
+def test_reservation_series__add_reservation__general_admin(graphql: GraphQLClient) -> None:
     reservation_series = create_reservation_series()
 
     assert reservation_series.reservations.count() == 9
