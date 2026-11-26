@@ -125,9 +125,13 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         return order
 
     @classmethod
-    def cancel_order(cls, *, order_uuid: uuid.UUID, user_uuid: uuid.UUID) -> Order | None:
+    def cancel_order(cls, *, order_uuid: uuid.UUID, user_uuid: uuid.UUID | None) -> Order | None:
         action_fail = "Order cancellation failed"
         url = f"{settings.VERKKOKAUPPA_ORDER_API_URL}/{order_uuid}/cancel"
+
+        if user_uuid is None:
+            msg = f"{action_fail}: Order has no user UUID"
+            raise CancelOrderError(msg)
 
         try:
             response = cls.post(

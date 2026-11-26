@@ -507,6 +507,16 @@ def test_verkkokauppa__cancel_order__returns_none_if_order_is_not_found():
     assert order is None
 
 
+@patch_method(VerkkokauppaAPIClient.request)
+def test_verkkokauppa__cancel_order__raises_exception_if_user_uuid_is_missing():
+    order_uuid = uuid.UUID(cancel_order_response["order"]["orderId"])
+
+    with pytest.raises(CancelOrderError, match=exact("Order cancellation failed: Order has no user UUID")):
+        VerkkokauppaAPIClient.cancel_order(order_uuid=order_uuid, user_uuid=None)
+
+    assert VerkkokauppaAPIClient.request.call_count == 0
+
+
 @patch_method(VerkkokauppaAPIClient.request, return_value=ResponseMock(status_code=500, json_data={}, method="POST"))
 @patch_method(SentryLogger.log_message)
 @patch_method(SentryLogger.log_exception)
