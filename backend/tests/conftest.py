@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
     from _pytest.mark import Mark
-    from django.core.mail import EmailMessage
+    from django.core.mail import EmailMultiAlternatives
 
 
 @pytest.fixture
@@ -34,7 +34,7 @@ def _deactivate_retries() -> None:
 
 
 @pytest.fixture
-def outbox() -> list[EmailMessage]:
+def outbox() -> list[EmailMultiAlternatives]:
     from django.core import mail
 
     return mail.outbox
