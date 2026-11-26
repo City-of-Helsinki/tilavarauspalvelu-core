@@ -30,6 +30,8 @@ class ModelManagerPlugin(Plugin):
     At runtime, `ModelManager.__init_subclass__` copies the public queryset methods to the manager.
     The model stub cannot show this, so it gives `ModelManager` a `__getattr__`.
     mypy calls this hook for each name that the manager does not define.
+    mypy also calls it for the attributes that `ModelManager` declares, such as `model`.
+    These keep their declared type.
     """
 
     def get_attribute_hook(self, fullname: str) -> Callable[[AttributeContext], Type] | None:
@@ -45,6 +47,9 @@ def queryset_attribute_type(ctx: AttributeContext, *, name: str) -> Type:
         return ctx.default_attr_type
 
     model_manager_info = next(info for info in manager_type.type.mro if info.fullname == MODEL_MANAGER)
+    if name in model_manager_info.names:
+        return ctx.default_attr_type
+
     model_manager_type = map_instance_to_supertype(manager_type, model_manager_info)
     queryset_type = get_proper_type(model_manager_type.args[1])
     if not isinstance(queryset_type, Instance):
