@@ -18,7 +18,7 @@ from django.utils.translation import trans_real
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Generator
     from types import TracebackType
     from unittest.mock import NonCallableMock
 
@@ -152,7 +152,7 @@ class TranslationsFromPOFiles:
 
         return super().__new__(cls)
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.language: Lang = self.default_language
 
     def __enter__(self) -> Self:
@@ -199,7 +199,7 @@ class TranslationsFromPOFiles:
     def ngettext_lazy(self, singular: str, plural: str, number: int) -> str:
         raise NotImplementedError
 
-    def npgettext(self, context, singular, plural, number):
+    def npgettext(self, context: str, singular: str, plural: str, number: int) -> str:
         raise NotImplementedError
 
     def activate(self, language: Lang) -> None:
@@ -223,7 +223,7 @@ class TranslationsFromPOFiles:
     def check_for_language(self, language: Lang) -> bool:
         return language in self.language_options
 
-    def get_language_from_request(self, request: HttpRequest, check_path: bool = False):  # noqa: FBT002
+    def get_language_from_request(self, request: HttpRequest, check_path: bool = False) -> str:  # noqa: FBT002
         return trans_real.get_language_from_request(request, check_path)
 
     def get_language_from_path(self, path: str) -> str | None:
@@ -247,7 +247,7 @@ def exact(msg: str) -> str:
 
 
 @contextmanager
-def use_retries(attempts: int = 1):
+def use_retries(attempts: int = 1) -> Generator[None]:
     """Enable given amount of retries for the duration of a test bu using the this manager."""
     is_active = stamina.is_active()
     is_testing = stamina.is_testing()

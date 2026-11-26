@@ -11,6 +11,8 @@ from tests.factories._base import FakerEN, FakerFI, FakerSV
 from tests.helpers import GraphQLClient, patch_method
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from _pytest.mark import Mark
     from django.core.mail import EmailMessage
 
@@ -26,7 +28,7 @@ def api_client() -> APIClient:
 
 
 @pytest.fixture(autouse=True, scope="session")
-def _deactivate_retries():
+def _deactivate_retries() -> None:
     """Deactivate all retry logic during testing."""
     stamina.set_active(False)
 
@@ -39,7 +41,7 @@ def outbox() -> list[EmailMessage]:
 
 
 @pytest.fixture(autouse=True)
-def _reset_faker_uniqueness():
+def _reset_faker_uniqueness() -> None:
     """Reset the uniqueness of all faker instances between tests so that they don't run out of unique values."""
     FakerFI.clear_unique()
     FakerSV.clear_unique()
@@ -47,7 +49,7 @@ def _reset_faker_uniqueness():
 
 
 @pytest.fixture(autouse=True)
-def _patch_method_marker(request: pytest.FixtureRequest):
+def _patch_method_marker(request: pytest.FixtureRequest) -> Generator[None]:
     """
     Allows using the 'patch_method' in 'pytestmark' to patch methods in multiple tests at once.
 

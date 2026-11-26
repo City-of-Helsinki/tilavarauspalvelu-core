@@ -16,7 +16,7 @@ def pytest_load_initial_conftests(early_config: pytest.Config, parser: pytest.Pa
     keep_fold_in_freezegun_datetimes()
 
 
-def setup_now_tt():
+def setup_now_tt() -> None:
     """
     Setup NowTT for tests so that when freezegun is used,
     it will also setup the offset in the database for NowTT.
@@ -68,10 +68,9 @@ def setup_now_tt():
     # Just apply the patch for the whole duration of the test run.
     mocked_freeze_factory = patch("freezegun.api._freeze_time", MockFreezeTime)
     mocked_freeze_factory.start()
-    return mocked_freeze_factory
 
 
-def keep_fold_in_freezegun_datetimes():
+def keep_fold_in_freezegun_datetimes() -> None:
     """
     Keep the 'fold' attribute when freezegun converts a datetime to its fake datetime.
     Without it, a time in the repeated hour of a daylight saving time change gets the wrong UTC offset.
@@ -93,7 +92,6 @@ def keep_fold_in_freezegun_datetimes():
 
     mocked_datetime_to_fakedatetime = patch("freezegun.api.datetime_to_fakedatetime", datetime_to_fakedatetime)
     mocked_datetime_to_fakedatetime.start()
-    return mocked_datetime_to_fakedatetime
 
 
 @pytest.hookimpl()
@@ -120,7 +118,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 @pytest.hookimpl()
-def pytest_collection_modifyitems(config, items):
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     skip_slow = config.getoption("--skip-slow")
     without_migrations = config.option.nomigrations
     only_frontend_query_tests = config.getoption("--only-frontend-query-tests")
