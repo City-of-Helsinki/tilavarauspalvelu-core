@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import EquipmentFactory
 
 from .helpers import UPDATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_equipment__update__regular_user_cannot_update(graphql):
+def test_equipment__update__regular_user_cannot_update(graphql: GraphQLClient) -> None:
     equipment = EquipmentFactory.create(name="foo")
 
     data = {"pk": equipment.pk, "name": "bar", "category": equipment.category.pk}

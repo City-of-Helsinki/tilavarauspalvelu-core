@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django.settings import graphene_settings
 
@@ -7,13 +9,16 @@ from tests.factories import EquipmentFactory
 
 from .helpers import equipments_all_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_equipment_all__no_pagination_limit(graphql):
+def test_equipment_all__no_pagination_limit(graphql: GraphQLClient) -> None:
     EquipmentFactory.create_batch(2)
 
     graphql.login_with_superuser()
@@ -30,7 +35,7 @@ def test_equipment_all__no_pagination_limit(graphql):
     assert len(response.first_query_object) == 2
 
 
-def test_equipment_all__order_by__category_rank(graphql):
+def test_equipment_all__order_by__category_rank(graphql: GraphQLClient) -> None:
     EquipmentFactory.create(name="1", category__rank=2)
     EquipmentFactory.create(name="2", category__rank=1)
     EquipmentFactory.create(name="3", category__rank=3)
