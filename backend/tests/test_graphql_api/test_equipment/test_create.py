@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import Equipment
@@ -8,13 +10,16 @@ from tests.factories import EquipmentCategoryFactory
 
 from .helpers import CREATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_equipment__create(graphql):
+def test_equipment__create(graphql: GraphQLClient) -> None:
     category = EquipmentCategoryFactory.create()
     data = {"name": "foo", "category": category.pk}
 

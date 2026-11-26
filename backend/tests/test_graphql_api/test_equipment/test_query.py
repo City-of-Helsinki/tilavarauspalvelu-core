@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import EquipmentFactory
 
 from .helpers import equipments_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_equipment__query(graphql):
+def test_equipment__query(graphql: GraphQLClient) -> None:
     equipment = EquipmentFactory.create(name="foo")
 
     graphql.login_with_superuser()
@@ -27,7 +32,7 @@ def test_equipment__query(graphql):
     }
 
 
-def test_equipment__order__by_category_rank(graphql):
+def test_equipment__order__by_category_rank(graphql: GraphQLClient) -> None:
     equipment_1 = EquipmentFactory.create(name="foo", category__rank=2)
     equipment_2 = EquipmentFactory.create(name="bar", category__rank=3)
     equipment_3 = EquipmentFactory.create(name="baz", category__rank=1)
@@ -55,7 +60,7 @@ def test_equipment__order__by_category_rank(graphql):
     }
 
 
-def test_equipment__filter__by_name_use_fallback(graphql):
+def test_equipment__filter__by_name_use_fallback(graphql: GraphQLClient) -> None:
     equipment_1 = EquipmentFactory.create(name_fi="1111", name_sv="")
     equipment_2 = EquipmentFactory.create(name_fi="2222", name_sv="1111")
     EquipmentFactory.create(name_fi="3333", name_en="1111")
@@ -71,7 +76,7 @@ def test_equipment__filter__by_name_use_fallback(graphql):
     assert response.node(1)["pk"] == equipment_2.pk
 
 
-def test_equipment__filter__by_category_rank(graphql):
+def test_equipment__filter__by_category_rank(graphql: GraphQLClient) -> None:
     equipment_1 = EquipmentFactory.create(name="1", category__rank=2)
     equipment_2 = EquipmentFactory.create(name="2", category__rank=1)
     EquipmentFactory.create(name="3", category__rank=3)
