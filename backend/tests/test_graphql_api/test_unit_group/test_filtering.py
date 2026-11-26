@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ApplicationRoundFactory, UnitFactory, UnitGroupFactory, UserFactory
 from tests.test_graphql_api.test_unit_group.helpers import unit_groups_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_unit_groups__filter__only_with_permission__regular_user(graphql):
+def test_unit_groups__filter__only_with_permission__regular_user(graphql: GraphQLClient) -> None:
     unit_group = UnitGroupFactory.create()
     UnitFactory.create(unit_groups=[unit_group])
 
@@ -24,7 +29,7 @@ def test_unit_groups__filter__only_with_permission__regular_user(graphql):
     assert response.error_message() == "No permission to access node."
 
 
-def test_unit_groups__filter__only_with_permission__general_admin(graphql):
+def test_unit_groups__filter__only_with_permission__general_admin(graphql: GraphQLClient) -> None:
     UnitFactory.create(unit_groups__name="Included")
 
     user = UserFactory.create_with_general_role()
@@ -37,7 +42,7 @@ def test_unit_groups__filter__only_with_permission__general_admin(graphql):
     assert len(response.edges) == 1
 
 
-def test_unit_groups__filter__only_with_permission__unit_group_admin(graphql):
+def test_unit_groups__filter__only_with_permission__unit_group_admin(graphql: GraphQLClient) -> None:
     UnitFactory.create(unit_groups__name="Excluded")
     unit_group = UnitGroupFactory.create()
     UnitFactory.create(unit_groups=[unit_group])
@@ -53,7 +58,7 @@ def test_unit_groups__filter__only_with_permission__unit_group_admin(graphql):
     assert response.node(0) == {"pk": unit_group.pk}
 
 
-def test_unit_groups__filter__only_with_permission__unit_admin(graphql):
+def test_unit_groups__filter__only_with_permission__unit_admin(graphql: GraphQLClient) -> None:
     UnitFactory.create(unit_groups__name="Excluded")
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
@@ -69,7 +74,7 @@ def test_unit_groups__filter__only_with_permission__unit_admin(graphql):
     assert response.node(0) == {"pk": unit_group.pk}
 
 
-def test_unit_groups__filter__application_round(graphql):
+def test_unit_groups__filter__application_round(graphql: GraphQLClient) -> None:
     UnitFactory.create(unit_groups__name="Excluded")
     unit_group = UnitGroupFactory.create()
     application_round = ApplicationRoundFactory.create_in_status_in_allocation(

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
@@ -7,13 +9,16 @@ from tilavarauspalvelu.enums import UserRoleChoice
 
 from tests.factories import UnitFactory, UnitGroupFactory
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_unit_groups__query(graphql):
+def test_unit_groups__query(graphql: GraphQLClient) -> None:
     unit_1 = UnitFactory.create(rank=1)
     unit_2 = UnitFactory.create(rank=2)
     unit_group = UnitGroupFactory.create(units=[unit_1, unit_2])
@@ -43,7 +48,7 @@ def test_unit_groups__query(graphql):
     }
 
 
-def test_unit_groups__query__regular_user(graphql):
+def test_unit_groups__query__regular_user(graphql: GraphQLClient) -> None:
     UnitGroupFactory.create()
 
     graphql.login_with_regular_user()
@@ -55,7 +60,7 @@ def test_unit_groups__query__regular_user(graphql):
     assert response.error_message() == "No permission to access node."
 
 
-def test_unit_groups__query__unit_groups_with_no_units_are_excluded(graphql):
+def test_unit_groups__query__unit_groups_with_no_units_are_excluded(graphql: GraphQLClient) -> None:
     UnitGroupFactory.create()
 
     graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
