@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
@@ -8,13 +10,16 @@ from tests.factories import BannerNotificationFactory, UserFactory
 
 from .helpers import DELETE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_user_deletes_banner_notification(graphql):
+def test_user_deletes_banner_notification(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
@@ -38,7 +43,7 @@ def test_user_deletes_banner_notification(graphql):
     assert BannerNotification.objects.exists() is False
 
 
-def test_primary_key_is_required_for_deleting(graphql):
+def test_primary_key_is_required_for_deleting(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
@@ -55,7 +60,7 @@ def test_primary_key_is_required_for_deleting(graphql):
     assert response.error_message().startswith("Variable '$input'")
 
 
-def test_user_tries_to_delete_non_existing_banner_notification(graphql):
+def test_user_tries_to_delete_non_existing_banner_notification(graphql: GraphQLClient) -> None:
     # given:
     # - There is no draft banner notifications in the system
     # - Notification manager is using the system

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
 from freezegun import freeze_time
@@ -12,6 +12,9 @@ from utils.date_utils import local_datetime
 
 from tests.factories import BannerNotificationFactory, UserFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -48,7 +51,9 @@ class OrderingParams(NamedTuple):
         },
     )
 )
-def test_sort_banner_notifications_by_state(graphql, order_by, expected):
+def test_sort_banner_notifications_by_state(
+    graphql: GraphQLClient, order_by: str, expected: list[dict[str, dict[str, str | None]]]
+) -> None:
     # given:
     # - There are banner notification of all different states in the system
     # - Notification manager user is using the system
@@ -114,7 +119,9 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
         },
     )
 )
-def test_sort_banner_notifications_by_name(graphql, order_by, expected):
+def test_sort_banner_notifications_by_name(
+    graphql: GraphQLClient, order_by: str, expected: list[dict[str, dict[str, str | None]]]
+) -> None:
     # given:
     # - There are two banner notification with different names in the system
     # - Notification manager user is using the system
@@ -176,7 +183,9 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
     )
 )
 @freeze_time("2023-02-01", tz_offset=0)
-def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
+def test_sort_banner_notifications_by_start_date(
+    graphql: GraphQLClient, order_by: str, expected: list[dict[str, dict[str, str | None]]]
+) -> None:
     # given:
     # - There are two banner notification with different start dates & and one without one
     # - Notification manager user is using the system
@@ -244,7 +253,9 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
     )
 )
 @freeze_time("2023-02-01", tz_offset=0)
-def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
+def test_sort_banner_notifications_by_end_date(
+    graphql: GraphQLClient, order_by: str, expected: list[dict[str, dict[str, str | None]]]
+) -> None:
     # given:
     # - There are two banner notification with different end dates & and one without one
     # - Notification manager user is using the system
@@ -311,7 +322,9 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
         },
     )
 )
-def test_sort_banner_notifications_by_target(graphql, order_by, expected):
+def test_sort_banner_notifications_by_target(
+    graphql: GraphQLClient, order_by: str, expected: list[dict[str, dict[str, str | None]]]
+) -> None:
     # given:
     # - There are banner notification for all target audiences in the system
     # - Notification manager user is using the system
@@ -374,7 +387,9 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
         },
     )
 )
-def test_sort_banner_notifications_by_level(graphql, order_by, expected):
+def test_sort_banner_notifications_by_level(
+    graphql: GraphQLClient, order_by: str, expected: list[dict[str, dict[str, str | None]]]
+) -> None:
     # given:
     # - There are banner notification for all types in the system
     # - Notification manager user is using the system

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
@@ -11,6 +11,9 @@ from tilavarauspalvelu.models.banner_notification.model import BannerNotificatio
 from tests.factories import UserFactory
 
 from .helpers import CREATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -29,7 +32,7 @@ class InvalidActiveParams(NamedTuple):
     expected: Any
 
 
-def test_user_creates_draft_banner_notification(graphql):
+def test_user_creates_draft_banner_notification(graphql: GraphQLClient) -> None:
     # given:
     # - Notification manager is using the system
     user = UserFactory.create_with_general_role()
@@ -54,7 +57,7 @@ def test_user_creates_draft_banner_notification(graphql):
     assert BannerNotification.objects.filter(pk=response.first_query_object["pk"]).exists()
 
 
-def test_user_creates_draft_banner_notification_without_required_fields(graphql):
+def test_user_creates_draft_banner_notification_without_required_fields(graphql: GraphQLClient) -> None:
     # given:
     # - Notification manager is using the system
     user = UserFactory.create_with_general_role()
@@ -74,7 +77,7 @@ def test_user_creates_draft_banner_notification_without_required_fields(graphql)
     assert response.error_message().startswith("Variable '$input'")
 
 
-def test_user_creates_non_draft_banner_notification_without_required_fields(graphql):
+def test_user_creates_non_draft_banner_notification_without_required_fields(graphql: GraphQLClient) -> None:
     # given:
     # - Notification manager is using the system
     user = UserFactory.create_with_general_role()
@@ -163,7 +166,9 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
         },
     ),
 )
-def test_user_creates_banner_notification_where_active_range_is_invalid(graphql, active_from, active_until, expected):
+def test_user_creates_banner_notification_where_active_range_is_invalid(
+    graphql: GraphQLClient, active_from: str | None, active_until: str | None, expected: Any
+) -> None:
     # given:
     # - Notification manager is using the system
     user = UserFactory.create_with_general_role()

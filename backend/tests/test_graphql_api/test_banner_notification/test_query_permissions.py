@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from graphene_django_extensions.testing import parametrize_helper
@@ -15,6 +15,8 @@ from .helpers import FieldParams, TargetParams, UserType, UserTypeParams
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
 
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -24,7 +26,7 @@ pytestmark = [
 _PRIVATE_FIELDS = ("draft", "name", "target", "state")
 
 
-def login_based_on_type(graphql, user_type: UserType) -> User | None:
+def login_based_on_type(graphql: GraphQLClient, user_type: UserType) -> User | None:
     match user_type:
         case UserType.ANONYMOUS:
             return None
@@ -104,7 +106,9 @@ def login_based_on_type(graphql, user_type: UserType) -> User | None:
         },
     ),
 )
-def test_user_permissions_on_banner_notifications(graphql, target, user_type, expected):
+def test_user_permissions_on_banner_notifications(
+    graphql: GraphQLClient, target: BannerNotificationTarget, user_type: UserType, expected: Any
+) -> None:
     # given:
     # - There is an active notification with the given target
     # - User of the given type is using the system
@@ -198,7 +202,9 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
         },
     ),
 )
-def test_user_permissions_on_banner_notifications_with_target_filter(graphql, target, user_type, expected):
+def test_user_permissions_on_banner_notifications_with_target_filter(
+    graphql: GraphQLClient, target: BannerNotificationTarget, user_type: UserType, expected: Any
+) -> None:
     # given:
     # - There are banner notification for all target audiences in the system
     # - User of the given type is using the system
@@ -272,7 +278,9 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
         },
     ),
 )
-def test_user_permissions_on_banner_notifications_without_target_filter(graphql, user_type, expected):
+def test_user_permissions_on_banner_notifications_without_target_filter(
+    graphql: GraphQLClient, user_type: UserType, expected: Any
+) -> None:
     # given:
     # - There are banner notification for all target audiences in the system
     # - User of the given type is using the system
@@ -350,7 +358,9 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
         },
     ),
 )
-def test_field_permissions_on_banner_notifications(graphql, field, user_type, expected):
+def test_field_permissions_on_banner_notifications(
+    graphql: GraphQLClient, field: str, user_type: UserType, expected: Any
+) -> None:
     # given:
     # - There is an active notification for all
     # - User of the given type is using the system
@@ -404,7 +414,9 @@ def test_field_permissions_on_banner_notifications(graphql, field, user_type, ex
         },
     ),
 )
-def test_permissions_on_non_visible_banner_notifications(graphql, user_type, expected):
+def test_permissions_on_non_visible_banner_notifications(
+    graphql: GraphQLClient, user_type: UserType, expected: Any
+) -> None:
     # given:
     # - There is a draft notification for all
     # - User of the given type is using the system
@@ -454,7 +466,9 @@ def test_permissions_on_non_visible_banner_notifications(graphql, user_type, exp
         },
     ),
 )
-def test_permission_on_both_non_visible_and_visible_banner_notifications(graphql, user_type, expected):
+def test_permission_on_both_non_visible_and_visible_banner_notifications(
+    graphql: GraphQLClient, user_type: UserType, expected: Any
+) -> None:
     # given:
     # - There is a draft notification for all & an active notification for all
     # - User of the given type is using the system

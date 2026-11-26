@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
@@ -12,6 +12,9 @@ from tilavarauspalvelu.models.banner_notification.model import BannerNotificatio
 from tests.factories import BannerNotificationFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -25,7 +28,7 @@ class InvalidActiveParams(NamedTuple):
     expected: Any
 
 
-def test_user_updates_draft_banner_notification(graphql):
+def test_user_updates_draft_banner_notification(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
@@ -63,7 +66,7 @@ def test_user_updates_draft_banner_notification(graphql):
     assert notification.level == BannerNotificationLevel.NORMAL.value
 
 
-def test_user_publishes_draft_banner_notification(graphql):
+def test_user_publishes_draft_banner_notification(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
@@ -102,7 +105,7 @@ def test_user_publishes_draft_banner_notification(graphql):
     assert notification.active_until == active_until
 
 
-def test_user_tries_to_publish_draft_banner_notification_without_setting_active_period(graphql):
+def test_user_tries_to_publish_draft_banner_notification_without_setting_active_period(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
@@ -212,8 +215,8 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
     ),
 )
 def test_user_tries_to_publish_draft_banner_notification_with_improper_active_period(
-    graphql, active_from, active_until, expected
-):
+    graphql: GraphQLClient, active_from: str | None, active_until: str | None, expected: Any
+) -> None:
     # given:
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
@@ -243,7 +246,7 @@ def test_user_tries_to_publish_draft_banner_notification_with_improper_active_pe
     assert response.field_errors == expected, response
 
 
-def test_primary_key_is_required_for_updating(graphql):
+def test_primary_key_is_required_for_updating(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
@@ -265,7 +268,7 @@ def test_primary_key_is_required_for_updating(graphql):
     assert response.error_message().startswith("Variable '$input'")
 
 
-def test_user_updates_non_existing_banner_notification(graphql):
+def test_user_updates_non_existing_banner_notification(graphql: GraphQLClient) -> None:
     # given:
     # - There are no banner notifications in the system
     # - Notification manager is using the system

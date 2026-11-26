@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget, UserRoleChoice
@@ -7,13 +9,16 @@ from tilavarauspalvelu.models import BannerNotification
 
 from tests.test_graphql_api.test_banner_notification.helpers import CREATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_banner_notification__create__anonymous_user(graphql):
+def test_banner_notification__create__anonymous_user(graphql: GraphQLClient) -> None:
     response = graphql(
         CREATE_MUTATION,
         input_data={
@@ -27,7 +32,7 @@ def test_banner_notification__create__anonymous_user(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_banner_notification__create__regular_user(graphql):
+def test_banner_notification__create__regular_user(graphql: GraphQLClient) -> None:
     graphql.login_with_regular_user()
 
     response = graphql(
@@ -43,7 +48,7 @@ def test_banner_notification__create__regular_user(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_banner_notification__create__no_perms(graphql):
+def test_banner_notification__create__no_perms(graphql: GraphQLClient) -> None:
     graphql.login_user_with_role(role=UserRoleChoice.VIEWER)
 
     response = graphql(
@@ -59,7 +64,7 @@ def test_banner_notification__create__no_perms(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_banner_notification__create__notification_manager(graphql):
+def test_banner_notification__create__notification_manager(graphql: GraphQLClient) -> None:
     graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
 
     response = graphql(
