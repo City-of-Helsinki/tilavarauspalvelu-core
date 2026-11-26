@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import Weekday
@@ -8,16 +10,19 @@ from tests.factories import ApplicationFactory, ReservationUnitOptionFactory, Us
 
 from .helpers import REJECT_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application__reject_all_options(graphql):
+def test_application__reject_all_options(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_in_allocation()
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     assert option.is_rejected is False
 
     graphql.login_with_superuser()
@@ -29,13 +34,13 @@ def test_application__reject_all_options(graphql):
     assert option.is_rejected is True
 
 
-def test_application__reject_all_options__has_allocations(graphql):
+def test_application__reject_all_options__has_allocations(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_in_allocation(
         application_sections__reservation_unit_options__is_rejected=False,
         application_sections__reservation_unit_options__allocated_time_slots__day_of_the_week=Weekday.MONDAY,
     )
-    section = application.application_sections.first()
-    option = section.reservation_unit_options.first()
+    section = application.application_sections.get()
+    option = section.reservation_unit_options.get()
     assert option.is_rejected is False
     assert option.allocated_time_slots.exists()
 
@@ -48,9 +53,9 @@ def test_application__reject_all_options__has_allocations(graphql):
     ]
 
 
-def test_application__reject_all_options__general_admin(graphql):
+def test_application__reject_all_options__general_admin(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_in_allocation()
-    option = application.application_sections.first().reservation_unit_options.first()
+    option = application.application_sections.get().reservation_unit_options.get()
 
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
@@ -63,10 +68,10 @@ def test_application__reject_all_options__general_admin(graphql):
     assert option.is_rejected is True
 
 
-def test_application__reject_all_options__unit_admin(graphql):
+def test_application__reject_all_options__unit_admin(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_in_allocation()
 
-    option = application.application_sections.first().reservation_unit_options.first()
+    option = application.application_sections.get().reservation_unit_options.get()
     admin = UserFactory.create_with_unit_role(units=[option.reservation_unit.unit])
     graphql.force_login(admin)
 
@@ -78,13 +83,15 @@ def test_application__reject_all_options__unit_admin(graphql):
     assert option.is_rejected is True
 
 
-def test_application__reject_all_options__unit_admin__no_permission_for_all_units(graphql):
+def test_application__reject_all_options__unit_admin__no_permission_for_all_units(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_in_allocation()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
 
     ReservationUnitOptionFactory.create(application_section=section)
 
-    unit = section.reservation_unit_options.first().reservation_unit.unit
+    first_option = section.reservation_unit_options.first()
+    assert first_option is not None
+    unit = first_option.reservation_unit.unit
     admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
@@ -93,11 +100,11 @@ def test_application__reject_all_options__unit_admin__no_permission_for_all_unit
     assert response.error_message() == "No permission to update."
 
 
-def test_application__reject_all_options__unit_admin__has_permission_for_all_units(graphql):
+def test_application__reject_all_options__unit_admin__has_permission_for_all_units(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_in_allocation()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
 
-    option_1 = section.reservation_unit_options.first()
+    option_1 = section.reservation_unit_options.get()
     option_2 = ReservationUnitOptionFactory.create(application_section=section)
 
     unit_1 = option_1.reservation_unit.unit

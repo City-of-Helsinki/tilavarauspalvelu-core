@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -13,13 +14,18 @@ from tests.factories import ApplicationFactory, ApplicationRoundFactory, Applica
 
 from .helpers import UPDATE_MUTATION
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application__update__single_field(graphql):
+def test_application__update__single_field(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
@@ -42,7 +48,7 @@ def test_application__update__single_field(graphql):
     assert application.additional_information == "bar"
 
 
-def test_application__update__applicant__resets_sent_at(graphql):
+def test_application__update__applicant__resets_sent_at(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_received()
     graphql.force_login(application.user)
 
@@ -59,7 +65,7 @@ def test_application__update__applicant__resets_sent_at(graphql):
     assert application.sent_at is None
 
 
-def test_application__update__staff__does_not_reset_sent_at(graphql):
+def test_application__update__staff__does_not_reset_sent_at(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_received()
     sent_at = application.sent_at
     graphql.login_with_superuser()
@@ -74,18 +80,19 @@ def test_application__update__staff__does_not_reset_sent_at(graphql):
 
     application = Application.objects.get(pk=application.pk)
     assert application.additional_information == "bar"
+    assert sent_at is not None
     assert application.sent_at == sent_at.astimezone(datetime.UTC)
 
 
-def test_application__update__application_sections__replace(graphql):
+def test_application__update__application_sections__replace(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
         application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
     )
-    section = application.application_sections.first()
-    suitable_time_range = section.suitable_time_ranges.first()
+    section = application.application_sections.get()
+    suitable_time_range = section.suitable_time_ranges.get()
     graphql.login_with_superuser()
 
     old_section_pk = section.pk
@@ -123,25 +130,25 @@ def test_application__update__application_sections__replace(graphql):
     # - The old section and ranges do not exist anymore
     assert response.has_errors is False, response
 
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     assert section.pk != old_section_pk
 
-    suitable = section.suitable_time_ranges.first()
+    suitable = section.suitable_time_ranges.get()
     assert suitable.pk != old_range_pk
 
     assert ApplicationSection.objects.filter(pk=old_section_pk).count() == 0
     assert SuitableTimeRange.objects.filter(pk=old_range_pk).count() == 0
 
 
-def test_application__update__application_sections__not_deleted_if_not_given(graphql):
+def test_application__update__application_sections__not_deleted_if_not_given(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
         application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
     )
-    section = application.application_sections.first()
-    suitable_time_range = section.suitable_time_ranges.first()
+    section = application.application_sections.get()
+    suitable_time_range = section.suitable_time_ranges.get()
 
     graphql.login_with_superuser()
 
@@ -161,14 +168,14 @@ def test_application__update__application_sections__not_deleted_if_not_given(gra
     # - The application sections and suitable time ranges have not changed
     assert response.has_errors is False, response
 
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     assert section.pk == old_section_pk
 
-    suitable = section.suitable_time_ranges.first()
+    suitable = section.suitable_time_ranges.get()
     assert suitable.pk == old_range_pk
 
 
-def test_application__update__application_sections__section_of_another_application(graphql):
+def test_application__update__application_sections__section_of_another_application(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft()
     other_section = ApplicationSectionFactory.create_in_status_unallocated()
     other_application_pk = other_section.application.pk
@@ -190,7 +197,7 @@ def test_application__update__application_sections__section_of_another_applicati
     assert other_section.application.pk == other_application_pk
 
 
-def test_application__update__application_sections__too_many(graphql, settings):
+def test_application__update__application_sections__too_many(graphql: GraphQLClient, settings: Settings) -> None:
     settings.MAXIMUM_SECTIONS_PER_APPLICATION = 0
 
     application = ApplicationFactory.create_in_status_draft()
@@ -226,7 +233,9 @@ def test_application__update__application_sections__too_many(graphql, settings):
     ]
 
 
-def test_application__update__application_sections__reservations_begin_date_before_round(graphql):
+def test_application__update__application_sections__reservations_begin_date_before_round(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is a draft application in an open application round
     # - The owner of the application is using the system
@@ -261,7 +270,7 @@ def test_application__update__application_sections__reservations_begin_date_befo
     ]
 
 
-def test_application__update__application_sections__deleted_if_empty(graphql):
+def test_application__update__application_sections__deleted_if_empty(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
@@ -285,7 +294,7 @@ def test_application__update__application_sections__deleted_if_empty(graphql):
     assert section is None
 
 
-def test_application__update__user(graphql):
+def test_application__update__user(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft()
     user = graphql.login_with_superuser()
 
@@ -299,7 +308,7 @@ def test_application__update__user(graphql):
     assert response.has_schema_errors is True, response
 
 
-def test_application__update__application_round(graphql):
+def test_application__update__application_round(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create()
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
@@ -314,7 +323,7 @@ def test_application__update__application_round(graphql):
     assert response.has_schema_errors is True, response
 
 
-def test_application__update__sent_at(graphql):
+def test_application__update__sent_at(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
 
@@ -328,7 +337,7 @@ def test_application__update__sent_at(graphql):
     assert response.has_schema_errors is True, response
 
 
-def test_application__update__working_memo(graphql):
+def test_application__update__working_memo(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
 

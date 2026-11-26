@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import Application
@@ -9,13 +11,16 @@ from tests.factories import ApplicationRoundFactory
 
 from .helpers import CREATE_MUTATION, get_application_create_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_unauthenticated_cannot_create_application(graphql):
+def test_unauthenticated_cannot_create_application(graphql: GraphQLClient) -> None:
     # given:
     # - There is an open application round
     # - An anonymous user is using the system
@@ -32,7 +37,7 @@ def test_unauthenticated_cannot_create_application(graphql):
     assert Application.objects.count() == 0
 
 
-def test_regular_user_can_create_application(graphql):
+def test_regular_user_can_create_application(graphql: GraphQLClient) -> None:
     # given:
     # - There is an open application round
     # - A regular user is using the system

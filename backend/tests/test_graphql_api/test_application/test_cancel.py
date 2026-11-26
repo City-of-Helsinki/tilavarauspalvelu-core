@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice
@@ -9,13 +11,16 @@ from tests.factories.application import ApplicationBuilder
 
 from .helpers import CANCEL_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application__cancel(graphql):
+def test_application__cancel(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round with a single application section
     # - A superuser is using the system
@@ -44,7 +49,7 @@ def test_application__cancel(graphql):
         ApplicationStatusChoice.CANCELLED,
     ],
 )
-def test_application__cancel__wrong_status(graphql, status):
+def test_application__cancel__wrong_status(graphql: GraphQLClient, status: ApplicationStatusChoice) -> None:
     # given:
     # - There is a draft application in a certain status
     # - A superuser is using the system

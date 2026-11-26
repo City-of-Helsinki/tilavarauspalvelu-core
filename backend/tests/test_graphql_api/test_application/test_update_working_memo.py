@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ApplicationFactory, UserFactory
 
 from .helpers import WORKING_MEMO_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_application__update_working_memo__application_owner(graphql):
+def test_application__update_working_memo__application_owner(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft(working_memo="foo")
 
     graphql.force_login(application.user)
@@ -29,7 +34,7 @@ def test_application__update_working_memo__application_owner(graphql):
     assert application.working_memo == "foo"
 
 
-def test_application__update_working_memo__general_admin(graphql):
+def test_application__update_working_memo__general_admin(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft(working_memo="foo")
 
     admin = UserFactory.create_with_general_role()
@@ -47,7 +52,7 @@ def test_application__update_working_memo__general_admin(graphql):
     assert application.working_memo == "123"
 
 
-def test_application__update_working_memo__blank(graphql):
+def test_application__update_working_memo__blank(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft(working_memo="foo")
 
     admin = UserFactory.create_with_general_role()

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.models import PersonalInfoViewLog
@@ -8,18 +10,21 @@ from tests.factories import ApplicationFactory
 
 from .helpers import applications_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application__query__all_fields(graphql):
+def test_application__query__all_fields(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in the system with one application section
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    section = application.application_sections.first()
+    section = application.application_sections.get()
     graphql.login_with_superuser()
 
     fields = """
@@ -91,7 +96,7 @@ def test_application__query__all_fields(graphql):
     }
 
 
-def test_application__query__date_of_birth_creates_personal_info_view_log(graphql):
+def test_application__query__date_of_birth_creates_personal_info_view_log(graphql: GraphQLClient) -> None:
     # given:
     # - There is an application in the system
     # - A superuser is using the system

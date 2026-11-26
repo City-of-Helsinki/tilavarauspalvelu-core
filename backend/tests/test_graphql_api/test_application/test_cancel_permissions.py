@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ApplicationFactory, UnitFactory, UserFactory
 
 from .helpers import CANCEL_MUTATION
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_application__cancel__regular_user(graphql):
+def test_application__cancel__regular_user(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round with a single application section
     # - A regular user is using the system
@@ -28,7 +33,7 @@ def test_application__cancel__regular_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_application__cancel__regular_user__own_application(graphql):
+def test_application__cancel__regular_user__own_application(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round with a single application section
     # - The owner of the application is using the system
@@ -47,7 +52,7 @@ def test_application__cancel__regular_user__own_application(graphql):
     assert application.cancelled_at is not None
 
 
-def test_application__cancel__regular_user__own_application__application_period_over(graphql):
+def test_application__cancel__regular_user__own_application__application_period_over(graphql: GraphQLClient) -> None:
     # given:
     # - There an application round in allocation with a single application
     # - The owner of the application is using the system
@@ -63,7 +68,7 @@ def test_application__cancel__regular_user__own_application__application_period_
     assert response.error_message() == "No permission to update."
 
 
-def test_application__cancel__general_admin(graphql):
+def test_application__cancel__general_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round with a single application section
     # - A general admin is using the system
@@ -83,7 +88,7 @@ def test_application__cancel__general_admin(graphql):
     assert application.cancelled_at is not None
 
 
-def test_application__cancel__unit_admin(graphql):
+def test_application__cancel__unit_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There is a draft application in an open application round
     # - A unit admin is using the system

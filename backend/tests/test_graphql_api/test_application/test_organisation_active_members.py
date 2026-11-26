@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationFormType
@@ -10,6 +12,9 @@ from tests.factories import ApplicationFactory, ApplicationRoundFactory
 
 from .helpers import CREATE_MUTATION, UPDATE_MUTATION, get_application_create_data
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -19,7 +24,7 @@ pytestmark = [
 # ── Create ──
 
 
-def test_application__create__sports_form__organisation_active_members(graphql):
+def test_application__create__sports_form__organisation_active_members(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open(
         application_form=ApplicationFormType.SPORTS_FORM,
     )
@@ -34,7 +39,7 @@ def test_application__create__sports_form__organisation_active_members(graphql):
     assert application.organisation_active_members == 25
 
 
-def test_application__create__default_form__organisation_active_members_not_allowed(graphql):
+def test_application__create__default_form__organisation_active_members_not_allowed(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -48,7 +53,7 @@ def test_application__create__default_form__organisation_active_members_not_allo
     assert not Application.objects.filter(application_round=application_round).exists()
 
 
-def test_application__create__default_form__organisation_active_members_null(graphql):
+def test_application__create__default_form__organisation_active_members_null(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
@@ -63,7 +68,7 @@ def test_application__create__default_form__organisation_active_members_null(gra
 # ── Update ──
 
 
-def test_application__update__sports_form__organisation_active_members(graphql):
+def test_application__update__sports_form__organisation_active_members(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft(
         application_round__application_form=ApplicationFormType.SPORTS_FORM,
     )
@@ -77,7 +82,7 @@ def test_application__update__sports_form__organisation_active_members(graphql):
     assert application.organisation_active_members == 25
 
 
-def test_application__update__default_form__organisation_active_members_not_allowed(graphql):
+def test_application__update__default_form__organisation_active_members_not_allowed(graphql: GraphQLClient) -> None:
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
 
