@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ApplicationRoundFactory, PriceOptionFactory, ReservationUnitFactory
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_application_round_price_options(graphql):
+def test_application_round_price_options(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open(
         reservation_units=[ReservationUnitFactory.create()],
     )
@@ -24,7 +29,7 @@ def test_application_round_price_options(graphql):
     assert response.json["data"]["applicationRoundPriceOptions"] == [{"pk": price_option.pk, "nameFi": "Adults"}]
 
 
-def test_application_round_price_options__none_offered(graphql):
+def test_application_round_price_options__none_offered(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_open(
         reservation_units=[ReservationUnitFactory.create()],
     )
@@ -36,7 +41,7 @@ def test_application_round_price_options__none_offered(graphql):
     assert response.json["data"]["applicationRoundPriceOptions"] == []
 
 
-def test_application_round_price_options__round_not_found(graphql):
+def test_application_round_price_options__round_not_found(graphql: GraphQLClient) -> None:
     query = build_query("applicationRoundPriceOptions", fields="pk", application_round=0)
     response = graphql(query)
 

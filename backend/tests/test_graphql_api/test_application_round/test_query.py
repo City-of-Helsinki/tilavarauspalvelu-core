@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -16,13 +17,16 @@ from tests.factories import ApplicationFactory, ApplicationRoundFactory, Reserva
 from tests.factories.application import ApplicationBuilder
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_application_round_query__all_fields(graphql):
+def test_application_round_query__all_fields(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application rounds
     # - A superuser is using the system
@@ -72,6 +76,8 @@ def test_application_round_query__all_fields(graphql):
     # then:
     # - The response contains the selected fields from both application rounds
     assert len(response.edges) == 2, response
+    assert application_round.terms_of_use is not None
+    assert application_round.status_timestamp is not None
     assert response.node(0) == {
         "nameFi": application_round.name_fi,
         "nameEn": application_round.name_en,
@@ -104,7 +110,9 @@ def test_application_round_query__all_fields(graphql):
     }
 
 
-def test_application_round_query__applications_count_does_not_include_draft_applications(graphql):
+def test_application_round_query__applications_count_does_not_include_draft_applications(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is a single application round with two applications, one of which is a draft
     application_round = ApplicationRoundFactory.create_in_status_open()
@@ -122,7 +130,9 @@ def test_application_round_query__applications_count_does_not_include_draft_appl
     assert response.node(0) == {"applicationsCount": 1}
 
 
-def test_application_round_query__applications_count_does_not_include_expired_applications(graphql):
+def test_application_round_query__applications_count_does_not_include_expired_applications(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is a single application round with two applications, one of which is expired
     application_round = ApplicationRoundFactory.create_in_status_handled()
@@ -140,7 +150,9 @@ def test_application_round_query__applications_count_does_not_include_expired_ap
     assert response.node(0) == {"applicationsCount": 1}
 
 
-def test_application_round_query__applications_count_does_not_include_cancelled_applications(graphql):
+def test_application_round_query__applications_count_does_not_include_cancelled_applications(
+    graphql: GraphQLClient,
+) -> None:
     # given:
     # - There is a single application round with two applications, one of which is cancelled
     application_round = ApplicationRoundFactory.create_in_status_handled()
@@ -158,7 +170,7 @@ def test_application_round_query__applications_count_does_not_include_cancelled_
     assert response.node(0) == {"applicationsCount": 1}
 
 
-def test_application_round_query__is_setting_handled_allowed__no_permissions__false(graphql):
+def test_application_round_query__is_setting_handled_allowed__no_permissions__false(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     application_round = ApplicationRoundFactory.create_in_status_in_allocation(reservation_units=[reservation_unit])
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
@@ -172,7 +184,9 @@ def test_application_round_query__is_setting_handled_allowed__no_permissions__fa
     assert response.node() == {"isSettingHandledAllowed": False}
 
 
-def test_application_round_query__is_setting_handled_allowed__application_in_allocation__false(graphql):
+def test_application_round_query__is_setting_handled_allowed__application_in_allocation__false(
+    graphql: GraphQLClient,
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
@@ -195,7 +209,9 @@ def test_application_round_query__is_setting_handled_allowed__application_in_all
         ApplicationStatusChoice.CANCELLED,
     ],
 )
-def test_application_round_query__is_setting_handled_allowed__application_status__true(graphql, application_status):
+def test_application_round_query__is_setting_handled_allowed__application_status__true(
+    graphql: GraphQLClient, application_status: ApplicationStatusChoice
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
@@ -208,7 +224,9 @@ def test_application_round_query__is_setting_handled_allowed__application_status
     assert response.node() == {"isSettingHandledAllowed": True}
 
 
-def test_application_round_query__reservation_creation_status__NOT_COMPLETED__not_set_as_handled(graphql):
+def test_application_round_query__reservation_creation_status__NOT_COMPLETED__not_set_as_handled(
+    graphql: GraphQLClient,
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled(handled_at=None)
     ApplicationFactory.create_in_status_handled(application_round=application_round)
 
@@ -220,7 +238,9 @@ def test_application_round_query__reservation_creation_status__NOT_COMPLETED__no
     assert response.node() == {"reservationCreationStatus": state}
 
 
-def test_application_round_query__reservation_creation_status__NOT_COMPLETED__before_timeout(graphql):
+def test_application_round_query__reservation_creation_status__NOT_COMPLETED__before_timeout(
+    graphql: GraphQLClient,
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled(
         handled_at=local_datetime() - datetime.timedelta(minutes=9)
     )
@@ -234,7 +254,7 @@ def test_application_round_query__reservation_creation_status__NOT_COMPLETED__be
     assert response.node() == {"reservationCreationStatus": state}
 
 
-def test_application_round_query__reservation_creation_status__FAILED__after_timeout(graphql):
+def test_application_round_query__reservation_creation_status__FAILED__after_timeout(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled(
         handled_at=local_datetime() - datetime.timedelta(minutes=11)
     )
@@ -248,7 +268,9 @@ def test_application_round_query__reservation_creation_status__FAILED__after_tim
     assert response.node() == {"reservationCreationStatus": state}
 
 
-def test_application_round_query__reservation_creation_status__COMPLETED__before_timeout(graphql):
+def test_application_round_query__reservation_creation_status__COMPLETED__before_timeout(
+    graphql: GraphQLClient,
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled(
         handled_at=local_datetime() - datetime.timedelta(minutes=9)
     )
@@ -265,7 +287,7 @@ def test_application_round_query__reservation_creation_status__COMPLETED__before
     assert response.node() == {"reservationCreationStatus": state}
 
 
-def test_application_round_query__reservation_creation_status__COMPLETED__after_timeout(graphql):
+def test_application_round_query__reservation_creation_status__COMPLETED__after_timeout(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled(
         handled_at=local_datetime() - datetime.timedelta(minutes=11)
     )

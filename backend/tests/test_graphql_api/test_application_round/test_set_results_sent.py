@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from unittest.mock import NonCallableMock
 
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -33,7 +35,7 @@ def mock_send_application_handled_email_task() -> Generator[NonCallableMock]:
         yield mock
 
 
-def test_application_round__set_results_sent(graphql):
+def test_application_round__set_results_sent(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
     ApplicationFactory.create_in_status_handled(application_round=application_round)
 
@@ -52,7 +54,7 @@ def test_application_round__set_results_sent(graphql):
     assert mock.call_count == 1
 
 
-def test_application_round__set_results_sent__not_handled(graphql):
+def test_application_round__set_results_sent__not_handled(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     ApplicationFactory.create_in_status_handled(application_round=application_round)
 
