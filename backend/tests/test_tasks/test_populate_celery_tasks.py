@@ -11,7 +11,7 @@ pytestmark = [
 ]
 
 
-def test_populate_celery_tasks__creates_disabled_periodic_task_for_scheduled_task():
+def test_populate_celery_tasks__creates_disabled_periodic_task_for_scheduled_task() -> None:
     output = io.StringIO()
 
     call_command("populate_celery_tasks", stdout=output)
@@ -25,14 +25,14 @@ def test_populate_celery_tasks__creates_disabled_periodic_task_for_scheduled_tas
     assert output.getvalue() == "Successfully populated Periodic Tasks.\n"
 
 
-def test_populate_celery_tasks__skips_tasks_without_schedule():
+def test_populate_celery_tasks__skips_tasks_without_schedule() -> None:
     call_command("populate_celery_tasks", stdout=io.StringIO())
 
     assert PeriodicTask.objects.filter(task="save_personal_info_view_log").exists() is False
     assert PeriodicTask.objects.filter(task__startswith="celery.").exists() is False
 
 
-def test_populate_celery_tasks__keeps_existing_periodic_task():
+def test_populate_celery_tasks__keeps_existing_periodic_task() -> None:
     crontab = CrontabSchedule.objects.create(hour="5", minute="0")
     PeriodicTask.objects.create(
         task="rebuild_space_tree_hierarchy",
@@ -50,7 +50,7 @@ def test_populate_celery_tasks__keeps_existing_periodic_task():
     assert tasks[0].crontab == crontab
 
 
-def test_populate_celery_tasks__reuses_existing_crontab_schedule():
+def test_populate_celery_tasks__reuses_existing_crontab_schedule() -> None:
     crontab = CrontabSchedule.objects.create(hour="3", minute="30")
 
     call_command("populate_celery_tasks", stdout=io.StringIO())
@@ -60,7 +60,7 @@ def test_populate_celery_tasks__reuses_existing_crontab_schedule():
     assert CrontabSchedule.objects.filter(hour="3", minute="30").count() == 1
 
 
-def test_populate_celery_tasks__running_twice_creates_no_duplicates():
+def test_populate_celery_tasks__running_twice_creates_no_duplicates() -> None:
     call_command("populate_celery_tasks", stdout=io.StringIO())
     task_count = PeriodicTask.objects.count()
     crontab_count = CrontabSchedule.objects.count()

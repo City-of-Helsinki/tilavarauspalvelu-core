@@ -25,9 +25,11 @@ from tests.factories import (
     SalesItemFactory,
     TaxLevelFactory,
 )
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 if TYPE_CHECKING:
+    from pytest_django import DjangoCaptureOnCommitCallbacks
+
     from tilavarauspalvelu.models import SalesItem
 
 # Applied to all tests
@@ -43,7 +45,7 @@ def create_sales_item(*, vat_code: str) -> SalesItem:
     return SalesItemFactory.create(tax_level=tax_level)
 
 
-def mock_create_product():
+def mock_create_product() -> Product:
     return Product(
         product_id=product_id,
         namespace="tilanvaraus",
@@ -55,7 +57,9 @@ def mock_create_product():
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
-def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save(django_capture_on_commit_callbacks):
+def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save(
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     tax_level = TaxLevelFactory.create(rates__vat_code="48")
     sales_item = SalesItemFactory.create(tax_level=tax_level, material="10000116", main_ledger_account="350080")
     reservation_unit = ReservationUnitFactory.create(
@@ -76,9 +80,9 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is not None
 
-    assert VerkkokauppaAPIClient.create_product.called is True
+    assert as_mock(VerkkokauppaAPIClient.create_product).called is True
 
-    VerkkokauppaAPIClient.create_or_update_accounting.assert_called_with(
+    as_mock(VerkkokauppaAPIClient.create_or_update_accounting).assert_called_with(
         product_uuid=reservation_unit.payment_product.id,
         params=CreateOrUpdateAccountingParams(
             vat_code="48",
@@ -102,8 +106,8 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
 def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_does_not_exist(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     sales_item = create_sales_item(vat_code="48")
     reservation_unit = ReservationUnitFactory.create(
         is_draft=False,
@@ -119,15 +123,15 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_doe
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is not None
-    assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is False
 
 
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
 def test_refresh_reservation_unit_accounting__api_not_called_when_product_mapping_is_not_needed(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(is_draft=True, own_price__amount=Decimal(10))
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
     reservation_unit.payment_accounting = PaymentAccountingFactory.create()
@@ -136,11 +140,11 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is None
-    assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is False
 
 
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
-def test_refresh_reservation_unit_accounting__api_not_called_when_price_today_has_no_sales_item():
+def test_refresh_reservation_unit_accounting__api_not_called_when_price_today_has_no_sales_item() -> None:
     reservation_unit = ReservationUnitFactory.create(
         payment_product=PaymentProductFactory.create(),
         payment_accounting=PaymentAccountingFactory.create(),
@@ -150,12 +154,12 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_price_today_ha
 
     refresh_reservation_unit_accounting_task(reservation_unit.pk)
 
-    assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is False
 
 
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
 @patch_method(SentryLogger.log_message)
-def test_refresh_reservation_unit_accounting__api_not_called_when_tax_rate_has_no_vat_code():
+def test_refresh_reservation_unit_accounting__api_not_called_when_tax_rate_has_no_vat_code() -> None:
     sales_item = create_sales_item(vat_code="")
     reservation_unit = ReservationUnitFactory.create(
         payment_product=PaymentProductFactory.create(),
@@ -167,8 +171,8 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_tax_rate_has_n
 
     refresh_reservation_unit_accounting_task(reservation_unit.pk)
 
-    assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
-    SentryLogger.log_message.assert_called_once_with(
+    assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is False
+    as_mock(SentryLogger.log_message).assert_called_once_with(
         "Reservation unit accounting not sent, because the tax rate of its sales item has no VAT code",
         details={
             "reservation_unit_id": reservation_unit.pk,
@@ -180,7 +184,7 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_tax_rate_has_n
 
 
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
-def test_refresh_reservation_unit_accounting__api_not_called_when_product_mapping_does_not_exist():
+def test_refresh_reservation_unit_accounting__api_not_called_when_product_mapping_does_not_exist() -> None:
     reservation_unit = ReservationUnitFactory.create(
         payment_product=None,
         payment_accounting=PaymentAccountingFactory.create(),
@@ -188,14 +192,16 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
 
     refresh_reservation_unit_accounting_task(reservation_unit.pk)
 
-    assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is False
 
 
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting, side_effect=CreateOrUpdateAccountingError("test"))
 @patch_method(SentryLogger.log_exception)
-def test_refresh_reservation_unit_accounting__capture_error__api_errors(django_capture_on_commit_callbacks):
+def test_refresh_reservation_unit_accounting__capture_error__api_errors(
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     sales_item = create_sales_item(vat_code="48")
     reservation_unit = ReservationUnitFactory.create(
         is_draft=False,
@@ -208,13 +214,13 @@ def test_refresh_reservation_unit_accounting__capture_error__api_errors(django_c
     with django_capture_on_commit_callbacks(execute=True):
         reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
-    assert VerkkokauppaAPIClient.create_product.called is True
-    assert VerkkokauppaAPIClient.create_or_update_accounting.called is True
-    assert SentryLogger.log_exception.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.create_product).called is True
+    assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is True
+    assert as_mock(SentryLogger.log_exception).call_count == 1
 
 
 @patch_method(SentryLogger.log_message)
-def test_refresh_reservation_unit_accounting__capture_error__reservation_unit_does_not_exist():
+def test_refresh_reservation_unit_accounting__capture_error__reservation_unit_does_not_exist() -> None:
     refresh_reservation_unit_accounting_task(0)
 
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1

@@ -19,7 +19,7 @@ pytestmark = [
 
 @override_settings(REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS=365)
 @freeze_time(local_datetime(2024, 6, 1, 12))
-def test_delete_expired_applications():
+def test_delete_expired_applications() -> None:
     now = local_datetime()
     application_round_old = ApplicationRoundFactory.create_in_status_results_sent(
         application_period_begins_at=now - datetime.timedelta(days=400),

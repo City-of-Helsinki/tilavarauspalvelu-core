@@ -9,7 +9,7 @@ from tests.factories import ReservationFactory
 
 
 @pytest.mark.django_db
-def test_create_missing_reservation_statistics_task():
+def test_create_missing_reservation_statistics_task() -> None:
     reservation = ReservationFactory.create()
 
     assert ReservationStatistic.objects.exists() is False

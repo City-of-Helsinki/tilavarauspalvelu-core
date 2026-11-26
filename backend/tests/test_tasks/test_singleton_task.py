@@ -9,7 +9,7 @@ from config.celery import app
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.tasks import singleton_task
 
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -47,45 +47,45 @@ def runs() -> TaskRuns:
 
 
 @patch_method(SentryLogger.log_message)
-def test_singleton_task__runs_with_other_arguments_while_locked(runs):
+def test_singleton_task__runs_with_other_arguments_while_locked(runs: TaskRuns) -> None:
     runs.calls_to_make_while_locked.append(lambda: run_other_while_locked_task("2"))
 
     run_other_while_locked_task("1")
 
     assert runs.calls == [("1", ""), ("2", "")]
-    assert SentryLogger.log_message.call_count == 0
+    assert as_mock(SentryLogger.log_message).call_count == 0
 
 
 @patch_method(SentryLogger.log_message)
-def test_singleton_task__runs_with_arguments_that_join_to_the_same_text_while_locked(runs):
+def test_singleton_task__runs_with_arguments_that_join_to_the_same_text_while_locked(runs: TaskRuns) -> None:
     runs.calls_to_make_while_locked.append(lambda: run_other_while_locked_task("a", "b:c"))
 
     run_other_while_locked_task("a:b", "c")
 
     assert runs.calls == [("a:b", "c"), ("a", "b:c")]
-    assert SentryLogger.log_message.call_count == 0
+    assert as_mock(SentryLogger.log_message).call_count == 0
 
 
 @patch_method(SentryLogger.log_message)
-def test_singleton_task__skips_same_arguments_while_locked(runs):
+def test_singleton_task__skips_same_arguments_while_locked(runs: TaskRuns) -> None:
     runs.calls_to_make_while_locked.append(lambda: run_other_while_locked_task("1"))
 
     run_other_while_locked_task("1")
 
     assert runs.calls == [("1", "")]
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ()
-    assert SentryLogger.log_message.call_args.kwargs == {
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert as_mock(SentryLogger.log_message).call_args.args == ()
+    assert as_mock(SentryLogger.log_message).call_args.kwargs == {
         "message": "Task skipped since another instance is already running.",
         "details": {"task_name": "test_singleton_task"},
     }
 
 
 @patch_method(SentryLogger.log_message)
-def test_singleton_task__skips_same_arguments_given_by_keyword_or_default_while_locked(runs):
+def test_singleton_task__skips_same_arguments_given_by_keyword_or_default_while_locked(runs: TaskRuns) -> None:
     runs.calls_to_make_while_locked.append(lambda: run_other_while_locked_task(first="1", second=""))
 
     run_other_while_locked_task("1")
 
     assert runs.calls == [("1", "")]
-    assert SentryLogger.log_message.call_count == 1
+    assert as_mock(SentryLogger.log_message).call_count == 1

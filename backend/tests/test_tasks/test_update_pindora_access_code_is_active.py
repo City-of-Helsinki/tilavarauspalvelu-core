@@ -13,7 +13,7 @@ from tilavarauspalvelu.tasks import update_pindora_access_code_is_active_task
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 
 @pytest.mark.django_db
@@ -21,7 +21,7 @@ from tests.helpers import patch_method
 @patch_method(PindoraClient.activate_reservation_access_code)
 @patch_method(PindoraClient.deactivate_reservation_access_code)
 @patch_method(EmailService.send_reservation_access_type_changed_email)
-def test_update_pindora_access_code_is_active__activate():
+def test_update_pindora_access_code_is_active__activate() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -36,9 +36,9 @@ def test_update_pindora_access_code_is_active__activate():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 1
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 0
+    assert as_mock(EmailService.send_reservation_access_type_changed_email).call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True
@@ -48,7 +48,7 @@ def test_update_pindora_access_code_is_active__activate():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code)
 @patch_method(PindoraClient.deactivate_reservation_access_code)
-def test_update_pindora_access_code_is_active__deactivate():
+def test_update_pindora_access_code_is_active__deactivate() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -63,8 +63,8 @@ def test_update_pindora_access_code_is_active__deactivate():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -74,7 +74,7 @@ def test_update_pindora_access_code_is_active__deactivate():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code)
 @patch_method(PindoraClient.deactivate_reservation_access_code)
-def test_update_pindora_access_code_is_active__already_active():
+def test_update_pindora_access_code_is_active__already_active() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -89,8 +89,8 @@ def test_update_pindora_access_code_is_active__already_active():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True
@@ -100,7 +100,7 @@ def test_update_pindora_access_code_is_active__already_active():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code)
 @patch_method(PindoraClient.deactivate_reservation_access_code)
-def test_update_pindora_access_code_is_active__already_not_active():
+def test_update_pindora_access_code_is_active__already_not_active() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -115,8 +115,8 @@ def test_update_pindora_access_code_is_active__already_not_active():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -126,7 +126,7 @@ def test_update_pindora_access_code_is_active__already_not_active():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError())
 @patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraAPIError())
-def test_update_pindora_access_code_is_active__activate__pindora_error():
+def test_update_pindora_access_code_is_active__activate__pindora_error() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -141,8 +141,8 @@ def test_update_pindora_access_code_is_active__activate__pindora_error():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 1
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -152,7 +152,7 @@ def test_update_pindora_access_code_is_active__activate__pindora_error():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("error"))
 @patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraNotFoundError("error"))
-def test_update_pindora_access_code_is_active__activate__pindora_error__404():
+def test_update_pindora_access_code_is_active__activate__pindora_error__404() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -167,8 +167,8 @@ def test_update_pindora_access_code_is_active__activate__pindora_error__404():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 1
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -178,7 +178,7 @@ def test_update_pindora_access_code_is_active__activate__pindora_error__404():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError())
 @patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraAPIError())
-def test_update_pindora_access_code_is_active__deactivate__pindora_error():
+def test_update_pindora_access_code_is_active__deactivate__pindora_error() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -193,8 +193,8 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True
@@ -204,7 +204,7 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("error"))
 @patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraNotFoundError("error"))
-def test_update_pindora_access_code_is_active__deactivate__pindora_error__404():
+def test_update_pindora_access_code_is_active__deactivate__pindora_error__404() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -219,8 +219,8 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error__404():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -230,7 +230,7 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error__404():
 @freeze_time("2023-01-01")
 @patch_method(PindoraClient.activate_reservation_access_code)
 @patch_method(PindoraClient.deactivate_reservation_access_code)
-def test_update_pindora_access_code_is_active__reservation_series_is_ignored():
+def test_update_pindora_access_code_is_active__reservation_series_is_ignored() -> None:
     now = local_datetime()
 
     reservation = ReservationFactory.create(
@@ -246,8 +246,8 @@ def test_update_pindora_access_code_is_active__reservation_series_is_ignored():
 
     update_pindora_access_code_is_active_task()
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
+    assert as_mock(PindoraClient.activate_reservation_access_code).call_count == 0
+    assert as_mock(PindoraClient.deactivate_reservation_access_code).call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False

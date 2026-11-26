@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import pytest
@@ -11,9 +12,13 @@ from utils.date_utils import local_datetime
 
 from tests.factories import EmailMessageFactory
 
+if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+    from pytest_django import Settings
+
 
 @pytest.mark.django_db
-def test_send_valid_saved_emails(outbox, settings) -> None:
+def test_send_valid_saved_emails(outbox: list[EmailMultiAlternatives], settings: Settings) -> None:
     settings.SEND_EMAILS = True
 
     email_message = EmailMessageFactory.create()
@@ -31,7 +36,7 @@ def test_send_valid_saved_emails(outbox, settings) -> None:
 
 
 @pytest.mark.django_db
-def test_send_valid_saved_emails__delete_expired(outbox, settings) -> None:
+def test_send_valid_saved_emails__delete_expired(outbox: list[EmailMultiAlternatives], settings: Settings) -> None:
     settings.SEND_EMAILS = True
 
     EmailMessageFactory.create(valid_until=local_datetime() - datetime.timedelta(days=1))
@@ -44,7 +49,9 @@ def test_send_valid_saved_emails__delete_expired(outbox, settings) -> None:
 
 
 @pytest.mark.django_db
-def test_send_valid_saved_emails__sending_fails__copy_created(outbox, settings) -> None:
+def test_send_valid_saved_emails__sending_fails__copy_created(
+    outbox: list[EmailMultiAlternatives], settings: Settings
+) -> None:
     settings.SEND_EMAILS = True
 
     email_message = EmailMessageFactory.create()
@@ -70,7 +77,9 @@ def test_send_valid_saved_emails__sending_fails__copy_created(outbox, settings) 
 
 
 @pytest.mark.django_db
-def test_send_valid_saved_emails__partial_success__copy_created(outbox, settings) -> None:
+def test_send_valid_saved_emails__partial_success__copy_created(
+    outbox: list[EmailMultiAlternatives], settings: Settings
+) -> None:
     settings.SEND_EMAILS = True
     settings.EMAIL_MAX_RECIPIENTS = 1
 
@@ -79,7 +88,7 @@ def test_send_valid_saved_emails__partial_success__copy_created(outbox, settings
 
     partial = False
 
-    def send_partial(*args, **kwargs):
+    def send_partial(*args: Any, **kwargs: Any) -> None:
         nonlocal partial
         if partial:
             raise TimeoutError

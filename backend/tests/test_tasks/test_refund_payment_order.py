@@ -10,7 +10,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 from tilavarauspalvelu.tasks import refund_payment_order_for_webshop_task
 
 from tests.factories import PaymentOrderFactory, RefundFactory, ReservationFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -18,12 +18,12 @@ pytestmark = [
 ]
 
 
-def test_refund_payment_order_for_webshop__does_not_fail_when_payment_order_is_missing():
+def test_refund_payment_order_for_webshop__does_not_fail_when_payment_order_is_missing() -> None:
     refund_payment_order_for_webshop_task(0)
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
-def test_refund_payment_order_for_webshop__updates_payment_order_on_success():
+def test_refund_payment_order_for_webshop__updates_payment_order_on_success() -> None:
     reservation = ReservationFactory.create()
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
@@ -32,11 +32,11 @@ def test_refund_payment_order_for_webshop__updates_payment_order_on_success():
     )
 
     refund = RefundFactory.create()
-    VerkkokauppaAPIClient.refund_order.return_value = refund
+    as_mock(VerkkokauppaAPIClient.refund_order).return_value = refund
 
     refund_payment_order_for_webshop_task(payment_order.pk)
 
-    assert VerkkokauppaAPIClient.refund_order.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.refund_order).call_count == 1
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id == refund.refund_id
@@ -46,7 +46,7 @@ def test_refund_payment_order_for_webshop__updates_payment_order_on_success():
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, side_effect=RefundPaymentError("Error"))
-def test_refund_payment_order_for_webshop__not_refunded_on_verkkokauppa_error():
+def test_refund_payment_order_for_webshop__not_refunded_on_verkkokauppa_error() -> None:
     reservation = ReservationFactory.create()
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
@@ -57,7 +57,7 @@ def test_refund_payment_order_for_webshop__not_refunded_on_verkkokauppa_error():
     with pytest.raises(RefundPaymentError):
         refund_payment_order_for_webshop_task(payment_order.pk)
 
-    assert VerkkokauppaAPIClient.refund_order.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.refund_order).call_count == 1
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id is None
@@ -65,9 +65,9 @@ def test_refund_payment_order_for_webshop__not_refunded_on_verkkokauppa_error():
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
-def test_refund_payment_order_for_webshop__refund_already_issued():
+def test_refund_payment_order_for_webshop__refund_already_issued() -> None:
     refund = RefundFactory.create()
-    VerkkokauppaAPIClient.refund_order.return_value = refund
+    as_mock(VerkkokauppaAPIClient.refund_order).return_value = refund
 
     reservation = ReservationFactory.create()
     payment_order = PaymentOrderFactory.create(
@@ -79,4 +79,4 @@ def test_refund_payment_order_for_webshop__refund_already_issued():
 
     refund_payment_order_for_webshop_task(payment_order.pk)
 
-    assert VerkkokauppaAPIClient.refund_order.call_count == 0
+    assert as_mock(VerkkokauppaAPIClient.refund_order).call_count == 0

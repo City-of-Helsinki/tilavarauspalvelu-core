@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -18,11 +19,14 @@ from tests.factories.reservation_unit import ReservationUnitBuilder
 from tests.factories.unit import UnitBuilder
 from tests.helpers import patch_method
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
 
 @pytest.mark.django_db
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
 @patch_method(HaukiAPIClient.get_date_periods, side_effect=SoftTimeLimitExceeded())
-def test_generate_reservation_series_from_allocations__soft_time_limit_fails_the_task(settings):
+def test_generate_reservation_series_from_allocations__soft_time_limit_fails_the_task(settings: Settings) -> None:
     settings.SENTRY_LOGGER_ALWAYS_RE_RAISE = False
 
     user = UserFactory.create()

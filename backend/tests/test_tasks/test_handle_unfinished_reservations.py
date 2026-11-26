@@ -23,11 +23,13 @@ from tilavarauspalvelu.tasks import delete_pindora_reservation_task, handle_unfi
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 if TYPE_CHECKING:
     from collections.abc import Generator
     from unittest.mock import NonCallableMock
+
+    from pytest_django import Settings
 
 # Applied to all tests
 pytestmark = [
@@ -48,7 +50,7 @@ def mock_delete_pindora_reservation_task() -> Generator[NonCallableMock]:
 # ── Free ──
 
 
-def test_handle_unfinished_reservations__direct__free(settings):
+def test_handle_unfinished_reservations__direct__free(settings: Settings) -> None:
     settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
 
     ReservationFactory.create(
@@ -61,7 +63,7 @@ def test_handle_unfinished_reservations__direct__free(settings):
     assert Reservation.objects.exists() is False
 
 
-def test_handle_unfinished_reservations__direct__free__do_not_delete_too_early(settings):
+def test_handle_unfinished_reservations__direct__free__do_not_delete_too_early(settings: Settings) -> None:
     settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
 
     ReservationFactory.create(
@@ -77,8 +79,8 @@ def test_handle_unfinished_reservations__direct__free__do_not_delete_too_early(s
 # Five minutes after the clocks moved from 03:00 to 04:00 local time.
 @freeze_time("2026-03-29 01:05:00+00:00")
 def test_handle_unfinished_reservations__direct__free__do_not_delete_too_early__after_daylight_saving_time_change(
-    settings,
-):
+    settings: Settings,
+) -> None:
     settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
 
     ReservationFactory.create(
@@ -92,7 +94,7 @@ def test_handle_unfinished_reservations__direct__free__do_not_delete_too_early__
 
 
 @patch_method(PindoraClient.delete_reservation)
-def test_handle_unfinished_reservations__direct__free__delete_from_pindora(settings):
+def test_handle_unfinished_reservations__direct__free__delete_from_pindora(settings: Settings) -> None:
     settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
 
     ReservationFactory.create(
@@ -106,11 +108,13 @@ def test_handle_unfinished_reservations__direct__free__delete_from_pindora(setti
 
     assert Reservation.objects.exists() is False
 
-    assert PindoraClient.delete_reservation.called is True
+    assert as_mock(PindoraClient.delete_reservation).called is True
 
 
 @patch_method(PindoraClient.delete_reservation, side_effect=PindoraAPIError())
-def test_handle_unfinished_reservations__direct__free__delete_from_pindora__call_fails_runs_task(settings):
+def test_handle_unfinished_reservations__direct__free__delete_from_pindora__call_fails_runs_task(
+    settings: Settings,
+) -> None:
     settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
 
     ReservationFactory.create(
@@ -125,11 +129,13 @@ def test_handle_unfinished_reservations__direct__free__delete_from_pindora__call
 
     assert Reservation.objects.exists() is False
 
-    assert PindoraClient.delete_reservation.called is True
+    assert as_mock(PindoraClient.delete_reservation).called is True
     assert task.called is True
 
 
-def test_handle_unfinished_reservations__direct__free__delete_from_pindora_after_deleting_reservations(settings):
+def test_handle_unfinished_reservations__direct__free__delete_from_pindora_after_deleting_reservations(
+    settings: Settings,
+) -> None:
     settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
 
     first_reservation = ReservationFactory.create(
@@ -158,7 +164,7 @@ def test_handle_unfinished_reservations__direct__free__delete_from_pindora_after
     with patch_method(PindoraClient.delete_reservation, side_effect=check_reservations_left):
         handle_unfinished_reservations_task()
 
-        called_uuids = {call.kwargs["reservation"] for call in PindoraClient.delete_reservation.call_args_list}
+        called_uuids = {call.kwargs["reservation"] for call in as_mock(PindoraClient.delete_reservation).call_args_list}
 
     assert Reservation.objects.exists() is False
     assert reservations_left_at_pindora_calls == [False, False]
@@ -168,7 +174,7 @@ def test_handle_unfinished_reservations__direct__free__delete_from_pindora_after
 # ── Paid directly ──
 
 
-def test_handle_unfinished_reservations__direct__waiting_for_payment__expired(settings):
+def test_handle_unfinished_reservations__direct__waiting_for_payment__expired(settings: Settings) -> None:
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     PaymentOrderFactory.create_at(
@@ -182,7 +188,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__expired(se
     assert Reservation.objects.exists() is False
 
 
-def test_handle_unfinished_reservations__direct__waiting_for_payment__cancelled(settings):
+def test_handle_unfinished_reservations__direct__waiting_for_payment__cancelled(settings: Settings) -> None:
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     PaymentOrderFactory.create_at(
@@ -196,7 +202,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__cancelled(
     assert Reservation.objects.exists() is False
 
 
-def test_handle_unfinished_reservations__direct__waiting_for_payment__dont_delete_too_early(settings):
+def test_handle_unfinished_reservations__direct__waiting_for_payment__dont_delete_too_early(settings: Settings) -> None:
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     PaymentOrderFactory.create_at(
@@ -210,7 +216,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__dont_delet
     assert Reservation.objects.exists() is True
 
 
-def test_handle_unfinished_reservations__direct__waiting_for_payment__paid(settings):
+def test_handle_unfinished_reservations__direct__waiting_for_payment__paid(settings: Settings) -> None:
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     PaymentOrderFactory.create_at(
@@ -224,7 +230,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__paid(setti
     assert Reservation.objects.exists() is True
 
 
-def test_handle_unfinished_reservations__direct__waiting_for_payment__no_remote_id(settings):
+def test_handle_unfinished_reservations__direct__waiting_for_payment__no_remote_id(settings: Settings) -> None:
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
 
     PaymentOrderFactory.create_at(
@@ -239,7 +245,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__no_remote_
     assert Reservation.objects.exists() is True
 
 
-def test_handle_unfinished_reservations__direct__waiting_for_payment__no_payment():
+def test_handle_unfinished_reservations__direct__waiting_for_payment__no_payment() -> None:
     ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
 
     handle_unfinished_reservations_task()
@@ -248,7 +254,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__no_payment
 
 
 @patch_method(PindoraClient.delete_reservation)
-def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_from_pindora():
+def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_from_pindora() -> None:
     PaymentOrderFactory.create_at(
         reservation__state=ReservationStateChoice.WAITING_FOR_PAYMENT,
         reservation__access_type=AccessType.ACCESS_CODE,
@@ -261,11 +267,13 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_fro
 
     assert Reservation.objects.exists() is False
 
-    assert PindoraClient.delete_reservation.called is True
+    assert as_mock(PindoraClient.delete_reservation).called is True
 
 
 @patch_method(PindoraClient.delete_reservation, side_effect=PindoraAPIError())
-def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_from_pindora__call_fails_runs_task():
+def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_from_pindora__call_fails_runs_task() -> (
+    None
+):
     PaymentOrderFactory.create_at(
         reservation__state=ReservationStateChoice.WAITING_FOR_PAYMENT,
         reservation__access_type=AccessType.ACCESS_CODE,
@@ -279,7 +287,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_fro
 
     assert Reservation.objects.exists() is False
 
-    assert PindoraClient.delete_reservation.called is True
+    assert as_mock(PindoraClient.delete_reservation).called is True
     assert task.called is True
 
 
@@ -288,7 +296,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_fro
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(EmailService.send_reservation_cancelled_email)
-def test_handle_unfinished_reservations__handled__overdue():
+def test_handle_unfinished_reservations__handled__overdue() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     reservation = ReservationFactory.create(
@@ -310,12 +318,12 @@ def test_handle_unfinished_reservations__handled__overdue():
     assert reservation.state == ReservationStateChoice.CANCELLED
     assert reservation.cancel_reason == ReservationCancelReasonChoice.NOT_PAID
 
-    assert EmailService.send_reservation_cancelled_email.called is True
+    assert as_mock(EmailService.send_reservation_cancelled_email).called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(EmailService.send_reservation_cancelled_email)
-def test_handle_unfinished_reservations__handled__overdue__dont_delete_too_early():
+def test_handle_unfinished_reservations__handled__overdue__dont_delete_too_early() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     reservation = ReservationFactory.create(
@@ -337,12 +345,12 @@ def test_handle_unfinished_reservations__handled__overdue__dont_delete_too_early
     assert reservation.state == ReservationStateChoice.CONFIRMED
     assert reservation.cancel_reason is None
 
-    assert EmailService.send_reservation_cancelled_email.called is False
+    assert as_mock(EmailService.send_reservation_cancelled_email).called is False
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(PindoraClient.delete_reservation)
-def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora():
+def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     reservation = ReservationFactory.create(
@@ -362,7 +370,7 @@ def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora()
 
     handle_unfinished_reservations_task()
 
-    assert PindoraClient.delete_reservation.called is True
+    assert as_mock(PindoraClient.delete_reservation).called is True
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CANCELLED
@@ -371,7 +379,7 @@ def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora()
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(PindoraClient.delete_reservation, side_effect=PindoraAPIError())
-def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora__call_fails_runs_task():
+def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora__call_fails_runs_task() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     reservation = ReservationFactory.create(
@@ -392,7 +400,7 @@ def test_handle_unfinished_reservations__handled__overdue__delete_from_pindora__
     with mock_delete_pindora_reservation_task() as task:
         handle_unfinished_reservations_task()
 
-    assert PindoraClient.delete_reservation.called is True
+    assert as_mock(PindoraClient.delete_reservation).called is True
     assert task.called is True
 
     reservation.refresh_from_db()

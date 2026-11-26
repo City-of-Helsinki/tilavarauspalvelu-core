@@ -13,7 +13,7 @@ pytestmark = [
 ]
 
 
-def test_remove_old_personal_info_view_logs__removes_logs_older_than_two_years_and_keeps_newer():
+def test_remove_old_personal_info_view_logs__removes_logs_older_than_two_years_and_keeps_newer() -> None:
     user = UserFactory.create()
     with freeze_time("2021-02-21 10:00"):
         PersonalInfoViewLog.objects.create(

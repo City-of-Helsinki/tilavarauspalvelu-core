@@ -15,7 +15,7 @@ def get_tasks() -> list[tuple[str, Task]]:
     return inspect.getmembers(tasks, predicate)
 
 
-def test_that_there_are_no_duplicate_tasks():
+def test_that_there_are_no_duplicate_tasks() -> None:
     known_tasks: set[str] = set()
 
     for func_name, _task_func in get_tasks():
@@ -24,7 +24,7 @@ def test_that_there_are_no_duplicate_tasks():
         known_tasks.add(func_name)
 
 
-def test_that_task_name_matches_its_function_name():
+def test_that_task_name_matches_its_function_name() -> None:
     for task_func_name, task_func in get_tasks():
         assert task_func_name.endswith("_task"), f"Task {task_func_name!r} should end with '_task'"
 

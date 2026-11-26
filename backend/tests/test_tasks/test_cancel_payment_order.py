@@ -11,7 +11,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 from tilavarauspalvelu.tasks import cancel_payment_order_for_invoice_task
 
 from tests.factories import OrderFactory, PaymentOrderFactory, ReservationFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -19,12 +19,12 @@ pytestmark = [
 ]
 
 
-def test_cancel_payment_order_for_invoice__does_not_fail_when_payment_order_is_missing():
+def test_cancel_payment_order_for_invoice__does_not_fail_when_payment_order_is_missing() -> None:
     cancel_payment_order_for_invoice_task(0)
 
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-def test_cancel_payment_order_for_invoice__updates_payment_order_on_success():
+def test_cancel_payment_order_for_invoice__updates_payment_order_on_success() -> None:
     reservation = ReservationFactory.create()
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
@@ -34,18 +34,18 @@ def test_cancel_payment_order_for_invoice__updates_payment_order_on_success():
     )
 
     order = OrderFactory.create(status=WebShopOrderStatus.CANCELLED)
-    VerkkokauppaAPIClient.cancel_order.return_value = order
+    as_mock(VerkkokauppaAPIClient.cancel_order).return_value = order
 
     cancel_payment_order_for_invoice_task(payment_order.pk)
 
-    assert VerkkokauppaAPIClient.cancel_order.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.cancel_order).call_count == 1
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.CANCELLED
 
 
 @patch_method(VerkkokauppaAPIClient.cancel_order, side_effect=CancelOrderError("Error"))
-def test_cancel_payment_order_for_invoice__not_cancelled_on_verkkokauppa_error():
+def test_cancel_payment_order_for_invoice__not_cancelled_on_verkkokauppa_error() -> None:
     reservation = ReservationFactory.create()
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
@@ -57,7 +57,7 @@ def test_cancel_payment_order_for_invoice__not_cancelled_on_verkkokauppa_error()
     with pytest.raises(CancelOrderError):
         cancel_payment_order_for_invoice_task(payment_order.pk)
 
-    assert VerkkokauppaAPIClient.cancel_order.call_count == 1
+    assert as_mock(VerkkokauppaAPIClient.cancel_order).call_count == 1
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID_BY_INVOICE

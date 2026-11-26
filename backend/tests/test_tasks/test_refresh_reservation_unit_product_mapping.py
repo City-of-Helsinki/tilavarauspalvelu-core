@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from django.test import override_settings
@@ -13,7 +14,10 @@ from tilavarauspalvelu.tasks import refresh_reservation_unit_product_mapping_tas
 from utils.date_utils import local_date
 
 from tests.factories import PaymentMerchantFactory, PaymentProductFactory, PriceComponentFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
+
+if TYPE_CHECKING:
+    from pytest_django import DjangoCaptureOnCommitCallbacks
 
 # Applied to all tests
 pytestmark = [
@@ -23,7 +27,7 @@ pytestmark = [
 product_id = uuid.uuid4()
 
 
-def mock_create_product(*args, **kwargs):
+def mock_create_product(*args: Any, **kwargs: Any) -> Product:
     return Product(
         product_id=product_id,
         namespace="tilanvaraus",
@@ -35,8 +39,8 @@ def mock_create_product(*args, **kwargs):
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 def test_refresh_reservation_unit_product_mapping__is_paid_and_has_merchant__mapping_is_created(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(
         payment_merchant=PaymentMerchantFactory.create(), own_price__amount=Decimal(10)
     )
@@ -51,8 +55,8 @@ def test_refresh_reservation_unit_product_mapping__is_paid_and_has_merchant__map
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 def test_refresh_reservation_unit_product_mapping__reservation_unit_is_saved__mapping_is_created_after_commit(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(
         payment_merchant=PaymentMerchantFactory.create(), own_price__amount=Decimal(10)
     )
@@ -73,8 +77,8 @@ def test_refresh_reservation_unit_product_mapping__reservation_unit_is_saved__ma
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 def test_refresh_reservation_unit_product_mapping__merchant_is_missing__mapping_is_not_created(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(payment_merchant=None, own_price__amount=Decimal(10))
     with django_capture_on_commit_callbacks(execute=True):
         reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
@@ -86,8 +90,8 @@ def test_refresh_reservation_unit_product_mapping__merchant_is_missing__mapping_
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 def test_refresh_reservation_unit_product_mapping__unit_is_not_paid__mapping_is_not_created(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(
         payment_merchant=PaymentMerchantFactory.create(),
         own_price__amount=Decimal(0),
@@ -97,22 +101,22 @@ def test_refresh_reservation_unit_product_mapping__unit_is_not_paid__mapping_is_
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is None
-    assert VerkkokauppaAPIClient.create_product.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_product).called is False
 
 
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
-def test_refresh_reservation_unit_product_mapping__no_price__mapping_is_not_created():
+def test_refresh_reservation_unit_product_mapping__no_price__mapping_is_not_created() -> None:
     reservation_unit = ReservationUnitFactory.create(payment_merchant=PaymentMerchantFactory.create())
 
     refresh_reservation_unit_product_mapping_task(reservation_unit.pk)
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.payment_product is None
-    assert VerkkokauppaAPIClient.create_product.called is False
+    assert as_mock(VerkkokauppaAPIClient.create_product).called is False
 
 
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
-def test_refresh_reservation_unit_product_mapping__only_future_price_is_paid__mapping_is_created():
+def test_refresh_reservation_unit_product_mapping__only_future_price_is_paid__mapping_is_created() -> None:
     reservation_unit = ReservationUnitFactory.create(
         payment_merchant=PaymentMerchantFactory.create(),
         own_price__amount=Decimal(10),
@@ -129,8 +133,8 @@ def test_refresh_reservation_unit_product_mapping__only_future_price_is_paid__ma
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 def test_refresh_reservation_unit_product_mapping__future_price_is_paid__mapping_is_created(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     future = local_date() + datetime.timedelta(days=30)
     reservation_unit = ReservationUnitFactory.create(
         payment_merchant=PaymentMerchantFactory.create(),
@@ -153,8 +157,8 @@ def test_refresh_reservation_unit_product_mapping__future_price_is_paid__mapping
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 def test_refresh_reservation_unit_product_mapping__merchant_from_unit__mapping_is_created(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     payment_merchant = PaymentMerchantFactory.create()
     reservation_unit = ReservationUnitFactory.create(
         payment_merchant=None, unit__payment_merchant=payment_merchant, own_price__amount=Decimal(10)
@@ -171,8 +175,8 @@ def test_refresh_reservation_unit_product_mapping__merchant_from_unit__mapping_i
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 def test_refresh_reservation_unit_product_mapping__has_product__mapping_is_refreshed_for_draft(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     payment_merchant = PaymentMerchantFactory.create()
     reservation_unit = ReservationUnitFactory.create(
         is_draft=True,
@@ -190,8 +194,8 @@ def test_refresh_reservation_unit_product_mapping__has_product__mapping_is_refre
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 def test_refresh_reservation_unit_product_mapping__merchant_is_removed__mapping_is_removed(
-    django_capture_on_commit_callbacks,
-):
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     reservation_unit = ReservationUnitFactory.create(
         payment_merchant=PaymentMerchantFactory.create(), own_price__amount=Decimal(10)
     )
