@@ -39,10 +39,10 @@ class ReservationUnitInline(admin.TabularInline):
     can_delete = False
     extra = 0
 
-    def has_add_permission(self, request, obj=None) -> bool:
+    def has_add_permission(self, request: HttpRequest, obj: OriginHaukiResource | None = None) -> bool:
         return False
 
-    def reservation_unit_link(self, obj) -> str:
+    def reservation_unit_link(self, obj: ReservationUnit) -> str:
         url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=(obj.pk,))
 
         return format_html(f"<a href={url}>{obj.name_fi}</a>")
@@ -161,7 +161,11 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
         self.message_user(request, _("Reservable Time Spans updated."))
 
-    def update_reservable_time_spans_action(self, request, queryset: QuerySet[OriginHaukiResource]) -> None:
+    def update_reservable_time_spans_action(
+        self,
+        request: HttpRequest,
+        queryset: QuerySet[OriginHaukiResource],
+    ) -> None:
         ids: list[int] = list(queryset.values_list("id", flat=True))
         try:
             HaukiResourceHashUpdater(ids).run(force_refetch=True)

@@ -147,7 +147,7 @@ class ReservationFilterSet(ModelFilterSet):
         ).distinct()
 
     @staticmethod
-    def filter_by_requested(qs: QuerySet, name, value: str) -> QuerySet:
+    def filter_by_requested(qs: QuerySet, name: str, value: str) -> QuerySet:
         """Filter for displaying reservations which requires or had required handling."""
         query = Q(state=ReservationStateChoice.REQUIRES_HANDLING) | Q(handled_at__isnull=False)
         if value:

@@ -41,10 +41,10 @@ class UnitGroupInlineAdmin(admin.TabularInline):
     fields = ("unitgroup",)
     readonly_fields = fields
 
-    def has_add_permission(self, request, obj=None) -> bool:
+    def has_add_permission(self, request: HttpRequest, obj: Unit | None = None) -> bool:
         return False
 
-    def has_delete_permission(self, request, obj=None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj: Unit | None = None) -> bool:
         return False
 
 
