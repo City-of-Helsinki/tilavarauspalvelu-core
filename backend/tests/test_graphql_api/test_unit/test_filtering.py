@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -13,6 +14,11 @@ from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFact
 
 from .helpers import units_all_query, units_query
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -20,7 +26,7 @@ pytestmark = [
 
 
 @pytest.mark.parametrize("gql_query", [units_query, units_all_query])
-def test_units__filter__by_name(graphql, gql_query):
+def test_units__filter__by_name(graphql: GraphQLClient, gql_query: Callable[..., str]) -> None:
     unit = UnitFactory.create(name_fi="1111")
     UnitFactory.create(name_fi="2222")
     UnitFactory.create(name_fi="3333")
@@ -39,7 +45,9 @@ def test_units__filter__by_name(graphql, gql_query):
 
 
 @pytest.mark.parametrize("gql_query", [units_query, units_all_query])
-def test_units__filter__by_name__translation_missing_fallback_to_fi(graphql, gql_query):
+def test_units__filter__by_name__translation_missing_fallback_to_fi(
+    graphql: GraphQLClient, gql_query: Callable[..., str]
+) -> None:
     UnitFactory.create(name_fi="1111", name_sv="")
     UnitFactory.create(name_fi="2222", name_sv="1111")
     UnitFactory.create(name_fi="3333", name_en="1111")
@@ -55,7 +63,7 @@ def test_units__filter__by_name__translation_missing_fallback_to_fi(graphql, gql
 
 
 @pytest.mark.parametrize("gql_query", [units_query, units_all_query])
-def test_units__filter__by_unit_group(graphql, gql_query):
+def test_units__filter__by_unit_group(graphql: GraphQLClient, gql_query: Callable[..., str]) -> None:
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
     UnitFactory.create()
@@ -76,7 +84,7 @@ def test_units__filter__by_unit_group(graphql, gql_query):
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
 @pytest.mark.parametrize("gql_query", [units_query, units_all_query])
-def test_units__filter__by_published_reservation_units(graphql, gql_query):
+def test_units__filter__by_published_reservation_units(graphql: GraphQLClient, gql_query: Callable[..., str]) -> None:
     unit_1 = UnitFactory.create(name="1")
     unit_2 = UnitFactory.create(name="2")
     unit_3 = UnitFactory.create(name="3")
@@ -112,7 +120,7 @@ def test_units__filter__by_published_reservation_units(graphql, gql_query):
 
 
 @pytest.mark.parametrize("gql_query", [units_query, units_all_query])
-def test_units__filter__by_own_reservations(graphql, gql_query):
+def test_units__filter__by_own_reservations(graphql: GraphQLClient, gql_query: Callable[..., str]) -> None:
     unit_1 = UnitFactory.create(name="1")
     unit_2 = UnitFactory.create(name="2")
     unit_3 = UnitFactory.create(name="3")
@@ -158,7 +166,7 @@ def test_units__filter__by_own_reservations(graphql, gql_query):
 
 
 @pytest.mark.parametrize("gql_query", [units_query, units_all_query])
-def test_units__filter__by_only_direct_bookable(graphql, gql_query):
+def test_units__filter__by_only_direct_bookable(graphql: GraphQLClient, gql_query: Callable[..., str]) -> None:
     # Has only direct reservation unit, should be included
     unit_1 = UnitFactory.create(name="1")
     ReservationUnitFactory.create(unit=unit_1, reservation_kind=ReservationKind.DIRECT)
@@ -196,7 +204,7 @@ def test_units__filter__by_only_direct_bookable(graphql, gql_query):
 
 
 @pytest.mark.parametrize("gql_query", [units_query, units_all_query])
-def test_units__filter__by_only_seasonal_bookable(graphql, gql_query):
+def test_units__filter__by_only_seasonal_bookable(graphql: GraphQLClient, gql_query: Callable[..., str]) -> None:
     # Has only direct reservation unit, should be excluded
     unit_1 = UnitFactory.create(name="1")
     ReservationUnitFactory.create(unit=unit_1, reservation_kind=ReservationKind.DIRECT)
@@ -233,7 +241,7 @@ def test_units__filter__by_only_seasonal_bookable(graphql, gql_query):
         assert response.first_query_object[2] == {"pk": unit_4.pk}
 
 
-def test_unit_all__no_pagination_limit(graphql):
+def test_unit_all__no_pagination_limit(graphql: GraphQLClient) -> None:
     UnitFactory.create_batch(2)
 
     graphql.login_with_superuser()

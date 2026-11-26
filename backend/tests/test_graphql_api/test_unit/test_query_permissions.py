@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import PaymentMerchantFactory, UnitFactory, UnitGroupFactory, UserFactory
 
 from .helpers import units_all_query, units_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_units__filter__only_with_permission__regular_user(graphql):
+def test_units__filter__only_with_permission__regular_user(graphql: GraphQLClient) -> None:
     UnitFactory.create()
     graphql.login_with_regular_user()
 
@@ -23,7 +28,7 @@ def test_units__filter__only_with_permission__regular_user(graphql):
     assert len(response.edges) == 0
 
 
-def test_units__filter__only_with_permission__general_admin__can_manage_units(graphql):
+def test_units__filter__only_with_permission__general_admin__can_manage_units(graphql: GraphQLClient) -> None:
     UnitFactory.create()
 
     user = UserFactory.create_with_general_role()
@@ -36,7 +41,7 @@ def test_units__filter__only_with_permission__general_admin__can_manage_units(gr
     assert len(response.edges) == 1
 
 
-def test_units__filter__only_with_permission__unit_admin__can_manage_units(graphql):
+def test_units__filter__only_with_permission__unit_admin__can_manage_units(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     UnitFactory.create()
 
@@ -51,7 +56,7 @@ def test_units__filter__only_with_permission__unit_admin__can_manage_units(graph
     assert response.node(0) == {"pk": unit.pk}
 
 
-def test_units__filter__only_with_permission__unit_group_admin__can_manage_units(graphql):
+def test_units__filter__only_with_permission__unit_group_admin__can_manage_units(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     UnitFactory.create()
     unit_group = UnitGroupFactory.create(units=[unit])
@@ -67,7 +72,7 @@ def test_units__filter__only_with_permission__unit_group_admin__can_manage_units
     assert response.node(0) == {"pk": unit.pk}
 
 
-def test_units__query__hide_payment_merchant_without_permissions(graphql):
+def test_units__query__hide_payment_merchant_without_permissions(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create(payment_merchant=PaymentMerchantFactory.create())
 
     graphql.login_with_regular_user()
@@ -80,7 +85,7 @@ def test_units__query__hide_payment_merchant_without_permissions(graphql):
     assert response.node(0) == {"nameFi": unit.name, "paymentMerchant": None}
 
 
-def test_units__query__show_payment_merchant_with_permissions(graphql):
+def test_units__query__show_payment_merchant_with_permissions(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create(payment_merchant=PaymentMerchantFactory.create())
 
     graphql.login_with_superuser()
@@ -90,10 +95,11 @@ def test_units__query__show_payment_merchant_with_permissions(graphql):
     assert response.has_errors is False
 
     assert len(response.edges) == 1
+    assert unit.payment_merchant is not None
     assert response.node(0) == {"nameFi": unit.name, "paymentMerchant": {"name": unit.payment_merchant.name}}
 
 
-def test_unit_all__filter__only_with_permission__general_admin(graphql):
+def test_unit_all__filter__only_with_permission__general_admin(graphql: GraphQLClient) -> None:
     unit_1 = UnitFactory.create()
     unit_2 = UnitFactory.create()
 

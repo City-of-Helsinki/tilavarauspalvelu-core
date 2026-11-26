@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UnitGroupFactory, UserFactory
 
 from .helpers import units_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_units__order__by_name_fi(graphql):
+def test_units__order__by_name_fi(graphql: GraphQLClient) -> None:
     unit_1 = UnitFactory.create(name_fi="Unit 1")
     unit_2 = UnitFactory.create(name_fi="Unit 2")
     unit_3 = UnitFactory.create(name_fi="Unit 3")
@@ -38,7 +43,7 @@ def test_units__order__by_name_fi(graphql):
     assert response.node(2) == {"pk": unit_1.pk}
 
 
-def test_units__order__by_name_en(graphql):
+def test_units__order__by_name_en(graphql: GraphQLClient) -> None:
     """Test ordering by name in English, with fallback to Finnish if English name is not set."""
     unit_1 = UnitFactory.create(name_fi="Unit 1", name_en="Unit 4")
     unit_2 = UnitFactory.create(name_fi="Unit 2", name_en="Unit 5")
@@ -65,7 +70,7 @@ def test_units__order__by_name_en(graphql):
     assert response.node(2) == {"pk": unit_3.pk}
 
 
-def test_units__order__by_reservations_count(graphql):
+def test_units__order__by_reservations_count(graphql: GraphQLClient) -> None:
     units = {
         0: UnitFactory.create(name="1"),  # 4 Reservations in 2 ReservationUnits
         1: UnitFactory.create(name="2"),  # 2 Reservations in 1 ReservationUnit
@@ -116,7 +121,7 @@ def test_units__order__by_reservations_count(graphql):
     assert response_2.node(3) == {"pk": units[expected_order[3]].pk}
 
 
-def test_units__order__by_reservations_count__only_own_reservations(graphql):
+def test_units__order__by_reservations_count__only_own_reservations(graphql: GraphQLClient) -> None:
     units = {
         0: UnitFactory.create(name="1"),  # 3 Reservations for user (total 4)
         1: UnitFactory.create(name="2"),  # 2 Reservations for user (total 2)
@@ -171,7 +176,7 @@ def test_units__order__by_reservations_count__only_own_reservations(graphql):
     assert response_2.node(2) == {"pk": units[expected_order[2]].pk}
 
 
-def test_units__order__by_reservation_units_count(graphql):
+def test_units__order__by_reservation_units_count(graphql: GraphQLClient) -> None:
     units = {
         0: UnitFactory.create(name="1"),  # 4 ReservationUnits
         1: UnitFactory.create(name="2"),  # 2 ReservationUnits
@@ -227,7 +232,7 @@ def test_units__order__by_reservation_units_count(graphql):
         ("sv", [0, 1, 2, 3]),
     ],
 )
-def test_units__order__unit_group_name(graphql, language, order):
+def test_units__order__unit_group_name(graphql: GraphQLClient, language: str, order: list[int]) -> None:
     units = {
         0: UnitFactory.create(name="0"),
         1: UnitFactory.create(name="1"),
