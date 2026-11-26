@@ -21,7 +21,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
     ProductInvoicingParams,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, PriceComponent, Reservation
+from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, PriceComponent, Reservation, TaxLevelRate
 from tilavarauspalvelu.tasks import (
     create_statistics_for_reservations_task,
     notify_reservation_on_access_type_change_task,
@@ -508,18 +508,22 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if accounting is None:
             return
 
+        today = local_date()
+
+        rates_today = TaxLevelRate.objects.effective_on(on_date=today)
         products = (
             self.reservation_unit.payment_products
             .filter(merchant=merchant, sales_item__isnull=False)
             .select_related("sales_item__tax_level")
+            .prefetch_related(
+                models.Prefetch("sales_item__tax_level__rates", queryset=rates_today, to_attr="rates_today")
+            )
             .order_by("pk")
         )
 
-        today = local_date()
-
         for product in products:
             sales_item = product.sales_item
-            rate = sales_item.tax_level.rates.effective_on(on_date=today).first()
+            rate = next(iter(sales_item.tax_level.rates_today), None)
             vat_code = rate.vat_code if rate is not None else ""
             if not vat_code:
                 SentryLogger.log_message(
