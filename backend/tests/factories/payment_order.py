@@ -44,7 +44,7 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     handled_payment_due_by = None
 
     language = Language.FI
-    reservation_user_uuid = None
+    reservation_user_uuid = factory.LazyFunction(uuid.uuid4)
     checkout_url = ""
     receipt_url = ""
 
