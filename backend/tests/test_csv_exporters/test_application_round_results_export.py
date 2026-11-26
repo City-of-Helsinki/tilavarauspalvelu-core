@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from tilavarauspalvelu.enums import Weekday
+from tilavarauspalvelu.models import AllocatedTimeSlot
 from tilavarauspalvelu.services.export import ApplicationRoundResultCSVExporter
 from tilavarauspalvelu.services.export.application_round_result_exporter import ApplicationSectionExportRow
 from utils.date_utils import local_date_string, local_timedelta_string
@@ -22,7 +23,7 @@ from tests.factories.application_section import ApplicationSectionBuilder
 from tests.test_csv_exporters.helpers import mock_csv_writer
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -30,7 +31,7 @@ pytestmark = [
 ]
 
 
-def test_application_round_results_export__single_application__all_fields(graphql):
+def test_application_round_results_export__single_application__all_fields(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
     application = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
@@ -42,8 +43,8 @@ def test_application_round_results_export__single_application__all_fields(graphq
         application_sections__reservation_unit_options__allocated_time_slots__begin_time=datetime.time(12, 0),
         application_sections__reservation_unit_options__allocated_time_slots__end_time=datetime.time(14, 0),
     )
-    section: ApplicationSection = application.application_sections.first()
-    allocation: AllocatedTimeSlot = section.reservation_unit_options.first().allocated_time_slots.first()
+    section = application.application_sections.get()
+    allocation = AllocatedTimeSlot.objects.get(reservation_unit_option__application_section=section)
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
@@ -77,7 +78,7 @@ def test_application_round_results_export__single_application__all_fields(graphq
     )
 
 
-def test_application_round_results_export__no_suitable_time_ranges(graphql):
+def test_application_round_results_export__no_suitable_time_ranges(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
     ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
@@ -91,7 +92,7 @@ def test_application_round_results_export__no_suitable_time_ranges(graphql):
     assert len(writes) == 1  # Just the header
 
 
-def test_application_round_results_export__application_status_is_expired(graphql):
+def test_application_round_results_export__application_status_is_expired(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
     ApplicationFactory.create_in_status_expired(
         application_round=application_round,
@@ -106,7 +107,7 @@ def test_application_round_results_export__application_status_is_expired(graphql
     assert len(writes) == 1  # Just the header
 
 
-def test_application_round_results_export__application_status_is_draft(graphql):
+def test_application_round_results_export__application_status_is_draft(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
     ApplicationFactory.create_in_status_draft(
         application_round=application_round,
@@ -121,7 +122,7 @@ def test_application_round_results_export__application_status_is_draft(graphql):
     assert len(writes) == 1  # Just the header
 
 
-def test_application_round_results_export__section_has_no_allocated_time_slots(graphql):
+def test_application_round_results_export__section_has_no_allocated_time_slots(graphql: GraphQLClient) -> None:
     """Section which has no allocated time slots should still be exported."""
     application_round = ApplicationRoundFactory.create_in_status_handled()
     application = ApplicationBuilder().in_allocation().in_application_round(application_round).create()
@@ -150,7 +151,7 @@ def test_application_round_results_export__section_has_no_allocated_time_slots(g
     assert section_row.end_time == ""
 
 
-def test_application_round_results_export__reservation_unit_option_ordering(graphql):
+def test_application_round_results_export__reservation_unit_option_ordering(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
     application = ApplicationFactory.create_in_status_in_allocation(application_round=application_round)
     section = ApplicationSectionFactory.create(
@@ -189,7 +190,7 @@ def test_application_round_results_export__reservation_unit_option_ordering(grap
     assert ApplicationSectionExportRow(*writes[3]).reservation_unit_name == "three"
 
 
-def test_application_round_results_export__allocated_slot_ordering(graphql):
+def test_application_round_results_export__allocated_slot_ordering(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_handled()
     application = ApplicationFactory.create_in_status_in_allocation(application_round=application_round)
     section = ApplicationSectionFactory.create(
