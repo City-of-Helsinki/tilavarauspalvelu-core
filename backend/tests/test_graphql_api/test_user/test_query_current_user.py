@@ -9,12 +9,12 @@ from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 
 from tests.factories import GeneralRoleFactory, UnitFactory, UnitGroupFactory, UnitRoleFactory, UserFactory
-from tests.helpers import patch_method
+from tests.helpers import as_mock, patch_method
 
 from .helpers import current_user_query
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import GeneralRole
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -23,7 +23,7 @@ pytestmark = [
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__all_fields(graphql):
+def test_query_current_user__all_fields(graphql: GraphQLClient) -> None:
     # given:
     # - There is a user in the system
     # - That user is using the system
@@ -56,6 +56,7 @@ def test_query_current_user__all_fields(graphql):
     # then:
     # - The response contains the expected data
     assert response.has_errors is False, response
+    assert user.date_of_birth is not None
     assert response.first_query_object == {
         "pk": user.pk,
         "uuid": str(user.uuid),
@@ -71,11 +72,11 @@ def test_query_current_user__all_fields(graphql):
         "unitRoles": [],
     }
 
-    assert HelsinkiProfileClient.ensure_token_valid.call_count == 1
+    assert as_mock(HelsinkiProfileClient.ensure_token_valid).call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__unauthenticated(graphql):
+def test_query_current_user__unauthenticated(graphql: GraphQLClient) -> None:
     # given:
     # - An anonymous user is using the system
 
@@ -109,12 +110,12 @@ def test_query_current_user__unauthenticated(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__general_roles(graphql):
+def test_query_current_user__general_roles(graphql: GraphQLClient) -> None:
     # given:
     # - There is a general admin in the system
     # - That admin is using the system
     user = UserFactory.create_with_general_role()
-    general_role: GeneralRole = user.general_roles.first()
+    general_role = user.general_roles.get()
     graphql.force_login(user)
 
     fields = """
@@ -163,7 +164,7 @@ def test_query_current_user__general_roles(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__general_roles__permissions_are_for_each_role(graphql):
+def test_query_current_user__general_roles__permissions_are_for_each_role(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     GeneralRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
     GeneralRoleFactory.create(user=user, role=UserRoleChoice.NOTIFICATION_MANAGER)
@@ -188,14 +189,14 @@ def test_query_current_user__general_roles__permissions_are_for_each_role(graphq
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__unit_admin(graphql):
+def test_query_current_user__unit_admin(graphql: GraphQLClient) -> None:
     # given:
     # - There is a unit in the system
     # - There is a unit admin for that unit in the system
     # - That admin is using the system
     unit = UnitFactory.create()
     user = UserFactory.create_with_unit_role(units=[unit])
-    unit_role = user.unit_roles.first()
+    unit_role = user.unit_roles.get()
     graphql.force_login(user)
 
     fields = """
@@ -256,12 +257,12 @@ def test_query_current_user__unit_admin(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__unit_admin__unit_group(graphql):
+def test_query_current_user__unit_admin__unit_group(graphql: GraphQLClient) -> None:
     unit = UnitFactory.create()
     unit_group = UnitGroupFactory.create(units=[unit])
 
     user = UserFactory.create_with_unit_role(unit_groups=[unit_group])
-    unit_role = user.unit_roles.first()
+    unit_role = user.unit_roles.get()
     graphql.force_login(user)
 
     fields = """
@@ -318,7 +319,7 @@ def test_query_current_user__unit_admin__unit_group(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__unit_admin__multiple_roles(graphql):
+def test_query_current_user__unit_admin__multiple_roles(graphql: GraphQLClient) -> None:
     unit_1 = UnitFactory.create()
     unit_2 = UnitFactory.create()
     unit_3 = UnitFactory.create()
@@ -395,7 +396,7 @@ def test_query_current_user__unit_admin__multiple_roles(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__inactive_general_roles(graphql):
+def test_query_current_user__inactive_general_roles(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
 
     general_role = GeneralRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
@@ -428,7 +429,7 @@ def test_query_current_user__inactive_general_roles(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__inactive_unit_roles(graphql):
+def test_query_current_user__inactive_unit_roles(graphql: GraphQLClient) -> None:
     unit_1 = UnitFactory.create()
     unit_2 = UnitFactory.create()
 
@@ -470,7 +471,7 @@ def test_query_current_user__inactive_unit_roles(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__reservation_notification(graphql):
+def test_query_current_user__reservation_notification(graphql: GraphQLClient) -> None:
     # given:
     # - There is a superuser user in the system
     # - That user is using the system
@@ -496,7 +497,7 @@ def test_query_current_user__reservation_notification(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__reservation_notification__hidden_for_non_staff(graphql):
+def test_query_current_user__reservation_notification__hidden_for_non_staff(graphql: GraphQLClient) -> None:
     # given:
     # - There is a regular user in the system
     # - That user is using the system
@@ -522,7 +523,7 @@ def test_query_current_user__reservation_notification__hidden_for_non_staff(grap
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__ad_login(graphql):
+def test_query_current_user__ad_login(graphql: GraphQLClient) -> None:
     # given:
     # - There is a user logged in with azure ad
     # - That user is using the system
@@ -550,7 +551,7 @@ def test_query_current_user__ad_login(graphql):
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
-def test_query_current_user__suomi_fi_login(graphql):
+def test_query_current_user__suomi_fi_login(graphql: GraphQLClient) -> None:
     # given:
     # - There is a user logged in with azure ad
     # - That user is using the system

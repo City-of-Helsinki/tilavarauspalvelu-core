@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -12,13 +13,16 @@ from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from tests.factories import GeneralRoleFactory, ReservationFactory, UnitRoleFactory, UserFactory
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_user__query__through_reservation(graphql):
+def test_user__query__through_reservation(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     reservation = ReservationFactory.create(user=user)
 
@@ -56,7 +60,7 @@ def test_user__query__through_reservation(graphql):
     }
 
 
-def test_user__query__through_reservation__roles_of_another_user_are_hidden(graphql):
+def test_user__query__through_reservation__roles_of_another_user_are_hidden(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     GeneralRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
     UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
@@ -92,7 +96,7 @@ def test_user__query__through_reservation__roles_of_another_user_are_hidden(grap
 
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
-def test_user__query__through_reservation__date_of_birth_read_is_logged(graphql):
+def test_user__query__through_reservation__date_of_birth_read_is_logged(graphql: GraphQLClient) -> None:
     user = UserFactory.create()
     reservation = ReservationFactory.create(user=user)
 
@@ -105,6 +109,7 @@ def test_user__query__through_reservation__date_of_birth_read_is_logged(graphql)
 
     assert response.has_errors is False, response.errors
 
+    assert user.date_of_birth is not None
     assert response.first_query_object == {
         "user": {
             "pk": user.pk,

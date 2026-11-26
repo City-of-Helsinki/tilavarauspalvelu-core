@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
@@ -8,13 +10,16 @@ from tests.factories import UserFactory
 
 from .helpers import STAFF_UPDATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_user__update__superuser(graphql):
+def test_user__update__superuser(graphql: GraphQLClient) -> None:
     user = UserFactory.create_superuser(reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED)
     graphql.force_login(user)
 
@@ -30,7 +35,7 @@ def test_user__update__superuser(graphql):
     assert user.reservation_notification == ReservationNotification.NONE
 
 
-def test_user__update__anonymous_user(graphql):
+def test_user__update__anonymous_user(graphql: GraphQLClient) -> None:
     user = UserFactory.create(reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED)
 
     data = {
@@ -45,7 +50,7 @@ def test_user__update__anonymous_user(graphql):
     assert user.reservation_notification == ReservationNotification.ONLY_HANDLING_REQUIRED
 
 
-def test_user__update__cannot_update_other_user(graphql):
+def test_user__update__cannot_update_other_user(graphql: GraphQLClient) -> None:
     user = UserFactory.create_superuser(reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED)
     graphql.login_with_regular_user()
 
@@ -61,7 +66,7 @@ def test_user__update__cannot_update_other_user(graphql):
     assert user.reservation_notification == ReservationNotification.ONLY_HANDLING_REQUIRED
 
 
-def test_user__update__regular_user(graphql):
+def test_user__update__regular_user(graphql: GraphQLClient) -> None:
     user = UserFactory.create(reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED)
     graphql.force_login(user)
 
@@ -77,7 +82,7 @@ def test_user__update__regular_user(graphql):
     assert user.reservation_notification == ReservationNotification.ONLY_HANDLING_REQUIRED
 
 
-def test_user__update__admin_user(graphql):
+def test_user__update__admin_user(graphql: GraphQLClient) -> None:
     user = UserFactory.create_with_general_role(
         role=UserRoleChoice.ADMIN,
         reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
