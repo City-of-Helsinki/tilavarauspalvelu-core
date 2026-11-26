@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
@@ -28,6 +29,11 @@ from tests.factories.application import ApplicationBuilder
 
 from .helpers import SET_HANDLED_MUTATION, disable_reservation_generation
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationRound, PriceOption, ReservationUnit
+
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -43,7 +49,13 @@ MAY_17 = datetime.date(2027, 5, 17)  # Monday
 MAY_31 = datetime.date(2027, 5, 31)  # Monday
 
 
-def create_allocation(*, application_round, reservation_unit, section_name="Kenttä", price_option=None):
+def create_allocation(
+    *,
+    application_round: ApplicationRound,
+    reservation_unit: ReservationUnit,
+    section_name: str = "Kenttä",
+    price_option: PriceOption | None = None,
+) -> None:
     """An allocation on Mondays 12-14 in May 2027, in a handled application."""
     application = ApplicationFactory.create_in_status_handled_no_sections(application_round=application_round)
     section = ApplicationSectionFactory.create(
@@ -63,7 +75,9 @@ def create_allocation(*, application_round, reservation_unit, section_name="Kent
     )
 
 
-def create_unit_with_price(*, name, price_option=None, valid_until=None):
+def create_unit_with_price(
+    *, name: str, price_option: PriceOption | None = None, valid_until: datetime.date | None = None
+) -> ReservationUnit:
     unit_group = price_option.unit_group if price_option is not None else None
     pricing_group = PricingGroupFactory.create(unit_group=unit_group)
     PriceComponentFactory.create(
@@ -85,7 +99,7 @@ def create_unit_with_price(*, name, price_option=None, valid_until=None):
 # ── Set handled ──
 
 
-def test_application_round__set_handled(graphql):
+def test_application_round__set_handled(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
@@ -106,7 +120,7 @@ def test_application_round__set_handled(graphql):
 
 # The application period ends between 00:00 and 03:00 local time, when the UTC date is still the previous day.
 @freeze_time(local_datetime(2026, 10, 12, 2))
-def test_application_round__set_handled__on_the_night_the_application_period_ends(graphql):
+def test_application_round__set_handled__on_the_night_the_application_period_ends(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation(
         application_period_ends_at=local_datetime(2026, 10, 12, 1),
     )
@@ -134,7 +148,9 @@ def test_application_round__set_handled__on_the_night_the_application_period_end
         ApplicationRoundStatusChoice.RESULTS_SENT,
     ],
 )
-def test_application_round__set_handled__wrong_status(graphql, status):
+def test_application_round__set_handled__wrong_status(
+    graphql: GraphQLClient, status: ApplicationRoundStatusChoice
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status(status)
     assert application_round.status == status
 
@@ -147,7 +163,7 @@ def test_application_round__set_handled__wrong_status(graphql, status):
     assert response.field_error_messages() == ["Application round is not in allocation status."]
 
 
-def test_application_round__set_handled__general_admin(graphql):
+def test_application_round__set_handled__general_admin(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
@@ -163,7 +179,7 @@ def test_application_round__set_handled__general_admin(graphql):
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
 
 
-def test_application_round__set_handled__unit_admin(graphql):
+def test_application_round__set_handled__unit_admin(graphql: GraphQLClient) -> None:
     reservation_unit = ReservationUnitFactory.create()
     application_round = ApplicationRoundFactory.create_in_status_in_allocation(reservation_units=[reservation_unit])
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
@@ -181,7 +197,7 @@ def test_application_round__set_handled__unit_admin(graphql):
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
 
 
-def test_application_round__set_handled__unit_admin__no_perms_to_all_units(graphql):
+def test_application_round__set_handled__unit_admin__no_perms_to_all_units(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -200,7 +216,7 @@ def test_application_round__set_handled__unit_admin__no_perms_to_all_units(graph
     assert response.error_message() == "No permission to update."
 
 
-def test_application_round__set_handled__unit_admin__has_perms_to_all_units(graphql):
+def test_application_round__set_handled__unit_admin__has_perms_to_all_units(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -233,7 +249,9 @@ def test_application_round__set_handled__unit_admin__has_perms_to_all_units(grap
         (ApplicationStatusChoice.CANCELLED, False),
     ],
 )
-def test_application_round__set_handled__error__has_applications_in_status(graphql, application_status, raises_error):
+def test_application_round__set_handled__error__has_applications_in_status(
+    graphql: GraphQLClient, application_status: ApplicationStatusChoice, raises_error: bool
+) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
@@ -258,7 +276,7 @@ def test_application_round__set_handled__error__has_applications_in_status(graph
 # ── Prices ──
 
 
-def test_application_round__set_handled__all_prices_exist(graphql):
+def test_application_round__set_handled__all_prices_exist(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     adults = PriceOptionFactory.create(unit_group=UnitGroupFactory.create())
     reservation_unit = create_unit_with_price(name="Halli", price_option=adults)
@@ -276,7 +294,7 @@ def test_application_round__set_handled__all_prices_exist(graphql):
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
 
 
-def test_application_round__set_handled__no_pricing_groups(graphql):
+def test_application_round__set_handled__no_pricing_groups(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     reservation_unit = ReservationUnitFactory.create()
     create_allocation(application_round=application_round, reservation_unit=reservation_unit)
@@ -293,7 +311,7 @@ def test_application_round__set_handled__no_pricing_groups(graphql):
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
 
 
-def test_application_round__set_handled__mixed_pricing_groups(graphql):
+def test_application_round__set_handled__mixed_pricing_groups(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     priced_unit = create_unit_with_price(name="Halli")
     unpriced_unit = ReservationUnitFactory.create(name="Kenttä")
@@ -320,7 +338,7 @@ def test_application_round__set_handled__mixed_pricing_groups(graphql):
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
 
-def test_application_round__set_handled__price_missing_on_a_date(graphql):
+def test_application_round__set_handled__price_missing_on_a_date(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     adults = PriceOptionFactory.create(unit_group=UnitGroupFactory.create())
     reservation_unit = create_unit_with_price(name="Halli", price_option=adults, valid_until=MAY_17)
@@ -351,7 +369,7 @@ def test_application_round__set_handled__price_missing_on_a_date(graphql):
 
 
 @freeze_time(local_datetime(2026, 10, 12, 12))
-def test_application_round__set_handled__tax_level_has_no_rate_today(graphql):
+def test_application_round__set_handled__tax_level_has_no_rate_today(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     tax_level = TaxLevelFactory.create(name="ALV", rates__begins=datetime.date(2027, 1, 1))
     pricing_group = PricingGroupFactory.create()

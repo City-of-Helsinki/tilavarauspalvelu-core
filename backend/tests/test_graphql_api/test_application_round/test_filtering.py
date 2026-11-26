@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import ApplicationRoundFactory, ReservationUnitFactory, UserFactory
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
+
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_application_round__filter__by_pk(graphql):
+def test_application_round__filter__by_pk(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application rounds
     # - A superuser is using the system
@@ -29,7 +34,7 @@ def test_application_round__filter__by_pk(graphql):
     assert response.node(0) == {"pk": application_round.pk}
 
 
-def test_application_round__filter__by_pk__multiple(graphql):
+def test_application_round__filter__by_pk__multiple(graphql: GraphQLClient) -> None:
     # given:
     # - There are two application rounds
     # - A superuser is using the system
@@ -48,7 +53,7 @@ def test_application_round__filter__by_pk__multiple(graphql):
     assert response.node(1) == {"pk": application_round_2.pk}
 
 
-def test_application_round__filter__by_active(graphql):
+def test_application_round__filter__by_active(graphql: GraphQLClient) -> None:
     ApplicationRoundFactory.create_in_status_upcoming()
     application_round = ApplicationRoundFactory.create_in_status_open()
     ApplicationRoundFactory.create_in_status_in_allocation()
@@ -61,7 +66,7 @@ def test_application_round__filter__by_active(graphql):
     assert response.node(0) == {"pk": application_round.pk}
 
 
-def test_application_round__filter__by_active__negative(graphql):
+def test_application_round__filter__by_active__negative(graphql: GraphQLClient) -> None:
     application_round_1 = ApplicationRoundFactory.create_in_status_upcoming()
     ApplicationRoundFactory.create_in_status_open()
     application_round_2 = ApplicationRoundFactory.create_in_status_in_allocation()
@@ -75,7 +80,7 @@ def test_application_round__filter__by_active__negative(graphql):
     assert response.node(1) == {"pk": application_round_2.pk}
 
 
-def test_application_round__filter__by_ongoing(graphql):
+def test_application_round__filter__by_ongoing(graphql: GraphQLClient) -> None:
     application_round_1 = ApplicationRoundFactory.create_in_status_upcoming()
     application_round_2 = ApplicationRoundFactory.create_in_status_open()
     ApplicationRoundFactory.create_in_status_results_sent()
@@ -89,7 +94,7 @@ def test_application_round__filter__by_ongoing(graphql):
     assert response.node(1) == {"pk": application_round_2.pk}
 
 
-def test_application_round__filter__by_ongoing__negative(graphql):
+def test_application_round__filter__by_ongoing__negative(graphql: GraphQLClient) -> None:
     ApplicationRoundFactory.create_in_status_upcoming()
     ApplicationRoundFactory.create_in_status_open()
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
@@ -102,7 +107,7 @@ def test_application_round__filter__by_ongoing__negative(graphql):
     assert response.node(0) == {"pk": application_round.pk}
 
 
-def test_application_round__filter__by_only_with_permissions__superuser(graphql):
+def test_application_round__filter__by_only_with_permissions__superuser(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create()
 
     graphql.login_with_superuser()
@@ -113,7 +118,7 @@ def test_application_round__filter__by_only_with_permissions__superuser(graphql)
     assert response.node(0) == {"pk": application_round.pk}
 
 
-def test_application_round__filter__by_only_with_permissions__anonymous_user(graphql):
+def test_application_round__filter__by_only_with_permissions__anonymous_user(graphql: GraphQLClient) -> None:
     ApplicationRoundFactory.create()
 
     query = rounds_query(only_with_permissions=True)
@@ -122,7 +127,7 @@ def test_application_round__filter__by_only_with_permissions__anonymous_user(gra
     assert len(response.edges) == 0, response
 
 
-def test_application_round__filter__by_only_with_permissions__regular_user(graphql):
+def test_application_round__filter__by_only_with_permissions__regular_user(graphql: GraphQLClient) -> None:
     ApplicationRoundFactory.create()
 
     graphql.login_with_regular_user()
@@ -132,7 +137,7 @@ def test_application_round__filter__by_only_with_permissions__regular_user(graph
     assert len(response.edges) == 0, response
 
 
-def test_application_round__filter__by_only_with_permissions__general_admin(graphql):
+def test_application_round__filter__by_only_with_permissions__general_admin(graphql: GraphQLClient) -> None:
     application_round = ApplicationRoundFactory.create()
 
     admin = UserFactory.create_with_general_role()
@@ -145,7 +150,7 @@ def test_application_round__filter__by_only_with_permissions__general_admin(grap
     assert response.node(0) == {"pk": application_round.pk}
 
 
-def test_application_round__filter__by_only_with_permissions__unit_admin(graphql):
+def test_application_round__filter__by_only_with_permissions__unit_admin(graphql: GraphQLClient) -> None:
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
