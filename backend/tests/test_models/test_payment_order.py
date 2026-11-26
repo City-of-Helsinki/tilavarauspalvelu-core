@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentOrder, Reservation
 from utils.date_utils import local_datetime
@@ -126,6 +127,45 @@ def test_cancel_together_with_verkkokauppa__does_not_cancel_if_order_is_not_foun
     payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
     assert payment_order.status == OrderStatus.DRAFT
     assert payment_order.processed_at is None
+
+
+@patch_method(VerkkokauppaAPIClient.request)
+@patch_method(SentryLogger.log_message)
+def test_cancel_together_with_verkkokauppa__no_user_uuid__raises_error():
+    payment_order = PaymentOrderFactory.create(
+        status=OrderStatus.DRAFT,
+        remote_id=uuid.uuid4(),
+        reservation_user_uuid=None,
+    )
+
+    with pytest.raises(CancelOrderError):
+        payment_order.actions.cancel_together_with_verkkokauppa()
+
+    assert VerkkokauppaAPIClient.request.call_count == 0
+    assert SentryLogger.log_message.call_count == 1
+
+    payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
+    assert payment_order.status == OrderStatus.DRAFT
+    assert payment_order.processed_at is None
+
+
+@patch_method(VerkkokauppaAPIClient.request)
+@patch_method(SentryLogger.log_message)
+def test_cancel_together_with_verkkokauppa__no_user_uuid__cancel_on_error():
+    payment_order = PaymentOrderFactory.create(
+        status=OrderStatus.DRAFT,
+        remote_id=uuid.uuid4(),
+        reservation_user_uuid=None,
+    )
+
+    payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
+
+    assert VerkkokauppaAPIClient.request.call_count == 0
+    assert SentryLogger.log_message.call_count == 1
+
+    payment_order = PaymentOrder.objects.get(pk=payment_order.pk)
+    assert payment_order.status == OrderStatus.CANCELLED
+    assert payment_order.processed_at is not None
 
 
 # ── Issue refund in verkkokauppa ──
