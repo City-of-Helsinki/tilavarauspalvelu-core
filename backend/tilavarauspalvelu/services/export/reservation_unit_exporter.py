@@ -29,6 +29,9 @@ if TYPE_CHECKING:
 
     class ExportedReservationUnitAnnotations(TypedDict):
         past_pricing_group_rows: list[ReservationUnitPricingGroup]
+        annotated_publishing_state: str
+        annotated_reservation_state: str
+        annotated_access_type: str | None
 
     class ExportedPriceComponentAnnotations(TypedDict):
         tax_percentage: Decimal | None
@@ -148,8 +151,7 @@ class ReservationUnitExporter(BaseCSVExporter["ExportedReservationUnit"]):
         )
 
         return (
-            # The annotations use the lookup property names, so that the properties read the annotated values.
-            self._queryset  # type: ignore[no-redef]
+            self._queryset
             .select_related(
                 "unit",
                 "origin_hauki_resource",
@@ -173,9 +175,9 @@ class ReservationUnitExporter(BaseCSVExporter["ExportedReservationUnit"]):
                 ),
             )
             .annotate(
-                publishing_state=L("publishing_state"),
-                reservation_state=L("reservation_state"),
-                current_access_type=L("current_access_type"),
+                annotated_publishing_state=L("publishing_state"),
+                annotated_reservation_state=L("reservation_state"),
+                annotated_access_type=L("current_access_type"),
             )
         )
 
@@ -290,7 +292,7 @@ class ReservationUnitExporter(BaseCSVExporter["ExportedReservationUnit"]):
         start_interval = ReservationStartInterval(instance.reservation_start_interval)
         payment_type = instance.payment_type
         tax_percentage = highest_component.tax_percentage if highest_component is not None else None
-        access_type = instance.current_access_type
+        access_type = instance.annotated_access_type
 
         space_names = (space.name_fi or space.name_en or space.name_sv for space in instance.spaces.all())
         resource_names = (
@@ -372,8 +374,8 @@ class ReservationUnitExporter(BaseCSVExporter["ExportedReservationUnit"]):
                 is_reservation_unit_archived=instance.is_archived,
                 intended_uses=", ".join(name for name in intended_use_names if name),
                 equipments=", ".join(name for name in equipment_names if name),
-                state=instance.publishing_state,
-                reservation_state=instance.reservation_state,
+                state=instance.annotated_publishing_state,
+                reservation_state=instance.annotated_reservation_state,
                 updated_at=self.format_datetime(instance.updated_at),
             )
         ]

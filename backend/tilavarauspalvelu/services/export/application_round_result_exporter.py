@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from django.db.models import Prefetch
 from lookup_property import L
@@ -15,7 +15,15 @@ from ._base_exporter import BaseCSVExporter, BaseExportRow
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from django_stubs_ext import WithAnnotations
+
     from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
+
+    class ExportedApplicationSectionAnnotations(TypedDict):
+        application_status: str
+        section_status: str
+
+    type ExportedApplicationSection = WithAnnotations[ApplicationSection, ExportedApplicationSectionAnnotations]
 
 __all__ = [
     "ApplicationRoundResultCSVExporter",
@@ -50,21 +58,20 @@ class ApplicationSectionExportRow(BaseExportRow):
     price: str = ""  # empty by design, the column will be manually filled after export
 
 
-class ApplicationRoundResultCSVExporter(BaseCSVExporter[ApplicationSection]):
+class ApplicationRoundResultCSVExporter(BaseCSVExporter["ExportedApplicationSection"]):
     """Exports a CSV file containing application section data from an application round."""
 
     def __init__(self, application_round_id: int) -> None:
         self.application_round_id = application_round_id
 
     @property
-    def queryset(self) -> ApplicationSectionQuerySet:
+    def queryset(self) -> ApplicationSectionQuerySet[ExportedApplicationSection, ExportedApplicationSection]:
         return (
-            # The annotations use the lookup property names, so that the properties read the annotated values.
-            ApplicationSection.objects  # type: ignore[no-redef]
+            ApplicationSection.objects
             .annotate(
                 # Annotate statuses for performance
                 application_status=L("application__status"),
-                status=L("status"),
+                section_status=L("status"),
             )
             .filter(
                 application__application_round=self.application_round_id,
@@ -130,14 +137,14 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter[ApplicationSection]):
             ),
         ]
 
-    def get_data_rows(self, instance: ApplicationSection) -> Iterable[ApplicationSectionExportRow]:
+    def get_data_rows(self, instance: ExportedApplicationSection) -> Iterable[ApplicationSectionExportRow]:
         application = instance.application
 
         section_row = ApplicationSectionExportRow(
             application_id=str(instance.application.id),
-            application_status=instance.application_status,  # type: ignore[attr-defined]
+            application_status=instance.application_status,
             section_id=str(instance.id),
-            section_status=instance.status,
+            section_status=instance.section_status,
             section_name=instance.name,
             reservations_begin_date=local_date_string(instance.reservations_begin_date),
             reservations_end_date=local_date_string(instance.reservations_end_date),

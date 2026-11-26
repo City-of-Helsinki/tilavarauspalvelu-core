@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from django.db.models import Max, OuterRef, Prefetch
 from django.db.models.functions import Coalesce
@@ -18,7 +18,16 @@ from ._base_exporter import BaseCSVExporter, BaseExportRow
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from django_stubs_ext import WithAnnotations
+
     from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
+
+    class ExportedApplicationSectionAnnotations(TypedDict):
+        application_status: str
+        section_status: str
+        option_count: int
+
+    type ExportedApplicationSection = WithAnnotations[ApplicationSection, ExportedApplicationSectionAnnotations]
 
 __all__ = [
     "ApplicationRoundApplicationsCSVExporter",
@@ -85,7 +94,7 @@ class ApplicationExportRow(BaseExportRow):
             setattr(self, key, new_value)
 
 
-class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter[ApplicationSection]):
+class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter["ExportedApplicationSection"]):
     """Exports a CSV file containing application data for a single application round."""
 
     def __init__(self, application_round_id: int) -> None:
@@ -94,14 +103,13 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter[ApplicationSection
         self.options_part_template: list[str] = [""] * self.max_options
 
     @property
-    def queryset(self) -> ApplicationSectionQuerySet:
+    def queryset(self) -> ApplicationSectionQuerySet[ExportedApplicationSection, ExportedApplicationSection]:
         return (
-            # The annotations use the lookup property names, so that the properties read the annotated values.
-            ApplicationSection.objects  # type: ignore[no-redef]
+            ApplicationSection.objects
             .annotate(
                 # Annotate statuses for performance
                 application_status=L("application__status"),
-                status=L("status"),
+                section_status=L("status"),
                 option_count=SubqueryCount(
                     ReservationUnitOption.objects.filter(application_section=OuterRef("pk")).values("id"),
                 ),
@@ -203,14 +211,14 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter[ApplicationSection
             ),
         ]
 
-    def get_data_rows(self, instance: ApplicationSection) -> Iterable[ApplicationExportRow]:
+    def get_data_rows(self, instance: ExportedApplicationSection) -> Iterable[ApplicationExportRow]:
         application = instance.application
 
         row = ApplicationExportRow(
             application_id=str(instance.application.id),
-            application_status=instance.application_status,  # type: ignore[attr-defined]
+            application_status=instance.application_status,
             section_id=str(instance.id),
-            section_status=instance.status,
+            section_status=instance.section_status,
             section_name=instance.name,
             municipality=application.municipality or "",
             num_persons=str(instance.num_persons),
