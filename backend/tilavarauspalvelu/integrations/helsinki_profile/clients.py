@@ -96,6 +96,9 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         if user.is_anonymous:
             return None
 
+        if session.get("keycloak_refresh_token_expired", False):
+            return None
+
         leeway = 10
         cutoff = utc_datetime() - datetime.timedelta(seconds=leeway)
         profile_access_token: str | None = session.get("profile_access_token")

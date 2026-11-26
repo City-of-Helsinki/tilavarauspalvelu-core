@@ -430,6 +430,22 @@ def test_helsinki_profile_client__ensure_token_valid__valid_token_in_session(key
     assert keycloak.token_requests == []
 
 
+def test_helsinki_profile_client__get_token__expired_keycloak_session_does_not_refresh(keycloak):
+    user = UserFactory.create_profile_user()
+    session = {
+        "keycloak_refresh_token_expired": True,
+        "profile_access_token": "expired-profile-access-token",
+        "profile_access_token_expires_at": local_datetime() - datetime.timedelta(minutes=5),
+        "profile_refresh_token": "profile-refresh-token",
+        "profile_refresh_token_expires_at": local_datetime() + datetime.timedelta(minutes=5),
+    }
+
+    token = HelsinkiProfileClient.get_token(user=user, session=session)
+
+    assert token is None
+    assert keycloak.token_requests == []
+
+
 @freeze_time("2024-01-01T12:00:00+02:00")
 def test_helsinki_profile_client__get_token__refresh_with_profile_refresh_token(keycloak):
     user = UserFactory.create_profile_user()
@@ -505,6 +521,8 @@ def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens
         TokenRequest(grant_type="refresh_token", token=keycloak_refresh_token),
     ]
     assert session["keycloak_refresh_token_expired"] is True
+    assert session["profile_refresh_token"] == "session-profile-refresh-token"
+    assert session["profile_refresh_token_expires_at"] == local_datetime() + datetime.timedelta(minutes=5)
     assert "profile_access_token" not in session
 
     SentryLogger.log_message.assert_called_once_with(
