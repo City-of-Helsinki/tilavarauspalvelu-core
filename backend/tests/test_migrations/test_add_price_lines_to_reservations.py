@@ -14,6 +14,7 @@ from tests.helpers import exact
 
 if TYPE_CHECKING:
     from django.db.migrations.state import StateApps
+    from pytest_django import Settings
 
 migration = importlib.import_module("tilavarauspalvelu.migrations.0195_add_price_lines_to_reservations")
 
@@ -83,7 +84,7 @@ def price_lines_of(apps: StateApps, reservation_pk: int) -> list[tuple[Any, ...]
 # ── Price lines ──
 
 
-def test_add_price_lines_to_reservations__line_from_price():
+def test_add_price_lines_to_reservations__line_from_price() -> None:
     reservation = ReservationFactory.create(
         price=Decimal("50.00"),
         non_subsidised_price=Decimal("50.00"),
@@ -115,7 +116,7 @@ def test_add_price_lines_to_reservations__line_from_price():
     ]
 
 
-def test_add_price_lines_to_reservations__override_when_subsidised():
+def test_add_price_lines_to_reservations__override_when_subsidised() -> None:
     reservation = ReservationFactory.create(
         price=Decimal("10.00"),
         non_subsidised_price=Decimal("50.00"),
@@ -134,7 +135,7 @@ def test_add_price_lines_to_reservations__override_when_subsidised():
     ]
 
 
-def test_add_price_lines_to_reservations__free():
+def test_add_price_lines_to_reservations__free() -> None:
     reservation = ReservationFactory.create(
         price=Decimal(0),
         non_subsidised_price=Decimal(0),
@@ -153,7 +154,7 @@ def test_add_price_lines_to_reservations__free():
     ]
 
 
-def test_add_price_lines_to_reservations__price_above_non_subsidised_price():
+def test_add_price_lines_to_reservations__price_above_non_subsidised_price() -> None:
     reservation = ReservationFactory.create(
         price=Decimal("120.00"),
         non_subsidised_price=Decimal(0),
@@ -177,7 +178,7 @@ def test_add_price_lines_to_reservations__price_above_non_subsidised_price():
     assert list(price_lines.values_list("amount", "override_amount")) == [(Decimal("120.00"), None)]
 
 
-def test_add_price_lines_to_reservations__price_above_non_subsidised_price__audit_log(settings):
+def test_add_price_lines_to_reservations__price_above_non_subsidised_price__audit_log(settings: Settings) -> None:
     settings.AUDIT_LOGGING_ENABLED = True
 
     reservation = ReservationFactory.create(
@@ -211,7 +212,9 @@ def test_add_price_lines_to_reservations__price_above_non_subsidised_price__audi
     ]
 
 
-def test_add_price_lines_to_reservations__price_above_non_subsidised_price__no_audit_log_when_disabled(settings):
+def test_add_price_lines_to_reservations__price_above_non_subsidised_price__no_audit_log_when_disabled(
+    settings: Settings,
+) -> None:
     settings.AUDIT_LOGGING_ENABLED = False
 
     ReservationFactory.create(
@@ -229,7 +232,7 @@ def test_add_price_lines_to_reservations__price_above_non_subsidised_price__no_a
     assert LogEntry.objects.filter(content_type__model="reservation").exists() is False
 
 
-def test_add_price_lines_to_reservations__skips_reservation_with_price_lines():
+def test_add_price_lines_to_reservations__skips_reservation_with_price_lines() -> None:
     reservation = ReservationFactory.create(
         price=Decimal("50.00"),
         non_subsidised_price=Decimal("50.00"),
@@ -262,7 +265,7 @@ def test_add_price_lines_to_reservations__skips_reservation_with_price_lines():
 # ── Errors ──
 
 
-def test_add_price_lines_to_reservations__error_when_unknown_tax_percentage():
+def test_add_price_lines_to_reservations__error_when_unknown_tax_percentage() -> None:
     ReservationFactory.create(tax_percentage_value=Decimal("23.00"))
 
     apps = migrate_to(BEFORE_MIGRATION)
@@ -273,7 +276,7 @@ def test_add_price_lines_to_reservations__error_when_unknown_tax_percentage():
         migrate_to(AFTER_MIGRATION)
 
 
-def test_add_price_lines_to_reservations__error_when_tax_percentage_has_two_tax_levels():
+def test_add_price_lines_to_reservations__error_when_tax_percentage_has_two_tax_levels() -> None:
     ReservationFactory.create(tax_percentage_value=Decimal("25.50"))
 
     apps = migrate_to(BEFORE_MIGRATION)
