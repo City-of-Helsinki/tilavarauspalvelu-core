@@ -17,7 +17,7 @@ pytestmark = [
 
 
 @pytest.mark.parametrize("preferred_language", Language.values)
-def test_get_application_email_language(preferred_language):
+def test_get_application_email_language(preferred_language: str) -> None:
     application = ApplicationFactory.create(user__preferred_language=preferred_language)
 
     lang = get_application_email_language(application)
@@ -26,7 +26,7 @@ def test_get_application_email_language(preferred_language):
 
 
 @pytest.mark.parametrize("preferred_language", Language.values)
-def test_get_series_email_language(preferred_language):
+def test_get_series_email_language(preferred_language: str) -> None:
     series = ReservationSeriesFactory.create(user__preferred_language=preferred_language)
 
     lang = get_series_email_language(series)
@@ -35,7 +35,7 @@ def test_get_series_email_language(preferred_language):
 
 
 @pytest.mark.parametrize("preferred_language", Language.values)
-def test_get_reservation_email_language(preferred_language):
+def test_get_reservation_email_language(preferred_language: str) -> None:
     reservation = ReservationFactory.create(
         user__preferred_language=preferred_language,
     )

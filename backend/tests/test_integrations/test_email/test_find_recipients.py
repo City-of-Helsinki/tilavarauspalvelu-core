@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import Language, ReservationNotification
@@ -20,12 +22,18 @@ from tests.factories import (
     UserFactory,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from contextlib import AbstractContextManager
+
+    from graphene_django_extensions.testing.utils import QueryData
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_get_application_email_recipients():
+def test_get_application_email_recipients() -> None:
     user = UserFactory.create(email="applicant@example.com")
     application = ApplicationFactory.create(user=user, contact_person_email="contact@example.com")
 
@@ -33,7 +41,7 @@ def test_get_application_email_recipients():
     assert sorted(result) == ["applicant@example.com", "contact@example.com"]
 
 
-def test_get_application_email_recipients__no_contact_person():
+def test_get_application_email_recipients__no_contact_person() -> None:
     user = UserFactory.create(email="applicant@example.com")
     application = ApplicationFactory.create(user=user, contact_person_email=None)
 
@@ -41,21 +49,21 @@ def test_get_application_email_recipients__no_contact_person():
     assert result == ["applicant@example.com"]
 
 
-def test_get_application_email_recipients__no_applicant():
+def test_get_application_email_recipients__no_applicant() -> None:
     application = ApplicationFactory.create(user__email="", contact_person_email="contact@example.com")
 
     result = get_application_email_recipients(application)
     assert result == ["contact@example.com"]
 
 
-def test_get_application_email_recipients__no_contact_person_or_applicant():
+def test_get_application_email_recipients__no_contact_person_or_applicant() -> None:
     application = ApplicationFactory.create(user__email="", contact_person_email=None)
 
     result = get_application_email_recipients(application)
     assert result == []
 
 
-def test_get_series_email_recipients():
+def test_get_series_email_recipients() -> None:
     user = UserFactory.create(email="applicant@example.com")
     application = ApplicationFactory.create(user=user, contact_person_email="contact@example.com")
     series = ReservationSeriesFactory.create(
@@ -67,7 +75,7 @@ def test_get_series_email_recipients():
     assert sorted(result) == ["applicant@example.com", "contact@example.com"]
 
 
-def test_get_series_email_recipients__no_application():
+def test_get_series_email_recipients__no_application() -> None:
     user = UserFactory.create(email="applicant@example.com")
     series = ReservationSeriesFactory.create(user=user)
 
@@ -75,7 +83,7 @@ def test_get_series_email_recipients__no_application():
     assert sorted(result) == ["applicant@example.com"]
 
 
-def test_get_reservation_email_recipients():
+def test_get_reservation_email_recipients() -> None:
     user = UserFactory.create(email="user@example.com")
     reservation = ReservationFactory.create(user=user, reservee_email="reservee@example.com")
 
@@ -83,7 +91,7 @@ def test_get_reservation_email_recipients():
     assert sorted(result) == ["reservee@example.com", "user@example.com"]
 
 
-def test_get_reservation_email_recipients__no_reservee_email():
+def test_get_reservation_email_recipients__no_reservee_email() -> None:
     user = UserFactory.create(email="user@example.com")
     reservation = ReservationFactory.create(user=user, reservee_email="")
 
@@ -91,7 +99,7 @@ def test_get_reservation_email_recipients__no_reservee_email():
     assert sorted(result) == ["user@example.com"]
 
 
-def test_get_reservation_email_recipients__no_user_email():
+def test_get_reservation_email_recipients__no_user_email() -> None:
     reservation = ReservationFactory.create(
         user__email="",
         reservee_email="reservee@example.com",
@@ -101,7 +109,7 @@ def test_get_reservation_email_recipients__no_user_email():
     assert result == ["reservee@example.com"]
 
 
-def test_get_reservation_email_recipients__no_reservee_email_or_user_email():
+def test_get_reservation_email_recipients__no_reservee_email_or_user_email() -> None:
     reservation = ReservationFactory.create(
         user__email="",
         reservee_email="",
@@ -111,7 +119,7 @@ def test_get_reservation_email_recipients__no_reservee_email_or_user_email():
     assert result == []
 
 
-def test_get_recipients_for_applications_by_language():
+def test_get_recipients_for_applications_by_language() -> None:
     applications = [
         ApplicationFactory.create(
             user__email="applicant1@example.com",
@@ -132,7 +140,7 @@ def test_get_recipients_for_applications_by_language():
     assert sorted(result["sv"]) == []
 
 
-def test_get_users_by_email_language():
+def test_get_users_by_email_language() -> None:
     users = [
         UserFactory.create(email="user1@example.com", preferred_language=Language.FI.value),
         UserFactory.create(email="user2@example.com", preferred_language=Language.EN.value),
@@ -146,7 +154,7 @@ def test_get_users_by_email_language():
     assert sorted(result["sv"]) == []
 
 
-def test_get_reservation_staff_notification_recipients__not_handling():
+def test_get_reservation_staff_notification_recipients__not_handling() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     admin_1 = UserFactory.create_with_unit_role(
@@ -174,7 +182,7 @@ def test_get_reservation_staff_notification_recipients__not_handling():
     assert result == {"fi": {admin_1.email}}
 
 
-def test_get_reservation_staff_notification_recipients__handling():
+def test_get_reservation_staff_notification_recipients__handling() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     admin_1 = UserFactory.create_with_unit_role(
@@ -202,7 +210,7 @@ def test_get_reservation_staff_notification_recipients__handling():
     assert result == {"fi": {admin_1.email}, "en": {admin_2.email}}
 
 
-def test_get_reservation_staff_notification_recipients__dont_include_reservation_recipient():
+def test_get_reservation_staff_notification_recipients__dont_include_reservation_recipient() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     admin = UserFactory.create_with_unit_role(
@@ -217,7 +225,7 @@ def test_get_reservation_staff_notification_recipients__dont_include_reservation
     assert result == {}
 
 
-def test_get_reservation_staff_notification_recipients__dont_include_if_role_deactivated():
+def test_get_reservation_staff_notification_recipients__dont_include_if_role_deactivated() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     UserFactory.create_with_unit_role(
@@ -234,7 +242,7 @@ def test_get_reservation_staff_notification_recipients__dont_include_if_role_dea
     assert result == {}
 
 
-def test_get_reservation_staff_notification_recipients__dont_include_if_role_deactivated__also_superuser():
+def test_get_reservation_staff_notification_recipients__dont_include_if_role_deactivated__also_superuser() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     # Should not be included, since the unit role is deactivated.
@@ -254,7 +262,7 @@ def test_get_reservation_staff_notification_recipients__dont_include_if_role_dea
     assert result == {}
 
 
-def test_get_reservation_staff_notification_recipients__no_email():
+def test_get_reservation_staff_notification_recipients__no_email() -> None:
     reservation_unit = ReservationUnitFactory.create()
 
     UserFactory.create_with_unit_role(
@@ -270,7 +278,9 @@ def test_get_reservation_staff_notification_recipients__no_email():
     assert result == {}
 
 
-def test_get_reservation_staff_notification_recipients__query_count_does_not_grow_with_users(query_counter):
+def test_get_reservation_staff_notification_recipients__query_count_does_not_grow_with_users(
+    query_counter: Callable[[], AbstractContextManager[QueryData]],
+) -> None:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 

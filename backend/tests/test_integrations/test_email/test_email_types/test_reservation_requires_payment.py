@@ -20,7 +20,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentOrderFactory, ReservationFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.helpers import TranslationsFromPOFiles, as_mock, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -43,6 +43,9 @@ from tests.test_integrations.test_email.helpers import (
 )
 
 if TYPE_CHECKING:
+    from django.core.mail import EmailMultiAlternatives
+
+    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import Lang
 
 
@@ -122,7 +125,7 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_requires_payment__get_context(lang: Lang):
+def test_reservation_requires_payment__get_context(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         "price_can_be_subsidised": False,
@@ -137,7 +140,7 @@ def test_reservation_requires_payment__get_context(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_requires_payment__get_context__get_mock_data(lang: Lang):
+def test_reservation_requires_payment__get_context__get_mock_data(lang: Lang) -> None:
     expected = {
         **LANGUAGE_CONTEXT[lang],
         "price_can_be_subsidised": False,
@@ -152,7 +155,7 @@ def test_reservation_requires_payment__get_context__get_mock_data(lang: Lang):
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_payment__get_context__instance(email_reservation):
+def test_reservation_requires_payment__get_context__instance(email_reservation: Reservation) -> None:
     link = f"https://fake.varaamo.hel.fi/en/reservations/{email_reservation.id}"
 
     PaymentOrderFactory.create(
@@ -179,7 +182,7 @@ def test_reservation_requires_payment__get_context__instance(email_reservation):
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_payment__render__text():
+def test_reservation_requires_payment__render__text() -> None:
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, context=context)
 
@@ -223,7 +226,7 @@ def test_reservation_requires_payment__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_requires_payment__render__html():
+def test_reservation_requires_payment__render__html() -> None:
     context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language="en")
     html_content = render_html(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, context=context)
     text_content = html_email_to_text(html_content)
@@ -268,7 +271,7 @@ def test_reservation_requires_payment__render__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_requires_payment__send_email(outbox):
+def test_reservation_requires_payment__send_email(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -289,7 +292,7 @@ def test_reservation_requires_payment__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
-def test_reservation_requires_payment__send_email__no_recipients(outbox):
+def test_reservation_requires_payment__send_email__no_recipients(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         reservee_email="",
         user__email="",
@@ -303,13 +306,16 @@ def test_reservation_requires_payment__send_email__no_recipients(outbox):
 
     assert len(outbox) == 0
 
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation requires payment' email"
+    assert as_mock(SentryLogger.log_message).call_count == 1
+    assert (
+        as_mock(SentryLogger.log_message).call_args.args[0]
+        == "No recipients for the 'reservation requires payment' email"
+    )
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_requires_payment__send_email__price_zero(outbox):
+def test_reservation_requires_payment__send_email__price_zero(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -326,7 +332,7 @@ def test_reservation_requires_payment__send_email__price_zero(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_requires_payment__send_email__not_handled(outbox):
+def test_reservation_requires_payment__send_email__not_handled(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -343,7 +349,7 @@ def test_reservation_requires_payment__send_email__not_handled(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_requires_payment__send_email__no_payment_order(outbox):
+def test_reservation_requires_payment__send_email__no_payment_order(outbox: list[EmailMultiAlternatives]) -> None:
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
@@ -360,7 +366,9 @@ def test_reservation_requires_payment__send_email__no_payment_order(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_requires_payment__send_email__payment_order_not_handled_payment(outbox):
+def test_reservation_requires_payment__send_email__payment_order_not_handled_payment(
+    outbox: list[EmailMultiAlternatives],
+) -> None:
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
