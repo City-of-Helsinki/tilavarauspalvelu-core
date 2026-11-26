@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
+from typing import Any
 
 from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent
@@ -35,6 +36,6 @@ class PriceComponentFactory(GenericDjangoModelFactory[PriceComponent]):
     sales_item = ForeignKeyFactory("tests.factories.SalesItemFactory")
 
     @classmethod
-    def create_free(cls, **kwargs) -> PriceComponent:
+    def create_free(cls, **kwargs: Any) -> PriceComponent:
         kwargs.setdefault("amount", Decimal(0))
         return cls.create(**kwargs)
