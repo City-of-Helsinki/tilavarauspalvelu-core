@@ -165,7 +165,6 @@ def test_seasonal_booking_cancelled_all_staff_notification__get_context__instanc
     reservation_id_2 = Reservation.objects.exclude(id=reservation_id_1).get().id
 
     section = email_reservation.actions.get_application_section()
-    section = email_reservation.actions.get_application_section()
 
     assert section is not None
     section.actions.get_reservations().update(cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS)
