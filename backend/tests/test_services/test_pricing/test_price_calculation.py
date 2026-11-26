@@ -480,7 +480,7 @@ def test_calculate_price_with_data__surcharge_counts_only_on_the_dates_when_it_i
     row = create_pricing_group_row()
     reservation_unit = row.reservation_unit
     pricing_group = row.pricing_group
-    PriceComponentFactory.create(
+    base = PriceComponentFactory.create(
         pricing_group=pricing_group,
         valid_from=JAN_1,
         amount=Decimal(10),
@@ -501,8 +501,9 @@ def test_calculate_price_with_data__surcharge_counts_only_on_the_dates_when_it_i
         end=local_datetime(2026, 3, 2, 1),
     )
 
-    assert result.lines[1].component == surcharge
-    assert result.lines[1].quantity == Decimal(1)
+    assert [line.component for line in result.lines] == [base, surcharge]
+    assert [line.quantity for line in result.lines] == [Decimal(3), Decimal(1)]
+    assert [line.amount for line in result.lines] == [Decimal("30.00"), Decimal("5.00")]
     assert result.total == Decimal("35.00")
 
 

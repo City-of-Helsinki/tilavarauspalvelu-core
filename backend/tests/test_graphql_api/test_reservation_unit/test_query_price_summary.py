@@ -397,7 +397,15 @@ def test_reservation_unit__query__price_summary__future_surcharge_not_included(g
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert response.first_query_object["priceSummary"]["varies"] is False
+    assert response.first_query_object == {
+        "priceSummary": {
+            "isFree": False,
+            "lowestAmount": "12.50",
+            "priceUnit": PriceUnit.PER_HOUR.value,
+            "varies": False,
+            "canApplyForDiscount": False,
+        },
+    }
 
 
 def test_reservation_unit__query__price_summary__future_price_change_not_included(graphql):
