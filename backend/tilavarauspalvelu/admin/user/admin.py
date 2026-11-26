@@ -46,10 +46,10 @@ class GeneralRoleInlineAdmin(admin.TabularInline):
         "is_role_active",
     ]
 
-    def has_add_permission(self, request, obj=None) -> bool:
+    def has_add_permission(self, request: HttpRequest, obj: User | None = None) -> bool:
         return False
 
-    def has_delete_permission(self, request, obj=None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj: User | None = None) -> bool:
         return False
 
 
@@ -71,10 +71,10 @@ class UnitRoleInlineAdmin(admin.TabularInline):
         "is_role_active",
     ]
 
-    def has_add_permission(self, request, obj=None) -> bool:
+    def has_add_permission(self, request: HttpRequest, obj: User | None = None) -> bool:
         return False
 
-    def has_delete_permission(self, request, obj=None) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj: User | None = None) -> bool:
         return False
 
 

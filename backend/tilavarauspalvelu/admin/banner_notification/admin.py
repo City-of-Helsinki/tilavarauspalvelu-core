@@ -57,5 +57,5 @@ class BannerNotificationAdmin(TranslationAdmin):
     form = BannerNotificationAdminForm
 
     @admin.display(boolean=True)
-    def is_active(self, obj) -> bool:
+    def is_active(self, obj: BannerNotification) -> bool:
         return obj.is_active
