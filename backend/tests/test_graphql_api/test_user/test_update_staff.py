@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tilavarauspalvelu.enums import ReservationNotification
@@ -8,13 +10,16 @@ from tests.factories import UserFactory
 
 from .helpers import STAFF_UPDATE_MUTATION
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_user__update_staff(graphql):
+def test_user__update_staff(graphql: GraphQLClient) -> None:
     user = UserFactory.create_superuser(reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED)
 
     data = {
