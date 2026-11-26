@@ -29,6 +29,8 @@ from .helpers import assert_no_undefined_variables, get_customer_query_info
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application, BannerNotification, Reservation, ReservationUnit, TermsOfUse
 
+    from tests.helpers import GraphQLClient
+
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.frontend_query,
@@ -36,7 +38,7 @@ pytestmark = [
 
 
 # NOTE: Test names need to include the name of the operation for this to work.
-def test_frontend_queries__customer_ui__unauthenticated__tests_exist_for_all_queries():
+def test_frontend_queries__customer_ui__unauthenticated__tests_exist_for_all_queries() -> None:
     queries = get_customer_query_info()
     operations = {name for name, info in queries.items() if info[0].operation == OperationType.QUERY}
 
@@ -59,7 +61,7 @@ def test_frontend_queries__customer_ui__unauthenticated__tests_exist_for_all_que
 # Unauthenticated - Has permissions
 
 
-def test_frontend_queries__customer_ui__AffectingReservations__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__AffectingReservations__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["AffectingReservations"]
 
@@ -72,6 +74,7 @@ def test_frontend_queries__customer_ui__AffectingReservations__unauthenticated(g
     factory_args["reservation_unit"] = reservation_unit
     factory_args["begins_at"] = local_datetime(2024, 1, 1, 12, 0)
     factory_args["ends_at"] = local_datetime(2024, 1, 1, 15, 0)
+    assert query_info.factory is not None
     query_info.factory.create(**factory_args)
 
     ReservationUnitHierarchy.refresh()
@@ -92,7 +95,7 @@ def test_frontend_queries__customer_ui__AffectingReservations__unauthenticated(g
     assert len(response.first_query_object) != 0
 
 
-def test_frontend_queries__customer_ui__ApplicationRound__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationRound__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationRound"]
 
@@ -106,6 +109,7 @@ def test_frontend_queries__customer_ui__ApplicationRound__unauthenticated(graphq
     factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -119,7 +123,7 @@ def test_frontend_queries__customer_ui__ApplicationRound__unauthenticated(graphq
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ApplicationRoundCriteria__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationRoundCriteria__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationRoundCriteria"]
 
@@ -133,6 +137,7 @@ def test_frontend_queries__customer_ui__ApplicationRoundCriteria__unauthenticate
     factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -146,7 +151,7 @@ def test_frontend_queries__customer_ui__ApplicationRoundCriteria__unauthenticate
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ApplicationRoundPriceOptions__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationRoundPriceOptions__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationRoundPriceOptions"]
 
@@ -169,7 +174,7 @@ def test_frontend_queries__customer_ui__ApplicationRoundPriceOptions__unauthenti
     assert [option["pk"] for option in response.first_query_object] == [price_option.pk]
 
 
-def test_frontend_queries__customer_ui__ApplicationRoundsUi__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationRoundsUi__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationRoundsUi"]
 
@@ -183,6 +188,7 @@ def test_frontend_queries__customer_ui__ApplicationRoundsUi__unauthenticated(gra
     factory_args["reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["public_display_ends_at"] = local_datetime(2024, 2, 2)
+    assert query_info.factory is not None
     query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -195,7 +201,7 @@ def test_frontend_queries__customer_ui__ApplicationRoundsUi__unauthenticated(gra
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ShowNotificationsList__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ShowNotificationsList__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ShowNotificationsList"]
 
@@ -213,6 +219,7 @@ def test_frontend_queries__customer_ui__ShowNotificationsList__unauthenticated(g
     factory_args["active_from"] = now - datetime.timedelta(days=1)
     factory_args["active_until"] = now + datetime.timedelta(days=1)
     factory_args["target"] = BannerNotificationTarget.ALL
+    assert query_info.factory is not None
     obj: BannerNotification = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -227,7 +234,7 @@ def test_frontend_queries__customer_ui__ShowNotificationsList__unauthenticated(g
     assert len(response.edges) == 1
 
 
-def test_frontend_queries__customer_ui__CurrentUser__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__CurrentUser__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["CurrentUser"]
 
@@ -235,6 +242,7 @@ def test_frontend_queries__customer_ui__CurrentUser__unauthenticated(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -248,7 +256,7 @@ def test_frontend_queries__customer_ui__CurrentUser__unauthenticated(graphql):
     assert response.first_query_object is None
 
 
-def test_frontend_queries__customer_ui__FrontPage__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__FrontPage__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["FrontPage"]
 
@@ -257,9 +265,11 @@ def test_frontend_queries__customer_ui__FrontPage__unauthenticated(graphql):
     query_info_2 = factories[1]
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
+    assert query_info_1.factory is not None
     query_info_1.factory.create(**factory_args_1)
 
     factory_args_2 = deepcopy(query_info_2.factory_args)
+    assert query_info_2.factory is not None
     query_info_2.factory.create(**factory_args_2)
 
     variables = query_info_1.variables
@@ -272,7 +282,7 @@ def test_frontend_queries__customer_ui__FrontPage__unauthenticated(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ListInProgressReservations__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ListInProgressReservations__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ListInProgressReservations"]
 
@@ -280,6 +290,7 @@ def test_frontend_queries__customer_ui__ListInProgressReservations__unauthentica
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj: Reservation = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -294,7 +305,7 @@ def test_frontend_queries__customer_ui__ListInProgressReservations__unauthentica
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__Options__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__Options__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["Options"]
 
@@ -302,6 +313,7 @@ def test_frontend_queries__customer_ui__Options__unauthenticated(graphql):
 
     for query_info in factories:
         factory_args = deepcopy(query_info.factory_args)
+        assert query_info.factory is not None
         query_info.factory.create(**factory_args)
 
     variables = factories[0].variables
@@ -314,7 +326,7 @@ def test_frontend_queries__customer_ui__Options__unauthenticated(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RelatedReservationUnits__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__RelatedReservationUnits__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["RelatedReservationUnits"]
 
@@ -326,6 +338,7 @@ def test_frontend_queries__customer_ui__RelatedReservationUnits__unauthenticated
     factory_args = deepcopy(query_info.factory_args)
     factory_args["publish_begins_at"] = now - datetime.timedelta(days=1)
     factory_args["publish_ends_at"] = now + datetime.timedelta(days=1)
+    assert query_info.factory is not None
     obj: ReservationUnit = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -342,7 +355,7 @@ def test_frontend_queries__customer_ui__RelatedReservationUnits__unauthenticated
     assert len(response.edges) == 1
 
 
-def test_frontend_queries__customer_ui__ReservationQuotaReached__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ReservationQuotaReached__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationQuotaReached"]
 
@@ -350,6 +363,7 @@ def test_frontend_queries__customer_ui__ReservationQuotaReached__unauthenticated
     query_info = factories[0]
 
     factory_args = query_info.factory_args
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = query_info.variables
@@ -363,7 +377,7 @@ def test_frontend_queries__customer_ui__ReservationQuotaReached__unauthenticated
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ReservationPrice__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ReservationPrice__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationPrice"]
 
@@ -393,7 +407,7 @@ def test_frontend_queries__customer_ui__ReservationPrice__unauthenticated(graphq
     assert len(response.first_query_object["lines"]) == 1
 
 
-def test_frontend_queries__customer_ui__ReservationState__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ReservationState__unauthenticated(graphql: GraphQLClient) -> None:
     #
     # This one is not meant for unauthenticated users, but our permissions allow them to query it.
     # This is fine, since it doesn't reveal any critical information about the reservation.
@@ -405,6 +419,7 @@ def test_frontend_queries__customer_ui__ReservationState__unauthenticated(graphq
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -418,7 +433,7 @@ def test_frontend_queries__customer_ui__ReservationState__unauthenticated(graphq
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ReservationUnitPage__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ReservationUnitPage__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationUnitPage"]
 
@@ -433,6 +448,7 @@ def test_frontend_queries__customer_ui__ReservationUnitPage__unauthenticated(gra
     factory_args["application_rounds__public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["application_rounds__public_display_ends_at"] = local_datetime(2024, 2, 2)
     factory_args["application_round_time_slots__is_closed"] = False
+    assert query_info.factory is not None
     obj: ReservationUnit = query_info.factory.create(**factory_args)
 
     ReservationFactory.create_for_reservation_unit(obj)
@@ -451,7 +467,7 @@ def test_frontend_queries__customer_ui__ReservationUnitPage__unauthenticated(gra
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__SearchReservationUnits__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__SearchReservationUnits__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["SearchReservationUnits"]
 
@@ -459,6 +475,7 @@ def test_frontend_queries__customer_ui__SearchReservationUnits__unauthenticated(
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -471,7 +488,7 @@ def test_frontend_queries__customer_ui__SearchReservationUnits__unauthenticated(
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__TermsOfUse__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__TermsOfUse__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["TermsOfUse"]
 
@@ -479,6 +496,7 @@ def test_frontend_queries__customer_ui__TermsOfUse__unauthenticated(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj: TermsOfUse = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -497,7 +515,7 @@ def test_frontend_queries__customer_ui__TermsOfUse__unauthenticated(graphql):
 # Unauthenticated - No permissions
 
 
-def test_frontend_queries__customer_ui__AccessCode__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__AccessCode__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["AccessCode"]
 
@@ -505,6 +523,7 @@ def test_frontend_queries__customer_ui__AccessCode__unauthenticated(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -519,7 +538,7 @@ def test_frontend_queries__customer_ui__AccessCode__unauthenticated(graphql):
     assert response.first_query_object == {"id": variables["id"], "pindoraInfo": None}
 
 
-def test_frontend_queries__customer_ui__ApplicationPage1__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationPage1__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationPage1"]
 
@@ -542,6 +561,7 @@ def test_frontend_queries__customer_ui__ApplicationPage1__unauthenticated(graphq
     factory_args_1["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
     factory_args_1["application_sections__suitable_time_ranges__begin_time"] = local_time(8, 0)
     factory_args_1["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
+    assert query_info_1.factory is not None
     obj = query_info_1.factory.create(**factory_args_1)
 
     variables = query_info_1.variables
@@ -555,7 +575,7 @@ def test_frontend_queries__customer_ui__ApplicationPage1__unauthenticated(graphq
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ApplicationPage2__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationPage2__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationPage2"]
 
@@ -577,6 +597,7 @@ def test_frontend_queries__customer_ui__ApplicationPage2__unauthenticated(graphq
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
     factory_args["application_sections__suitable_time_ranges__begin_time"] = local_time(8, 0)
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -590,7 +611,7 @@ def test_frontend_queries__customer_ui__ApplicationPage2__unauthenticated(graphq
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ApplicationPage3__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationPage3__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationPage3"]
 
@@ -612,6 +633,7 @@ def test_frontend_queries__customer_ui__ApplicationPage3__unauthenticated(graphq
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
     factory_args["application_sections__suitable_time_ranges__begin_time"] = local_time(8, 0)
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -625,7 +647,7 @@ def test_frontend_queries__customer_ui__ApplicationPage3__unauthenticated(graphq
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ApplicationPage4__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationPage4__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationPage4"]
 
@@ -647,6 +669,7 @@ def test_frontend_queries__customer_ui__ApplicationPage4__unauthenticated(graphq
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
     factory_args["application_sections__suitable_time_ranges__begin_time"] = local_time(8, 0)
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -660,7 +683,7 @@ def test_frontend_queries__customer_ui__ApplicationPage4__unauthenticated(graphq
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ApplicationReservationSeries__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationReservationSeries__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationReservationSeries"]
 
@@ -668,6 +691,7 @@ def test_frontend_queries__customer_ui__ApplicationReservationSeries__unauthenti
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -682,7 +706,7 @@ def test_frontend_queries__customer_ui__ApplicationReservationSeries__unauthenti
     assert response.first_query_object is None
 
 
-def test_frontend_queries__customer_ui__ApplicationReservations__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationReservations__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationReservations"]
 
@@ -690,6 +714,7 @@ def test_frontend_queries__customer_ui__ApplicationReservations__unauthenticated
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -704,7 +729,7 @@ def test_frontend_queries__customer_ui__ApplicationReservations__unauthenticated
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ApplicationSectionCancel__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationSectionCancel__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationSectionCancel"]
 
@@ -712,6 +737,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel__unauthenticate
     query_info_1 = factories[0]
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
+    assert query_info_1.factory is not None
     obj = query_info_1.factory.create(**factory_args_1)
 
     variables = query_info_1.variables
@@ -725,7 +751,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel__unauthenticate
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ApplicationSectionView__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationSectionView__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationSectionView"]
 
@@ -733,6 +759,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionView__unauthenticated(
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -746,7 +773,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionView__unauthenticated(
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ApplicationSentPage__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationSentPage__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationSentPage"]
 
@@ -754,6 +781,7 @@ def test_frontend_queries__customer_ui__ApplicationSentPage__unauthenticated(gra
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -768,7 +796,7 @@ def test_frontend_queries__customer_ui__ApplicationSentPage__unauthenticated(gra
     assert response.first_query_object is None
 
 
-def test_frontend_queries__customer_ui__ApplicationView__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ApplicationView__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationView"]
 
@@ -790,6 +818,7 @@ def test_frontend_queries__customer_ui__ApplicationView__unauthenticated(graphql
     factory_args["application_sections__reservation_max_duration"] = datetime.timedelta(minutes=60)
     factory_args["application_sections__suitable_time_ranges__begin_time"] = local_time(8, 0)
     factory_args["application_sections__suitable_time_ranges__end_time"] = local_time(10, 0)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -803,7 +832,7 @@ def test_frontend_queries__customer_ui__ApplicationView__unauthenticated(graphql
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__Applications__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__Applications__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["Applications"]
 
@@ -811,6 +840,7 @@ def test_frontend_queries__customer_ui__Applications__unauthenticated(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj: Application = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -826,7 +856,7 @@ def test_frontend_queries__customer_ui__Applications__unauthenticated(graphql):
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ListReservations__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ListReservations__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ListReservations"]
 
@@ -834,6 +864,7 @@ def test_frontend_queries__customer_ui__ListReservations__unauthenticated(graphq
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj: Reservation = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -847,7 +878,7 @@ def test_frontend_queries__customer_ui__ListReservations__unauthenticated(graphq
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__Order__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__Order__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["Order"]
 
@@ -860,6 +891,7 @@ def test_frontend_queries__customer_ui__Order__unauthenticated(graphql):
     del factory_args["reservation__payment_order__id"]
     del factory_args["reservation__payment_order__status"]
     del factory_args["reservation__payment_order__handled_payment_due_by"]
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -874,7 +906,7 @@ def test_frontend_queries__customer_ui__Order__unauthenticated(graphql):
     assert response.first_query_object is None
 
 
-def test_frontend_queries__customer_ui__Reservation__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__Reservation__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["Reservation"]
 
@@ -882,6 +914,7 @@ def test_frontend_queries__customer_ui__Reservation__unauthenticated(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
@@ -895,7 +928,7 @@ def test_frontend_queries__customer_ui__Reservation__unauthenticated(graphql):
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ReservationCancelPage__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ReservationCancelPage__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationCancelPage"]
 
@@ -903,6 +936,7 @@ def test_frontend_queries__customer_ui__ReservationCancelPage__unauthenticated(g
     query_info_1 = factories[0]
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
+    assert query_info_1.factory is not None
     obj = query_info_1.factory.create(**factory_args_1)
 
     variables = query_info_1.variables
@@ -916,7 +950,7 @@ def test_frontend_queries__customer_ui__ReservationCancelPage__unauthenticated(g
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ReservationEditPage__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ReservationEditPage__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationEditPage"]
 
@@ -930,6 +964,7 @@ def test_frontend_queries__customer_ui__ReservationEditPage__unauthenticated(gra
     factory_args["reservation_unit__application_rounds__reservation_period_end_date"] = local_date(2024, 3, 1)
     factory_args["reservation_unit__application_rounds__public_display_begins_at"] = local_datetime(2024, 1, 1)
     factory_args["reservation_unit__application_rounds__public_display_ends_at"] = local_datetime(2024, 2, 2)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     begin = next_hour()
@@ -948,7 +983,7 @@ def test_frontend_queries__customer_ui__ReservationEditPage__unauthenticated(gra
     assert response.has_errors is True, response
 
 
-def test_frontend_queries__customer_ui__ReservationPage__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ReservationPage__unauthenticated(graphql: GraphQLClient) -> None:
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationPage"]
 
@@ -956,6 +991,7 @@ def test_frontend_queries__customer_ui__ReservationPage__unauthenticated(graphql
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
+    assert query_info.factory is not None
     obj = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
