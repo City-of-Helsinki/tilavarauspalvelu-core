@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -10,13 +11,16 @@ from tests.factories import RejectedOccurrenceFactory, UnitGroupFactory
 
 from .helpers import rejected_occurrence_query
 
+if TYPE_CHECKING:
+    from tests.helpers import GraphQLClient
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_rejected_occurrence__query__all_fields(graphql):
+def test_rejected_occurrence__query__all_fields(graphql: GraphQLClient) -> None:
     occurrence = RejectedOccurrenceFactory.create()
     graphql.login_with_superuser()
 
@@ -50,7 +54,7 @@ def test_rejected_occurrence__query__all_fields(graphql):
     }
 
 
-def test_rejected_occurrence__filter__by_pk(graphql):
+def test_rejected_occurrence__filter__by_pk(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create()
     occurrence_2 = RejectedOccurrenceFactory.create()
     RejectedOccurrenceFactory.create()
@@ -66,7 +70,7 @@ def test_rejected_occurrence__filter__by_pk(graphql):
     assert response.node(1) == {"pk": occurrence_2.pk}
 
 
-def test_rejected_occurrence__filter__by_reservation_series(graphql):
+def test_rejected_occurrence__filter__by_reservation_series(graphql: GraphQLClient) -> None:
     RejectedOccurrenceFactory.create()
     occurrence = RejectedOccurrenceFactory.create()
     RejectedOccurrenceFactory.create()
@@ -81,13 +85,14 @@ def test_rejected_occurrence__filter__by_reservation_series(graphql):
     assert response.node(0) == {"pk": occurrence.pk}
 
 
-def test_rejected_occurrence__filter__by_application_round(graphql):
+def test_rejected_occurrence__filter__by_application_round(graphql: GraphQLClient) -> None:
     RejectedOccurrenceFactory.create()
     occurrence = RejectedOccurrenceFactory.create(
         reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     RejectedOccurrenceFactory.create()
 
+    assert occurrence.reservation_series.allocated_time_slot is not None
     option = occurrence.reservation_series.allocated_time_slot.reservation_unit_option
     application_round = option.application_section.application.application_round
 
@@ -101,7 +106,7 @@ def test_rejected_occurrence__filter__by_application_round(graphql):
     assert response.node(0) == {"pk": occurrence.pk}
 
 
-def test_rejected_occurrence__filter__by_reservation_unit(graphql):
+def test_rejected_occurrence__filter__by_reservation_unit(graphql: GraphQLClient) -> None:
     RejectedOccurrenceFactory.create()
     occurrence = RejectedOccurrenceFactory.create()
     RejectedOccurrenceFactory.create()
@@ -118,7 +123,7 @@ def test_rejected_occurrence__filter__by_reservation_unit(graphql):
     assert response.node(0) == {"pk": occurrence.pk}
 
 
-def test_rejected_occurrence__filter__by_unit(graphql):
+def test_rejected_occurrence__filter__by_unit(graphql: GraphQLClient) -> None:
     RejectedOccurrenceFactory.create()
     occurrence = RejectedOccurrenceFactory.create()
     RejectedOccurrenceFactory.create()
@@ -135,7 +140,7 @@ def test_rejected_occurrence__filter__by_unit(graphql):
     assert response.node(0) == {"pk": occurrence.pk}
 
 
-def test_rejected_occurrence__filter__by_unit_group(graphql):
+def test_rejected_occurrence__filter__by_unit_group(graphql: GraphQLClient) -> None:
     unit_group = UnitGroupFactory.create()
 
     RejectedOccurrenceFactory.create()
@@ -152,7 +157,7 @@ def test_rejected_occurrence__filter__by_unit_group(graphql):
     assert response.node(0) == {"pk": occurrence.pk}
 
 
-def test_rejected_occurrence__filter__by_text_search(graphql):
+def test_rejected_occurrence__filter__by_text_search(graphql: GraphQLClient) -> None:
     # Works similarly to allocated time slot text search.
     # No need to test as thoroughly.
     section_ref = "reservation_series__allocated_time_slot__reservation_unit_option__application_section"
@@ -183,7 +188,7 @@ def test_rejected_occurrence__filter__by_text_search(graphql):
     assert response.node(0) == {"pk": occurrence.pk}
 
 
-def test_rejected_occurrence__order__by_pk(graphql):
+def test_rejected_occurrence__order__by_pk(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create()
     occurrence_2 = RejectedOccurrenceFactory.create()
     occurrence_3 = RejectedOccurrenceFactory.create()
@@ -210,7 +215,7 @@ def test_rejected_occurrence__order__by_pk(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_begin_datetime(graphql):
+def test_rejected_occurrence__order__by_begin_datetime(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create(begin_datetime=datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
     occurrence_2 = RejectedOccurrenceFactory.create(begin_datetime=datetime.datetime(2024, 1, 2, tzinfo=datetime.UTC))
     occurrence_3 = RejectedOccurrenceFactory.create(begin_datetime=datetime.datetime(2024, 1, 3, tzinfo=datetime.UTC))
@@ -237,7 +242,7 @@ def test_rejected_occurrence__order__by_begin_datetime(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_end_datetime(graphql):
+def test_rejected_occurrence__order__by_end_datetime(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create(end_datetime=datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
     occurrence_2 = RejectedOccurrenceFactory.create(end_datetime=datetime.datetime(2024, 1, 2, tzinfo=datetime.UTC))
     occurrence_3 = RejectedOccurrenceFactory.create(end_datetime=datetime.datetime(2024, 1, 3, tzinfo=datetime.UTC))
@@ -264,7 +269,7 @@ def test_rejected_occurrence__order__by_end_datetime(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_rejection_reason(graphql):
+def test_rejected_occurrence__order__by_rejection_reason(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create(rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED)
     occurrence_2 = RejectedOccurrenceFactory.create(rejection_reason=RejectionReadinessChoice.OVERLAPPING_RESERVATIONS)
     occurrence_3 = RejectedOccurrenceFactory.create(rejection_reason=RejectionReadinessChoice.RESERVATION_UNIT_CLOSED)
@@ -291,7 +296,7 @@ def test_rejected_occurrence__order__by_rejection_reason(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_application_pk(graphql):
+def test_rejected_occurrence__order__by_application_pk(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create(
         reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
@@ -324,7 +329,7 @@ def test_rejected_occurrence__order__by_application_pk(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_application_section_pk(graphql):
+def test_rejected_occurrence__order__by_application_section_pk(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create(
         reservation_series__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
@@ -357,7 +362,7 @@ def test_rejected_occurrence__order__by_application_section_pk(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_reservation_unit_pk(graphql):
+def test_rejected_occurrence__order__by_reservation_unit_pk(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create()
     occurrence_2 = RejectedOccurrenceFactory.create()
     occurrence_3 = RejectedOccurrenceFactory.create()
@@ -384,7 +389,7 @@ def test_rejected_occurrence__order__by_reservation_unit_pk(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_reservation_unit_name(graphql):
+def test_rejected_occurrence__order__by_reservation_unit_name(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create(reservation_series__reservation_unit__name="A")
     occurrence_2 = RejectedOccurrenceFactory.create(reservation_series__reservation_unit__name="C")
     occurrence_3 = RejectedOccurrenceFactory.create(reservation_series__reservation_unit__name="B")
@@ -411,7 +416,7 @@ def test_rejected_occurrence__order__by_reservation_unit_name(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_unit_pk(graphql):
+def test_rejected_occurrence__order__by_unit_pk(graphql: GraphQLClient) -> None:
     occurrence_1 = RejectedOccurrenceFactory.create()
     occurrence_2 = RejectedOccurrenceFactory.create()
     occurrence_3 = RejectedOccurrenceFactory.create()
@@ -438,7 +443,7 @@ def test_rejected_occurrence__order__by_unit_pk(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
-def test_rejected_occurrence__order__by_applicant(graphql):
+def test_rejected_occurrence__order__by_applicant(graphql: GraphQLClient) -> None:
     section_ref = "reservation_series__allocated_time_slot__reservation_unit_option__application_section"
     occurrence_1 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation_name": "A"})
     occurrence_2 = RejectedOccurrenceFactory.create(**{f"{section_ref}__application__organisation_name": "B"})
