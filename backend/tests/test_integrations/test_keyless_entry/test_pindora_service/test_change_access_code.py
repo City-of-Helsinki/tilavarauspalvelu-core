@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -20,12 +21,15 @@ from tests.factories import (
 from tests.helpers import ResponseMock, exact, patch_method
 from tests.test_integrations.test_keyless_entry.helpers import default_access_code_modify_response
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_change_access_code__reservation(settings):
+def test_change_access_code__reservation(settings: Settings) -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -59,7 +63,7 @@ def test_change_access_code__reservation(settings):
     )
 
 
-def test_change_access_code__reservation__in_series(settings):
+def test_change_access_code__reservation__in_series(settings: Settings) -> None:
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -109,7 +113,7 @@ def test_change_access_code__reservation__in_series(settings):
     )
 
 
-def test_change_access_code__reservation__in_series__in_seasonal_booking(settings):
+def test_change_access_code__reservation__in_series__in_seasonal_booking(settings: Settings) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -167,7 +171,7 @@ def test_change_access_code__reservation__in_series__in_seasonal_booking(setting
     )
 
 
-def test_change_access_code__series(settings):
+def test_change_access_code__series(settings: Settings) -> None:
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -217,7 +221,7 @@ def test_change_access_code__series(settings):
     )
 
 
-def test_change_access_code__series__in_seasonal_booking(settings):
+def test_change_access_code__series__in_seasonal_booking(settings: Settings) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -275,7 +279,7 @@ def test_change_access_code__series__in_seasonal_booking(settings):
     )
 
 
-def test_change_access_code__seasonal_booking(settings):
+def test_change_access_code__seasonal_booking(settings: Settings) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -333,11 +337,12 @@ def test_change_access_code__seasonal_booking(settings):
     )
 
 
-def test_change_access_code__invalid_target():
+def test_change_access_code__invalid_target() -> None:
     unit = UnitFactory.build(name="foo")
 
     msg = "Invalid change access code target: foo"
     with patch_method(PindoraClient.request) as patch, pytest.raises(PindoraClientError, match=exact(msg)):
-        PindoraService.change_access_code(obj=unit)
+        # The test passes an unsupported type on purpose.
+        PindoraService.change_access_code(obj=unit)  # type: ignore[arg-type]
 
     assert patch.call_count == 0

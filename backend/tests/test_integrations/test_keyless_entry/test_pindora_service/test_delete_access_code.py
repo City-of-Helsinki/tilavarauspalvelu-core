@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -21,12 +22,15 @@ from tests.factories import (
 from tests.helpers import ResponseMock, exact, patch_method
 from tests.test_integrations.test_keyless_entry.helpers import default_access_code_modify_response
 
+if TYPE_CHECKING:
+    from pytest_django import Settings
+
 pytestmark = [
     pytest.mark.django_db,
 ]
 
 
-def test_delete_access_code__reservation(settings):
+def test_delete_access_code__reservation(settings: Settings) -> None:
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -50,7 +54,7 @@ def test_delete_access_code__reservation(settings):
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation/{reservation.ext_uuid}"
 
 
-def test_delete_access_code__reservation__in_series(settings):
+def test_delete_access_code__reservation__in_series(settings: Settings) -> None:
     now = local_datetime()
 
     series = ReservationSeriesFactory.create()
@@ -99,7 +103,7 @@ def test_delete_access_code__reservation__in_series(settings):
     )
 
 
-def test_delete_access_code__reservation__in_series__in_seasonal_booking(settings):
+def test_delete_access_code__reservation__in_series__in_seasonal_booking(settings: Settings) -> None:
     now = local_datetime()
 
     user = UserFactory.create()
@@ -154,7 +158,7 @@ def test_delete_access_code__reservation__in_series__in_seasonal_booking(setting
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/reschedule/{section.ext_uuid}"
 
 
-def test_delete_access_code__series(settings):
+def test_delete_access_code__series(settings: Settings) -> None:
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -194,7 +198,7 @@ def test_delete_access_code__series(settings):
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series/{series.ext_uuid}"
 
 
-def test_delete_access_code__series__in_seasonal_booking(settings):
+def test_delete_access_code__series__in_seasonal_booking(settings: Settings) -> None:
     now = local_datetime()
 
     user = UserFactory.create()
@@ -249,7 +253,7 @@ def test_delete_access_code__series__in_seasonal_booking(settings):
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/reschedule/{section.ext_uuid}"
 
 
-def test_delete_access_code__seasonal_booking(settings):
+def test_delete_access_code__seasonal_booking(settings: Settings) -> None:
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -297,11 +301,12 @@ def test_delete_access_code__seasonal_booking(settings):
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/{section.ext_uuid}"
 
 
-def test_delete_access_code__invalid_target():
+def test_delete_access_code__invalid_target() -> None:
     unit = UnitFactory.build(name="foo")
 
     msg = "Invalid delete target: foo"
     with patch_method(PindoraClient.request) as patch, pytest.raises(PindoraClientError, match=exact(msg)):
-        PindoraService.delete_access_code(obj=unit)
+        # The test passes an unsupported type on purpose.
+        PindoraService.delete_access_code(obj=unit)  # type: ignore[arg-type]
 
     assert patch.call_count == 0

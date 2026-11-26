@@ -5,5 +5,5 @@ from django.core.cache import cache
 
 
 @pytest.fixture(autouse=True)
-def clear_pindora_cache():
+def clear_pindora_cache() -> None:
     cache.clear()
