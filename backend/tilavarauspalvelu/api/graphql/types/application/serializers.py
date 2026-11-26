@@ -196,7 +196,7 @@ class ApplicationSendSerializer(NestingModelSerializer[Application]):
 
         if errors:
             details = [detail for error in errors for detail in error.detail]
-            raise serializers.ValidationError(details)
+            raise serializers.ValidationError(details)  # type: ignore[arg-type]
 
         return data
 
@@ -534,7 +534,7 @@ class ApplicationCancelSerializer(NestingModelSerializer[Application]):
 
         if errors:
             details = [detail for error in errors for detail in error.detail]
-            raise serializers.ValidationError(details)
+            raise serializers.ValidationError(details)  # type: ignore[arg-type]
 
         return data
 

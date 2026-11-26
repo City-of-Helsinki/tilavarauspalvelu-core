@@ -96,6 +96,7 @@ pre-commit = "4.7.0"
 ruff = "0.17.6"
 mypy = "2.4.1"
 django-stubs = { version = "6.1.2", extras = ["compatible-mypy"] }
+djangorestframework-stubs = "3.18.2"
 
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
