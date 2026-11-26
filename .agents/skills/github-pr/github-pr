@@ -32,9 +32,10 @@ pr="$(gh pr view "$number" --repo "$repo" \
   --json number,title,state,author,baseRefName,headRefName,url,isDraft,body \
   --jq '{number, title, state, author: .author.login, source_branch: .headRefName, target_branch: .baseRefName, web_url: .url, draft: .isDraft, description: .body}')"
 
-# Review summaries. Skip empty bodies, which only group line-specific review comments.
+# Review summaries. Skip empty COMMENTED reviews, which only group line-specific review comments.
+# Keep approvals and change requests, also when their body is empty.
 reviews="$(gh api "repos/$repo/pulls/$number/reviews" --paginate \
-  --jq '.[] | select(.body != "") | {id, author: .user.login, at: .submitted_at, state, body}' \
+  --jq '.[] | select(.body != "" or .state != "COMMENTED") | {id, author: .user.login, at: .submitted_at, state, body}' \
   | jq --slurp .)"
 
 # Line-specific review comments.
