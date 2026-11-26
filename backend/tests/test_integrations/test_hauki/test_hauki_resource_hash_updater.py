@@ -17,10 +17,10 @@ from tilavarauspalvelu.models import ReservableTimeSpan
 from utils.date_utils import local_date, local_datetime
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, as_mock, patch_method
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import OriginHaukiResource
+    from tilavarauspalvelu.models import OriginHaukiResource, ReservationUnit
 
 # Applied to all tests
 pytestmark = [
@@ -28,7 +28,7 @@ pytestmark = [
 ]
 
 
-def test__HaukiResourceHashUpdater__init__no_params(reservation_unit):
+def test__HaukiResourceHashUpdater__init__no_params(reservation_unit: ReservationUnit) -> None:
     hash_updater = HaukiResourceHashUpdater()
 
     assert list(hash_updater.hauki_resource_ids) == [
@@ -37,13 +37,13 @@ def test__HaukiResourceHashUpdater__init__no_params(reservation_unit):
     ]
 
 
-def test__HaukiResourceHashUpdater__init__pass_resource_ids():
+def test__HaukiResourceHashUpdater__init__pass_resource_ids() -> None:
     hash_updater = HaukiResourceHashUpdater([1, 2, 3])
 
     assert hash_updater.hauki_resource_ids == [1, 2, 3]
 
 
-def test__HaukiResourceHashUpdater__init__pass_empty_list():
+def test__HaukiResourceHashUpdater__init__pass_empty_list() -> None:
     hash_updater = HaukiResourceHashUpdater([])
 
     assert hash_updater.hauki_resource_ids == []
@@ -51,14 +51,14 @@ def test__HaukiResourceHashUpdater__init__pass_empty_list():
 
 @patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
-def test__HaukiResourceHashUpdater__no_initial_hash():
+def test__HaukiResourceHashUpdater__no_initial_hash() -> None:
     origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory.create(
         id=999,
         opening_hours_hash="",
         latest_fetched_date=None,
     )
 
-    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
+    as_mock(HaukiAPIClient._get_resources).return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
@@ -66,20 +66,20 @@ def test__HaukiResourceHashUpdater__no_initial_hash():
     origin_hauki_resource.refresh_from_db()
     assert origin_hauki_resource.opening_hours_hash == "OLD"  # Hash is updated to a new one
     assert origin_hauki_resource.latest_fetched_date is None  # Not set, as ReservableTimeSpanClient.run is mocked
-    assert ReservableTimeSpanClient.run.call_count == 1
+    assert as_mock(ReservableTimeSpanClient.run).call_count == 1
 
 
 @freezegun.freeze_time("2020-01-01 08:00:00")
 @patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
-def test__HaukiResourceHashUpdater__handle_existing_reservable_time_spans():
+def test__HaukiResourceHashUpdater__handle_existing_reservable_time_spans() -> None:
     origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory.create(
         id=999,
         opening_hours_hash="OLD",
         latest_fetched_date=datetime.date(2019, 12, 31),  # in the past
     )
 
-    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "UPDATED"}]}
+    as_mock(HaukiAPIClient._get_resources).return_value = {"results": [{"id": 999, "date_periods_hash": "UPDATED"}]}
 
     # In the past: Should be kept as is
     rts1 = ReservableTimeSpanFactory.create(
@@ -120,69 +120,75 @@ def test__HaukiResourceHashUpdater__handle_existing_reservable_time_spans():
     assert rts2.end_datetime == local_datetime(2020, 1, 1, 0)
 
     assert hash_updater.resources_updated == [origin_hauki_resource]
-    assert ReservableTimeSpanClient.run.call_count == 1  # Tried to create time spans for the resource from Hauki API
+    assert (
+        as_mock(ReservableTimeSpanClient.run).call_count == 1
+    )  # Tried to create time spans for the resource from Hauki API
 
 
 @freezegun.freeze_time("2020-01-01")
 @patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
-def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__no_latest_fetched_date():
+def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__no_latest_fetched_date() -> None:
     hauki_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
 
     # Hash not changed, but has no latest_fetched_date so it should be updated
-    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
+    as_mock(HaukiAPIClient._get_resources).return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
 
     assert hash_updater.resources_updated == [hauki_resource]
-    assert ReservableTimeSpanClient.run.call_count == 1
+    assert as_mock(ReservableTimeSpanClient.run).call_count == 1
 
 
 @freezegun.freeze_time("2020-01-01")
 @patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
-def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__latest_fetched_date_is_stale():
+def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__latest_fetched_date_is_stale() -> (
+    None
+):
     hauki_resource = OriginHaukiResourceFactory.create(
         id=999, opening_hours_hash="OLD", latest_fetched_date=local_date()
     )
 
     # Hash not changed, but latest_fetched_date is early enough to warrant an update
-    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
+    as_mock(HaukiAPIClient._get_resources).return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
 
     assert hash_updater.resources_updated == [hauki_resource]
-    assert ReservableTimeSpanClient.run.call_count == 1
+    assert as_mock(ReservableTimeSpanClient.run).call_count == 1
 
 
 @freezegun.freeze_time("2020-01-01")
 @patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
-def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__latest_fetched_date_is_up_to_date():
+def test__HaukiResourceHashUpdater__process_single_resource__hash_unchanged__latest_fetched_date_is_up_to_date() -> (
+    None
+):
     cutoff_date = local_date() + datetime.timedelta(days=settings.HAUKI_DAYS_TO_FETCH + 1)  # Late enough to not update
 
     OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=cutoff_date)
 
     # Hash not changed and latest_fetched_date late enough to not warrant an update
-    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
+    as_mock(HaukiAPIClient._get_resources).return_value = {"results": [{"id": 999, "date_periods_hash": "OLD"}]}
 
     hash_updater = HaukiResourceHashUpdater()
     hash_updater.run()
 
     assert hash_updater.resources_updated == []
-    assert ReservableTimeSpanClient.run.call_count == 0
+    assert as_mock(ReservableTimeSpanClient.run).call_count == 0
 
 
 @freezegun.freeze_time("2020-01-01")
 @patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
-def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_updated__never_any_opening_hours_hash():
+def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_updated__never_any_opening_hours_hash() -> None:
     hauki_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
 
     # Hash is updated, but is known to not have hours
-    HaukiAPIClient._get_resources.return_value = {
+    as_mock(HaukiAPIClient._get_resources).return_value = {
         "results": [{"id": 999, "date_periods_hash": NEVER_ANY_OPENING_HOURS_HASH}]
     }
 
@@ -190,17 +196,19 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_updated_
     hash_updater.run()
 
     assert hash_updater.resources_updated == [hauki_resource]
-    assert ReservableTimeSpanClient.run.call_count == 0  # Not called, due to hash being known to not have hours
+    assert (
+        as_mock(ReservableTimeSpanClient.run).call_count == 0
+    )  # Not called, due to hash being known to not have hours
 
 
 @freezegun.freeze_time("2020-01-01")
 @patch_method(HaukiAPIClient.get)
 @patch_method(SentryLogger.log_exception)
-def test__HaukiResourceHashUpdater__failing_resource_does_not_stop_other_resources():
+def test__HaukiResourceHashUpdater__failing_resource_does_not_stop_other_resources() -> None:
     failing_resource = OriginHaukiResourceFactory.create(id=998, opening_hours_hash="OLD", latest_fetched_date=None)
     working_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
 
-    HaukiAPIClient.get.side_effect = [
+    as_mock(HaukiAPIClient.get).side_effect = [
         ResponseMock(
             status_code=200,
             json_data={
@@ -230,8 +238,8 @@ def test__HaukiResourceHashUpdater__failing_resource_does_not_stop_other_resourc
 
     assert hash_updater.resources_updated == [working_resource]
 
-    assert SentryLogger.log_exception.call_count == 1
-    error = SentryLogger.log_exception.call_args.args[0]
+    assert as_mock(SentryLogger.log_exception).call_count == 1
+    error = as_mock(SentryLogger.log_exception).call_args.args[0]
     assert isinstance(error, HaukiAPIError)
     assert str(error) == "Hauki API returned status 404 for opening hours of '998'."
-    assert SentryLogger.log_exception.call_args.kwargs == {"details": "Hauki resource: 998"}
+    assert as_mock(SentryLogger.log_exception).call_args.kwargs == {"details": "Hauki resource: 998"}

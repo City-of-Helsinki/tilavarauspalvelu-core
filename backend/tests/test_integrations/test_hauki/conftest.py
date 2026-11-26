@@ -8,11 +8,13 @@ from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 from tests.helpers import patch_method
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from tilavarauspalvelu.models import ReservationUnit
 
 
 @pytest.fixture(autouse=True)
-def _force_HaukiAPIClient_to_be_mocked():
+def _force_HaukiAPIClient_to_be_mocked() -> Generator[None]:
     """Force 'HaukiAPIClient.generic' to be mocked in all tests."""
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 

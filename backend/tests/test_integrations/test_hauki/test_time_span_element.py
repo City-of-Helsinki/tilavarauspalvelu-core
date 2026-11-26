@@ -2,17 +2,19 @@ from __future__ import annotations
 
 import copy
 import datetime
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import HaukiResourceState
-from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.test_integrations.test_hauki.test_reservable_time_spans_client import _get_date
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 
 
 class TimeSpanElementParams(NamedTuple):
@@ -87,8 +89,10 @@ class TimeSpanElementParams(NamedTuple):
         },
     )
 )
-def test__TimeSpanElement__create_from_time_element(time_element_changes, expected):
-    time_element_kwargs = {
+def test__TimeSpanElement__create_from_time_element(
+    time_element_changes: dict[str, Any], expected: TimeSpanElement | None
+) -> None:
+    time_element_kwargs: dict[str, Any] = {
         "name": "",
         "description": "",
         "start_time": None,
@@ -103,13 +107,14 @@ def test__TimeSpanElement__create_from_time_element(time_element_changes, expect
     time_span = TimeSpanElement.create_from_time_element(
         date=datetime.date(2023, 1, 1),
         timezone=DEFAULT_TIMEZONE,
-        time_element=HaukiAPIOpeningHoursResponseTime(**time_element_kwargs),
+        # The parameters change only some keys of the full time element above.
+        time_element=cast("HaukiAPIOpeningHoursResponseTime", time_element_kwargs),
     )
 
     assert time_span == expected
 
 
-def test__TimeSpanElement__copy():
+def test__TimeSpanElement__copy() -> None:
     time_span = TimeSpanElement(
         start_datetime=_get_date(day=1, hour=10),
         end_datetime=_get_date(day=2, hour=12),
@@ -126,7 +131,7 @@ def test__TimeSpanElement__copy():
 
 
 # The clocks move from 04:00 back to 03:00 on the night of 2026-10-25, so the hour from 03:00 to 04:00 occurs twice.
-def test__TimeSpanElement__overlaps_with__in_the_repeated_hour_of_a_daylight_saving_time_change():
+def test__TimeSpanElement__overlaps_with__in_the_repeated_hour_of_a_daylight_saving_time_change() -> None:
     time_span_in_first_hour = TimeSpanElement(
         start_datetime=datetime.datetime(2026, 10, 25, 3, 0, tzinfo=DEFAULT_TIMEZONE, fold=0),
         end_datetime=datetime.datetime(2026, 10, 25, 3, 50, tzinfo=DEFAULT_TIMEZONE, fold=0),
