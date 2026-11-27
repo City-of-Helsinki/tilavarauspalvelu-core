@@ -69,6 +69,17 @@ type PricingOptionsProps = {
   pricingTermsOptions: Array<{ value: string; label: string }>;
 };
 
+// The generated enum is in alphabetical order. Show the units from the shortest to the longest.
+const PRICE_UNIT_ORDER: ReadonlyArray<PriceUnit> = [
+  PriceUnit.Per_15Mins,
+  PriceUnit.Per_30Mins,
+  PriceUnit.PerHour,
+  PriceUnit.PerHalfDay,
+  PriceUnit.PerDay,
+  PriceUnit.PerWeek,
+  PriceUnit.Fixed,
+];
+
 // The number input sets the price to null when it is empty
 export function formatNetPrice(price: number | null, taxPercentage: number | undefined): string {
   if (price == null || taxPercentage == null || Number.isNaN(price)) {
@@ -315,7 +326,7 @@ function PricingFields({
   const taxPercentage = taxLevelOptions.find((x) => x.pk === pricing.taxLevel)?.percentage;
   const netPrice = formatNetPrice(pricing.price, taxPercentage);
 
-  const unitPriceOptions = Object.values(PriceUnit).map((choice) => ({
+  const unitPriceOptions = PRICE_UNIT_ORDER.map((choice) => ({
     label: t(`translation:priceUnit.${choice}`),
     value: choice,
   }));
