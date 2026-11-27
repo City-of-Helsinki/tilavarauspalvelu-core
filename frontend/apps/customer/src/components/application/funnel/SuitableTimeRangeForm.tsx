@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, useFormContext } from "react-hook-form";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
@@ -162,6 +162,18 @@ export function describeTime(
   return `${dayName} ${formatClockRange(begin, end)}`;
 }
 
+/** Why a listed time can't be applied for, or null when it can. */
+function describeProblem(t: TFunction, isOutside: boolean, isTooShort: boolean): string | null {
+  // Outside the opening hours is the more basic problem: such a time can't be applied for at all, whatever its length.
+  if (isOutside) {
+    return t("application:TimeSelector.form.outsideOpeningHours");
+  }
+  if (isTooShort) {
+    return t("application:TimeSelector.form.tooShort");
+  }
+  return null;
+}
+
 function toClockOption(minutes: number): { value: number; label: string } {
   return { value: minutes, label: formatClock(minutes) };
 }
@@ -229,16 +241,12 @@ export function SuitableTimeRangeForm({
   useEffect(syncPicker, [openingHoursKey]);
 
   // Every day is listed, so that none seems to be missing, but the days without open times can't be picked.
-  const openWeekdayList = useMemo(() => listOpenWeekdays(openingHours), [openingHours]);
-  const dayOptionList = useMemo(
-    () =>
-      WEEKDAYS_SORTED.map((day) => ({
-        value: day,
-        label: t(`common:weekdayLongEnum.${day}`),
-        disabled: !openWeekdayList.includes(day),
-      })),
-    [openWeekdayList, t]
-  );
+  const openWeekdayList = listOpenWeekdays(openingHours);
+  const dayOptionList = WEEKDAYS_SORTED.map((day) => ({
+    value: day,
+    label: t(`common:weekdayLongEnum.${day}`),
+    disabled: !openWeekdayList.includes(day),
+  }));
   const fromOptionList =
     weekday == null ? [] : listStartOptions(openingHours, weekday).map((minutes) => toClockOption(minutes));
   const toOptionList =
@@ -256,21 +264,11 @@ export function SuitableTimeRangeForm({
   // Unique weekdays in the listed user selections, used to place the times in columns in the list.
   const selectedWeekdayList = [...new Set(listed.map(({ weekday }) => convertWeekday(weekday)))];
 
-  // Outside the opening hours is the more basic problem: such a time can't be applied for at all, whatever its length.
   const isOutsideList = findOutsideListed(listed, openingHours);
   const isTooShortList = findTooShortListed(listed, minDuration);
-  const problemOf = (position: number) => {
-    if (isOutsideList[position]) {
-      return t("application:TimeSelector.form.outsideOpeningHours");
-    }
-    if (isTooShortList[position]) {
-      return t("application:TimeSelector.form.tooShort");
-    }
-    return null;
-  };
 
   const getTimeRangeContent = (day: Weekday, begin: number, end: number, variant?: "short" | "long") => {
-    const timeString = describeTime(t, day, begin, end, variant === "short" ? "short" : "long");
+    const timeString = describeTime(t, day, begin, end, variant);
     const [weekDay, timeRange] = timeString.split(" ");
     return (
       <>
@@ -360,7 +358,7 @@ export function SuitableTimeRangeForm({
               {listed.map(({ weekday: day, beginMinutes, endMinutes, data }, position) => {
                 const priority = priorityKey(data.priority);
                 const priorityLabel = t(`application:TimeSelector.form.priority.${priority}`);
-                const problem = problemOf(position);
+                const problem = describeProblem(t, isOutsideList[position] ?? false, isTooShortList[position] ?? false);
                 const time = describeTime(t, day, beginMinutes, endMinutes);
                 return (
                   <TimeListItem
