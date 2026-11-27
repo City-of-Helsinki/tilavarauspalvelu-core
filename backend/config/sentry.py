@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
 import sentry_sdk
 from django.db.models.signals import post_init
 from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.logging import ignore_logger
+from sentry_sdk.integrations.logging import LoggingIntegration, ignore_logger_for_events
 
 if TYPE_CHECKING:
-    from sentry_sdk.types import Event, Hint, SamplingContext
+    from sentry_sdk.types import SamplingContext
 
 
 def init_sentry(
@@ -26,16 +27,33 @@ def init_sentry(
             # modeltranslation connects 'delete_mt_init' to 'post_init', which fires for every loaded
             # model instance. Each call becomes a span, and these spans fill the trace.
             DjangoIntegration(signals_denylist=[post_init]),
+            # Report error logs as issues. Do not send Sentry Logs.
+            LoggingIntegration(level=None, event_level=logging.ERROR, breadcrumb_level=logging.INFO),
         ],
         traces_sampler=sentry_traces_sampler,
-        before_send_transaction=sentry_before_send_transaction,
+        # The SDK defaults collect personal data, such as IP addresses, request bodies and GraphQL variables.
+        data_collection={
+            "user_info": False,
+            "cookies": {"mode": "off"},
+            "http_headers": {
+                "request": {
+                    "mode": "allowlist",
+                    "terms": ["Accept-Language", "Content-Type", "Origin", "User-Agent"],
+                },
+            },
+            "http_bodies": [],
+            "url_query_params": {"mode": "off"},
+            "graphql": {"document": True, "variables": False},
+            "database_query_data": False,
+            "queues": False,
+        },
         profile_session_sample_rate=profile_session_sample_rate,
         profile_lifecycle="trace",
     )
 
     # The worker logs hard time limits and lost worker processes here without the task scope,
     # so Sentry groups them into one issue. 'tilavarauspalvelu.signals' reports them per task instead.
-    ignore_logger("celery.worker.request")
+    ignore_logger_for_events("celery.worker.request")
 
 
 def sentry_traces_sampler(sampling_context: SamplingContext) -> float:
@@ -50,19 +68,3 @@ def sentry_traces_sampler(sampling_context: SamplingContext) -> float:
         return 0.0
 
     return settings.SENTRY_TRACES_SAMPLE_RATE or 0.0
-
-
-def sentry_before_send_transaction(event: Event, _hint: Hint) -> Event:
-    # The trace view shows span data, not the request headers of the transaction event.
-    # Copy only allowlisted headers, so cookies, CSRF tokens and IP addresses stay out.
-    allowed_header_names = ("Accept-Language", "Content-Type", "Origin", "User-Agent")
-    request_headers: dict[str, str] = event.get("request", {}).get("headers", {})  # type: ignore[assignment]
-    trace_context = event.setdefault("contexts", {}).setdefault("trace", {})
-    trace_data: dict[str, object] = trace_context.setdefault("data", {})  # type: ignore[assignment]
-
-    for header_name in allowed_header_names:
-        header_value = request_headers.get(header_name)
-        if header_value is not None:
-            trace_data[f"http.request.header.{header_name.lower()}"] = header_value
-
-    return event

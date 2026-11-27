@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 import sentry_sdk
 from graphene_django_extensions import FileUploadGraphQLView
 from graphql import get_operation_ast, parse
-from sentry_sdk.tracing import TransactionSource
+from sentry_sdk.traces import SegmentNameSource
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -39,10 +39,10 @@ class SentryGraphQLView(FileUploadGraphQLView):
         span_name = operation_name or _operation_name_from_query(query) or "<unknown operation>"
 
         scope = sentry_sdk.get_current_scope()
-        scope.set_transaction_name(f"/graphql/ {span_name}", source=TransactionSource.CUSTOM)
+        scope.set_transaction_name(f"/graphql/ {span_name}", source=SegmentNameSource.CUSTOM)
 
-        with sentry_sdk.start_span(op="graphql.execute", name=span_name) as span:
-            span.set_data("graphql.operation.name", span_name)
+        span_attributes = {"sentry.op": "graphql.execute", "graphql.operation.name": span_name}
+        with sentry_sdk.start_span(name=span_name, attributes=span_attributes):
             return super().execute_graphql_request(request, data, query, variables, operation_name, show_graphiql)
 
 

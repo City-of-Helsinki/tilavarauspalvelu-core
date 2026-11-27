@@ -8,13 +8,14 @@ import pytest
 import sentry_sdk
 from celery.exceptions import TimeLimitExceeded, WorkerLostError
 from celery.signals import task_failure
+from django.core.handlers.wsgi import WSGIHandler
 from django.db.models.signals import post_init
-from django.test import Client, override_settings
+from django.test import Client, RequestFactory, override_settings
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.transport import Transport
 
-from config.sentry import init_sentry, sentry_before_send_transaction, sentry_traces_sampler
+from config.sentry import init_sentry, sentry_traces_sampler
 from config.settings import Common, Docker, Platta
 from tilavarauspalvelu.tasks import create_robot_test_data_task
 
@@ -22,7 +23,6 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from sentry_sdk.envelope import Envelope
-    from sentry_sdk.types import Event
 
 # ── Helpers ──
 
@@ -35,13 +35,20 @@ class EnvelopeCollector(Transport):
     def capture_envelope(self, envelope: Envelope) -> None:
         self.envelopes.append(envelope)
 
-    def sent_transactions(self) -> list[dict[str, Any]]:
-        return [
-            item.payload.json
-            for envelope in self.envelopes
-            for item in envelope.items
-            if item.type == "transaction" and item.payload.json is not None
-        ]
+    def sent_spans(self) -> list[dict[str, Any]]:
+        sentry_sdk.flush()
+
+        spans: list[dict[str, Any]] = []
+        for envelope in self.envelopes:
+            for item in envelope.items:
+                if item.type != "span" or item.payload.json is None:
+                    continue
+
+                for span in item.payload.json["items"]:
+                    attributes = {key: value["value"] for key, value in span.get("attributes", {}).items()}
+                    spans.append({**span, "attributes": attributes})
+
+        return spans
 
     def sent_events(self) -> list[dict[str, Any]]:
         return [
@@ -69,15 +76,15 @@ def sentry_transport() -> Iterator[EnvelopeCollector]:
         sentry_sdk.get_global_scope().set_client(previous_client)
 
 
-def post_graphql_in_transaction(*, body: dict[str, Any]) -> None:
+def post_graphql_in_request_span(*, body: dict[str, Any]) -> None:
     client = Client()
-    with sentry_sdk.start_transaction(name="/graphql/", op="http.server"):
+    with sentry_sdk.start_span(name="/graphql/", attributes={"sentry.op": "http.server"}):
         response = client.post("/graphql/", data=body, content_type="application/json")
 
     assert response.status_code == 200
 
 
-# ── Sampling and transaction data ──
+# ── Sampling and setup ──
 
 
 def test_sentry_traces_sampler_respects_parent_sampling_decision() -> None:
@@ -110,38 +117,6 @@ def test_sentry_traces_sampler_excludes_health_checks(path: str) -> None:
         assert sentry_traces_sampler({"wsgi_environ": {"PATH_INFO": path}}) == 0.0
 
 
-def test_sentry_before_send_transaction_copies_allowlisted_headers_to_trace_data() -> None:
-    event: Event = {
-        "request": {
-            "headers": {
-                "Accept-Language": "fi",
-                "Content-Type": "application/json",
-                "Cookie": "",
-                "Origin": "https://varaamo.hel.fi",
-                "User-Agent": "node",
-                "X-Csrftoken": "secret-token",
-            },
-        },
-        "contexts": {"trace": {"data": {"http.request.method": "POST"}}},
-    }
-
-    result = sentry_before_send_transaction(event, {})
-
-    assert result["contexts"]["trace"]["data"] == {
-        "http.request.method": "POST",
-        "http.request.header.accept-language": "fi",
-        "http.request.header.content-type": "application/json",
-        "http.request.header.origin": "https://varaamo.hel.fi",
-        "http.request.header.user-agent": "node",
-    }
-
-
-def test_sentry_before_send_transaction_accepts_event_without_request() -> None:
-    result = sentry_before_send_transaction({"transaction": "celery-task"}, {})
-
-    assert result == {"transaction": "celery-task", "contexts": {"trace": {"data": {}}}}
-
-
 @pytest.mark.parametrize("environment", [Docker, Platta])
 def test_sentry_post_setup_initializes_sdk_with_configured_options(environment: type[Docker | Platta]) -> None:
     with (
@@ -161,12 +136,12 @@ def test_sentry_post_setup_initializes_sdk_with_configured_options(environment: 
     assert options["environment"] == "testing"
     assert options["release"] == "release-123"
     assert options["traces_sampler"] is sentry_traces_sampler
-    assert options["before_send_transaction"] is sentry_before_send_transaction
     assert options["profile_session_sample_rate"] == 0.1
     assert options["profile_lifecycle"] == "trace"
-    assert len(options["integrations"]) == 1
+    assert len(options["integrations"]) == 2
     assert isinstance(options["integrations"][0], DjangoIntegration)
     assert options["integrations"][0].signals_denylist == [post_init]
+    assert isinstance(options["integrations"][1], LoggingIntegration)
 
 
 @pytest.mark.parametrize("environment", [Docker, Platta])
@@ -252,8 +227,8 @@ def test_sentry_is_enabled_by_default_only_in_platta_environments() -> None:
     assert Platta.SENTRY_ENABLED is True
 
 
-def test_sentry_init_drops_celery_worker_request_error_logs() -> None:
-    with patch("sentry_sdk.init"):
+def test_sentry_init_reports_error_logs_except_celery_worker_request_logs() -> None:
+    with patch("sentry_sdk.init") as sentry_init:
         init_sentry(
             dsn="https://public@example.ingest.sentry.io/1",
             environment="testing",
@@ -261,14 +236,14 @@ def test_sentry_init_drops_celery_worker_request_error_logs() -> None:
             profile_session_sample_rate=None,
         )
 
+    options = sentry_init.call_args.kwargs
     previous_client = sentry_sdk.get_client()
     transport = EnvelopeCollector()
     sentry_sdk.init(
-        dsn="https://public@example.ingest.sentry.io/1",
+        **options,
         transport=transport,
         default_integrations=False,
         auto_enabling_integrations=False,
-        integrations=[LoggingIntegration()],
     )
     try:
         logging.getLogger("celery.worker.request").error("Hard time limit (%ss) exceeded", 300)
@@ -278,6 +253,67 @@ def test_sentry_init_drops_celery_worker_request_error_logs() -> None:
 
     messages = [event["logentry"]["message"] for event in transport.sent_events()]
     assert messages == ["Task failed"]
+
+
+# ── Data collection ──
+
+
+@pytest.mark.django_db
+@override_settings(SENTRY_TRACES_SAMPLE_RATE=1.0)
+def test_sentry_request_span_has_only_allowlisted_headers_and_no_client_address() -> None:
+    with patch("sentry_sdk.init") as sentry_init:
+        init_sentry(
+            dsn="https://public@example.ingest.sentry.io/1",
+            environment="testing",
+            release=None,
+            profile_session_sample_rate=None,
+        )
+
+    options = sentry_init.call_args.kwargs
+    previous_client = sentry_sdk.get_client()
+    transport = EnvelopeCollector()
+    sentry_sdk.init(
+        **options,
+        transport=transport,
+        default_integrations=False,
+        auto_enabling_integrations=False,
+    )
+
+    request = RequestFactory().post(
+        "/graphql/?token=secret",
+        data={"query": "query FrontPage { __typename }"},
+        content_type="application/json",
+        headers={
+            "Accept-Language": "fi",
+            "Cookie": "sessionid=secret",
+            "Origin": "https://varaamo.hel.fi",
+            "User-Agent": "node",
+            "X-Forwarded-For": "192.0.2.1",
+        },
+    )
+    try:
+        WSGIHandler()(request.environ, lambda _status, _headers: None)
+        spans = transport.sent_spans()
+    finally:
+        sentry_sdk.get_global_scope().set_client(previous_client)
+
+    segment_attributes = [span["attributes"] for span in spans if span["is_segment"]]
+    assert len(segment_attributes) == 1
+
+    header_attributes = {
+        key: value for key, value in segment_attributes[0].items() if key.startswith("http.request.header.")
+    }
+    assert header_attributes == {
+        "http.request.header.accept-language": ["fi"],
+        "http.request.header.content-length": ["[Filtered]"],
+        "http.request.header.content-type": ["application/json"],
+        "http.request.header.cookie": ["[Filtered]"],
+        "http.request.header.origin": ["https://varaamo.hel.fi"],
+        "http.request.header.user-agent": ["node"],
+        "http.request.header.x-forwarded-for": ["[Filtered]"],
+    }
+    assert "client.address" not in segment_attributes[0]
+    assert "http.query" not in segment_attributes[0]
 
 
 # ── Celery task failures ──
@@ -316,46 +352,51 @@ def test_sentry_does_not_report_celery_task_failure_raised_inside_task(sentry_tr
 # ── GraphQL view ──
 
 
-def test_sentry_graphql_view_names_transaction_and_span_with_operation_name(
+def test_sentry_graphql_view_names_segment_and_span_with_operation_name(
     sentry_transport: EnvelopeCollector,
 ) -> None:
-    post_graphql_in_transaction(body={"query": "query FrontPage { __typename }", "operationName": "FrontPage"})
+    post_graphql_in_request_span(body={"query": "query FrontPage { __typename }", "operationName": "FrontPage"})
 
-    transactions = sentry_transport.sent_transactions()
-    assert len(transactions) == 1
-    assert transactions[0]["transaction"] == "/graphql/ FrontPage"
-    assert transactions[0]["transaction_info"] == {"source": "custom"}
-
-    spans = [
-        (span["op"], span["description"], span["data"]["graphql.operation.name"]) for span in transactions[0]["spans"]
+    spans = sentry_transport.sent_spans()
+    segments = [
+        (span["name"], span["attributes"]["sentry.segment.name.source"]) for span in spans if span["is_segment"]
     ]
-    assert spans == [("graphql.execute", "FrontPage", "FrontPage")]
+    assert segments == [("/graphql/ FrontPage", "custom")]
+
+    child_spans = [
+        (span["attributes"]["sentry.op"], span["name"], span["attributes"]["graphql.operation.name"])
+        for span in spans
+        if not span["is_segment"]
+    ]
+    assert child_spans == [("graphql.execute", "FrontPage", "FrontPage")]
 
 
 def test_sentry_graphql_view_reads_operation_name_from_query_without_operation_name(
     sentry_transport: EnvelopeCollector,
 ) -> None:
-    post_graphql_in_transaction(body={"query": "query FrontPage { __typename }"})
+    post_graphql_in_request_span(body={"query": "query FrontPage { __typename }"})
 
-    transactions = sentry_transport.sent_transactions()
-    assert len(transactions) == 1
-    assert transactions[0]["transaction"] == "/graphql/ FrontPage"
+    spans = sentry_transport.sent_spans()
+    segment_names = [span["name"] for span in spans if span["is_segment"]]
+    assert segment_names == ["/graphql/ FrontPage"]
 
-    spans = [
-        (span["op"], span["description"], span["data"]["graphql.operation.name"]) for span in transactions[0]["spans"]
+    child_spans = [
+        (span["attributes"]["sentry.op"], span["name"], span["attributes"]["graphql.operation.name"])
+        for span in spans
+        if not span["is_segment"]
     ]
-    assert spans == [("graphql.execute", "FrontPage", "FrontPage")]
+    assert child_spans == [("graphql.execute", "FrontPage", "FrontPage")]
 
 
 def test_sentry_graphql_view_uses_placeholder_for_anonymous_operation(sentry_transport: EnvelopeCollector) -> None:
-    post_graphql_in_transaction(body={"query": "{ __typename }"})
+    post_graphql_in_request_span(body={"query": "{ __typename }"})
 
-    transactions = sentry_transport.sent_transactions()
-    assert len(transactions) == 1
-    assert transactions[0]["transaction"] == "/graphql/ <unknown operation>"
+    spans = sentry_transport.sent_spans()
+    segment_names = [span["name"] for span in spans if span["is_segment"]]
+    assert segment_names == ["/graphql/ <unknown operation>"]
 
-    spans = [(span["op"], span["description"]) for span in transactions[0]["spans"]]
-    assert spans == [("graphql.execute", "<unknown operation>")]
+    child_spans = [(span["attributes"]["sentry.op"], span["name"]) for span in spans if not span["is_segment"]]
+    assert child_spans == [("graphql.execute", "<unknown operation>")]
 
 
 @pytest.mark.parametrize(
@@ -373,7 +414,7 @@ def test_sentry_graphql_view_returns_graphql_error_when_query_cannot_be_parsed(
     query: Any,
 ) -> None:
     client = Client()
-    with sentry_sdk.start_transaction(name="/graphql/", op="http.server"):
+    with sentry_sdk.start_span(name="/graphql/", attributes={"sentry.op": "http.server"}):
         response = client.post("/graphql/", data={"query": query}, content_type="application/json")
 
     assert response.status_code == 400
@@ -382,6 +423,6 @@ def test_sentry_graphql_view_returns_graphql_error_when_query_cannot_be_parsed(
     assert list(response_body) == ["errors"]
     assert len(response_body["errors"]) == 1
 
-    transactions = sentry_transport.sent_transactions()
-    assert len(transactions) == 1
-    assert transactions[0]["transaction"] == "/graphql/ <unknown operation>"
+    spans = sentry_transport.sent_spans()
+    segment_names = [span["name"] for span in spans if span["is_segment"]]
+    assert segment_names == ["/graphql/ <unknown operation>"]
