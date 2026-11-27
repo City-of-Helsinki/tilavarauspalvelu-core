@@ -115,14 +115,14 @@ files = [
 
 [[package]]
 name = "billiard"
-version = "4.3.1"
+version = "4.3.2"
 description = "Python multiprocessing fork with improvements and bugfixes"
 optional = false
 python-versions = ">=3.10"
 groups = ["celery"]
 files = [
-    {file = "billiard-4.3.1-py3-none-any.whl", hash = "sha256:2c7075283191d9c0add66cf8fca8e06ba599e75fe7319b67186759f8877dfdaf"},
-    {file = "billiard-4.3.1.tar.gz", hash = "sha256:c88559b306ee5dc93f8d5f843d07da15d795d67af26720d14ee9d09f09eb0b22"},
+    {file = "billiard-4.3.2-py3-none-any.whl", hash = "sha256:37735a7b4117aafa73532b3b493db4c02fb85c0e69d5f3447f113fd30ff27872"},
+    {file = "billiard-4.3.2.tar.gz", hash = "sha256:9eb83c99b1cf7acb1fed86c1dfd477157000a1a2c0108005c1e5837b55d2acba"},
 ]
 
 [[package]]
@@ -139,58 +139,59 @@ files = [
 
 [[package]]
 name = "celery"
-version = "5.6.3"
+version = "5.7.0"
 description = "Distributed Task Queue."
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["celery"]
 files = [
-    {file = "celery-5.6.3-py3-none-any.whl", hash = "sha256:0808f42f80909c4d5833202360ffafb2a4f83f4d8e23e1285d926610e9a7afa6"},
-    {file = "celery-5.6.3.tar.gz", hash = "sha256:177006bd2054b882e9f01be59abd8529e88879ef50d7918a7050c5a9f4e12912"},
+    {file = "celery-5.7.0-py3-none-any.whl", hash = "sha256:18310a9c919f9029e4735367484d93e6a25cdfd30afdc474622cc263d9b35f6e"},
+    {file = "celery-5.7.0.tar.gz", hash = "sha256:6a5dfcf6662287204f009a02002b9e66c83d4105e47ebabdc7079108772fc6f0"},
 ]
 
 [package.dependencies]
-billiard = ">=4.2.1,<5.0"
-click = ">=8.1.2,<9.0"
-click-didyoumean = ">=0.3.0"
-click-plugins = ">=1.1.1"
-click-repl = ">=0.2.0"
+billiard = ">=4.3.2"
+click = ">=8.3.1,<9.0"
+click-didyoumean = ">=0.3.1"
+click-plugins = ">=1.1.1.2"
+click-repl = ">=0.4.1"
 kombu = [
-    {version = ">=5.6.0"},
+    {version = ">=5.7.0"},
     {version = "*", extras = ["redis"], optional = true, markers = "extra == \"redis\""},
 ]
-python-dateutil = ">=2.8.2"
+python-dateutil = "2.9.0.post0"
 tzlocal = "*"
 vine = ">=5.1.0,<6.0"
 
 [package.extras]
-arangodb = ["pyArango (>=2.0.2)"]
-auth = ["cryptography (==46.0.5)"]
-azureblockblob = ["azure-identity (>=1.19.0)", "azure-storage-blob (>=12.15.0)"]
-brotli = ["brotli (>=1.0.0) ; platform_python_implementation == \"CPython\"", "brotlipy (>=0.7.0) ; platform_python_implementation == \"PyPy\""]
-cassandra = ["cassandra-driver (>=3.25.0,<4)"]
+arangodb = ["pyArango (>=2.1.1)"]
+auth = ["cryptography (==50.0.2)"]
+azureblockblob = ["azure-identity (==1.27.0)", "azure-storage-blob (==12.31.1)"]
+brotli = ["brotli (>=1.2.1) ; platform_python_implementation == \"CPython\"", "brotlicffi (>=1.2.1.0) ; platform_python_implementation == \"PyPy\""]
+cassandra = ["cassandra-driver (==3.30.1)"]
 consul = ["python-consul2 (==0.1.5)"]
 cosmosdbsql = ["pydocumentdb (==2.3.5)"]
 couchbase = ["couchbase (>=3.0.0) ; platform_python_implementation != \"PyPy\" and (platform_system != \"Windows\" or python_version < \"3.10\")"]
-couchdb = ["pycouchdb (==1.16.0)"]
-django = ["Django (>=2.2.28)"]
+couchdb = ["pycouchdb (==1.17.1)"]
+django = ["Django (>=3.2.1)"]
 dynamodb = ["boto3 (>=1.26.143)"]
-elasticsearch = ["elastic-transport (<=9.2.1)", "elasticsearch (<=9.3.0)"]
+elasticsearch = ["elastic-transport (<=9.4.2)", "elasticsearch (<=9.5.1)"]
 eventlet = ["eventlet (>=0.32.0) ; python_version < \"3.10\""]
-gcs = ["google-cloud-firestore (==2.23.0)", "google-cloud-storage (>=2.10.0)", "grpcio (==1.76.0)"]
-gevent = ["gevent (>=1.5.0)"]
+gcpubsub = ["kombu[gcpubsub] (>=5.5.0)"]
+gcs = ["google-cloud-firestore (==2.32.0)", "google-cloud-storage (==3.17.1)", "grpcio (==1.85.1)"]
+gevent = ["gevent (==26.9.0)"]
 librabbitmq = ["librabbitmq (>=2.0.0) ; python_version < \"3.11\""]
-memcache = ["pylibmc (==1.6.3) ; platform_system != \"Windows\""]
+memcache = ["pymemcache (>=4.0.0)"]
 mongodb = ["kombu[mongodb]"]
 msgpack = ["kombu[msgpack]"]
-pydantic = ["pydantic (>=2.12.0a1) ; python_version >= \"3.14\"", "pydantic (>=2.4) ; python_version < \"3.14\""]
-pymemcache = ["python-memcached (>=1.61)"]
+pydantic = ["pydantic (==2.14.1)"]
+pymemcache = ["pymemcache (>=4.0.0)"]
 pyro = ["pyro4 (==4.82) ; python_version < \"3.11\""]
 pytest = ["pytest-celery[all] (>=1.3.0)"]
 redis = ["kombu[redis]"]
 s3 = ["boto3 (>=1.26.143)"]
 slmq = ["softlayer_messaging (>=1.0.3)"]
-solar = ["ephem (==4.2) ; platform_python_implementation != \"PyPy\""]
+solar = ["ephem (==4.2.1) ; platform_python_implementation != \"PyPy\""]
 sqlalchemy = ["kombu[sqlalchemy]"]
 sqs = ["boto3 (>=1.26.143)", "kombu[sqs] (>=5.5.0)", "pycurl (>=7.43.0.5,<7.45.4) ; sys_platform != \"win32\" and platform_python_implementation == \"CPython\" and python_version < \"3.9\"", "pycurl (>=7.45.4) ; sys_platform != \"win32\" and platform_python_implementation == \"CPython\" and python_version >= \"3.9\"", "urllib3 (>=1.26.16)"]
 tblib = ["tblib (==3.2.2)"]
@@ -4050,14 +4051,14 @@ brotli = ["brotli"]
 
 [[package]]
 name = "xhtml2pdf"
-version = "0.2.28"
+version = "0.2.29"
 description = "PDF generator using HTML and CSS"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "xhtml2pdf-0.2.28-py3-none-any.whl", hash = "sha256:67b9f3dcb5597322d984621343b96c7044c91e4ca70eebf090292d6bfc96d6a2"},
-    {file = "xhtml2pdf-0.2.28.tar.gz", hash = "sha256:c68c177dd10a59fb185c5ce163bb4ba6557f7c24bcd72b3e5e66aaf838411bef"},
+    {file = "xhtml2pdf-0.2.29-py3-none-any.whl", hash = "sha256:396205c2dfced6810a075ce3d9f494341c585282c97db97b1ec18c5c3e3c0703"},
+    {file = "xhtml2pdf-0.2.29.tar.gz", hash = "sha256:f8e280eb74c6f1625e200623db126fcf5fb9c6a40027b4d05e38f73e5175c48d"},
 ]
 
 [package.dependencies]
@@ -4082,4 +4083,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "5d0c7efb8f6efdb3a70099a0cb9eb9a194a38654782f5a022fba983777bd451e"
+content-hash = "de434f5dfc0a749c3cdc95af764210ad102524bb4b1ab386acb65dbd346cf190"
