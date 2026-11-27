@@ -496,11 +496,27 @@ def test_helsinki_profile_client__get_token__profile_refresh_token_rejected__use
 
 
 @patch_method(SentryLogger.log_message)
-def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens_rejected(keycloak):
+@pytest.mark.parametrize(
+    ("profile_error_description", "expected_tag_value"),
+    [
+        ("Session doesn't have required client", "Session doesn't have required client"),
+        ("Unknown Keycloak error description", "Unknown Keycloak error description"),
+        (None, "missing_description"),
+    ],
+)
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens_rejected(
+    keycloak,
+    profile_error_description,
+    expected_tag_value,
+):
     user = UserFactory.create_profile_user()
     keycloak_refresh_token = user.current_social_auth.extra_data["refresh_token"]
+    profile_error_data = {"error": "invalid_grant"}
+    if profile_error_description is not None:
+        profile_error_data["error_description"] = profile_error_description
     keycloak.refresh_error_responses["session-profile-refresh-token"] = ResponseMock(
-        json_data={"error": "invalid_grant"},
+        json_data=profile_error_data,
         text="Profile refresh token expired",
         status_code=400,
     )
@@ -529,6 +545,7 @@ def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens
         "Unable to refresh Helsinki profile token",
         details={"user": user.pk, "error": "Profile refresh token expired"},
         level="warning",
+        tags={"profile_refresh_invalid_grant_description": expected_tag_value},
     )
 
 

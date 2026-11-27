@@ -14,10 +14,19 @@ LogLevelStr = Literal["fatal", "critical", "error", "warning", "info", "debug"]
 
 class SentryLogger:
     @staticmethod
-    def log_message(message: str, details: str | dict[str, Any] | None = None, level: LogLevelStr = "info") -> None:
+    def log_message(
+        message: str,
+        details: str | dict[str, Any] | None = None,
+        level: LogLevelStr = "info",
+        *,
+        tags: dict[str, str] | None = None,
+    ) -> None:
         with new_scope() as scope:
             if details:
                 scope.set_extra("details", details)
+            if tags:
+                for key, value in tags.items():
+                    scope.set_tag(key, value)
             capture_message(message, level=level)
 
     @staticmethod

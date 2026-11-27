@@ -146,13 +146,27 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)
                 access_token = response["access_token"]
             except HTTPError as error:
+                error_tags: dict[str, str] = {}
+                if error.response is not None:
+                    try:
+                        error_data = error.response.json()
+                    except ValueError:
+                        error_data = None
+
+                    if isinstance(error_data, dict) and error_data.get("error") == "invalid_grant":
+                        error_description = error_data.get("error_description")
+                        if not isinstance(error_description, str) or not error_description:
+                            error_description = "missing_description"
+
+                        error_tags["profile_refresh_invalid_grant_description"] = error_description
+
                 #
                 # Last resort, try keycloak refresh
                 access_token = KeyCloakClient.refresh_token(user=user, session=session)
                 if access_token is None:
                     msg = "Unable to refresh Helsinki profile token"
                     details = {"user": user.pk, "error": error.response.text}
-                    SentryLogger.log_message(msg, details=details, level="warning")
+                    SentryLogger.log_message(msg, details=details, level="warning", tags=error_tags)
                     return None
 
         try:
