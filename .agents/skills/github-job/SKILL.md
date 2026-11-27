@@ -40,6 +40,14 @@ If the user gives a run id or a run URL, list the failed jobs in the run:
 
 Take the id of the job that needs attention (`conclusion: "failure"`).
 
+To find runs of a workflow, for example to check if a failure repeats, list its latest runs.
+Give the workflow file name from `.github/workflows/` and an optional limit (default 10):
+
+```bash
+.agents/skills/github-job/github-job runs ci.yml
+.agents/skills/github-job/github-job runs mirror-base-images.yml 20
+```
+
 ## 3. Fetch the log
 
 ```bash
