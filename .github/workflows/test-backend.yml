@@ -36,6 +36,7 @@ jobs:
       contents: read
       packages: write
 
+  # The ruleset of the main branch requires a check with this name. Change the ruleset before you rename the job.
   checks:
     name: "Check migrations, translations and outdated graphql schema"
     runs-on: ubuntu-latest
@@ -82,6 +83,14 @@ jobs:
 
       - name: "Install project dependencies"
         uses: ./.github/actions/poetry
+
+      # The mypy Django plugin loads the settings, so this step needs the same settings as the management commands.
+      - name: "Check types with mypy"
+        working-directory: backend
+        run: poetry run mypy .
+        env:
+          DJANGO_SETTINGS_ENVIRONMENT: CI
+          DATABASE_URL: postgis://tvp:tvp@postgres:5432/tvp
 
       # Dependabot can write wrong dependency groups to the lock file. 'poetry check --lock' does not find them.
       - name: "Test for outdated poetry.lock"
