@@ -216,8 +216,8 @@ importers:
         specifier: ^21.0.4
         version: 21.0.4
       postcss-styled-syntax:
-        specifier: ^0.7.3
-        version: 0.7.3(postcss@8.5.33)
+        specifier: ^0.7.4
+        version: 0.7.4(postcss@8.5.33)
       stylelint:
         specifier: ^18.0.0
         version: 18.0.0
@@ -367,8 +367,8 @@ importers:
         specifier: ^21.0.4
         version: 21.0.4
       postcss-styled-syntax:
-        specifier: ^0.7.3
-        version: 0.7.3(postcss@8.5.33)
+        specifier: ^0.7.4
+        version: 0.7.4(postcss@8.5.33)
       stylelint:
         specifier: ^18.0.0
         version: 18.0.0
@@ -512,8 +512,8 @@ importers:
         specifier: ^16.5.1
         version: 16.5.1(@types/react@19.3.0)(i18next@27.2.2(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.2.2(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
       postcss-styled-syntax:
-        specifier: ^0.7.3
-        version: 0.7.3(postcss@8.5.33)
+        specifier: ^0.7.4
+        version: 0.7.4(postcss@8.5.33)
       stylelint:
         specifier: ^18.0.0
         version: 18.0.0
@@ -4532,8 +4532,8 @@ packages:
     resolution: {integrity: sha512-GwxlMgTTXwIom+ebC7an3k6RaJDwklRQQnfiXsLPGicu8FYV/k/+1/9YY2OU2+r938H2t4X0TDxoif+HP2rjzQ==}
     engines: {node: '>=4'}
 
-  postcss-styled-syntax@0.7.3:
-    resolution: {integrity: sha512-F6PSmNJKnOk1E5BWNqp6lEg3qlVYexKPf9C5eoBflPxNyS29goTATFVU7vUi0WWMmpAK+Pf2yHuUdjKXL2bOTg==}
+  postcss-styled-syntax@0.7.4:
+    resolution: {integrity: sha512-wRRWfMTQEFtFv94NpfOAx/GLM7vfHRsgHQIEhBlBw3C7XXuFG6ASTGbR8VdINoF84uBx4lxHdWRUQ+VDi5jNpA==}
     engines: {node: '>=14.17'}
     peerDependencies:
       postcss: ^8.5.28
@@ -9182,7 +9182,7 @@ snapshots:
     dependencies:
       util-deprecate: 1.0.2
 
-  postcss-styled-syntax@0.7.3(postcss@8.5.33):
+  postcss-styled-syntax@0.7.4(postcss@8.5.33):
     dependencies:
       postcss: 8.5.33
       typescript: 6.0.3
