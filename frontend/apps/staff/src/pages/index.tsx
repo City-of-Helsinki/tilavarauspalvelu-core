@@ -17,7 +17,11 @@ const Ingress = styled(H2)`
   line-height: 1.8125rem;
 `;
 
-const CUSTOM_WELCOME_USERNAME_SET = new Set(["u-gptwmnqqnjahlfj2uas2glyx5a", "u-zwckoxj3abdandug5odsi3q2la"]);
+const CUSTOM_WELCOME_USERNAME_SET = new Set([
+  "u-gptwmnqqnjahlfj2uas2glyx5a",
+  "u-zwckoxj3abdandug5odsi3q2la",
+  "u-sgw4gqziubgtpfmyl4fdfmn5ha",
+]);
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function Index({ rand }: PageProps) {
