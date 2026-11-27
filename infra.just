@@ -339,12 +339,15 @@ dependabot-ignores part:
     run_log=$(gh run view "${run_id}" --repo "${repo}" --log)
     job_definition=$(grep -m1 'Job definition:' <<< "${run_log}" | sed 's/.*Job definition: //')
 
-    jq -r '.job["ignore-conditions"][]
-        | [
-            .["dependency-name"],
-            (.["version-requirement"] // "-"),
-            ((.["update-types"] // []) | join(", ") | if . == "" then "-" else . end),
-            .source
-          ]
-        | @tsv' <<< "${job_definition}" \
-        | column -t -s $'\t' -N DEPENDENCY,VERSIONS,UPDATE-TYPES,SOURCE
+    # The header is part of the jq output, because 'column -N' is not available on macOS.
+    # Empty fields get "-", because the macOS 'column' merges empty fields.
+    jq -r '(["DEPENDENCY", "VERSIONS", "UPDATE-TYPES", "SOURCE"] | @tsv),
+        (.job["ignore-conditions"][]
+            | [
+                .["dependency-name"],
+                (.["version-requirement"] // "-"),
+                ((.["update-types"] // []) | join(", ") | if . == "" then "-" else . end),
+                (.source // "-")
+              ]
+            | @tsv)' <<< "${job_definition}" \
+        | column -t -s $'\t'
