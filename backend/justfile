@@ -69,6 +69,10 @@ lint:
 lock:
     @poetry lock
 
+# Check types with mypy
+mypy:
+    @mypy .
+
 # Run database migrations
 migrate:
     @python manage.py migrate
