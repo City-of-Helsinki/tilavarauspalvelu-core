@@ -41,7 +41,7 @@
     "react-hook-form": "7.92.0",
     "react-use": "^17.6.1",
     "roarr": "^7.21.7",
-    "sass": "^1.105.0",
+    "sass": "^1.108.2",
     "styled-components": "6.6.0",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
