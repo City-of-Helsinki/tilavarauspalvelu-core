@@ -162,6 +162,22 @@ but it cannot accept a step, rethink a step or open a pull request.
 
 Seer runs cost money, so do not start or rethink without a reason.
 
+### Resolve old issues from non-browser clients
+
+```bash
+.agents/skills/sentry/sentry-cleanup --dry-run --verbose
+.agents/skills/sentry/sentry-cleanup --days 14
+```
+
+The script resolves the unresolved issues of the three projects that have had no events for 7 days, or for `--days`.
+It resolves an issue only if every event is from a non-browser client such as curl,
+or if the issue is a `?throw=` test error of the frontend. The list of clients is in the script.
+`--verbose` also shows the issues that stay unresolved, with the reason.
+
+The workflow `.github/workflows/sentry-cleanup.yml` runs it every Monday with the `SENTRY_CLEANUP_TOKEN` secret.
+A manual run from the Actions tab is a dry run by default.
+The script writes to Sentry. Run it locally only with `--dry-run`, unless the user asks for a real run.
+
 ### List and delete releases
 
 ```bash

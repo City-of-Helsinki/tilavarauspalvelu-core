@@ -1,0 +1,41 @@
+name: "Resolve old Sentry issues from non-browser clients"
+
+# Resolves old Sentry issues that only curl, scripts or the "?throw=" test errors caused.
+# See .agents/skills/sentry/sentry-cleanup for the rules.
+on:
+  schedule:
+    # Every Monday at 05:00 UTC.
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only print the issues to resolve"
+        type: boolean
+        default: true
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  sentry-cleanup:
+    name: "Resolve old Sentry issues"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Resolve the issues
+        env:
+          # A Sentry token with "Issue & Event" Read & Write and "Project" Read.
+          SENTRY_CLEANUP_TOKEN: ${{ secrets.SENTRY_CLEANUP_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [[ "$DRY_RUN" == "true" ]]; then
+            .agents/skills/sentry/sentry-cleanup --dry-run --verbose
+          else
+            .agents/skills/sentry/sentry-cleanup
+          fi

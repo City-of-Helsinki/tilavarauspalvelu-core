@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# Resolve old Sentry issues that only non-browser clients or test triggers caused.
+# Such issues come from our own tests with curl, from scripts and from scanners.
+# We keep them in Sentry, because they show what tests and release checks do. But they need no work.
+#
+# The script resolves an unresolved issue of the projects of this service if:
+#   - nothing has happened in the issue for the given number of days, and
+#   - every event of the issue has a browser.name tag from a non-browser client, such as curl, or
+#     the issue is a test error from the "?throw=" query parameter of the frontend (see ErrorTrigger.tsx).
+# An issue that comes back after this is a regression in Sentry. That is correct: the error happens again.
+#
+# The token is read from the SENTRY_CLEANUP_TOKEN variable in CI, else from the secret file or from 1Password.
+# See lib.sh.
+# Usage: sentry-cleanup [--dry-run] [--verbose] [--days <days>]
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: sentry-cleanup [--dry-run] [--verbose] [--days <days>]
+  --dry-run       Print the issues to resolve. Change nothing in Sentry.
+  --verbose       Also print the old issues that stay unresolved, with the reason.
+  --days <days>   Resolve only issues with no events in this number of days. The default is 7.
+EOF
+  exit 2
+}
+
+dry_run=false
+verbose=false
+days=7
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) dry_run=true; shift ;;
+    --verbose) verbose=true; shift ;;
+    --days)
+      [[ $# -ge 2 && "$2" =~ ^[1-9][0-9]*$ ]] || usage
+      days="$2"
+      shift 2
+      ;;
+    *) echo "Unknown argument: $1" >&2; usage ;;
+  esac
+done
+
+# The Sentry projects of this service.
+projects=(tilavarauspalvelu-core tilavarauspalvelu-customer-ui tilavarauspalvelu-staff-ui)
+
+# Values of the browser.name tag that are not a browser. Sentry gets the value from the User-Agent header.
+# The frontend server forwards the User-Agent of the client to the backend, so a curl call
+# to a frontend page also shows as curl in the backend. Without a User-Agent from the client,
+# the frontend server sends the Node.js default, which shows as "node-fetch" or "Other".
+# Add a value here only if no real user and no integration can have it.
+# Do not add "ReactorNetty". It is the webshop of the City (Verkkokauppa) that calls the payment webhooks.
+# An empty value is not here on purpose, because we do not know the client.
+non_browsers='["curl", "Wget", "Python Requests", "python-requests", "Python-urllib", "Go-http-client",
+  "node-fetch", "undici", "axios", "okhttp", "PostmanRuntime", "HTTPie", "libwww-perl"]'
+
+# The title of a test error from the "?throw=" query parameter of the frontend.
+test_error_pattern='Test error from \?throw=(ssr|render|async|promise)$'
+
+if [[ -n "${SENTRY_CLEANUP_TOKEN:-}" ]]; then
+  token="${SENTRY_CLEANUP_TOKEN//\\/\\\\}"
+  token="${token//\"/\\\"}"
+else
+  load_token
+fi
+
+project_params=()
+for project in "${projects[@]}"; do
+  project_id="$(api "projects/?query=slug:$project" | jq -r --arg slug "$project" '.[] | select(.slug == $slug) | .id')"
+  [[ -n "$project_id" ]] || { echo "Sentry project not found: $project" >&2; exit 1; }
+  project_params+=(--data-urlencode "project=$project_id")
+done
+
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "$tmp_dir"' EXIT
+
+# List the unresolved issues with no events in the given number of days.
+# Sentry keeps events for 90 days, so an older issue has no events to check.
+# Sentry gives 100 issues on a page. Stop after max_pages, so that a wrong query does not run for long.
+max_pages=20
+cursor=""
+page=0
+while :; do
+  page=$((page + 1))
+  api "issues/" --get "${project_params[@]}" \
+    --data-urlencode "query=is:unresolved lastSeen:+${days}d" \
+    --data-urlencode "statsPeriod=90d" \
+    --data-urlencode "limit=100" \
+    ${cursor:+--data-urlencode "cursor=$cursor"} \
+    --dump-header "$tmp_dir/headers" >"$tmp_dir/page-$(printf '%03d' "$page").json"
+  next="$(grep -io 'rel="next"; *results="true"; *cursor="[^"]*"' "$tmp_dir/headers" || true)"
+  [[ -n "$next" ]] || break
+  if [[ $page -ge $max_pages ]]; then
+    echo "Stopped after $max_pages pages of issues. Run the script again to check the rest." >&2
+    break
+  fi
+  cursor="$(sed -E 's/.*cursor="([^"]*)".*/\1/' <<<"$next")"
+done
+
+mapfile -t issues < <(jq -c '.[] | {id, shortId, title: (.title | gsub("[\\r\\n]+"; " ")), count: (.count | tonumber), lastSeen}' \
+  "$tmp_dir"/page-*.json)
+
+if [[ "$dry_run" == true ]]; then
+  echo "Dry run. Nothing is changed in Sentry."
+fi
+echo "Unresolved issues with no events in $days days: ${#issues[@]}"
+
+resolved=0
+for issue in "${issues[@]}"; do
+  id="$(jq -r '.id' <<<"$issue")"
+  label="$(jq -r '"\(.shortId) (\(.count) events, last seen \(.lastSeen[0:10])): \(.title)"' <<<"$issue")"
+
+  # Decide from the browser.name tag of all events of the issue.
+  # Sentry gives the top 9 values. If there are more, the issue is not only from known clients.
+  reason="$(api "issues/$id/tags/" | jq -r \
+    --argjson issue "$issue" --argjson non_browsers "$non_browsers" --arg test_error "$test_error_pattern" '
+    ([.[] | select(.key == "browser.name")] | first) as $tag
+    | if ($issue.title | test($test_error)) then "resolve: test error"
+      elif $tag == null then "keep: no browser.name tag"
+      elif $tag.totalValues < $issue.count then "keep: \($issue.count - $tag.totalValues) events have no browser.name tag"
+      elif $tag.uniqueValues > ($tag.topValues | length) then "keep: too many browser.name values"
+      elif all($tag.topValues[]; .value as $v | $non_browsers | index($v)) then
+        "resolve: only \([$tag.topValues[].value] | join(", "))"
+      else "keep: browser.name has \([$tag.topValues[] | "\(.value) \(.count)"] | join(", "))"
+      end')"
+
+  if [[ "$reason" != resolve:* ]]; then
+    [[ "$verbose" == true ]] && echo "Keep: $label. Reason: ${reason#keep: }"
+    continue
+  fi
+  if [[ "$dry_run" == false ]]; then
+    api "issues/$id/" --request PUT --header "Content-Type: application/json" --data '{"status":"resolved"}' >/dev/null
+  fi
+  # Print each change after its request succeeds, so a failure shows what is already done.
+  echo "Resolve: $label. Reason: ${reason#resolve: }"
+  resolved=$((resolved + 1))
+done
+
+echo "Issues resolved: $resolved$([[ "$dry_run" == true ]] && echo " (dry run)")"
