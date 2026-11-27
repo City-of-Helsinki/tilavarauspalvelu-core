@@ -11,7 +11,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getReservationByOrderUuid } from "@/modules/serverUtils";
-import { getReservationPath, reservationsPrefix } from "@/modules/urls";
+import { getLocalizedRedirectPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 
 // This is the callback page from webstore if user cancels the order
 function Cancel({ state }: NarrowedProps): React.ReactElement {
@@ -67,7 +67,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     if (reservation?.state !== ReservationStateChoice.WaitingForPayment) {
       return {
         redirect: {
-          destination: getReservationPath(reservation.pk),
+          destination: getLocalizedRedirectPath(getReservationPath(reservation.pk), ctx),
           permanent: false,
         },
         props: {

@@ -11,7 +11,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { ReservationCancellation } from "@/lib/reservation/[id]/cancel";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isReservationCancellable } from "@/modules/reservation";
-import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
+import { getApplicationPath, getLocalizedRedirectPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -88,7 +88,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return {
         redirect: {
           permanent: false,
-          destination: getReservationPath(reservation.pk),
+          destination: getLocalizedRedirectPath(getReservationPath(reservation.pk), ctx),
         },
         props: {
           notFound: true, // for prop narrowing

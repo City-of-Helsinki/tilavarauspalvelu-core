@@ -31,6 +31,7 @@ import { ReservationStep0, ReservationStep1 } from "@/lib/reservation-unit/[...p
 import { createApolloClient } from "@/modules/apolloClient";
 import { queryOptions } from "@/modules/queryOptions";
 import {
+  getLocalizedRedirectPath,
   getReservationInProgressPath,
   getReservationPath,
   getReservationUnitPath,
@@ -252,7 +253,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return {
       redirect: {
         permanent: false,
-        destination: getReservationUnitPath(reservationUnitPk, params),
+        destination: getLocalizedRedirectPath(getReservationUnitPath(reservationUnitPk, params), ctx),
       },
       props: {
         notFound: true, // for prop narrowing
@@ -263,7 +264,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return {
       redirect: {
         permanent: false,
-        destination: getReservationPath(reservation.pk),
+        destination: getLocalizedRedirectPath(getReservationPath(reservation.pk), ctx),
       },
       props: {
         notFound: true, // for prop narrowing

@@ -73,7 +73,7 @@ import { isReservationUnitPublished, isReservationUnitReservable } from "@/modul
 import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { JustForDesktop } from "@/modules/style/layout";
-import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
+import { getLocalizedRedirectPath, getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import { SubmitButton } from "@/styled/utils";
 
@@ -493,7 +493,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         const { pk: reservationPk } = res.data?.createReservation ?? {};
         return {
           redirect: {
-            destination: getReservationInProgressPath(pk, reservationPk),
+            destination: getLocalizedRedirectPath(getReservationInProgressPath(pk, reservationPk), ctx),
             permanent: false,
           },
           props: {
