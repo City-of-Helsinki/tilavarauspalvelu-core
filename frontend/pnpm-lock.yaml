@@ -122,8 +122,8 @@ importers:
         specifier: ^6.0.8
         version: 6.0.8(@types/react@19.3.0)(graphql-ws@6.4.2(graphql@17.1.0)(ws@8.23.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       i18next:
-        specifier: ^27.1.3
-        version: 27.1.3(typescript@7.0.2)
+        specifier: ^27.2.2
+        version: 27.2.2(typescript@7.0.2)
       import-in-the-middle:
         specifier: ^3.6.0
         version: 3.6.0
@@ -137,8 +137,8 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
       next-i18next:
-        specifier: ^16.4.10
-        version: 16.4.10(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
+        specifier: ^16.5.1
+        version: 16.5.1(@types/react@19.3.0)(i18next@27.2.2(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.2.2(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
       nuka-carousel:
         specifier: ^7.0.0
         version: 7.0.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -273,8 +273,8 @@ importers:
         specifier: ^7.14.0
         version: 7.14.0
       i18next:
-        specifier: ^27.1.3
-        version: 27.1.3(typescript@7.0.2)
+        specifier: ^27.2.2
+        version: 27.2.2(typescript@7.0.2)
       import-in-the-middle:
         specifier: ^3.6.0
         version: 3.6.0
@@ -285,8 +285,8 @@ importers:
         specifier: ^16.4.6
         version: 16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2)
       next-i18next:
-        specifier: ^16.4.10
-        version: 16.4.10(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
+        specifier: ^16.5.1
+        version: 16.5.1(@types/react@19.3.0)(i18next@27.2.2(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.2.2(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
       quill:
         specifier: ^2.0.3
         version: 2.0.3
@@ -418,8 +418,8 @@ importers:
         specifier: ^6.0.8
         version: 6.0.8(@types/react@19.3.0)(graphql-ws@6.4.2(graphql@17.1.0)(ws@8.23.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       i18next:
-        specifier: ^27.1.3
-        version: 27.1.3(typescript@7.0.2)
+        specifier: ^27.2.2
+        version: 27.2.2(typescript@7.0.2)
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
@@ -509,8 +509,8 @@ importers:
         specifier: ^16.4.6
         version: 16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2)
       next-i18next:
-        specifier: ^16.4.10
-        version: 16.4.10(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
+        specifier: ^16.5.1
+        version: 16.5.1(@types/react@19.3.0)(i18next@27.2.2(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.2.2(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1)
       postcss-styled-syntax:
         specifier: ^0.7.3
         version: 0.7.3(postcss@8.5.33)
@@ -3856,11 +3856,11 @@ packages:
     resolution: {integrity: sha512-nXHJZYtNrfsi1UQbyRqm3Gou431elgLjKl//CYlnBGt5aTWdRPH1PiS2T/p/n8Q8LnqYqzQJik3Q7mkwvLokeg==}
     engines: {node: '>= 12'}
 
-  i18next-resources-to-backend@1.2.4:
-    resolution: {integrity: sha512-NV0bCktHrBNyEnjS5sq5k6J8HL3A+iR2MORcSJ7ZbQOnRwizrRmq+8K9WsdYy9mJv/Vki3VPnspBcFmF97UsQw==}
+  i18next-resources-to-backend@1.3.0:
+    resolution: {integrity: sha512-tpSsuGjgK146b9XkCZuaZCDHRc2UMudpNpFFD8grJLUq7vIz1AkXrSlZhaWCtjvgMnGmAXNBuzcUFm0i71O/pA==}
 
-  i18next@27.1.3:
-    resolution: {integrity: sha512-Qih5Erw8m9qJPmuNUjoSiBctutYkfgg+mhzLaQ7xbn2Y9e2tsB8dNhYyMB00fUfBRt6v0UTFjPPCSROJPn93JQ==}
+  i18next@27.2.2:
+    resolution: {integrity: sha512-1/AJgz/bpE/YL6tqekQlZAzDhkmrUBbgU8+Xon/Lwv6c5WdYuyFZ9mb86OVfR2C2XujUDT7Rz23Ydaq4l981lA==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
@@ -4295,8 +4295,8 @@ packages:
   next-compose-plugins@2.2.1:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
 
-  next-i18next@16.4.10:
-    resolution: {integrity: sha512-3/29Df7pwDij+w6dZ9f2QwfGGcX4+rmRkn94nKhtnQ8U+N4Z0qeIttVKnxrek8showC2ylpdy0Lgji14rS4/Eg==}
+  next-i18next@16.5.1:
+    resolution: {integrity: sha512-+DEIDZPo1oxv0ms1XYGElrjh2JOoqGa/BtotR5CXHxsbJ8tX59ZhUOAKWJsB+5HFG6j6etTpIhC0w9bHF+gN+w==}
     engines: {node: '>=20'}
     peerDependencies:
       '@types/react': '*'
@@ -8549,11 +8549,11 @@ snapshots:
     dependencies:
       diacritics: 1.3.0
 
-  i18next-resources-to-backend@1.2.4:
+  i18next-resources-to-backend@1.3.0:
     dependencies:
       '@babel/runtime': 7.29.14
 
-  i18next@27.1.3(typescript@7.0.2):
+  i18next@27.2.2(typescript@7.0.2):
     optionalDependencies:
       typescript: 7.0.2
 
@@ -8931,15 +8931,15 @@ snapshots:
 
   next-compose-plugins@2.2.1: {}
 
-  next-i18next@16.4.10(@types/react@19.3.0)(i18next@27.1.3(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1):
+  next-i18next@16.5.1(@types/react@19.3.0)(i18next@27.2.2(typescript@7.0.2))(next@16.4.6(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2))(react-i18next@17.1.11(i18next@27.2.2(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2))(react@19.3.1):
     dependencies:
       '@types/hoist-non-react-statics': 3.3.7(@types/react@19.3.0)
       hoist-non-react-statics: 3.3.2
-      i18next: 27.1.3(typescript@7.0.2)
-      i18next-resources-to-backend: 1.2.4
+      i18next: 27.2.2(typescript@7.0.2)
+      i18next-resources-to-backend: 1.3.0
       next: 16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sass@1.108.2)
       react: 19.3.1
-      react-i18next: 17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2)
+      react-i18next: 17.1.11(i18next@27.2.2(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2)
     optionalDependencies:
       '@types/react': 19.3.0
 
@@ -9297,11 +9297,11 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
-  react-i18next@17.1.11(i18next@27.1.3(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2):
+  react-i18next@17.1.11(i18next@27.2.2(typescript@7.0.2))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2):
     dependencies:
       '@babel/runtime': 7.29.14
       html-parse-stringify: 4.0.1
-      i18next: 27.1.3(typescript@7.0.2)
+      i18next: 27.2.2(typescript@7.0.2)
       react: 19.3.1
       use-sync-external-store: 1.7.0(react@19.3.1)
     optionalDependencies:
