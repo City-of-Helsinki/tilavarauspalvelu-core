@@ -11,7 +11,7 @@ from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
-from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
+from tilavarauspalvelu.tasks import refresh_reservation_unit_payment_products_task
 from tilavarauspalvelu.typing import error_codes
 
 from tests.factories import (
@@ -137,7 +137,7 @@ def test_pricing_group_admin__new_components_send_accounting_of_reservation_unit
         **management_form_data("reservation_unit_pricing_groups", total_forms=1, initial_forms=1),
     }
 
-    with patch.object(refresh_reservation_unit_accounting_task, "delay_on_commit") as mock:
+    with patch.object(refresh_reservation_unit_payment_products_task, "delay_on_commit") as mock:
         response = api_client.post(path=url, data=data)
 
     assert response.status_code == 302, response.content

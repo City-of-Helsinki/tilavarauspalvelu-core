@@ -11,7 +11,13 @@ from tilavarauspalvelu.enums import ReserveeType
 from tilavarauspalvelu.integrations.verkkokauppa.helpers import get_verkkokauppa_order_params
 from utils.date_utils import local_datetime
 
-from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
+from tests.factories import (
+    PaymentProductFactory,
+    ReservationFactory,
+    ReservationPriceLineFactory,
+    ReservationUnitFactory,
+    UserFactory,
+)
 
 # Applied to all tests
 pytestmark = [
@@ -22,7 +28,7 @@ pytestmark = [
 @freezegun.freeze_time("2023-01-01 00:00:00")
 def test_get_verkkokauppa_order_params__to_json():
     payment_product = PaymentProductFactory.create()
-    reservation_unit = ReservationUnitFactory.create(payment_product=payment_product)
+    reservation_unit = ReservationUnitFactory.create()
     user = UserFactory.create(
         username="test",
         email="test@localhost",
@@ -35,6 +41,7 @@ def test_get_verkkokauppa_order_params__to_json():
         user=user,
         price_lines__amount=Decimal("12.55"),
         price_lines__tax_percentage=Decimal("24.0"),
+        price_lines__payment_product=payment_product,
         reservee_type=ReserveeType.INDIVIDUAL,
         reservee_first_name="Firstname",
         reservee_last_name="Lastname",
@@ -42,7 +49,7 @@ def test_get_verkkokauppa_order_params__to_json():
         reservee_phone="+358 50 123 4567",
     )
 
-    order_params = get_verkkokauppa_order_params(reservation, vat_percentage=Decimal(24))
+    order_params = get_verkkokauppa_order_params(reservation)
     json = order_params.to_json()
 
     assert json["namespace"] == settings.VERKKOKAUPPA_NAMESPACE
@@ -60,7 +67,7 @@ def test_get_verkkokauppa_order_params__to_json():
     ).strftime("%Y-%m-%dT%H:%M:%S")
 
     assert len(json["items"]) == 1
-    assert json["items"][0]["productId"] == str(reservation.reservation_unit.payment_product.id)
+    assert json["items"][0]["productId"] == str(payment_product.id)
     assert (
         json["items"][0]["productName"]
         == f"{reservation.reservation_unit.name_fi}, {reservation.reservation_unit.unit.name_fi}"
@@ -89,30 +96,88 @@ def test_get_verkkokauppa_order_params__to_json():
 
 @freezegun.freeze_time("2023-01-01 00:00:00")
 def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
-    payment_product = PaymentProductFactory.create()
-    reservation_unit = ReservationUnitFactory.create(payment_product=payment_product)
-    user = UserFactory.create(
-        username="test",
-        email="test@localhost",
-        first_name="First",
-        last_name="Name",
-        preferred_language="en",
-    )
     reservation = ReservationFactory.create(
-        reservation_unit=reservation_unit,
-        user=user,
+        user__preferred_language="en",
         price_lines__amount=Decimal("12.55"),
         price_lines__tax_percentage=Decimal("24.0"),
+        price_lines__payment_product=PaymentProductFactory.create(),
         reservee_type=ReserveeType.INDIVIDUAL,
-        reservee_first_name="Firstname",
-        reservee_last_name="Lastname",
-        reservee_email="test@example.com",
-        reservee_phone="+358 50 123 4567",
     )
 
-    order_params = get_verkkokauppa_order_params(reservation, vat_percentage=Decimal(24))
+    order_params = get_verkkokauppa_order_params(reservation)
     json = order_params.to_json()
 
     assert len(json["items"][0]["meta"]) == 3
     assert json["items"][0]["meta"][1]["label"] == "Booking time"
     assert json["items"][0]["meta"][2]["label"] == "Booking number"
+
+
+# ── Order rows ───────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+def test_get_verkkokauppa_order_params__row_for_each_price_line():
+    first_product = PaymentProductFactory.create()
+    second_product = PaymentProductFactory.create()
+    reservation = ReservationFactory.create(
+        user__preferred_language="fi",
+        reservation_unit__name_fi="Sali",
+        reservation_unit__unit__name_fi="Talo",
+    )
+    ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal("12.55"),
+        tax_percentage=Decimal("25.5"),
+        payment_product=first_product,
+        description_fi="Aikuiset",
+    )
+    ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal("10.00"),
+        tax_percentage=Decimal("10.0"),
+        payment_product=second_product,
+    )
+
+    order_params = get_verkkokauppa_order_params(reservation)
+
+    assert [item.product_id for item in order_params.items] == [first_product.pk, second_product.pk]
+    assert [item.product_name for item in order_params.items] == ["Sali, Talo, Aikuiset", "Sali, Talo"]
+    assert [item.vat_percentage for item in order_params.items] == [Decimal("25.5"), Decimal("10.0")]
+    assert [item.row_price_net for item in order_params.items] == [Decimal("10.00"), Decimal("9.09")]
+    assert [item.row_price_vat for item in order_params.items] == [Decimal("2.55"), Decimal("0.91")]
+    assert [item.row_price_total for item in order_params.items] == [Decimal("12.55"), Decimal("10.00")]
+    assert order_params.price_net == Decimal("19.09")
+    assert order_params.price_vat == Decimal("3.46")
+    assert order_params.price_total == Decimal("22.55")
+    assert order_params.price_net == reservation.total_price_net
+
+
+def test_get_verkkokauppa_order_params__uses_override_amount():
+    reservation = ReservationFactory.create(
+        price_lines__amount=Decimal(20),
+        price_lines__override_amount=Decimal("12.55"),
+        price_lines__tax_percentage=Decimal("25.5"),
+        price_lines__payment_product=PaymentProductFactory.create(),
+    )
+
+    order_params = get_verkkokauppa_order_params(reservation)
+
+    assert len(order_params.items) == 1
+    assert order_params.items[0].row_price_total == Decimal("12.55")
+    assert order_params.price_total == Decimal("12.55")
+
+
+def test_get_verkkokauppa_order_params__leaves_out_free_price_lines():
+    payment_product = PaymentProductFactory.create()
+    reservation = ReservationFactory.create()
+    ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(10), payment_product=payment_product)
+    ReservationPriceLineFactory.create(reservation=reservation, amount=Decimal(0), payment_product=None)
+    ReservationPriceLineFactory.create(
+        reservation=reservation,
+        amount=Decimal(10),
+        override_amount=Decimal(0),
+        payment_product=None,
+    )
+
+    order_params = get_verkkokauppa_order_params(reservation)
+
+    assert [item.product_id for item in order_params.items] == [payment_product.pk]

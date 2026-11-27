@@ -2114,10 +2114,6 @@ msgid "Payment accounting"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Payment product"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
 msgstr ""
 
@@ -2268,10 +2264,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment accounting information"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Product used for payments"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py

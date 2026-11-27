@@ -18,7 +18,7 @@ from .data_creation.create_reservation_related_things import TEST_PAYMENT_MERCHA
 class Command(BaseCommand):
     help = (
         "Makes sure that the test payment merchant from 'create_test_data' exists in Verkkokauppa, "
-        "and creates a Verkkokauppa product for each paid reservation unit that uses the merchant. "
+        "and creates new Verkkokauppa products for each reservation unit that uses the merchant. "
         "If the merchant does not exist in Verkkokauppa, creates a new one and moves the units to it. "
         "Runs only in the dev environment."
     )
@@ -49,12 +49,16 @@ class Command(BaseCommand):
         reservation_units = ReservationUnit.objects.filter(
             models.Q(payment_merchant=merchant)
             | models.Q(payment_merchant__isnull=True, unit__payment_merchant=merchant)
-        ).select_related("payment_merchant", "payment_product", "unit__payment_merchant")
+        ).select_related("payment_merchant", "unit__payment_merchant")
 
         failed_pks: list[int] = []
         for reservation_unit in reservation_units:
+            # The products of the test merchant can be missing in Verkkokauppa, so delete them and make new ones.
+            # A price line protects its product, so keep the products that price lines use.
+            reservation_unit.payment_products.filter(merchant=merchant, reservation_price_lines__isnull=True).delete()
             try:
-                reservation_unit.actions.refresh_reservation_unit_product_mapping()
+                reservation_unit.actions.create_missing_payment_products()
+                reservation_unit.actions.send_payment_product_accounting()
             except CreateProductError as error:
                 failed_pks.append(reservation_unit.pk)
                 self.stderr.write(f"Reservation unit {reservation_unit.pk}: {error}")

@@ -122,7 +122,7 @@ class Unit(models.Model):
         return self.name
 
     def save(self, *args: Any, **kwargs: Any) -> None:
-        if not settings.UPDATE_PRODUCT_MAPPING:
+        if not settings.UPDATE_PRODUCT_MAPPING and not settings.UPDATE_ACCOUNTING:
             return super().save(*args, **kwargs)
 
         old_values = Unit.objects.filter(pk=self.pk).first()
@@ -132,12 +132,12 @@ class Unit(models.Model):
         # the merchant information from the Unit. This will update their
         # product mapping.
         if old_values is None or old_values.payment_merchant_id != self.payment_merchant_id:
-            from tilavarauspalvelu.tasks import refresh_reservation_unit_product_mapping_task
+            from tilavarauspalvelu.tasks import refresh_reservation_unit_payment_products_task
 
             reservation_units = self.reservation_units.filter(payment_merchant__isnull=True)
             reservation_unit_pks = reservation_units.values_list("pk", flat=True)
             for reservation_unit_pk in reservation_unit_pks:
-                refresh_reservation_unit_product_mapping_task.delay_on_commit(reservation_unit_pk)
+                refresh_reservation_unit_payment_products_task.delay_on_commit(reservation_unit_pk)
 
         return result
 

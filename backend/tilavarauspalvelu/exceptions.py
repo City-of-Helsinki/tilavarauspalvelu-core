@@ -55,10 +55,6 @@ class ReservableTimeSpanClientNothingToDoError(ReservableTimeSpanClientError):
     """Error in reservable time span client when there is nothing to do"""
 
 
-class ReservationPriceCalculationError(Exception):
-    """Error when calculating reservation price"""
-
-
 class TimeSpanElementError(Exception):
     """Error when dealing with time span elements"""
 

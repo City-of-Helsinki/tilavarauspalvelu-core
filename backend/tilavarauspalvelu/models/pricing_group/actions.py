@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 
-from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
+from tilavarauspalvelu.tasks import refresh_reservation_unit_payment_products_task
 
 if TYPE_CHECKING:
     from .model import PricingGroup
@@ -20,9 +20,9 @@ __all__ = [
 class PricingGroupActions:
     pricing_group: PricingGroup
 
-    def refresh_reservation_unit_accounting(self) -> None:
-        """Send the accounting of every reservation unit of the group to verkkokauppa again, after the commit."""
-        if not settings.UPDATE_ACCOUNTING:
+    def refresh_reservation_unit_payment_products(self) -> None:
+        """Refresh the verkkokauppa products of every reservation unit of the group, after the commit."""
+        if not settings.UPDATE_PRODUCT_MAPPING and not settings.UPDATE_ACCOUNTING:
             return
 
         reservation_unit_pks = (
@@ -32,4 +32,4 @@ class PricingGroupActions:
             .distinct()
         )
         for reservation_unit_pk in reservation_unit_pks:
-            refresh_reservation_unit_accounting_task.delay_on_commit(reservation_unit_pk)
+            refresh_reservation_unit_payment_products_task.delay_on_commit(reservation_unit_pk)

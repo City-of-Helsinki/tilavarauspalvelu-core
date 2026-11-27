@@ -2156,10 +2156,6 @@ msgid "Payment accounting"
 msgstr "Kirjanpidon tiliöintitieto"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Payment product"
-msgstr "Maksutuote"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
 msgstr "Varausyksikön maksuehdot."
 
@@ -2322,10 +2318,6 @@ msgstr "Kauppias, jota käytetään maksuihin"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment accounting information"
 msgstr "Maksujen kirjanpidon tiliöintitiedot"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Product used for payments"
-msgstr "Tuote, jota käytetään maksuihin"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Cancellation terms are required for direct booking"

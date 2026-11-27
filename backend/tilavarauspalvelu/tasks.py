@@ -15,6 +15,7 @@ from django.db import transaction
 from config.celery import app
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateProductError
 from tilavarauspalvelu.management.commands.data_creation.create_robot_test_data import create_robot_test_data
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
@@ -58,6 +59,7 @@ __all__ = [
     "rebuild_space_tree_hierarchy_task",
     "refresh_expired_payments_in_verkkokauppa_task",
     "refresh_reservation_unit_accounting_task",
+    "refresh_reservation_unit_payment_products_task",
     "refresh_reservation_unit_product_mapping_task",
     "remove_old_personal_info_view_logs_task",
     "save_personal_info_view_log_task",
@@ -336,41 +338,39 @@ def create_statistics_for_reservations_task(reservation_pks: list[int]) -> None:
 
 
 @app.task(
-    name="refresh_reservation_unit_product_mapping",
-    autoretry_for=(TypeError,),
+    name="refresh_reservation_unit_payment_products",
+    # The refresh skips the products that exist, so a retry continues where the failed run stopped.
+    autoretry_for=(TypeError, CreateProductError),
     max_retries=5,
     retry_backoff=True,
 )
+def refresh_reservation_unit_payment_products_task(reservation_unit_pk: int) -> None:
+    reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
+    if reservation_unit is None:
+        SentryLogger.log_message(
+            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) payment products.",
+            details=f"Reservation unit ({reservation_unit_pk}) not found.",
+            level="warning",
+        )
+        return
+
+    if settings.UPDATE_PRODUCT_MAPPING:
+        reservation_unit.actions.create_missing_payment_products()
+
+    if settings.UPDATE_ACCOUNTING:
+        reservation_unit.actions.send_payment_product_accounting()
+
+
+# TODO: Remove in the release after the one that adds 'refresh_reservation_unit_payment_products'.
+@app.task(name="refresh_reservation_unit_product_mapping")
 def refresh_reservation_unit_product_mapping_task(reservation_unit_pk: int) -> None:
-    reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
-    if reservation_unit is None:
-        SentryLogger.log_message(
-            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) product mapping.",
-            details=f"Reservation unit ({reservation_unit_pk}) not found.",
-            level="warning",
-        )
-        return
-
-    reservation_unit.actions.refresh_reservation_unit_product_mapping()
+    refresh_reservation_unit_payment_products_task.delay(reservation_unit_pk)
 
 
-@app.task(
-    name="refresh_reservation_unit_accounting",
-    autoretry_for=(TypeError,),
-    max_retries=5,
-    retry_backoff=True,
-)
+# TODO: Remove in the release after the one that adds 'refresh_reservation_unit_payment_products'.
+@app.task(name="refresh_reservation_unit_accounting")
 def refresh_reservation_unit_accounting_task(reservation_unit_pk: int) -> None:
-    reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
-    if reservation_unit is None:
-        SentryLogger.log_message(
-            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) accounting data.",
-            details=f"Reservation unit ({reservation_unit_pk}) not found.",
-            level="warning",
-        )
-        return
-
-    reservation_unit.actions.refresh_reservation_unit_accounting()
+    refresh_reservation_unit_payment_products_task.delay(reservation_unit_pk)
 
 
 @app.task(name="update_reservation_unit_image_urls")

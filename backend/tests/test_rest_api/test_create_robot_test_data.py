@@ -190,6 +190,7 @@ def test_create_robot_test_data():
     assert ReservationUnitPricingGroup.objects.count() == 23
     assert PricingGroup.objects.count() == 23
     assert PriceComponent.objects.count() == 23
+    assert PaymentProduct.objects.count() == 11
     assert ReservationUnitAccessType.objects.count() == 23
     assert User.objects.count() == 39
     assert ApplicationRound.objects.count() == 1
@@ -370,6 +371,7 @@ def test_remove_existing_data():
 
     assert Unit.objects.count() == 0
     assert ReservationUnit.objects.count() == 0
+    assert PaymentProduct.objects.count() == 0
     assert Space.objects.count() == 0
     assert ReservationUnitPricingGroup.objects.count() == 0
     assert PricingGroup.objects.count() == 0
@@ -390,7 +392,6 @@ def test_remove_existing_data():
     assert TaxLevel.objects.count() == 3
     assert TaxLevelRate.objects.count() == 6
     assert OriginHaukiResource.objects.count() == 14
-    assert PaymentProduct.objects.count() == 5
     assert PaymentAccounting.objects.count() == 1
     assert User.objects.count() == 39  # Users are not removed
 

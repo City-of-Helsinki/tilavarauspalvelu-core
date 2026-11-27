@@ -9,7 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import Subquery
-from django.db.models.functions import TruncDate
+from django.db.models.functions import Coalesce, TruncDate
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
@@ -42,6 +42,7 @@ if TYPE_CHECKING:
         ApplicationRoundTimeSlot,
         Equipment,
         IntendedUse,
+        PaymentProduct,
         Reservation,
         ReservationSeries,
         ReservationUnitAccessType,
@@ -58,6 +59,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models.application_round_time_slot.queryset import ApplicationRoundTimeSlotQuerySet
     from tilavarauspalvelu.models.equipment.queryset import EquipmentQuerySet
     from tilavarauspalvelu.models.intended_use.queryset import IntendedUseQuerySet
+    from tilavarauspalvelu.models.payment_product.queryset import PaymentProductQuerySet
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.models.reservation_series.queryset import ReservationSeriesQuerySet
     from tilavarauspalvelu.models.reservation_unit_access_type.queryset import ReservationUnitAccessTypeQuerySet
@@ -240,13 +242,6 @@ class ReservationUnit(models.Model):
         null=True,
         limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.PAYMENT),
     )
-    payment_product = models.ForeignKey(
-        "tilavarauspalvelu.PaymentProduct",
-        related_name="reservation_units",
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-    )
     payment_merchant = models.ForeignKey(
         "tilavarauspalvelu.PaymentMerchant",
         related_name="reservation_units",
@@ -336,6 +331,7 @@ class ReservationUnit(models.Model):
     access_types: OneToManyRelatedManager[ReservationUnitAccessType, ReservationUnitAccessTypeQuerySet]
     reservation_series: OneToManyRelatedManager[ReservationSeries, ReservationSeriesQuerySet]
     reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
+    payment_products: OneToManyRelatedManager[PaymentProduct, PaymentProductQuerySet]
     application_round_time_slots: OneToManyRelatedManager[ApplicationRoundTimeSlot, ApplicationRoundTimeSlotQuerySet]
     application_rounds: ManyToManyRelatedManager[ApplicationRound, ApplicationRoundQuerySet]
 
@@ -531,7 +527,7 @@ class ReservationUnit(models.Model):
                 then=models.Value(ReservationUnitReservationState.SCHEDULED_PERIOD.value),
             ),
             # Reservation Unit doesn't have a price today,
-            #  OR it has a paid price with no payment product,
+            #  OR it has a paid price paid in verkkokauppa with no payment product,
             #  OR it was reservable in the past (but not anymore),
             #  OR reservation period is zero-length.
             models.When(
@@ -539,8 +535,11 @@ class ReservationUnit(models.Model):
                     # No price today.
                     L(highest_price_today=None)
                     | (
-                        # Paid price with no payment product.
-                        L(highest_price_today__gt=0) & models.Q(payment_product__isnull=True)
+                        # Paid price paid in verkkokauppa with no payment product.
+                        L(highest_price_today__gt=0)
+                        # The create mutation needs a product also when the payment type is empty.
+                        & ~models.Q(payment_type=PaymentType.ON_SITE.value)
+                        & L(has_payment_product=False)
                         # When using Mock Verkkokauppa API, pricing is valid even if there is no payment product.
                         if not settings.MOCK_VERKKOKAUPPA_API_ENABLED
                         else ~models.Q()  # Evaluates to False
@@ -592,6 +591,29 @@ class ReservationUnit(models.Model):
         )
 
         return case  # type: ignore[return-value]  # noqa: RET504
+
+    @lookup_property
+    def has_payment_product() -> bool:
+        """Whether the reservation unit has a verkkokauppa product with a sales item for its current merchant."""
+        from tilavarauspalvelu.models import PaymentProduct
+
+        merchant = Coalesce(
+            models.OuterRef("payment_merchant"),
+            models.OuterRef("unit__payment_merchant"),
+        )
+        products = PaymentProduct.objects.filter(
+            reservation_unit=models.OuterRef("pk"),
+            sales_item__isnull=False,
+            merchant=merchant,
+        )
+        return models.Exists(products)  # type: ignore[return-value]
+
+    @has_payment_product.override
+    def _(self) -> bool:
+        merchant = self.actions.get_merchant()
+        if merchant is None:
+            return False
+        return self.payment_products.filter(sales_item__isnull=False, merchant=merchant).exists()
 
     @lookup_property
     def current_access_type() -> AccessType | None:

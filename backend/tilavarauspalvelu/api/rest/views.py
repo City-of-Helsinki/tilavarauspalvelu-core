@@ -451,12 +451,13 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
     if is_valid_url(payment_order.checkout_url) and payment_order.expires_at > cutoff:
         return HttpResponseRedirect(append_payment_method_to_checkout_url(payment_order.checkout_url, request))
 
-    if not reservation.price_lines.exists():
+    price_lines = list(reservation.price_lines.all())
+    if not price_lines:
         msg = "Reservation has no price lines"
         raise ValidationError(msg, code="RESERVATION_NO_PRICE_LINES")
 
     try:
-        reservation.reservation_unit.validators.validate_has_payment_product()
+        reservation.reservation_unit.validators.validate_has_payment_products(price_lines=price_lines)
     except DRFValidationError as error:
         msg = "Reservation unit has no payment product"
         raise ValidationError(msg, code="RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT") from error

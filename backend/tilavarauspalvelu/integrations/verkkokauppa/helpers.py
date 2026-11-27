@@ -17,11 +17,12 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     OrderItemParams,
     WebShopOrderStatus,
 )
-from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
+from tilavarauspalvelu.translation import get_attr_by_language
 from utils.date_utils import DEFAULT_TIMEZONE, from_iso_format, local_datetime, localized_short_weekday, utc_datetime
+from utils.decimal_utils import round_decimal
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation, ReservationUnit
+    from tilavarauspalvelu.models import Reservation, ReservationPriceLine, ReservationUnit
 
 
 @overload
@@ -80,9 +81,12 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
 def get_verkkokauppa_order_params(
     reservation: Reservation,
     *,
-    vat_percentage: Decimal,
     invoicing_date: datetime.date | None = None,
 ) -> CreateOrderParams:
+    """
+    One order row for each price line with a positive final amount.
+    The price lines must have their payment products.
+    """
     reservation_unit: ReservationUnit = reservation.reservation_unit
     preferred_language = reservation.user.get_preferred_language()
     reservation_unit_name = getattr(reservation_unit, f"name_{preferred_language}", reservation_unit.name)
@@ -91,20 +95,34 @@ def get_verkkokauppa_order_params(
     order_expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
     last_valid_purchase_datetime = (utc_datetime() + order_expiration).astimezone(DEFAULT_TIMEZONE)
 
-    # One row with the tax percentage of the price lines. TILA-4594 makes one row for each price line.
-    items = [
-        OrderItemParams(
-            product_id=reservation_unit.payment_product.id,
-            product_name=f"{reservation_unit_name}, {unit_name}",
-            quantity=1,  # Currently, we don't support quantities larger than 1
+    price_lines: list[ReservationPriceLine] = list(reservation.price_lines.order_by("pk"))
+
+    items: list[OrderItemParams] = []
+    for line in price_lines:
+        final_amount = line.amount if line.override_amount is None else line.override_amount
+        if final_amount <= 0:
+            continue
+
+        net_amount = round_decimal(final_amount / (1 + line.tax_percentage / Decimal(100)), 2)
+        vat_amount = final_amount - net_amount
+
+        product_name = f"{reservation_unit_name}, {unit_name}"
+        description = get_attr_by_language(line, "description", preferred_language)
+        if description:
+            product_name = f"{product_name}, {description}"
+
+        item = OrderItemParams(
+            product_id=line.payment_product_id,
+            product_name=product_name,
+            quantity=1,
             unit="pcs",
-            row_price_net=reservation.total_price_net,
-            row_price_vat=reservation.total_vat_amount,
-            row_price_total=reservation.total_price,
-            price_net=reservation.total_price_net,
-            price_vat=reservation.total_vat_amount,
-            price_gross=reservation.total_price,
-            vat_percentage=vat_percentage,
+            row_price_net=net_amount,
+            row_price_vat=vat_amount,
+            row_price_total=final_amount,
+            price_net=net_amount,
+            price_vat=vat_amount,
+            price_gross=final_amount,
+            vat_percentage=line.tax_percentage,
             invoicing_date=invoicing_date,
             meta=[
                 OrderItemMetaParams(
@@ -130,7 +148,8 @@ def get_verkkokauppa_order_params(
                 ),
             ],
         )
-    ]
+        items.append(item)
+
     return CreateOrderParams(
         namespace=settings.VERKKOKAUPPA_NAMESPACE,
         user=reservation.user.uuid,
@@ -150,18 +169,6 @@ def get_verkkokauppa_order_params(
 
 
 def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
-    reservation_unit: ReservationUnit = reservation.reservation_unit
-
-    if reservation_unit.payment_product is None:
-        payment_merchant = reservation_unit.actions.get_merchant()
-        if payment_merchant is None:
-            payment_merchant = PaymentMerchant.objects.create(id=uuid.uuid4(), name="MOCK VERKKOKAUPPA MERCHANT")
-            reservation_unit.payment_merchant = payment_merchant
-
-        payment_product = PaymentProduct.objects.create(id=uuid.uuid4(), merchant=payment_merchant)
-        reservation_unit.payment_product = payment_product
-        reservation_unit.save()
-
     order_uuid = uuid.uuid4()
 
     # Assume that the first URL in CORS_ALLOWED_ORIGINS is the backend URL

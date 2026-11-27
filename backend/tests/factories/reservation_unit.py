@@ -19,7 +19,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStartInterval,
 )
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import PriceComponent, ReservationUnit
 from utils.date_utils import local_start_of_day
 
 from ._base import (
@@ -126,7 +126,6 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     service_specific_terms = ForeignKeyFactory("tests.factories.TermsOfUseFactory")
     pricing_terms = ForeignKeyFactory("tests.factories.TermsOfUseFactory")
     payment_terms = ForeignKeyFactory("tests.factories.TermsOfUseFactory")
-    payment_product = ForeignKeyFactory("tests.factories.PaymentProductFactory")
     payment_merchant = ForeignKeyFactory("tests.factories.PaymentMerchantFactory")
     payment_accounting = ForeignKeyFactory("tests.factories.PaymentAccountingFactory")
 
@@ -167,6 +166,35 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
 
         kwargs.setdefault("valid_from", begins)
         PriceComponentFactory.create(pricing_group=pricing_group, **kwargs)
+
+    @factory.post_generation
+    def payment_product(self: ReservationUnit, create: bool, value: Any, **kwargs: Any) -> None:
+        """
+        Give `payment_product__<field>` arguments to give the reservation unit a verkkokauppa product
+        for the sales item of its own price, with the merchant of the reservation unit.
+        The own price gets a sales item, and the reservation unit gets a merchant, if they have none.
+        """
+        from .payment_merchant import PaymentMerchantFactory
+        from .payment_product import PaymentProductFactory
+        from .sales_item import SalesItemFactory
+
+        if not create or not kwargs:
+            return
+
+        component = PriceComponent.objects.get(pricing_group__reservation_unit_pricing_groups__reservation_unit=self)
+        if component.sales_item is None:
+            component.sales_item = SalesItemFactory.create(tax_level=component.tax_level)
+            component.save(update_fields=["sales_item"])
+
+        merchant = self.actions.get_merchant()
+        if merchant is None:
+            merchant = PaymentMerchantFactory.create()
+            self.payment_merchant = merchant
+            self.save(update_fields=["payment_merchant"])
+
+        PaymentProductFactory.create(
+            reservation_unit=self, sales_item=component.sales_item, merchant=merchant, **kwargs
+        )
 
     @classmethod
     def create_reservable_now(cls, **kwargs: Any) -> ReservationUnit:

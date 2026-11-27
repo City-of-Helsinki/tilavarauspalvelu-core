@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 from django.db import IntegrityError
 
-from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting_task
+from tilavarauspalvelu.tasks import refresh_reservation_unit_payment_products_task
 
 from tests.factories import PaymentAccountingFactory, ReservationUnitFactory
 
@@ -22,9 +22,9 @@ pytestmark = [
 
 
 @contextmanager
-def mock_refresh_reservation_unit_accounting_task() -> Generator[NonCallableMock]:
+def mock_refresh_reservation_unit_payment_products_task() -> Generator[NonCallableMock]:
     path = "tilavarauspalvelu.tasks."
-    path += refresh_reservation_unit_accounting_task.__name__
+    path += refresh_reservation_unit_payment_products_task.__name__
     path += ".delay"
 
     with patch(path) as mock:
@@ -37,7 +37,7 @@ def test_payment_accounting__webshop_sync_is_not_triggered_when_accounting_is_no
     settings.UPDATE_ACCOUNTING = True
 
     with (
-        mock_refresh_reservation_unit_accounting_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         PaymentAccountingFactory.create()
@@ -49,7 +49,7 @@ def test_payment_accounting__webshop_sync_trigger_reservation_units(settings, dj
     settings.UPDATE_ACCOUNTING = True
 
     with (
-        mock_refresh_reservation_unit_accounting_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         payment_accounting = PaymentAccountingFactory.create()
@@ -60,7 +60,7 @@ def test_payment_accounting__webshop_sync_trigger_reservation_units(settings, dj
 
     payment_accounting.refresh_from_db()
     with (
-        mock_refresh_reservation_unit_accounting_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         payment_accounting.save()
@@ -75,7 +75,7 @@ def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
     settings.UPDATE_ACCOUNTING = True
 
     with (
-        mock_refresh_reservation_unit_accounting_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         payment_accounting = PaymentAccountingFactory.create()
@@ -86,7 +86,7 @@ def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
 
     payment_accounting.refresh_from_db()
     with (
-        mock_refresh_reservation_unit_accounting_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         payment_accounting.save()
@@ -101,7 +101,7 @@ def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(
     settings.UPDATE_ACCOUNTING = True
 
     with (
-        mock_refresh_reservation_unit_accounting_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         payment_accounting = PaymentAccountingFactory.create()
@@ -113,7 +113,7 @@ def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(
 
     payment_accounting.refresh_from_db()
     with (
-        mock_refresh_reservation_unit_accounting_task() as mock,
+        mock_refresh_reservation_unit_payment_products_task() as mock,
         django_capture_on_commit_callbacks(execute=True),
     ):
         payment_accounting.save()
@@ -129,7 +129,7 @@ def test_payment_accounting__webshop_sync_waits_for_commit(settings, django_capt
     reservation_unit = ReservationUnitFactory.create(payment_accounting=payment_accounting)
 
     payment_accounting.refresh_from_db()
-    with mock_refresh_reservation_unit_accounting_task() as mock:
+    with mock_refresh_reservation_unit_payment_products_task() as mock:
         with django_capture_on_commit_callbacks() as callbacks:
             payment_accounting.save()
 

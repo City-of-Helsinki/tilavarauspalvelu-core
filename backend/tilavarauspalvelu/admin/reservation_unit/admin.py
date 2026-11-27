@@ -155,7 +155,6 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "payment_type",
                     "payment_merchant",
                     "payment_accounting",
-                    "payment_product",
                 ],
             },
         ),
@@ -207,7 +206,6 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
     readonly_fields = [
         "id",
         "ext_uuid",
-        "payment_product",
         "publishing_state",
         "reservation_state",
         "current_access_type",

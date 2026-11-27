@@ -63,7 +63,8 @@ class ReservationConfirmSerializer(NestingModelSerializer[Reservation, Reservati
         data["payment_type"] = PaymentType(reservation_unit.payment_type)
 
         if data["payment_type"] != PaymentType.ON_SITE:
-            reservation_unit.validators.validate_has_payment_product()
+            price_lines = list(self.instance.price_lines.all())
+            reservation_unit.validators.validate_has_payment_products(price_lines=price_lines)
 
         data["state"] = self.instance.actions.get_state_on_reservation_confirmed(payment_type=data["payment_type"])
 

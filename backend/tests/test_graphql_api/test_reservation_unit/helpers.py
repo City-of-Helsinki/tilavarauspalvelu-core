@@ -1,16 +1,23 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import AccessType, AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import (
+    AccessType,
+    AuthenticationType,
+    PaymentType,
+    PriceUnit,
+    ReservationKind,
+    ReservationStartInterval,
+)
 from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
-    PaymentProductFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
@@ -192,7 +199,8 @@ def create_reservation_units_for_reservation_state_filtering() -> ReservationSta
         reservation_begins_at=(now + datetime.timedelta(hours=1)),
     )
     reservable_paid = ReservationUnitFactory.create(
-        payment_product=PaymentProductFactory.create(),
+        payment_type=PaymentType.ONLINE,
+        payment_product__id=uuid.uuid4(),
         own_price__amount=20,
     )
     reservable_free = ReservationUnitFactory.create(
@@ -213,6 +221,7 @@ def create_reservation_units_for_reservation_state_filtering() -> ReservationSta
     )
     missing_pricing = ReservationUnitFactory.create()
     missing_payment_product = ReservationUnitFactory.create(
+        payment_type=PaymentType.ONLINE,
         own_price__amount=20,
     )
 
