@@ -6,6 +6,7 @@
 
 - Use functions designed for formatting strings instead of hand-rolling them, e.g. `urllib.parse.urlencode` to build query strings.
 - Accept what the formatter and linter want. If a formatter rewrites imports or other code, keep the rewrite. Do not revert an autofix for any reason.
+- Run `just be mypy` from the repository root after you change backend code. CI fails on any mypy error.
 
 ## Readability
 
