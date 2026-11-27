@@ -13,7 +13,7 @@ from tests.factories import EquipmentFactory, IntendedUseFactory, ReservationUni
 from .helpers import reservation_units_query
 
 if TYPE_CHECKING:
-    from pytest_django import Settings
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
 
     from tests.helpers import GraphQLClient
 
@@ -354,16 +354,17 @@ def test_reservation_unit__filter__by_text_search__unauthenticated_user(graphql:
 
 
 def test_reservation_unit__filter__by_text_search__unit_name_changed(
-    graphql: GraphQLClient, settings: Settings
+    graphql: GraphQLClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
 ) -> None:
     settings.UPDATE_SEARCH_VECTORS = True
 
-    reservation_unit = ReservationUnitFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_unit = ReservationUnitFactory.create()
 
-    unit = reservation_unit.unit
-    unit.name = "Zyxquar"
-    unit.name_fi = "Zyxquar"
-    unit.save()
+        unit = reservation_unit.unit
+        unit.name = "Zyxquar"
+        unit.name_fi = "Zyxquar"
+        unit.save()
 
     query = reservation_units_query(text_search="zyxquar")
     response = graphql(query)

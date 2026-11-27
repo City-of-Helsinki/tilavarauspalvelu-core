@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import pytest
 from django.db import IntegrityError
@@ -27,7 +27,7 @@ pytestmark = [
 def mock_refresh_reservation_unit_accounting_task() -> Generator[NonCallableMock]:
     path = "tilavarauspalvelu.tasks."
     path += refresh_reservation_unit_accounting_task.__name__
-    path += ".delay"
+    path += ".apply_async"
 
     with patch(path) as mock:
         yield mock
@@ -69,8 +69,7 @@ def test_payment_accounting__webshop_sync_trigger_reservation_units(
     ):
         payment_accounting.save()
 
-    assert mock.call_count == 1
-    assert mock.call_args.args == (reservation_unit.pk,)
+    assert mock.call_args_list == [call(kwargs={"reservation_unit_pks": [reservation_unit.pk]})]
 
 
 def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
@@ -95,8 +94,7 @@ def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
     ):
         payment_accounting.save()
 
-    assert mock.call_count == 1
-    assert mock.call_args.args == (reservation_unit.pk,)
+    assert mock.call_args_list == [call(kwargs={"reservation_unit_pks": [reservation_unit.pk]})]
 
 
 def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(
@@ -122,8 +120,8 @@ def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(
     ):
         payment_accounting.save()
 
-    assert mock.call_count == 2
-    assert sorted(call.args[0] for call in mock.call_args_list) == [reservation_unit_1.pk, reservation_unit_2.pk]
+    reservation_unit_pks = sorted([reservation_unit_1.pk, reservation_unit_2.pk])
+    assert mock.call_args_list == [call(kwargs={"reservation_unit_pks": reservation_unit_pks})]
 
 
 def test_payment_accounting__webshop_sync_waits_for_commit(
@@ -144,8 +142,7 @@ def test_payment_accounting__webshop_sync_waits_for_commit(
         for callback in callbacks:
             callback()
 
-    assert mock.call_count == 1
-    assert mock.call_args.args == (reservation_unit.pk,)
+    assert mock.call_args_list == [call(kwargs={"reservation_unit_pks": [reservation_unit.pk]})]
 
 
 def test_payment_accounting__one_of_the_fields_is_required(settings: Settings) -> None:

@@ -60,21 +60,21 @@ def mock_create_product() -> Product:
 def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save(
     django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
 ) -> None:
-    tax_level = TaxLevelFactory.create(rates__vat_code="48")
-    sales_item = SalesItemFactory.create(tax_level=tax_level, material="10000116", main_ledger_account="350080")
-    reservation_unit = ReservationUnitFactory.create(
-        is_draft=False,
-        own_price__amount=Decimal(10),
-        own_price__tax_level=sales_item.tax_level,
-        own_price__sales_item=sales_item,
-    )
-
-    reservation_unit.payment_merchant = PaymentMerchantFactory.create()
-    reservation_unit.payment_accounting = PaymentAccountingFactory.create(
-        main_ledger_account="340025",
-        product_invoicing_material="12345678",
-    )
     with django_capture_on_commit_callbacks(execute=True):
+        tax_level = TaxLevelFactory.create(rates__vat_code="48")
+        sales_item = SalesItemFactory.create(tax_level=tax_level, material="10000116", main_ledger_account="350080")
+        reservation_unit = ReservationUnitFactory.create(
+            is_draft=False,
+            own_price__amount=Decimal(10),
+            own_price__tax_level=sales_item.tax_level,
+            own_price__sales_item=sales_item,
+        )
+
+        reservation_unit.payment_merchant = PaymentMerchantFactory.create()
+        reservation_unit.payment_accounting = PaymentAccountingFactory.create(
+            main_ledger_account="340025",
+            product_invoicing_material="12345678",
+        )
         reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     reservation_unit.refresh_from_db()
@@ -108,17 +108,17 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
 def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_does_not_exist(
     django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
 ) -> None:
-    sales_item = create_sales_item(vat_code="48")
-    reservation_unit = ReservationUnitFactory.create(
-        is_draft=False,
-        own_price__amount=Decimal(10),
-        own_price__tax_level=sales_item.tax_level,
-        own_price__sales_item=sales_item,
-    )
-
-    reservation_unit.payment_merchant = PaymentMerchantFactory.create()
-    reservation_unit.payment_accounting = None
     with django_capture_on_commit_callbacks(execute=True):
+        sales_item = create_sales_item(vat_code="48")
+        reservation_unit = ReservationUnitFactory.create(
+            is_draft=False,
+            own_price__amount=Decimal(10),
+            own_price__tax_level=sales_item.tax_level,
+            own_price__sales_item=sales_item,
+        )
+
+        reservation_unit.payment_merchant = PaymentMerchantFactory.create()
+        reservation_unit.payment_accounting = None
         reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     reservation_unit.refresh_from_db()
@@ -132,10 +132,10 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_accounting_doe
 def test_refresh_reservation_unit_accounting__api_not_called_when_product_mapping_is_not_needed(
     django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
 ) -> None:
-    reservation_unit = ReservationUnitFactory.create(is_draft=True, own_price__amount=Decimal(10))
-    reservation_unit.payment_merchant = PaymentMerchantFactory.create()
-    reservation_unit.payment_accounting = PaymentAccountingFactory.create()
     with django_capture_on_commit_callbacks(execute=True):
+        reservation_unit = ReservationUnitFactory.create(is_draft=True, own_price__amount=Decimal(10))
+        reservation_unit.payment_merchant = PaymentMerchantFactory.create()
+        reservation_unit.payment_accounting = PaymentAccountingFactory.create()
         reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     reservation_unit.refresh_from_db()
@@ -152,7 +152,7 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_price_today_ha
         own_price__sales_item=None,
     )
 
-    refresh_reservation_unit_accounting_task(reservation_unit.pk)
+    refresh_reservation_unit_accounting_task(reservation_unit_pks=[reservation_unit.pk])
 
     assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is False
 
@@ -169,7 +169,7 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_tax_rate_has_n
         own_price__sales_item=sales_item,
     )
 
-    refresh_reservation_unit_accounting_task(reservation_unit.pk)
+    refresh_reservation_unit_accounting_task(reservation_unit_pks=[reservation_unit.pk])
 
     assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is False
     as_mock(SentryLogger.log_message).assert_called_once_with(
@@ -190,7 +190,7 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
         payment_accounting=PaymentAccountingFactory.create(),
     )
 
-    refresh_reservation_unit_accounting_task(reservation_unit.pk)
+    refresh_reservation_unit_accounting_task(reservation_unit_pks=[reservation_unit.pk])
 
     assert as_mock(VerkkokauppaAPIClient.create_or_update_accounting).called is False
 
@@ -202,16 +202,16 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
 def test_refresh_reservation_unit_accounting__capture_error__api_errors(
     django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
 ) -> None:
-    sales_item = create_sales_item(vat_code="48")
-    reservation_unit = ReservationUnitFactory.create(
-        is_draft=False,
-        own_price__amount=Decimal(10),
-        own_price__tax_level=sales_item.tax_level,
-        own_price__sales_item=sales_item,
-    )
-    reservation_unit.payment_merchant = PaymentMerchantFactory.create()
-    reservation_unit.payment_accounting = PaymentAccountingFactory.create()
     with django_capture_on_commit_callbacks(execute=True):
+        sales_item = create_sales_item(vat_code="48")
+        reservation_unit = ReservationUnitFactory.create(
+            is_draft=False,
+            own_price__amount=Decimal(10),
+            own_price__tax_level=sales_item.tax_level,
+            own_price__sales_item=sales_item,
+        )
+        reservation_unit.payment_merchant = PaymentMerchantFactory.create()
+        reservation_unit.payment_accounting = PaymentAccountingFactory.create()
         reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     assert as_mock(VerkkokauppaAPIClient.create_product).called is True
@@ -221,6 +221,6 @@ def test_refresh_reservation_unit_accounting__capture_error__api_errors(
 
 @patch_method(SentryLogger.log_message)
 def test_refresh_reservation_unit_accounting__capture_error__reservation_unit_does_not_exist() -> None:
-    refresh_reservation_unit_accounting_task(0)
+    refresh_reservation_unit_accounting_task(reservation_unit_pks=[0])
 
     assert as_mock(SentryLogger.log_message).call_count == 1

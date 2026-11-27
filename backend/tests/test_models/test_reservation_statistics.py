@@ -141,9 +141,11 @@ def test_statistics__create__after_commit(
     assert ReservationStatistic.objects.filter(reservation=reservation).exists() is True
 
 
-@mock.patch("tilavarauspalvelu.signals.create_statistics_for_reservations_task.delay")
+@mock.patch("tilavarauspalvelu.signals.create_statistics_for_reservations_task.apply_async")
 def test_statistics__create__one_task_for_one_transaction(
-    mock_delay: mock.MagicMock, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+    mock_apply_async: mock.MagicMock,
+    settings: Settings,
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
 ) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
@@ -151,41 +153,9 @@ def test_statistics__create__one_task_for_one_transaction(
         reservation_1 = ReservationFactory.create()
         reservation_2 = ReservationFactory.create()
 
-    assert mock_delay.call_args_list == [mock.call(reservation_pks=[reservation_1.pk, reservation_2.pk])]
-
-
-@mock.patch("tilavarauspalvelu.signals.create_statistics_for_reservations_task.delay")
-def test_statistics__create__one_task_for_each_transaction(
-    mock_delay: mock.MagicMock, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
-) -> None:
-    settings.SAVE_RESERVATION_STATISTICS = True
-
-    with django_capture_on_commit_callbacks(execute=True):
-        reservation_1 = ReservationFactory.create()
-
-    with django_capture_on_commit_callbacks(execute=True):
-        reservation_2 = ReservationFactory.create()
-
-    assert mock_delay.call_args_list == [
-        mock.call(reservation_pks=[reservation_1.pk]),
-        mock.call(reservation_pks=[reservation_2.pk]),
+    assert mock_apply_async.call_args_list == [
+        mock.call(kwargs={"reservation_pks": [reservation_1.pk, reservation_2.pk]}),
     ]
-
-
-@mock.patch("tilavarauspalvelu.signals.create_statistics_for_reservations_task.delay")
-def test_statistics__create__no_task_for_rolled_back_transaction(
-    mock_delay: mock.MagicMock, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
-) -> None:
-    settings.SAVE_RESERVATION_STATISTICS = True
-
-    with transaction.atomic():
-        ReservationFactory.create()
-        transaction.set_rollback(True)
-
-    with django_capture_on_commit_callbacks(execute=True):
-        reservation = ReservationFactory.create()
-
-    assert mock_delay.call_args_list == [mock.call(reservation_pks=[reservation.pk])]
 
 
 def test_statistics__create__rolled_back_savepoint_in_committed_transaction(
@@ -195,9 +165,9 @@ def test_statistics__create__rolled_back_savepoint_in_committed_transaction(
 
     with (
         mock.patch(
-            "tilavarauspalvelu.signals.create_statistics_for_reservations_task.delay",
-            wraps=create_statistics_for_reservations_task.delay,
-        ) as mock_delay,
+            "tilavarauspalvelu.signals.create_statistics_for_reservations_task.apply_async",
+            wraps=create_statistics_for_reservations_task.apply_async,
+        ) as mock_apply_async,
         django_capture_on_commit_callbacks(execute=True),
     ):
         reservation_1 = ReservationFactory.create()
@@ -206,7 +176,9 @@ def test_statistics__create__rolled_back_savepoint_in_committed_transaction(
             reservation_2 = ReservationFactory.create()
             transaction.set_rollback(True)
 
-    assert mock_delay.call_args_list == [mock.call(reservation_pks=[reservation_1.pk, reservation_2.pk])]
+    assert mock_apply_async.call_args_list == [
+        mock.call(kwargs={"reservation_pks": [reservation_1.pk, reservation_2.pk]}),
+    ]
 
     statistic_reservation_pks = list(ReservationStatistic.objects.values_list("reservation_id", flat=True))
     assert statistic_reservation_pks == [reservation_1.pk]

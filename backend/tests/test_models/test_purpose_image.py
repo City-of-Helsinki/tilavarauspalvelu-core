@@ -12,7 +12,7 @@ from PIL import Image
 from tilavarauspalvelu.models import IntendedUse
 
 if TYPE_CHECKING:
-    from pytest_django import Settings
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
 
 # Applied to all tests
 pytestmark = [
@@ -20,9 +20,13 @@ pytestmark = [
 ]
 
 
-@mock.patch("tilavarauspalvelu.signals.purge_image_cache_task.delay")
+@mock.patch("tilavarauspalvelu.signals.purge_image_cache_task.apply_async")
 @override_settings()
-def test_purpose__image_purge_on_save(mock_purge_image_cache: mock.MagicMock, settings: Settings) -> None:
+def test_purpose__image_purge_on_save(
+    mock_purge_image_cache: mock.MagicMock,
+    settings: Settings,
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     mock_image_data = BytesIO()
     mock_image = Image.new("RGB", (100, 100))
     mock_image.save(fp=mock_image_data, format="PNG")
@@ -36,6 +40,8 @@ def test_purpose__image_purge_on_save(mock_purge_image_cache: mock.MagicMock, se
     purpose.refresh_from_db()
 
     purpose.name = "new test purpose"
-    purpose.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        purpose.save()
 
-    assert mock_purge_image_cache.call_count == 4
+    assert mock_purge_image_cache.call_count == 1
+    assert len(mock_purge_image_cache.call_args.kwargs["kwargs"]["image_paths"]) == 4

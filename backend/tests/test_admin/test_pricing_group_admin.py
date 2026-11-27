@@ -147,7 +147,7 @@ def test_pricing_group_admin__new_components_send_accounting_of_reservation_unit
 
     assert response.status_code == 302, response.content
     assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
-    assert [call.args for call in mock.call_args_list] == [(reservation_unit.pk,)]
+    assert [call.kwargs for call in mock.call_args_list] == [{"reservation_unit_pks": [reservation_unit.pk]}]
 
 
 # ── Validation ──

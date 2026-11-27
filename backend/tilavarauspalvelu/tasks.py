@@ -343,17 +343,21 @@ def create_statistics_for_reservations_task(reservation_pks: list[int]) -> None:
     max_retries=5,
     retry_backoff=True,
 )
-def refresh_reservation_unit_product_mapping_task(reservation_unit_pk: int) -> None:
-    reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
-    if reservation_unit is None:
-        SentryLogger.log_message(
-            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) product mapping.",
-            details=f"Reservation unit ({reservation_unit_pk}) not found.",
-            level="warning",
-        )
-        return
+def refresh_reservation_unit_product_mapping_task(reservation_unit_pks: list[int]) -> None:
+    reservation_units = ReservationUnit.objects.filter(pk__in=reservation_unit_pks).order_by("pk")
+    found_pks: set[int] = set()
 
-    reservation_unit.actions.refresh_reservation_unit_product_mapping()
+    for reservation_unit in reservation_units:
+        found_pks.add(reservation_unit.pk)
+        reservation_unit.actions.refresh_reservation_unit_product_mapping()
+
+    for reservation_unit_pk in reservation_unit_pks:
+        if reservation_unit_pk not in found_pks:
+            SentryLogger.log_message(
+                message=f"Unable to refresh reservation unit ({reservation_unit_pk}) product mapping.",
+                details=f"Reservation unit ({reservation_unit_pk}) not found.",
+                level="warning",
+            )
 
 
 @app.task(
@@ -362,34 +366,39 @@ def refresh_reservation_unit_product_mapping_task(reservation_unit_pk: int) -> N
     max_retries=5,
     retry_backoff=True,
 )
-def refresh_reservation_unit_accounting_task(reservation_unit_pk: int) -> None:
-    reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
-    if reservation_unit is None:
-        SentryLogger.log_message(
-            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) accounting data.",
-            details=f"Reservation unit ({reservation_unit_pk}) not found.",
-            level="warning",
-        )
-        return
+def refresh_reservation_unit_accounting_task(reservation_unit_pks: list[int]) -> None:
+    reservation_units = ReservationUnit.objects.filter(pk__in=reservation_unit_pks).order_by("pk")
+    found_pks: set[int] = set()
 
-    reservation_unit.actions.refresh_reservation_unit_accounting()
+    for reservation_unit in reservation_units:
+        found_pks.add(reservation_unit.pk)
+        reservation_unit.actions.refresh_reservation_unit_accounting()
+
+    for reservation_unit_pk in reservation_unit_pks:
+        if reservation_unit_pk not in found_pks:
+            SentryLogger.log_message(
+                message=f"Unable to refresh reservation unit ({reservation_unit_pk}) accounting data.",
+                details=f"Reservation unit ({reservation_unit_pk}) not found.",
+                level="warning",
+            )
 
 
 @app.task(name="update_reservation_unit_image_urls")
-def update_reservation_unit_image_urls_task(pk: int | None = None) -> None:
+def update_reservation_unit_image_urls_task(pks: list[int] | None = None) -> None:
     """Create optimized thumbnail images and update URLs to the reservation unit instances."""
     images = ReservationUnitImage.objects.all()
-    if pk is not None:
-        images = images.filter(pk=pk)
+    if pks is not None:
+        images = images.filter(pk__in=pks)
 
     images.update_thumbnail_urls()
 
 
 @app.task(name="purge_image_cache")
-def purge_image_cache_task(image_path: str) -> None:
+def purge_image_cache_task(image_paths: list[str]) -> None:
     from tilavarauspalvelu.integrations.image_cache import purge
 
-    purge(image_path)
+    for image_path in image_paths:
+        purge(image_path)
 
 
 @singleton_task

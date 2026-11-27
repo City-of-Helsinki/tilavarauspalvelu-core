@@ -135,9 +135,9 @@ class Unit(models.Model):
             from tilavarauspalvelu.tasks import refresh_reservation_unit_product_mapping_task
 
             reservation_units = self.reservation_units.filter(payment_merchant__isnull=True)
-            reservation_unit_pks = reservation_units.values_list("pk", flat=True)
-            for reservation_unit_pk in reservation_unit_pks:
-                refresh_reservation_unit_product_mapping_task.delay_on_commit(reservation_unit_pk)
+            reservation_unit_pks = list(reservation_units.values_list("pk", flat=True))
+            if reservation_unit_pks:
+                refresh_reservation_unit_product_mapping_task.delay_on_commit(reservation_unit_pks=reservation_unit_pks)
 
         return result
 
