@@ -55,6 +55,20 @@ describe("WeeklyPatternCalendar", () => {
     expect(cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30, closed$/)).toHaveAttribute("aria-disabled", "true");
   });
 
+  test("short weekday names are shown, and the header keeps the long name as its accessible name", () => {
+    render(<Harness weekdayNameStyle="short" />);
+    expect(screen.getByRole("columnheader", { name: "common:weekdayLongEnum.WEDNESDAY" })).toBeInTheDocument();
+    const stickyHeader = screen.getByTestId("weekly-pattern__sticky-header");
+    expect(stickyHeader).toHaveTextContent("common:weekdayShortEnum.WEDNESDAY");
+    expect(stickyHeader).not.toHaveTextContent("common:weekdayLongEnum.WEDNESDAY");
+    expect(cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30, closed$/)).toBeInTheDocument();
+  });
+
+  test("long weekday names are shown without the prop", () => {
+    render(<Harness />);
+    expect(screen.getByTestId("weekly-pattern__sticky-header")).toHaveTextContent("common:weekdayLongEnum.WEDNESDAY");
+  });
+
   test("only one cell is in the tab order", () => {
     render(<Harness />);
     const tabbable = screen.getAllByRole("gridcell").filter((element) => element.getAttribute("tabindex") === "0");

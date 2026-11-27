@@ -74,6 +74,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     brush,
     isDataEqual,
     isValidPaint,
+    weekdayNameStyle = "long",
     getStateLabel,
     getCellAppearance,
     getCellProps,
@@ -85,7 +86,12 @@ function WeeklyPatternTable<TData extends CalendarData>(
     ...tableAttributes
   } = props;
 
+  // Speech always uses the long name. Only the visible column header follows the style.
   const longNames = useMemo(() => weekdayNames("long", t), [t]);
+  const headerNames = useMemo(
+    () => (weekdayNameStyle === "short" ? weekdayNames("short", t) : longNames),
+    [t, weekdayNameStyle, longNames]
+  );
 
   const grid = useWeeklyPatternCalendar({
     value,
@@ -234,7 +240,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
                 <td aria-hidden />
                 {grid.days.map((weekday) => (
                   <th key={weekday} role="presentation">
-                    {longNames[weekday]}
+                    {headerNames[weekday]}
                   </th>
                 ))}
               </tr>

@@ -102,6 +102,12 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
   /** Return a reason to refuse a paint. The reason is announced to screen readers. */
   isValidPaint?: (span: WeeklyPatternSpan<TData>) => string | null;
 
+  /**
+   * How a weekday name is shown in the visible column header. Short is for a narrow day column, where a long name such
+   * as "keskiviikko" does not fit. The grid's own header keeps the long name for screen readers either way, and so
+   * does a cell label.
+   */
+  weekdayNameStyle?: "long" | "short";
   /** Translated state word for a cell, e.g. "Closed", "Free", "Primary". */
   getStateLabel: (cell: WeeklyPatternCellInfo<TData>) => string;
   getCellAppearance?: (data: TData) => CellAppearance | undefined;
