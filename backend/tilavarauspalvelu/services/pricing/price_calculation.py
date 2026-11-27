@@ -6,7 +6,7 @@ import math
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.enums import PriceUnit
+from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup, TaxLevelRate
 from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
@@ -51,7 +51,7 @@ class PricingData:
     """The pricing group rows of each reservation unit, from the latest to the earliest."""
 
     components: dict[int, list[PriceComponent]]
-    """The price components of each pricing group, ordered by their start date."""
+    """The price components of each pricing group, ordered by their start date and primary key."""
 
     tax_rates: dict[int, list[TaxLevelRate]]
     """The rates of each tax level, from the latest to the earliest."""
@@ -100,7 +100,7 @@ def load_pricing_data(*, reservation_unit_pks: Collection[int]) -> PricingData:
         PriceComponent.objects
         .filter(pricing_group__in=pricing_group_pks)
         .select_related("tax_level", "sales_item")
-        .order_by("valid_from")
+        .order_by("valid_from", "pk")
     )
     components: dict[int, list[PriceComponent]] = {}
     for component in component_list:
@@ -127,11 +127,14 @@ def calculate_price_with_data(
     Calculate the price of a reservation from the pricing group that the reservation unit uses on its start date.
     The pricing comes from `pricing_data`, so this makes no queries.
 
-    The reservation is walked through from its begin. Each step is priced by the component that is active
+    The reservation is walked through from its begin. Each step is priced by the base component that is active
     on the date of the step's start:
     - A minute-based unit counts the minutes until the next local midnight or the end of the reservation.
     - A unit of half a day or longer counts one started unit, even if the unit goes over a price change.
     - A fixed price counts once and covers the rest of the reservation.
+
+    Every surcharge component is walked through in the same way, with its own price unit.
+    It counts only on the dates on which it is active, and it gets its own line.
 
     The duration of the reservation is rounded up to the next 15 minutes.
     Durations are real time, so a night with a daylight saving change is one hour shorter or longer.
@@ -168,44 +171,18 @@ def calculate_price_with_data(
     duration_minutes = math.ceil((end - begin).total_seconds() / 60 / 15) * 15
     end = begin + datetime.timedelta(minutes=duration_minutes)
 
-    quantities: dict[int, Decimal] = {}
-    components_by_pk: dict[int, PriceComponent] = {}
+    base_components = [component for component in components if component.kind == PriceComponentKind.BASE]
+    base_quantities = _count_quantities(components=base_components, begin=begin, end=end)
+    if base_quantities.first_date_without_component is not None:
+        msg = f"Reservation unit has no price on {base_quantities.first_date_without_component.isoformat()}."
+        raise PriceCalculationError(msg)
 
-    moment = begin
+    lines = _build_calculation_lines(base_quantities)
 
-    while moment < end:
-        moment_date = moment.astimezone(DEFAULT_TIMEZONE).date()
-        component = _component_for_date(components=components, date=moment_date)
-        components_by_pk[component.pk] = component
-        quantity = quantities.get(component.pk, Decimal(0))
-        price_unit = PriceUnit(component.price_unit)
-
-        if price_unit == PriceUnit.FIXED:
-            quantities[component.pk] = quantity + 1
-            break
-
-        if price_unit in {PriceUnit.PER_HALF_DAY, PriceUnit.PER_DAY, PriceUnit.PER_WEEK}:
-            quantities[component.pk] = quantity + 1
-            moment = _start_of_next_unit(moment=moment, price_unit=price_unit)
-            continue
-
-        next_midnight = local_start_of_day(moment_date + datetime.timedelta(days=1)).astimezone(datetime.UTC)
-        step_end = min(next_midnight, end)
-        step_minutes = Decimal(int((step_end - moment).total_seconds()) // 60)
-        quantities[component.pk] = quantity + step_minutes / price_unit.in_minutes
-        moment = step_end
-
-    lines: list[PriceCalculationLine] = []
-    for pk, quantity in quantities.items():
-        component = components_by_pk[pk]
-        amount = round_decimal(component.amount * quantity, 2)
-        line = PriceCalculationLine(
-            component=component,
-            quantity=quantity,
-            unit_amount=component.amount,
-            amount=amount,
-        )
-        lines.append(line)
+    surcharge_components = [component for component in components if component.kind == PriceComponentKind.SURCHARGE]
+    for surcharge_component in surcharge_components:
+        surcharge_quantities = _count_quantities(components=[surcharge_component], begin=begin, end=end)
+        lines += _build_calculation_lines(surcharge_quantities)
 
     total = sum((line.amount for line in lines), start=Decimal(0))
     can_apply_for_discount = any(line.component.can_apply_for_discount for line in lines)
@@ -223,13 +200,87 @@ def calculate_price_with_data(
 # Internals
 
 
-def _component_for_date(*, components: list[PriceComponent], date: datetime.date) -> PriceComponent:
+@dataclasses.dataclass(frozen=True, slots=True)
+class _Quantities:
+    quantities: dict[int, Decimal]
+    components_by_pk: dict[int, PriceComponent]
+    first_date_without_component: datetime.date | None
+
+
+def _count_quantities(
+    *,
+    components: list[PriceComponent],
+    begin: datetime.datetime,
+    end: datetime.datetime,
+) -> _Quantities:
+    """
+    Walk through the reservation and count the quantity of each component.
+    The components must not overlap. A date with no active component is skipped.
+    """
+    quantities: dict[int, Decimal] = {}
+    components_by_pk: dict[int, PriceComponent] = {}
+    first_date_without_component: datetime.date | None = None
+
+    moment = begin
+
+    while moment < end:
+        moment_date = moment.astimezone(DEFAULT_TIMEZONE).date()
+        next_midnight = local_start_of_day(moment_date + datetime.timedelta(days=1)).astimezone(datetime.UTC)
+
+        component = _component_for_date(components=components, date=moment_date)
+        if component is None:
+            if first_date_without_component is None:
+                first_date_without_component = moment_date
+            moment = next_midnight
+            continue
+
+        components_by_pk[component.pk] = component
+        quantity = quantities.get(component.pk, Decimal(0))
+        price_unit = PriceUnit(component.price_unit)
+
+        if price_unit == PriceUnit.FIXED:
+            quantities[component.pk] = quantity + 1
+            break
+
+        if price_unit in {PriceUnit.PER_HALF_DAY, PriceUnit.PER_DAY, PriceUnit.PER_WEEK}:
+            quantities[component.pk] = quantity + 1
+            moment = _start_of_next_unit(moment=moment, price_unit=price_unit)
+            continue
+
+        step_end = min(next_midnight, end)
+        step_minutes = Decimal(int((step_end - moment).total_seconds()) // 60)
+        quantities[component.pk] = quantity + step_minutes / price_unit.in_minutes
+        moment = step_end
+
+    return _Quantities(
+        quantities=quantities,
+        components_by_pk=components_by_pk,
+        first_date_without_component=first_date_without_component,
+    )
+
+
+def _build_calculation_lines(quantities: _Quantities) -> list[PriceCalculationLine]:
+    lines: list[PriceCalculationLine] = []
+    for pk, quantity in quantities.quantities.items():
+        component = quantities.components_by_pk[pk]
+        amount = round_decimal(component.amount * quantity, 2)
+        line = PriceCalculationLine(
+            component=component,
+            quantity=quantity,
+            unit_amount=component.amount,
+            amount=amount,
+        )
+        lines.append(line)
+
+    return lines
+
+
+def _component_for_date(*, components: list[PriceComponent], date: datetime.date) -> PriceComponent | None:
     for component in components:
         if component.valid_from <= date and (component.valid_until is None or component.valid_until > date):
             return component
 
-    msg = f"Reservation unit has no price on {date.isoformat()}."
-    raise PriceCalculationError(msg)
+    return None
 
 
 def _start_of_next_unit(*, moment: datetime.datetime, price_unit: PriceUnit) -> datetime.datetime:

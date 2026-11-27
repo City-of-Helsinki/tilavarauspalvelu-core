@@ -39,9 +39,10 @@ from tilavarauspalvelu.models import (
 from tilavarauspalvelu.services.pricing.next_price_change import (
     ScheduledBasePrice,
     ScheduledPricingGroup,
+    ScheduledSurcharge,
     find_next_price_change,
 )
-from tilavarauspalvelu.services.pricing.price_summary import BasePrice, summarize_base_prices
+from tilavarauspalvelu.services.pricing.price_summary import BasePrice, Surcharge, summarize_prices
 from tilavarauspalvelu.typing import AnyUser, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 from utils.db import SubqueryCount
@@ -114,7 +115,7 @@ class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
     price_summary = ManuallyOptimizedField(
         PriceSummaryType,
         on_date=graphene.Date(description="The date of the prices. Today if not given."),
-        description="Summary of the base prices of the pricing group that the reservation unit uses on the date.",
+        description="Summary of the prices of the pricing group that the reservation unit uses on the date.",
     )
     next_price_change = ManuallyOptimizedField(
         PriceChangeType,
@@ -431,7 +432,7 @@ class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
     ) -> models.QuerySet:
         price_date = on_date if on_date is not None else local_date()
         # A queryset annotation is lost when the reservation unit comes through a foreign key. This one is not.
-        optimizer.annotations["price_summary_components"] = _base_component_data_on_date(price_date=price_date)
+        optimizer.annotations["price_summary_components"] = _component_data_on_date(price_date=price_date)
         optimizer.annotations["price_summary_date"] = models.Value(price_date, output_field=models.DateField())
         return queryset
 
@@ -447,10 +448,11 @@ class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
         # So an aliased field can get the components of another date. Load them again for this reservation unit.
         if root.price_summary_date != requested_date:
             reservation_units = ReservationUnit.objects.filter(pk=root.pk).annotate(
-                components=_base_component_data_on_date(price_date=requested_date),
+                components=_component_data_on_date(price_date=requested_date),
             )
             components = reservation_units.values_list("components", flat=True).get()
 
+        base_components = [component for component in components if component["kind"] == PriceComponentKind.BASE]
         base_prices = [
             BasePrice(
                 amount=Decimal(component["amount"]),
@@ -463,9 +465,17 @@ class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
                     Decimal(component["tax_percentage"]) if component["tax_percentage"] is not None else None
                 ),
             )
-            for component in components
+            for component in base_components
         ]
-        return summarize_base_prices(base_prices)
+        surcharges = [
+            Surcharge(
+                amount=Decimal(component["amount"]),
+                can_apply_for_discount=component["can_apply_for_discount"],
+            )
+            for component in components
+            if component["kind"] == PriceComponentKind.SURCHARGE
+        ]
+        return summarize_prices(base_prices=base_prices, surcharges=surcharges)
 
     @staticmethod
     def optimize_next_price_change(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
@@ -498,10 +508,28 @@ class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
                     ),
                 )
                 for component in pricing_group["components"]
+                if component["kind"] == PriceComponentKind.BASE
+            ]
+            scheduled_surcharges = [
+                ScheduledSurcharge(
+                    surcharge=Surcharge(
+                        amount=Decimal(component["amount"]),
+                        can_apply_for_discount=component["can_apply_for_discount"],
+                    ),
+                    valid_from=datetime.date.fromisoformat(component["valid_from"]),
+                    valid_until=(
+                        datetime.date.fromisoformat(component["valid_until"])
+                        if component["valid_until"] is not None
+                        else None
+                    ),
+                )
+                for component in pricing_group["components"]
+                if component["kind"] == PriceComponentKind.SURCHARGE
             ]
             scheduled_pricing_group = ScheduledPricingGroup(
                 begins=datetime.date.fromisoformat(pricing_group["begins"]),
                 base_prices=scheduled_prices,
+                surcharges=scheduled_surcharges,
             )
             pricing_groups.append(scheduled_pricing_group)
 
@@ -555,9 +583,10 @@ class ReservationUnitAllNode(DjangoNode[ReservationUnit, AnyUser]):
 # Internals
 
 
-def _base_component_data_on_date(*, price_date: datetime.date) -> ArraySubquery:
+def _component_data_on_date(*, price_date: datetime.date) -> ArraySubquery:
     """
-    Base component data for the price summary of the reservation unit in the outer query, as it is on the given date.
+    Base and surcharge component data for the price summary of the reservation unit in the outer query,
+    as it is on the given date.
     The tax percentage is the one of today, the same as in the price lines of a new reservation.
     """
     today = local_date()
@@ -574,19 +603,20 @@ def _base_component_data_on_date(*, price_date: datetime.date) -> ArraySubquery:
         .order_by("-begins")
         .values("percentage")[:1]
     )
-    active_base_components = (
+    active_components = (
         PriceComponent.objects
         .filter(
             models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=price_date),
             models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
             pricing_group=models.Subquery(active_pricing_group),
-            kind=PriceComponentKind.BASE,
+            kind__in=[PriceComponentKind.BASE, PriceComponentKind.SURCHARGE],
             valid_from__lte=price_date,
         )
         .order_by("amount", "pk")
         .annotate(
             # Amounts as text, so that they do not go through a float in JSON.
             data=JSONObject(
+                kind="kind",
                 amount=Cast("amount", models.CharField()),
                 price_unit="price_unit",
                 can_apply_for_discount="can_apply_for_discount",
@@ -598,13 +628,13 @@ def _base_component_data_on_date(*, price_date: datetime.date) -> ArraySubquery:
         )
         .values("data")
     )
-    return ArraySubquery(active_base_components)
+    return ArraySubquery(active_components)
 
 
 def _scheduled_pricing_group_data() -> ArraySubquery:
     """
     The pricing group that the reservation unit in the outer query uses today and the ones that begin later.
-    Each with its base components that are valid today or later.
+    Each with its base and surcharge components that are valid today or later.
     """
     today = local_date()
 
@@ -626,12 +656,13 @@ def _scheduled_pricing_group_data() -> ArraySubquery:
             models.Q(valid_until__isnull=True) | models.Q(valid_until__gt=today),
             models.Q(price_option__isnull=True) | models.Q(price_option__is_active=True),
             pricing_group=models.OuterRef("pricing_group"),
-            kind=PriceComponentKind.BASE,
+            kind__in=[PriceComponentKind.BASE, PriceComponentKind.SURCHARGE],
         )
         .order_by("amount", "pk")
         .annotate(
             # Amounts as text, so that they do not go through a float in JSON.
             data=JSONObject(
+                kind="kind",
                 amount=Cast("amount", models.CharField()),
                 price_unit="price_unit",
                 can_apply_for_discount="can_apply_for_discount",

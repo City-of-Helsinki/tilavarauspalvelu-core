@@ -50,6 +50,8 @@ class PriceComponent(models.Model):
     price_unit = TextChoicesField(enum=PriceUnit)
 
     can_apply_for_discount = models.BooleanField(default=False)
+    # Whether adjustment components can change the amount of this component. The adjustment kind is not built yet.
+    is_adjustable = models.BooleanField(default=True)
 
     material_price_description = Nh3CharField(
         blank=True,
@@ -102,14 +104,16 @@ class PriceComponent(models.Model):
             # Staff can raise the price of a reservation only when the customer has applied for a discount.
             # A free price has no sales item, so it cannot be paid online if its price is raised.
             models.CheckConstraint(
-                name="price_component_base_discount_only_when_paid",
-                condition=(
-                    ~models.Q(kind=PriceComponentKind.BASE)
-                    | models.Q(can_apply_for_discount=False)
-                    | models.Q(amount__gt=0)
-                ),
-                violation_error_message="A free base component cannot allow applying for a discount.",
+                name="price_component_discount_only_when_paid",
+                condition=models.Q(can_apply_for_discount=False) | models.Q(amount__gt=0),
+                violation_error_message="A free price component cannot allow applying for a discount.",
                 violation_error_code=error_codes.PRICE_COMPONENT_DISCOUNT_WHEN_FREE,
+            ),
+            models.CheckConstraint(
+                name="price_component_base_is_adjustable",
+                condition=~models.Q(kind=PriceComponentKind.BASE) | models.Q(is_adjustable=True),
+                violation_error_message="A base component must be adjustable.",
+                violation_error_code=error_codes.PRICE_COMPONENT_BASE_NOT_ADJUSTABLE,
             ),
         ]
 

@@ -128,6 +128,7 @@ class ReservationUnitExporter(BaseCSVExporter["ExportedReservationUnit"]):
     @property
     def queryset(self) -> ReservationUnitQuerySet[ExportedReservationUnit, ExportedReservationUnit]:
         today = local_date()
+        # The price columns describe the rent. Surcharges have their own price units, so they are not included.
         components_today = (
             PriceComponent.objects
             .filter(

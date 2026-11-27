@@ -7,7 +7,7 @@ import pytest
 from freezegun import freeze_time
 from graphql_relay import to_global_id
 
-from tilavarauspalvelu.enums import PriceUnit
+from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -169,6 +169,71 @@ def test_reservation_unit__query__next_price_change__component_changes(graphql):
             },
         },
     }
+
+
+@freeze_time(local_datetime(2026, 1, 15, 12))
+def test_reservation_unit__query__next_price_change__surcharge_begins(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=datetime.date(2026, 1, 1),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=datetime.date(2026, 1, 1),
+        amount=Decimal(20),
+        tax_level=TaxLevelFactory.create(rates__percentage=Decimal("25.5")),
+    )
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=datetime.date(2026, 3, 1),
+        amount=Decimal(5),
+    )
+
+    query = reservation_unit_query(fields=FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {
+        "nextPriceChange": {
+            "begins": "2026-03-01",
+            "summary": {
+                "isFree": False,
+                "lowestAmount": "20.00",
+                "priceUnit": PriceUnit.PER_HOUR.value,
+                "varies": True,
+                "canApplyForDiscount": False,
+                "taxPercentage": "25.50",
+            },
+        },
+    }
+
+
+@freeze_time(local_datetime(2026, 1, 15, 12))
+def test_reservation_unit__query__next_price_change__active_surcharge_is_no_change(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=datetime.date(2026, 1, 1),
+    )
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=datetime.date(2026, 1, 1), amount=Decimal(20))
+    PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=datetime.date(2026, 1, 1),
+        amount=Decimal(5),
+    )
+
+    query = reservation_unit_query(fields=FIELDS, id=to_global_id("ReservationUnitNode", reservation_unit.pk))
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.first_query_object == {"nextPriceChange": None}
 
 
 @freeze_time(local_datetime(2026, 1, 15, 12))

@@ -54,6 +54,7 @@ def component_form_data(
         f"components-{index}-amount": "10.00",
         f"components-{index}-price_unit": PriceUnit.PER_HOUR.value,
         f"components-{index}-tax_level": tax_level.pk,
+        f"components-{index}-is_adjustable": "on",
         f"components-{index}-material_price_description_fi": "",
         f"components-{index}-material_price_description_en": "",
         f"components-{index}-material_price_description_sv": "",

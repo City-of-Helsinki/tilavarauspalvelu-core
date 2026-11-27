@@ -10,6 +10,7 @@ from unittest.mock import patch
 import pytest
 from django.core.management import call_command
 
+from tilavarauspalvelu.enums import PriceComponentKind
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
@@ -133,6 +134,34 @@ def test_refresh_payment_products__two_sales_items__creates_product_for_each():
 
     products = PaymentProduct.objects.filter(reservation_unit=reservation_unit)
     assert sorted(products.values_list("sales_item", flat=True)) == sorted([first_sales_item.pk, second_sales_item.pk])
+
+
+@patch_method(VerkkokauppaAPIClient.create_product, side_effect=mock_create_product)
+@patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+def test_refresh_payment_products__surcharge__creates_product_for_its_sales_item():
+    base_sales_item = create_sales_item()
+    surcharge_sales_item = create_sales_item()
+    reservation_unit = ReservationUnitFactory.create(
+        payment_merchant=PaymentMerchantFactory.create(),
+        own_price__amount=Decimal(10),
+        own_price__tax_level=base_sales_item.tax_level,
+        own_price__sales_item=base_sales_item,
+    )
+    PriceComponentFactory.create(
+        pricing_group=reservation_unit.reservation_unit_pricing_groups.get().pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        amount=Decimal(5),
+        tax_level=surcharge_sales_item.tax_level,
+        sales_item=surcharge_sales_item,
+    )
+
+    refresh_reservation_unit_payment_products_task(reservation_unit.pk)
+
+    products = PaymentProduct.objects.filter(reservation_unit=reservation_unit)
+    assert sorted(products.values_list("sales_item", flat=True)) == sorted([
+        base_sales_item.pk,
+        surcharge_sales_item.pk,
+    ])
 
 
 @patch_method(VerkkokauppaAPIClient.create_product, side_effect=mock_create_product)

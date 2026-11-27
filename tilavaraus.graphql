@@ -952,7 +952,7 @@ type ReservationUnitNode implements Node {
   haukiUrl: String
 
   """
-  Summary of the base prices of the pricing group that the reservation unit uses on the date.
+  Summary of the prices of the pricing group that the reservation unit uses on the date.
   """
   priceSummary(
     """The date of the prices. Today if not given."""
@@ -2494,6 +2494,7 @@ type PriceComponentNode implements Node {
   amount: Decimal!
   priceUnit: PriceUnit!
   canApplyForDiscount: Boolean!
+  isAdjustable: Boolean!
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String
   materialPriceDescriptionSv: String
@@ -2509,6 +2510,9 @@ type PriceComponentNode implements Node {
 enum PriceComponentKind {
   """Base"""
   BASE
+
+  """Surcharge"""
+  SURCHARGE
 }
 
 type TaxLevelNode implements Node {
@@ -4447,12 +4451,14 @@ input PricingGroupComponentsUpdateMutationInput {
 
 input UpdatePriceComponentInputSerializerInput {
   pk: Int
+  kind: PriceComponentKind
   validFrom: Date
   validUntil: Date
   priceOption: Int
   amount: Decimal
   priceUnit: PriceUnit
   canApplyForDiscount: Boolean
+  isAdjustable: Boolean
   materialPriceDescription: String
   materialPriceDescriptionFi: String
   materialPriceDescriptionEn: String

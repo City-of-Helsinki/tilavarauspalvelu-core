@@ -6,6 +6,7 @@ from decimal import Decimal
 import pytest
 from django.db import IntegrityError
 
+from tilavarauspalvelu.enums import PriceComponentKind
 from tilavarauspalvelu.models import PriceComponent
 
 from tests.factories import PriceComponentFactory
@@ -26,6 +27,13 @@ def test_price_component__amount_cannot_be_negative():
     assert "price_component_amount_not_negative" in str(error.value)
 
 
+def test_price_component__surcharge_amount_cannot_be_negative():
+    with pytest.raises(IntegrityError) as error:
+        PriceComponentFactory.create(kind=PriceComponentKind.SURCHARGE, amount=Decimal(-1))
+
+    assert "price_component_amount_not_negative" in str(error.value)
+
+
 # ── Discount ──
 
 
@@ -33,7 +41,14 @@ def test_price_component__free_component_cannot_allow_discount():
     with pytest.raises(IntegrityError) as error:
         PriceComponentFactory.create_free(can_apply_for_discount=True)
 
-    assert "price_component_base_discount_only_when_paid" in str(error.value)
+    assert "price_component_discount_only_when_paid" in str(error.value)
+
+
+def test_price_component__free_surcharge_cannot_allow_discount():
+    with pytest.raises(IntegrityError) as error:
+        PriceComponentFactory.create_free(kind=PriceComponentKind.SURCHARGE, can_apply_for_discount=True)
+
+    assert "price_component_discount_only_when_paid" in str(error.value)
 
 
 def test_price_component__paid_component_can_allow_discount():
@@ -41,6 +56,23 @@ def test_price_component__paid_component_can_allow_discount():
 
     component = PriceComponent.objects.get(pk=component.pk)
     assert component.can_apply_for_discount is True
+
+
+# ── Adjustable ──
+
+
+def test_price_component__base_component_must_be_adjustable():
+    with pytest.raises(IntegrityError) as error:
+        PriceComponentFactory.create(kind=PriceComponentKind.BASE, is_adjustable=False)
+
+    assert "price_component_base_is_adjustable" in str(error.value)
+
+
+def test_price_component__surcharge_can_be_not_adjustable():
+    component = PriceComponentFactory.create(kind=PriceComponentKind.SURCHARGE, is_adjustable=False)
+
+    component = PriceComponent.objects.get(pk=component.pk)
+    assert component.is_adjustable is False
 
 
 # ── Validity ──

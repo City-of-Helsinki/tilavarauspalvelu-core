@@ -5,17 +5,18 @@ from typing import TYPE_CHECKING
 
 from utils.date_utils import local_add_days, local_date, local_datetime, local_start_of_day
 
-from .price_summary import summarize_base_prices
+from .price_summary import summarize_prices
 
 if TYPE_CHECKING:
     import datetime
 
-    from .price_summary import BasePrice, PriceSummary
+    from .price_summary import BasePrice, PriceSummary, Surcharge
 
 __all__ = [
     "PriceChange",
     "ScheduledBasePrice",
     "ScheduledPricingGroup",
+    "ScheduledSurcharge",
     "find_next_price_change",
 ]
 
@@ -28,9 +29,17 @@ class ScheduledBasePrice:
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class ScheduledSurcharge:
+    surcharge: Surcharge
+    valid_from: datetime.date
+    valid_until: datetime.date | None  # Exclusive
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class ScheduledPricingGroup:
     begins: datetime.date
     base_prices: list[ScheduledBasePrice]
+    surcharges: list[ScheduledSurcharge]
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -51,7 +60,7 @@ def find_next_price_change(
     Only changes on dates on which a customer can still make a reservation are included.
 
     :param pricing_groups: The pricing group in use today and the pricing groups that begin later.
-                           Each with its base components that are valid today or later.
+                           Each with its base and surcharge components that are valid today or later.
     :param reservation_ends_at: No reservation can begin at or after this moment.
     :param reservations_max_days_before: How many days ahead a reservation can begin.
     """
@@ -65,6 +74,10 @@ def find_next_price_change(
             change_dates.add(scheduled_price.valid_from)
             if scheduled_price.valid_until is not None:
                 change_dates.add(scheduled_price.valid_until)
+        for surcharge in pricing_group.surcharges:
+            change_dates.add(surcharge.valid_from)
+            if surcharge.valid_until is not None:
+                change_dates.add(surcharge.valid_until)
 
     latest_reservation_start: datetime.datetime | None = None
     if reservations_max_days_before:
@@ -94,24 +107,32 @@ def find_next_price_change(
 
 
 def _summarize_on_date(*, pricing_groups: list[ScheduledPricingGroup], on_date: datetime.date) -> PriceSummary | None:
-    scheduled_prices = _scheduled_prices_on_date(pricing_groups=pricing_groups, on_date=on_date)
-    base_prices = [scheduled_price.base_price for scheduled_price in scheduled_prices]
-    return summarize_base_prices(base_prices)
+    pricing_group = _pricing_group_on_date(pricing_groups=pricing_groups, on_date=on_date)
+    if pricing_group is None:
+        return None
 
-
-def _scheduled_prices_on_date(
-    *,
-    pricing_groups: list[ScheduledPricingGroup],
-    on_date: datetime.date,
-) -> list[ScheduledBasePrice]:
-    begun_groups = [pricing_group for pricing_group in pricing_groups if pricing_group.begins <= on_date]
-    if not begun_groups:
-        return []
-
-    pricing_group = max(begun_groups, key=lambda group: group.begins)
-    return [
-        scheduled_price
+    base_prices = [
+        scheduled_price.base_price
         for scheduled_price in pricing_group.base_prices
         if scheduled_price.valid_from <= on_date
         and (scheduled_price.valid_until is None or scheduled_price.valid_until > on_date)
     ]
+    surcharges = [
+        scheduled_surcharge.surcharge
+        for scheduled_surcharge in pricing_group.surcharges
+        if scheduled_surcharge.valid_from <= on_date
+        and (scheduled_surcharge.valid_until is None or scheduled_surcharge.valid_until > on_date)
+    ]
+    return summarize_prices(base_prices=base_prices, surcharges=surcharges)
+
+
+def _pricing_group_on_date(
+    *,
+    pricing_groups: list[ScheduledPricingGroup],
+    on_date: datetime.date,
+) -> ScheduledPricingGroup | None:
+    begun_groups = [pricing_group for pricing_group in pricing_groups if pricing_group.begins <= on_date]
+    if not begun_groups:
+        return None
+
+    return max(begun_groups, key=lambda group: group.begins)

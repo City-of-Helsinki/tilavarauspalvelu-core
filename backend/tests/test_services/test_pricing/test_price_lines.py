@@ -11,7 +11,7 @@ from auditlog.registry import auditlog
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import PriceUnit
+from tilavarauspalvelu.enums import PriceComponentKind, PriceUnit
 from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.models import Reservation, ReservationPriceLine
 from tilavarauspalvelu.services.pricing.price_calculation import load_pricing_data
@@ -165,6 +165,54 @@ def test_build_price_lines__price_change_during_reservation_gives_two_lines():
     assert result.lines[1].price_component == new_component
     assert result.lines[1].quantity == Decimal(1)
     assert result.lines[1].amount == Decimal("20.00")
+
+
+@freeze_time("2026-02-15T12:00:00+02:00")
+def test_build_price_lines__surcharge_gets_its_own_line_with_its_own_tax_level_and_sales_item():
+    reservation_unit = ReservationUnitFactory.create()
+    pricing_group = PricingGroupFactory.create()
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit,
+        pricing_group=pricing_group,
+        begins=JAN_1,
+    )
+    base_tax_level = TaxLevelFactory.create(rates=[])
+    TaxLevelRateFactory.create(tax_level=base_tax_level, begins=JAN_1, percentage=Decimal(10))
+    base_sales_item = SalesItemFactory.create(tax_level=base_tax_level)
+    base = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(10),
+        price_unit=PriceUnit.PER_HOUR,
+        tax_level=base_tax_level,
+        sales_item=base_sales_item,
+    )
+    surcharge_tax_level = TaxLevelFactory.create(rates=[])
+    TaxLevelRateFactory.create(tax_level=surcharge_tax_level, begins=JAN_1, percentage=Decimal("25.5"))
+    surcharge_sales_item = SalesItemFactory.create(tax_level=surcharge_tax_level)
+    surcharge = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        kind=PriceComponentKind.SURCHARGE,
+        valid_from=JAN_1,
+        amount=Decimal(4),
+        price_unit=PriceUnit.PER_HOUR,
+        tax_level=surcharge_tax_level,
+        sales_item=surcharge_sales_item,
+    )
+
+    result = build_price_lines(
+        reservation_unit=reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 3, 10, 10),
+        end=local_datetime(2026, 3, 10, 12),
+    )
+
+    assert [line.price_component for line in result.lines] == [base, surcharge]
+    assert [line.amount for line in result.lines] == [Decimal("20.00"), Decimal("8.00")]
+    assert [line.tax_level for line in result.lines] == [base_tax_level, surcharge_tax_level]
+    assert [line.tax_percentage for line in result.lines] == [Decimal(10), Decimal("25.5")]
+    assert [line.sales_item for line in result.lines] == [base_sales_item, surcharge_sales_item]
+    assert result.calculation.total == Decimal("28.00")
 
 
 def test_build_price_lines__description_from_price_option():
