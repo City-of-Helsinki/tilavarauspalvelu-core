@@ -305,3 +305,46 @@ az-build-log id log="": az-login
             --route-parameters project="{{ az_project }}" buildId="{{ id }}" logId="${log_id}" --api-version 7.1 -o json \
             | jq -r '.value[]'
     done
+
+# Show the Dependabot ignore conditions of a part (backend, frontend), as the latest Dependabot update run used them
+dependabot-ignores part:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    case "{{ part }}" in
+        backend)
+            title_prefix="pip in /backend"
+            ;;
+        frontend)
+            title_prefix="npm_and_yarn in /frontend"
+            ;;
+        *)
+            echo "Unknown part '{{ part }}'. Use backend or frontend." >&2
+            exit 1
+            ;;
+    esac
+
+    repo="City-of-Helsinki/tilavarauspalvelu-core"
+
+    run_id=$(gh run list --repo "${repo}" --workflow "Dependabot Updates" --limit 50 --json databaseId,displayTitle \
+        --jq "[.[] | select(.displayTitle | startswith(\"${title_prefix}\"))][0].databaseId // empty")
+    if [ -z "${run_id}" ]; then
+        echo "No Dependabot update run for '{{ part }}' in the last 50 runs." >&2
+        exit 1
+    fi
+    echo "Using run ${run_id}" >&2
+
+    # There is no API for the ignore conditions. Each update run logs its job definition, which has them.
+    # Read the whole log first. 'grep -m1' would close the pipe early and fail the script with SIGPIPE.
+    run_log=$(gh run view "${run_id}" --repo "${repo}" --log)
+    job_definition=$(grep -m1 'Job definition:' <<< "${run_log}" | sed 's/.*Job definition: //')
+
+    jq -r '.job["ignore-conditions"][]
+        | [
+            .["dependency-name"],
+            (.["version-requirement"] // "-"),
+            ((.["update-types"] // []) | join(", ") | if . == "" then "-" else . end),
+            .source
+          ]
+        | @tsv' <<< "${job_definition}" \
+        | column -t -s $'\t' -N DEPENDENCY,VERSIONS,UPDATE-TYPES,SOURCE
