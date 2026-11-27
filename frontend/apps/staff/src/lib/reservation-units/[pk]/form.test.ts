@@ -103,6 +103,7 @@ function createValidFormValues(overrides: Partial<ReservationUnitEditFormValues>
     spaces: [1],
     reservationUnitType: 1,
     reservationForm: ReservationFormType.ReserveeInfoForm,
+    paymentTerms: "payment-terms",
     minReservationDuration: 3600,
     maxReservationDuration: 7200,
     reservationsMaxDaysBefore: 180,
@@ -660,6 +661,50 @@ describe("ReservationUnitEditSchema", () => {
     if (!result.success) {
       expect(result.error.issues.map((i) => i.path.join("."))).toContain("pricingTerms");
     }
+  });
+
+  it("requires the payment terms when the shown price is paid", () => {
+    const values = createValidFormValues({ paymentType: PaymentType.OnSite, paymentTerms: "" });
+    values.pricings[0] = {
+      ...at(values.pricings, 0),
+      isPaid: true,
+      taxLevel: 1,
+      priceUnit: PriceUnit.PerHour,
+      price: 10,
+    };
+    const result = ReservationUnitEditSchema.safeParse(values);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map((i) => [i.path.join("."), i.message])).toEqual([["paymentTerms", "Required"]]);
+    }
+  });
+
+  it("does not require the payment terms when the price is free, even with a material price", () => {
+    const values = createValidFormValues({ paymentTerms: "" });
+    values.pricings[0] = {
+      ...at(values.pricings, 0),
+      isPaid: false,
+      hasMaterialPrice: true,
+      materialPriceDescriptionFi: "Materiaali",
+      materialPriceDescriptionEn: "Material",
+      materialPriceDescriptionSv: "Material",
+    };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
+  });
+
+  it.each([
+    { name: "a draft", overrides: { isDraft: true } },
+    { name: "a shared pricing group", overrides: { isSharedPricingGroup: true } },
+  ])("does not require the payment terms for $name", ({ overrides }) => {
+    const values = createValidFormValues({ paymentType: PaymentType.OnSite, paymentTerms: "", ...overrides });
+    values.pricings[0] = {
+      ...at(values.pricings, 0),
+      isPaid: true,
+      taxLevel: 1,
+      priceUnit: PriceUnit.PerHour,
+      price: 10,
+    };
+    expect(ReservationUnitEditSchema.safeParse(values).success).toBe(true);
   });
 
   it("rejects duplicate or unparseable access type begin dates", () => {
