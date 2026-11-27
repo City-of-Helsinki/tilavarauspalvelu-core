@@ -262,16 +262,27 @@ const EXPECTED_VALIDATION_CODES = new Set([
   "USER_NOT_INTERNAL_USER",
 ]);
 
-function isExpectedError(error: QueryErrorT): boolean {
+/// Apollo context of a query whose caller handles some error codes itself.
+/// The error link does not send these codes to Sentry for that query.
+/// Use it only where the error is a normal outcome, for example a permission error in an optional SSR query.
+export type ExpectedErrorContext = {
+  expectedErrorCodes?: ReadonlyArray<string>;
+};
+
+function isExpectedError(error: QueryErrorT, expectedErrorCodeList: ReadonlyArray<string>): boolean {
   if (error.type !== "GRAPHQL_ERROR" || error.details.length === 0) {
     return false;
   }
-  return error.details.every(
-    (e) =>
+  return error.details.every((e) => {
+    if (expectedErrorCodeList.includes(e.code)) {
+      return true;
+    }
+    return (
       "validation_code" in e &&
       typeof e.validation_code === "string" &&
       EXPECTED_VALIDATION_CODES.has(e.validation_code)
-  );
+    );
+  });
 }
 
 /// Capture all graphql errors as warnings in Sentry
@@ -284,7 +295,8 @@ export const errorLink = onError(({ graphQLErrors, networkError, operation }) =>
     toastNetworkError(networkError);
   }
   const errors = transformApolloError(new ApolloError({ graphQLErrors, networkError }));
-  if (isExpectedError(errors)) {
+  const { expectedErrorCodes }: ExpectedErrorContext = operation.getContext();
+  if (isExpectedError(errors, expectedErrorCodes ?? [])) {
     log.info(`expected graphql error in ${operation.operationName}: ${errors.message}`);
     return;
   }

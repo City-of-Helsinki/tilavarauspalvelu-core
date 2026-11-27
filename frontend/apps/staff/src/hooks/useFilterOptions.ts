@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import type { InteropApolloQueryResult } from "@apollo/client";
 import type { TFunction } from "next-i18next/pages";
+import type { ExpectedErrorContext } from "@ui/modules/apollo/helpers";
 import { filterNonNullable, sortAgeGroups } from "ui/src/modules/helpers";
 import {
   FilterOptionsDocument,
@@ -141,14 +142,18 @@ export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
 
 /// Safe (never throw) variant of filter options query
 /// Used to fetch possible options for selects in SSR. Failure is non critical and we never want SSR to have uncaught exceptions.
+/// SSR runs also when the session has expired. Then `unitGroups` gives FILTER_PERMISSION_DENIED.
+/// The page shows the login page in that case, so the error is not sent to Sentry.
 export async function fetchFilterOptionsSafe(
   client: ReturnType<typeof createClient>,
   variables: FilterOptionsQueryVariables = {}
 ): Promise<InteropApolloQueryResult<FilterOptionsQuery> | null> {
+  const context: ExpectedErrorContext = { expectedErrorCodes: ["FILTER_PERMISSION_DENIED"] };
   try {
     const options = await client.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
       query: FilterOptionsDocument,
       variables,
+      context,
     });
     return options;
   } catch {
