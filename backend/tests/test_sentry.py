@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import logging
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
@@ -8,15 +9,20 @@ import pytest
 import sentry_sdk
 from celery.exceptions import TimeLimitExceeded, WorkerLostError
 from celery.signals import task_failure
+from django.core.signals import got_request_exception
 from django.db.models.signals import post_init
+from django.http import HttpRequest
 from django.test import Client, override_settings
+from graphene_django_extensions.errors import GQLCodeError, GQLNotFoundError
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.transport import Transport
 
+import tilavarauspalvelu.signals
 from config.sentry import init_sentry, sentry_before_send_transaction, sentry_traces_sampler
 from config.settings import Common, Docker, Platta
 from tilavarauspalvelu.tasks import create_robot_test_data_task
+from tilavarauspalvelu.typing import error_codes
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -66,6 +72,30 @@ def sentry_transport() -> Iterator[EnvelopeCollector]:
     try:
         yield transport
     finally:
+        sentry_sdk.get_global_scope().set_client(previous_client)
+
+
+@pytest.fixture
+def sentry_transport_with_django_integration() -> Iterator[EnvelopeCollector]:
+    previous_client = sentry_sdk.get_client()
+    transport = EnvelopeCollector()
+    sentry_sdk.init(
+        dsn="https://public@example.ingest.sentry.io/1",
+        transport=transport,
+        traces_sample_rate=1.0,
+        default_integrations=False,
+        auto_enabling_integrations=False,
+        integrations=[DjangoIntegration()],
+    )
+    # Sentry connects its default handler after app setup, so reload to register the custom handler.
+    signals = importlib.reload(tilavarauspalvelu.signals)
+
+    try:
+        assert signals.sentry_disconnected is True
+        yield transport
+    finally:
+        got_request_exception.disconnect(dispatch_uid="sentry_log_exception")
+        importlib.reload(tilavarauspalvelu.signals)
         sentry_sdk.get_global_scope().set_client(previous_client)
 
 
@@ -311,6 +341,26 @@ def test_sentry_does_not_report_celery_task_failure_raised_inside_task(sentry_tr
     task_failure.send(sender=create_robot_test_data_task, task_id="task-id", exception=ValueError("Failed"))
 
     assert sentry_transport.sent_events() == []
+
+
+# ── Exception filtering ──
+
+
+def test_sentry_filters_graphql_errors(
+    sentry_transport_with_django_integration: EnvelopeCollector,
+) -> None:
+    errors = [
+        (GQLCodeError("GraphQL error", code=error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED), 0),
+        (GQLCodeError("GraphQL error", code=error_codes.RESERVATION_PRICE_INTERVAL_TOO_LONG), 1),
+        (GQLNotFoundError("Resource not found"), 1),
+    ]
+    for error, expected_event_count in errors:
+        try:
+            raise error
+        except (GQLCodeError, GQLNotFoundError):
+            got_request_exception.send(sender=None, request=HttpRequest())
+
+        assert len(sentry_transport_with_django_integration.sent_events()) == expected_event_count
 
 
 # ── GraphQL view ──

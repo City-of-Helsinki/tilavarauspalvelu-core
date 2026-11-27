@@ -219,10 +219,6 @@ class EmailService:
 
         recipients_by_language = get_reservation_staff_notification_recipients_by_language(reservation)
         if not recipients_by_language:
-            SentryLogger.log_message(
-                "No recipients for the 'Reservation created staff notification' email",
-                details={"reservation": reservation.pk},
-            )
             return
 
         emails: list[EmailData] = []
@@ -477,8 +473,6 @@ class EmailService:
         """Sends an email to all applicants when an application round has entered the allocation phase."""
         applications = Application.objects.all().should_send_in_allocation_email().order_by("created_at")
         if not applications:
-            msg = "Zero applications require the 'seasonal booking application round in allocation email' to be sent"
-            SentryLogger.log_message(msg)
             return
 
         recipients_by_language = get_recipients_for_applications_by_language(applications)
