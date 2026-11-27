@@ -21,8 +21,10 @@ import type {
   PaymentOrderNode,
   ReservationPaymentUrlFragment,
   ReservationStartInterval,
+  ReservationStateQuery,
 } from "@gql/gql-types";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import { getReservationPath } from "@/modules/urls";
 import { isRangeReservable } from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";
 
@@ -473,6 +475,40 @@ export function getPaymentUrl(
   }
 
   return undefined;
+}
+
+type WebstoreSuccessReservation = Pick<
+  NonNullable<ReservationStateQuery["reservation"]>,
+  "state" | "pk" | "paymentOrder"
+>;
+
+/// Get the page to go to after the webstore sends the user back after a successful payment.
+/// The webstore tells the backend about the payment with a webhook. The webhook can come after the user.
+/// @returns null if the page must wait for the webhook
+export function getWebstoreSuccessRedirectUrl(reservation: WebstoreSuccessReservation): string | null {
+  const isPaid =
+    reservation.paymentOrder?.status === OrderStatus.Paid ||
+    reservation.paymentOrder?.status === OrderStatus.PaidByInvoice;
+  switch (reservation.state) {
+    case ReservationStateChoice.RequiresHandling:
+      return getReservationPath(reservation.pk, undefined, "requires_handling");
+    case ReservationStateChoice.Confirmed:
+      if (!reservation.paymentOrder?.handledPaymentDueBy) {
+        return getReservationPath(reservation.pk, undefined, "confirmed");
+      }
+      // A handled reservation is confirmed before the payment, so the state does not show that the webhook came.
+      if (!isPaid) {
+        return null;
+      }
+      return getReservationPath(reservation.pk, undefined, "paid");
+    case ReservationStateChoice.WaitingForPayment:
+      return null;
+    case ReservationStateChoice.Cancelled:
+    case ReservationStateChoice.Created:
+    case ReservationStateChoice.Denied:
+    case null:
+      return "/reservations?error=order1";
+  }
 }
 
 /// Get the pending payment url for a reservation (handled reservations)

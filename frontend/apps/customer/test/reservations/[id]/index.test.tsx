@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useToastIfQueryParam } from "ui/src/hooks/useToastIfQueryParam";
 import { OrderStatus, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationTypeChoice } from "@gql/gql-types";
 import Reservation from "@/pages/reservations/[id]";
@@ -101,6 +102,36 @@ function customRender(
 }
 
 describe("Page: View reservation", () => {
+  it("shows a translated error when the payment of a handled reservation is no longer pending", async () => {
+    const params = new URLSearchParams();
+    params.set("error_code", "RESERVATION_PAYMENT_ORDER_NOT_PENDING");
+    params.set("error_message", "Payment for reservation is not in status 'PENDING'");
+    mockedSearchParams.mockReturnValue(params);
+    const view = customRender(reservationRenderProps("default", OrderStatus.Expired));
+    await waitForAddressSection(view);
+
+    expect(useToastIfQueryParam).toHaveBeenCalledWith({
+      key: "error_code",
+      message: "reservation:reservationNoLongerPayable",
+      type: "error",
+    });
+  });
+
+  it("tells the user that a handled reservation is already paid when a second payment is refused", async () => {
+    const params = new URLSearchParams();
+    params.set("error_code", "RESERVATION_PAYMENT_ORDER_NOT_PENDING");
+    params.set("error_message", "Payment for reservation is not in status 'PENDING'");
+    mockedSearchParams.mockReturnValue(params);
+    const view = customRender(reservationRenderProps("default", OrderStatus.Paid));
+    await waitForAddressSection(view);
+
+    expect(useToastIfQueryParam).toHaveBeenCalledWith({
+      key: "error_code",
+      message: "reservation:reservationAlreadyPaid",
+      type: "success",
+    });
+  });
+
   it("renders reservation name as page title", async () => {
     const view = customRender();
     await waitForAddressSection(view);

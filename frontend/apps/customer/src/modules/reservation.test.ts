@@ -15,6 +15,7 @@ import type {
   PaymentOrderNode,
   CanReservationBeChangedFragment,
   ReservationPaymentUrlFragment,
+  ReservationStateQuery,
 } from "@gql/gql-types";
 import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
 import { isSlotWithinReservationTime } from "./reservable";
@@ -29,6 +30,7 @@ import {
   getPaymentUrl,
   getDurationOptions,
   getNormalizedReservationOrderStatus,
+  getWebstoreSuccessRedirectUrl,
   getWhyReservationCantBeChanged,
   isReservationEditable,
   transformReservation,
@@ -647,6 +649,67 @@ describe("getPaymentUrl", () => {
         "https://varaamo.example"
       )
     ).toBeUndefined();
+  });
+});
+
+describe("getWebstoreSuccessRedirectUrl", () => {
+  type WebstoreReservation = NonNullable<ReservationStateQuery["reservation"]>;
+
+  function createHandledReservation(status: OrderStatus): WebstoreReservation {
+    return {
+      id: "ReservationNode:1",
+      pk: 1,
+      state: ReservationStateChoice.Confirmed,
+      paymentOrder: {
+        id: "PaymentOrderNode:1",
+        status,
+        handledPaymentDueBy: "2026-12-01T12:00:00+02:00",
+      },
+    };
+  }
+
+  test("waits for the webhook when a handled payment is still pending", () => {
+    expect(getWebstoreSuccessRedirectUrl(createHandledReservation(OrderStatus.Pending))).toBeNull();
+  });
+
+  test("goes to the reservation page when a handled payment is paid", () => {
+    expect(getWebstoreSuccessRedirectUrl(createHandledReservation(OrderStatus.Paid))).toBe(
+      "/reservations/1/?notify=paid"
+    );
+  });
+
+  test("goes to the reservation page when a handled payment is paid by invoice", () => {
+    expect(getWebstoreSuccessRedirectUrl(createHandledReservation(OrderStatus.PaidByInvoice))).toBe(
+      "/reservations/1/?notify=paid"
+    );
+  });
+
+  test("goes to the reservation page when a direct payment confirmed the reservation", () => {
+    const reservation: WebstoreReservation = {
+      id: "ReservationNode:1",
+      pk: 1,
+      state: ReservationStateChoice.Confirmed,
+      paymentOrder: {
+        id: "PaymentOrderNode:1",
+        status: OrderStatus.Paid,
+        handledPaymentDueBy: null,
+      },
+    };
+    expect(getWebstoreSuccessRedirectUrl(reservation)).toBe("/reservations/1/?notify=confirmed");
+  });
+
+  test("waits for the webhook when a direct payment is not done", () => {
+    const reservation: WebstoreReservation = {
+      id: "ReservationNode:1",
+      pk: 1,
+      state: ReservationStateChoice.WaitingForPayment,
+      paymentOrder: {
+        id: "PaymentOrderNode:1",
+        status: OrderStatus.Draft,
+        handledPaymentDueBy: null,
+      },
+    };
+    expect(getWebstoreSuccessRedirectUrl(reservation)).toBeNull();
   });
 });
 
