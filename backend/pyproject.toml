@@ -46,7 +46,7 @@ psycopg2 = "2.9.13"
 python-dateutil = "2.9.0.post0"
 redis = { version = "6.4.0", extras = ["hiredis"] }
 requests = "2.34.2"
-sentry-sdk = "2.75.0"
+sentry-sdk = "3.0.0"
 social-auth-app-django = "5.7.0"
 social-auth-core = "4.8.5"
 stamina = "26.2.0"
