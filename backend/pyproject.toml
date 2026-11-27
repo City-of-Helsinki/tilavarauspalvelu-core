@@ -143,6 +143,11 @@ module = [
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
+# The file is git-ignored and optional. CI does not have it.
+module = ["local_settings"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 # Read the source so that the plugin can see the fields of `User`, which subclasses a model from here.
 module = ["helusers.*"]
 follow_untyped_imports = true
