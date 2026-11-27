@@ -89,7 +89,8 @@ def singleton_task(task: Task) -> Task:
     @wraps(task_func)
     def wrapper(*args: Any, **kwargs: Any) -> None:
         # Hold the lock as long as the task can run, so that a second instance cannot start while the first runs.
-        lock_timeout = task.time_limit or settings.CELERY_TASK_TIME_LIMIT
+        # Celery sets `time_limit` from `CELERY_TASK_TIME_LIMIT` for tasks that do not set their own.
+        lock_timeout = task.time_limit
         timeout_leeway = 3  # Some leeway for cache operations
 
         timeout_at = time.monotonic() + lock_timeout - timeout_leeway

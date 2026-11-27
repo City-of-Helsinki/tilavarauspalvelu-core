@@ -15,7 +15,6 @@ from tests.helpers import as_mock, patch_method
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from pytest_django import Settings
 
 # ── Helpers ──
 
@@ -104,22 +103,16 @@ def test_singleton_task__skips_same_arguments_given_by_keyword_or_default_while_
 
 
 @mock.patch("tilavarauspalvelu.tasks.cache")
-def test_singleton_task__locks_for_the_default_time_limit(
-    mock_cache: mock.MagicMock, runs: TaskRuns, settings: Settings
-) -> None:
-    settings.CELERY_TASK_TIME_LIMIT = 600
-
+def test_singleton_task__locks_for_the_default_time_limit(mock_cache: mock.MagicMock, runs: TaskRuns) -> None:
     run_other_while_locked_task("1")
 
-    assert mock_cache.add.call_args == mock.call('test_singleton_task:{"first":"1","second":""}', 1, 600)
+    assert mock_cache.add.call_args == mock.call(
+        'test_singleton_task:{"first":"1","second":""}', 1, app.conf.task_time_limit
+    )
 
 
 @mock.patch("tilavarauspalvelu.tasks.cache")
-def test_singleton_task__locks_for_the_time_limit_of_the_task(
-    mock_cache: mock.MagicMock, runs: TaskRuns, settings: Settings
-) -> None:
-    settings.CELERY_TASK_TIME_LIMIT = 600
-
+def test_singleton_task__locks_for_the_time_limit_of_the_task(mock_cache: mock.MagicMock, runs: TaskRuns) -> None:
     run_with_time_limit_task("1")
 
     assert mock_cache.add.call_args == mock.call('test_singleton_task_with_time_limit:{"first":"1"}', 1, 1800)
