@@ -65,7 +65,6 @@
       "ALLOCATION_DURATION_TOO_LONG": "Vuoron pituus on liian pitkä.",
       "ALLOCATION_DURATION_TOO_SHORT": "Vuoron pituus on liian lyhyt.",
       "ALLOCATION_NOT_IN_SUITABLE_TIME_RANGES": "Vuoroa ei voi jakaa, koska se ei vastaa käyttäjän toiveita.",
-      "ALLOCATION_NO_ALLOCATIONS_ON_THE_SAME_DAY": "Vuoroa ei voi jakaa, koska samalle päivälle on jo jaettu vuoro.",
       "ALLOCATION_OPTION_LOCKED": "Vuoroa ei voi jakaa, koska se on hylätty.",
       "ALLOCATION_OPTION_REJECTED": "Vuoroa ei voi jakaa, koska se on hylätty.",
       "ALLOCATION_OVERLAPPING_ALLOCATIONS": "Vuoroa ei voi jakaa, koska se on päällekkäinen jo jaetun vuoron kanssa.",

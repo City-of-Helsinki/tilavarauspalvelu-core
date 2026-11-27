@@ -25,12 +25,21 @@ import type { CellGrid, PaintMode } from "./engine";
 import type {
   CalendarData,
   CellAvailability,
+  WeekdayInterval,
   WeeklyPatternAnnouncements,
   WeeklyPatternCalendarProps,
   WeeklyPatternCellInfo,
+  WeeklyPatternSelectionAnnouncements,
   WeeklyPatternValue,
 } from "./types";
 import { useLongPressPaint } from "./useLongPressPaint";
+
+/** The three select mode props, which only mean something together. Without them the gestures paint. */
+export type WeeklyPatternSelectMode = {
+  selection: WeekdayInterval | null;
+  onSelectionChange: (next: WeekdayInterval | null) => void;
+  announcements: WeeklyPatternSelectionAnnouncements;
+};
 
 export type WeeklyPatternOptions<TData extends CalendarData> = Pick<
   WeeklyPatternCalendarProps<TData>,
@@ -42,22 +51,52 @@ export type WeeklyPatternOptions<TData extends CalendarData> = Pick<
   | "visibleHours"
   | "brush"
   | "isDataEqual"
-  | "isValidSelection"
+  | "isValidPaint"
   | "disabled"
 > & {
   onChange: (value: WeeklyPatternValue<TData>) => void;
   readOnly?: boolean;
   announcements: WeeklyPatternAnnouncements;
+  /** Given in select mode, where the gestures choose a Selection and `value` is never written. */
+  select?: WeeklyPatternSelectMode;
   /** Spoken description of a span, e.g. "Monday, 10:00-11:00". */
   describeSpan: (weekday: Weekday, beginMinutes: number, endMinutes: number) => string;
 };
 
-// A pointer drag: the cell it started on, the cell the pointer is over now, and whether it paints or erases.
-type Gesture<TData> = { weekday: Weekday; anchor: number; current: number; mode: PaintMode<TData> };
+// A pointer drag on one weekday: the cell it started on and the cell the pointer is over now. A paint gesture
+// also carries what it does, which is fixed on the cell it started on. A select gesture needs no mode, because
+// choosing a Selection has one meaning.
+type Gesture<TData> = { weekday: Weekday; anchor: number; current: number } & (
+  | { kind: "paint"; mode: PaintMode<TData> }
+  | { kind: "select" }
+);
 // The cells a paint in progress covers on one weekday, as inclusive indexes.
 type PaintRange = { weekday: Weekday; first: number; last: number };
-// A Shift+Arrow keyboard sweep on one weekday. The mode and the grid before the sweep are fixed when it starts.
-type Sweep<TData> = { weekday: Weekday; anchor: number; mode: PaintMode<TData>; origin: CellGrid<TData> };
+
+// The keyboard twin of a gesture, on one weekday. A paint sweep fixes its mode and the grid before the sweep when
+// it starts. A select sweep holds the end that stays put, so the moving end can shrink the Selection as well as
+// grow it.
+type PaintSweep<TData> = {
+  kind: "paint";
+  weekday: Weekday;
+  anchor: number;
+  mode: PaintMode<TData>;
+  origin: CellGrid<TData>;
+};
+type SelectSweep = { kind: "select"; weekday: Weekday; anchor: number };
+type Sweep<TData> = PaintSweep<TData> | SelectSweep;
+
+/**
+ * What a cell does on a gesture. One of the two objects below is picked, once, from the mode the grid is in, so
+ * no handler has to ask which mode it is in.
+ */
+type CellGestures = {
+  /** A pointer press or a touch long press, which starts a gesture. Returns false when the cell allows none. */
+  press: (weekday: Weekday, index: number) => boolean;
+  /** A touch tap, or a click from assistive technology, which acts on the one cell it hits. */
+  tap: (weekday: Weekday, index: number) => void;
+  keyDown: (event: KeyboardEvent<HTMLTableCellElement>, weekday: Weekday, index: number) => void;
+};
 
 export type GridRow = {
   index: number;
@@ -66,6 +105,34 @@ export type GridRow = {
   /** Set on the rows that start an hour (or every row when the step is an hour or more). */
   headerRowSpan: number | null;
 };
+
+/** The span a run of cells covers, with an exclusive end, as every interval in this calendar has. */
+function intervalOf(weekday: Weekday, from: number, to: number, step: number): WeekdayInterval {
+  return {
+    weekday,
+    beginMinutes: Math.min(from, to) * step,
+    endMinutes: (Math.max(from, to) + 1) * step,
+  };
+}
+
+// Which cells a Selection covers. Rounded outward, so a cell the Selection only reaches into still counts.
+function selectionCells(selection: WeekdayInterval | null, step: number) {
+  if (!selection) {
+    return null;
+  }
+  return {
+    weekday: selection.weekday,
+    first: Math.floor(selection.beginMinutes / step),
+    last: Math.ceil(selection.endMinutes / step) - 1,
+  };
+}
+
+function sameInterval(a: WeekdayInterval | null, b: WeekdayInterval | null): boolean {
+  if (a == null || b == null) {
+    return a === b;
+  }
+  return a.weekday === b.weekday && a.beginMinutes === b.beginMinutes && a.endMinutes === b.endMinutes;
+}
 
 export function useWeeklyPatternCalendar<TData extends CalendarData>({
   value,
@@ -77,10 +144,11 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   visibleHours,
   brush,
   isDataEqual = shallowEqual,
-  isValidSelection,
+  isValidPaint,
   readOnly = false,
   disabled = false,
   announcements,
+  select,
   describeSpan,
 }: WeeklyPatternOptions<TData>) {
   assertValidStep(step);
@@ -108,6 +176,10 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     return !paintable || isPaintable(weekday, index) ? "closed" : "unavailable";
   };
 
+  // The whole span has to be paintable, which is also what stops a Selection crossing a cell it can't hold.
+  const isSpanPaintable = (weekday: Weekday, from: number, to: number) =>
+    isRangeOpen(paintableByDay[weekday], Math.min(from, to) * step, (Math.max(from, to) + 1) * step);
+
   const [gesture, setGesture] = useState<Gesture<TData> | null>(null);
   const [message, setMessage] = useState({ text: "", count: 0 });
   const gestureRef = useRef<Gesture<TData> | null>(null);
@@ -126,17 +198,18 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   }, []);
 
   // While dragging, preview the gesture without committing it to `value`.
-  const grid: CellGrid<TData> = gesture
-    ? paintRange(
-        baseGrid,
-        gesture.weekday,
-        gesture.anchor,
-        gesture.current,
-        gesture.mode,
-        isEditableFor(gesture.mode, (index) => isPaintable(gesture.weekday, index)),
-        isDataEqual
-      )
-    : baseGrid;
+  const grid: CellGrid<TData> =
+    gesture?.kind === "paint"
+      ? paintRange(
+          baseGrid,
+          gesture.weekday,
+          gesture.anchor,
+          gesture.current,
+          gesture.mode,
+          isEditableFor(gesture.mode, (index) => isPaintable(gesture.weekday, index)),
+          isDataEqual
+        )
+      : baseGrid;
 
   // The tab stop starts on the first paintable cell, so the grid isn't entered through one that can't be painted.
   const defaultActive = (): GridAddress<Weekday> | null => {
@@ -159,8 +232,9 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     step,
     isDataEqual,
     isPaintable,
-    isValidSelection,
+    isValidPaint,
     announcements,
+    select,
     describeSpan,
   });
   useEffect(() => {
@@ -170,8 +244,9 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       step,
       isDataEqual,
       isPaintable,
-      isValidSelection,
+      isValidPaint,
       announcements,
+      select,
       describeSpan,
     };
   });
@@ -184,7 +259,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   // The single path through which every gesture changes `value`. A sweep commits once per step, so it passes
   // itself in. Validation and the announcement then cover every cell the sweep changed, not only the last step.
   const commit = useCallback(
-    (weekday: Weekday, from: number, to: number, mode: PaintMode<TData>, activeSweep?: Sweep<TData>) => {
+    (weekday: Weekday, from: number, to: number, mode: PaintMode<TData>, activeSweep?: PaintSweep<TData>) => {
       const current = latest.current;
       const next = paintRange(
         current.baseGrid,
@@ -207,9 +282,9 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
         beginMinutes: run.first * current.step,
         endMinutes: (run.last + 1) * current.step,
       }));
-      if (mode.kind === "paint" && current.isValidSelection) {
+      if (mode.kind === "paint" && current.isValidPaint) {
         for (const span of spans) {
-          const reason = current.isValidSelection({ weekday, ...span, data: mode.data });
+          const reason = current.isValidPaint({ weekday, ...span, data: mode.data });
           if (reason) {
             announce(reason);
             return;
@@ -224,6 +299,36 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     [announce]
   );
 
+  // The single path through which every gesture chooses a Selection. A gesture that lands on the span that is
+  // already chosen commits nothing, so nothing is announced twice.
+  const chooseSelection = useCallback(
+    (weekday: Weekday, from: number, to: number) => {
+      const current = latest.current;
+      if (!current.select) {
+        return;
+      }
+      const next = intervalOf(weekday, from, to, current.step);
+      if (sameInterval(current.select.selection, next)) {
+        return;
+      }
+      current.select.onSelectionChange(next);
+      const described = current.describeSpan(next.weekday, next.beginMinutes, next.endMinutes);
+      announce(`${current.select.announcements.chosen}: ${described}`);
+    },
+    [announce]
+  );
+
+  const clearSelection = useCallback(() => {
+    const current = latest.current;
+    const cleared = current.select?.selection;
+    if (!current.select || !cleared) {
+      return;
+    }
+    current.select.onSelectionChange(null);
+    const described = current.describeSpan(cleared.weekday, cleared.beginMinutes, cleared.endMinutes);
+    announce(`${current.select.announcements.cleared}: ${described}`);
+  }, [announce]);
+
   const endGesture = useCallback(
     (shouldCommit: boolean) => {
       const finished = gestureRef.current;
@@ -232,11 +337,17 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       }
       gestureRef.current = null;
       setGesture(null);
-      if (shouldCommit) {
+      if (!shouldCommit) {
+        return;
+      }
+      // Releasing is the one thing the two modes do differently at the end of a gesture.
+      if (finished.kind === "paint") {
         commit(finished.weekday, finished.anchor, finished.current, finished.mode);
+      } else {
+        chooseSelection(finished.weekday, finished.anchor, finished.current);
       }
     },
-    [commit]
+    [commit, chooseSelection]
   );
 
   // A drag can end outside the table, so the listeners live on the window while a gesture is active.
@@ -265,30 +376,26 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     };
   }, [gestureActive, endGesture]);
 
-  const startGesture = (weekday: Weekday, index: number): boolean => {
-    const mode = modeAt(weekday, index);
-    if (!mode) {
-      return false;
-    }
-    const started: Gesture<TData> = { weekday, anchor: index, current: index, mode };
+  const startGesture = (started: Gesture<TData>): boolean => {
     gestureRef.current = started;
     setGesture(started);
     return true;
   };
 
-  // Dragging across weekdays is intentionally unsupported: a gesture paints a single-day range.
+  // Dragging across weekdays is intentionally unsupported: a gesture paints or chooses a single-day range.
   const extendGesture = (weekday: Weekday, index: number) => {
     const running = gestureRef.current;
     if (!running || running.weekday !== weekday || running.current === index) {
+      return;
+    }
+    // A Selection cannot cross a cell it can't paint, so the moving end stops where the paintable range does.
+    if (running.kind === "select" && !isSpanPaintable(weekday, running.anchor, index)) {
       return;
     }
     const extended = { ...running, current: index };
     gestureRef.current = extended;
     setGesture(extended);
   };
-
-  // On touch, a swipe scrolls and a long press followed by a drag paints.
-  const longPress = useLongPressPaint({ start: startGesture, extend: extendGesture, end: endGesture }, interactive);
 
   const toggleCell = (weekday: Weekday, index: number) => {
     const mode = modeAt(weekday, index);
@@ -299,45 +406,150 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
 
   // Keyboard equivalent of a drag. The mode is decided once per sweep so it doesn't flip
   // when later cells are in a different state.
-  const sweep = (weekday: Weekday, from: number, to: number) => {
+  const paintSweep = (weekday: Weekday, from: number, to: number) => {
     let running = sweepRef.current;
-    if (!running || running.weekday !== weekday) {
+    if (running?.kind !== "paint" || running.weekday !== weekday) {
       const anchor = modeAt(weekday, from) ? from : to;
       const mode = modeAt(weekday, anchor);
       if (!mode) {
         return;
       }
-      running = { weekday, anchor, mode, origin: baseGrid };
+      running = { kind: "paint", weekday, anchor, mode, origin: baseGrid };
       sweepRef.current = running;
     }
     commit(weekday, from, to, running.mode, running);
     setSweepRange({ weekday, first: Math.min(running.anchor, to), last: Math.max(running.anchor, to) });
   };
 
+  const paintGestures: CellGestures = {
+    press: (weekday, index) => {
+      const mode = modeAt(weekday, index);
+      return mode != null && startGesture({ kind: "paint", weekday, anchor: index, current: index, mode });
+    },
+    tap: toggleCell,
+    keyDown: (event, weekday, index) => {
+      if (event.key === " " || event.key === "Enter") {
+        event.preventDefault();
+        endSweep();
+        toggleCell(weekday, index);
+        return;
+      }
+
+      const target = navigation.targetFor(event.key, weekday, index);
+      if (!target) {
+        return;
+      }
+
+      event.preventDefault();
+      if (event.shiftKey && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+        paintSweep(weekday, index, target.index);
+      } else {
+        endSweep();
+      }
+      navigation.focusCell(target);
+    },
+  };
+
+  // What a select gesture may do on a cell. A Selection cannot start on a cell it can't paint, so such a cell allows
+  // nothing. This is the select mode twin of `modeAt`.
+  const canSelect = (weekday: Weekday, index: number) => interactive && isPaintable(weekday, index);
+
+  /**
+   * The end of the Selection that stays put while Shift and an arrow move the other one. It is the far end when
+   * focus sits on one end of the Selection, and the focused cell itself otherwise. Once a sweep runs the anchor
+   * is held, because the consumer owns the Selection and may not have echoed the last change back yet.
+   */
+  const sweepAnchor = (weekday: Weekday, index: number): number => {
+    const running = sweepRef.current;
+    if (running?.kind === "select" && running.weekday === weekday) {
+      return running.anchor;
+    }
+    const chosen = selectionCells(select?.selection ?? null, step);
+    if (chosen?.weekday === weekday) {
+      if (index === chosen.first) {
+        return chosen.last;
+      }
+      if (index === chosen.last) {
+        return chosen.first;
+      }
+    }
+    return index;
+  };
+
+  const selectSweep = (weekday: Weekday, index: number, to: number) => {
+    const anchor = sweepAnchor(weekday, index);
+    if (!interactive || !isSpanPaintable(weekday, anchor, to)) {
+      // The end cannot move onto or across a cell it can't paint, so neither it nor focus moves at all.
+      return;
+    }
+    sweepRef.current = { kind: "select", weekday, anchor };
+    chooseSelection(weekday, anchor, to);
+    navigation.focusCell({ column: weekday, index: to });
+  };
+
+  const chooseCell = (weekday: Weekday, index: number) => {
+    if (canSelect(weekday, index)) {
+      chooseSelection(weekday, index, index);
+    }
+  };
+
+  const selectGestures: CellGestures = {
+    // A pointer or a touch chooses a new span, so a Shift sweep after it starts from that span, not the old anchor.
+    press: (weekday, index) => {
+      endSweep();
+      return canSelect(weekday, index) && startGesture({ kind: "select", weekday, anchor: index, current: index });
+    },
+    tap: (weekday, index) => {
+      endSweep();
+      chooseCell(weekday, index);
+    },
+    keyDown: (event, weekday, index) => {
+      if (event.key === " " || event.key === "Enter") {
+        event.preventDefault();
+        endSweep();
+        chooseCell(weekday, index);
+        return;
+      }
+
+      if (event.key === "Escape") {
+        endSweep();
+        // Escape also cancels a drag, so the release after it does not choose the dragged span again.
+        endGesture(false);
+        if (interactive) {
+          clearSelection();
+        }
+        return;
+      }
+
+      const target = navigation.targetFor(event.key, weekday, index);
+      if (!target) {
+        return;
+      }
+
+      event.preventDefault();
+      if (event.shiftKey && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+        selectSweep(weekday, index, target.index);
+        return;
+      }
+      // A plain arrow key only moves focus. The Selection stays as it is.
+      endSweep();
+      navigation.focusCell(target);
+    },
+  };
+
+  const gestures = select ? selectGestures : paintGestures;
+
+  // On touch, a swipe scrolls and a long press followed by a drag paints, or chooses a Selection in select mode.
+  const longPress = useLongPressPaint(
+    { start: (weekday, index) => gestures.press(weekday, index), extend: extendGesture, end: endGesture },
+    interactive
+  );
+
   const handleKeyDown = (event: KeyboardEvent<HTMLTableCellElement>, weekday: Weekday, index: number) => {
     if (event.altKey || event.ctrlKey || event.metaKey) {
       return;
     }
-
-    if (event.key === " " || event.key === "Enter") {
-      event.preventDefault();
-      endSweep();
-      toggleCell(weekday, index);
-      return;
-    }
-
-    const target = navigation.targetFor(event.key, weekday, index);
-    if (!target) {
-      return;
-    }
-
-    event.preventDefault();
-    if (event.shiftKey && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
-      sweep(weekday, index, target.index);
-    } else {
-      endSweep();
-    }
-    navigation.focusCell(target);
+    gestures.keyDown(event, weekday, index);
   };
 
   // Touch is handled as a plain tap on click, and non-primary mouse buttons are ignored.
@@ -347,7 +559,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       return;
     }
     event.currentTarget.focus();
-    startGesture(weekday, index);
+    gestures.press(weekday, index);
   };
 
   const rows: GridRow[] = [];
@@ -363,6 +575,14 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     });
   }
 
+  // While a select gesture runs, the span it covers is the Selection the cells show. It is committed on release,
+  // so until then the consumer's own `selection` is one gesture behind.
+  const shownSelection =
+    gesture?.kind === "select"
+      ? intervalOf(gesture.weekday, gesture.anchor, gesture.current, step)
+      : (select?.selection ?? null);
+  const selectionRun = select ? selectionCells(shownSelection, step) : null;
+
   const cellInfo = (weekday: Weekday, index: number): WeeklyPatternCellInfo<TData> => {
     const dayCells = grid[weekday];
     const data = dayCells?.[index];
@@ -377,18 +597,26 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
         ? { first: index, last: index }
         : cellExtent(dayCells ?? [], index, (cell) => cell !== undefined && isDataEqual(cell, data));
 
+    const painted = data !== undefined;
+    const chosen = selectionRun?.weekday === weekday ? selectionRun : null;
+
     return {
       weekday,
       beginMinutes: index * step,
       endMinutes: (index + 1) * step,
       data,
-      selected: data !== undefined,
+      painted,
+      // Painting is the user's choice in editable and read only mode, so it is what `aria-selected` reports
+      // there. In select mode the Selection is the choice, and a painted cell is only a layer the consumer draws.
+      selected: select ? chosen != null && index >= chosen.first && index <= chosen.last : painted,
       isRunStart,
       isRunEnd,
       isBlockStart: data !== undefined && previous === undefined,
       isBlockEnd: data !== undefined && next === undefined,
       runBeginMinutes: run.first * step,
       runEndMinutes: (run.last + 1) * step,
+      isSelectionStart: chosen != null && index === chosen.first,
+      isSelectionEnd: chosen != null && index === chosen.last,
       availability: cellAvailability(weekday, index),
     };
   };
@@ -420,7 +648,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       }
       // detail === 0 is a click synthesized by assistive technology, with no preceding pointer events.
       if (pointerTypeRef.current === "touch" || event.detail === 0) {
-        toggleCell(weekday, index);
+        gestures.tap(weekday, index);
       }
     },
   });
@@ -446,13 +674,14 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
 
   // The cells a paint action still in progress covers: a pointer drag (a click is a short one) until the button is
   // released, or a Shift+Arrow sweep until Shift is.
-  const pendingRange: PaintRange | null = gesture
-    ? {
-        weekday: gesture.weekday,
-        first: Math.min(gesture.anchor, gesture.current),
-        last: Math.max(gesture.anchor, gesture.current),
-      }
-    : sweepRange;
+  const pendingRange: PaintRange | null =
+    gesture?.kind === "paint"
+      ? {
+          weekday: gesture.weekday,
+          first: Math.min(gesture.anchor, gesture.current),
+          last: Math.max(gesture.anchor, gesture.current),
+        }
+      : sweepRange;
 
   // Whether a cell belongs to the time being painted: its block (the painted cells around it, of any data) overlaps
   // or touches the paint in progress. Validation waits for the paint to end there, so a run isn't shown as invalid on

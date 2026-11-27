@@ -4,7 +4,12 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { axe } from "vitest-axe";
 import { Weekday } from "../../../gql/gql-types";
-import type { WeeklyPatternCalendarProps, WeeklyPatternValue } from "./types";
+import type {
+  WeekdayInterval,
+  WeeklyPatternAnnouncements,
+  WeeklyPatternCalendarProps,
+  WeeklyPatternValue,
+} from "./types";
 import { LONG_PRESS_MS } from "./useLongPressPaint";
 import { WeeklyPatternCalendar } from "./WeeklyPatternCalendar";
 
@@ -17,7 +22,15 @@ const availability = [
   { weekday: Weekday.Tuesday, beginMinutes: 480, endMinutes: 600 },
 ];
 
-type Overrides = Partial<WeeklyPatternCalendarProps<Data>> & { initial?: WeeklyPatternValue<Data> };
+// A harness fixes which props variant it renders, so its overrides are the props of that one variant. The
+// partial of the whole union is a union too, and spreading that matches no variant.
+type PaintProps = Extract<WeeklyPatternCalendarProps<Data>, { announcements: WeeklyPatternAnnouncements }>;
+type SelectVariantProps = Extract<WeeklyPatternCalendarProps<Data>, { onSelectionChange: unknown }>;
+
+type Overrides = Partial<Omit<PaintProps, "readOnly">> & {
+  readOnly?: boolean;
+  initial?: WeeklyPatternValue<Data>;
+};
 
 function Harness({ initial = [], onChange, ...overrides }: Overrides) {
   const [value, setValue] = useState<WeeklyPatternValue<Data>>(initial);
@@ -44,7 +57,41 @@ function Harness({ initial = [], onChange, ...overrides }: Overrides) {
   );
 }
 
+type SelectOverrides = Partial<SelectVariantProps> & { initialSelection?: WeekdayInterval | null };
+
+// Select mode: the grid chooses a Selection and never writes the value, so the value is a plain prop here.
+function SelectHarness({ value = [], initialSelection = null, onSelectionChange, ...overrides }: SelectOverrides) {
+  const [selection, setSelection] = useState<WeekdayInterval | null>(initialSelection);
+  return (
+    <>
+      <WeeklyPatternCalendar<Data>
+        value={value}
+        selection={selection}
+        onSelectionChange={(next) => {
+          setSelection(next);
+          onSelectionChange?.(next);
+        }}
+        selectionAnnouncements={{ chosen: "Selected", cleared: "Selection cleared" }}
+        step={30}
+        availability={availability}
+        getStateLabel={(cell) => (cell.data ? cell.data.priority : cell.availability === "open" ? "free" : "closed")}
+        getCellAppearance={(data) => (data.priority === "primary" ? "primary" : "secondary")}
+        alternative={{ id: "form", label: "Skip to the time form" }}
+        aria-label="Allocation"
+        {...overrides}
+      />
+      <form id="form" aria-label="Time form" />
+    </>
+  );
+}
+
 const cell = (name: RegExp) => screen.getByRole("gridcell", { name });
+
+const monday = (beginMinutes: number, endMinutes: number): WeekdayInterval => ({
+  weekday: Weekday.Monday,
+  beginMinutes,
+  endMinutes,
+});
 
 describe("WeeklyPatternCalendar", () => {
   test("is a grid with weekday column headers and state in every cell label", () => {
@@ -53,6 +100,20 @@ describe("WeeklyPatternCalendar", () => {
     expect(screen.getAllByRole("columnheader")).toHaveLength(7);
     expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30, free$/)).toBeInTheDocument();
     expect(cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30, closed$/)).toHaveAttribute("aria-disabled", "true");
+  });
+
+  test("short weekday names are shown, and the header keeps the long name as its accessible name", () => {
+    render(<Harness weekdayNameStyle="short" />);
+    expect(screen.getByRole("columnheader", { name: "common:weekdayLongEnum.WEDNESDAY" })).toBeInTheDocument();
+    const stickyHeader = screen.getByTestId("weekly-pattern__sticky-header");
+    expect(stickyHeader).toHaveTextContent("common:weekdayShortEnum.WEDNESDAY");
+    expect(stickyHeader).not.toHaveTextContent("common:weekdayLongEnum.WEDNESDAY");
+    expect(cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30, closed$/)).toBeInTheDocument();
+  });
+
+  test("long weekday names are shown without the prop", () => {
+    render(<Harness />);
+    expect(screen.getByTestId("weekly-pattern__sticky-header")).toHaveTextContent("common:weekdayLongEnum.WEDNESDAY");
   });
 
   test("only one cell is in the tab order", () => {
@@ -111,6 +172,39 @@ describe("WeeklyPatternCalendar", () => {
     ]);
   });
 
+  test("a cell says whether it is painted, apart from what aria-selected reports", () => {
+    render(
+      <Harness
+        initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 510, data: primary }]}
+        getCellProps={(info) => ({ "data-test-painted": info.painted })}
+      />
+    );
+    const painted = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30, primary$/);
+    expect(painted).toHaveAttribute("data-test-painted", "true");
+    expect(painted).toHaveAttribute("aria-selected", "true");
+
+    const empty = cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00, free$/);
+    expect(empty).toHaveAttribute("data-test-painted", "false");
+    expect(empty).toHaveAttribute("aria-selected", "false");
+  });
+
+  test("a custom renderer decides what a cell shows", () => {
+    render(
+      <Harness
+        initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 540, data: primary }]}
+        renderCellContent={(info) => (info.painted ? <span>{info.data?.priority}</span> : null)}
+      />
+    );
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–09:00, primary$/)).toHaveTextContent("primary");
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30, free$/)).toBeEmptyDOMElement();
+  });
+
+  test("without a custom renderer a cell shows its hour, and a painted run its range", () => {
+    render(<Harness initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 540, data: primary }]} />);
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00, primary$/)).toHaveTextContent("8:00–9:00");
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30, free$/)).toHaveTextContent("9:00");
+  });
+
   test("a different brush paints over an existing run instead of erasing it", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
@@ -128,10 +222,10 @@ describe("WeeklyPatternCalendar", () => {
     ]);
   });
 
-  test("a refused selection is announced with its reason and does not change the value", async () => {
+  test("a refused paint is announced with its reason and does not change the value", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<Harness onChange={onChange} isValidSelection={() => "Too short"} />);
+    render(<Harness onChange={onChange} isValidPaint={() => "Too short"} />);
 
     cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
     await user.keyboard("{Enter}");
@@ -140,30 +234,30 @@ describe("WeeklyPatternCalendar", () => {
   });
 
   test("a sweep over an already painted cell validates and announces each changed run alone", async () => {
-    const isValidSelection = vi.fn(() => null);
+    const isValidPaint = vi.fn(() => null);
     const user = userEvent.setup();
     render(
       <Harness
         initial={[{ weekday: Weekday.Monday, beginMinutes: 510, endMinutes: 540, data: primary }]}
-        isValidSelection={isValidSelection}
+        isValidPaint={isValidPaint}
       />
     );
 
     cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
     await user.keyboard("{Shift>}{ArrowDown}{ArrowDown}{/Shift}");
-    expect(isValidSelection).toHaveBeenLastCalledWith({
+    expect(isValidPaint).toHaveBeenLastCalledWith({
       weekday: Weekday.Monday,
       beginMinutes: 540,
       endMinutes: 570,
       data: primary,
     });
-    expect(isValidSelection).toHaveBeenCalledWith({
+    expect(isValidPaint).toHaveBeenCalledWith({
       weekday: Weekday.Monday,
       beginMinutes: 480,
       endMinutes: 510,
       data: primary,
     });
-    expect(isValidSelection).not.toHaveBeenCalledWith(expect.objectContaining({ beginMinutes: 480, endMinutes: 570 }));
+    expect(isValidPaint).not.toHaveBeenCalledWith(expect.objectContaining({ beginMinutes: 480, endMinutes: 570 }));
     expect(screen.getByRole("status").textContent?.trim()).toBe(
       "Added: common:weekdayLongEnum.MONDAY, 08:00–08:30, common:weekdayLongEnum.MONDAY, 09:00–09:30"
     );
@@ -257,9 +351,9 @@ describe("WeeklyPatternCalendar", () => {
         { weekday: Weekday.Thursday, beginMinutes: 480, endMinutes: 510 },
         { weekday: Weekday.Thursday, beginMinutes: 540, endMinutes: 570 },
       ];
-      const isValidSelection = vi.fn(() => null);
+      const isValidPaint = vi.fn(() => null);
       const user = userEvent.setup();
-      render(<Harness paintable={withGap} getStateLabel={label} isValidSelection={isValidSelection} />);
+      render(<Harness paintable={withGap} getStateLabel={label} isValidPaint={isValidPaint} />);
 
       await user.pointer([
         { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.THURSDAY, 08:00–08:30/) },
@@ -267,7 +361,7 @@ describe("WeeklyPatternCalendar", () => {
         { target: cell(/^common:weekdayLongEnum.THURSDAY, 09:00–09:30/) },
         { keys: "[/MouseLeft]" },
       ]);
-      expect(isValidSelection.mock.calls).toEqual([
+      expect(isValidPaint.mock.calls).toEqual([
         [{ weekday: Weekday.Thursday, beginMinutes: 480, endMinutes: 510, data: primary }],
         [{ weekday: Weekday.Thursday, beginMinutes: 540, endMinutes: 570, data: primary }],
       ]);
@@ -528,6 +622,259 @@ describe("WeeklyPatternCalendar", () => {
 
   test("a read-only grid has no axe violations", async () => {
     const { container } = render(<Harness readOnly />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe("WeeklyPatternCalendar in select mode", () => {
+  test("a pointer press chooses the cell it pressed, and announces it", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness onSelectionChange={onSelectionChange} />);
+
+    await user.pointer([
+      { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00/) },
+      { keys: "[/MouseLeft]" },
+    ]);
+
+    expect(onSelectionChange).toHaveBeenCalledWith(monday(510, 540));
+    expect(screen.getByRole("status")).toHaveTextContent("Selected: common:weekdayLongEnum.MONDAY, 08:30–09:00");
+  });
+
+  test("a drag moves the open end of the Selection, and the release commits it", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness onSelectionChange={onSelectionChange} />);
+
+    await user.pointer([
+      { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/) },
+      { target: cell(/^common:weekdayLongEnum.MONDAY, 09:30–10:00/) },
+      // Moving back towards the press shrinks the run again, so only the release decides what is chosen.
+      { target: cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/) },
+      { keys: "[/MouseLeft]" },
+    ]);
+
+    expect(onSelectionChange).toHaveBeenCalledOnce();
+    expect(onSelectionChange).toHaveBeenCalledWith(monday(480, 570));
+  });
+
+  test("a touch tap chooses one cell", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness onSelectionChange={onSelectionChange} />);
+
+    await user.pointer({ keys: "[TouchA]", target: cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/) });
+
+    expect(onSelectionChange).toHaveBeenCalledWith(monday(540, 570));
+  });
+
+  test("Enter chooses the focused cell, and Space replaces the Selection", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness onSelectionChange={onSelectionChange} />);
+
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
+    await user.keyboard("{Enter}");
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(480, 510));
+
+    await user.keyboard("{ArrowDown} ");
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(510, 540));
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/)).toHaveAttribute("aria-selected", "false");
+  });
+
+  test("Shift and an arrow key grow the Selection, and shrink it from the end focus is on", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness initialSelection={monday(480, 510)} onSelectionChange={onSelectionChange} />);
+
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
+    await user.keyboard("{Shift>}{ArrowDown}{ArrowDown}{/Shift}");
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(480, 570));
+    expect(screen.getByRole("status")).toHaveTextContent("Selected: common:weekdayLongEnum.MONDAY, 08:00–09:30");
+
+    // Focus sits on the last cell of the run, so moving that end back leaves the begin time where it was.
+    await user.keyboard("{Shift>}{ArrowUp}{/Shift}");
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(480, 540));
+  });
+
+  test("Escape clears the Selection, and says what was cleared", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness initialSelection={monday(480, 540)} onSelectionChange={onSelectionChange} />);
+
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
+    await user.keyboard("{Escape}");
+
+    expect(onSelectionChange).toHaveBeenCalledWith(null);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Selection cleared: common:weekdayLongEnum.MONDAY, 08:00–09:00"
+    );
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/)).toHaveAttribute("aria-selected", "false");
+  });
+
+  test("Escape during a drag cancels the drag, so the release chooses nothing", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness initialSelection={monday(540, 570)} onSelectionChange={onSelectionChange} />);
+
+    await user.pointer([
+      { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/) },
+      { target: cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/) },
+    ]);
+    await user.keyboard("{Escape}");
+    await user.pointer({ keys: "[/MouseLeft]" });
+
+    expect(onSelectionChange).toHaveBeenCalledOnce();
+    expect(onSelectionChange).toHaveBeenCalledWith(null);
+  });
+
+  test("a click with Shift held starts the next Shift sweep from the clicked cell", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness onSelectionChange={onSelectionChange} />);
+
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
+    await user.keyboard("{Shift>}{ArrowDown}");
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(480, 540));
+
+    await user.pointer([
+      { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/) },
+      { keys: "[/MouseLeft]" },
+    ]);
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(540, 570));
+
+    await user.keyboard("{ArrowDown}{/Shift}");
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(540, 600));
+  });
+
+  test("a plain arrow key moves focus and keeps the Selection", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness initialSelection={monday(480, 510)} onSelectionChange={onSelectionChange} />);
+
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
+    await user.keyboard("{ArrowDown}{ArrowRight}");
+
+    expect(cell(/^common:weekdayLongEnum.TUESDAY, 08:30–09:00/)).toHaveFocus();
+    expect(onSelectionChange).not.toHaveBeenCalled();
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/)).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("aria-selected marks only the Selection, so a cell with data is not announced as selected", () => {
+    render(
+      <SelectHarness
+        value={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 540, data: primary }]}
+        initialSelection={monday(540, 570)}
+      />
+    );
+
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:00–09:00, primary$/)).toHaveAttribute("aria-selected", "false");
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00, primary$/)).toHaveAttribute("aria-selected", "false");
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30, free$/)).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("the ends of the Selection are marked, so a view can frame the run", () => {
+    render(<SelectHarness initialSelection={monday(480, 570)} />);
+
+    const first = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/);
+    const middle = cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00/);
+    const last = cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/);
+
+    expect(first).toHaveAttribute("data-selection-start");
+    expect(first).not.toHaveAttribute("data-selection-end");
+    expect(middle).not.toHaveAttribute("data-selection-start");
+    expect(middle).not.toHaveAttribute("data-selection-end");
+    expect(last).toHaveAttribute("data-selection-end");
+    expect(last).not.toHaveAttribute("data-selection-start");
+  });
+
+  // Every offset of the frame has to be a length. A browser drops the whole box shadow when one of them is not,
+  // and then only the cell that sets its own value keeps a frame. jsdom does not check a length, so this test
+  // reads the offsets instead and fails if any of them loses its unit.
+  test("every cell of the Selection keeps all four shadows of the frame", () => {
+    render(<SelectHarness initialSelection={monday(480, 570)} />);
+
+    const cells = [
+      cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/),
+      cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00/),
+      cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/),
+    ];
+
+    for (const td of cells) {
+      const shadows = [...getComputedStyle(td).boxShadow.matchAll(/inset (\S+) (\S+)/g)];
+      expect(shadows).toHaveLength(4);
+      for (const [, offsetX, offsetY] of shadows) {
+        expect(offsetX).toMatch(/^-?(0|\d+px)$/);
+        expect(offsetY).toMatch(/^-?(0|\d+px)$/);
+      }
+    }
+  });
+
+  test("no gesture changes the value", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    // A brush is given, so a gesture that fell through to painting would show up in onChange.
+    render(<SelectHarness onChange={onChange} brush={primary} initialSelection={monday(480, 510)} />);
+
+    await user.pointer([
+      { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/) },
+      { target: cell(/^common:weekdayLongEnum.MONDAY, 09:00–09:30/) },
+      { keys: "[/MouseLeft]" },
+    ]);
+    await user.pointer({ keys: "[TouchA]", target: cell(/^common:weekdayLongEnum.MONDAY, 09:30–10:00/) });
+    cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
+    await user.keyboard("{Enter}{Shift>}{ArrowDown}{/Shift}{Escape}");
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  test("a Selection cannot start on a closed cell", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    render(<SelectHarness onSelectionChange={onSelectionChange} />);
+
+    cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30/).focus();
+    await user.keyboard("{Enter}");
+    await user.pointer([
+      { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.WEDNESDAY, 08:00–08:30/) },
+      { keys: "[/MouseLeft]" },
+    ]);
+
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  test("a Selection cannot cross a closed cell", async () => {
+    const onSelectionChange = vi.fn();
+    const user = userEvent.setup();
+    const gapped = [
+      { weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 540 },
+      { weekday: Weekday.Monday, beginMinutes: 600, endMinutes: 660 },
+    ];
+    render(<SelectHarness availability={gapped} onSelectionChange={onSelectionChange} />);
+
+    await user.pointer([
+      { keys: "[MouseLeft>]", target: cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/) },
+      { target: cell(/^common:weekdayLongEnum.MONDAY, 10:00–10:30/) },
+      { keys: "[/MouseLeft]" },
+    ]);
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(480, 510));
+
+    cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00/).focus();
+    await user.keyboard("{Enter}");
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(510, 540));
+
+    await user.keyboard("{Shift>}{ArrowDown}{/Shift}");
+    expect(onSelectionChange).toHaveBeenLastCalledWith(monday(510, 540));
+    expect(cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00/)).toHaveFocus();
+  });
+
+  test("a grid in select mode has no axe violations", async () => {
+    const { container } = render(
+      <SelectHarness
+        value={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 540, data: primary }]}
+        initialSelection={monday(540, 600)}
+      />
+    );
     expect(await axe(container)).toHaveNoViolations();
   });
 });

@@ -3,22 +3,28 @@ import { ApolloError, gql } from "@apollo/client";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import type { ApolloQueryResult } from "@apollo/client";
+import type { WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
 import { logError } from "@ui/modules/errors";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
-import { numberToDayT } from "ui/src/modules/conversion";
+import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";
 import { toNumber } from "ui/src/modules/helpers";
 import { useCreateAllocatedTimeSlotMutation, useDeleteAllocatedTimeSlotMutation } from "@gql/gql-types";
 import type { AllocatedTimeSlotCreateMutationInput, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { decodeTimeSlot, timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
-import type {
-  AllocatedTimeSlotNodeT,
-  SectionNodeT,
-  SuitableTimeRangeNodeT,
-} from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { useSelectedSlots } from "./SelectedSlotsContext";
-import type { TimeSlotRange } from "./SelectedSlotsContext";
+
+/**
+ * Forget the Highlight, which lives in the `aes` and `allocated` search params.
+ *
+ * A Highlight means "this section on this reservation unit", the same way the Selection does. So the write that
+ * changes the unit clears it in the same navigation.
+ */
+export function clearHighlightParams(params: URLSearchParams): void {
+  params.delete("aes");
+  params.delete("allocated");
+}
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();
@@ -28,11 +34,9 @@ export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT)
 
   const setFocused: (aes?: SectionNodeT) => Promise<void> = async (aes) => {
     const p = new URLSearchParams(params);
+    clearHighlightParams(p);
     if (aes?.pk != null) {
       p.set("aes", aes.pk.toString());
-      p.delete("allocated");
-    } else {
-      p.delete("aes");
     }
     await setParams(p);
   };
@@ -52,11 +56,9 @@ export function useFocusAllocatedSlot(): [
 
   const setAllocated: (allocated?: Pick<AllocatedTimeSlotNodeT, "pk">) => Promise<void> = async (allocated) => {
     const p = new URLSearchParams(params);
+    clearHighlightParams(p);
     if (allocated?.pk != null) {
       p.set("allocated", allocated.pk.toString());
-      p.delete("aes");
-    } else {
-      p.delete("allocated");
     }
     await setParams(p);
   };
@@ -64,71 +66,15 @@ export function useFocusAllocatedSlot(): [
   return [allocatedPk, setAllocated];
 }
 
-// generate a list of strings for each slot based on the interval
-const generateSelection = (selectionRange: TimeSlotRange): string[] => {
-  const { day, ends, begins } = selectionRange;
-  const beginHour = Math.floor(begins);
-  const beginMinute = Math.round((begins - beginHour) * 60);
-  const endHour = Math.floor(ends);
-  const endMinute = Math.round((ends - endHour) * 60);
-
-  const slots = [];
-  if (day == null || beginHour == null || beginMinute == null || endHour == null || endMinute == null) {
-    return [];
-  }
-  // NOTE: parseInt returns NaN for invalid => the loop checks will fail and return []
-  for (let hour = beginHour; hour <= endHour; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      if (hour === beginHour && minute < beginMinute) {
-        continue;
-      }
-      if (hour === endHour && minute > endMinute) {
-        break;
-      }
-      // hours have no leading zero, minutes have to have it
-      const minuteString = minute < 10 ? `0${minute}` : `${minute}`;
-      slots.push(`${day}-${hour}-${minuteString}`);
-    }
-  }
-  return slots;
-};
-
-/// Allow selecting a continuous block on a single day
-/// state is saved in the URL as selectionBegin and selectionEnd parameters
-export function useSlotSelection(): [string[], (slots: string[]) => void] {
+/**
+ * The Selection, which is one span on one weekday, and the write that replaces it. Null means nothing is selected.
+ *
+ * This is the context in a pair, so a caller can name both halves in one line.
+ */
+export function useSlotSelection(): [WeekdayInterval | null, (next: WeekdayInterval | null) => void] {
   const { selection, setSelection } = useSelectedSlots();
 
-  const setSelectedSlots = (slots: string[]) => {
-    if (slots.length === 0) {
-      setSelection(null);
-    } else {
-      const selectionBegin = slots[0];
-      const selectionEnd = slots[slots.length - 1];
-      if (selectionBegin == null || selectionEnd == null) {
-        return;
-      }
-      const begins = decodeTimeSlot(selectionBegin);
-      const ends = decodeTimeSlot(selectionEnd);
-      const day = numberToDayT(begins.day);
-      if (day == null) {
-        return;
-      }
-      setSelection({
-        begins: begins.hour,
-        ends: ends.hour,
-        day,
-      });
-    }
-  };
-
-  const getSelection = (): string[] => {
-    if (selection == null) {
-      return [];
-    }
-    return generateSelection(selection);
-  };
-
-  return [getSelection(), setSelectedSlots];
+  return [selection, setSelection];
 }
 
 // side effects that should happen when a modification is made
@@ -144,7 +90,7 @@ export function useRefreshApplications(
     setIsRefetchLoading(false);
     // Close all the cards (requires removing the selection)
     if (clearSelection) {
-      setSelection([]);
+      setSelection(null);
     }
   };
 
@@ -154,8 +100,8 @@ export function useRefreshApplications(
 type AcceptSlotMutationProps = {
   applicationSection: SectionNodeT;
   reservationUnitOptionPk: number;
-  selection: string[];
-  timeRange: SuitableTimeRangeNodeT | null;
+  /** The Selection to allocate. It carries the weekday and both times. */
+  selection: WeekdayInterval | null;
   refresh: (clearSelection?: boolean) => void;
 };
 
@@ -166,9 +112,14 @@ type HookReturnValue = [
   },
 ];
 
+/** The API writes a time as `HH:MM:SS`, and the end of the day as `00:00:00`. */
+function toApiTime(minutes: number): string {
+  const hours = Math.floor(minutes / 60) % 24;
+  return `${formatApiTimeUnsafe(hours, minutes % 60)}:00`;
+}
+
 export function useAcceptSlotMutation({
   selection,
-  timeRange,
   applicationSection,
   reservationUnitOptionPk,
   refresh,
@@ -179,28 +130,24 @@ export function useAcceptSlotMutation({
   const displayError = useDisplayError();
 
   const handleAcceptSlot = async () => {
-    if (selection.length === 0) {
-      logError("Invalid selection", "warning");
-    }
-    if (timeRange == null) {
-      logError(`Invalid timeRange for section ${JSON.stringify(applicationSection)}`, "warning");
+    if (selection == null) {
+      logError(`Invalid selection for section ${JSON.stringify(applicationSection)}`, "warning");
     }
     if (reservationUnitOptionPk < 1) {
       logError(`Invalid reservation unit pk ${reservationUnitOptionPk}`, "warning");
     }
-    if (selection.length === 0 || timeRange == null || reservationUnitOptionPk < 1) {
+    if (selection == null || reservationUnitOptionPk < 1) {
       errorToast({ text: t("allocation:errors.accepting.generic") });
       return;
     }
-    const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
-    const allocatedEnd = timeSlotKeyToScheduleTime(selection[selection.length - 1], true);
 
     // NOTE the pk is an update pk that matches AllocatedTimeSlot (not the applicationSection)
     const input: AllocatedTimeSlotCreateMutationInput = {
       reservationUnitOption: reservationUnitOptionPk,
-      dayOfTheWeek: timeRange.dayOfTheWeek,
-      beginTime: allocatedBegin,
-      endTime: allocatedEnd,
+      // The Selection says which weekday it is on, so no Suitable Time Range is searched for it.
+      dayOfTheWeek: selection.weekday,
+      beginTime: toApiTime(selection.beginMinutes),
+      endTime: toApiTime(selection.endMinutes),
       // Disable backend checks
       force: true,
     };

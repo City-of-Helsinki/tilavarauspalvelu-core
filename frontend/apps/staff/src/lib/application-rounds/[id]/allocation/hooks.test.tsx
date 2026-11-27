@@ -5,8 +5,10 @@ import { act, render, renderHook, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
 import { CreateAllocatedTimeSlotDocument, DeleteAllocatedTimeSlotDocument, Weekday } from "@gql/gql-types";
 import {
+  clearHighlightParams,
   useAcceptSlotMutation,
   useFocusAllocatedSlot,
   useFocusApplicationEvent,
@@ -14,12 +16,8 @@ import {
   useRemoveAllocation,
   useSlotSelection,
 } from "./hooks";
-import type {
-  AllocatedTimeSlotNodeT,
-  SectionNodeT,
-  SuitableTimeRangeNodeT,
-} from "./modules/applicationRoundAllocation";
-import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
+import { SelectedSlotsContextProvider, useSelectedSlots } from "./SelectedSlotsContext";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();
@@ -135,32 +133,118 @@ describe("useFocusAllocatedSlot", () => {
 });
 
 function Wrapper({ children }: { children: React.ReactNode }) {
-  return <SelectedSlotsContextProvider>{children}</SelectedSlotsContextProvider>;
+  return <SelectedSlotsContextProvider reservationUnitPk={1}>{children}</SelectedSlotsContextProvider>;
 }
 
 describe("useSlotSelection", () => {
-  it("starts with no selected slots", () => {
-    const { result } = renderHook(() => useSlotSelection(), { wrapper: Wrapper });
-    expect(result.current[0]).toEqual([]);
+  function renderSlotSelection() {
+    return renderHook(() => useSlotSelection(), { wrapper: Wrapper });
+  }
+
+  it("starts with no Selection", () => {
+    const { result } = renderSlotSelection();
+    expect(result.current[0]).toBeNull();
   });
 
-  it("generates every half hour slot between the first and last selected slot", () => {
-    const { result } = renderHook(() => useSlotSelection(), { wrapper: Wrapper });
+  it("holds the Selection it is given, times included", () => {
+    const { result } = renderSlotSelection();
     act(() => {
-      result.current[1](["1-10-00", "1-11-00"]);
+      result.current[1]({ weekday: Weekday.Tuesday, beginMinutes: 10 * 60, endMinutes: 10 * 60 + 45 });
     });
-    expect(result.current[0]).toEqual(["1-10-00", "1-10-30", "1-11-00"]);
+    expect(result.current[0]).toEqual({
+      weekday: Weekday.Tuesday,
+      beginMinutes: 10 * 60,
+      endMinutes: 10 * 60 + 45,
+    });
   });
 
-  it("clears the selection when given an empty list", () => {
-    const { result } = renderHook(() => useSlotSelection(), { wrapper: Wrapper });
+  it("clears the Selection", () => {
+    const { result } = renderSlotSelection();
     act(() => {
-      result.current[1](["1-10-00", "1-11-00"]);
+      result.current[1]({ weekday: Weekday.Monday, beginMinutes: 23 * 60, endMinutes: 24 * 60 });
     });
     act(() => {
-      result.current[1]([]);
+      result.current[1](null);
     });
-    expect(result.current[0]).toEqual([]);
+    expect(result.current[0]).toBeNull();
+  });
+});
+
+describe("clearHighlightParams", () => {
+  it("removes both Highlight params and leaves the rest alone", () => {
+    const params = new URLSearchParams("unit=2&aes=5&allocated=3&priority=PRIMARY");
+    clearHighlightParams(params);
+    expect(params.toString()).toBe("unit=2&priority=PRIMARY");
+  });
+
+  it("does nothing when there is no Highlight", () => {
+    const params = new URLSearchParams("unit=2");
+    clearHighlightParams(params);
+    expect(params.toString()).toBe("unit=2");
+  });
+});
+
+/** Shows the Selection the context holds, and sets one on request. */
+function SelectionProbe(): ReactElement {
+  const { selection, setSelection } = useSelectedSlots();
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() =>
+          setSelection({
+            weekday: Weekday.Tuesday,
+            beginMinutes: 10 * 60,
+            endMinutes: 10 * 60 + 30,
+          })
+        }
+      >
+        select
+      </button>
+      <span data-testid="selection">
+        {selection == null ? "none" : `${selection.weekday} ${selection.beginMinutes}`}
+      </span>
+    </>
+  );
+}
+
+describe("SelectedSlotsContextProvider", () => {
+  function renderWithUnit(reservationUnitPk: number) {
+    const view = render(
+      <SelectedSlotsContextProvider reservationUnitPk={reservationUnitPk}>
+        <SelectionProbe />
+      </SelectedSlotsContextProvider>
+    );
+    const showUnit = (pk: number) =>
+      view.rerender(
+        <SelectedSlotsContextProvider reservationUnitPk={pk}>
+          <SelectionProbe />
+        </SelectedSlotsContextProvider>
+      );
+    return { ...view, showUnit };
+  }
+
+  it("clears the Selection when the reservation unit changes", async () => {
+    const view = renderWithUnit(1);
+    const user = userEvent.setup();
+    await user.click(view.getByRole("button", { name: /select/i }));
+    expect(view.getByTestId("selection")).toHaveTextContent(`${Weekday.Tuesday} 600`);
+
+    view.showUnit(2);
+
+    expect(view.getByTestId("selection")).toHaveTextContent("none");
+  });
+
+  it("keeps the Selection when the reservation unit stays the same", async () => {
+    const view = renderWithUnit(1);
+    const user = userEvent.setup();
+    await user.click(view.getByRole("button", { name: /select/i }));
+
+    // a filter change renders the view again with the same unit
+    view.showUnit(1);
+
+    expect(view.getByTestId("selection")).toHaveTextContent(`${Weekday.Tuesday} 600`);
   });
 });
 
@@ -182,18 +266,17 @@ describe("useRefreshApplications", () => {
 
 function AcceptSlotTestComponent({
   reservationUnitOptionPk,
-  timeRange,
+  selection,
   refresh,
 }: {
   reservationUnitOptionPk: number;
-  timeRange: SuitableTimeRangeNodeT | null;
+  selection: WeekdayInterval | null;
   refresh: () => void;
 }): ReactElement {
   const [handleAcceptSlot] = useAcceptSlotMutation({
     applicationSection: createSection({ pk: 1 }),
     reservationUnitOptionPk,
-    selection: ["1-10-00", "1-10-30"],
-    timeRange,
+    selection,
     refresh,
   });
 
@@ -205,9 +288,8 @@ function AcceptSlotTestComponent({
 }
 
 describe("useAcceptSlotMutation", () => {
-  const timeRange: SuitableTimeRangeNodeT = {
-    dayOfTheWeek: Weekday.Tuesday,
-  } as SuitableTimeRangeNodeT;
+  // The Selection carries the weekday and both times, so the mutation reads them straight off it.
+  const selection: WeekdayInterval = { weekday: Weekday.Tuesday, beginMinutes: 10 * 60, endMinutes: 11 * 60 };
 
   it("creates an allocated time slot and refreshes on success", async () => {
     const refresh = vi.fn();
@@ -241,7 +323,7 @@ describe("useAcceptSlotMutation", () => {
 
     const view = render(
       <MockedProvider mocks={mocks}>
-        <AcceptSlotTestComponent reservationUnitOptionPk={1} timeRange={timeRange} refresh={refresh} />
+        <AcceptSlotTestComponent reservationUnitOptionPk={1} selection={selection} refresh={refresh} />
       </MockedProvider>
     );
     const user = userEvent.setup();
@@ -250,11 +332,11 @@ describe("useAcceptSlotMutation", () => {
     await waitFor(() => expect(refresh).toHaveBeenCalled());
   });
 
-  it("does not call the mutation nor refresh when the time range is invalid", async () => {
+  it("does not call the mutation nor refresh when there is no Selection", async () => {
     const refresh = vi.fn();
     const view = render(
       <MockedProvider mocks={[]}>
-        <AcceptSlotTestComponent reservationUnitOptionPk={1} timeRange={null} refresh={refresh} />
+        <AcceptSlotTestComponent reservationUnitOptionPk={1} selection={null} refresh={refresh} />
       </MockedProvider>
     );
     const user = userEvent.setup();
@@ -287,7 +369,7 @@ describe("useAcceptSlotMutation", () => {
 
     const view = render(
       <MockedProvider mocks={mocks}>
-        <AcceptSlotTestComponent reservationUnitOptionPk={1} timeRange={timeRange} refresh={refresh} />
+        <AcceptSlotTestComponent reservationUnitOptionPk={1} selection={selection} refresh={refresh} />
       </MockedProvider>
     );
     const user = userEvent.setup();

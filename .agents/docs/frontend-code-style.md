@@ -70,7 +70,6 @@ in the frontend, including comments in tests and in JSX.
 
 - Every interactive element works with a keyboard and has an accessible name.
 - Prefer a native element or an HDS component to a `div` with a `role`.
-- For the calendar, read the ADRs in `docs/adr/` first.
 
 ## Error handling
 

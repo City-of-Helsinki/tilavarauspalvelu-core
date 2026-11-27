@@ -67,24 +67,41 @@ function WeeklyPatternTable<TData extends CalendarData>(
     disabled,
     readOnly,
     announcements = NO_ANNOUNCEMENTS,
+    selection,
+    onSelectionChange,
+    selectionAnnouncements,
     step,
     availability,
     paintable,
     visibleHours,
     brush,
     isDataEqual,
-    isValidSelection,
+    isValidPaint,
+    weekdayNameStyle = "long",
     getStateLabel,
     getCellAppearance,
     getCellProps,
     getRunError,
+    renderCellContent,
     alternative,
     className,
     style,
     ...tableAttributes
   } = props;
 
+  // Speech always uses the long name. Only the visible column header follows the style.
   const longNames = useMemo(() => weekdayNames("long", t), [t]);
+  const headerNames = useMemo(
+    () => (weekdayNameStyle === "short" ? weekdayNames("short", t) : longNames),
+    [t, weekdayNameStyle, longNames]
+  );
+
+  // The three select mode props travel together, so the grid is given one object or nothing and can never be
+  // left in a half-built mode.
+  const select =
+    onSelectionChange && selectionAnnouncements
+      ? { selection: selection ?? null, onSelectionChange, announcements: selectionAnnouncements }
+      : undefined;
 
   const grid = useWeeklyPatternCalendar({
     value,
@@ -96,10 +113,11 @@ function WeeklyPatternTable<TData extends CalendarData>(
     visibleHours,
     brush,
     isDataEqual,
-    isValidSelection,
+    isValidPaint,
     readOnly,
     disabled,
     announcements,
+    select,
     describeSpan: (weekday, beginMinutes, endMinutes) =>
       `${longNames[weekday]}, ${formatClockRange(beginMinutes, endMinutes)}`,
   });
@@ -126,7 +144,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
   // The time being painted isn't validated until the paint ends, so a run on its way to a valid length isn't flagged
   // at its first cell. Every other run, also on the same day, keeps its error.
   const runErrorOf = (cell: WeeklyPatternCellInfo<TData>) =>
-    cell.selected && !grid.isPaintPending(cell.weekday, cell.beginMinutes / step)
+    cell.painted && !grid.isPaintPending(cell.weekday, cell.beginMinutes / step)
       ? (getRunError?.(cell, grid.dayRuns(cell.weekday)) ?? null)
       : null;
 
@@ -197,8 +215,8 @@ function WeeklyPatternTable<TData extends CalendarData>(
 
   // A run's first cell shows where it starts, its last where it ends, the rest a connector.
   // A run of two cells or fewer shows the whole range once, on its last cell.
-  const getCellContent = (cell: WeeklyPatternCellInfo<TData>): React.ReactNode => {
-    if (!cell.selected) {
+  const getDefaultCellContent = (cell: WeeklyPatternCellInfo<TData>): React.ReactNode => {
+    if (!cell.painted) {
       return minutesToHoursString(cell.beginMinutes, true);
     }
     // The visible label of a run. A real element rather than generated content, so the end time can be styled on its
@@ -233,7 +251,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
                 <td aria-hidden />
                 {grid.days.map((weekday) => (
                   <th key={weekday} role="presentation">
-                    {longNames[weekday]}
+                    {headerNames[weekday]}
                   </th>
                 ))}
               </tr>
@@ -285,6 +303,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
             data-name={name}
             data-readonly={readOnly ? "" : undefined}
             data-disabled={disabled ? "" : undefined}
+            data-select={select ? "" : undefined}
           >
             {columns}
             <thead>
@@ -339,8 +358,10 @@ function WeeklyPatternTable<TData extends CalendarData>(
                         data-block-start={cell.isBlockStart ? "" : undefined}
                         data-block-end={cell.isBlockEnd ? "" : undefined}
                         data-invalid={runErrorOf(cell) ? "" : undefined}
+                        data-selection-start={cell.isSelectionStart ? "" : undefined}
+                        data-selection-end={cell.isSelectionEnd ? "" : undefined}
                       >
-                        {getCellContent(cell)}
+                        {(renderCellContent ?? getDefaultCellContent)(cell)}
                       </td>
                     );
                   })}

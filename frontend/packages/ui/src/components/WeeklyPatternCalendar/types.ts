@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { Weekday } from "../../../gql/gql-types";
 
 export type CalendarData = Record<string, unknown>;
@@ -27,6 +27,12 @@ export type CellAvailability = "open" | "closed" | "unavailable";
 
 export type WeeklyPatternCellInfo<TData extends CalendarData> = WeekdayInterval & {
   data: TData | undefined;
+  /** The cell holds a value, so it is part of a painted run. */
+  painted: boolean;
+  /**
+   * What `aria-selected` reports. The same as `painted` while painting is the user's own choice. A mode where the
+   * consumer owns a separate selection reports that instead, so a drawn cell is not announced as selected.
+   */
   selected: boolean;
   isRunStart: boolean;
   isRunEnd: boolean;
@@ -38,6 +44,10 @@ export type WeeklyPatternCellInfo<TData extends CalendarData> = WeekdayInterval 
   isBlockEnd: boolean;
   runBeginMinutes: number;
   runEndMinutes: number;
+  /** First cell of the Selection, so a view can draw a frame around the whole run. False outside select mode. */
+  isSelectionStart: boolean;
+  /** Last cell of the Selection. False outside select mode. */
+  isSelectionEnd: boolean;
   /**
    * Open is inside `availability`. Closed is outside it, and can still be painted when `paintable` reaches it.
    * Unavailable is outside `paintable` too, so nothing can be painted there.
@@ -59,19 +69,58 @@ export type WeeklyPatternAnnouncements = {
   erased: string;
 };
 
+export type WeeklyPatternSelectionAnnouncements = {
+  /** Spoken (with weekday and time range appended) after a Selection is chosen, e.g. "Selected". */
+  chosen: string;
+  /** Spoken (with weekday and time range appended) after the Selection is cleared, e.g. "Selection cleared". */
+  cleared: string;
+};
+
+/** Painting writes the value. Each gesture paints or erases, and a paint can be refused. */
 type EditableProps<TData extends CalendarData> = {
   readOnly?: false;
   onChange: (value: WeeklyPatternValue<TData>) => void;
   announcements: WeeklyPatternAnnouncements;
+  selection?: never;
+  onSelectionChange?: never;
+  selectionAnnouncements?: never;
 };
 
+/** Nothing can be changed. The value is only drawn. */
 type ReadOnlyProps<TData extends CalendarData> = {
   readOnly: true;
   onChange?: (value: WeeklyPatternValue<TData>) => void;
   announcements?: WeeklyPatternAnnouncements;
+  selection?: never;
+  onSelectionChange?: never;
+  selectionAnnouncements?: never;
 };
 
-export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditableProps<TData> | ReadOnlyProps<TData>) & {
+/**
+ * The gestures choose a Selection, which is one span on one weekday that the consumer owns. The value is still
+ * drawn, so a layer such as Demand and the Selection live in the same cell. `aria-selected` marks only the
+ * Selection here.
+ */
+type SelectProps<TData extends CalendarData> = {
+  readOnly?: false;
+  /** Never called in this mode. It is taken so the props of a form field can still be spread in. */
+  onChange?: (value: WeeklyPatternValue<TData>) => void;
+  announcements?: never;
+  /** The chosen span, or `null` when nothing is chosen. */
+  selection: WeekdayInterval | null;
+  /**
+   * Called with the span every committed gesture chose, or with `null` when the Selection is cleared. There is no
+   * return value, so a Selection is never refused.
+   */
+  onSelectionChange: (next: WeekdayInterval | null) => void;
+  selectionAnnouncements: WeeklyPatternSelectionAnnouncements;
+};
+
+export type WeeklyPatternCalendarProps<TData extends CalendarData> = (
+  | EditableProps<TData>
+  | ReadOnlyProps<TData>
+  | SelectProps<TData>
+) & {
   // Controlled value/onChange pair, shaped like a react-hook-form Controller field.
   value: WeeklyPatternValue<TData>;
   onBlur?: () => void;
@@ -94,8 +143,14 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
   /** Defaults to a shallow comparison of the data objects. */
   isDataEqual?: (a: TData, b: TData) => boolean;
   /** Return a reason to refuse a paint. The reason is announced to screen readers. */
-  isValidSelection?: (span: WeeklyPatternSpan<TData>) => string | null;
+  isValidPaint?: (span: WeeklyPatternSpan<TData>) => string | null;
 
+  /**
+   * How a weekday name is shown in the visible column header. Short is for a narrow day column, where a long name such
+   * as "keskiviikko" does not fit. The grid's own header keeps the long name for screen readers either way, and so
+   * does a cell label.
+   */
+  weekdayNameStyle?: "long" | "short";
   /** Translated state word for a cell, e.g. "Closed", "Free", "Primary". */
   getStateLabel: (cell: WeeklyPatternCellInfo<TData>) => string;
   getCellAppearance?: (data: TData) => CellAppearance | undefined;
@@ -109,6 +164,11 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
    */
   getRunError?: (cell: WeeklyPatternCellInfo<TData>, dayRuns: WeeklyPatternValue<TData>) => string | null;
   getCellProps?: (cell: WeeklyPatternCellInfo<TData>) => WeeklyPatternCellProps;
+  /**
+   * Replaces what a cell shows. The default shows the hour, and where a painted run begins and ends. The cell's
+   * accessible name comes from `getStateLabel`, so this changes only what is on screen.
+   */
+  renderCellContent?: (cell: WeeklyPatternCellInfo<TData>) => ReactNode;
   /**
    * The equal alternative for the same task, e.g. a form or a list of the times. A skip link to it is shown before the
    * grid. Leave it out when the alternative is already as easy to reach, e.g. in a tab next to the calendar.

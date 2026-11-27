@@ -131,8 +131,22 @@ const eventBackground = (appearance: CellAppearance) => css`
   }
 `;
 
+/**
+ * The grid's own box. A view that needs another size, or another colour, sets one of these custom properties on
+ * an ancestor, or through the calendar's `style` prop:
+ *
+ * - `--weekly-pattern-height`, the height of the box. `auto` drops the inner vertical scroll and lets the page
+ *   carry the whole grid.
+ * - `--weekly-pattern-day-min-width`, how narrow a weekday column may get before the box scrolls sideways.
+ * - `--weekly-pattern-step-height`, the height of one row.
+ * - `--weekly-pattern-width`, the width of the table. `0` shrinks it to the day column minimums instead of filling the box.
+ * - `--weekly-pattern-selection-color`, the colour of the frame around the Selection in select mode.
+ *
+ * The defaults suit the application funnel and the staff application view, which pass nothing.
+ */
 export const WeeklyPatternRoot = styled.div`
   --border-color: var(--color-black-50);
+  --selection-color: var(--weekly-pattern-selection-color, var(--color-black-80));
   ${gridTableStyles};
 
   position: relative;
@@ -149,12 +163,15 @@ export const WeeklyPatternRoot = styled.div`
     The container's overflow-x: auto scrolls instead of squeezing columns too thin.
   */
   table {
-    min-width: calc(30px + 7 * 110px);
+    /* Fills the box by default. A view that sets --weekly-pattern-width to 0 gets a table just as wide as its minimum. */
+    width: var(--weekly-pattern-width, 100%);
+    min-width: calc(var(--time-column-width) + 7 * var(--weekly-pattern-day-min-width, 110px));
     user-select: none;
     -webkit-touch-callout: none; /* No iOS callout on the long press that starts touch painting. */
     touch-action: manipulation;
 
-    --step-height: 12px;
+    /* The shared table styles read --step-height, so the override arrives through it. */
+    --step-height: var(--weekly-pattern-step-height, 12px);
     --time-column-width: 30px; /* Just wide enough for a time label like "14". The other columns split the rest evenly. */
     --event-gap: 4px;
     --event-border-radius: 4px;
@@ -186,8 +203,8 @@ export const WeeklyPatternRoot = styled.div`
   }
 
   tbody td {
-    padding-right: var(--spacing-2-xs);
-    width: calc((100% - 30px) / 7);
+    padding: 0 var(--spacing-2-xs) 0 0;
+    width: calc((100% - var(--time-column-width)) / 7);
     cursor: pointer;
     text-align: center;
     font-size: 12px;
@@ -321,6 +338,36 @@ export const WeeklyPatternRoot = styled.div`
           color: var(--color-black);
         }
       }
+    }
+  }
+
+  /*
+    Select mode. The Selection is one run of cells on one weekday, so it is drawn as one frame around the run:
+    both sides on every cell, the top on the first and the bottom on the last. A view that wants a tint as well
+    styles these same attributes. The frame is a box shadow, so it takes no space and leaves the focus outline,
+    which is an outline, to show on top of it.
+
+    All four shadows are always there, and the two that only the ends of the run need are turned on by their
+    colour. Hiding an edge by its offset instead would need a zero length, and a zero length in a custom property
+    is easy to write without a unit. That makes the offset a number, which is not a length, and one invalid
+    shadow drops the whole declaration, so the frame would disappear from every cell but one.
+  */
+  table[data-select] tbody td[data-selected] {
+    --selection-top-color: transparent;
+    --selection-bottom-color: transparent;
+
+    box-shadow:
+      inset 3px 0 0 0 var(--selection-color),
+      inset -3px 0 0 0 var(--selection-color),
+      inset 0 3px 0 0 var(--selection-top-color),
+      inset 0 -3px 0 0 var(--selection-bottom-color);
+
+    &[data-selection-start] {
+      --selection-top-color: var(--selection-color);
+    }
+
+    &[data-selection-end] {
+      --selection-bottom-color: var(--selection-color);
     }
   }
 

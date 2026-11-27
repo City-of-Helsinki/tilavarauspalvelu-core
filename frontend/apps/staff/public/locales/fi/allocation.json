@@ -12,7 +12,6 @@
   "openApplication": "Avaa hakemus",
   "ageGroup": "Ikäryhmä",
   "desiredReservationUnit": "Tilatoive",
-  "changeTime": "Muuta aikaa",
   "startingTime": "Aloitusaika",
   "endingTime": "Päättymisaika",
   "primaryItems": "Ensisijaiset",
@@ -23,10 +22,9 @@
   "primaryTimes": "Ensisijaisesti",
   "secondaryTimes": "Muut ajat",
   "showTimeRequests": "Näytä vuorotoiveet",
-  "allocatedTime": "Myonnetty aika",
+  "allocatedTime": "Myönnetty aika",
   "removeAllocation": "Poista",
   "changeSlot": "Muuta aikaa",
-  "rejectSlot": "Hylkää vuoro",
   "acceptSlot": "Jaa {{duration}} vuoro",
   "acceptingSlot": "Jaetaan vuoroa...",
   "acceptingSuccess": "Vuoroa varaukselle \"{{name}}\" jaetaan.",
@@ -37,6 +35,41 @@
   "lockOptions": "Hylkää kaikki",
   "lockPartialOptions": "Hylkää loput",
   "unlockOptions": "Palauta käsittelyyn",
+  "form": {
+    "weekday": "Viikonpäivä",
+    "status": {
+      "demand_one": "1 vuorotoive",
+      "demand_other": "{{count}} vuorotoivetta",
+      "allocation_one": "1 jaettu vuoro",
+      "allocation_other": "{{count}} jaettua vuoroa"
+    }
+  },
+  "calendar": {
+    "label": "Vuorojen jaon kalenteri",
+    "announcements": {
+      "chosen": "Valittu",
+      "cleared": "Valinta poistettu"
+    },
+    "state": {
+      "free": "Ei vuorotoiveita",
+      "demand_one": "1 vuorotoive",
+      "demand_other": "{{count}} vuorotoivetta",
+      "allocated": "Jaettu vuoro",
+      "affecting": "Estynyt, aika on jo jaettu",
+      "highlighted": "korostettu"
+    },
+    "legend": {
+      "demandOne": "1 vuorotoive",
+      "demandFew": "2-4 vuorotoivetta",
+      "demandMany": "5-10 vuorotoivetta",
+      "demandFull": "Yli 10 vuorotoivetta",
+      "allocated": "Jaettu vuoro",
+      "affecting": "Estynyt",
+      "selection": "Valittu aika",
+      "highlightRange": "Hakijan vuorotoiveet",
+      "highlightAllocation": "Hakijan jaettu vuoro"
+    }
+  },
   "errors": {
     "accepting": {
       "generic": "Varmista, että hakukierros on käsittelyssä ja että valittu ajankohta on vapaana."
@@ -49,6 +82,7 @@
     "allocatedDurationIsIncorrect": "Jaettu vuoro ei vastaa hakijan toiveita.",
     "requestedDurationIsIncorrect": "Valittu kesto ei vastaa hakijan toiveita.",
     "allocatedOutsideOfRequestedTimes": "Jaettu vuoro on toiveen ulkopuolella.",
-    "selectionOutsideOfRequestedTimes": "Valittu aika on toiveiden ulkopuolella."
+    "selectionOutsideOfRequestedTimes": "Valittu aika on toiveiden ulkopuolella.",
+    "selectionBeginTimeNotAllowed": "Aloitusaika ei kelpaa tälle tilalle."
   }
 }
