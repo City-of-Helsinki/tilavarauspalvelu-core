@@ -55,10 +55,25 @@ jobs:
     # Copies the multi-arch manifest from registry to registry without pulling the layers to the runner.
     # Only copy the platforms we use. Each platform adds requests to ECR, and ECR limits requests per second.
     # "linux/amd64" is for CI and OpenShift. "linux/arm64" is for local builds on Apple Silicon.
+    # Runners share IP addresses, so other traffic can use up the ECR limit for anonymous pulls.
+    # The limit resets quickly, so try again a few times with a longer wait each time.
     - name: "Copy image"
-      run: >-
-        docker buildx imagetools create
-        --platform linux/amd64
-        --platform linux/arm64
-        --tag ${{ env.TARGET }}:${{ matrix.tag }}
-        ${{ matrix.source }}
+      env:
+        SOURCE: ${{ matrix.source }}
+        DESTINATION: ${{ env.TARGET }}:${{ matrix.tag }}
+      run: |
+        for wait in 10 30 60 0; do
+          if docker buildx imagetools create \
+            --platform linux/amd64 \
+            --platform linux/arm64 \
+            --tag "$DESTINATION" \
+            "$SOURCE"; then
+            exit 0
+          fi
+          if [[ "$wait" -eq 0 ]]; then
+            echo "::error::Could not copy $SOURCE after 4 tries."
+            exit 1
+          fi
+          echo "Copy failed. Trying again in $wait seconds."
+          sleep "$wait"
+        done
