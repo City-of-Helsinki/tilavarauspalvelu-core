@@ -42,15 +42,17 @@ const FormControls = styled.div`
   display: flex;
   width: 100%;
   flex-wrap: wrap;
-  justify-content: space-between;
   align-items: flex-end;
   gap: var(--spacing-3-xs);
+  > button {
+    margin-top: var(--spacing-s);
+  }
 `;
 
 const Fields = styled.div`
   display: flex;
+  margin-right: var(--spacing-xs);
   flex-wrap: wrap;
-
   align-items: flex-end;
   gap: var(--spacing-3-xs);
 `;
@@ -69,8 +71,7 @@ const TimeList = styled.ul<{ $columnCount: number }>`
 `;
 
 const EmptyList = styled.div`
-  font-style: italic;
-  margin: var(--spacing-m) 0 0;
+  margin-top: var(--spacing-m);
 `;
 
 const TimeListItem = styled.li<{ $priority?: "primary" | "secondary"; $weekday?: number }>`
@@ -81,7 +82,7 @@ const TimeListItem = styled.li<{ $priority?: "primary" | "secondary"; $weekday?:
   align-items: center;
   justify-content: space-between;
   width: stretch;
-  gap: var(--spacing-s);
+  gap: var(--spacing-3-xs);
   font-size: var(--fontsize-body-m);
   line-height: var(--lineheight-m);
   padding: var(--spacing-3-xs) 0 var(--spacing-3-xs) var(--spacing-m);
@@ -313,16 +314,16 @@ export function SuitableTimeRangeForm({
   return (
     <StyledFieldset id={id} data-testid={`time-selector__form-${index}`}>
       <FormControls>
+        <ControlledSelect
+          id={`${id}-day`}
+          name="weekday"
+          control={picker.control}
+          label={t("application:TimeSelector.form.day")}
+          options={dayOptionList}
+          disabled={openWeekdayList.length === 0}
+          afterChange={syncPicker}
+        />
         <Fields>
-          <ControlledSelect
-            id={`${id}-day`}
-            name="weekday"
-            control={picker.control}
-            label={t("application:TimeSelector.form.day")}
-            options={dayOptionList}
-            disabled={openWeekdayList.length === 0}
-            afterChange={syncPicker}
-          />
           <ControlledSelect
             id={`${id}-from`}
             name="from"
