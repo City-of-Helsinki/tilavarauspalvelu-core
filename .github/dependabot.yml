@@ -137,6 +137,17 @@ updates:
       - dependency-name: "redis"
         versions: [">=6.5"]
     groups:
+      # mypy runs in CI. An update of these packages can add type errors, so it gets its own pull request.
+      # Then a type error does not block the updates of the other packages.
+      python-type-checking:
+        patterns:
+          - "mypy"
+          - "django-stubs"
+          - "djangorestframework-stubs"
       python-dependencies:
         patterns:
           - "*"
+        exclude-patterns:
+          - "mypy"
+          - "django-stubs"
+          - "djangorestframework-stubs"
