@@ -139,6 +139,7 @@ const eventBackground = (appearance: CellAppearance) => css`
  *   carry the whole grid.
  * - `--weekly-pattern-day-min-width`, how narrow a weekday column may get before the box scrolls sideways.
  * - `--weekly-pattern-step-height`, the height of one row.
+ * - `--weekly-pattern-width`, the width of the table. `0` shrinks it to the day column minimums instead of filling the box.
  *
  * The defaults suit the application funnel and the staff application view, which pass nothing.
  */
@@ -160,6 +161,8 @@ export const WeeklyPatternRoot = styled.div`
     The container's overflow-x: auto scrolls instead of squeezing columns too thin.
   */
   table {
+    /* Fills the box by default. A view that sets --weekly-pattern-width to 0 gets a table just as wide as its minimum. */
+    width: var(--weekly-pattern-width, 100%);
     min-width: calc(var(--time-column-width) + 7 * var(--weekly-pattern-day-min-width, 110px));
     user-select: none;
     -webkit-touch-callout: none; /* No iOS callout on the long press that starts touch painting. */
