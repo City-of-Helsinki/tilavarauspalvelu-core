@@ -17,20 +17,12 @@ import { findOutsideListed, findTooShortListed, listTimeRanges } from "./timeSel
 const TimesErrorText = styled(ErrorText)`
   white-space: pre-line;
   margin-bottom: var(--spacing-m);
-  /* The two selectors below are more specific than the HDS styles they override. */
+  /* The selector below is more specific than the HDS style it overrides. */
   [class*="notification_hds-notification__label__"] {
     font-size: var(--fontsize-heading-xxs);
     margin-bottom: var(--spacing-xs);
     ${fontBold}
   }
-  li a[class*="SectionHeaderLink"] {
-    font-size: var(--fontsize-body-m);
-    ${fontMedium}
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
   p {
     font-size: var(--fontsize-body-s);
   }
@@ -42,6 +34,14 @@ const TimesErrorText = styled(ErrorText)`
       list-style-type: disc;
       padding-left: var(--spacing-m) !important;
     }
+  }
+`;
+
+const SectionHeaderLink = styled.a`
+  font-size: var(--fontsize-body-m);
+  ${fontMedium}
+  &:hover {
+    text-decoration: underline;
   }
 `;
 
@@ -101,7 +101,6 @@ export function TimesErrorSummary({
       size={NotificationSize.Medium}
       title={t("application:validation.calendar.summaryTitle")}
       data-testid="application__page2--error-summary"
-      style={{ marginBottom: "var(--spacing-m)" }}
       id="time-selector__error-summary"
     >
       <SectionList>
@@ -195,8 +194,7 @@ function SectionErrors({
 
   return (
     <li>
-      <a
-        className="SectionHeaderLink"
+      <SectionHeaderLink
         href={href}
         onClick={(event) => {
           event.preventDefault();
@@ -204,7 +202,7 @@ function SectionErrors({
         }}
       >
         {name}: {title}
-      </a>
+      </SectionHeaderLink>
       {message && <p>{message}</p>}
       {invalidTimeList.length > 0 && (
         <>
