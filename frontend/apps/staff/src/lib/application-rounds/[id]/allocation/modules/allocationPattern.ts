@@ -16,9 +16,9 @@ import type { Priority, Weekday } from "@gql/gql-types";
  * What the allocation calendar draws, built from the query result alone. There is no React and no GraphQL here,
  * so every rule below can be read and tested on its own.
  *
- * The words are the ones in GLOSSARY.md. Demand is how many Application Sections still want a time, an Allocation
- * is a time staff gave a section on the shown reservation unit, and an Affecting Allocation takes a time away from
- * that unit.
+ * The words are the ones in .agents/docs/frontend-glossary.md. Demand is how many Application Sections still want a
+ * time, an Allocation is a time staff gave a section on the shown reservation unit, and an Affecting Allocation takes
+ * a time away from that unit.
  */
 
 /** The grid granularity. 15 minutes for every reservation unit, so a quarter hour request is drawn where it is. */
