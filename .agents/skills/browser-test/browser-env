@@ -1,11 +1,34 @@
 #!/usr/bin/env node
 // Finds which development setup runs and prints its URLs as JSON.
-// Usage: browser-env [--project NAME]
+// Usage: browser-env [--project NAME] [--checkout PATH] [--env dev|test|stage]
 //   --project   the Compose project of the stack, for an agent in a container of its own. Default: tilavarauspalvelu-core.
+//   --checkout  the checkout that the stack runs, for the check of generated files. Default: the main checkout.
+//   --env       a shared environment instead of the local setup. Production is not allowed.
 import { parseArgs } from "node:util";
-import { DEFAULT_PROJECT, detect } from "./lib.mjs";
+import { DEFAULT_PROJECT, detect, mainCheckout, proxyFrontend, remote, staleCheckout } from "./lib.mjs";
 
-const { values } = parseArgs({ options: { project: { type: "string", default: DEFAULT_PROJECT } } });
+const { values } = parseArgs({
+  options: {
+    project: { type: "string", default: DEFAULT_PROJECT },
+    checkout: { type: "string" },
+    env: { type: "string" },
+  },
+});
+
+if (values.env) {
+  try {
+    const env = await remote(values.env);
+    const hint =
+      "Ready. The env is shared with the team. Name the test data so that it is clear it is a test, " +
+      "and tell the user what you made.";
+    console.log(JSON.stringify({ ...env, hint }, null, 2));
+  } catch (e) {
+    console.log(JSON.stringify({ setup: "none", reason: "remote", hint: e.message }, null, 2));
+    process.exitCode = 1;
+  }
+  process.exit();
+}
+
 const env = await detect({ project: values.project });
 
 const START = 'Ask the user to start the stack with "just stack up" or "just stack up-no-gateway". Do not start it yourself.';
@@ -25,5 +48,30 @@ const hints = {
     nothing: `No setup found. ${START}`,
   }[env.reason],
 };
-console.log(JSON.stringify({ ...env, hint: hints[env.setup] }, null, 2));
-process.exitCode = env.customer ? 0 : 1;
+
+// The frontends run from the checkout of the user, unless the proxy or the agent runs them from a worktree.
+async function usesUserCheckout() {
+  if (env.setup === "direct" || env.setup === "gateway") return true;
+  if (env.setup === "container") return env.reason !== "no-frontends";
+  // An older proxy has no status path. It always used the stack.
+  if (env.setup === "proxy") return (await proxyFrontend()) !== "local";
+  return false;
+}
+
+let stale = [];
+if (await usesUserCheckout()) {
+  stale = staleCheckout(values.checkout ?? mainCheckout());
+}
+
+if (stale.length > 0) {
+  const checkout = values.checkout ?? mainCheckout();
+  const hint =
+    `The stack runs the frontend from ${checkout}, but the checkout is out of date. See "stale". ` +
+    `Stop and ask the user to run "just stack install" in ${checkout}. ` +
+    "The dev servers then load the new types. Do not work around it with a frontend from a worktree.";
+  console.log(JSON.stringify({ ...env, stale, hint }, null, 2));
+  process.exitCode = 1;
+} else {
+  console.log(JSON.stringify({ ...env, hint: hints[env.setup] }, null, 2));
+  process.exitCode = env.customer ? 0 : 1;
+}
