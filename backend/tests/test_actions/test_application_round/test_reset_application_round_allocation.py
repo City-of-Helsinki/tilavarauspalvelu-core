@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import pytest
+from auditlog.models import LogEntry
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -11,14 +13,16 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
+    Application,
     Reservation,
     ReservationSeries,
     ReservationStatistic,
     ReservationUnitOption,
 )
+from utils.date_utils import local_datetime
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
-from tests.helpers import as_mock, patch_method
+from tests.helpers import as_mock, audit_log_enabled, patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -156,3 +160,20 @@ def test_reset_application_round_allocation__results_sent() -> None:
 
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
     assert application.results_ready_notification_sent_at is None
+
+
+def test_reset_application_round_allocation__results_sent__logs_sent_date_and_keeps_updated_at() -> None:
+    with freeze_time(local_datetime(2024, 1, 1, 11)):
+        application_round = ApplicationRoundFactory.create_in_status_results_sent()
+        application = ApplicationFactory.create_in_status_results_sent(application_round=application_round)
+
+    with freeze_time(local_datetime(2024, 1, 1, 12)), audit_log_enabled(Application):
+        application_round.actions.reset_application_round_allocation()
+
+    application.refresh_from_db()
+    assert application.updated_at == local_datetime(2024, 1, 1, 11)
+
+    log_entries = list(LogEntry.objects.get_for_object(application))
+    assert [log_entry.changes for log_entry in log_entries] == [
+        {"results_ready_notification_sent_at": ["2024-01-01 09:00:00", "None"]},
+    ]

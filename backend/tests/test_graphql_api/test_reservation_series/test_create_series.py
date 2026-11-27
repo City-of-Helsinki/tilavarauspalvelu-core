@@ -17,7 +17,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import Reservation, ReservationSeries, ReservationUnitHierarchy
+from tilavarauspalvelu.models import Reservation, ReservationSeries, ReservationStatistic, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_end_of_day, local_start_of_day
 
 from tests.factories import (
@@ -34,6 +34,8 @@ from tests.helpers import as_mock, patch_method
 from .helpers import CREATE_SERIES_MUTATION, get_minimal_series_data
 
 if TYPE_CHECKING:
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
+
     from tests.helpers import GraphQLClient
 
 # Applied to all tests
@@ -190,6 +192,30 @@ def test_reservation_series__create_series__multiple_recurrences(graphql: GraphQ
 
     assert reservations[2].begins_at.astimezone(DEFAULT_TIMEZONE) == begin
     assert reservations[2].ends_at.astimezone(DEFAULT_TIMEZONE) == end
+
+
+def test_reservation_series__create_series__creates_statistics(
+    graphql: GraphQLClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation_unit = ReservationUnitFactory.create()
+    user = graphql.login_with_superuser()
+
+    end = datetime.date(2024, 1, 15).isoformat()
+    data = get_minimal_series_data(reservation_unit, user, endDate=end)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(CREATE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False
+
+    reservation_series = ReservationSeries.objects.get(pk=response.first_query_object["pk"])
+    reservation_pks = set(reservation_series.reservations.values_list("pk", flat=True))
+    statistic_reservation_pks = set(ReservationStatistic.objects.values_list("reservation", flat=True))
+
+    assert len(reservation_pks) == 3
+    assert statistic_reservation_pks == reservation_pks
 
 
 def test_reservation_series__create_series__multiple_weekdays(graphql: GraphQLClient) -> None:

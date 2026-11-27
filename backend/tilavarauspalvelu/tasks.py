@@ -88,7 +88,9 @@ def singleton_task(task: Task) -> Task:
 
     @wraps(task_func)
     def wrapper(*args: Any, **kwargs: Any) -> None:
-        lock_timeout = 300  # 5 mins
+        # Hold the lock as long as the task can run, so that a second instance cannot start while the first runs.
+        # Celery sets `time_limit` from `CELERY_TASK_TIME_LIMIT` for tasks that do not set their own.
+        lock_timeout = task.time_limit
         timeout_leeway = 3  # Some leeway for cache operations
 
         timeout_at = time.monotonic() + lock_timeout - timeout_leeway
@@ -391,7 +393,12 @@ def purge_image_cache_task(image_path: str) -> None:
 
 
 @singleton_task
-@app.task(name="generate_reservation_series_from_allocations")
+@app.task(
+    name="generate_reservation_series_from_allocations",
+    # The largest rounds create tens of thousands of reservations, and each one writes an audit log entry.
+    time_limit=30 * 60,
+    soft_time_limit=27 * 60,
+)
 @SentryLogger.log_if_raises("Failed to generate reservation series from allocations", re_raise=True)
 def generate_reservation_series_from_allocations_task(application_round_id: int) -> None:
     application_round: ApplicationRound | None = ApplicationRound.objects.filter(pk=application_round_id).first()

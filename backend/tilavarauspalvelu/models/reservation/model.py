@@ -468,5 +468,9 @@ AuditLogger.register(
         "_total_price",
         "_total_price_without_overrides",
         "_total_price_net",
+        # Exclude reverse one-to-one relations. The audit log makes a query for each one on create and delete.
+        "affecting_time_span",
+        "payment_order",
+        "reservation_statistic",
     ],
 )

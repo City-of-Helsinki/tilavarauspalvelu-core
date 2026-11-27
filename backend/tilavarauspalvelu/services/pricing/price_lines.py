@@ -9,6 +9,7 @@ from django.db import transaction
 from tilavarauspalvelu.models import ReservationPriceLine
 from utils.date_utils import local_date
 from utils.decimal_utils import round_decimal
+from utils.model_signals import bulk_create_with_signals, bulk_update_with_signals
 
 from .price_calculation import calculate_price_with_data, load_pricing_data
 
@@ -137,10 +138,7 @@ def save_reservation_price_lines(*, reservation: Reservation, price_lines: Price
 
     with transaction.atomic():
         reservation.price_lines.all().delete()
-
-        # Save each line, so that the audit log gets an entry. Bulk writes make none.
-        for line in price_lines.lines:
-            line.save()
+        bulk_create_with_signals(price_lines.lines)
 
 
 def set_price_line_taxes(*, reservation: Reservation, on_date: datetime.date) -> None:
@@ -157,7 +155,4 @@ def set_price_line_taxes(*, reservation: Reservation, on_date: datetime.date) ->
     for line in price_lines:
         line.tax_percentage = line.tax_level.actions.get_percentage(on_date=on_date)
 
-    # Save each line, so that the audit log gets an entry. Bulk writes make none.
-    with transaction.atomic():
-        for line in price_lines:
-            line.save(update_fields=["tax_percentage"])
+    bulk_update_with_signals(price_lines, fields=["tax_percentage"])

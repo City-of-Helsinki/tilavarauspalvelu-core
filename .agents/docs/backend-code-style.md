@@ -74,6 +74,10 @@ See `Integrations layer` in the [backend architecture](./backend-architecture.md
 - Avoid shallow modules: large interface with many methods that just pass through to thin implementation.
   When designing, ask: Can I reduce the number of methods? Can I simplify the parameters? Can I hide more complexity inside?
 
+## Bulk writes
+
+- Follow `Bulk writes` in [backend ORM](./backend-orm.md).
+
 ## Error handling
 
 - Never raise built-in or third-party exceptions manually. Always create a custom exception instead.

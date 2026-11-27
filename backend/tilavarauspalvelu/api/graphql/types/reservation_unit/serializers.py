@@ -31,6 +31,7 @@ from tilavarauspalvelu.services.pricing.sales_items import validate_sales_items_
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
+from utils.model_signals import bulk_create_with_signals, bulk_update_with_signals
 
 if TYPE_CHECKING:
     import datetime
@@ -494,24 +495,37 @@ class ReservationUnitSerializer(NestingModelSerializer[ReservationUnit]):
                 if existing_pk is not None:
                     access_type["pk"] = existing_pk
 
-            access_type_pks = [access_type["pk"] for access_type in access_types if access_type.get("pk") is not None]
+            access_type_data_by_pk = {
+                int(access_type["pk"]): access_type for access_type in access_types if access_type.get("pk") is not None
+            }
 
             # Delete future access types that are not in the payload.
             # Past or active access types should not be deleted.
             ReservationUnitAccessType.objects.filter(
                 reservation_unit=reservation_unit,
                 begin_date__gt=today,
-            ).exclude(pk__in=access_type_pks).delete()
+            ).exclude(pk__in=list(access_type_data_by_pk)).delete()
 
-            ReservationUnitAccessType.objects.bulk_create(
-                objs=[
-                    ReservationUnitAccessType(**access_type, reservation_unit=reservation_unit)
-                    for access_type in access_types
-                ],
-                update_conflicts=True,
-                update_fields=["access_type", "begin_date"],
-                unique_fields=["pk"],
+            access_types_to_update = list(
+                ReservationUnitAccessType.objects.filter(pk__in=list(access_type_data_by_pk)).select_for_update()
             )
+            for access_type_to_update in access_types_to_update:
+                access_type_data = access_type_data_by_pk[access_type_to_update.pk]
+                access_type_to_update.access_type = access_type_data["access_type"]
+                access_type_to_update.begin_date = access_type_data["begin_date"]
+
+            bulk_update_with_signals(access_types_to_update, fields=["access_type", "begin_date"])
+
+            access_types_to_create = [
+                ReservationUnitAccessType(
+                    access_type=access_type["access_type"],
+                    begin_date=access_type["begin_date"],
+                    reservation_unit=reservation_unit,
+                )
+                for access_type in access_types
+                if access_type.get("pk") is None
+            ]
+            bulk_create_with_signals(access_types_to_create)
 
         reservation_unit.actions.update_access_types_for_reservations()
 

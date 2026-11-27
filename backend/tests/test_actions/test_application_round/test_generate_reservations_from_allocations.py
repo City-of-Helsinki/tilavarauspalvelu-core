@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
+from auditlog.models import LogEntry
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
@@ -28,6 +29,7 @@ from tilavarauspalvelu.models import (
     Reservation,
     ReservationPriceLine,
     ReservationSeries,
+    ReservationStatistic,
     ReservationUnitHierarchy,
 )
 from tilavarauspalvelu.typing import Allocation
@@ -46,9 +48,11 @@ from tests.factories import (
 from tests.factories.application_round import ApplicationRoundFactory
 from tests.factories.reservation_unit import ReservationUnitBuilder
 from tests.factories.unit import UnitBuilder
-from tests.helpers import as_mock
+from tests.helpers import as_mock, audit_log_enabled
 
 if TYPE_CHECKING:
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
+
     from tilavarauspalvelu.models import Application, ApplicationRound, PriceOption, ReservationUnit
 
 pytestmark = [
@@ -200,6 +204,42 @@ def test_generate_reservation_series_from_allocations() -> None:
     assert reservations[2].ends_at.astimezone(DEFAULT_TIMEZONE) == local_datetime(2024, 1, 15, 14)
 
     assert RejectedOccurrence.objects.count() == 0
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
+def test_generate_reservation_series_from_allocations__creates_statistics(
+    settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    user = UserFactory.create()
+    unit = UnitBuilder().with_hauki_resource().create()
+    reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
+
+    next_monday = next_date_matching_weekday(local_date(), Weekday.MONDAY)
+
+    application_round = ApplicationRoundFactory.create_with_allocations(
+        allocations=[
+            Allocation(
+                reservation_unit=reservation_unit,
+                day_of_the_week=Weekday.MONDAY,
+                begin_time=local_time(12, 0),
+                end_time=local_time(14, 0),
+            ),
+        ],
+        reservation_period_begin_date=next_monday,
+        reservation_period_end_date=next_monday + datetime.timedelta(days=14),
+        user=user,
+    )
+
+    with django_capture_on_commit_callbacks(execute=True):
+        application_round.actions.generate_reservations_from_allocations()
+
+    reservation_pks = set(Reservation.objects.values_list("pk", flat=True))
+    statistic_reservation_pks = set(ReservationStatistic.objects.values_list("reservation", flat=True))
+
+    assert len(reservation_pks) == 3
+    assert statistic_reservation_pks == reservation_pks
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
@@ -739,6 +779,21 @@ def test_generate_reservation_series_from_allocations__prices_from_price_option(
         assert lines[0].description_fi == "Aikuiset"
         assert lines[0].quantity == Decimal(2)
         assert lines[0].amount == Decimal("20.00")
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_generate_reservation_series_from_allocations__price_lines_write_audit_log() -> None:
+    reservation_unit = create_priced_reservation_unit()
+    application_round = create_round_on_mondays(reservation_units=[reservation_unit])
+
+    with audit_log_enabled(ReservationPriceLine):
+        application_round.actions.generate_reservations_from_allocations()
+
+    lines = list(ReservationPriceLine.objects.order_by("pk"))
+    assert len(lines) == 3
+    for line in lines:
+        entries = LogEntry.objects.get_for_object(line)
+        assert list(entries.values_list("action", flat=True)) == [LogEntry.Action.CREATE]
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))

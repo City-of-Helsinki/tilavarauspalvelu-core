@@ -11,6 +11,7 @@ from unittest.mock import patch
 import polib
 import pytest
 import stamina
+from auditlog.registry import auditlog
 from django.conf import settings
 from django.utils import translation
 from django.utils.functional import lazy
@@ -18,11 +19,14 @@ from django.utils.translation import trans_real
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 from graphene_django_extensions.testing.client import GQLResponse as BaseGQLResponse
 
+from utils.auditlog_util import AuditLogger
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
     from types import TracebackType
     from unittest.mock import NonCallableMock
 
+    from django.db.models.base import ModelBase
     from django.http import HttpRequest
 
     from tilavarauspalvelu.enums import UserRoleChoice
@@ -36,6 +40,7 @@ __all__ = [
     "TranslationsFromPOFiles",
     "anonymous_user",
     "as_mock",
+    "audit_log_enabled",
     "exact",
 ]
 
@@ -340,3 +345,17 @@ def use_retries(attempts: int = 1) -> Generator[None]:
     finally:
         stamina.set_active(is_active)
         stamina.set_testing(is_testing)
+
+
+@contextmanager
+def audit_log_enabled(*models: ModelBase) -> Generator[None]:
+    """Turn on the audit log for the given models, with the same options as in production."""
+    for model in models:
+        exclude_fields = AuditLogger.exclude_fields_by_model[model]
+        auditlog.register(model, exclude_fields=exclude_fields)
+
+    try:
+        yield
+    finally:
+        for model in models:
+            auditlog.unregister(model)

@@ -10,6 +10,7 @@ from tilavarauspalvelu.enums import AccessType, ApplicationStatusChoice, Reserva
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, User
 from utils.date_utils import local_datetime, local_end_of_day, utc_datetime
+from utils.model_signals import update_with_signals
 
 from .attachements import get_reservation_ical_attachment
 from .find_language import get_application_email_language, get_reservation_email_language, get_series_email_language
@@ -499,7 +500,13 @@ class EmailService:
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
-        applications.update(in_allocation_notification_sent_at=local_datetime())
+
+        # Keep 'updated_at', since users see it as the time they last saved the application.
+        update_with_signals(
+            applications,
+            in_allocation_notification_sent_at=local_datetime(),
+            updated_at=models.F("updated_at"),
+        )
 
     @staticmethod
     def send_seasonal_booking_application_round_handled_emails() -> None:
@@ -528,7 +535,13 @@ class EmailService:
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
-        applications.update(results_ready_notification_sent_at=local_datetime())
+
+        # Keep 'updated_at', since users see it as the time they last saved the application.
+        update_with_signals(
+            applications,
+            results_ready_notification_sent_at=local_datetime(),
+            updated_at=models.F("updated_at"),
+        )
 
     @staticmethod
     def send_seasonal_booking_cancelled_all_email(

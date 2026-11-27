@@ -23,6 +23,7 @@ from tilavarauspalvelu.services.pricing.price_lines import set_price_line_taxes
 from tilavarauspalvelu.typing import ReservationApproveData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
+from utils.model_signals import bulk_update_with_signals
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationPriceLine
@@ -207,10 +208,10 @@ class ReservationApproveSerializer(NestingModelSerializer[Reservation, Reservati
     def save_price_line_overrides(self, price_line_overrides: dict[int, Decimal | None]) -> None:
         price_lines: list[ReservationPriceLine] = list(self.instance.price_lines.all())
 
-        # Save each line, so that the audit log gets an entry. Bulk writes make none.
         for line in price_lines:
             line.override_amount = price_line_overrides[line.pk]
-            line.save(update_fields=["override_amount"])
+
+        bulk_update_with_signals(price_lines, fields=["override_amount"])
 
     def create_payment_order_if_required(self, validated_data: ReservationApproveData) -> None:
         # Delete any non-paid/refunded payment order

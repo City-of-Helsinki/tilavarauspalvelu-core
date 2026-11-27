@@ -5,8 +5,7 @@ import datetime
 from contextlib import suppress
 from typing import TYPE_CHECKING
 
-from django.conf import settings
-from django.db import transaction
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
@@ -27,22 +26,21 @@ from tilavarauspalvelu.models import (
     Application,
     ApplicationSection,
     Reservation,
-    ReservationPriceLine,
     ReservationSeries,
     ReservationStatistic,
     ReservationUnitOption,
 )
 from tilavarauspalvelu.services.pricing.application_round_prices import load_application_round_pricing
 from tilavarauspalvelu.services.pricing.price_lines import build_price_lines_with_data
-from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.translation import translate_for_user
 from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import local_end_of_day, local_start_of_day
+from utils.model_signals import bulk_create_with_signals, update_with_signals
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from tilavarauspalvelu.models import ApplicationRound
+    from tilavarauspalvelu.models import ApplicationRound, ReservationPriceLine
 
 
 __all__ = [
@@ -93,8 +91,13 @@ class ApplicationRoundActions:
 
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 # Reset handling email dates and round sent date
-                Application.objects.filter(application_round=self.application_round).update(
+                applications = Application.objects.filter(application_round=self.application_round)
+
+                # Keep 'updated_at', since users see it as the time they last saved the application.
+                update_with_signals(
+                    applications,
                     results_ready_notification_sent_at=None,
+                    updated_at=models.F("updated_at"),
                 )
 
                 self.application_round.sent_at = None
@@ -152,11 +155,10 @@ class ApplicationRoundActions:
             for allocation in allocations
         ]
 
-        reservation_pks: set[int] = set()
         price_lines: list[ReservationPriceLine] = []
 
         with transaction.atomic():
-            reservation_series = ReservationSeries.objects.bulk_create(reservation_series)
+            reservation_series = bulk_create_with_signals(reservation_series)
 
             for series in reservation_series:
                 reservation_details = self._get_reservation_series_details(series)
@@ -194,8 +196,7 @@ class ApplicationRoundActions:
                             line.reservation = reservation
                             price_lines.append(line)
 
-                reservations = Reservation.objects.bulk_create(reservations)
-                reservation_pks.update(reservation.pk for reservation in reservations)
+                bulk_create_with_signals(reservations)
 
                 series.actions.bulk_create_rejected_occurrences_for_periods(
                     overlapping=slots.overlapping,
@@ -203,16 +204,13 @@ class ApplicationRoundActions:
                     invalid_start_interval=slots.invalid_start_interval,
                 )
 
-            ReservationPriceLine.objects.bulk_create(price_lines)
+            bulk_create_with_signals(price_lines)
 
         # Must refresh the materialized view after the reservation is created.
         # TODO: Disabled for now, since it might contribute to timeouts in production.
         #  Refresh still happens on a background task every 2 minutes.
         #  if settings.UPDATE_AFFECTING_TIME_SPANS:
         #      update_affecting_time_spans_task.delay()  # noqa: ERA001
-
-        if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(reservation_pks=list(reservation_pks))
 
     def _get_series_override_closed_time_spans(
         self, allocations: Iterable[AllocatedTimeSlot]

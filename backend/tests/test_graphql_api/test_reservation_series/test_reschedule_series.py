@@ -19,7 +19,7 @@ from tests.helpers import as_mock, patch_method
 from .helpers import RESCHEDULE_SERIES_MUTATION, create_reservation_series, get_minimal_reschedule_data
 
 if TYPE_CHECKING:
-    from pytest_django import Settings
+    from pytest_django import DjangoCaptureOnCommitCallbacks, Settings
 
     from tilavarauspalvelu.models import Reservation
 
@@ -719,36 +719,8 @@ def test_reservation_series__reschedule_series__skip_dates(graphql: GraphQLClien
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
-def test_reservation_series__reschedule_series__create_statistics(graphql: GraphQLClient, settings: Settings) -> None:
-    settings.SAVE_RESERVATION_STATISTICS = True
-
-    reservation_series = create_reservation_series()
-
-    reservation_series.reservations.upsert_statistics()
-
-    # We have 9 reservations, so there should be 9 reservation statistics.
-    assert ReservationStatistic.objects.count() == 9
-
-    before = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
-
-    data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
-
-    graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
-
-    assert response.has_errors is False
-
-    # After rescheduling, there should be 9 reservation statistics.
-    assert ReservationStatistic.objects.count() == 9
-
-    # But those statistics should be for different reservations.
-    after = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
-    assert set(before).isdisjoint(after)
-
-
-@freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
-def test_reservation_series__reschedule_series__create_statistics__partial(
-    graphql: GraphQLClient, settings: Settings
+def test_reservation_series__reschedule_series__create_statistics(
+    graphql: GraphQLClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
 ) -> None:
     settings.SAVE_RESERVATION_STATISTICS = True
 
@@ -764,7 +736,39 @@ def test_reservation_series__reschedule_series__create_statistics__partial(
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False
+
+    # After rescheduling, there should be 9 reservation statistics.
+    assert ReservationStatistic.objects.count() == 9
+
+    # But those statistics should be for different reservations.
+    after = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
+    assert set(before).isdisjoint(after)
+
+
+@freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
+def test_reservation_series__reschedule_series__create_statistics__partial(
+    graphql: GraphQLClient, settings: Settings, django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks
+) -> None:
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation_series = create_reservation_series()
+
+    reservation_series.reservations.upsert_statistics()
+
+    # We have 9 reservations, so there should be 9 reservation statistics.
+    assert ReservationStatistic.objects.count() == 9
+
+    before = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
+
+    data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
+
+    graphql.login_with_superuser()
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 

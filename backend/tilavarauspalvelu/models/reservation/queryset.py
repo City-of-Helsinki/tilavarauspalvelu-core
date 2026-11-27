@@ -27,6 +27,7 @@ from tilavarauspalvelu.tasks import delete_pindora_reservation_task
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, utc_datetime
 from utils.db import Now
 from utils.mixins import SerializableModelManagerMixin
+from utils.model_signals import update_with_signals
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -223,7 +224,8 @@ class ReservationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
         Sets access code info to reservations in the queryset so that reservation that should have
         active access codes get the given values, and the rest get empty values.
         """
-        self.update(
+        update_with_signals(
+            self,
             access_code_generated_at=models.Case(
                 models.When(
                     L(access_code_should_be_active=True),
@@ -247,7 +249,8 @@ class ReservationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
         Sets access code info to reservations in the queryset so that reservation that should have
         active access codes get the given values, and the rest get empty values.
         """
-        self.update(
+        update_with_signals(
+            self,
             access_code_is_active=models.Case(
                 # A reservation without a generated access code cannot be active. See 'no_access_code_but_active'.
                 models.When(
@@ -260,16 +263,21 @@ class ReservationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
         )
 
     def upsert_statistics(self: ReservationQuerySet) -> None:
-        reservations = self.select_related(
-            "user",
-            "reservation_series",
-            "reservation_series__allocated_time_slot",
-            "deny_reason",
-            "purpose",
-            "age_group",
-            "reservation_unit",
-            "reservation_unit__unit",
-        ).prefetch_related("price_lines")
+        reservations = (
+            self
+            .select_related(
+                "user",
+                "reservation_series",
+                "reservation_series__allocated_time_slot",
+                "deny_reason",
+                "purpose",
+                "age_group",
+                "reservation_unit",
+                "reservation_unit__unit",
+            )
+            .prefetch_related("price_lines")
+            .order_by("pk")
+        )
 
         new_statistics: list[ReservationStatistic] = [
             ReservationStatistic.for_reservation(reservation) for reservation in reservations
