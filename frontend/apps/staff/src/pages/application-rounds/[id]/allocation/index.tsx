@@ -498,13 +498,13 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
         node {
           ...ApplicationSectionFields
           allocations
-          suitableTimeRanges(fulfilled: false) {
+          # Every range, also one that already holds an Allocation, because a day can take more than one.
+          suitableTimeRanges {
             id
             beginTime
             endTime
             dayOfTheWeek
             priority
-            fulfilled
           }
           reservationUnitOptions {
             id

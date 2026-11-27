@@ -3,7 +3,13 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { WeekdayInterval } from "@ui/components/WeeklyPatternCalendar/types";
-import { Priority, ReservationStartInterval, ReserveeType, Weekday } from "@gql/gql-types";
+import {
+  ApplicationSectionStatusChoice,
+  Priority,
+  ReservationStartInterval,
+  ReserveeType,
+  Weekday,
+} from "@gql/gql-types";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import type {
   AllocatedTimeSlotNodeT,
@@ -24,6 +30,7 @@ function createSection(overrides: Partial<SectionNodeT> = {}): SectionNodeT {
   return {
     pk: 1,
     name: "Section name",
+    status: ApplicationSectionStatusChoice.InAllocation,
     reservationMinDuration: 3600,
     reservationMaxDuration: 3600,
     appliedReservationsPerWeek: 1,

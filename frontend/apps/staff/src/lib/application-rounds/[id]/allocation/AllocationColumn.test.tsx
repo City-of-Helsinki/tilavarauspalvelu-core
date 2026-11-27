@@ -244,3 +244,46 @@ describe("the allocation form", () => {
     expect(statusLine()).toBeEmptyDOMElement();
   });
 });
+
+describe("a second Allocation on the same day", () => {
+  it("offers the free part of a range that already holds an Allocation of the same section", async () => {
+    const user = userEvent.setup();
+    const allocation = {
+      pk: 5,
+      dayOfTheWeek: Weekday.Monday,
+      beginTime: "10:00:00",
+      endTime: "10:30:00",
+    } as AllocatedTimeSlotNodeT;
+    const section = createSection({
+      ...createRequesting(1),
+      status: ApplicationSectionStatusChoice.InAllocation,
+      appliedReservationsPerWeek: 2,
+      reservationUnitOptions: [createOption({ allocatedTimeSlots: [allocation] })],
+    });
+    renderColumn({ sections: [section], grid: { weekday: Weekday.Monday, beginMinutes: 660, endMinutes: 720 } });
+
+    await user.click(screen.getByRole("button", { name: "drag the grid" }));
+
+    expect(screen.getByRole("heading", { name: "Section name" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /allocation:acceptSlot/ })).toBeEnabled();
+  });
+
+  it("shows a card for each Allocation of the section that the Selection covers", async () => {
+    const user = userEvent.setup();
+    const allocations = [
+      { pk: 5, dayOfTheWeek: Weekday.Monday, beginTime: "10:00:00", endTime: "10:30:00" },
+      { pk: 6, dayOfTheWeek: Weekday.Monday, beginTime: "11:00:00", endTime: "11:30:00" },
+    ] as AllocatedTimeSlotNodeT[];
+    const section = createSection({
+      ...createRequesting(1),
+      status: ApplicationSectionStatusChoice.InAllocation,
+      appliedReservationsPerWeek: 3,
+      reservationUnitOptions: [createOption({ allocatedTimeSlots: allocations })],
+    });
+    renderColumn({ sections: [section], grid: { weekday: Weekday.Monday, beginMinutes: 600, endMinutes: 720 } });
+
+    await user.click(screen.getByRole("button", { name: "drag the grid" }));
+
+    expect(screen.getAllByRole("button", { name: "allocation:removeAllocation" })).toHaveLength(2);
+  });
+});

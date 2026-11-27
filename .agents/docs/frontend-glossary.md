@@ -38,8 +38,8 @@ The span on one weekday that a staff user marks in the allocation calendar, to s
 _Avoid_: Selected slots, time slot range
 
 - **Highlight**:
-The outline that shows one Application Section's unfulfilled Suitable Time Ranges, or one Allocation, in the allocation
-calendar. _Avoid_: Focus, active, select
+The outline that shows one Application Section's Suitable Time Ranges and Allocations, or one Allocation, in the
+allocation calendar. A section that can no longer be allocated shows only its Allocations. _Avoid_: Focus, active, select
 
 ### Allocation glossary
 Use these words when writing text describing the staff allocation view and naming things in its code.
@@ -58,8 +58,9 @@ a resource with it, in an overlapping reservation period. _Avoid_: Related alloc
 
 - **Fulfilled**:
 A Suitable Time Range is fulfilled when its Application Section has an Allocation that overlaps it on the same weekday,
-or when the section can no longer be allocated.
+or when the section can no longer be allocated. The allocation view does not hide fulfilled ranges, because staff can
+give a section more than one Allocation on the same day.
 
 - **Demand**:
-How many Application Sections still want a time on the shown reservation unit, counted from their unfulfilled Suitable
-Time Ranges. _Avoid_: Applicants, heat, event count
+How many Application Sections still want a time on the shown reservation unit. It counts the Suitable Time Ranges of
+every section that is Unallocated or In Allocation, also the ranges that already hold an Allocation. _Avoid_: Applicants, heat, event count

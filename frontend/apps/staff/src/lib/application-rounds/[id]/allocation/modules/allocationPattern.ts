@@ -10,6 +10,7 @@ import type { VisibleHours, WeekdayInterval, WeeklyPatternValue } from "@ui/comp
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { timeToMinutes } from "ui/src/modules/date-utils";
 import { endTimeToMinutes } from "ui/src/modules/suitableTimes";
+import { ApplicationSectionStatusChoice } from "@gql/gql-types";
 import type { Priority, Weekday } from "@gql/gql-types";
 
 /**
@@ -51,6 +52,7 @@ export type AllocationSlot = AllocationTimes & { pk?: number | null };
  */
 export type AllocationSection = {
   pk?: number | null;
+  status?: ApplicationSectionStatusChoice | null;
   suitableTimeRanges: ReadonlyArray<AllocationRange>;
   reservationUnitOptions: ReadonlyArray<{ allocatedTimeSlots: ReadonlyArray<AllocationSlot> }>;
 };
@@ -110,9 +112,28 @@ function matchesPriority(range: AllocationRange, priorityFilter: PriorityFilter)
   return priorityFilter == null || priorityFilter.length === 0 || priorityFilter.includes(range.priority);
 }
 
-/** The Suitable Time Ranges of one section on one weekday, after the priority filter. */
+/**
+ * Whether the section can still take an Allocation. This is the backend's `can_allocate`. Once a section is Handled
+ * or Rejected, it wants no more time.
+ */
+export function canTakeAllocation(section: AllocationSection): boolean {
+  return (
+    section.status === ApplicationSectionStatusChoice.Unallocated ||
+    section.status === ApplicationSectionStatusChoice.InAllocation
+  );
+}
+
+/**
+ * The Suitable Time Ranges the section still wants. A range that already holds an Allocation is still wanted,
+ * because staff can give a section more than one Allocation on the same day. Only the status ends the wish.
+ */
+function wantedRanges(section: AllocationSection): ReadonlyArray<AllocationRange> {
+  return canTakeAllocation(section) ? section.suitableTimeRanges : [];
+}
+
+/** The wanted Suitable Time Ranges of one section on one weekday, after the priority filter. */
 function rangesOn(section: AllocationSection, weekday: Weekday, priorityFilter?: PriorityFilter): Range[] {
-  return section.suitableTimeRanges
+  return wantedRanges(section)
     .filter((range) => range.dayOfTheWeek === weekday && matchesPriority(range, priorityFilter))
     .map((range) => toRange(range));
 }
@@ -197,7 +218,7 @@ function toHighlight(times: AllocationTimes, kind: AllocationHighlightKind): All
 }
 
 /**
- * The spans to outline. One Application Section shows its Suitable Time Ranges and its Allocations, and one
+ * The spans to outline. One Application Section shows its wanted Suitable Time Ranges and its Allocations, and one
  * Allocation shows itself alone.
  */
 export function toHighlightRanges({
@@ -218,7 +239,7 @@ export function toHighlightRanges({
     return [];
   }
   return [
-    ...section.suitableTimeRanges
+    ...wantedRanges(section)
       .filter((range) => matchesPriority(range, priorityFilter))
       .map((range) => toHighlight(range, "range")),
     ...allocationsOf(section).map((slot) => toHighlight(slot, "allocation")),
@@ -245,6 +266,11 @@ export function wantsInterval(
   return rangesOn(section, interval.weekday, priorityFilter).some((range) => overlaps(range, interval));
 }
 
+/** Every slot that takes part of the Selection's time, by the same overlap rule the cells use. */
+export function findOverlapping<T extends AllocationSlot>(selection: WeekdayInterval, slots: ReadonlyArray<T>): T[] {
+  return onWeekday(slots, selection.weekday).filter((slot) => overlaps(toRange(slot), selection));
+}
+
 /**
  * The Affecting Allocation that takes the Selection's time, or null when the time is free. The cell state and the
  * column's block both use this, so they cannot drift apart.
@@ -253,5 +279,5 @@ export function findBlockingAffecting<T extends AllocationSlot>(
   selection: WeekdayInterval,
   affecting: ReadonlyArray<T>
 ): T | null {
-  return onWeekday(affecting, selection.weekday).find((slot) => overlaps(toRange(slot), selection)) ?? null;
+  return findOverlapping(selection, affecting)[0] ?? null;
 }

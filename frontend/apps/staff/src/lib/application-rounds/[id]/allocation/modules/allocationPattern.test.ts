@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { WeekdayInterval, WeeklyPatternValue } from "@ui/components/WeeklyPatternCalendar/types";
 import { timeToMinutes } from "ui/src/modules/date-utils";
 import { endTimeToMinutes } from "ui/src/modules/suitableTimes";
-import { Priority, Weekday } from "@gql/gql-types";
+import { ApplicationSectionStatusChoice, Priority, Weekday } from "@gql/gql-types";
 import {
   ALLOCATION_STEP_MINUTES,
   findBlockingAffecting,
@@ -30,15 +30,20 @@ function slot(beginTime: string, endTime: string, pk?: number, dayOfTheWeek: Wee
 
 function section({
   pk = 1,
+  status = ApplicationSectionStatusChoice.InAllocation,
   ranges = [],
   allocations = [],
 }: {
   pk?: number;
+  status?: ApplicationSectionStatusChoice;
   ranges?: AllocationRange[];
   allocations?: AllocationSlot[];
 } = {}): AllocationSection {
-  return { pk, suitableTimeRanges: ranges, reservationUnitOptions: [{ allocatedTimeSlots: allocations }] };
+  return { pk, status, suitableTimeRanges: ranges, reservationUnitOptions: [{ allocatedTimeSlots: allocations }] };
 }
+
+// The statuses where allocation is over for a section, so it no longer wants a time.
+const FINISHED_STATUSES = [ApplicationSectionStatusChoice.Handled, ApplicationSectionStatusChoice.Rejected];
 
 // The expected spans read better as times than as minute counts.
 function span(beginTime: string, endTime: string, data: AllocationCellData, weekday: Weekday = Weekday.Monday) {
@@ -181,6 +186,39 @@ describe("toAllocationPattern", () => {
     expect(pattern).toEqual([span("10:00", "11:00", allocated)]);
   });
 
+  it("keeps the rest of a range as Demand after one Allocation in it, so a day can take a second Allocation", () => {
+    const { pattern } = toAllocationPattern({
+      sections: [section({ ranges: [range("16:00", "21:00")], allocations: [slot("16:00", "17:00")] })],
+      affecting: [],
+    });
+
+    expect(pattern).toEqual([span("16:00", "17:00", allocated), span("17:00", "21:00", demand(1))]);
+  });
+
+  it.each(FINISHED_STATUSES)("counts no Demand for a section that is %s", (status) => {
+    const { pattern } = toAllocationPattern({
+      sections: [section({ status, ranges: [range("10:00", "11:00")] })],
+      affecting: [],
+    });
+
+    expect(pattern).toEqual([]);
+  });
+
+  it("still draws the Allocations of a Handled section", () => {
+    const { pattern } = toAllocationPattern({
+      sections: [
+        section({
+          status: ApplicationSectionStatusChoice.Handled,
+          ranges: [range("10:00", "12:00")],
+          allocations: [slot("10:00", "11:00")],
+        }),
+      ],
+      affecting: [],
+    });
+
+    expect(pattern).toEqual([span("10:00", "11:00", allocated)]);
+  });
+
   it("lets an Affecting Allocation win over Demand", () => {
     const { pattern } = toAllocationPattern({
       sections: [section({ ranges: [range("10:00", "11:00")] })],
@@ -281,6 +319,19 @@ describe("toHighlightRanges", () => {
     ]);
   });
 
+  it("outlines only the Allocations of a Handled section, because it wants no more time", () => {
+    const handled = section({
+      pk: 7,
+      status: ApplicationSectionStatusChoice.Handled,
+      ranges: [range("10:00", "12:00")],
+      allocations: [slot("10:00", "11:00", 42)],
+    });
+
+    expect(toHighlightRanges({ sections: [handled], sectionPk: 7 })).toEqual([
+      { ...selection("10:00", "11:00"), kind: "allocation" },
+    ]);
+  });
+
   it("outlines one Allocation alone, not the others on the same weekday", () => {
     const many = section({ pk: 7, allocations: [slot("10:00", "11:00", 42), slot("14:00", "15:00", 43)] });
 
@@ -342,6 +393,17 @@ describe("fitsSection", () => {
     expect(fitsSection(selection("23:00", "00:00"), target)).toBe(true);
   });
 
+  it("accepts a second time in a range that already holds an Allocation", () => {
+    const target = section({ ranges: [range("16:00", "21:00")], allocations: [slot("16:00", "17:00")] });
+    expect(fitsSection(selection("19:00", "20:00"), target)).toBe(true);
+  });
+
+  it.each(FINISHED_STATUSES)("refuses every Selection for a section that is %s", (status) => {
+    expect(fitsSection(selection("10:00", "11:00"), section({ status, ranges: [range("10:00", "11:00")] }))).toBe(
+      false
+    );
+  });
+
   it("ignores the priority of a range", () => {
     const target = section({ ranges: [range("10:00", "11:00", Priority.Secondary)] });
 
@@ -365,6 +427,17 @@ describe("wantsInterval", () => {
   it("reads the priority filter", () => {
     expect(wantsInterval(selection("14:00", "15:00"), target, [Priority.Primary])).toBe(false);
     expect(wantsInterval(selection("14:00", "15:00"), target, [Priority.Secondary])).toBe(true);
+  });
+
+  it("is true for the free part of a range that already holds an Allocation", () => {
+    const partly = section({ ranges: [range("16:00", "21:00")], allocations: [slot("16:00", "17:00")] });
+    expect(wantsInterval(selection("19:00", "20:00"), partly)).toBe(true);
+  });
+
+  it.each(FINISHED_STATUSES)("is false for a section that is %s", (status) => {
+    expect(wantsInterval(selection("10:00", "11:00"), section({ status, ranges: [range("10:00", "11:00")] }))).toBe(
+      false
+    );
   });
 });
 

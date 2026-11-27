@@ -9,13 +9,18 @@ import type { VisibleHours, WeekdayInterval } from "@ui/components/WeeklyPattern
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { convertWeekday } from "ui/src/modules/conversion";
 import { formatTimeRange } from "ui/src/modules/date-utils";
-import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
+import { convertOptionToHDS, toNumber } from "ui/src/modules/helpers";
 import { fontMedium } from "ui/src/styled";
-import { ApplicationRoundStatusChoice, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import { ApplicationRoundStatusChoice } from "@gql/gql-types";
 import type { ApplicationSectionAllocationsQuery, ReservationUnitNode, Weekday } from "@gql/gql-types";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
-import { ALLOCATION_STEP_MINUTES, findBlockingAffecting, wantsInterval } from "./modules/allocationPattern";
+import {
+  ALLOCATION_STEP_MINUTES,
+  findBlockingAffecting,
+  findOverlapping,
+  wantsInterval,
+} from "./modules/allocationPattern";
 import type { AllocationSlot, PriorityFilter } from "./modules/allocationPattern";
 import { getBeginTimeOptions, getEndTimeOptions } from "./modules/applicationRoundAllocation";
 import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
@@ -313,21 +318,17 @@ function toSelectionCards({
 }): SelectionCardsData {
   const sections = applicationSections ?? [];
 
-  const allocated = filterNonNullable(
-    sections.map((section) => {
-      const allocations = section.reservationUnitOptions.flatMap((ruo) => ruo.allocatedTimeSlots);
-      // An Allocation takes the time the same way an Affecting Allocation does, so one rule answers both.
-      const allocatedTimeSlot = findBlockingAffecting(selection, allocations);
-      if (allocatedTimeSlot == null) {
-        return null;
-      }
-      return { key: section.pk, applicationSection: section, allocatedTimeSlot };
-    })
+  // A section can have more than one Allocation on the same day, so every Allocation the Selection overlaps gets
+  // its own card.
+  const allocated = sections.flatMap((section) =>
+    findOverlapping(
+      selection,
+      section.reservationUnitOptions.flatMap((ruo) => ruo.allocatedTimeSlots)
+    ).map((allocatedTimeSlot) => ({ key: allocatedTimeSlot.pk, applicationSection: section, allocatedTimeSlot }))
   );
 
-  // NOTE we show Handled for already allocated, but not for suitable that have already been allocated.
+  // A Handled or Rejected section wants no time, so only its Allocations get a card.
   const requested = sections
-    .filter((section) => section.status !== ApplicationSectionStatusChoice.Handled)
     .filter((section) => wantsInterval(selection, section, priorityFilter))
     .map((section) => ({
       key: section.pk,
